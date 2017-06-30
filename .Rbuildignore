@@ -1,0 +1,14 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+.*\.tar\.gz$
+.*\.toc$
+.*\.zip$
+^_ignore$
+^\.lintr$
+^\.travis\.yml$
+^appveyor\.yml$
+CONTRIBUTING\.md
+cran-comments\.md
+LICENSE
+vignettes/.*_cache$
+vignettes/.*\.log$
