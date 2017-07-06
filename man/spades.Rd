@@ -102,7 +102,7 @@ various \code{simList} slot components.
 See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details.
 }
 \examples{
-#' \dontrun{
+\dontrun{
 mySim <- simInit(
  times = list(start = 0.0, end = 2.0, timeunit = "year"),
  params = list(
@@ -136,7 +136,8 @@ for (i in 1:2) {
  )
  print(system.time(out <- spades(mySim, cache = TRUE)))
 }
-#' }
+}
+
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).

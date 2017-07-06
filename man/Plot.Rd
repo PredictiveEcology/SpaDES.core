@@ -48,8 +48,7 @@ by to plot rasters. See Details.}
 \item{size}{Numeric. The size, in points, for \code{SpatialPoints} symbols,
 if using a scalable symbol.}
 
-\item{cols}{(also \code{col}) Character vector or list of character vectors of colours.
-See details.}
+\item{cols}{(also \code{col}) Character vector or list of character vectors of colours. See details.}
 
 \item{col}{(also \code{cols}) Alternative to \code{cols} to be consistent with \code{plot}.
 \code{cols} takes precedence, if both are provided.}

@@ -107,9 +107,12 @@ test_that("test event-level cache", {
 
 test_that("test module-level cache", {
   library(igraph)
+  library(reproducible)
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
+    detach("package:reproducible")
+    detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 

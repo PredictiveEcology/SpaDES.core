@@ -3,6 +3,6 @@
 #' Environment used internally to store internal package objects and methods.
 #'
 #' @keywords internal
-#' @rdname spadesEnv
+#' @rdname pkgEnv
 #'
 .pkgEnv <- new.env(parent = emptyenv())

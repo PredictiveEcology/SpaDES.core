@@ -134,7 +134,7 @@ simulation via simInit. \code{modules}, \code{paths}, \code{params}, and \code{o
 are all needed for initialization.
 }
 \examples{
-#' \dontrun{
+\dontrun{
 mySim <- simInit(
  times = list(start = 0.0, end = 2.0, timeunit = "year"),
  params = list(
@@ -204,7 +204,8 @@ if (require(rgdal)) {
      stringsAsFactors = FALSE))
  all.equal(mySim, mySim2) # TRUE
 }
-#' }
+}
+
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
