@@ -6,7 +6,7 @@ if (!isGeneric("robustDigest")) {
   })
 }
 
-#' robustDigest for simList class objects
+#' robustDigest for \code{simList} class objects
 #'
 #' This is intended to be used within the \code{Cache} function, but can be
 #' used to evaluate what a \code{simList} would look like once it is

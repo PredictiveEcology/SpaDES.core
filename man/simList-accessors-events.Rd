@@ -86,7 +86,7 @@ Each event is represented by a \code{\link{data.table}} row consisting of:
  }
 }
 \seealso{
-\code{\link{SpaDES-core-package}}, specifically the section 1.2.6 on Simulation event queues.
+\code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.
 
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},

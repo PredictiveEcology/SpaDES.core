@@ -498,7 +498,7 @@ setMethod(
 #'
 #' @return Invisibly returns the modified \code{simList} object.
 #'
-#' @seealso \code{\link{simInit}}, \code{\link{SpaDES-core-package}}, \code{\link[reproducible]{Cache}}
+#' @seealso \code{\link{simInit}}, \code{\link{SpaDES.core-package}}, \code{\link[reproducible]{Cache}}
 #'
 #' @details
 #' The is the workhorse function in the SpaDES package. It runs simulations by

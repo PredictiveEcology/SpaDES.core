@@ -160,7 +160,7 @@ of the simulation:
 }
 }
 \seealso{
-\code{\link{SpaDES-core-package}}, specifically the section 1.2.5 on Simulation times.
+\code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
 
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},

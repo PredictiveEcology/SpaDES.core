@@ -145,7 +145,7 @@ Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{simInit}}, \code{\link{SpaDES-core-package}}, \code{\link[reproducible]{Cache}}
+\code{\link{simInit}}, \code{\link{SpaDES.core-package}}, \code{\link[reproducible]{Cache}}
 
 \code{\link{experiment}} for using replication with \code{spades}.
 }

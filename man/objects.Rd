@@ -65,7 +65,7 @@ allowing, e.g. \code{all.names=TRUE}
 the simulation envirment.
 }
 \seealso{
-\code{\link{SpaDES-core-package}}, specifically the section 1.2.1 on Simulation Parameters.
+\code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
 
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},

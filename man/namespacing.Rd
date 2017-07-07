@@ -9,7 +9,7 @@
 \alias{.callingFrameTimeunit}
 \alias{.callingFrameTimeunit,.simList-method}
 \alias{.callingFrameTimeunit,NULL-method}
-\title{Namespacing within SpaDES}
+\title{Namespacing within \code{SpaDES}}
 \usage{
 .callingModuleName(sim)
 
@@ -42,8 +42,6 @@ current module name. This latter will return the module that is in the current
 event queue, which will never be \code{NULL}.
 }
 \author{
-Eliot McIntire
-
 Eliot McIntire
 }
 \keyword{internal}

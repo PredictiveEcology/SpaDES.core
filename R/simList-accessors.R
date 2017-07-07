@@ -191,7 +191,7 @@ setMethod("ls.str",
 #'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.8 on simList environment.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.8 on simList environment.
 #'
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
@@ -255,7 +255,7 @@ setReplaceMethod("envir",
 #' @return Returns or sets a list of objects in the \code{simList} environment.
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.1 on Simulation Parameters.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -382,7 +382,7 @@ setReplaceMethod("$", signature(x = "simList", value = "ANY"),
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.7 on Modules and dependencies.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @export
 #' @include simList-class.R
@@ -467,7 +467,7 @@ setReplaceMethod("depends",
 })
 
 ################################################################################
-#' Namespacing within SpaDES
+#' Namespacing within \code{SpaDES}
 #'
 #' \code{.callingModuleName} returns the name of the module that is currently
 #' the active module calling functions like \code{scheduleEvent}.
@@ -478,19 +478,19 @@ setReplaceMethod("depends",
 #' event queue, which will never be \code{NULL}.
 #'
 #' @inheritParams modules
-#' @include simList-class.R
-#' @export
-#' @keywords internal
-#' @docType methods
-#' @rdname namespacing
+#'
 #' @author Eliot McIntire
+#' @export
+#' @docType methods
+#' @include simList-class.R
+#' @keywords internal
+#' @rdname namespacing
 #'
 setGeneric(".callingModuleName", function(sim) {
   standardGeneric(".callingModuleName")
 })
 
 #' @export
-#' @docType methods
 #' @rdname namespacing
 setMethod(
   ".callingModuleName",
@@ -510,18 +510,14 @@ setMethod(
     return(mod)
 })
 
-#' @inheritParams modules
-#' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname namespacing
-#' @author Eliot McIntire
 setGeneric("currentModule", function(sim) {
   standardGeneric("currentModule")
 })
 
-#' @rdname namespacing
 #' @export
+#' @rdname namespacing
 setMethod(
   "currentModule",
   signature = c(".simList"),
@@ -558,7 +554,7 @@ setMethod(
 #' Specifying the parameter name is <5% faster.
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.1 on Simulation parameters.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -708,7 +704,7 @@ setMethod(
 #' @rdname globals
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.1 on Simulation Parameters.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
 #'
 setGeneric("globals", function(sim) {
   standardGeneric("globals")
@@ -1102,7 +1098,7 @@ setReplaceMethod("progressType",
 #' in the \code{simList} object.
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.2 on loading and saving.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
@@ -1651,7 +1647,7 @@ setReplaceMethod(
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.4 on Simulation Paths.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
 #' @importFrom stats na.omit
@@ -1934,7 +1930,7 @@ setReplaceMethod(
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
 #' @family functions to access elements of a \code{simList} object
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.5 on Simulation times.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
 #'
 #' @export
 #' @include simList-class.R
@@ -2391,7 +2387,7 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @seealso \code{\link{SpaDES-core-package}}, specifically the section 1.2.6 on Simulation event queues.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.
 #'
 #' @aliases simList-accessors-events
 #' @docType methods

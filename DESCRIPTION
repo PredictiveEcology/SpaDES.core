@@ -13,9 +13,9 @@ URL:
 Date: 2017-07-07
 Version: 0.1.0
 Authors@R: c(
-    person(c("Alex", "M"), "Chubaty", email = "alexander.chubaty@canada.ca",
+    person("Alex M", "Chubaty", email = "alexander.chubaty@canada.ca",
     role = c("aut", "cre")),
-    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
+    person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
     role = c("aut")),
     person("Yong", "Luo", email = "yluo1@lakeheadu.ca",
     role = c("ctb")),

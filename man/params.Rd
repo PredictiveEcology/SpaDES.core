@@ -77,7 +77,7 @@ parameters(mySim)
 
 }
 \seealso{
-\code{\link{SpaDES-core-package}}, specifically the section 1.2.1 on Simulation parameters.
+\code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
 
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},

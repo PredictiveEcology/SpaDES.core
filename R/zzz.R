@@ -1,4 +1,4 @@
-#' @section 6 Package options:
+#' @section 10 Package options:
 #'
 #' \code{SpaDES} packages use the following \code{\link{options}} to configure behaviour:
 #'
@@ -35,10 +35,10 @@
 #'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
 #'
 #' }
-#' @docType package
-#' @name SpaDES-core-package
 #'
-NULL
+#' @rdname SpaDES.core-package
+#'
+"_PACKAGE"
 
 .onLoad <- function(libname, pkgname) {
   tmpdir <- file.path(tempdir(), "SpaDES")

@@ -3,7 +3,7 @@
 \docType{methods}
 \name{robustDigest,simList-method}
 \alias{robustDigest,simList-method}
-\title{robustDigest for simList class objects}
+\title{robustDigest for \code{simList} class objects}
 \usage{
 \S4method{robustDigest}{simList}(object, objects,
   compareRasterFileLength = 1e+06, algo = "xxhash64",

@@ -100,7 +100,7 @@ If no paths are specified, the defaults are as follows:
 }
 }
 \seealso{
-\code{\link{SpaDES-core-package}}, specifically the section 1.2.4 on Simulation Paths.
+\code{\link{SpaDES.core-package}}, specifically the section 1.2.4 on Simulation Paths.
 
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
