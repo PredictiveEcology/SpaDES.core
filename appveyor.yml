@@ -46,9 +46,9 @@ branches:
 clone_depth: 5
 
 build_script:
-  #- travis-tool.sh r_binary_install dplyr
   - travis-tool.sh r_github_packages PredictiveEcology/reproducible PredictiveEcology/quickPlot
   - travis-tool.sh install_deps
+  - travis-tool.sh r_install dplyr
 
 test_script:
   - travis-tool.sh run_tests
