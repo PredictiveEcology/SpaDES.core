@@ -26,6 +26,8 @@ matrix:
     before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
+    before_script:
+      - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
 
   - os: linux
     dist: trusty
@@ -38,6 +40,7 @@ matrix:
     before_install:
       - export DISPLAY=:99.0
       - sh -e /etc/init.d/xvfb start
+    before_script:
       - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
     after_success:
       - Rscript -e 'library(covr); coveralls(coverage = print(package_coverage(quiet = FALSE)))'
@@ -51,10 +54,11 @@ matrix:
         packages:
           - libgdal1-dev
           - libproj-dev
+    before_script:
+      - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
     before_install:
       - export DISPLAY=:99.0
       - sh -e /etc/init.d/xvfb start
-      - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
 
   - os: osx
     osx_image: xcode8
@@ -62,7 +66,7 @@ matrix:
     r_build_args: '--no-build-vignettes'
     r_check_args: '--as-cran --ignore-vignettes --no-examples'
     before_script:
-      - Rscript -e "install.packages('rgdal', type = 'source')"
+      - Rscript -e "install.packages(c('dplyr', 'rgdal'), type = 'source')"
 
 r_build_args: " "
 
