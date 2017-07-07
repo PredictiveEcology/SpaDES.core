@@ -1,87 +1,71 @@
-# Sample .travis.yml for R projects.
-#
-# See README.md for instructions, or for more configuration options,
-# see the wiki:
-#   https://github.com/craigcitro/r-travis/wiki
-
 sudo: required
-
 language: r
-
 cache: packages
-
 cran: https://cran.rstudio.com/
-
+env:
+  global:
+    secure: IhM9205qcY6H6Bld28reqoNjyWOc0DSS+XqHt3xW8vRmtCG2bH0OCQvt4P2xrKFT2spHy04DvRGICrTxg9xs7Fkm57Zk8r4N7bx0Nboa6mxyizuZAd5Y9litFoJ3lryB2j8Ovz6V/vC36gyn+N5RYT7z3f036FAg0+w84jy1yu8U6d/OQPnY2n6/hv1nTVLpkMwjIBFrWUBoz9HLr5MM7oukVAeRJ8Yk5nE3fAHjHsr434RTP3bID3EsDNLLOHJjccmlm++KNg0UFuxowAVFkQhIVP0xmdeWZVoR8eeUjg6Buo6KPkE+feiYtWz5ox5fLJd7P3EpQFfpBh75xOTho9lJt4Q8O+FcUv8AY+GEqiFMAAqQ8cB1OEnS1qP7m4nMn8/G/ZXLFum1T/covfKBFM4ZFD8e5d0FJOOxorXVr/lVk8ClVMm8/Doqtl+ja3wc0BUpsc5wWVBPBw0K/QV9Umi2qNcgZljCEiUvD1R8DMFtywMjapqaj9Sk14+fF8DnpCeHMJoRMbCmWOKRu/GtUKrdLT5fAJQdC1PONiUjYhy2PIP5kkK9Gln3m/FJhY087OUgbmSYfEBOn1xhn5KSEzpq5K+TCO2mGfBwbjKgZGYdcPMNWQk+bZ2Eu0W4epgpANRXADBn5FOqT2fvxKl4Lu/34nJU4q1qz8uLb0aYv6I=
 matrix:
   include:
-
   - os: linux
     dist: trusty
     r: oldrel
     addons:
       apt:
         packages:
-          - libgdal1-dev
-          - libproj-dev
+        - libgdal1-dev
+        - libproj-dev
     before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
     before_script:
-      - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
-
+    - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
   - os: linux
     dist: trusty
     r: release
     addons:
       apt:
         packages:
-          - libgdal1-dev
-          - libproj-dev
+        - libgdal1-dev
+        - libproj-dev
     before_install:
-      - export DISPLAY=:99.0
-      - sh -e /etc/init.d/xvfb start
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
     before_script:
-      - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
+    - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
     after_success:
-      - Rscript -e 'library(covr); coveralls(coverage = print(package_coverage(quiet = FALSE)))'
-      - Rscript -e 'library(lintr); lint_package()'
-
+    - Rscript -e 'library(covr); coveralls(coverage = print(package_coverage(quiet
+      = FALSE)))'
+    - Rscript -e 'library(lintr); lint_package()'
   - os: linux
     dist: trusty
     r: devel
     addons:
       apt:
         packages:
-          - libgdal1-dev
-          - libproj-dev
+        - libgdal1-dev
+        - libproj-dev
     before_script:
-      - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
+    - Rscript -e 'install.packages("dplyr", dependencies = TRUE)'
     before_install:
-      - export DISPLAY=:99.0
-      - sh -e /etc/init.d/xvfb start
-
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
   - os: osx
     osx_image: xcode8
     latex: false
-    r_build_args: '--no-build-vignettes'
-    r_check_args: '--as-cran --ignore-vignettes --no-examples'
+    r_build_args: "--no-build-vignettes"
+    r_check_args: "--as-cran --ignore-vignettes --no-examples"
     before_script:
-      - Rscript -e "install.packages(c('dplyr', 'rgdal'), type = 'source')"
-
+    - Rscript -e "install.packages(c('dplyr', 'rgdal'), type = 'source')"
 r_build_args: " "
-
 r_check_args: "--as-cran"
-
 warnings_are_errors: true
-
 notifications:
   email:
     on_success: change
     on_failure: change
-
 branches:
   only:
-    - master
-    - development
-    - testing
-
+  - master
+  - development
+  - testing
