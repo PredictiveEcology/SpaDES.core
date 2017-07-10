@@ -405,6 +405,45 @@
 #'   \code{fireSpread} \tab A simple model of a spatial spread process\cr
 #' }
 #'
+#' ------------------------------------------------------------------------------------------
+#' @section 10 Package options:
+#'
+#' \code{SpaDES} packages use the following \code{\link{options}} to configure behaviour:
+#'
+#' \itemize{
+#'   \item \code{spades.cachePath}: The default local directory in which to
+#'   cache simulation outputs.
+#'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
+#'
+#'   \item \code{spades.inputPath}: The default local directory in which to
+#'   look for simulation inputs.
+#'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs}).
+#'
+#'   \item \code{spades.lowMemory}: If true, some functions will use more memory
+#'     efficient (but slower) algorithms. Default \code{FALSE}.
+#'
+#'   \item \code{spades.modulePath}: The default local directory where modules
+#'     and data will be downloaded and stored.
+#'     Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/modules}).
+#'
+#'   \item \code{spades.moduleRepo}: The default GitHub repository to use when
+#'     downloading modules. Default \code{"PredictiveEcology/SpaDES-modules"}.
+#'
+#'   \item \code{spades.nCompleted}: The maximum number of completed events to
+#'     retain in the \code{completed} event queue. Default \code{1000L}.
+#'
+#'   \item \code{spades.outputPath}: The default local directory in which to
+#'   save simulation outputs.
+#'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
+#'
+#'   \item \code{spades.tolerance}: The default tolerance value used for floating
+#'     point number comparisons. Default \code{.Machine$double.eps^0.5}.
+#'
+#'   \item \code{spades.useragent}: The default user agent to use for downloading
+#'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
+#'
+#' }
+#'
 #' @rdname SpaDES.core-package
 #'
 "_PACKAGE"
