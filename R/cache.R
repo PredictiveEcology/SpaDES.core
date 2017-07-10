@@ -1,7 +1,7 @@
 if (!isGeneric("robustDigest")) {
   setGeneric("robustDigest", function(object, objects,
                                       compareRasterFileLength = 1e6,
-                                      algo = "xxhash64") {
+                                      algo = "xxhash64", classOptions = list()) {
     standardGeneric("robustDigest")
   })
 }
@@ -32,12 +32,14 @@ if (!isGeneric("robustDigest")) {
 setMethod(
   "robustDigest",
   signature = "simList",
-  definition = function(object, objects, compareRasterFileLength, algo, digestPathContent) {
+  definition = function(object, objects, compareRasterFileLength, algo,
+                        digestPathContent, classOptions) {
     allObjs <- ls(object@.envir, all.names = TRUE)
     objectsToDigest <- sort(allObjs, method = "radix")
     if (!missing(objects)) {
-      if (!is.null(objects))
+      if (!is.null(objects)) {
         objectsToDigest <- objectsToDigest[objectsToDigest %in% objects]
+      }
     }
 
     envirHash <- robustDigest(mget(objectsToDigest, envir = object@.envir))
@@ -65,15 +67,29 @@ setMethod(
     }
 
     # Sort the params and .list with dots first, to allow Linux and Windows to be compatible
+    if(!is.null(classOptions$params)) if(length(classOptions$params)) {
+      object@params <- list(classOptions$params)
+      names(object@params) <- classOptions$modules
+    }
+    if(!is.null(classOptions$modules)) if(length(classOptions$modules)) {
+      object@modules <- list(classOptions$modules)
+      object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+    }
     object@params <- lapply(object@params, function(x) sortDotsUnderscoreFirst(x))
     object@params <- sortDotsUnderscoreFirst(object@params)
 
     nonDotList <- grep(".list", slotNames(object), invert=TRUE, value=TRUE)
     obj <- list()
     obj$.list <- object@.list
+
     obj[nonDotList] <- lapply(nonDotList, function(x) {fastdigest(slot(object, x))})
+    if(!is.null(classOptions$events)) if(FALSE %in% classOptions$events) obj$events <- NULL
+    if(!is.null(classOptions$current)) if(FALSE %in% classOptions$current) obj$current <- NULL
+    if(!is.null(classOptions$completed)) if(FALSE %in% classOptions$completed) obj$completed <- NULL
+    if(!is.null(classOptions$simtimes)) if(FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
+
     obj
-})
+  })
 
 if (!isGeneric(".tagsByClass")) {
   setGeneric(".tagsByClass", function(object) {
@@ -113,7 +129,7 @@ setMethod(
       userTags <- NULL
     }
     userTags
-})
+  })
 
 if (!isGeneric(".cacheMessage")) {
   setGeneric(".cacheMessage", function(object, functionName) {
@@ -145,17 +161,17 @@ setMethod(
         })
 
         whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
-          if(isTRUE(useCacheVals[[whCurrent]])) {
-            cat("Using cached copy of", cur$moduleName, "module\n")
-          } else {
-            cat("Using cached copy of", cur$eventType, "event in", cur$moduleName, "module\n")
-          }
+        if(isTRUE(useCacheVals[[whCurrent]])) {
+          cat("Using cached copy of", cur$moduleName, "module\n")
+        } else {
+          cat("Using cached copy of", cur$eventType, "event in", cur$moduleName, "module\n")
         }
+      }
 
     } else {
       .cacheMessage(NULL, functionName)
     }
-})
+  })
 
 #########################################################
 if (!isGeneric(".checkCacheRepo")) {
@@ -194,7 +210,7 @@ setMethod(
       }
     }
     checkPath(path = cacheRepo, create=create)
-})
+  })
 
 if (!isGeneric(".prepareOutput")) {
   setGeneric(".prepareOutput", function(object) {
@@ -219,30 +235,66 @@ setMethod(
   ".prepareOutput",
   signature = "simList",
   definition = function(object, cacheRepo, ...) {
-      tmpl <- list(...)
-      whSimList <- which(unlist(lapply(tmpl, is, "simList")))
-      origEnv <- tmpl[[whSimList[1]]]@.envir
-      isListOfSimLists <- if (is.list(object)) {
-        if (is(object[[1]], "simList")) TRUE else FALSE
-      } else {
-        FALSE
-      }
+    tmpl <- list(...)
+    whSimList <- which(unlist(lapply(tmpl, is, "simList")))
+    origEnv <- tmpl[[whSimList[1]]]@.envir
+    isListOfSimLists <- if (is.list(object)) {
+      if (is(object[[1]], "simList")) TRUE else FALSE
+    } else {
+      FALSE
+    }
 
-      if (isListOfSimLists) {
-        for (i in seq_along(object)) {
-          keepFromOrig <- !(ls(origEnv, all.names = TRUE) %in% ls(object[[i]]@.envir, all.names = TRUE))
-          # list2env(mget(ls(origEnv, all.names = TRUE)[keepFromOrig], envir = origEnv),
-          #          envir = object[[i]]@.envir)
-          list2env(mget(ls(origEnv, all.names = TRUE)[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
-                   envir = object[[i]]@.envir)
-        }
-      } else {
-        keepFromOrig <- !(ls(origEnv, all.names = TRUE) %in% ls(object@.envir, all.names = TRUE))
-        list2env(mget(ls(origEnv, all.names = TRUE)[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
-                 envir = object@.envir)
-      }
+    if (isListOfSimLists) {
+      for (i in seq_along(object)) {
+        keepFromOrig <- !(ls(origEnv, all.names = TRUE) %in% ls(object[[i]]@.envir, all.names = TRUE))
+        # list2env(mget(ls(origEnv, all.names = TRUE)[keepFromOrig], envir = origEnv),
+        #          envir = object[[i]]@.envir)
+        list2env(mget(ls(origEnv, all.names = TRUE)[keepFromOrig], envir=tmpl[[whSimList]]@.envir),
+                 envir=object[[i]]@.envir)        }
+    } else {
+      keepFromOrig <- !(ls(origEnv, all.names = TRUE) %in% ls(object@.envir, all.names = TRUE))
+      list2env(mget(ls(origEnv, all.names = TRUE)[keepFromOrig], envir=tmpl[[whSimList]]@.envir),
+               envir=object@.envir)
+    }
+    if(!is.null(attr(object, "removedObjs"))) {
+      rm(list=attr(object, "removedObjs"), envir = object@.envir)
+    }
+
     return(object)
-})
+  })
+
+
+
+
+if (!isGeneric(".preDigestByClass")) {
+  setGeneric(".preDigestByClass", function(object) {
+    standardGeneric(".preDigestByClass")
+  })
+}
+
+##########################################
+#' Pre digesting method for \code{simList}
+#'
+#' Takes a snapshot of simList objects.
+#'
+#' See \code{\link[reproducible]{.preDigestByClass}}.
+#'
+#' @importFrom reproducible .preDigestByClass
+#' @importMethodsFrom reproducible .preDigestByClass
+#' @inheritParams reproducible::.preDigestByClass
+#' @include simList-class.R
+#' @seealso \code{\link[reproducible]{.preDigestByClass}}
+#' @exportMethod .preDigestByClass
+#' @export
+#' @rdname preDigestByClass
+setMethod(
+  ".preDigestByClass",
+  signature = "simList",
+  definition = function(object) {
+    obj <- ls(object@.envir, all.names=TRUE)
+    return(obj)
+  })
+
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -269,12 +321,12 @@ if (!isGeneric(".addTagsToOutput")) {
 setMethod(
   ".addTagsToOutput",
   signature = "simList",
-  definition = function(object, outputObjects, FUN) {
+  definition = function(object, outputObjects, FUN, preDigestByClass) {
     if (!is.null(outputObjects)) {
       outputToSave <- object
       outputToSave@.envir <- new.env()
       # Some objects are conditionally produced from a module's outputObject
-      whExist <- outputObjects %in% ls(object@.envir, all.names = TRUE)
+      whExist <- outputObjects %in% ls(object@.envir, all.names=TRUE)
       list2env(mget(outputObjects[whExist], envir = object@.envir), envir = outputToSave@.envir)
       attr(outputToSave, "tags") <- attr(object, "tags")
       attr(outputToSave, "call") <- attr(object, "call")
@@ -283,8 +335,16 @@ setMethod(
     } else {
       outputToSave <- object
     }
+
+    # Some objects are removed from a simList
+    if(!is.null(preDigestByClass)) {
+      lsInObj <- ls(object@.envir, all.names=TRUE)
+      removedObjs <- unlist(preDigestByClass)[!(unlist(preDigestByClass) %in% lsInObj)]
+      attr(outputToSave, "removedObjs") <- removedObjs
+    }
+
     outputToSave
-})
+  })
 
 if (!isGeneric(".objSizeInclEnviros")) {
   setGeneric(".objSizeInclEnviros", function(object) {
@@ -309,4 +369,4 @@ setMethod(
   signature = "simList",
   definition = function(object) {
     object.size(as.list(object@.envir, all.names = TRUE)) + object.size(object)
-})
+  })
