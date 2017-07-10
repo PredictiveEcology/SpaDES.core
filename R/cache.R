@@ -1,8 +1,8 @@
 if (!isGeneric("robustDigest")) {
-  setGeneric("robustDigest", function(object, objects,
-                                      compareRasterFileLength = 1e6,
-                                      algo = "xxhash64") {
-    standardGeneric("robustDigest")
+  setGeneric(
+    "robustDigest",
+    function(object, objects, compareRasterFileLength = 1e6, algo = "xxhash64") {
+      standardGeneric("robustDigest")
   })
 }
 
