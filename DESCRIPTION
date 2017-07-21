@@ -5,12 +5,12 @@ Description: Provide the core discrete event simulation (DES) framework for
     implementing spatially explicit simulation models. The core DES components 
     facilitate modularity, and easily enable the user to include additional
     functionality by running user-built simulation modules. This code was split
-    from the 'SpaDES' package in June 2017. Plotting functionality is provided
+    from the 'SpaDES' package in July 2017. Plotting functionality is provided
     by 'quickPlot'.
 URL:
     http://spades.predictiveecology.org,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2017-07-07
+Date: 2017-07-21
 Version: 0.1.0
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alexander.chubaty@canada.ca",
@@ -73,7 +73,6 @@ Remotes:
     PredictiveEcology/reproducible,
     PredictiveEcology/quickPlot,
     PredictiveEcology/SpaDES.tools,
-    MangoTheCat/visualTest
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
