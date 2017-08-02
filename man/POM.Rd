@@ -36,6 +36,11 @@ followed by a derivation of a value that can be minimized
 but the \code{optimizer}. It must have, as first argument, the
 values for the parameters. See example.}
 
+\item{cl}{A cluster object. Optional. This would generally be created using
+parallel::makeCluster or equivalent. This is an alternative way, instead
+of \code{beginCluster()}, to use parallelism for this function, allowing for
+more control over cluster use.}
+
 \item{optimizer}{The function to use to optimize. Default is \code{"DEoptim"}.
 Currently it can also be \code{"optim"} or \code{"rgenoud"},
 which use \code{stats::optim} or \code{rgenoud::genoud}, respectively.

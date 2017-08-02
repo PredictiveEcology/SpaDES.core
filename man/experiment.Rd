@@ -58,6 +58,11 @@ If \code{Sys.time()} is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
 Ignored if \code{cache} is \code{FALSE}.}
 
+\item{cl}{A cluster object. Optional. This would generally be created using
+parallel::makeCluster or equivalent. This is an alternative way, instead
+of \code{beginCluster()}, to use parallelism for this function, allowing for
+more control over cluster use.}
+
 \item{...}{Passed to \code{spades}. Specifically, \code{debug}, \code{.plotInitialTime},
 \code{.saveInitialTime}, \code{cache} and/or \code{notOlderThan}. Caching
 is still experimental. It is tested to work under some conditions, but not

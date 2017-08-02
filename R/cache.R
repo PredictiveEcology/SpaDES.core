@@ -1,36 +1,37 @@
-if (!isGeneric("robustDigest")) {
+if (!isGeneric(".robustDigest")) {
   setGeneric(
-    "robustDigest",
+    ".robustDigest",
     function(object, objects, compareRasterFileLength = 1e6, algo = "xxhash64") {
-      standardGeneric("robustDigest")
+      standardGeneric(".robustDigest")
   })
 }
 
-#' robustDigest for \code{simList} class objects
+#' \code{.robustDigest} for \code{simList} class objects
 #'
 #' This is intended to be used within the \code{Cache} function, but can be
 #' used to evaluate what a \code{simList} would look like once it is
 #' converted to a repeatably digestible object.
 #'
-#' See \code{\link[reproducible]{robustDigest}}. This method strips out stuff
+#' See \code{\link[reproducible]{.robustDigest}}. This method strips out stuff
 #' from a simList class object that would make it otherwise not
 #' reproducibly digestible between sessions, operating systems,
 #' or machines. This will likely still not allow identical digest
 #' results across R versions.
 #'
-#' @inheritParams reproducible::robustDigest
+#' @inheritParams reproducible::.robustDigest
 #'
 #' @author Eliot Mcintire
 #' @docType methods
-#' @exportMethod robustDigest
+#' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
-#' @importFrom reproducible asPath robustDigest .sortDotsUnderscoreFirst
-#' @importMethodsFrom reproducible robustDigest
+#' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst
+#' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{robustDigest}}
+#' @rdname robustDigest
+#' @seealso \code{\link[reproducible]{.robustDigest}}
 #'
 setMethod(
-  "robustDigest",
+  ".robustDigest",
   signature = "simList",
   definition = function(object, objects, compareRasterFileLength, algo,
                         digestPathContent, classOptions) {
@@ -42,7 +43,7 @@ setMethod(
       }
     }
 
-    envirHash <- robustDigest(mget(objectsToDigest, envir = object@.envir))
+    envirHash <- .robustDigest(mget(objectsToDigest, envir = object@.envir))
 
     # Copy all parts except environment, clear that, then convert to list
     object <- Copy(object, objects = FALSE, queues = FALSE)
@@ -53,21 +54,26 @@ setMethod(
 
     # Remove paths as they are system dependent and not relevant for digest
     #  i.e., if the same file is located in a different place, that is ok
-    object@paths <- robustDigest(lapply(object@paths, asPath), digestPathContent = digestPathContent)
-    object@outputs$file <- basename(object@outputs$file) # don't cache contents of output because file may already exist
-    object@inputs$file <- unlist(robustDigest(object@inputs$file))
+    object@paths <- .robustDigest(lapply(object@paths, asPath),
+                                  digestPathContent = digestPathContent)
+
+    # don't cache contents of output because file may already exist
+    object@outputs$file <- basename(object@outputs$file)
+    object@inputs$file <- unlist(.robustDigest(object@inputs$file))
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
-        object@depends@dependencies[[i]] <- lapply(slotNames(object@depends@dependencies[[i]]), function(x)
-          slot(object@depends@dependencies[[i]],x))
+        object@depends@dependencies[[i]] <- lapply(
+          slotNames(object@depends@dependencies[[i]]), function(x) {
+          slot(object@depends@dependencies[[i]],x)
+        })
         names(object@depends@dependencies[[i]]) <- slotNames(deps[[i]])
         object@depends@dependencies[[i]][["timeframe"]] <- as.Date(deps[[i]]@timeframe)
       }
     }
 
     # Sort the params and .list with dots first, to allow Linux and Windows to be compatible
-    if(!is.null(classOptions$params)) if(length(classOptions$params)) {
+    if (!is.null(classOptions$params)) if (length(classOptions$params)) {
       object@params <- list(classOptions$params)
       names(object@params) <- classOptions$modules
     }
