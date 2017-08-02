@@ -24,7 +24,7 @@ if (!isGeneric("robustDigest")) {
 #' @docType methods
 #' @exportMethod robustDigest
 #' @importFrom fastdigest fastdigest
-#' @importFrom reproducible asPath robustDigest sortDotsUnderscoreFirst
+#' @importFrom reproducible asPath robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible robustDigest
 #' @include simList-class.R
 #' @seealso \code{\link[reproducible]{robustDigest}}
@@ -71,22 +71,26 @@ setMethod(
       object@params <- list(classOptions$params)
       names(object@params) <- classOptions$modules
     }
-    if(!is.null(classOptions$modules)) if(length(classOptions$modules)) {
+    if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
     }
-    object@params <- lapply(object@params, function(x) sortDotsUnderscoreFirst(x))
-    object@params <- sortDotsUnderscoreFirst(object@params)
+    object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
+    object@params <- .sortDotsUnderscoreFirst(object@params)
 
-    nonDotList <- grep(".list", slotNames(object), invert=TRUE, value=TRUE)
+    nonDotList <- grep(".list", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
     obj$.list <- object@.list
 
     obj[nonDotList] <- lapply(nonDotList, function(x) {fastdigest(slot(object, x))})
-    if(!is.null(classOptions$events)) if(FALSE %in% classOptions$events) obj$events <- NULL
-    if(!is.null(classOptions$current)) if(FALSE %in% classOptions$current) obj$current <- NULL
-    if(!is.null(classOptions$completed)) if(FALSE %in% classOptions$completed) obj$completed <- NULL
-    if(!is.null(classOptions$simtimes)) if(FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
+    if (!is.null(classOptions$events))
+      if (FALSE %in% classOptions$events) obj$events <- NULL
+    if (!is.null(classOptions$current))
+      if (FALSE %in% classOptions$current) obj$current <- NULL
+    if (!is.null(classOptions$completed))
+      if (FALSE %in% classOptions$completed) obj$completed <- NULL
+    if (!is.null(classOptions$simtimes))
+      if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
 
     obj
   })
@@ -262,7 +266,7 @@ setMethod(
       object2 <- Copy(list(...)[[whSimList]], objects = FALSE)
       object2@.envir <- object@.envir
       if(NROW(current(object2))==0) { # this is usually a spades call
-        object2@events <- object@events 
+        object2@events <- object@events
       } else {
         if(!isTRUE(all.equal(object@events, object2@events))) # if this is FALSE, it means that events were added by the event
           object2@events <- unique(rbindlist(list(object@events, object2@events)))
