@@ -8,7 +8,7 @@
 \S4method{Copy}{simList}(object, objects, queues)
 }
 \arguments{
-\item{object}{An R object (likely containing environments) or an environment}
+\item{object}{An R object (likely containing environments) or an environment.}
 
 \item{objects}{Whether the objects contained within the simList environment
 should be copied. Default = TRUE, which may be slow.}

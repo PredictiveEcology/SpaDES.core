@@ -271,29 +271,26 @@ setMethod(
       # need to keep the list(...) slots ... i.e., Caching of simLists is mostly about objects in .envir
       object2 <- Copy(list(...)[[whSimList]], objects = FALSE)
       object2@.envir <- object@.envir
-      if(NROW(current(object2))==0) { # this is usually a spades call
+      if (NROW(current(object2)) == 0) { # this is usually a spades call
         object2@events <- object@events
       } else {
-        if(!isTRUE(all.equal(object@events, object2@events))) # if this is FALSE, it means that events were added by the event
+        # if this is FALSE, it means that events were added by the event
+        if (!isTRUE(all.equal(object@events, object2@events)))
           object2@events <- unique(rbindlist(list(object@events, object2@events)))
       }
 
       lsOrigEnv <- ls(origEnv, all.names = TRUE)
       keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
-      list2env(mget(lsOrigEnv[keepFromOrig], envir=origEnv),
-               envir=object2@.envir)
+      list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
     }
-    if(!is.null(attr(object, "removedObjs"))) {
-      if(length(attr(object, "removedObjs"))) {
-        rm(list=attr(object, "removedObjs"), envir = object2@.envir)
+    if (!is.null(attr(object, "removedObjs"))) {
+      if (length(attr(object, "removedObjs"))) {
+        rm(list = attr(object, "removedObjs"), envir = object2@.envir)
       }
     }
 
     return(object2)
-  })
-
-
-
+})
 
 if (!isGeneric(".preDigestByClass")) {
   setGeneric(".preDigestByClass", function(object) {
@@ -301,29 +298,29 @@ if (!isGeneric(".preDigestByClass")) {
   })
 }
 
-##########################################
-#' Pre digesting method for \code{simList}
+################################################################################
+#' Pre-digesting method for \code{simList}
 #'
 #' Takes a snapshot of simList objects.
 #'
 #' See \code{\link[reproducible]{.preDigestByClass}}.
 #'
+#' @author Eliot McIntire
+#' @export
+#' @exportMethod .preDigestByClass
 #' @importFrom reproducible .preDigestByClass
 #' @importMethodsFrom reproducible .preDigestByClass
 #' @inheritParams reproducible::.preDigestByClass
 #' @include simList-class.R
 #' @seealso \code{\link[reproducible]{.preDigestByClass}}
-#' @exportMethod .preDigestByClass
-#' @export
 #' @rdname preDigestByClass
 setMethod(
   ".preDigestByClass",
   signature = "simList",
   definition = function(object) {
-    obj <- ls(object@.envir, all.names=TRUE)
+    obj <- ls(object@.envir, all.names = TRUE)
     return(obj)
-  })
-
+})
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -355,7 +352,7 @@ setMethod(
       outputToSave <- object
       outputToSave@.envir <- new.env()
       # Some objects are conditionally produced from a module's outputObject
-      whExist <- outputObjects %in% ls(object@.envir, all.names=TRUE)
+      whExist <- outputObjects %in% ls(object@.envir, all.names = TRUE)
       list2env(mget(outputObjects[whExist], envir = object@.envir), envir = outputToSave@.envir)
       attr(outputToSave, "tags") <- attr(object, "tags")
       attr(outputToSave, "call") <- attr(object, "call")
@@ -366,14 +363,14 @@ setMethod(
     }
 
     # Some objects are removed from a simList
-    if(!is.null(preDigestByClass)) {
-      lsInObj <- ls(object@.envir, all.names=TRUE)
+    if (!is.null(preDigestByClass)) {
+      lsInObj <- ls(object@.envir, all.names = TRUE)
       removedObjs <- unlist(preDigestByClass)[!(unlist(preDigestByClass) %in% lsInObj)]
       attr(outputToSave, "removedObjs") <- removedObjs
     }
 
     outputToSave
-  })
+})
 
 if (!isGeneric(".objSizeInclEnviros")) {
   setGeneric(".objSizeInclEnviros", function(object) {
@@ -398,4 +395,4 @@ setMethod(
   signature = "simList",
   definition = function(object) {
     object.size(as.list(object@.envir, all.names = TRUE)) + object.size(object)
-  })
+})
