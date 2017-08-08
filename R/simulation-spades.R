@@ -391,16 +391,43 @@ setMethod(
         } else {
           # This is faster than rbindlist below. So, use for smaller event queues
           if (nrowEvnts < .lengthEventsDT) {
-            for (i in 1:.numColsEventList) {
-              set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
-            }
+
+             #for speed -- the special case where there are only one event in the queue
+             if (nrowEvnts == 1L) {
+               if(eventTimeInSeconds<sim@events[[1]][1]) {
+                 for (i in 1:.numColsEventList) {
+                   set(.eventsDT[[nrowEvnts + 2]], , i, c(newEvent[[i]], sim@events[[i]]))
+                 }
+               } else {
+                 for (i in 1:.numColsEventList) {
+                   set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
+                 }
+
+               }
+             } else {
+              for (i in 1:.numColsEventList) {
+                set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
+              }
+             }
+
             sim@events <- .eventsDT[[nrowEvnts + 2]]
           } else {
             sim@events <- rbindlist(list(sim@events, newEvent))
           }
-        }
-        setkey(sim@events, "eventTime", "eventPriority")
 
+          # only sort if new event is not already at the end
+          needSort <- TRUE
+
+          if(eventTimeInSeconds>sim@events[[1]][nrowEvnts]) {
+            needSort <- FALSE
+          } else if (eventTimeInSeconds==sim@events[[1]][nrowEvnts] & eventPriority>=sim@events[[4]][nrowEvnts]){
+            needSort <- FALSE
+          }
+          if(needSort) {
+              num <<- num + 1
+              setkey(sim@events, "eventTime", "eventPriority")
+          }
+        }
       }
     } else {
       warning(
