@@ -263,6 +263,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
 test_that("simulation runs with simInit with duplicate modules named", {
   skip("benchmarking DES")
 
+  library(dplyr)
+
   tmpdir <- file.path(tempdir(), "testBenchmarking")
   checkPath(tmpdir, create = TRUE)
   setwd(tmpdir)
@@ -271,7 +273,6 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
   sim <- simInit()
 
-  library(dplyr)
   cat(file = file.path(tmpdir, "test", "test.R"),'
   defineModule(sim, list(
     name = "test",
@@ -289,10 +290,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
     parameters = rbind(
     ),
     inputObjects = bind_rows(
-      expectsInput(objectName = NA, objectClass = NA, desc = NA, sourceURL = NA)
     ),
     outputObjects = bind_rows(
-      createsOutput(objectName = NA, objectClass = NA, desc = NA)
     )
   ))
 
@@ -330,5 +329,6 @@ test_that("simulation runs with simInit with duplicate modules named", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    objects = objects, paths = paths)
 
+  # was 10.2 seconds -- currently 6.4 seconds or so
   system.time({spades(mySim, debug = FALSE)})
 })
