@@ -31,6 +31,7 @@
 #' @include environment.R
 #' @include priority.R
 #' @importFrom R.utils isAbsolutePath
+#' @importFrom quickPlot .objectNames
 #' @importFrom reproducible checkPath
 #' @export
 #' @docType methods
@@ -115,9 +116,9 @@ checkpointLoad <- function(file) {
   #fobj <- paste0(f, "_objs", ".RData")
 
   tmpEnv <- new.env()
-  assign(objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
+  assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
-  saveSimList(objectNames("spades", "simList", "sim")[[1]]$objs,
+  saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
               filename = file, keepFileBackedAsIs = TRUE, envir = tmpEnv)
 
   #save(list = ls(tmpEnv, all.names = TRUE), file = file, envir = tmpEnv)

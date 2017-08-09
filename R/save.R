@@ -209,7 +209,7 @@ saveFiles <- function(sim) {
 #' @inheritParams base::save
 #'
 #' @inheritParams spades
-#' @importFrom reproducible prepareFileBackedRaster
+#' @importFrom reproducible .prepareFileBackedRaster
 #'
 #' @param filename Character string with the path for saving \code{simList}
 #'
@@ -232,7 +232,7 @@ saveSimList <- function(sim, filename, keepFileBackedAsIs, envir = parent.frame(
   if (any(isRaster)) {
     if (keepFileBackedAsIs) {
       for (x in names(isRaster)[isRaster])
-        sim[[x]] <- prepareFileBackedRaster(sim[[x]], repoDir = dirname(filename))
+        sim[[x]] <- .prepareFileBackedRaster(sim[[x]], repoDir = dirname(filename))
     } else {
       for (x in names(isRaster)[isRaster])
         sim[[x]][] <- sim[[x]][]

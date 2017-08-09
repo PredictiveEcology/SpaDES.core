@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.preDigestByClass,simList-method}
 \alias{.preDigestByClass,simList-method}
-\title{Pre digesting method for \code{simList}}
+\title{Pre-digesting method for \code{simList}}
 \usage{
 \S4method{.preDigestByClass}{simList}(object)
 }
@@ -18,4 +18,7 @@ See \code{\link[reproducible]{.preDigestByClass}}.
 }
 \seealso{
 \code{\link[reproducible]{.preDigestByClass}}
+}
+\author{
+Eliot McIntire
 }

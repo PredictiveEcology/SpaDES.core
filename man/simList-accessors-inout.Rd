@@ -220,7 +220,7 @@ simOut$test
 allTifs <- dir(system.file("maps", package = "quickPlot"),
                full.names = TRUE, pattern = "tif")
 
-# next: objectNames are taken from the filenames (without the extension)
+# next: .objectNames are taken from the filenames (without the extension)
 # This will load all 5 tifs in the SpaDES sample directory, using
 #   the raster fuction in the raster package, all at time = 0
 if (require("rgdal", quietly = TRUE)) {

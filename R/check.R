@@ -78,7 +78,7 @@ setMethod(
     if (exists(name, envir = sim@.envir)) {
       return(invisible(TRUE))
     } else {
-      simName <- objectNames("spades", "simList", "sim")[[1]]$objs
+      simName <- .objectNames("spades", "simList", "sim")[[1]]$objs
       message(paste(name, "does not exist in", simName))
       return(FALSE)
     }
