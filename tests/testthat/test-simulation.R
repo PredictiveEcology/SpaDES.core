@@ -258,3 +258,77 @@ test_that("simulation runs with simInit with duplicate modules named", {
   expect_true(length(modules(mySim)) != length(modules))
   expect_true(length(modules(mySim)) == length(unique(modules)))
 })
+
+
+test_that("simulation runs with simInit with duplicate modules named", {
+  skip("benchmarking DES")
+
+  tmpdir <- file.path(tempdir(), "testBenchmarking")
+  checkPath(tmpdir, create = TRUE)
+  setwd(tmpdir)
+  on.exit(unlink(tmpdir, force = TRUE, recursive = TRUE))
+  newModule("test", tmpdir)
+
+  sim <- simInit()
+
+  library(dplyr)
+  cat(file = file.path(tmpdir, "test", "test.R"),'
+  defineModule(sim, list(
+    name = "test",
+    description = "insert module description here",
+    keywords = c("insert key words here"),
+    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+    childModules = character(0),
+    version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+    spatialExtent = raster::extent(rep(NA_real_, 4)),
+    timeframe = as.POSIXlt(c(NA, NA)),
+    timeunit = "year",
+    citation = list("citation.bib"),
+    documentation = list("README.txt", "test.Rmd"),
+    reqdPkgs = list(),
+    parameters = rbind(
+    ),
+    inputObjects = bind_rows(
+      expectsInput(objectName = NA, objectClass = NA, desc = NA, sourceURL = NA)
+    ),
+    outputObjects = bind_rows(
+      createsOutput(objectName = NA, objectClass = NA, desc = NA)
+    )
+  ))
+
+  doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+    switch(
+      eventType,
+      init = {
+        sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+      },
+      event1 = {
+        sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+      })
+    return(invisible(sim))
+  }
+  ', fill = TRUE)
+
+  library(igraph)
+
+  moduleDir <- file.path(tmpdir)
+  inputDir <- file.path(moduleDir, "inputs") %>% reproducible::checkPath(create = TRUE)
+  outputDir <- file.path(moduleDir, "outputs")
+  cacheDir <- file.path(outputDir, "cache")
+  times <- list(start = 0, end = 5000)
+  parameters <- list(
+  )
+  modules <- list("test")
+  objects <- list()
+  paths <- list(
+    cachePath = cacheDir,
+    modulePath = moduleDir,
+    inputPath = inputDir,
+    outputPath = outputDir
+  )
+
+  mySim <- simInit(times = times, params = parameters, modules = modules,
+                   objects = objects, paths = paths)
+
+  system.time({spades(mySim, debug = FALSE)})
+})

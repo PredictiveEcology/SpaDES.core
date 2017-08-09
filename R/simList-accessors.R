@@ -404,7 +404,7 @@ setMethod(
     if (hidden) {
       mods <- sim@modules
     } else {
-      hiddenMods <- unlist(sim@modules) %in% (.coreModules() %>% unname() %>% unlist())
+      hiddenMods <- unlist(sim@modules) %in% (.pkgEnv$.coreModules %>% unlist())
       mods <- sim@modules[!hiddenMods]
     }
     return(mods)
@@ -2038,11 +2038,11 @@ setMethod(
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
-        t <- convertTimeunit(x@simtimes$current, unit, x@.envir)
+        t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir)
         return(t)
       }
     }
-    t <- x@simtimes$current
+    t <- x@simtimes[["current"]]
     return(t)
 })
 
@@ -2222,9 +2222,14 @@ setMethod(
   ".callingFrameTimeunit",
   signature = c(".simList"),
   definition = function(x) {
-    mod <- x@current$moduleName
+    mod <- x@current[["moduleName"]]
     out <- if (length(mod) > 0) {
-      timeunits(x)[[mod]]
+      if(!is.null(x@.envir$.timeunits)) {
+        x@.envir$.timeunits[[mod]]
+      } else {
+        timeunits(x)[[mod]]
+      }
+
     } else {
       x@simtimes[["timeunit"]]
     }
@@ -2282,7 +2287,7 @@ setGeneric("timeunit", function(x) {
 setMethod("timeunit",
           signature = ".simList",
           definition = function(x) {
-            return(x@simtimes$timeunit)
+            return(x@simtimes[["timeunit"]])
 })
 
 #' @export
