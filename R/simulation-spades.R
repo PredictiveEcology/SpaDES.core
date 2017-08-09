@@ -415,16 +415,16 @@ setMethod(
             sim@events <- rbindlist(list(sim@events, newEvent))
           }
 
-          # only sort if new event is not already at the end
           needSort <- TRUE
-
+          # only sort if new event is not already at the end
           if(eventTimeInSeconds>sim@events[[1]][nrowEvnts]) {
             needSort <- FALSE
           } else if (eventTimeInSeconds==sim@events[[1]][nrowEvnts] & eventPriority>=sim@events[[4]][nrowEvnts]){
             needSort <- FALSE
           }
+
           if(needSort) {
-              num <<- num + 1
+              #num <<- num + 1
               setkey(sim@events, "eventTime", "eventPriority")
           }
         }
