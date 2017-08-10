@@ -2011,6 +2011,7 @@ setReplaceMethod(
 #' @export
 #' @docType methods
 #' @rdname simList-accessors-times
+#' @importFrom stats time
 time..simList <-
     function(x, unit) {
     if(missing(unit)) {

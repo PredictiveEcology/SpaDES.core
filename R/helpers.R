@@ -251,7 +251,8 @@ setMethod(
   }
 }
 
-.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|base|methods|utils|graphics|datasets|stats"
+
+.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats"
 
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
 .pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)], paste0("package:",.pkgEnv$corePackagesVec[-(1:2)]))
