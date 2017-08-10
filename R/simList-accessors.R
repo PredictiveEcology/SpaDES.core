@@ -2011,30 +2011,15 @@ setReplaceMethod(
 #' @export
 #' @docType methods
 #' @rdname simList-accessors-times
-setGeneric("time", function(x, unit, ...) {
-  stats::time(x, ...)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "time",
-  signature = c(".simList", "missing"),
-  definition = function(x) {
-    mUnit <- .callingFrameTimeunit(x)
-    if (is.null(mUnit)) {
-      mUnit <- NA_character_
+time..simList <-
+    function(x, unit) {
+    if(missing(unit)) {
+      mUnit <- .callingFrameTimeunit(x)
+      if (is.null(mUnit)) {
+        mUnit <- NA_character_
+      }
+      unit <- mUnit
     }
-    t <- time(x, mUnit)
-    return(t)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "time",
-  signature = c(".simList", "character"),
-  definition = function(x, unit) {
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
@@ -2044,7 +2029,10 @@ setMethod(
     }
     t <- x@simtimes[["current"]]
     return(t)
-})
+    #t <- time(x, mUnit)
+    #return(t)
+}
+
 
 #' @export
 #' @rdname simList-accessors-times
@@ -2210,42 +2198,22 @@ setReplaceMethod(
 #' @docType methods
 #' @keywords internal
 #' @rdname namespacing
-#'
-setGeneric(".callingFrameTimeunit", function(x) {
-  standardGeneric(".callingFrameTimeunit")
-})
-
-#' @export
-#' @docType methods
-#' @rdname namespacing
-setMethod(
-  ".callingFrameTimeunit",
-  signature = c(".simList"),
-  definition = function(x) {
-    mod <- x@current[["moduleName"]]
-    out <- if (length(mod) > 0) {
-      if(!is.null(x@.envir$.timeunits)) {
-        x@.envir$.timeunits[[mod]]
-      } else {
-        timeunits(x)[[mod]]
-      }
-
+.callingFrameTimeunit <- function(x) {
+  if(is.null(x)) return(NULL)
+  #if(!is(x, ".simList")) stop("x must be a .simList")
+  mod <- x@current[["moduleName"]]
+  out <- if (length(mod) > 0) {
+    if(!is.null(x@.envir$.timeunits)) {
+      x@.envir$.timeunits[[mod]]
     } else {
-      x@simtimes[["timeunit"]]
+      timeunits(x)[[mod]]
     }
-    return(out)
-})
 
-#' @export
-#' @docType methods
-#' @rdname namespacing
-#'
-setMethod(
-  ".callingFrameTimeunit",
-  signature = c("NULL"),
-  definition = function(x) {
-    return(NULL)
-})
+  } else {
+    x@simtimes[["timeunit"]]
+  }
+  return(out)
+}
 
 ################################################################################
 #' @inheritParams times

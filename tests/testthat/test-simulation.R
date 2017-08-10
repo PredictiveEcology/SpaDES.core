@@ -330,5 +330,6 @@ test_that("simulation runs with simInit with duplicate modules named", {
                    objects = objects, paths = paths)
 
   # was 10.2 seconds -- currently 6.4 seconds or so
-  system.time({spades(mySim, debug = FALSE)})
+  #system.time({spades(mySim, debug = FALSE)})
+  profvis::profvis({spades(mySim, debug = FALSE)})
 })
