@@ -14,6 +14,8 @@
   list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load")
 }
 
+.pkgEnv$.coreModules <- .coreModules() %>% unname()
+
 ################################################################################
 #' Blank (template) event list
 #'
@@ -213,7 +215,10 @@ setMethod(
 #' @rdname modifySearchPath
 .modifySearchPath <- function(pkgs, removeOthers = FALSE) {
   pkgs <- c("SpaDES.core", pkgs)
-  pkgs <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
+  #pkgs1 <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
+  pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
+  #browser(expr=!identical(pkgs2, pkgs1))
+  #pkgs <- pkgs2
   pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
   # Find all packages that are not in the first sequence after .GlobalEnv
   whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
@@ -247,3 +252,7 @@ setMethod(
 }
 
 .pkgEnv$corePackages <- ".GlobalEnv|Autoloads|base|methods|utils|graphics|datasets|stats"
+
+.pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
+.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)], paste0("package:",.pkgEnv$corePackagesVec[-(1:2)]))
+

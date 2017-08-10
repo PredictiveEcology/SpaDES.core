@@ -8,9 +8,7 @@
 \alias{times<-}
 \alias{times<-}
 \alias{times<-,.simList-method}
-\alias{time}
-\alias{time,.simList,missing-method}
-\alias{time,.simList,character-method}
+\alias{time..simList}
 \alias{time<-}
 \alias{time<-}
 \alias{time<-,.simList-method}
@@ -43,11 +41,7 @@ times(x) <- value
 
 \S4method{times}{.simList}(x) <- value
 
-time(x, unit, ...)
-
-\S4method{time}{.simList,missing}(x)
-
-\S4method{time}{.simList,character}(x, unit)
+\method{time}{.simList}(x, unit)
 
 time(x) <- value
 

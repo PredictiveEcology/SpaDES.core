@@ -54,7 +54,7 @@ setMethod(
     }
 
     # core modules
-    core <- .coreModules() %>% unname()
+    core <- .pkgEnv$.coreModules
 
     cur <- sim@current
     if (NROW(cur) == 0) {
@@ -646,8 +646,11 @@ setMethod(
     .refreshEventQueues()
     .pkgEnv$searchPath <- search()
 
+    # timeunits gets accessed every event -- this should only be needed once per simList
+    sim@.envir$.timeunits <- timeunits(sim)
     on.exit({
       .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
+      rm(".timeunits", envir = sim@.envir)
     })
 
     if (!is.null(.plotInitialTime)) {

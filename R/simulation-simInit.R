@@ -251,7 +251,7 @@ setMethod(
       lapply(., `attributes<-`, list(parsed = FALSE))
 
     # core modules
-    core <- .coreModules() %>% unname()
+    core <- .pkgEnv$.coreModules
 
     # parameters for core modules
     dotParamsReal <- list(".saveInterval",

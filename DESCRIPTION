@@ -30,7 +30,6 @@ Depends:
     quickPlot,
     reproducible
 Imports:
-    checkmate (>= 1.8.2),
     chron (>= 2.3-50),
     CircStats (>= 0.2-4),
     data.table (>= 1.10.4),

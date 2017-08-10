@@ -3,13 +3,7 @@
 \docType{methods}
 \name{inSeconds}
 \alias{inSeconds}
-\alias{inSeconds,character,environment-method}
-\alias{inSeconds,NULL,missing-method}
-\alias{inSeconds,character,missing-method}
 \alias{convertTimeunit}
-\alias{convertTimeunit,numeric,character,environment-method}
-\alias{convertTimeunit,numeric,missing,missing-method}
-\alias{convertTimeunit,numeric,character,missing-method}
 \alias{.spadesTimes}
 \alias{spadesTimes}
 \alias{checkTimeunit}
@@ -20,19 +14,7 @@
 \usage{
 inSeconds(unit, envir)
 
-\S4method{inSeconds}{character,environment}(unit, envir)
-
-\S4method{inSeconds}{`NULL`,missing}(unit)
-
-\S4method{inSeconds}{character,missing}(unit)
-
 convertTimeunit(time, unit, envir)
-
-\S4method{convertTimeunit}{numeric,character,environment}(time, unit, envir)
-
-\S4method{convertTimeunit}{numeric,missing,missing}(time)
-
-\S4method{convertTimeunit}{numeric,character,missing}(time, unit)
 
 .spadesTimes
 
