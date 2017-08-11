@@ -35,6 +35,7 @@
 }
 
 #' @rdname priority
+#' @include environment.R
 #' @export
 .normal <- function() {
   5

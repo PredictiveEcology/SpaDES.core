@@ -77,8 +77,8 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
-    'priority.R'
     'environment.R'
+    'priority.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'helpers.R'

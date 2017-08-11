@@ -298,15 +298,11 @@ scheduleEvent <- function(sim,
                         eventType,
                         eventPriority) {
   if(!is(sim, "simList")) stop("sim must be a simList")
-  if(is.null(eventTime)) {
-    warning(paste(
-      "Invalid or missing eventTime. This is usually",
-      "caused by an attempt to scheduleEvent at time NULL",
-      "or by using an undefined parameter."
-    ))
-    return(invisible(sim))
-  }
-  if(!is.numeric(eventTime)) stop("eventTime must be a numeric")
+  if(!is.numeric(eventTime)) stop(paste(
+    "Invalid or missing eventTime. eventTime must be a numeric. This is usually",
+    "caused by an attempt to scheduleEvent at time NULL",
+    "or by using an undefined parameter."
+  ))
   if(!is.character(eventType)) stop("eventType must be a character")
   if(!is.character(moduleName)) stop("moduleName must be a character")
   if(missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
