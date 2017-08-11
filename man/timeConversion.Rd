@@ -12,9 +12,9 @@
 \title{Convert time units}
 \format{An object of class \code{character} of length 6.}
 \usage{
-inSeconds(unit, envir)
+inSeconds(unit, envir, skipChecks = FALSE)
 
-convertTimeunit(time, unit, envir)
+convertTimeunit(time, unit, envir, skipChecks = FALSE)
 
 .spadesTimes
 
@@ -32,6 +32,9 @@ defined time unit, given as the unit name only. See details.}
 
 \item{envir}{An environment. This is where to look up the function definition for
 the time unit. See details.}
+
+\item{skipChecks}{For speed, the internal checks for classes and missingness can be skipped.
+Default \code{FALSE}.}
 
 \item{time}{Numeric. With a unit attribute, indicating the time unit of the
 input numeric. See Details.}

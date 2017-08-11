@@ -215,13 +215,12 @@ setMethod(
 #' @rdname modifySearchPath
 .modifySearchPath <- function(pkgs, removeOthers = FALSE) {
   pkgs <- c("SpaDES.core", pkgs)
-  #pkgs1 <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
   pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
-  #browser(expr=!identical(pkgs2, pkgs1))
-  #pkgs <- pkgs2
   pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
+
   # Find all packages that are not in the first sequence after .GlobalEnv
   whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
+
   if (any(whNotAtTop)) {
     if (removeOthers) {
       pkgs <- setdiff(search(), pkgs)

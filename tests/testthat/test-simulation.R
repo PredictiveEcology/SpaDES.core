@@ -329,7 +329,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    objects = objects, paths = paths)
 
-  # was 10.2 seconds -- currently 6.4 seconds or so
+  # was 10.2 seconds -- currently 4.6 seconds or so
   #system.time({spades(mySim, debug = FALSE)})
   profvis::profvis({spades(mySim, debug = FALSE)})
 })

@@ -212,6 +212,7 @@ setMethod(
           # Do not use pre-existing data.tables that get updated b/c completed will almost
           #  always be large (NROW(completed) > 20), so can't realistically pre-create
           #  many data.tables
+          browser(expr=NROW(compl)>3000)
           completed <- list(compl, cur) %>%
             rbindlist()
           if (NROW(completed) > getOption("spades.nCompleted")) {
@@ -337,27 +338,31 @@ setMethod(
               eventTimeInSeconds <- convertTimeunit((
                 eventTime -
                   convertTimeunit(sim@simtimes[["start"]],
-                                  sim@simtimes[["timeunit"]], sim@.envir)
+                                  sim@simtimes[["timeunit"]], sim@.envir,
+                                  skipChecks = TRUE)
               ),
               "seconds",
-              sim@.envir) +
+              sim@.envir, skipChecks = TRUE) +
                 sim@simtimes[["current"]] %>%
                 as.numeric()
             } else {
               eventTimeInSeconds <-
-                convertTimeunit(eventTime, "seconds", sim@.envir) %>%
+                convertTimeunit(eventTime, "seconds", sim@.envir,
+                                skipChecks = TRUE) %>%
                 as.numeric()
             }
           } else {
             # for core modules because they have no metadata
             eventTimeInSeconds <-
-              convertTimeunit(eventTime, "seconds", sim@.envir) %>%
+              convertTimeunit(eventTime, "seconds", sim@.envir,
+                              skipChecks = TRUE) %>%
               as.numeric()
           }
         } else {
           # when eventTime is NA... can't seem to get an example
           eventTimeInSeconds <-
-            convertTimeunit(eventTime, "seconds", sim@.envir) %>%
+            convertTimeunit(eventTime, "seconds", sim@.envir,
+                            skipChecks = TRUE) %>%
             as.numeric()
         }
         attributes(eventTimeInSeconds)$unit <- "second"
