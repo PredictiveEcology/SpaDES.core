@@ -96,7 +96,7 @@ setMethod(
     data.table(eventTime = integer(i), moduleName = character(i),
                eventType = character(i), eventPriority = numeric(i))
   }))
-  assignInMyNamespace(".singleEventListDT", data.table(eventTime = integer(1L), moduleName = character(1L),
+  assignInMyNamespace(".singleEventListDT", data.table(eventTime = numeric(1L), moduleName = character(1L),
                                                        eventType = character(1L), eventPriority = numeric(1L)))
   assignInMyNamespace(".currentEventDT", .emptyEventList(numeric(1), character(1), character(1), numeric(1)))
 
@@ -108,7 +108,7 @@ setMethod(
 
 
 #' @rdname emptyEventList
-.emptyEventListNA <- .emptyEventList(NA_integer_, NA_character_, NA_character_, NA_integer_)
+.emptyEventListNA <- .emptyEventList(NA_real_, NA_character_, NA_character_, NA_integer_)
 
 #' @rdname emptyEventList
 .currentEventDT <- list()
