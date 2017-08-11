@@ -39,3 +39,5 @@
 .normal <- function() {
   5
 }
+
+.pkgEnv$.normalVal <- .normal()

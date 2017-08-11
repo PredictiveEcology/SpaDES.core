@@ -292,30 +292,26 @@ setMethod(
 #'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .highest()) # highest priority
 #'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .lowest()) # lowest priority
 #' }
-setGeneric("scheduleEvent",
-           function(sim,
-                    eventTime,
-                    moduleName,
-                    eventType,
-                    eventPriority) {
-             standardGeneric("scheduleEvent")
-           })
-
-#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "numeric",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
+scheduleEvent <- function(sim,
                         eventTime,
                         moduleName,
                         eventType,
                         eventPriority) {
+  if(!is(sim, "simList")) stop("sim must be a simList")
+  if(is.null(eventTime)) {
+    warning(paste(
+      "Invalid or missing eventTime. This is usually",
+      "caused by an attempt to scheduleEvent at time NULL",
+      "or by using an undefined parameter."
+    ))
+    return(invisible(sim))
+  }
+  if(!is.numeric(eventTime)) stop("eventTime must be a numeric")
+  if(!is.character(eventType)) stop("eventType must be a character")
+  if(!is.character(moduleName)) stop("moduleName must be a character")
+  if(missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
+  if(!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
+
     if (length(eventTime)) {
       if (!is.na(eventTime)) {
         # if there is no metadata, meaning for the first
@@ -364,14 +360,6 @@ setMethod(
         }
         attributes(eventTimeInSeconds)$unit <- "second"
 
-        # newEvent <- .emptyEventList(
-        #   eventTime = eventTimeInSeconds,
-        #   moduleName = moduleName,
-        #   eventType = eventType,
-        #   eventPriority = eventPriority
-        # )
-
-        #newEvent <- .singleEventListDT
         newEvent <- copy(.singleEventListDT)
         newEventList <- list(
           eventTime = eventTimeInSeconds,
@@ -440,56 +428,56 @@ setMethod(
     }
 
     return(invisible(sim))
-  })
+  }
 
-#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "NULL",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) {
-    warning(
-      paste(
-        "Invalid or missing eventTime. This is usually",
-        "caused by an attempt to scheduleEvent at time NULL",
-        "or by using an undefined parameter."
-      )
-    )
-    return(invisible(sim))
-  })
-
-#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "numeric",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "missing"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) {
-    scheduleEvent(
-      sim = sim,
-      eventTime = eventTime,
-      moduleName = moduleName,
-      eventType = eventType,
-      eventPriority = .normal()
-    )
-  })
+# @rdname scheduleEvent
+#' setMethod(
+#'   "scheduleEvent",
+#'   signature(
+#'     sim = "simList",
+#'     eventTime = "NULL",
+#'     moduleName = "character",
+#'     eventType = "character",
+#'     eventPriority = "numeric"
+#'   ),
+#'   definition = function(sim,
+#'                         eventTime,
+#'                         moduleName,
+#'                         eventType,
+#'                         eventPriority) {
+#'     warning(
+#'       paste(
+#'         "Invalid or missing eventTime. This is usually",
+#'         "caused by an attempt to scheduleEvent at time NULL",
+#'         "or by using an undefined parameter."
+#'       )
+#'     )
+#'     return(invisible(sim))
+#'   })
+#'
+#' #' @rdname scheduleEvent
+#' setMethod(
+#'   "scheduleEvent",
+#'   signature(
+#'     sim = "simList",
+#'     eventTime = "numeric",
+#'     moduleName = "character",
+#'     eventType = "character",
+#'     eventPriority = "missing"
+#'   ),
+#'   definition = function(sim,
+#'                         eventTime,
+#'                         moduleName,
+#'                         eventType,
+#'                         eventPriority) {
+#'     scheduleEvent(
+#'       sim = sim,
+#'       eventTime = eventTime,
+#'       moduleName = moduleName,
+#'       eventType = eventType,
+#'       eventPriority = .normal()
+#'     )
+#'   })
 
 ################################################################################
 #' Run a spatial discrete event simulation
