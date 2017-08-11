@@ -2013,7 +2013,7 @@ setReplaceMethod(
 #' @rdname simList-accessors-times
 #' @importFrom stats time
 time..simList <-
-    function(x, unit) {
+    function(x, unit, ...) {
     if(missing(unit)) {
       mUnit <- .callingFrameTimeunit(x)
       if (is.null(mUnit)) {

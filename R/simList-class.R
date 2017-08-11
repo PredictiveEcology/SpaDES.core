@@ -32,8 +32,10 @@
 #' @slot current    The current event, as a \code{data.table}.
 #'                  See 'Event Lists' for more information..
 #'
-#' @slot completed  The list of completed events, as a \code{data.table}.
-#'                  See 'Event Lists' for more information.
+#' @slot completed  The list of completed events, as a \code{list}.
+#'                  See 'Event Lists' for more information. It is kept
+#'                  as a list of individual events for speed. The \code{completed}
+#'                  method converts it to a sorted \coe{data.table}.
 #'
 #' @slot depends    A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
 #'                  containing module object dependency information.
@@ -71,7 +73,9 @@
 #'
 #' @section Event Lists:
 #'
-#' Event lists are sorted (keyed) first by time, second by priority.
+#' The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
+#' The completed event list is an ordered list in the exact order that the events
+#' were executed.
 #' Each event is represented by a \code{\link{data.table}} row consisting of:
 #' \tabular{ll}{
 #'   \code{eventTime} \tab The time the event is to occur.\cr
