@@ -1186,7 +1186,7 @@ setMethod("inputs",
               # whereas is.na does not
               if (any(!is.na(sim@inputs$loadTime))) {
                 if (!is.null(sim@inputs$loadTime)) {
-                  obj <- data.table::copy(sim@inputs) # don't change original sim
+                  obj <- copy(sim@inputs) # don't change original sim
                   set(obj, , j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
                   #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.envir)]
                   obj[]
@@ -1422,7 +1422,7 @@ setMethod(
     # whereas is.na does not
     if (any(!is.na(sim@outputs$saveTime))) {
       if (!is.null(sim@outputs$saveTime)) {
-        obj <- data.table::copy(sim@outputs) # don't change original sim
+        obj <- copy(sim@outputs) # don't change original sim
         obj[, saveTime := convertTimeunit(saveTime, unit, sim@.envir)]
         obj[]
         obj
@@ -2389,7 +2389,7 @@ setMethod(
       # note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(sim@events$eventTime))) {
         if (!is.null(sim@events$eventTime)) {
-          obj <- data.table::copy(sim@events) # don't change original sim
+          obj <- copy(sim@events) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj
@@ -2467,7 +2467,7 @@ setMethod(
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
-          obj <- data.table::copy(sim@current) # don't change original sim
+          obj <- copy(sim@current) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj
@@ -2538,7 +2538,7 @@ setMethod(
       compl <- rbindlist(sim@completed)
       if (any(!is.na(compl$eventTime))) {
         if (!is.null(compl$eventTime)) {
-          obj <- compl#data.table::copy(sim@completed) # don't change original sim
+          obj <- compl#copy(sim@completed) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj

@@ -207,23 +207,17 @@ setMethod(
         }
 
         # add to list of completed events
-        #compl <- sim@completed # completed(sim, "second")
         lenCompl <- length(sim@completed)
         if (lenCompl) {
           # Do not use pre-existing data.tables that get updated b/c completed will almost
           #  always be large (NROW(completed) > 20), so can't realistically pre-create
           #  many data.tables
-          #browser(expr=NROW(compl)>3000)
           sim@completed[[lenCompl+1]] <- copy(cur)
-          #completed <- list(compl, cur) %>%
-          #  rbindlist()
           if (lenCompl > getOption("spades.nCompleted")) {
-            sim@completed <- tail(sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)])
+            sim@completed <- sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)]
           }
         } else {
-          #completed <- data.table::copy(cur)
-          sim@completed[[1]] <- list(copy(cur))
-
+          sim@completed[[1]] <- copy(cur)
         }
         # current event completed, replace current with empty
         sim@current <- .emptyEventListObj
@@ -378,7 +372,7 @@ setMethod(
         # )
 
         #newEvent <- .singleEventListDT
-        newEvent <- data.table::copy(.singleEventListDT)
+        newEvent <- copy(.singleEventListDT)
         newEventList <- list(
           eventTime = eventTimeInSeconds,
           moduleName = moduleName,
@@ -393,9 +387,7 @@ setMethod(
         nrowEvnts <- NROW(sim@events)
 
         if (nrowEvnts == 0L) {
-          # here, copy the newEVent to break connection between .singleEventListDT and sim@events
-          #sim@events <- data.table::copy(newEvent) %>% setkey("eventTime", "eventPriority")
-          sim@events <- newEvent #%>% setkey("eventTime", "eventPriority")
+          sim@events <- newEvent
         } else {
           # This is faster than rbindlist below. So, use for smaller event queues
           if (nrowEvnts < .lengthEventsDT) {

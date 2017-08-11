@@ -110,7 +110,7 @@ setClass(
     ),
     events = .emptyEventListObj,
     current = .emptyEventListObj,
-    completed = list(.emptyEventListObj),
+    completed = list(),
     depends = new(".simDeps", dependencies = list(NULL)),
     simtimes = list(
       current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
