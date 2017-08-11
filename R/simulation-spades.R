@@ -212,7 +212,6 @@ setMethod(
           # Do not use pre-existing data.tables that get updated b/c completed will almost
           #  always be large (NROW(completed) > 20), so can't realistically pre-create
           #  many data.tables
-          browser(expr=NROW(compl)>3000)
           completed <- list(compl, cur) %>%
             rbindlist()
           if (NROW(completed) > getOption("spades.nCompleted")) {
