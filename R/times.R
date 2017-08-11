@@ -161,6 +161,8 @@ attributes(monthsInSeconds)$unit <- "second"
 #'               defined time unit, given as the unit name only. See details.
 #' @param envir   An environment. This is where to look up the function definition for
 #'                the time unit. See details.
+#' @param skipChecks For speed, the internal checks for classes and missingness can be skipped.
+#'                   Default \code{FALSE}.
 #'
 #' @details Because of R scoping, if \code{envir} is a simList environment, then
 #' this function will search there first, then up the current \code{search()} path.
@@ -175,11 +177,13 @@ attributes(monthsInSeconds)$unit <- "second"
 #' @docType methods
 #' @rdname timeConversion
 #'
-inSeconds <- function(unit, envir) {
-  if(missing(envir)) envir <- .GlobalEnv
-  if(missing(unit)) unit <- NA_character_
-  if(!is.character(unit)) stop("unit must be a character")
-
+inSeconds <- function(unit, envir, skipChecks = FALSE) {
+  if(!skipChecks) {
+    if(missing(envir)) envir <- .GlobalEnv
+    if(missing(unit)) unit <- NA_character_
+    if(is.null(unit)) unit <- NA_character_
+    if(!is.character(unit)) stop("unit must be a character")
+  }
   if (!is.na(unit)) {
     out <- switch(unit,
                   second = secondsInSeconds,
@@ -224,25 +228,28 @@ inSeconds <- function(unit, envir) {
 #'               input numeric. See Details.
 #' @export
 #' @importFrom stringi stri_detect_fixed
+#' @inheritParams inSeconds
 #' @include simList-class.R
 #' @docType methods
 #' @rdname timeConversion
 #' @author Eliot McIntire
-convertTimeunit <- function(time, unit, envir) {
-  if(missing(envir)) envir <- .GlobalEnv
-  if(missing(unit)) unit <- "second"
-  if(!is.character(unit)) stop("unit must be a character")
-  if(!is.numeric(time)) stop("time must be a numeric")
-  if(!is.environment(envir)) stop("envir must be an environment")
-
+convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
+  if(!skipChecks) {
+    if(missing(envir)) envir <- .GlobalEnv
+    if(missing(unit)) unit <- "second"
+    if(!is.character(unit)) stop("unit must be a character")
+    if(!is.numeric(time)) stop("time must be a numeric")
+    if(!is.environment(envir)) stop("envir must be an environment")
+  }
 
   timeUnit <- attr(time, "unit")
-
   # Assume default of seconds if time has no units
   if (!is.character(timeUnit)) {
     attr(time, "unit") <- timeUnit <- "second"
   }
-  if (is.na(pmatch("second", unit)) | is.na(pmatch("second", timeUnit))) {
+  if(is.na(timeUnit)) timeUnit <- "NA" # for startsWith next
+
+  if (!all(startsWith(c(unit, timeUnit), "second"))) {
     if (!is.na(timeUnit) & !is.na(unit)) {
       # confirm that units are usable by SpaDES
       #  This has been commented out, because it is too slow to check every time
@@ -251,16 +258,14 @@ convertTimeunit <- function(time, unit, envir) {
       #checkTimeunit(c(timeUnit, unit), envir)
 
       # if timeUnit is same as unit, skip calculations
-      # a <- !stri_detect_fixed(unit, pattern = timeUnit)
-      # b <- unit != timeUnit
-      # browser(expr=!identical(a,b))
       if (unit != timeUnit) {
         if (timeUnit == "second") {
-          time <- time * 1 / inSeconds(unit, envir)
+          time <- time * 1 / inSeconds(unit, envir, skipChecks = TRUE)
         } else if (unit == "second") {
-          time <- time * inSeconds(timeUnit, envir) / 1
+          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) / 1
         } else {
-          time <- time * inSeconds(timeUnit, envir) / inSeconds(unit, envir)
+          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) /
+                          inSeconds(unit, envir, skipChecks = TRUE)
         }
         attr(time, "unit") <- unit
       }

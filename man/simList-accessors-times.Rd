@@ -41,7 +41,7 @@ times(x) <- value
 
 \S4method{times}{.simList}(x) <- value
 
-\method{time}{.simList}(x, unit)
+\method{time}{.simList}(x, unit, ...)
 
 time(x) <- value
 

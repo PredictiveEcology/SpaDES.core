@@ -87,7 +87,8 @@ test_that("timeunit works correctly", {
 
   exampleTime <- 1:10
   attributes(exampleTime)$unit <- NA_character_
-  expect_equal(as.numeric(convertTimeunit(exampleTime, "seconds")), 0)
+  expect_equal(as.numeric(convertTimeunit(exampleTime, "seconds")),
+               rep(0, length(exampleTime)))
 
   exampleTime <- 1:10
   attributes(exampleTime)$unit <- "hour"
