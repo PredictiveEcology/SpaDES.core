@@ -178,7 +178,6 @@ attributes(monthsInSeconds)$unit <- "second"
 #' @rdname timeConversion
 #'
 inSeconds <- function(unit, envir, skipChecks = FALSE) {
-  num <<- num + 1
   if(!skipChecks) {
     if(missing(envir)) envir <- .GlobalEnv
     if(missing(unit)) unit <- NA_character_

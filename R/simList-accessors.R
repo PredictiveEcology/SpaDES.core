@@ -2533,20 +2533,21 @@ setMethod(
   "completed",
   signature = c(".simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) & (length(sim@completed$eventTime))) {
+    out <- if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
-      if (any(!is.na(sim@completed$eventTime))) {
-        if (!is.null(sim@completed$eventTime)) {
-          obj <- data.table::copy(sim@completed) # don't change original sim
+      compl <- rbindlist(sim@completed)
+      if (any(!is.na(compl$eventTime))) {
+        if (!is.null(compl$eventTime)) {
+          obj <- compl#data.table::copy(sim@completed) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj
         }
       } else {
-        sim@completed
+        rbindlist(sim@completed)
       }
     } else {
-      sim@completed
+      rbindlist(sim@completed)
     }
     return(out)
 })
@@ -2580,7 +2581,7 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
-    sim@completed <- value
+    sim@completed <- list(value)
     return(sim)
 })
 

@@ -38,7 +38,7 @@ setMethod("Copy",
             sim_ <- object
             if (queues) {
               sim_@events <- data.table::copy(object@events)
-              sim_@completed <- data.table::copy(object@completed)
+              sim_@completed <- lapply(object@completed, data.table::copy)
               sim_@current <- data.table::copy(object@current)
             }
             if (objects) {

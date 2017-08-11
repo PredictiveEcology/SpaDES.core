@@ -207,20 +207,24 @@ setMethod(
         }
 
         # add to list of completed events
-        compl <- sim@completed # completed(sim, "second")
-        if (NROW(compl)) {
+        #compl <- sim@completed # completed(sim, "second")
+        lenCompl <- length(sim@completed)
+        if (lenCompl) {
           # Do not use pre-existing data.tables that get updated b/c completed will almost
           #  always be large (NROW(completed) > 20), so can't realistically pre-create
           #  many data.tables
-          completed <- list(compl, cur) %>%
-            rbindlist()
-          if (NROW(completed) > getOption("spades.nCompleted")) {
-            completed <- tail(completed, n = getOption("spades.nCompleted"))
+          #browser(expr=NROW(compl)>3000)
+          sim@completed[[lenCompl+1]] <- copy(cur)
+          #completed <- list(compl, cur) %>%
+          #  rbindlist()
+          if (lenCompl > getOption("spades.nCompleted")) {
+            sim@completed <- tail(sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)])
           }
         } else {
-          completed <- data.table::copy(cur)
+          #completed <- data.table::copy(cur)
+          sim@completed[[1]] <- list(copy(cur))
+
         }
-        sim@completed <- completed
         # current event completed, replace current with empty
         sim@current <- .emptyEventListObj
       } else {

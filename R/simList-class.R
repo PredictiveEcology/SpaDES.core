@@ -35,7 +35,7 @@
 #' @slot completed  The list of completed events, as a \code{list}.
 #'                  See 'Event Lists' for more information. It is kept
 #'                  as a list of individual events for speed. The \code{completed}
-#'                  method converts it to a sorted \coe{data.table}.
+#'                  method converts it to a sorted \code{data.table}.
 #'
 #' @slot depends    A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
 #'                  containing module object dependency information.
@@ -99,7 +99,7 @@ setClass(
   ".simList",
   slots = list(
     modules = "list", params = "list", events = "data.table",
-    current = "data.table", completed = "data.table", depends = ".simDeps",
+    current = "data.table", completed = "list", depends = ".simDeps",
     simtimes = "list", inputs = "list", outputs = "list", paths = "list"
   ),
   prototype = list(
@@ -110,7 +110,7 @@ setClass(
     ),
     events = .emptyEventListObj,
     current = .emptyEventListObj,
-    completed = .emptyEventListObj,
+    completed = list(.emptyEventListObj),
     depends = new(".simDeps", dependencies = list(NULL)),
     simtimes = list(
       current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
