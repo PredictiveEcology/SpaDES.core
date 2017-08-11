@@ -37,7 +37,7 @@ See 'Event Lists' for more information..}
 \item{\code{completed}}{The list of completed events, as a \code{list}.
 See 'Event Lists' for more information. It is kept
 as a list of individual events for speed. The \code{completed}
-method converts it to a sorted \coe{data.table}.}
+method converts it to a sorted \code{data.table}.}
 
 \item{\code{depends}}{A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
 containing module object dependency information.}
