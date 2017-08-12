@@ -297,7 +297,8 @@ scheduleEvent <- function(sim,
                         moduleName,
                         eventType,
                         eventPriority) {
-  if(!is(sim, "simList")) stop("sim must be a simList")
+  if(!class(sim)=="simList") stop("sim must be a simList")
+  #if(!is(sim, "simList")) stop("sim must be a simList")
   if(!is.numeric(eventTime)) stop(paste(
     "Invalid or missing eventTime. eventTime must be a numeric. This is usually",
     "caused by an attempt to scheduleEvent at time NULL",
