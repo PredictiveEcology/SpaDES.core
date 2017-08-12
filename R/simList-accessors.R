@@ -2013,7 +2013,7 @@ setReplaceMethod(
 #' @rdname simList-accessors-times
 #' @importFrom stats time
 time..simList <- function(x, unit, ...) {
-    if(missing(unit)) {
+    if (missing(unit)) {
       mUnit <- .callingFrameTimeunit(x)
       if (is.null(mUnit)) {
         mUnit <- NA_character_
@@ -2200,12 +2200,12 @@ setReplaceMethod(
 #' @keywords internal
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
-  if(is.null(x)) return(NULL)
-  #if(!is(x, ".simList")) stop("x must be a .simList")
+  if (is.null(x)) return(NULL)
+  #if (!is(x, ".simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
   out <- if (length(mod) > 0) {
-    if(!is.null(x@.envir$.timeunits)) {
-      x@.envir$.timeunits[[mod]]
+    if (!is.null(x@.envir[[".timeunits"]])) {
+      x@.envir[[".timeunits"]][[mod]]
     } else {
       timeunits(x)[[mod]]
     }

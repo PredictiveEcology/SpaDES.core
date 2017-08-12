@@ -39,15 +39,8 @@ if (getRversion() >= "3.1.0") {
 #' @keywords internal
 #' @rdname doEvent
 #'
-setGeneric("doEvent", function(sim, debug, notOlderThan) {
-  standardGeneric("doEvent")
-})
-
-#' @rdname doEvent
-setMethod(
-  "doEvent",
-  signature(sim = "simList"),
-  definition = function(sim, debug, notOlderThan) {
+doEvent <- function(sim, debug, notOlderThan) {
+    if (missing(debug)) debug <- FALSE
     if (class(sim) != "simList") {
       # use inherits()?
       stop("doEvent can only accept a simList object")
@@ -232,16 +225,7 @@ setMethod(
       }
     }
     return(invisible(sim))
-})
-
-#' @rdname doEvent
-setMethod(
-  "doEvent",
-  signature(sim = "simList", debug = "missing"),
-  definition = function(sim) {
-    stopifnot(class(sim) == "simList")
-    return(doEvent(sim, debug = FALSE))
-})
+}
 
 ################################################################################
 #' Schedule a simulation event
@@ -297,17 +281,17 @@ scheduleEvent <- function(sim,
                         moduleName,
                         eventType,
                         eventPriority) {
-  if(!class(sim)=="simList") stop("sim must be a simList")
-  #if(!is(sim, "simList")) stop("sim must be a simList")
-  if(!is.numeric(eventTime)) stop(paste(
+  if (!class(sim)=="simList") stop("sim must be a simList")
+  #if (!is(sim, "simList")) stop("sim must be a simList")
+  if (!is.numeric(eventTime)) stop(paste(
     "Invalid or missing eventTime. eventTime must be a numeric. This is usually",
     "caused by an attempt to scheduleEvent at time NULL",
     "or by using an undefined parameter."
   ))
-  if(!is.character(eventType)) stop("eventType must be a character")
-  if(!is.character(moduleName)) stop("moduleName must be a character")
-  if(missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
-  if(!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
+  if (!is.character(eventType)) stop("eventType must be a character")
+  if (!is.character(moduleName)) stop("moduleName must be a character")
+  if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
+  if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
     if (length(eventTime)) {
       if (!is.na(eventTime)) {
@@ -379,7 +363,7 @@ scheduleEvent <- function(sim,
 
              #for speed -- the special case where there are only one event in the queue
              if (nrowEvnts == 1L) {
-               if(eventTimeInSeconds<sim@events[[1]][1]) {
+               if (eventTimeInSeconds<sim@events[[1]][1]) {
                  for (i in 1:.numColsEventList) {
                    set(.eventsDT[[nrowEvnts + 2]], , i, c(newEvent[[i]], sim@events[[i]]))
                  }
@@ -402,13 +386,13 @@ scheduleEvent <- function(sim,
 
           needSort <- TRUE
           # only sort if new event is not already at the end
-          if(eventTimeInSeconds>sim@events[[1]][nrowEvnts]) {
+          if (eventTimeInSeconds>sim@events[[1]][nrowEvnts]) {
             needSort <- FALSE
           } else if (eventTimeInSeconds==sim@events[[1]][nrowEvnts] & eventPriority>=sim@events[[4]][nrowEvnts]){
             needSort <- FALSE
           }
 
-          if(needSort) {
+          if (needSort) {
               #num <<- num + 1
               setkey(sim@events, "eventTime", "eventPriority")
           }
