@@ -8,8 +8,6 @@ Core functionality for Spatial Discrete Event Simulation (SpaDES)
 
 ## Installation
 
-Building packages from source requires the appropriate development libraries for your operating system (*e.g.*, Windows users should install [Rtools](https://cran.r-project.org/bin/windows/Rtools/)).
-
 ### Current stable release
 
 [![Build Status](https://travis-ci.org/PredictiveEcology/SpaDES.core.svg?branch=master)](https://travis-ci.org/PredictiveEcology/SpaDES.core)

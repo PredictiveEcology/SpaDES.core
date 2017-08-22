@@ -63,9 +63,6 @@ including the state of the random number generator,
 by scheduling checkpoint events.
 }
 \details{
-\code{\link{checkpointLoad}} and \code{\link{.checkpointSave}} code based on:
-\url{https://raw.githubusercontent.com/achubaty/r-tools/master/checkpoint.R}
-
 RNG save code adapted from:
 \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
 and \url{https://stackoverflow.com/questions/13997444/}

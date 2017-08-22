@@ -8,7 +8,7 @@ Description: Provide the core discrete event simulation (DES) framework for
 URL:
     http://spades.predictiveecology.org,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2017-08-21
+Date: 2017-08-22
 Version: 0.1.0
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alexander.chubaty@canada.ca",
@@ -22,7 +22,6 @@ Authors@R: c(
     person("Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada",
     role = "cph")
     )
-Additional_repositories: http://rforge.net
 Depends:
     R (>= 3.3.2),
     quickPlot,
@@ -62,7 +61,6 @@ Suggests:
     rgdal,
     rgenoud,
     rmarkdown,
-    snow,
     SpaDES.tools,
     testthat (>= 1.0.2),
     tkrplot

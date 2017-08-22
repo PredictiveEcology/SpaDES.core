@@ -8,4 +8,3 @@ version 0.1.0
     - see `?SpaDES.core::SpaDES.core` for an overview
 
 * various speed improvements and bug fixes
-
