@@ -54,7 +54,7 @@ setMethod(
     }
 
     # core modules
-    core <- .coreModules() %>% unname()
+    core <- .pkgEnv$.coreModules
 
     cur <- sim@current
     if (NROW(cur) == 0) {
@@ -207,20 +207,18 @@ setMethod(
         }
 
         # add to list of completed events
-        compl <- sim@completed # completed(sim, "second")
-        if (NROW(compl)) {
+        lenCompl <- length(sim@completed)
+        if (lenCompl) {
           # Do not use pre-existing data.tables that get updated b/c completed will almost
           #  always be large (NROW(completed) > 20), so can't realistically pre-create
           #  many data.tables
-          completed <- list(compl, cur) %>%
-            rbindlist()
-          if (NROW(completed) > getOption("spades.nCompleted")) {
-            completed <- tail(completed, n = getOption("spades.nCompleted"))
+          sim@completed[[lenCompl+1]] <- copy(cur)
+          if (lenCompl > getOption("spades.nCompleted")) {
+            sim@completed <- sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)]
           }
         } else {
-          completed <- data.table::copy(cur)
+          sim@completed[[1]] <- copy(cur)
         }
-        sim@completed <- completed
         # current event completed, replace current with empty
         sim@current <- .emptyEventListObj
       } else {
@@ -294,30 +292,22 @@ setMethod(
 #'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .highest()) # highest priority
 #'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .lowest()) # lowest priority
 #' }
-setGeneric("scheduleEvent",
-           function(sim,
-                    eventTime,
-                    moduleName,
-                    eventType,
-                    eventPriority) {
-             standardGeneric("scheduleEvent")
-           })
-
-#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "numeric",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
+scheduleEvent <- function(sim,
                         eventTime,
                         moduleName,
                         eventType,
                         eventPriority) {
+  if(!is(sim, "simList")) stop("sim must be a simList")
+  if(!is.numeric(eventTime)) stop(paste(
+    "Invalid or missing eventTime. eventTime must be a numeric. This is usually",
+    "caused by an attempt to scheduleEvent at time NULL",
+    "or by using an undefined parameter."
+  ))
+  if(!is.character(eventType)) stop("eventType must be a character")
+  if(!is.character(moduleName)) stop("moduleName must be a character")
+  if(missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
+  if(!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
+
     if (length(eventTime)) {
       if (!is.na(eventTime)) {
         # if there is no metadata, meaning for the first
@@ -337,40 +327,36 @@ setMethod(
               eventTimeInSeconds <- convertTimeunit((
                 eventTime -
                   convertTimeunit(sim@simtimes[["start"]],
-                                  sim@simtimes[["timeunit"]], sim@.envir)
+                                  sim@simtimes[["timeunit"]], sim@.envir,
+                                  skipChecks = TRUE)
               ),
               "seconds",
-              sim@.envir) +
+              sim@.envir, skipChecks = TRUE) +
                 sim@simtimes[["current"]] %>%
                 as.numeric()
             } else {
               eventTimeInSeconds <-
-                convertTimeunit(eventTime, "seconds", sim@.envir) %>%
+                convertTimeunit(eventTime, "seconds", sim@.envir,
+                                skipChecks = TRUE) %>%
                 as.numeric()
             }
           } else {
             # for core modules because they have no metadata
             eventTimeInSeconds <-
-              convertTimeunit(eventTime, "seconds", sim@.envir) %>%
+              convertTimeunit(eventTime, "seconds", sim@.envir,
+                              skipChecks = TRUE) %>%
               as.numeric()
           }
         } else {
           # when eventTime is NA... can't seem to get an example
           eventTimeInSeconds <-
-            convertTimeunit(eventTime, "seconds", sim@.envir) %>%
+            convertTimeunit(eventTime, "seconds", sim@.envir,
+                            skipChecks = TRUE) %>%
             as.numeric()
         }
         attributes(eventTimeInSeconds)$unit <- "second"
 
-        # newEvent <- .emptyEventList(
-        #   eventTime = eventTimeInSeconds,
-        #   moduleName = moduleName,
-        #   eventType = eventType,
-        #   eventPriority = eventPriority
-        # )
-
-        #newEvent <- .singleEventListDT
-        newEvent <- data.table::copy(.singleEventListDT)
+        newEvent <- copy(.singleEventListDT)
         newEventList <- list(
           eventTime = eventTimeInSeconds,
           moduleName = moduleName,
@@ -385,22 +371,47 @@ setMethod(
         nrowEvnts <- NROW(sim@events)
 
         if (nrowEvnts == 0L) {
-          # here, copy the newEVent to break connection between .singleEventListDT and sim@events
-          #sim@events <- data.table::copy(newEvent) %>% setkey("eventTime", "eventPriority")
-          sim@events <- newEvent #%>% setkey("eventTime", "eventPriority")
+          sim@events <- newEvent
         } else {
           # This is faster than rbindlist below. So, use for smaller event queues
           if (nrowEvnts < .lengthEventsDT) {
-            for (i in 1:.numColsEventList) {
-              set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
-            }
+
+             #for speed -- the special case where there are only one event in the queue
+             if (nrowEvnts == 1L) {
+               if(eventTimeInSeconds<sim@events[[1]][1]) {
+                 for (i in 1:.numColsEventList) {
+                   set(.eventsDT[[nrowEvnts + 2]], , i, c(newEvent[[i]], sim@events[[i]]))
+                 }
+               } else {
+                 for (i in 1:.numColsEventList) {
+                   set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
+                 }
+
+               }
+             } else {
+              for (i in 1:.numColsEventList) {
+                set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
+              }
+             }
+
             sim@events <- .eventsDT[[nrowEvnts + 2]]
           } else {
             sim@events <- rbindlist(list(sim@events, newEvent))
           }
-        }
-        setkey(sim@events, "eventTime", "eventPriority")
 
+          needSort <- TRUE
+          # only sort if new event is not already at the end
+          if(eventTimeInSeconds>sim@events[[1]][nrowEvnts]) {
+            needSort <- FALSE
+          } else if (eventTimeInSeconds==sim@events[[1]][nrowEvnts] & eventPriority>=sim@events[[4]][nrowEvnts]){
+            needSort <- FALSE
+          }
+
+          if(needSort) {
+              #num <<- num + 1
+              setkey(sim@events, "eventTime", "eventPriority")
+          }
+        }
       }
     } else {
       warning(
@@ -413,56 +424,56 @@ setMethod(
     }
 
     return(invisible(sim))
-  })
+  }
 
-#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "NULL",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) {
-    warning(
-      paste(
-        "Invalid or missing eventTime. This is usually",
-        "caused by an attempt to scheduleEvent at time NULL",
-        "or by using an undefined parameter."
-      )
-    )
-    return(invisible(sim))
-  })
-
-#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "numeric",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "missing"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) {
-    scheduleEvent(
-      sim = sim,
-      eventTime = eventTime,
-      moduleName = moduleName,
-      eventType = eventType,
-      eventPriority = .normal()
-    )
-  })
+# @rdname scheduleEvent
+#' setMethod(
+#'   "scheduleEvent",
+#'   signature(
+#'     sim = "simList",
+#'     eventTime = "NULL",
+#'     moduleName = "character",
+#'     eventType = "character",
+#'     eventPriority = "numeric"
+#'   ),
+#'   definition = function(sim,
+#'                         eventTime,
+#'                         moduleName,
+#'                         eventType,
+#'                         eventPriority) {
+#'     warning(
+#'       paste(
+#'         "Invalid or missing eventTime. This is usually",
+#'         "caused by an attempt to scheduleEvent at time NULL",
+#'         "or by using an undefined parameter."
+#'       )
+#'     )
+#'     return(invisible(sim))
+#'   })
+#'
+#' #' @rdname scheduleEvent
+#' setMethod(
+#'   "scheduleEvent",
+#'   signature(
+#'     sim = "simList",
+#'     eventTime = "numeric",
+#'     moduleName = "character",
+#'     eventType = "character",
+#'     eventPriority = "missing"
+#'   ),
+#'   definition = function(sim,
+#'                         eventTime,
+#'                         moduleName,
+#'                         eventType,
+#'                         eventPriority) {
+#'     scheduleEvent(
+#'       sim = sim,
+#'       eventTime = eventTime,
+#'       moduleName = moduleName,
+#'       eventType = eventType,
+#'       eventPriority = .normal()
+#'     )
+#'   })
 
 ################################################################################
 #' Run a spatial discrete event simulation
@@ -619,8 +630,11 @@ setMethod(
     .refreshEventQueues()
     .pkgEnv$searchPath <- search()
 
+    # timeunits gets accessed every event -- this should only be needed once per simList
+    sim@.envir$.timeunits <- timeunits(sim)
     on.exit({
       .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
+      rm(".timeunits", envir = sim@.envir)
     })
 
     if (!is.null(.plotInitialTime)) {

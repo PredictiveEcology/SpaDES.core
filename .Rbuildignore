@@ -9,6 +9,7 @@
 ^appveyor\.yml$
 CONTRIBUTING\.md
 cran-comments\.md
+^docs$
 LICENSE
 vignettes/.*_cache$
 vignettes/.*\.log$

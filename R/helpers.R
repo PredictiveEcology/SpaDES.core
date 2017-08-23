@@ -14,6 +14,8 @@
   list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load")
 }
 
+.pkgEnv$.coreModules <- .coreModules() %>% unname()
+
 ################################################################################
 #' Blank (template) event list
 #'
@@ -62,11 +64,11 @@ setMethod(
             eventType = "character", eventPriority = "numeric"),
   definition = function(eventTime, moduleName, eventType, eventPriority) {
     # This is faster than direct call to new data.table
-    eeldt <- data.table::copy(.singleEventListDT)
-    data.table::set(eeldt, , "eventTime", eventTime)
-    data.table::set(eeldt, , "moduleName", moduleName)
-    data.table::set(eeldt, , "eventType", eventType)
-    data.table::set(eeldt, , "eventPriority", eventPriority)
+    eeldt <- copy(.singleEventListDT)
+    set(eeldt, , "eventTime", eventTime)
+    set(eeldt, , "moduleName", moduleName)
+    set(eeldt, , "eventType", eventType)
+    set(eeldt, , "eventPriority", eventPriority)
     # data.table(eventTime = eventTime, moduleName = moduleName,
     #           eventType = eventType, eventPriority = eventPriority)
     eeldt
@@ -79,7 +81,7 @@ setMethod(
   signature(eventTime = "missing", moduleName = "missing",
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
-    data.table::copy(.emptyEventListDT)
+    copy(.emptyEventListDT)
     #data.table(eventTime = numeric(0L), moduleName = character(0L),
     #           eventType = character(0L), eventPriority = numeric(0L))
 })
@@ -94,7 +96,7 @@ setMethod(
     data.table(eventTime = integer(i), moduleName = character(i),
                eventType = character(i), eventPriority = numeric(i))
   }))
-  assignInMyNamespace(".singleEventListDT", data.table(eventTime = integer(1L), moduleName = character(1L),
+  assignInMyNamespace(".singleEventListDT", data.table(eventTime = numeric(1L), moduleName = character(1L),
                                                        eventType = character(1L), eventPriority = numeric(1L)))
   assignInMyNamespace(".currentEventDT", .emptyEventList(numeric(1), character(1), character(1), numeric(1)))
 
@@ -106,7 +108,7 @@ setMethod(
 
 
 #' @rdname emptyEventList
-.emptyEventListNA <- .emptyEventList(NA_integer_, NA_character_, NA_character_, NA_integer_)
+.emptyEventListNA <- .emptyEventList(NA_real_, NA_character_, NA_character_, NA_integer_)
 
 #' @rdname emptyEventList
 .currentEventDT <- list()
@@ -213,10 +215,12 @@ setMethod(
 #' @rdname modifySearchPath
 .modifySearchPath <- function(pkgs, removeOthers = FALSE) {
   pkgs <- c("SpaDES.core", pkgs)
-  pkgs <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
+  pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
   pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
+
   # Find all packages that are not in the first sequence after .GlobalEnv
   whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
+
   if (any(whNotAtTop)) {
     if (removeOthers) {
       pkgs <- setdiff(search(), pkgs)
@@ -246,4 +250,9 @@ setMethod(
   }
 }
 
-.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|base|methods|utils|graphics|datasets|stats"
+
+.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats"
+
+.pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
+.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)], paste0("package:",.pkgEnv$corePackagesVec[-(1:2)]))
+

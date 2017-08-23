@@ -5,7 +5,29 @@
 \alias{spades}
 \alias{spades,simList,ANY,ANY,missing-method}
 \alias{spades,ANY,ANY,ANY,logical-method}
-\title{Run a spatial discrete event simulation}
+\title{setMethod(
+  "scheduleEvent",
+  signature(
+    sim = "simList",
+    eventTime = "NULL",
+    moduleName = "character",
+    eventType = "character",
+    eventPriority = "numeric"
+  ),
+  definition = function(sim,
+                        eventTime,
+                        moduleName,
+                        eventType,
+                        eventPriority) {
+    warning(
+      paste(
+        "Invalid or missing eventTime. This is usually",
+        "caused by an attempt to scheduleEvent at time NULL",
+        "or by using an undefined parameter."
+      )
+    )
+    return(invisible(sim))
+  })}
 \usage{
 spades(sim, debug = FALSE, progress = NA, cache, .plotInitialTime = NULL,
   .saveInitialTime = NULL, notOlderThan = NULL, ...)
@@ -55,11 +77,37 @@ anything passed in \code{...} is unique, i.e., not cached previously.}
 Invisibly returns the modified \code{simList} object.
 }
 \description{
+#' @rdname scheduleEvent
+setMethod(
+  "scheduleEvent",
+  signature(
+    sim = "simList",
+    eventTime = "numeric",
+    moduleName = "character",
+    eventType = "character",
+    eventPriority = "missing"
+  ),
+  definition = function(sim,
+                        eventTime,
+                        moduleName,
+                        eventType,
+                        eventPriority) {
+    scheduleEvent(
+      sim = sim,
+      eventTime = eventTime,
+      moduleName = moduleName,
+      eventType = eventType,
+      eventPriority = .normal()
+    )
+  })
+Run a spatial discrete event simulation
+}
+\details{
 Here, we implement a simulation in a more modular fashion so it's easier to add
 submodules to the simulation. We use S4 classes and methods, and use `data.table`
 instead of `data.frame` to implement the event queue (because it is much faster).
-}
-\details{
+
+
 The is the workhorse function in the SpaDES package. It runs simulations by
 implementing the rules outlined in the \code{simList}.
 

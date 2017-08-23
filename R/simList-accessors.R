@@ -404,7 +404,7 @@ setMethod(
     if (hidden) {
       mods <- sim@modules
     } else {
-      hiddenMods <- unlist(sim@modules) %in% (.coreModules() %>% unname() %>% unlist())
+      hiddenMods <- unlist(sim@modules) %in% (.pkgEnv$.coreModules %>% unlist())
       mods <- sim@modules[!hiddenMods]
     }
     return(mods)
@@ -1186,7 +1186,7 @@ setMethod("inputs",
               # whereas is.na does not
               if (any(!is.na(sim@inputs$loadTime))) {
                 if (!is.null(sim@inputs$loadTime)) {
-                  obj <- data.table::copy(sim@inputs) # don't change original sim
+                  obj <- copy(sim@inputs) # don't change original sim
                   set(obj, , j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
                   #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.envir)]
                   obj[]
@@ -1422,7 +1422,7 @@ setMethod(
     # whereas is.na does not
     if (any(!is.na(sim@outputs$saveTime))) {
       if (!is.null(sim@outputs$saveTime)) {
-        obj <- data.table::copy(sim@outputs) # don't change original sim
+        obj <- copy(sim@outputs) # don't change original sim
         obj[, saveTime := convertTimeunit(saveTime, unit, sim@.envir)]
         obj[]
         obj
@@ -2011,40 +2011,29 @@ setReplaceMethod(
 #' @export
 #' @docType methods
 #' @rdname simList-accessors-times
-setGeneric("time", function(x, unit, ...) {
-  stats::time(x, ...)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "time",
-  signature = c(".simList", "missing"),
-  definition = function(x) {
-    mUnit <- .callingFrameTimeunit(x)
-    if (is.null(mUnit)) {
-      mUnit <- NA_character_
+#' @importFrom stats time
+time..simList <- function(x, unit, ...) {
+    if(missing(unit)) {
+      mUnit <- .callingFrameTimeunit(x)
+      if (is.null(mUnit)) {
+        mUnit <- NA_character_
+      }
+      unit <- mUnit
     }
-    t <- time(x, mUnit)
-    return(t)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "time",
-  signature = c(".simList", "character"),
-  definition = function(x, unit) {
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
-        t <- convertTimeunit(x@simtimes$current, unit, x@.envir)
+        t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
+                             skipChecks = TRUE)
         return(t)
       }
     }
-    t <- x@simtimes$current
+    t <- x@simtimes[["current"]]
     return(t)
-})
+    #t <- time(x, mUnit)
+    #return(t)
+}
+
 
 #' @export
 #' @rdname simList-accessors-times
@@ -2210,37 +2199,22 @@ setReplaceMethod(
 #' @docType methods
 #' @keywords internal
 #' @rdname namespacing
-#'
-setGeneric(".callingFrameTimeunit", function(x) {
-  standardGeneric(".callingFrameTimeunit")
-})
-
-#' @export
-#' @docType methods
-#' @rdname namespacing
-setMethod(
-  ".callingFrameTimeunit",
-  signature = c(".simList"),
-  definition = function(x) {
-    mod <- x@current$moduleName
-    out <- if (length(mod) > 0) {
-      timeunits(x)[[mod]]
+.callingFrameTimeunit <- function(x) {
+  if(is.null(x)) return(NULL)
+  #if(!is(x, ".simList")) stop("x must be a .simList")
+  mod <- x@current[["moduleName"]]
+  out <- if (length(mod) > 0) {
+    if(!is.null(x@.envir$.timeunits)) {
+      x@.envir$.timeunits[[mod]]
     } else {
-      x@simtimes[["timeunit"]]
+      timeunits(x)[[mod]]
     }
-    return(out)
-})
 
-#' @export
-#' @docType methods
-#' @rdname namespacing
-#'
-setMethod(
-  ".callingFrameTimeunit",
-  signature = c("NULL"),
-  definition = function(x) {
-    return(NULL)
-})
+  } else {
+    x@simtimes[["timeunit"]]
+  }
+  return(out)
+}
 
 ################################################################################
 #' @inheritParams times
@@ -2282,7 +2256,7 @@ setGeneric("timeunit", function(x) {
 setMethod("timeunit",
           signature = ".simList",
           definition = function(x) {
-            return(x@simtimes$timeunit)
+            return(x@simtimes[["timeunit"]])
 })
 
 #' @export
@@ -2414,7 +2388,7 @@ setMethod(
       # note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(sim@events$eventTime))) {
         if (!is.null(sim@events$eventTime)) {
-          obj <- data.table::copy(sim@events) # don't change original sim
+          obj <- copy(sim@events) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj
@@ -2492,7 +2466,7 @@ setMethod(
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
-          obj <- data.table::copy(sim@current) # don't change original sim
+          obj <- copy(sim@current) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj
@@ -2558,20 +2532,21 @@ setMethod(
   "completed",
   signature = c(".simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) & (length(sim@completed$eventTime))) {
+    out <- if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
-      if (any(!is.na(sim@completed$eventTime))) {
-        if (!is.null(sim@completed$eventTime)) {
-          obj <- data.table::copy(sim@completed) # don't change original sim
+      compl <- rbindlist(sim@completed)
+      if (any(!is.na(compl$eventTime))) {
+        if (!is.null(compl$eventTime)) {
+          obj <- compl#copy(sim@completed) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
           obj
         }
       } else {
-        sim@completed
+        rbindlist(sim@completed)
       }
     } else {
-      sim@completed
+      rbindlist(sim@completed)
     }
     return(out)
 })
@@ -2605,7 +2580,7 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
-    sim@completed <- value
+    sim@completed <- list(value)
     return(sim)
 })
 

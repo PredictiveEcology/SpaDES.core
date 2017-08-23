@@ -5,23 +5,14 @@ test_that("spelling errors", {
   skip_on_os("windows")
   skip_if_not_installed("hunspell")
 
-  ## ensure that stats terms are included in the word list
   pkg <- "SpaDES.core"
   pkgDir <- system.file(package = pkg)
+  wordsFile <- file.path(".aspell", paste0(pkg, ".rds"))
 
-  if (interactive() && requireNamespace("devtools")) {
-    devtools::dev_mode(TRUE)
-  }
-  .wordsFile <- system.file("dict/words.rds", package = pkg)
-  .words <- readRDS(.wordsFile)
-  .en_stats <- hunspell::en_stats # nolint
-  .complete <- all(.en_stats %in% .words)
-  expect_true(.complete)
-
-  ## if needed, add any new stats words to the word list
-  if (interactive() && !.complete) {
-    ignore <- sort(unique(c(.en_stats, .words, pkg)))
-    saveRDS(ignore, .wordsFile)
+  if (interactive()) {
+    ## add custom words to package dictionary
+    words <- c("SpaDES")
+    saveRDS(words, wordsFile)
   }
 
   ## check vignettes

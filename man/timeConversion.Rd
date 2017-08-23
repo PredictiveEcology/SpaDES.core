@@ -3,13 +3,7 @@
 \docType{methods}
 \name{inSeconds}
 \alias{inSeconds}
-\alias{inSeconds,character,environment-method}
-\alias{inSeconds,NULL,missing-method}
-\alias{inSeconds,character,missing-method}
 \alias{convertTimeunit}
-\alias{convertTimeunit,numeric,character,environment-method}
-\alias{convertTimeunit,numeric,missing,missing-method}
-\alias{convertTimeunit,numeric,character,missing-method}
 \alias{.spadesTimes}
 \alias{spadesTimes}
 \alias{checkTimeunit}
@@ -18,21 +12,9 @@
 \title{Convert time units}
 \format{An object of class \code{character} of length 6.}
 \usage{
-inSeconds(unit, envir)
+inSeconds(unit, envir, skipChecks = FALSE)
 
-\S4method{inSeconds}{character,environment}(unit, envir)
-
-\S4method{inSeconds}{`NULL`,missing}(unit)
-
-\S4method{inSeconds}{character,missing}(unit)
-
-convertTimeunit(time, unit, envir)
-
-\S4method{convertTimeunit}{numeric,character,environment}(time, unit, envir)
-
-\S4method{convertTimeunit}{numeric,missing,missing}(time)
-
-\S4method{convertTimeunit}{numeric,character,missing}(time, unit)
+convertTimeunit(time, unit, envir, skipChecks = FALSE)
 
 .spadesTimes
 
@@ -50,6 +32,9 @@ defined time unit, given as the unit name only. See details.}
 
 \item{envir}{An environment. This is where to look up the function definition for
 the time unit. See details.}
+
+\item{skipChecks}{For speed, the internal checks for classes and missingness can be skipped.
+Default \code{FALSE}.}
 
 \item{time}{Numeric. With a unit attribute, indicating the time unit of the
 input numeric. See Details.}

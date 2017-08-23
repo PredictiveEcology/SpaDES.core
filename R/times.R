@@ -161,6 +161,8 @@ attributes(monthsInSeconds)$unit <- "second"
 #'               defined time unit, given as the unit name only. See details.
 #' @param envir   An environment. This is where to look up the function definition for
 #'                the time unit. See details.
+#' @param skipChecks For speed, the internal checks for classes and missingness can be skipped.
+#'                   Default \code{FALSE}.
 #'
 #' @details Because of R scoping, if \code{envir} is a simList environment, then
 #' this function will search there first, then up the current \code{search()} path.
@@ -175,64 +177,42 @@ attributes(monthsInSeconds)$unit <- "second"
 #' @docType methods
 #' @rdname timeConversion
 #'
-setGeneric("inSeconds", function(unit, envir) {
-  standardGeneric("inSeconds")
-})
+inSeconds <- function(unit, envir, skipChecks = FALSE) {
+  if(!skipChecks) {
+    if(missing(envir)) envir <- .GlobalEnv
+    if(missing(unit)) unit <- NA_character_
+    if(is.null(unit)) unit <- NA_character_
+    if(!is.character(unit)) stop("unit must be a character")
+  }
+  if (!is.na(unit)) {
+    out <- switch(unit,
+                  second = secondsInSeconds,
+                  seconds = secondsInSeconds,
+                  hour = hoursInSeconds,
+                  hours = hoursInSeconds,
+                  day = daysInSeconds,
+                  days = daysInSeconds,
+                  week = weeksInSeconds,
+                  weeks = weeksInSeconds,
+                  month = monthsInSeconds,
+                  months = monthsInSeconds,
+                  year = yearsInSeconds,
+                  years = yearsInSeconds)
+  } else {
+    out <- 0
+  }
 
-#' @export
-#' @rdname timeConversion
-setMethod(
-  "inSeconds",
-  signature = c("character", "environment"),
-  definition <- function(unit, envir) {
-
-    if (!is.na(unit)) {
-      out <- switch(unit,
-                    second = secondsInSeconds,
-                    seconds = secondsInSeconds,
-                    hour = hoursInSeconds,
-                    hours = hoursInSeconds,
-                    day = daysInSeconds,
-                    days = daysInSeconds,
-                    week = weeksInSeconds,
-                    weeks = weeksInSeconds,
-                    month = monthsInSeconds,
-                    months = monthsInSeconds,
-                    year = yearsInSeconds,
-                    years = yearsInSeconds)
-    } else {
-      out <- 0
+  # Allow for user defined time units in metadata - null is result
+  #  from switch fn above if it does not appear. So search through SpaDES
+  # functions first above, then check user defined units
+  if (is.null(out)) {
+    if (checkTimeunit(unit, envir)) {
+      out <- as.numeric(get(paste0("d", unit), envir = envir)(1))
     }
-
-    # Allow for user defined time units in metadata - null is result
-    #  from switch fn above if it does not appear. So search through SpaDES
-    # functions first above, then check user defined units
-    if (is.null(out)) {
-      if (checkTimeunit(unit, envir)) {
-        out <- as.numeric(get(paste0("d", unit), envir = envir)(1))
-      }
-    }
-    #attributes(out)$unit = "second"
-    return(out)
-})
-
-#' @export
-#' @rdname timeConversion
-setMethod("inSeconds",
-          signature = c("NULL", "missing"),
-          definition <- function(unit) {
-            out <- NA_character_
-            return(inSeconds(out, .GlobalEnv))
-})
-
-#' @export
-#' @rdname timeConversion
-setMethod("inSeconds",
-          signature = c("character", "missing"),
-          definition <- function(unit) {
-            return(inSeconds(unit, .GlobalEnv))
-})
-
+  }
+  #attributes(out)$unit = "second"
+  return(out)
+}
 ################################################################################
 #' Convert time units
 #'
@@ -248,69 +228,55 @@ setMethod("inSeconds",
 #'               input numeric. See Details.
 #' @export
 #' @importFrom stringi stri_detect_fixed
+#' @inheritParams inSeconds
 #' @include simList-class.R
 #' @docType methods
 #' @rdname timeConversion
 #' @author Eliot McIntire
-setGeneric("convertTimeunit", function(time, unit, envir) {
-  standardGeneric("convertTimeunit")
-})
+convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
+  if(!skipChecks) {
+    if(missing(envir)) envir <- .GlobalEnv
+    if(missing(unit)) unit <- "second"
+    if(!is.character(unit)) stop("unit must be a character")
+    if(!is.numeric(time)) stop("time must be a numeric")
+    if(!is.environment(envir)) stop("envir must be an environment")
+  }
 
-#' @export
-#' @rdname timeConversion
-setMethod(
-  "convertTimeunit",
-  signature = c("numeric", "character", "environment"),
-  definition = function(time, unit, envir) {
-    timeUnit <- attr(time, "unit")
+  timeUnit <- attr(time, "unit")
+  # Assume default of seconds if time has no units
+  if (!is.character(timeUnit)) {
+    attr(time, "unit") <- timeUnit <- "second"
+  }
+  if(is.na(timeUnit)) timeUnit <- "NA" # for startsWith next
 
-    # Assume default of seconds if time has no units
-    if (!is.character(timeUnit)) {
-      attr(time, "unit") <- timeUnit <- "second"
-    }
-    if (is.na(pmatch("second", unit)) | is.na(pmatch("second", timeUnit))) {
-      if (!is.na(timeUnit) & !is.na(unit)) {
-        # confirm that units are usable by SpaDES
-        #  This has been commented out, because it is too slow to check every time
-        #  This should be checked at defineMetadata stage, rather than every
-        #  time time(sim) is used.
-        #checkTimeunit(c(timeUnit, unit), envir)
+  if (!all(startsWith(c(unit, timeUnit), "second"))) {
+    if (!is.na(timeUnit) & !is.na(unit)) {
+      # confirm that units are usable by SpaDES
+      #  This has been commented out, because it is too slow to check every time
+      #  This should be checked at defineMetadata stage, rather than every
+      #  time time(sim) is used.
+      #checkTimeunit(c(timeUnit, unit), envir)
 
-        # if timeUnit is same as unit, skip calculations
-        if (!stri_detect_fixed(unit, pattern = timeUnit)) {
-          if (timeUnit == "second")
-            time <- time * 1 / inSeconds(unit, envir)
-          else if (unit == "second")
-            time <- time * inSeconds(timeUnit, envir) / 1
-          else
-            time <- time * inSeconds(timeUnit, envir) / inSeconds(unit, envir)
-          attr(time, "unit") <- unit
+      # if timeUnit is same as unit, skip calculations
+      if (unit != timeUnit) {
+        if (timeUnit == "second") {
+          time <- time * 1 / inSeconds(unit, envir, skipChecks = TRUE)
+        } else if (unit == "second") {
+          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) / 1
+        } else {
+          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) /
+                          inSeconds(unit, envir, skipChecks = TRUE)
         }
-      } else {
-        # if timeunit is NA
-        time <- 0
         attr(time, "unit") <- unit
       }
+    } else {
+      # if timeunit is NA
+      time <- 0
+      attr(time, "unit") <- unit
     }
-    return(time)
-})
-
-#' @export
-#' @rdname timeConversion
-setMethod("convertTimeunit",
-          signature = c("numeric", "missing", "missing"),
-          definition = function(time) {
-            return(convertTimeunit(time, "second", .GlobalEnv))
-})
-
-#' @export
-#' @rdname timeConversion
-setMethod("convertTimeunit",
-          signature = c("numeric", "character", "missing"),
-          definition = function(time, unit) {
-            return(convertTimeunit(time, unit, .GlobalEnv))
-})
-
+  }
+  return(time)
+}
 ################################################################################
 #' Determine the largest timestep unit in a simulation
 #'
