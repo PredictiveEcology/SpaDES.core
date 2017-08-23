@@ -113,7 +113,6 @@ if (getRversion() >= "3.1.0") {
 #' \code{\link{modules}}, \code{\link{inputs}}, \code{\link{outputs}}
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @docType methods
 #' @export
 #' @include environment.R
 #' @include module-dependencies-class.R

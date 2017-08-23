@@ -21,7 +21,6 @@ if (!isGeneric(".robustDigest")) {
 #' @inheritParams reproducible::.robustDigest
 #'
 #' @author Eliot Mcintire
-#' @docType methods
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
 #' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst
@@ -115,7 +114,6 @@ if (!isGeneric(".tagsByClass")) {
 #' @inheritParams reproducible::.tagsByClass
 #'
 #' @author Eliot McIntire
-#' @docType methods
 #' @exportMethod .tagsByClass
 #' @importFrom reproducible .tagsByClass
 #' @importMethodsFrom reproducible .tagsByClass
@@ -335,7 +333,6 @@ if (!isGeneric(".addTagsToOutput")) {
 #' @inheritParams reproducible::.addTagsToOutput
 #'
 #' @author Eliot MciIntire
-#' @docType methods
 #' @exportMethod .addTagsToOutput
 #' @export
 #' @importFrom reproducible .addTagsToOutput

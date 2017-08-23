@@ -26,7 +26,6 @@
 #' @return Number of seconds within each unit
 #'
 #' @export
-#' @docType methods
 #' @rdname spadesTime
 #'
 #' @author Eliot McIntire
@@ -37,7 +36,6 @@ setGeneric("dyears", function(x) {
 
 #' @importFrom lubridate duration
 #' @export
-#' @docType methods
 #' @rdname spadesTime
 setMethod("dyears",
           signature(x = "numeric"),
@@ -50,7 +48,6 @@ attributes(yearsInSeconds)$unit <- "second"
 
 #' @inheritParams dyears
 #' @export
-#' @docType methods
 #' @rdname spadesTime
 setGeneric("dmonths", function(x) {
   standardGeneric("dmonths")
@@ -174,7 +171,6 @@ attributes(monthsInSeconds)$unit <- "second"
 #'
 #' @export
 #' @author Alex Chubaty & Eliot McIntire
-#' @docType methods
 #' @rdname timeConversion
 #'
 inSeconds <- function(unit, envir, skipChecks = FALSE) {
@@ -230,7 +226,6 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #' @importFrom stringi stri_detect_fixed
 #' @inheritParams inSeconds
 #' @include simList-class.R
-#' @docType methods
 #' @rdname timeConversion
 #' @author Eliot McIntire
 convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
@@ -287,7 +282,6 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname maxTimeunit
 #'
 #' @author Eliot McIntire and Alex Chubaty
@@ -331,7 +325,6 @@ setMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname minTimeunit
 #'
 #' @author Eliot McIntire
@@ -394,7 +387,6 @@ setGeneric("checkTimeunit", function(unit, envir) {
 })
 
 #' @export
-#' @docType methods
 #' @rdname timeConversion
 setMethod("checkTimeunit",
           signature(unit = "character", "missing"),
@@ -403,7 +395,6 @@ setMethod("checkTimeunit",
 })
 
 #' @export
-#' @docType methods
 #' @rdname timeConversion
 setMethod("checkTimeunit",
           signature(unit = "character", "environment"),

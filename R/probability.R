@@ -6,11 +6,10 @@
 #'
 #' @inheritParams CircStats::dwrpnorm
 #'
+#' @author Eliot McIntire
 #' @export
-#' @docType methods
 #' @rdname dwrpnorm2
 #'
-#' @author Eliot McIntire
 #' @examples
 #' # Values for which to evaluate density
 #' theta <- c(1:500) * 2 * pi / 500

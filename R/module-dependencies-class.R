@@ -22,11 +22,9 @@ removeClass("person4")
 #'
 #' @return An empty inputObjects or outputObjects data.frame.
 #'
-#' @docType methods
+#' @author Alex Chubaty
 #' @keywords internal
 #' @rdname inputObjects
-#'
-#' @author Alex Chubaty
 #'
 setGeneric(".inputObjects", function(x) {
   standardGeneric(".inputObjects")

@@ -24,7 +24,6 @@
 #' @importFrom quickPlot .objectNames
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname checkObject
 #'
 #' @author Alex Chubaty and Eliot McIntire
@@ -137,7 +136,6 @@ setMethod(
 #'
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname checkParams
 #'
 #' @author Alex Chubaty

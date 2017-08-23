@@ -363,7 +363,6 @@ setMethod(
 #' @return Invisibly, a list of downloaded files.
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom dplyr mutate_
 #' @include moduleMetadata.R

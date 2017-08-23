@@ -51,7 +51,6 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param sim A \code{simList} simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @docType methods
 #' @export
 #' @importFrom tcltk tkProgressBar
 #' @include environment.R

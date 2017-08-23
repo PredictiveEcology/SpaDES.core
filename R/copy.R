@@ -22,7 +22,6 @@ if (!isGeneric("Copy")) {
 #'               \code{data.table::copy}
 #'
 #' @author Eliot MciIntire
-#' @docType methods
 #' @exportMethod Copy
 #' @export
 #' @importFrom reproducible Copy

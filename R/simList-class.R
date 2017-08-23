@@ -198,10 +198,11 @@ setAs(from = "simList", to = "simList_", def = function(from) {
 #' included in the object, \code{new} returns an object from that class.
 #'
 #' @param .Object  A \code{simList} object.
-#' @include misc-methods.R
+#'
 #' @export
-#' @docType methods
+#' @include misc-methods.R
 #' @rdname initialize-method
+#'
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object) {

@@ -6,7 +6,6 @@
 #' @return Returns a named list of the core modules.
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @keywords internal
 #' @name .coreModules
 #' @rdname coreModules
@@ -38,7 +37,6 @@
 #' @return Returns an empty event list.
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @importFrom data.table data.table
 #' @keywords internal
 #' @name emptyEventList
@@ -132,12 +130,11 @@ setMethod(
 #'
 #' @param x  Not used. Should be missing.
 #'
-#' @importFrom raster extent
-#' @keywords internal
-#' @include simList-class.R
-#' @docType methods
-#' @rdname emptyMetadata
 #' @author Alex Chubaty
+#' @importFrom raster extent
+#' @include simList-class.R
+#' @keywords internal
+#' @rdname emptyMetadata
 #'
 setGeneric(".emptyMetadata", function(x) {
   standardGeneric(".emptyMetadata")
@@ -179,7 +176,6 @@ setMethod(
 #' searched in the call stack. Default is "simInit"
 #'
 #' @author Eliot McIntire
-#' @docType methods
 #' @keywords internal
 #' @name findObjects
 #' @rdname findObjects

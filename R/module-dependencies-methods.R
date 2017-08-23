@@ -24,14 +24,11 @@ selectMethod("show", "igraph")
 #'          and remaining columns the attributes of the dependency objects
 #'          (object name, class, etc.).
 #'
-#' @include simList-class.R
-#'
+#' @author Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist setkey setorder
-#' @docType methods
+#' @include simList-class.R
 #' @rdname depsEdgeList
-#'
-#' @author Alex Chubaty
 #'
 setGeneric("depsEdgeList", function(sim, plot) {
   standardGeneric("depsEdgeList")
@@ -94,14 +91,11 @@ setMethod("depsEdgeList",
 #'
 #' @return An \code{\link{igraph}} object.
 #'
-#' @include simList-class.R
+#' @author Alex Chubaty
 #' @export
-#' @docType methods
+#' @include simList-class.R
 #' @rdname depsGraph
 #'
-#' @author Alex Chubaty
-# igraph is being imported in spades-package.R
-# igraph exports %>% from magrittr
 setGeneric("depsGraph", function(sim, plot) {
   standardGeneric("depsGraph")
 })
@@ -141,19 +135,15 @@ setMethod("depsGraph",
 #'
 #' @return An updated edge list object.
 #'
-#' @include simList-class.R
-#'
+#' @author Alex Chubaty
+#' @export
 #' @importFrom data.table as.data.table data.table rbindlist
 #' @importFrom dplyr anti_join bind_rows filter inner_join lead
 #' @importFrom stats na.omit
-#' @export
-#' @docType methods
+#' @include simList-class.R
 #' @keywords internal
 #' @rdname depsPruneEdges
 #'
-#' @author Alex Chubaty
-# igraph is being imported in spades-package.R
-# igraph exports %>% from magrittr
 setGeneric(".depsPruneEdges", function(simEdgeList) {
   standardGeneric(".depsPruneEdges")
 })
@@ -230,15 +220,11 @@ setMethod(
 #'
 #' @return Character vector of module names, sorted in correct load order.
 #'
-#' @include simList-class.R
-#' @export
-#' @keywords internal
-#' @docType methods
-#' @rdname depsLoadOrder
-#'
 #' @author Alex Chubaty
-# igraph is being imported in spades-package.R
-# igraph exports %>% from magrittr
+#' @export
+#' @include simList-class.R
+#' @keywords internal
+#' @rdname depsLoadOrder
 setGeneric(".depsLoadOrder", function(sim, simGraph) {
   standardGeneric(".depsLoadOrder")
 })

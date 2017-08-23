@@ -104,7 +104,6 @@
 #' @return Updated \code{simList} object.
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom raster extent
 #' @include simList-class.R
@@ -343,7 +342,6 @@ setMethod(
 #' @return data.frame
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @rdname defineParameter
 #'
@@ -437,7 +435,6 @@ setMethod(
 #' module's metadata.
 #'
 #' @author Yong Luo
-#' @docType methods
 #' @export
 #' @rdname expectsInput
 #'
@@ -513,7 +510,6 @@ setMethod(
 #' a module's metadata.
 #'
 #' @author Yong Luo
-#' @docType methods
 #' @export
 #' @rdname createsOutput
 #'
