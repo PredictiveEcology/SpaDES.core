@@ -167,7 +167,7 @@ parameters <- list(
                          .plotInitialTime = 1, .plotInterval = 1)
 )
 
-ftmp <- file.path(tempdir(), "spades_vignetteOutputs")
+ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
 mySim <- simInit(
