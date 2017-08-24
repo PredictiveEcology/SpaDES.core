@@ -16,7 +16,7 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
     } else {
       # don't use progress bar when non-interactive (this is already set during simInit)
       #  NOTE: this has been sorted in simInit because of updateList -- use sorted order here
-      params(sim)[[".progress"]] <- list(type = NA_character_, interval = NA_real_)[ids]
+      params(sim)[[".progress"]] <- .pkgEnv$.progressEmpty[ids]
     }
 
     # if NA then don't use progress bar

@@ -436,7 +436,7 @@ setMethod(
       unique(c(paste0(".", core[-omit]), names(sim@params)))
 
     if (is.null(params$.progress) || any(is.na(params$.progress))) {
-      params$.progress <- list(type = NA_character_, interval = NA_real_)
+      params$.progress <- .pkgEnv$.progressEmpty
     }
 
     tmp <- list()
