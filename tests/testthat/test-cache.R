@@ -212,25 +212,10 @@ test_that("test .prepareOutput", {
     objects = c("landscape")
   )
 
-  # inputs
-  # mySim <- simInit(
-  #   times = times,
-  #   params = list(
-  #     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-  #     # Turn off interactive plotting
-  #     fireSpread = list(.plotInitialTime = NA),
-  #     caribouMovement = list(.plotInitialTime = NA)
-  #     #randomLandscapes = list(.plotInitialTime = NA, .useCache = TRUE)
-  #   ),
-  #   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-  #   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-  #                outputPath = tmpdir,
-  #                cachePath = tmpdir)
-  # )
   simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
   simCached2 <- spades(Copy(mySim), cache = TRUE)
 
-  if(interactive()) {
+  if (interactive()) {
     cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
@@ -243,4 +228,3 @@ test_that("test .prepareOutput", {
 
   clearCache(tmpdir)
 })
-

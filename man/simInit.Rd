@@ -199,7 +199,7 @@ if (require(rgdal)) {
      loadTime = 1,
      stringsAsFactors = FALSE)
  outputs(mySim2) <- data.frame(
-     expand.grid(objectName = c("caribou","landscape"),
+     expand.grid(objectName = c("caribou", "landscape"),
      saveTime = 1:2,
      stringsAsFactors = FALSE))
  all.equal(mySim, mySim2) # TRUE
@@ -229,14 +229,13 @@ if (require(rgdal)) {
  #   declared during module loading, so month became the default
  times(mySim2) <- list(current = 0, start = 0.0, end = 2.0, timeunit = "year")
  all.equal(mySim, mySim2) # fails because time units are all different, so
-             # several parameters that have time units in "months" because they were
-             #  loaded that way
+                          # several parameters that have time units in
+                          # "months" because they were loaded that way
  params(mySim)$fireSpread$.plotInitialTime
  params(mySim2)$fireSpread$.plotInitialTime
  events(mySim) # load event is at time 1 year
  events(mySim2) # load event is at time 1 month, reported in years because of
                 #   update to times above
-
 }
 }
 
