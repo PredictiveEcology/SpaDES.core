@@ -216,7 +216,7 @@ test_that("test .prepareOutput", {
   simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
   simCached2 <- spades(Copy(mySim), cache = TRUE)
 
-  if(interactive()) {
+  if (interactive()) {
     cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
@@ -229,4 +229,3 @@ test_that("test .prepareOutput", {
 
   clearCache(tmpdir)
 })
-

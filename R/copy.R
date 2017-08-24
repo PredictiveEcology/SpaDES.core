@@ -31,14 +31,13 @@ if (!isGeneric("Copy")) {
 #' @rdname Copy
 #' @seealso \code{\link[reproducible]{Copy}}
 setMethod("Copy",
-          signature(object = "simList"),#, objects = "logical", queues = "logical"),
+          signature(object = "simList"),
           definition = function(object, objects, queues) {
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object
             if (queues) {
               sim_@events <- data.table::copy(object@events)
-              #sim_@completed <- lapply(object@completed, data.table::copy)# not needed b/c not data.table
               sim_@current <- data.table::copy(object@current)
             }
             if (objects) {
@@ -46,11 +45,3 @@ setMethod("Copy",
             }
             return(sim_)
 })
-
-#' #' @rdname Copy
-#' setMethod("Copy",
-#'           signature(object = "simList"),# objects = "missing", queues = "missing"),
-#'           definition = function(object) {
-#'             sim_ <- Copy(object, objects = TRUE, queues = TRUE)
-#'             return(sim_)
-#' })
