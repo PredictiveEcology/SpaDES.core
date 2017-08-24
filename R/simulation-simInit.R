@@ -627,7 +627,6 @@ setMethod(
 
 ###### individual missing elements
 #' @rdname simInit
-#' @importFrom sp SpatialPolygons
 setMethod(
   "simInit",
   signature(
