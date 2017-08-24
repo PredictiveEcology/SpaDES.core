@@ -197,7 +197,7 @@ test_that("test .prepareOutput", {
     stringsAsFactors = FALSE
   )
   layers <- lapply(filelist$files, rasterToMemory)
-  landscape <- stack(layers)
+  landscape <- raster::stack(layers)
 
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
@@ -208,7 +208,8 @@ test_that("test .prepareOutput", {
     ),
     modules = list("fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tempdir()),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
     objects = c("landscape")
   )
 
