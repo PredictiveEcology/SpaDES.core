@@ -260,7 +260,7 @@ test_that("test-load.R: passing nearly empty file to simInit does not work corre
   # test object passing directly
   if (require(rgdal, quietly = TRUE)) {
     on.exit(detach("package:rgdal"), add = TRUE)
-      filelist <- data.frame(
+    filelist <- data.frame(
       files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
       functions = "raster",
       package = "raster",

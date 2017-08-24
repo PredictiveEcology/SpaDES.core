@@ -207,6 +207,7 @@ sim <- simInit()
 
 test <- 1:10
 library(igraph) # for \%>\%
+library(reproducible) # for checkPath
 tmpdir <- file.path(tempdir(), "inputs") \%>\% checkPath(create = TRUE)
 tmpFile <- file.path(tmpdir, "test.rds")
 saveRDS(test, file = tmpFile)

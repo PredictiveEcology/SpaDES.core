@@ -15,6 +15,8 @@
 
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
+.pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
+
 ################################################################################
 #' Blank (template) event list
 #'

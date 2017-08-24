@@ -162,14 +162,14 @@ setMethod(
   definition = function(object, functionName) {
     cur <- current(object)
     if (NROW(cur)) {
-      if(cur$eventTime <= end(object)) {
+      if (cur$eventTime <= end(object)) {
         whichCached <- grep(".useCache", object@params)
         useCacheVals <- lapply(whichCached, function(x) {
           object@params[[x]]$.useCache
         })
 
         whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
-        if(isTRUE(useCacheVals[[whCurrent]])) {
+        if (isTRUE(useCacheVals[[whCurrent]])) {
           cat("Using cached copy of", cur$moduleName, "module\n")
         } else {
           cat("Using cached copy of", cur$eventType, "event in", cur$moduleName, "module\n")
@@ -258,6 +258,9 @@ setMethod(
         # need to keep the list(...) slots ... i.e., Caching of simLists is mostly about objects in .envir
         object2[[i]] <- Copy(list(...)[[whSimList]], objects = FALSE)
         object2[[i]]@.envir <- object[[i]]@.envir
+        object2[[i]]@completed <- object[[i]]@completed
+        object2[[i]]@simtimes <- object[[i]]@simtimes
+        object2[[i]]@current <- object[[i]]@current
 
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
@@ -269,6 +272,8 @@ setMethod(
       # need to keep the list(...) slots ... i.e., Caching of simLists is mostly about objects in .envir
       object2 <- Copy(list(...)[[whSimList]], objects = FALSE)
       object2@.envir <- object@.envir
+      object2@completed <- object@completed
+      object2@simtimes <- object@simtimes
       if (NROW(current(object2)) == 0) { # this is usually a spades call
         object2@events <- object@events
       } else {
@@ -276,6 +281,7 @@ setMethod(
         if (!isTRUE(all.equal(object@events, object2@events)))
           object2@events <- unique(rbindlist(list(object@events, object2@events)))
       }
+      object2@current <- object@current
 
       lsOrigEnv <- ls(origEnv, all.names = TRUE)
       keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
@@ -286,6 +292,10 @@ setMethod(
         rm(list = attr(object, "removedObjs"), envir = object2@.envir)
       }
     }
+
+    attr(object2, "tags") <- attr(object, "tags")
+    attr(object2, "call") <- attr(object, "call")
+    attr(object2, "function") <- attr(object, "function")
 
     return(object2)
 })

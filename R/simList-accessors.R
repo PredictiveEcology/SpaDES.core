@@ -1100,6 +1100,7 @@ setReplaceMethod("progressType",
 #'
 #' test <- 1:10
 #' library(igraph) # for %>%
+#' library(reproducible) # for checkPath
 #' tmpdir <- file.path(tempdir(), "inputs") %>% checkPath(create = TRUE)
 #' tmpFile <- file.path(tmpdir, "test.rds")
 #' saveRDS(test, file = tmpFile)
@@ -2166,12 +2167,12 @@ setReplaceMethod(
 #' @keywords internal
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
-  if(is.null(x)) return(NULL)
-  #if(!is(x, ".simList")) stop("x must be a .simList")
+  if (is.null(x)) return(NULL)
+  #if (!is(x, ".simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
   out <- if (length(mod) > 0) {
-    if(!is.null(x@.envir$.timeunits)) {
-      x@.envir$.timeunits[[mod]]
+    if (!is.null(x@.envir[[".timeunits"]])) {
+      x@.envir[[".timeunits"]][[mod]]
     } else {
       timeunits(x)[[mod]]
     }

@@ -3,15 +3,9 @@
 \docType{methods}
 \name{doEvent}
 \alias{doEvent}
-\alias{doEvent,simList,ANY-method}
-\alias{doEvent,simList,missing-method}
 \title{Process a simulation event}
 \usage{
 doEvent(sim, debug, notOlderThan)
-
-\S4method{doEvent}{simList,ANY}(sim, debug, notOlderThan)
-
-\S4method{doEvent}{simList,missing}(sim)
 }
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}

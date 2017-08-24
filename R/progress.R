@@ -1,6 +1,7 @@
 #' @importFrom stats na.omit
 doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
+    ids <- na.omit(match(names(P(sim, ".progress")), c("type", "interval")))
     if (interactive()) {
       tu <- sim@simtimes[["timeunit"]]
       defaults <- list(type = "text", interval = (end(sim, tu) - start(sim, tu)) / (end(sim, tu) - start(sim, tu)))
@@ -10,12 +11,12 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
              is.null(P(sim, ".progress")$interval) ) {
         params(sim)[[".progress"]] <- defaults
       } else {
-        ids <- na.omit(match(names(P(sim, ".progress")), c("type", "interval")))
         params(sim)[[".progress"]][names(defaults)[-ids]] <- defaults[-ids]
       }
     } else {
       # don't use progress bar when non-interactive (this is already set during simInit)
-      params(sim)[[".progress"]] <- list(type = NA, interval = NA_real_)
+      #  NOTE: this has been sorted in simInit because of updateList -- use sorted order here
+      params(sim)[[".progress"]] <- .pkgEnv$.progressEmpty[ids]
     }
 
     # if NA then don't use progress bar

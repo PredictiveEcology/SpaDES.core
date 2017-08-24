@@ -16,7 +16,7 @@ if (!isGeneric("Copy")) {
 #'
 #' @inheritParams reproducible::Copy
 #' @param objects  Whether the objects contained within the simList environment
-#'                 should be copied. Default = TRUE, which may be slow.
+#'                 should be copied. Default \code{TRUE}, which may be slow.
 #' @param queues Logical. Should the events queues (\code{events},
 #'               \code{current}, \code{completed}) be deep copied via
 #'               \code{data.table::copy}
@@ -30,14 +30,13 @@ if (!isGeneric("Copy")) {
 #' @rdname Copy
 #' @seealso \code{\link[reproducible]{Copy}}
 setMethod("Copy",
-          signature(object = "simList"),#, objects = "logical", queues = "logical"),
+          signature(object = "simList"),
           definition = function(object, objects, queues) {
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object
             if (queues) {
               sim_@events <- data.table::copy(object@events)
-              sim_@completed <- lapply(object@completed, data.table::copy)
               sim_@current <- data.table::copy(object@current)
             }
             if (objects) {
@@ -45,11 +44,3 @@ setMethod("Copy",
             }
             return(sim_)
 })
-
-#' #' @rdname Copy
-#' setMethod("Copy",
-#'           signature(object = "simList"),# objects = "missing", queues = "missing"),
-#'           definition = function(object) {
-#'             sim_ <- Copy(object, objects = TRUE, queues = TRUE)
-#'             return(sim_)
-#' })

@@ -174,11 +174,11 @@ attributes(monthsInSeconds)$unit <- "second"
 #' @rdname timeConversion
 #'
 inSeconds <- function(unit, envir, skipChecks = FALSE) {
-  if(!skipChecks) {
-    if(missing(envir)) envir <- .GlobalEnv
-    if(missing(unit)) unit <- NA_character_
-    if(is.null(unit)) unit <- NA_character_
-    if(!is.character(unit)) stop("unit must be a character")
+  if (!skipChecks) {
+    if (missing(envir)) envir <- .GlobalEnv
+    if (missing(unit)) unit <- NA_character_
+    if (is.null(unit)) unit <- NA_character_
+    if (!is.character(unit)) stop("unit must be a character")
   }
   if (!is.na(unit)) {
     out <- switch(unit,
@@ -229,12 +229,12 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #' @rdname timeConversion
 #' @author Eliot McIntire
 convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
-  if(!skipChecks) {
-    if(missing(envir)) envir <- .GlobalEnv
-    if(missing(unit)) unit <- "second"
-    if(!is.character(unit)) stop("unit must be a character")
-    if(!is.numeric(time)) stop("time must be a numeric")
-    if(!is.environment(envir)) stop("envir must be an environment")
+  if (!skipChecks) {
+    if (missing(envir)) envir <- .GlobalEnv
+    if (missing(unit)) unit <- "second"
+    if (!is.character(unit)) stop("unit must be a character")
+    if (!is.numeric(time)) stop("time must be a numeric")
+    if (!is.environment(envir)) stop("envir must be an environment")
   }
 
   timeUnit <- attr(time, "unit")
@@ -242,7 +242,7 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   if (!is.character(timeUnit)) {
     attr(time, "unit") <- timeUnit <- "second"
   }
-  if(is.na(timeUnit)) timeUnit <- "NA" # for startsWith next
+  if (is.na(timeUnit)) timeUnit <- "NA" # for startsWith next
 
   if (!all(startsWith(c(unit, timeUnit), "second"))) {
     if (!is.na(timeUnit) & !is.na(unit)) {
