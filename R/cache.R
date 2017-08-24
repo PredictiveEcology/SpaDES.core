@@ -262,6 +262,7 @@ setMethod(
         object2[[i]]@.envir <- object[[i]]@.envir
         object2[[i]]@completed <- object[[i]]@completed
         object2[[i]]@simtimes <- object[[i]]@simtimes
+        object2[[i]]@current <- object[[i]]@current
 
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
@@ -282,6 +283,7 @@ setMethod(
         if (!isTRUE(all.equal(object@events, object2@events)))
           object2@events <- unique(rbindlist(list(object@events, object2@events)))
       }
+      object2@current <- object@current
 
       lsOrigEnv <- ls(origEnv, all.names = TRUE)
       keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
