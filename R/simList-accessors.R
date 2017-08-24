@@ -8,7 +8,6 @@ if (getRversion() >= "3.1.0") {
 #' @param object  \code{simList}
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom dplyr mutate
 #' @importFrom stats na.omit
@@ -112,7 +111,6 @@ setMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname ls-method
 #' @family functions to access elements of a \code{simList} object
 ls.simList <- function(name) {
@@ -153,7 +151,6 @@ setMethod("objects",
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname ls_str-method
 #' @family functions to access elements of a \code{simList} object
 #'
@@ -195,7 +192,6 @@ setMethod("ls.str",
 #'
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @family functions to access elements of a \code{simList} object
 #' @include simList-class.R
@@ -259,7 +255,6 @@ setReplaceMethod("envir",
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @aliases simList-accessors-objects
 #' @rdname objects
 #'
@@ -320,7 +315,6 @@ setReplaceMethod(
 #' @name [[
 #' @aliases [[,simList,ANY,ANY-method
 #' @aliases simList-accessors-objects
-#' @docType methods
 #' @rdname objects
 setMethod("[[", signature(x = "simList", i = "ANY", j = "ANY"),
           definition = function(x, i, j, ..., drop) {
@@ -386,7 +380,6 @@ setReplaceMethod("$", signature(x = "simList", value = "ANY"),
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @aliases simList-accessors-modules
 #' @rdname simList-accessors-modules
 #'
@@ -432,7 +425,6 @@ setReplaceMethod("modules",
 #' @inheritParams modules
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname simList-accessors-modules
 #'
 setGeneric("depends", function(sim) {
@@ -481,7 +473,6 @@ setReplaceMethod("depends",
 #'
 #' @author Eliot McIntire
 #' @export
-#' @docType methods
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname namespacing
@@ -558,7 +549,6 @@ setMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @aliases simList-accessors-params
 #' @aliases parameters
 #' @rdname params
@@ -601,7 +591,6 @@ setReplaceMethod("params",
 #' \code{params(sim)$moduleName$paramName}
 #'
 #' @aliases simList-accessors-params
-#' @docType methods
 #' @export
 #' @include simList-class.R
 #' @rdname params
@@ -648,7 +637,6 @@ setMethod(
 #' @export
 #'
 #' @include simList-class.R
-#' @docType methods
 #' @aliases simList-accessors-function
 #' @rdname F
 #' @inheritParams P
@@ -700,7 +688,6 @@ setMethod(
 #' @inheritParams params
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname globals
 #'
 #' @family functions to access elements of a \code{simList} object
@@ -779,7 +766,6 @@ setReplaceMethod("G",
 #'
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname params
 #' @examples
 #' modules <- list("randomLandscapes")
@@ -821,7 +807,6 @@ setMethod("parameters",
 #' @inheritParams params
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname checkpoint
 #' @family functions to access elements of a \code{simList} object
 #'
@@ -860,7 +845,6 @@ setReplaceMethod("checkpointFile",
 #' @inheritParams params
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @rdname checkpoint
 #'
 setGeneric("checkpointInterval", function(sim) {
@@ -911,7 +895,6 @@ setReplaceMethod("checkpointInterval",
 #' @inheritParams params
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @family functions to access elements of a \code{simList} object
 #' @rdname progress
 #'
@@ -974,7 +957,6 @@ setReplaceMethod("progressInterval",
 #' @inheritParams params
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname progress
 #'
 setGeneric("progressType", function(sim) {
@@ -1105,7 +1087,6 @@ setReplaceMethod("progressType",
 #' @importFrom stats na.omit
 #' @importFrom R.utils isAbsolutePath
 #' @export
-#' @docType methods
 #' @name inputs
 #' @aliases simList-accessors-inout
 #' @rdname simList-accessors-inout
@@ -1119,6 +1100,7 @@ setReplaceMethod("progressType",
 #'
 #' test <- 1:10
 #' library(igraph) # for %>%
+#' library(reproducible) # for checkPath
 #' tmpdir <- file.path(tempdir(), "inputs") %>% checkPath(create = TRUE)
 #' tmpFile <- file.path(tmpdir, "test.rds")
 #' saveRDS(test, file = tmpFile)
@@ -1320,7 +1302,6 @@ setReplaceMethod(
 #'
 #' @inheritParams inputs
 #'
-#' @docType methods
 #' @export
 #' @include simList-class.R
 #' @importFrom dplyr inner_join
@@ -1534,7 +1515,6 @@ setReplaceMethod(
 #' @inheritParams inputs
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-inout
 #'
 setGeneric("inputArgs", function(sim) {
@@ -1579,7 +1559,6 @@ setReplaceMethod(
 #' @inheritParams inputs
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-inout
 #'
 setGeneric("outputArgs", function(sim) {
@@ -1652,7 +1631,6 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @importFrom stats na.omit
 #' @export
-#' @docType methods
 #' @aliases simList-accessors-paths
 #' @rdname simList-accessors-paths
 #'
@@ -1731,7 +1709,6 @@ setReplaceMethod(
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-paths
 #'
 setGeneric("cachePath", function(sim) {
@@ -1770,7 +1747,6 @@ setReplaceMethod(
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-paths
 #'
 setGeneric("inputPath", function(sim) {
@@ -1809,7 +1785,6 @@ setReplaceMethod(
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-paths
 #'
 setGeneric("outputPath", function(sim) {
@@ -1856,7 +1831,6 @@ setReplaceMethod(
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-paths
 #'
 setGeneric("modulePath", function(sim) {
@@ -1936,7 +1910,6 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @include times.R
 #' @importFrom chron times
-#' @docType methods
 #' @aliases simList-accessors-times
 #' @rdname simList-accessors-times
 #'
@@ -2006,14 +1979,14 @@ setReplaceMethod(
 
 ################################################################################
 #' @inheritParams times
+#'
+#' @export
+#' @importFrom stats time
 #' @include simList-class.R
 #' @include times.R
-#' @export
-#' @docType methods
 #' @rdname simList-accessors-times
-#' @importFrom stats time
 time..simList <- function(x, unit, ...) {
-    if(missing(unit)) {
+    if (missing(unit)) {
       mUnit <- .callingFrameTimeunit(x)
       if (is.null(mUnit)) {
         mUnit <- NA_character_
@@ -2030,10 +2003,7 @@ time..simList <- function(x, unit, ...) {
     }
     t <- x@simtimes[["current"]]
     return(t)
-    #t <- time(x, mUnit)
-    #return(t)
 }
-
 
 #' @export
 #' @rdname simList-accessors-times
@@ -2066,7 +2036,6 @@ setReplaceMethod(
 #' @include times.R
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-times
 #'
 setGeneric("end", function(x, unit, ...) {
@@ -2133,7 +2102,6 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @include times.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-times
 #'
 setGeneric("start", function(x, unit, ...) {
@@ -2196,16 +2164,15 @@ setReplaceMethod(
 #' @inheritParams times
 #' @include simList-class.R
 #' @include times.R
-#' @docType methods
 #' @keywords internal
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
-  if(is.null(x)) return(NULL)
-  #if(!is(x, ".simList")) stop("x must be a .simList")
+  if (is.null(x)) return(NULL)
+  #if (!is(x, ".simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
   out <- if (length(mod) > 0) {
-    if(!is.null(x@.envir$.timeunits)) {
-      x@.envir$.timeunits[[mod]]
+    if (!is.null(x@.envir[[".timeunits"]])) {
+      x@.envir[[".timeunits"]][[mod]]
     } else {
       timeunits(x)[[mod]]
     }
@@ -2244,7 +2211,6 @@ setReplaceMethod(
 #'
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-times
 #'
 setGeneric("timeunit", function(x) {
@@ -2299,7 +2265,6 @@ setReplaceMethod(
 #'
 #' @include simList-class.R
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-times
 #'
 setGeneric("timeunits", function(x) {
@@ -2364,7 +2329,6 @@ setMethod(
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.
 #'
 #' @aliases simList-accessors-events
-#' @docType methods
 #' @export
 #' @family functions to access elements of a \code{simList} object
 #' @importFrom data.table := copy data.table
@@ -2444,7 +2408,6 @@ setReplaceMethod(
 ################################################################################
 #' @inheritParams events
 #'
-#' @docType methods
 #' @export
 #' @importFrom data.table := data.table
 #' @importFrom lazyeval interp
@@ -2519,7 +2482,6 @@ setReplaceMethod("current",
 #' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @export
-#' @docType methods
 #' @rdname simList-accessors-events
 #'
 setGeneric("completed", function(sim, unit) {
@@ -2598,7 +2560,6 @@ setReplaceMethod(
 #' @return A \code{simList} object.
 #'
 #' @include simList-class.R
-#' @docType methods
 #' @family functions to access elements of a \code{simList} object
 #' @keywords internal
 #' @rdname addDepends
@@ -2639,7 +2600,6 @@ setMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @docType methods
 #' @family functions to access elements of a \code{simList} object
 #' @rdname packages
 #'

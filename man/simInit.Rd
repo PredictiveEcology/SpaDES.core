@@ -172,7 +172,7 @@ if (require(rgdal)) {
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
      functions = "raster",
      package = "raster",
-     loadTime = 0,
+     loadTime = 1,
      stringsAsFactors = FALSE),
    outputs = data.frame(
      expand.grid(objectName = c("caribou","landscape"),
@@ -180,8 +180,9 @@ if (require(rgdal)) {
      stringsAsFactors = FALSE))
  )
 
- # Use accessors for inputs, outputs, times
+ # Use accessors for inputs, outputs
  mySim2 <- simInit(
+   times = list(current = 0, start = 0.0, end = 2.0, timeunit = "year"),
    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
    params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
    paths = list(
@@ -190,19 +191,51 @@ if (require(rgdal)) {
    )
  )
 
- # add by accessor: note need current in times() accessor
- times(mySim2) <- list(current = 0, start = 0.0, end = 2.0, timeunit = "year")
+ # add by accessor is equivalent
  inputs(mySim2) <- data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
      functions = "raster",
      package = "raster",
-     loadTime = 3,
+     loadTime = 1,
      stringsAsFactors = FALSE)
  outputs(mySim2) <- data.frame(
-     expand.grid(objectName = c("caribou","landscape"),
+     expand.grid(objectName = c("caribou", "landscape"),
      saveTime = 1:2,
      stringsAsFactors = FALSE))
  all.equal(mySim, mySim2) # TRUE
+
+ # Use accessors for times -- does not work as desired because times are
+ #   adjusted to the input timeunit during simInit
+ mySim2 <- simInit(
+   params = list(
+     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+   ),
+   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                outputPath = tempdir()),
+   inputs = data.frame(
+     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+     functions = "raster",
+     package = "raster",
+     loadTime = 1,
+     stringsAsFactors = FALSE),
+   outputs = data.frame(
+     expand.grid(objectName = c("caribou","landscape"),
+     saveTime = 1:2,
+     stringsAsFactors = FALSE))
+ )
+
+ # add times by accessor fails all.equal test because "year" was not
+ #   declared during module loading, so month became the default
+ times(mySim2) <- list(current = 0, start = 0.0, end = 2.0, timeunit = "year")
+ all.equal(mySim, mySim2) # fails because time units are all different, so
+                          # several parameters that have time units in
+                          # "months" because they were loaded that way
+ params(mySim)$fireSpread$.plotInitialTime
+ params(mySim2)$fireSpread$.plotInitialTime
+ events(mySim) # load event is at time 1 year
+ events(mySim2) # load event is at time 1 month, reported in years because of
+                #   update to times above
 }
 }
 

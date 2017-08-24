@@ -117,7 +117,7 @@ if (interactive()) {
   # Run it twice to get two copies of the randomly generated landscape
   mySimRLOut <- experiment(mySimRL, replicate = 2)
 
-  #extract one of the random landscapes, which will be passed into next as an object
+  # extract one of the random landscapes, which will be passed into next as an object
   landscape <- mySimRLOut[[1]]$landscape
 
   # here we don't run the randomLandscapes module; instead we pass in a landscape

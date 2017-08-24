@@ -11,7 +11,7 @@
 \item{object}{An R object (likely containing environments) or an environment.}
 
 \item{objects}{Whether the objects contained within the simList environment
-should be copied. Default = TRUE, which may be slow.}
+should be copied. Default \code{TRUE}, which may be slow.}
 
 \item{queues}{Logical. Should the events queues (\code{events},
 \code{current}, \code{completed}) be deep copied via

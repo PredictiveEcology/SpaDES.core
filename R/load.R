@@ -86,7 +86,6 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param ...      Additional arguments.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom data.table := data.table rbindlist
 #' @importFrom stringi stri_detect_fixed
@@ -290,7 +289,6 @@ setMethod("loadFiles",
 #' @name rasterToMemory
 #' @importFrom raster getValues raster setValues
 #' @export
-#' @docType methods
 #' @rdname rasterToMemory
 #'
 #' @author Eliot McIntire and Alex Chubaty

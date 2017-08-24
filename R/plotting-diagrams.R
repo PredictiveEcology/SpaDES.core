@@ -16,7 +16,6 @@ if (getRversion() >= "3.1.0") {
 #' @return A character vector.
 #'
 #' @include simList-accessors.R
-#' @docType methods
 #' @keywords internal
 #' @rdname ganttStatus
 #'
@@ -62,7 +61,6 @@ setMethod("ganttStatus",
 #' @return A list of data.frames
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @include simList-accessors.R
 #' @keywords internal
 #' @rdname sim2gantt
@@ -140,7 +138,6 @@ setMethod(
 #' @include simList-accessors.R
 #' @importFrom DiagrammeR mermaid
 #' @export
-#' @docType methods
 #' @rdname eventDiagram
 #'
 #' @author Alex Chubaty
@@ -233,7 +230,6 @@ setMethod(
 #' @include simList-accessors.R
 #' @importFrom DiagrammeR mermaid
 #' @export
-#' @docType methods
 #' @rdname objectDiagram
 #'
 #' @author Alex Chubaty
@@ -288,7 +284,6 @@ setMethod(
 #'
 #' @include simList-accessors.R
 #' @export
-#' @docType methods
 #' @rdname moduleDiagram
 #'
 #' @author Alex Chubaty
@@ -357,7 +352,6 @@ setMethod(
 #' @include simList-class.R
 #' @importFrom data.table rbindlist
 #' @export
-#' @docType methods
 #' @rdname moduleGraph
 #' @seealso moduleDiagram
 #'

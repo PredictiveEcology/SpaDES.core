@@ -18,11 +18,9 @@ if (getRversion() >= "3.1.0") {
 #'          The values of matching elements in list \code{y}
 #'          replace the values in list \code{x}.
 #'
-#' @export
-#' @docType methods
-#' @rdname updateList
-#'
 #' @author Alex Chubaty
+#' @export
+#' @rdname updateList
 #'
 #' @examples
 #' L1 <- list(a = "hst", b = NA_character_, c = 43)
@@ -96,11 +94,9 @@ setMethod("updateList",
 #'
 #' @return An updated \code{list} with attributes.
 #'
-#' @export
-#' @docType methods
-#' @rdname append_attr
-#'
 #' @author Alex Chubaty and Eliot McIntire
+#' @export
+#' @rdname append_attr
 #'
 #' @examples
 #' library(igraph) # igraph exports magrittr's pipe operator
@@ -147,7 +143,6 @@ setMethod("append_attr",
 #' @seealso \code{\link{require}}.
 #'
 #' @export
-#' @docType methods
 #' @rdname loadPackages
 #'
 #' @author Alex Chubaty
@@ -229,13 +224,11 @@ setMethod("loadPackages",
 #'
 #' @return Character string representing the filename.
 #'
+#' @author Eliot McIntire and Alex Chubaty
+#' @export
 #' @importFrom fpCompare %==%
 #' @importFrom stringi stri_pad_left stri_pad_right
-#' @export
-#' @docType methods
 #' @rdname paddedFloatToChar
-#'
-#' @author Eliot McIntire and Alex Chubaty
 #'
 #' @examples
 #' paddedFloatToChar(1.25)
@@ -272,7 +265,6 @@ paddedFloatToChar <- function(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "
 #' @return Character vector of random strings.
 #'
 #' @export
-#' @docType methods
 #' @rdname rndstr
 #'
 #' @author Alex Chubaty and Eliot McIntire
@@ -380,7 +372,6 @@ setMethod("rndstr",
 #' These (known) cases are checked manually and corrected.
 #'
 #' @export
-#' @docType methods
 #' @rdname classFilter
 #'
 #' @author Alex Chubaty
@@ -503,7 +494,6 @@ setMethod(
 #'
 #' @return An empty data.frame with structure needed for input/output fileTable.
 #'
-#' @docType methods
 #' @keywords internal
 #' @rdname fileTable
 #'

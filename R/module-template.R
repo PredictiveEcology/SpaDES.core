@@ -11,7 +11,6 @@
 #' @return  Invoked for its side effect of opening a file for editing.
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @keywords internal
 #' @rdname fileEdit
 #'
@@ -87,7 +86,6 @@
 #' A message with the correct lines to copy and paste is provided.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @docType methods
 #' @export
 #' @family module creation helpers
 #' @rdname newModule
@@ -181,7 +179,6 @@ setMethod(
 #'                   specifying the names of child modules.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @docType methods
 #' @export
 #' @rdname newModuleCode
 #'
@@ -421,7 +418,6 @@ Event2 <- function(sim) {
 #' @inheritParams newModuleCode
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @docType methods
 #' @importFrom reproducible checkPath
 #' @export
 #' @family module creation helpers
@@ -603,7 +599,6 @@ setMethod("newModuleDocumentation",
 #'              Default \code{TRUE}.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @docType methods
 #' @importFrom reproducible checkPath
 #' @export
 #' @family module creation helpers
@@ -745,7 +740,6 @@ test_that(\"test Event1 and Event2.\", {
 #' and paste is provided.
 #'
 #' @author Eliot McIntire
-#' @docType methods
 #' @export
 #' @importFrom raster extension
 #' @importFrom reproducible checkPath
@@ -850,7 +844,6 @@ setMethod("openModules",
 #' @return Invisible logical indicating success (\code{TRUE}) or failure (\code{FALSE}).
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @rdname copyModule
 #'
@@ -939,7 +932,6 @@ setMethod("copyModule",
 #'                (the default flags are \code{"-r9X"}).
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom reproducible checkPath
 #' @rdname zipModule

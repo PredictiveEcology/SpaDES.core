@@ -173,3 +173,59 @@ test_that("test module-level cache", {
 
   clearCache(sims)
 })
+
+
+test_that("test .prepareOutput", {
+  library(igraph)
+  library(reproducible)
+  library(raster)
+
+  tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  on.exit({
+    detach("package:reproducible")
+    detach("package:igraph")
+    detach("package:raster")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  try(clearCache(tmpdir), silent = TRUE)
+
+  times <- list(start = 0.0, end = 1, timeunit = "year")
+  mapPath <- system.file("maps", package = "quickPlot")
+  filelist <- data.frame(
+    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[-3],
+    stringsAsFactors = FALSE
+  )
+  layers <- lapply(filelist$files, rasterToMemory)
+  landscape <- raster::stack(layers)
+
+  mySim <- simInit(
+    times = list(start = 0.0, end = 2.0, timeunit = "year"),
+    params = list(
+      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+      fireSpread = list(.plotInitialTime = NA),
+      caribouMovement = list(.plotInitialTime = NA)
+    ),
+    modules = list("fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    objects = c("landscape")
+  )
+
+  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
+  simCached2 <- spades(Copy(mySim), cache = TRUE)
+
+  if (interactive()) {
+    cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
+    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
+    cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
+    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
+    cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
+    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
+    cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
+  }
+  expect_true(isTRUE(all.equal(simCached1, simCached2)))
+
+  clearCache(tmpdir)
+})

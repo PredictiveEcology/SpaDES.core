@@ -331,5 +331,6 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
   # was 10.2 seconds -- currently 4.2 seconds or so
   #system.time({spades(mySim, debug = FALSE)})
-  profvis::profvis({spades(mySim, debug = FALSE)})
+  microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
+  #profvis::profvis({spades(mySim, debug = FALSE)})
 })
