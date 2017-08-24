@@ -203,21 +203,18 @@ test_that("test .prepareOutput", {
                  outputPath = tmpdir,
                  cachePath = tmpdir)
   )
-  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(),
-                       debug = 'paste(current(sim), time(sim), names(params(sim)$.progress))')
-  print("#################")
-  simCached2 <- spades(Copy(mySim), cache = TRUE,
-                       debug = 'paste(current(sim), time(sim), names(params(sim)$.progress))')
+  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
+  simCached2 <- spades(Copy(mySim), cache = TRUE)
 
-  #if(interactive()) {
-  cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
-  cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-  cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
-  cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-  cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
-  cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-  cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
-  #}
+  if(interactive()) {
+    cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
+    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
+    cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
+    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
+    cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
+    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
+    cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
+  }
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
 
   clearCache(tmpdir)
