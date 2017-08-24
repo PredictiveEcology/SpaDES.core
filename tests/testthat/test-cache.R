@@ -173,3 +173,44 @@ test_that("test module-level cache", {
 
   clearCache(sims)
 })
+
+
+test_that("test .prepareOutput", {
+  library(igraph)
+  library(reproducible)
+
+  tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  on.exit({
+    detach("package:reproducible")
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  tmpfile <- tempfile(fileext = ".pdf")
+  expect_true(file.create(tmpfile))
+  tmpfile <- normPath(tmpfile)
+  try(clearCache(tmpdir), silent = TRUE)
+
+  times <- list(start = 0.0, end = 1.0, timeunit = "year")
+  mySim <- simInit(
+    times = times,
+    params = list(
+      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+      # Turn off interactive plotting
+      fireSpread = list(.plotInitialTime = NA),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = NA, .useCache = TRUE)
+    ),
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir)
+  )
+  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
+  simCached2 <- spades(Copy(mySim), cache = TRUE)
+
+  expect_true(isTRUE(all.equal(simCached1, simCached2)))
+
+  clearCache(tmpdir)
+})
+
