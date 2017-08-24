@@ -293,6 +293,10 @@ setMethod(
       }
     }
 
+    attr(object2, "tags") <- attr(object, "tags")
+    attr(object2, "call") <- attr(object, "call")
+    attr(object2, "function") <- attr(object, "function")
+
     return(object2)
 })
 
