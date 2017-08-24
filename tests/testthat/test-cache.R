@@ -178,31 +178,55 @@ test_that("test module-level cache", {
 test_that("test .prepareOutput", {
   library(igraph)
   library(reproducible)
+  library(raster)
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
     detach("package:reproducible")
     detach("package:igraph")
+    detach("package:raster")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 
   try(clearCache(tmpdir), silent = TRUE)
 
-  times <- list(start = 0.0, end = 0.1, timeunit = "year")
+  times <- list(start = 0.0, end = 1, timeunit = "year")
+  mapPath <- system.file("maps", package = "quickPlot")
+  filelist <- data.frame(
+    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[-3],
+    stringsAsFactors = FALSE
+  )
+  layers <- lapply(filelist$files, rasterToMemory)
+  landscape <- stack(layers)
+
   mySim <- simInit(
-    times = times,
+    times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-      # Turn off interactive plotting
       fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, .useCache = TRUE)
+      caribouMovement = list(.plotInitialTime = NA)
     ),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    modules = list("fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tmpdir,
-                 cachePath = tmpdir)
+                 outputPath = tempdir()),
+    objects = c("landscape")
   )
+
+  # inputs
+  # mySim <- simInit(
+  #   times = times,
+  #   params = list(
+  #     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+  #     # Turn off interactive plotting
+  #     fireSpread = list(.plotInitialTime = NA),
+  #     caribouMovement = list(.plotInitialTime = NA)
+  #     #randomLandscapes = list(.plotInitialTime = NA, .useCache = TRUE)
+  #   ),
+  #   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+  #   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+  #                outputPath = tmpdir,
+  #                cachePath = tmpdir)
+  # )
   simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
   simCached2 <- spades(Copy(mySim), cache = TRUE)
 
