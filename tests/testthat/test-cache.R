@@ -197,7 +197,7 @@ test_that("test .prepareOutput", {
     stringsAsFactors = FALSE
   )
   layers <- lapply(filelist$files, rasterToMemory)
-  landscape <- stack(layers)
+  landscape <- raster::stack(layers)
 
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
@@ -208,25 +208,11 @@ test_that("test .prepareOutput", {
     ),
     modules = list("fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tempdir()),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
     objects = c("landscape")
   )
 
-  # inputs
-  # mySim <- simInit(
-  #   times = times,
-  #   params = list(
-  #     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-  #     # Turn off interactive plotting
-  #     fireSpread = list(.plotInitialTime = NA),
-  #     caribouMovement = list(.plotInitialTime = NA)
-  #     #randomLandscapes = list(.plotInitialTime = NA, .useCache = TRUE)
-  #   ),
-  #   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-  #   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-  #                outputPath = tmpdir,
-  #                cachePath = tmpdir)
-  # )
   simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
   simCached2 <- spades(Copy(mySim), cache = TRUE)
 
