@@ -63,7 +63,7 @@ produce very pixelated maps.}
 \item{visualSqueeze}{Numeric. The proportion of the white space to be used
 for plots. Default is 0.75.}
 
-\item{legend}{Logical idicating whether a legend should be drawn.
+\item{legend}{Logical indicating whether a legend should be drawn.
 Default is \code{TRUE}.}
 
 \item{legendRange}{Numeric vector giving values that, representing the lower
@@ -78,7 +78,7 @@ If \code{Raster*} has a Raster Attribute Table (\code{rat};
 see \pkg{raster} package), this will be used by default.
 Currently, only a single vector is accepted.
 The length of this must match the length of the legend, so
-this is mosty useful for discrete-valued rasters.}
+this is mostly useful for discrete-valued rasters.}
 
 \item{pch}{see \code{?par}.}
 
