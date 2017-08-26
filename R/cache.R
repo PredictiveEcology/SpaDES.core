@@ -263,6 +263,7 @@ setMethod(
         object2[[i]]@completed <- object[[i]]@completed
         object2[[i]]@simtimes <- object[[i]]@simtimes
         object2[[i]]@current <- object[[i]]@current
+        object2[[i]]@events <- object[[i]]@events
 
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
@@ -275,9 +276,10 @@ setMethod(
       object2 <- Copy(list(...)[[whSimList]], objects = FALSE)
       object2@.envir <- object@.envir
       object2@completed <- object@completed
-      object2@simtimes <- object@simtimes
-      if (NROW(current(object2)) == 0) { # this is usually a spades call
+      #object2@simtimes <- object@simtimes
+      if (NROW(current(object2)) == 0) { # this is usually a spades call, i.e., not an event or module doEvent call
         object2@events <- object@events
+        object2@simtimes <- object@simtimes
       } else {
         # if this is FALSE, it means that events were added by the event
         if (!isTRUE(all.equal(object@events, object2@events)))
