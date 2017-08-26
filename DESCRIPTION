@@ -4,13 +4,11 @@ Title: Core Utilities for Developing and Running Spatially Explicit Discrete Eve
 Description: Provide the core discrete event simulation (DES) framework for
     implementing spatially explicit simulation models. The core DES components 
     facilitate modularity, and easily enable the user to include additional
-    functionality by running user-built simulation modules. This code was split
-    from the 'SpaDES' package in July 2017. Plotting functionality is provided
-    by 'quickPlot'.
+    functionality by running user-built simulation modules.
 URL:
-    http://spades.predictiveecology.org,
+    https://predictiveecology.github.io/SpaDES.core/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2017-07-21
+Date: 2017-08-24
 Version: 0.1.0
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alexander.chubaty@canada.ca",
@@ -24,13 +22,11 @@ Authors@R: c(
     person("Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada",
     role = "cph")
     )
-Additional_repositories: http://rforge.net
 Depends:
     R (>= 3.3.2),
     quickPlot,
     reproducible
 Imports:
-    checkmate (>= 1.8.2),
     chron (>= 2.3-50),
     CircStats (>= 0.2-4),
     data.table (>= 1.10.4),
@@ -65,21 +61,16 @@ Suggests:
     rgdal,
     rgenoud,
     rmarkdown,
-    snow,
     SpaDES.tools,
     testthat (>= 1.0.2),
     tkrplot
-Remotes:
-    PredictiveEcology/reproducible,
-    PredictiveEcology/quickPlot,
-    PredictiveEcology/SpaDES.tools,
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
-    'priority.R'
     'environment.R'
+    'priority.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'helpers.R'

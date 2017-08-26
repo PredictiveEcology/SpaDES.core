@@ -15,7 +15,9 @@ The core simulation components are built upon a discrete event simulation
 framework that facilitates modularity, and easily enables the user to
 include additional functionality by running user-built simulation modules.
 Included are numerous tools to visualize various spatial data formats,
-as well as non-spatial data.
+as well as non-spatial data. Much work has been done to speed up the core
+of the DES, with current benchmarking as low as 700 microseconds overhead for each
+event (including queuing, sorting, spawning event etc.).
 
 Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 
@@ -474,7 +476,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://spades.predictiveecology.org}
+  \item \url{https://predictiveecology.github.io/SpaDES.core/}
   \item \url{https://github.com/PredictiveEcology/SpaDES.core}
   \item Report bugs at \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 }

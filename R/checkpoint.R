@@ -5,9 +5,6 @@
 #' including the state of the random number generator,
 #' by scheduling checkpoint events.
 #'
-#' \code{\link{checkpointLoad}} and \code{\link{.checkpointSave}} code based on:
-#' \url{https://raw.githubusercontent.com/achubaty/r-tools/master/checkpoint.R}
-#'
 #' RNG save code adapted from:
 #' \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
 #' and \url{https://stackoverflow.com/questions/13997444/}
@@ -34,7 +31,6 @@
 #' @importFrom quickPlot .objectNames
 #' @importFrom reproducible checkPath
 #' @export
-#' @docType methods
 #' @rdname checkpoint
 #'
 doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
@@ -88,14 +84,10 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @rdname checkpoint
 #' @export
 checkpointLoad <- function(file) {
-  #f <- strsplit(file, split = "[.][R|r][D|d]ata$")
-  #fobj <- paste0(f, "_objs", ".RData")
-
   # check for previous checkpoint files
-  if (file.exists(file)) { # && file.exists(fobj)) {
+  if (file.exists(file)) {
     simListName <- load(file, envir = .GlobalEnv)
     sim <- get(simListName, envir = .GlobalEnv)
-    #load(fobj, envir = sim@.envir)
 
     do.call("RNGkind", as.list(sim$.rng.kind))
     assign(".Random.seed", sim$.rng.state, envir = .GlobalEnv)

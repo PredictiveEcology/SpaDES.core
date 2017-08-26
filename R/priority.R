@@ -5,37 +5,38 @@
 #'
 #' @return A numeric.
 #'
+#' @author Alex Chubaty
 #' @export
-#' @docType methods
 #' @name priority
 #' @rdname priority
-#'
-#' @author Alex Chubaty
 #'
 .first <- function() {
   .highest()
 }
 
-#' @rdname priority
 #' @export
+#' @rdname priority
 .highest <- function() {
   return(1)
 }
 
-#' @rdname priority
 #' @export
+#' @rdname priority
 .last <- function() {
   .lowest()
 }
 
-#' @rdname priority
 #' @export
+#' @rdname priority
 .lowest <- function() {
   return(10)
 }
 
-#' @rdname priority
 #' @export
+#' @include environment.R
+#' @rdname priority
 .normal <- function() {
   5
 }
+
+.pkgEnv$.normalVal <- .normal()

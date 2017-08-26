@@ -7,8 +7,6 @@
 \alias{currentModule}
 \alias{currentModule,.simList-method}
 \alias{.callingFrameTimeunit}
-\alias{.callingFrameTimeunit,.simList-method}
-\alias{.callingFrameTimeunit,NULL-method}
 \title{Namespacing within \code{SpaDES}}
 \usage{
 .callingModuleName(sim)
@@ -20,10 +18,6 @@ currentModule(sim)
 \S4method{currentModule}{.simList}(sim)
 
 .callingFrameTimeunit(x)
-
-\S4method{.callingFrameTimeunit}{.simList}(x)
-
-\S4method{.callingFrameTimeunit}{`NULL`}(x)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

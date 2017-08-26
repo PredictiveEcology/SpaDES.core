@@ -32,8 +32,10 @@
 #' @slot current    The current event, as a \code{data.table}.
 #'                  See 'Event Lists' for more information..
 #'
-#' @slot completed  The list of completed events, as a \code{data.table}.
-#'                  See 'Event Lists' for more information.
+#' @slot completed  The list of completed events, as a \code{list}.
+#'                  See 'Event Lists' for more information. It is kept
+#'                  as a list of individual events for speed. The \code{completed}
+#'                  method converts it to a sorted \code{data.table}.
 #'
 #' @slot depends    A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
 #'                  containing module object dependency information.
@@ -71,7 +73,9 @@
 #'
 #' @section Event Lists:
 #'
-#' Event lists are sorted (keyed) first by time, second by priority.
+#' The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
+#' The completed event list is an ordered list in the exact order that the events
+#' were executed.
 #' Each event is represented by a \code{\link{data.table}} row consisting of:
 #' \tabular{ll}{
 #'   \code{eventTime} \tab The time the event is to occur.\cr
@@ -95,7 +99,7 @@ setClass(
   ".simList",
   slots = list(
     modules = "list", params = "list", events = "data.table",
-    current = "data.table", completed = "data.table", depends = ".simDeps",
+    current = "data.table", completed = "list", depends = ".simDeps",
     simtimes = "list", inputs = "list", outputs = "list", paths = "list"
   ),
   prototype = list(
@@ -106,7 +110,7 @@ setClass(
     ),
     events = .emptyEventListObj,
     current = .emptyEventListObj,
-    completed = .emptyEventListObj,
+    completed = list(),
     depends = new(".simDeps", dependencies = list(NULL)),
     simtimes = list(
       current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
@@ -194,10 +198,11 @@ setAs(from = "simList", to = "simList_", def = function(from) {
 #' included in the object, \code{new} returns an object from that class.
 #'
 #' @param .Object  A \code{simList} object.
-#' @include misc-methods.R
+#'
 #' @export
-#' @docType methods
+#' @include misc-methods.R
 #' @rdname initialize-method
+#'
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object) {

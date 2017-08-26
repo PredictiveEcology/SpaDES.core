@@ -164,20 +164,18 @@
 #' @seealso \code{\link{spades}}, \code{\link[parallel]{makeCluster}},
 #' \code{\link{simInit}}
 #'
+#' @author Eliot McIntire
+#' @export
+#' @importFrom DEoptim DEoptim DEoptim.control
+#' @importFrom stats optim
+#' @importFrom raster getCluster returnCluster
+#' @importFrom parallel clusterEvalQ clusterExport
 #' @include module-dependencies-class.R
 #' @include helpers.R
 #' @include simList-class.R
 #' @include environment.R
 #' @include priority.R
-#' @importFrom DEoptim DEoptim DEoptim.control
-#' @importFrom stats optim
-#' @importFrom raster getCluster returnCluster
-#' @importFrom parallel clusterEvalQ clusterExport
-#' @export
-#' @docType methods
 #' @rdname POM
-#'
-#' @author Eliot McIntire
 #'
 #' @example inst/examples/example_POM.R
 #'

@@ -79,7 +79,6 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @importFrom dplyr bind_rows
 #' @importFrom data.table data.table
 #' @export
-#' @docType methods
 #' @rdname saveFiles
 #'
 #' @examples
