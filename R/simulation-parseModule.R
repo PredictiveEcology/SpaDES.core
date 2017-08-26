@@ -11,11 +11,9 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @return The ids of the unparsed list elements.
 #'
-#' @docType methods
+#' @author Alex Chubaty
 #' @keywords internal
 #' @rdname unparsed
-#'
-#' @author Alex Chubaty
 #'
 setGeneric(".unparsed",
            function(modules) {
@@ -46,7 +44,6 @@ setMethod(
 #'                            elements in defineModule should be extracted
 #'
 #' @author Eliot McIntire
-#' @docType methods
 #' @export
 #' @include module-dependencies-class.R
 #' @include simList-class.R
@@ -126,7 +123,6 @@ setMethod(
 #' @return A \code{simList} simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @docType methods
 #' @keywords internal
 #' @importFrom reproducible Cache
 #' @include environment.R

@@ -31,7 +31,6 @@
 #' @importFrom quickPlot .objectNames
 #' @importFrom reproducible checkPath
 #' @export
-#' @docType methods
 #' @rdname checkpoint
 #'
 doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {

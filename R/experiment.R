@@ -173,7 +173,6 @@
 #' @seealso \code{\link{simInit}}
 #'
 #' @author Eliot McIntire
-#' @docType methods
 #' @export
 #' @importFrom parallel clusterApplyLB clusterEvalQ
 #' @importFrom raster getCluster returnCluster

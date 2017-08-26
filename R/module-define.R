@@ -104,7 +104,6 @@
 #' @return Updated \code{simList} object.
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom raster extent
 #' @include simList-class.R
@@ -116,7 +115,7 @@
 #'   newModule("test", path = tempdir())
 #'
 #'   ## view the resulting module file
-#'   #file.edit(file.path(tempdir(), "test", "test.R"))
+#'   if (interactive()) file.edit(file.path(tempdir(), "test", "test.R"))
 #'
 #'   # The default defineModule created by newModule is currently (SpaDES version 1.3.1.9044):
 #'   defineModule(sim, list(
@@ -135,7 +134,7 @@
 #'     reqdPkgs = list(),
 #'     parameters = rbind(
 #'       #defineParameter("paramName", "paramClass", value, min, max,
-#'       "parameter description")),
+#'       # "parameter description")),
 #'       defineParameter(".plotInitialTime", "numeric", NA, NA, NA,
 #'       "This describes the simulation time at which the first plot event should occur"),
 #'       defineParameter(".plotInterval", "numeric", NA, NA, NA,
@@ -343,7 +342,6 @@ setMethod(
 #' @return data.frame
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @rdname defineParameter
 #'
@@ -437,7 +435,6 @@ setMethod(
 #' module's metadata.
 #'
 #' @author Yong Luo
-#' @docType methods
 #' @export
 #' @rdname expectsInput
 #'
@@ -513,7 +510,6 @@ setMethod(
 #' a module's metadata.
 #'
 #' @author Yong Luo
-#' @docType methods
 #' @export
 #' @rdname createsOutput
 #'

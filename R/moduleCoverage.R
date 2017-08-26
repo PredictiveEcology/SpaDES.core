@@ -27,13 +27,11 @@
 #'
 #' @seealso \code{\link{newModule}}.
 #'
-#' @include simList-class.R
-#' @importFrom data.table data.table
-#' @export
-#' @docType methods
-#' @rdname moduleCoverage
-#'
 #' @author Yong Luo
+#' @export
+#' @importFrom data.table data.table
+#' @include simList-class.R
+#' @rdname moduleCoverage
 #'
 #' @examples
 #' \dontrun{

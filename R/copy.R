@@ -16,13 +16,12 @@ if (!isGeneric("Copy")) {
 #'
 #' @inheritParams reproducible::Copy
 #' @param objects  Whether the objects contained within the simList environment
-#'                 should be copied. Default = TRUE, which may be slow.
+#'                 should be copied. Default \code{TRUE}, which may be slow.
 #' @param queues Logical. Should the events queues (\code{events},
 #'               \code{current}, \code{completed}) be deep copied via
 #'               \code{data.table::copy}
 #'
 #' @author Eliot MciIntire
-#' @docType methods
 #' @exportMethod Copy
 #' @export
 #' @importFrom reproducible Copy

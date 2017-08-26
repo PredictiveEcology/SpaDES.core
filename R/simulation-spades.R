@@ -30,7 +30,6 @@ if (getRversion() >= "3.1.0") {
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @author Alex Chubaty
-#' @docType methods
 #' @export
 #' @importFrom data.table data.table rbindlist setkey
 #' @importFrom stringi stri_pad_right stri_pad stri_length
@@ -255,7 +254,6 @@ doEvent <- function(sim, debug, notOlderThan) {
 #' @importFrom data.table setkey
 #' @include priority.R
 #' @export
-#' @docType methods
 #' @rdname scheduleEvent
 #' @seealso \code{\link{priority}}
 #'
@@ -545,7 +543,6 @@ scheduleEvent <- function(sim,
 #' See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @docType methods
 #' @export
 #' @rdname spades
 #' @seealso \code{\link{experiment}} for using replication with \code{spades}.

@@ -11,14 +11,11 @@
 #' @return A list of module metadata, matching the structure in
 #'         \code{\link{defineModule}}.
 #'
-#' @docType methods
+#' @author Alex Chubaty
 #' @export
 #' @include simulation-simInit.R
 #' @rdname moduleMetadata
-#'
 #' @seealso \code{\link{defineModule}}
-#'
-#' @author Alex Chubaty
 #'
 #' @example inst/examples/example_moduleMetadata.R
 #'
@@ -115,14 +112,11 @@ setMethod(
 #'
 #' @return \code{numeric_version} indicating the module's version.
 #'
-#' @docType methods
+#' @author Alex Chubaty
 #' @export
 #' @include simulation-simInit.R
 #' @rdname moduleVersion
-#'
 #' @seealso \code{\link{moduleMetadata}}
-#'
-#' @author Alex Chubaty
 #'
 #' @example inst/examples/example_moduleVersion.R
 #'

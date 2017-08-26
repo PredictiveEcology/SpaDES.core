@@ -20,10 +20,10 @@ This is a spin off of an existing CRAN package (`SpaDES`), which we have split d
 
 ### Development R version
 * Debian:testing (rocker/r-devel), R 3.5.0 (2017-07-26 r72972)
-* Ubuntu 14.04        (travis-ci), R 3.5.0 (2017-08-21 r73109)
-* Ubuntu 16.04            (local), R 3.5.0 (2017-08-21 r73109)
-* Windows              (appveyor), R 3.5.0 (2017-08-19 r73108)
-* Windows           (win-builder), R 3.5.0 (2017-08-19 r73108)
+* Ubuntu 14.04        (travis-ci), R 3.5.0 (2017-08-24 r73121)
+* Ubuntu 16.04            (local), R 3.5.0 (2017-08-24 r73121)
+* Windows              (appveyor), R 3.5.0 (2017-08-23 r73116)
+* Windows           (win-builder), R 3.5.0 (2017-08-23 r73116)
 
 ## R CMD check results
 
