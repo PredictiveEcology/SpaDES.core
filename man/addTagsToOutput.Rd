@@ -25,5 +25,5 @@ See \code{\link[reproducible]{.addTagsToOutput}}.
 \code{\link[reproducible]{.addTagsToOutput}}
 }
 \author{
-Eliot MciIntire
+Eliot McIntire
 }

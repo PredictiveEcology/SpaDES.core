@@ -30,5 +30,5 @@ See \code{\link[reproducible]{Copy}}.
 \code{\link[reproducible]{Copy}}
 }
 \author{
-Eliot MciIntire
+Eliot McIntire
 }

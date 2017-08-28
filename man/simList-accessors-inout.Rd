@@ -107,7 +107,7 @@ can therefore be accessed with \code{sim$xxx} in any module, where
 directory information.\cr
 
 \code{fun} \tab optional, a character string indicating the function to use to
-load that file. Defaults to the known extentions in \code{SpaDES} (found by
+load that file. Defaults to the known extensions in \code{SpaDES} (found by
 examining \code{.fileExtensions()}). The \code{package} and \code{fun} can be
 jointly specified here as \code{"packageName::functionName"}, e.g.,
 \code{"raster::raster"}.\cr

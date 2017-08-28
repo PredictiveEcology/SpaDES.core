@@ -39,7 +39,7 @@ metadata will be downloaded, if possible. Default if FALSE.}
 \item{quiet}{Logical. This is passed to \code{download.file}. Default is FALSE.}
 }
 \value{
-A list of length 2. The first elemet is a character vector containing
+A list of length 2. The first element is a character vector containing
    a character vector of extracted files for the module. The second element is
    a tbl with details about the data that is relevant for the function, including
    whether it was downloaded or not, whether it was renamed (because there

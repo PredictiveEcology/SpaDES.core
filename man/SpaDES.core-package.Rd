@@ -319,7 +319,7 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
     \code{\link[SpaDES.tools]{agentLocation}} \tab Agent location\cr
     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a SpatialPointsDataFrame\cr
     \code{\link[SpaDES.tools]{numAgents}} \tab Number of agents\cr
-    \code{\link[SpaDES.tools]{probInit}} \tab Probability of intiating an agent or event\cr
+    \code{\link[SpaDES.tools]{probInit}} \tab Probability of initiating an agent or event\cr
     \code{\link[SpaDES.tools]{transitions}} \tab Transition probability\cr
   }
 }
