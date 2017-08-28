@@ -21,7 +21,7 @@ if (!isGeneric("Copy")) {
 #'               \code{current}, \code{completed}) be deep copied via
 #'               \code{data.table::copy}
 #'
-#' @author Eliot MciIntire
+#' @author Eliot McIntire
 #' @exportMethod Copy
 #' @export
 #' @importFrom reproducible Copy

@@ -214,11 +214,11 @@ saveFiles <- function(sim) {
 #'
 #' @param keepFileBackedAsIs Logical. If there are file-backed \code{Raster}
 #'        objects, should they be kept in their file-backed format,
-#'        or loaded into RAM and saved within the \code{.Rdata} file.
+#'        or loaded into RAM and saved within the \code{.RData} file.
 #'        If \code{TRUE} (default), then the files will be copied to
 #'        \code{file.path(dirname(filename), "rasters")}.
 #'
-#' @return A saved .Rdata file in \code{filename} location.
+#' @return A saved \code{.RData} file in \code{filename} location.
 #'
 #' @export
 #' @rdname loadFiles

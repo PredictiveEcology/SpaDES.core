@@ -237,7 +237,7 @@ setReplaceMethod("envir",
 #' \code{objs} can take \code{...} arguments passed to \code{ls},
 #' allowing, e.g. \code{all.names=TRUE}
 #' \code{objs<-} requires takes a named list of values to be assigned in
-#' the simulation envirment.
+#' the simulation environment.
 #'
 #' @param sim      A \code{simList} object from which to extract element(s) or
 #'                 in which to replace element(s).
@@ -628,11 +628,10 @@ setMethod(
   }
 })
 
-
-#' \code{F} allows the user to access functions from their module. It should
-#' be unnecessary to use this as namespacing should take care of it. But, if
-#' the user wants to specificy a function this way, it will work too.
-#' To access a function from within a module, you can use \code{F(sim)$functionName}
+#' \code{F} allows the user to access functions from their module.
+#' It should be unnecessary to use this as namespacing should take care of it.
+#' But, if the user wants to specify a function this way, it will work too.
+#' To access a function from within a module, you can use \code{F(sim)$functionName}.
 #'
 #' @export
 #'
@@ -1021,7 +1020,7 @@ setReplaceMethod("progressType",
 #' directory information.\cr
 #'
 #' \code{fun} \tab optional, a character string indicating the function to use to
-#' load that file. Defaults to the known extentions in \code{SpaDES} (found by
+#' load that file. Defaults to the known extensions in \code{SpaDES} (found by
 #' examining \code{.fileExtensions()}). The \code{package} and \code{fun} can be
 #' jointly specified here as \code{"packageName::functionName"}, e.g.,
 #' \code{"raster::raster"}.\cr

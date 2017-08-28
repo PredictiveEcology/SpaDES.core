@@ -22,8 +22,8 @@ if (getRversion() >= "3.1.0") {
 #'
 #' \code{params} can only contain updates to any parameters that are defined in
 #' the metadata of modules. Take the example of a module named, \code{Fire}, which
-#' has a parameter named \code{.plotInitialTime}. In the metadata of that moduel,
-#' it says TRUE. Here we can override that default with:
+#' has a parameter named \code{.plotInitialTime}. In the metadata of that module,
+#' it says \code{TRUE}. Here we can override that default with:
 #' \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting. Since
 #' this is a list of lists, one can override the module defaults for multiple parameters
 #' from multiple modules all at once, with say:

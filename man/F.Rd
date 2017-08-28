@@ -5,10 +5,10 @@
 \alias{F}
 \alias{simList-accessors-function}
 \alias{F,.simList-method}
-\title{\code{F} allows the user to access functions from their module. It should
-be unnecessary to use this as namespacing should take care of it. But, if
-the user wants to specificy a function this way, it will work too.
-To access a function from within a module, you can use \code{F(sim)$functionName}}
+\title{\code{F} allows the user to access functions from their module.
+It should be unnecessary to use this as namespacing should take care of it.
+But, if the user wants to specify a function this way, it will work too.
+To access a function from within a module, you can use \code{F(sim)$functionName}.}
 \usage{
 F(sim, module = NULL, functionName = NULL)
 
@@ -23,8 +23,8 @@ in which to replace element(s).}
 \item{functionName}{Optional character string indicating which function is desired.}
 }
 \description{
-\code{F} allows the user to access functions from their module. It should
-be unnecessary to use this as namespacing should take care of it. But, if
-the user wants to specificy a function this way, it will work too.
-To access a function from within a module, you can use \code{F(sim)$functionName}
+\code{F} allows the user to access functions from their module.
+It should be unnecessary to use this as namespacing should take care of it.
+But, if the user wants to specify a function this way, it will work too.
+To access a function from within a module, you can use \code{F(sim)$functionName}.
 }

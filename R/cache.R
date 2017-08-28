@@ -346,7 +346,7 @@ if (!isGeneric(".addTagsToOutput")) {
 #'
 #' @inheritParams reproducible::.addTagsToOutput
 #'
-#' @author Eliot MciIntire
+#' @author Eliot McIntire
 #' @exportMethod .addTagsToOutput
 #' @export
 #' @importFrom reproducible .addTagsToOutput

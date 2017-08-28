@@ -31,7 +31,7 @@
 #'                        if a character or numeric are supplied).
 #'                        The module developer should update manually this with each change
 #'                        that is made to the module. See \url{http://semver.org/}
-#'                        for a widely accepted standard for version numering.\cr
+#'                        for a widely accepted standard for version numbering.\cr
 #'    \code{spatialExtent} \tab The spatial extent of the module supplied via
 #'                              \code{raster::extent}. This is currently unimplemented.
 #'                              Once implemented, this should define what spatial region this
