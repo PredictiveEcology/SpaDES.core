@@ -23,7 +23,7 @@ This is a spin off of an existing CRAN package (`SpaDES`), which we have split d
 * Ubuntu 14.04        (travis-ci), R 3.5.0 (2017-08-28 r73148)
 * Ubuntu 16.04            (local), R 3.5.0 (2017-08-28 r73148)
 * Windows              (appveyor), R 3.5.0 (2017-08-27 r73146)
-* Windows           (win-builder), R 3.5.0 (2017-08-27 r73146)
+* Windows           (win-builder), R 3.5.0 (2017-08-27 r73145)
 
 ## R CMD check results
 
