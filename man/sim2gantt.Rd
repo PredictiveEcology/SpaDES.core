@@ -27,7 +27,7 @@ A list of data.frames
 \description{
 Internal function to convert the completed events list of a \code{simList}
 object to a list of \code{data.frame}s suitable to pass to a call to
-\code{\link[DiagrammeR]{mermaid}} to make a Gannt chart representing the
+\code{\link[DiagrammeR]{mermaid}} to make a Gantt chart representing the
 events in a completed simulation.
 }
 \author{

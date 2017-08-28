@@ -255,7 +255,8 @@ setMethod(
     if (isListOfSimLists) {
       object2 <- list()
       for (i in seq_along(object)) {
-        # need to keep the list(...) slots ... i.e., Caching of simLists is mostly about objects in .envir
+        # need to keep the list(...) slots ...
+        # i.e., Caching of simLists is mostly about objects in .envir
         object2[[i]] <- Copy(list(...)[[whSimList]], objects = FALSE)
         object2[[i]]@.envir <- object[[i]]@.envir
         object2[[i]]@completed <- object[[i]]@completed
@@ -267,15 +268,16 @@ setMethod(
         keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
         # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
         #          envir = object2[[i]]@.envir)
-        list2env(mget(lsOrigEnv[keepFromOrig], envir=tmpl[[whSimList]]@.envir),
-                 envir=object2[[i]]@.envir)        }
+        list2env(mget(lsOrigEnv[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
+                 envir = object2[[i]]@.envir)        }
     } else {
-      # need to keep the list(...) slots ... i.e., Caching of simLists is mostly about objects in .envir
+      # need to keep the list(...) slots ...
+      # i.e., Caching of simLists is mostly about objects in .envir
       object2 <- Copy(list(...)[[whSimList]], objects = FALSE)
       object2@.envir <- object@.envir
       object2@completed <- object@completed
-      #object2@simtimes <- object@simtimes
-      if (NROW(current(object2)) == 0) { # this is usually a spades call, i.e., not an event or module doEvent call
+      if (NROW(current(object2)) == 0) {
+        # this is usually a spades call, i.e., not an event or module doEvent call
         object2@events <- object@events
         object2@simtimes <- object@simtimes
       } else {
@@ -344,7 +346,7 @@ if (!isGeneric(".addTagsToOutput")) {
 #'
 #' @inheritParams reproducible::.addTagsToOutput
 #'
-#' @author Eliot MciIntire
+#' @author Eliot McIntire
 #' @exportMethod .addTagsToOutput
 #' @export
 #' @importFrom reproducible .addTagsToOutput

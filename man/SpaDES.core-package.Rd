@@ -241,7 +241,7 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
     \code{\link[SpaDES.tools]{directionFromEachPoint}} \tab Fast calculation of direction and distance surfaces\cr
     \code{\link[SpaDES.tools]{distanceFromEachPoint}} \tab Fast calculation of distance surfaces\cr
     \code{\link[SpaDES.tools]{rings}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
-    \code{\link[SpaDES.tools]{spokes}} \tab TO DO: need description\cr
+    \code{\link[SpaDES.tools]{spokes}} \tab Identify outward radiating spokes from initial points\cr
     \code{\link[SpaDES.tools]{spread}} \tab Contagious cellular automata\cr
     \code{\link[SpaDES.tools]{wrap}} \tab Create a torus from a grid\cr
   }
@@ -319,7 +319,7 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
     \code{\link[SpaDES.tools]{agentLocation}} \tab Agent location\cr
     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a SpatialPointsDataFrame\cr
     \code{\link[SpaDES.tools]{numAgents}} \tab Number of agents\cr
-    \code{\link[SpaDES.tools]{probInit}} \tab Probability of intiating an agent or event\cr
+    \code{\link[SpaDES.tools]{probInit}} \tab Probability of initiating an agent or event\cr
     \code{\link[SpaDES.tools]{transitions}} \tab Transition probability\cr
   }
 }

@@ -62,7 +62,7 @@ one can simply use \code{sim$object} or \code{sim[["object"]]}.
 \code{objs} can take \code{...} arguments passed to \code{ls},
 allowing, e.g. \code{all.names=TRUE}
 \code{objs<-} requires takes a named list of values to be assigned in
-the simulation envirment.
+the simulation environment.
 }
 \seealso{
 \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
