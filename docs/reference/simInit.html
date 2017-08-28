@@ -220,8 +220,8 @@ specified in the arguments supplied.</p>
 - determines time units of modules and how they fit together
     <code>params</code> can only contain updates to any parameters that are defined in
 the metadata of modules. Take the example of a module named, <code>Fire</code>, which
-has a parameter named <code>.plotInitialTime</code>. In the metadata of that moduel,
-it says TRUE. Here we can override that default with:
+has a parameter named <code>.plotInitialTime</code>. In the metadata of that module,
+it says <code>TRUE</code>. Here we can override that default with:
 <code>list(Fire=list(.plotInitialTime=NA))</code>, effectively turning off plotting. Since
 this is a list of lists, one can override the module defaults for multiple parameters
 from multiple modules all at once, with say:
