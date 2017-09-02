@@ -1,6 +1,6 @@
 urls:
-  reference: https://predictiveecology.github.io/SpaDES.core/reference
-  article: https://predictiveecology.github.io/SpaDES.core/articles
+  reference: https://spades-core.predictiveecology.org//reference
+  article: https://spades-core.predictiveecology.org//articles
 articles:
   ii-modules: ii-modules.html
   i-introduction: i-introduction.html

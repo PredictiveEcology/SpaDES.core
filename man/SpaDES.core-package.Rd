@@ -476,7 +476,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://predictiveecology.github.io/SpaDES.core/}
+  \item \url{https://spades-core.predictiveecology.org/}
   \item \url{https://github.com/PredictiveEcology/SpaDES.core}
   \item Report bugs at \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 }

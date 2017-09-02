@@ -147,7 +147,7 @@
 <span class='co'># Compute wrapped normal density function</span>
 <span class='no'>density</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='fl'>1</span>:<span class='fl'>500</span>)
 <span class='kw'>for</span>(<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fl'>500</span>) <span class='no'>density</span>[<span class='no'>i</span>] <span class='kw'>&lt;-</span> <span class='fu'>dwrpnorm2</span>(<span class='no'>theta</span>[<span class='no'>i</span>], <span class='no'>pi</span>, <span class='fl'>.75</span>)
-<span class='kw'>if</span> (<span class='fu'>interactive</span>()) <span class='fu'>plot</span>(<span class='no'>theta</span>, <span class='no'>density</span>)</div><div class='img'><img src='dwrpnorm2-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'><span class='co'># Approximate area under density curve</span>
+<span class='kw'>if</span> (<span class='fu'>interactive</span>()) <span class='fu'>plot</span>(<span class='no'>theta</span>, <span class='no'>density</span>)</div><div class='img'><img src='dwrpnorm2-2.png' alt='' width='700' height='432.632880098887' /></div><div class='input'><span class='co'># Approximate area under density curve</span>
 <span class='fu'>sum</span>(<span class='no'>density</span> * <span class='fl'>2</span> * <span class='no'>pi</span> / <span class='fl'>500</span>)</div><div class='output co'>#&gt; [1] 1</div><div class='input'>
 </div></pre>
   </div>

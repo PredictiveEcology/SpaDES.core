@@ -32,10 +32,6 @@ install_github("PredictiveEcology/SpaDES.core", dependencies = TRUE) # stable
 
 ### Development version (unstable)
 
-[![Build Status](https://travis-ci.org/PredictiveEcology/SpaDES.core.svg?branch=development)](https://travis-ci.org/PredictiveEcology/SpaDES.core)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/2fxqhgk6miv2fytd/branch/development?svg=true)](https://ci.appveyor.com/project/achubaty/spades-core/branch/development)
-[![Coverage Status](https://coveralls.io/repos/github/PredictiveEcology/SpaDES.core/badge.svg?branch=development)](https://coveralls.io/github/PredictiveEcology/SpaDES.core?branch=development)
-
 **Install from GitHub:**
 
 ```r
