@@ -46,7 +46,6 @@ branches:
 clone_depth: 5
 
 build_script:
-  - travis-tool.sh r_github_packages PredictiveEcology/reproducible PredictiveEcology/quickPlot
   - travis-tool.sh install_deps
   - Rscript -e  "install.packages('https://cran.rstudio.com/src/contrib/Archive/DiagrammeR/DiagrammeR_0.9.0.tar.gz', repos = NULL)"
 
