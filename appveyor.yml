@@ -47,7 +47,6 @@ clone_depth: 5
 
 build_script:
   - travis-tool.sh install_deps
-  - Rscript -e  "install.packages('https://cran.rstudio.com/src/contrib/Archive/DiagrammeR/DiagrammeR_0.9.0.tar.gz', repos = NULL)"
 
 test_script:
   - travis-tool.sh run_tests
@@ -80,7 +79,7 @@ notifications:
    to:
      - alex.chubaty@gmail.com
    subject: 'SpaDES.core: r-appveyor build {{status}}'
-   message: "https://ci.appveyor.com/project/achubaty/SpaDES.core"
+   message: "https://ci.appveyor.com/project/achubaty/SpaDES-core"
    on_build_success: false
    on_build_failure: false
    on_build_status_changed: true
