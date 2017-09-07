@@ -1,5 +1,10 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.1.0.9000
+==================
+
+* fix bug in `zipModule` that omitted the checksum file from being included when `data = FALSE` (#3)
+
 version 0.1.0
 =============
 
