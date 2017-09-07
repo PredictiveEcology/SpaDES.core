@@ -36,7 +36,6 @@ Imports:
     dplyr (>= 0.5.0),
     fastdigest,
     fpCompare (>= 0.2.1),
-    grDevices,
     httr (>= 1.2.1),
     igraph (>= 1.0.1),
     lazyeval (>= 0.2.0),
