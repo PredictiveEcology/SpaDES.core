@@ -404,15 +404,29 @@ setMethod(
         destfile <- file.path(dataDir, xFile)
         id <- which(chksums$expectedFile == xFile)
         if (length(id) == 0) {
-          stop("downloadData() requires that basename(sourceURL) name",
-               " and local filename be the same.")
+          fuzzy <- integer()
+          md <- 1
+          while(length(fuzzy) == 0) {
+            md <- md + 1
+            fuzzy <- agrep(xFile, chksums$expectedFile, max.distance = md, ignore.case = TRUE)
+            if(md>=nchar(xFile)) fuzzy <- 0
+          }
+          if(fuzzy==0) {
+            stop("downloadData() requires that basename(sourceURL) name",
+                 " and local filename be at least somewhat similar.")
+          } else {
+            id <- fuzzy
+            message("Used fuzzy matching of filenames. Assuming ",
+                    xFile, " is the source for ", paste(chksums$expectedFile[id], collapse = ", "))
+          }
         }
         if ((chksums$result[id] == "FAIL") | is.na(chksums$actualFile[id])) {
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
-          message("Downloading ", chksums$actualFile[id], " for module ", module, " ...")
-          download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
+          message("Downloading ", xFile, " for module ", module, " ...")
+          # Use Cache next in case multiple objects use same url, e.g., in a .tar file
+          Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
           copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
           destfile
         } else {
@@ -429,6 +443,7 @@ setMethod(
       message("  No data to download for module ", module)
     }
 
+    # There are at least 2 options if the expected doesn't match actual
     wh <- match(chksums$actualFile, chksums$expectedFile) %>% is.na() %>% which()
     if (length(wh)) {
       chksums[wh, "renamed"] <- sapply(wh, function(id) {
@@ -438,7 +453,8 @@ setMethod(
             to = file.path(dataDir, chksums$expectedFile[id])
           )
         } else {
-          warning("downloadData(", module, "): file ", chksums$expectedFile[id], " wasn't downloaded.", call. = FALSE)
+          warning("downloadData(", module, "): file ",
+                  chksums$expectedFile[id], " wasn't downloaded.", call. = FALSE)
         }
       })
     }
@@ -446,11 +462,14 @@ setMethod(
     # after download, check for childModules that also require downloading
     children <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                     defineModuleElement = "childModules")
+    chksums2 <- chksums[0,]
     #children <- moduleMetadata(module, path)$childModules
     if (!is.null(children)) {
-      if ( all( nzchar(children) & !is.na(children) ) ) {
-        chksums2 <- lapply(children, downloadData, path = path, quiet = quiet) %>%
-          bind_rows()
+      if(length(children)) {
+        if ( all( nzchar(children) & !is.na(children) ) ) {
+          chksums2 <- lapply(children, downloadData, path = path, quiet = quiet) %>%
+            bind_rows()
+        }
       }
     }
 
