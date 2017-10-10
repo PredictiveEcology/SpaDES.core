@@ -7,11 +7,13 @@
 \alias{checksums,character,character,missing-method}
 \title{Calculate checksums for a module's data files}
 \usage{
-checksums(module, path, write, ...)
+checksums(module, path, write, quickCheck = FALSE, ...)
 
-\S4method{checksums}{character,character,logical}(module, path, write, ...)
+\S4method{checksums}{character,character,logical}(module, path, write,
+  quickCheck = FALSE, ...)
 
-\S4method{checksums}{character,character,missing}(module, path, write, ...)
+\S4method{checksums}{character,character,missing}(module, path, write,
+  quickCheck = FALSE, ...)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}

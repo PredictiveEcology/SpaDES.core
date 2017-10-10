@@ -311,7 +311,7 @@ setMethod(
     if (data) {
       dataList <- downloadData(module = name, path = path, quiet = quiet)
     } else {
-      dataList <- checksums(module = name, path = path)
+      dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
     message("Download complete for module ", name, ".")
 
@@ -360,6 +360,10 @@ setMethod(
 #'
 #' @param quiet   Logical. This is passed to \code{download.file}. Default is FALSE.
 #'
+#' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
+#'                   use \code{file.size} instead of \code{digest::digest}. This is
+#'                   faster, but less robust.
+#'
 #' @return Invisibly, a list of downloaded files.
 #'
 #' @author Alex Chubaty
@@ -368,7 +372,7 @@ setMethod(
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #'
-setGeneric("downloadData", function(module, path, quiet) {
+setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE) {
   standardGeneric("downloadData")
 })
 
@@ -376,8 +380,9 @@ setGeneric("downloadData", function(module, path, quiet) {
 #' @importFrom reproducible checkPath
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "character", quiet = "logical"),
-  definition = function(module, path, quiet) {
+  signature = c(module = "character", path = "character", quiet = "logical",
+                quickCheck = "ANY"),
+  definition = function(module, path, quiet, quickCheck) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
     urls <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
@@ -392,7 +397,7 @@ setMethod(
 
     ids <- which( urls == "" | is.na(urls) )
     to.dl <- if (length(ids)) urls[-ids] else urls
-    chksums <- checksums(module, path) %>%
+    chksums <- checksums(module, path, quickCheck = quickCheck) %>%
       mutate(renamed = NA, module = module)
     dataDir <- file.path(path, module, "data" )
 
@@ -424,10 +429,32 @@ setMethod(
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
-          message("Downloading ", xFile, " for module ", module, " ...")
-          # Use Cache next in case multiple objects use same url, e.g., in a .tar file
-          Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
-          copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+          xx <- tryCatch(getURL(x, nobody=1L, header=1L), error = function(x) "")
+          checkRemote <- if(nchar(xx)) {
+            tryCatch({
+              grep(strsplit(xx, "\r\n")[[1]],
+                   pattern = "Content-Length", value = TRUE) %>%
+                strsplit(": ") %>%
+                .[[1]] %>%
+                .[2] %>%
+                as.numeric()
+            }, error = function(x) 0)
+          } else { 0 }
+
+          needNewDownload <- TRUE
+          if(checkRemote>0)
+            if(round(file.size(destfile)) == checkRemote )
+              needNewDownload <- FALSE
+
+          if(needNewDownload) {
+            # Use Cache next in case multiple objects use same url, e.g., in a .tar file
+            message("Downloading ", xFile, " for module ", module, " ...")
+            Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
+            copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+          } else {
+            message("Using local copy of ", xFile, ", whose file size matches its download server",
+                    " at\n  ", x)
+          }
           destfile
         } else {
           message("  Download data step skipped for ", chksums$actualFile[id],
@@ -435,7 +462,7 @@ setMethod(
         }
       })
 
-      chksums <- checksums(module, path) %>%
+      chksums <- checksums(module, path, quickCheck = quickCheck) %>%
         mutate(renamed = NA, module = module)
     } else if (NROW(chksums) > 0) {
       message("  Download data step skipped for module ", module, ". Local copy exists.")
@@ -454,7 +481,7 @@ setMethod(
           )
         } else {
           warning("downloadData(", module, "): file ",
-                  chksums$expectedFile[id], " wasn't downloaded.", call. = FALSE)
+                  chksums$expectedFile[id], " wasn't downloaded directly during download.", call. = FALSE)
         }
       })
     }
@@ -480,24 +507,27 @@ setMethod(
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "missing", quiet = "missing"),
-  definition = function(module) {
-    downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE)
+  definition = function(module, quickCheck) {
+    downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE,
+                 quickCheck = quickCheck)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "missing", quiet = "logical"),
-  definition = function(module, quiet) {
-    downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet)
+  definition = function(module, quiet, quickCheck) {
+    downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet,
+                 quickCheck = quickCheck)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "missing"),
-  definition = function(module, path) {
-    downloadData(module = module, path = path, quiet = FALSE)
+  definition = function(module, path, quickCheck) {
+    downloadData(module = module, path = path, quiet = FALSE,
+                 quickCheck = quickCheck)
 })
 
 ################################################################################
@@ -506,6 +536,7 @@ setMethod(
 #' Internal function. Wrapper for \code{\link[digest]{digest}} using md5sum.
 #'
 #' @param file  Character vector of file paths.
+#' @inheritParams downloadData
 #' @param ...   Additional arguments to \code{digest::digest}.
 #'
 #' @return A character vector of hashes.
@@ -516,7 +547,7 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #'
-setGeneric(".digest", function(file, ...) {
+setGeneric(".digest", function(file, quickCheck, ...) {
   standardGeneric(".digest")
 })
 
@@ -524,10 +555,16 @@ setGeneric(".digest", function(file, ...) {
 setMethod(
   ".digest",
   signature = c(file = "character"),
-  definition = function(file, algo = "xxhash64", ...) {
-    lapply(file, function(f) {
-      digest::digest(object = f, file = TRUE, algo = algo, ...)
-    }) %>% unlist() %>% unname() %>% as.character() # need as.character for empty case
+  definition = function(file, quickCheck, algo = "xxhash64", ...) {
+    if(quickCheck) {
+      file.size(file) %>%
+        as.character() # need as.character for empty case
+
+    } else {
+      lapply(file, function(f) {
+        digest::digest(object = f, file = TRUE, algo = algo, ...)
+      }) %>% unlist() %>% unname() %>% as.character() # need as.character for empty case
+    }
 })
 
 ################################################################################
@@ -590,7 +627,7 @@ setMethod(
 #' checksums(moduleName, modulePath, write = TRUE)
 #' }
 #'
-setGeneric("checksums", function(module, path, write, ...) {
+setGeneric("checksums", function(module, path, write, quickCheck = FALSE, ...) {
   standardGeneric("checksums")
 })
 
@@ -599,7 +636,7 @@ setGeneric("checksums", function(module, path, write, ...) {
 setMethod(
   "checksums",
   signature = c(module = "character", path = "character", write = "logical"),
-  definition = function(module, path, write, ...) {
+  definition = function(module, path, write, quickCheck, ...) {
     defaultHashAlgo <- "xxhash64"
     defaultWriteHashAlgo <- "xxhash64"
     dots <- list(...)
@@ -618,7 +655,8 @@ setMethod(
     txt <- if (!write && file.info(checksumFile)$size > 0) {
       read.table(checksumFile, header = TRUE, stringsAsFactors = FALSE)
     } else {
-      data.frame(file = character(0), checksum = character(0), stringsAsFactors = FALSE)
+      data.frame(file = character(0), checksum = character(0), filesize = character(0),
+                 stringsAsFactors = FALSE)
     }
 
     if (is.null(dots$algo)) {
@@ -649,14 +687,31 @@ setMethod(
     } else {
       filesToCheck <- files
     }
-    checksums <- do.call(.digest, args = append(list(file = filesToCheck), dots))
+
+    if(is.null(txt$filesize)) {
+      quickCheck <- FALSE
+      message("  Not possible to use quickCheck in downloadData;\n ",
+              "    checksums.txt file does not have filesizes")
+    }
+    checksums <- rep(list(rep("", length(filesToCheck))),2)
+    if(quickCheck | write) {
+      checksums[[2]] <- do.call(.digest,
+                         args = append(list(file = filesToCheck, quickCheck = TRUE),
+                                       dots))
+    } 
+    if(!quickCheck | write) {
+      checksums[[1]] <- do.call(.digest,
+                args = append(list(file = filesToCheck, quickCheck = FALSE), dots))
+    } 
     message("Finished checking local files.")
 
     if (length(filesToCheck)) {
-      out <- data.frame(file = basename(filesToCheck), checksum = checksums,
+      out <- data.frame(file = basename(filesToCheck), checksum = checksums[[1]],
+                        filesize = checksums[[2]],
                         algorithm = dots$algo, stringsAsFactors = FALSE)
     } else {
       out <- data.frame(file = character(0), checksum = character(0),
+                        filesize = character(0),
                         algorithm = character(0), stringsAsFactors = FALSE)
     }
 
@@ -669,9 +724,20 @@ setMethod(
         left_join(txt, ., by = "file") %>%
         rename_(expectedFile = "file") %>%
         dplyr::group_by_("expectedFile") %>%
-        mutate_(result = ~ifelse(checksum.x != checksum.y, "FAIL", "OK")) %>%
+        {if(!quickCheck) {
+          mutate_(., result = ~ifelse(checksum.x != checksum.y, "FAIL", "OK"))
+        } else {
+          mutate_(., result = ~ifelse(filesize.x != filesize.y, "FAIL", "OK"))
+        }} %>%
         dplyr::arrange(desc(result)) %>%
-        select_("result", "expectedFile", "actualFile", "checksum.x", "checksum.y", "algorithm.x", "algorithm.y") %>%
+        {if(!quickCheck){
+          select_(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
+                  "algorithm.x", "algorithm.y")
+        } else {
+          select_(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
+                  "algorithm.x", "algorithm.y",
+                  "filesize.x", "filesize.y")
+        }}  %>%
         filter(row_number() == 1L)
 
       return(results.df)
@@ -682,6 +748,6 @@ setMethod(
 setMethod(
   "checksums",
   signature = c(module = "character", path = "character", write = "missing"),
-  definition = function(module, path, ...) {
-    checksums(module, path, write = FALSE, ...)
+  definition = function(module, path, quickCheck, ...) {
+    checksums(module, path, write = FALSE, quickCheck = quickCheck, ...)
 })
