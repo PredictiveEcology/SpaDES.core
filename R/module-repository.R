@@ -369,6 +369,7 @@ setMethod(
 #' @author Alex Chubaty
 #' @export
 #' @importFrom dplyr mutate_
+#' @importFrom RCurl getURL
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #'
