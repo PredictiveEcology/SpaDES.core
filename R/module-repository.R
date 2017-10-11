@@ -417,16 +417,17 @@ setMethod(
             fuzzy <- agrep(xFile, chksums$expectedFile, max.distance = md, ignore.case = TRUE)
             if(md>=nchar(xFile)) fuzzy <- 0
           }
-          if(fuzzy==0) {
-            stop("downloadData() requires that basename(sourceURL) name",
+          if(all(fuzzy==0)) {
+            stop("  downloadData() requires that basename(sourceURL) name",
                  " and local filename be at least somewhat similar.")
           } else {
             id <- fuzzy
-            message("Used fuzzy matching of filenames. Assuming ",
-                    xFile, " is the source for ", paste(chksums$expectedFile[id], collapse = ", "))
+            message("  Used fuzzy matching of filenames. Assuming\n    ",
+                    xFile, " is the source for\n      ", 
+                    paste(chksums$expectedFile[id], collapse = ",\n      "))
           }
         }
-        if ((chksums$result[id] == "FAIL") | is.na(chksums$actualFile[id])) {
+        if (any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) {
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
@@ -443,22 +444,25 @@ setMethod(
           } else { 0 }
 
           needNewDownload <- TRUE
-          if(checkRemote>0)
-            if(round(file.size(destfile)) == checkRemote )
-              needNewDownload <- FALSE
+          if(file.exists(destfile)) {
+            if(checkRemote>0)
+              if(round(file.size(destfile)) == checkRemote )
+                needNewDownload <- FALSE
+          }
 
           if(needNewDownload) {
             # Use Cache next in case multiple objects use same url, e.g., in a .tar file
-            message("Downloading ", xFile, " for module ", module, " ...")
+            message("  Downloading ", xFile, " for module ", module, " ...")
             Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
             copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
           } else {
-            message("Using local copy of ", xFile, ", whose file size matches its download server",
-                    " at\n  ", x)
+            message("  Using local copy of ", xFile, ", whose file size matches its download server",
+                    " at\n    ", x)
           }
           destfile
         } else {
-          message("  Download data step skipped for ", chksums$actualFile[id],
+          message("  Download data step skipped for ", 
+                  paste(chksums$actualFile[id], collapse = ", "),
                   " in module ", module, ". Local copy exists.")
         }
       })
@@ -475,14 +479,14 @@ setMethod(
     wh <- match(chksums$actualFile, chksums$expectedFile) %>% is.na() %>% which()
     if (length(wh)) {
       chksums[wh, "renamed"] <- sapply(wh, function(id) {
-        if (!is.na(chksums$actualFile[id])) {
+        if (!is.na(chksums$expectedFile[id])) {
           renamed <- file.rename(
             from = file.path(dataDir, chksums$actualFile[id]),
             to = file.path(dataDir, chksums$expectedFile[id])
           )
         } else {
-          warning("downloadData(", module, "): file ",
-                  chksums$expectedFile[id], " wasn't downloaded directly during download.", call. = FALSE)
+          message("  downloadData(", module, "): file ",
+                  chksums$expectedFile[id], " wasn't downloaded directly during download.")
         }
       })
     }
