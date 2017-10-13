@@ -703,11 +703,11 @@ setMethod(
       checksums[[2]] <- do.call(.digest,
                          args = append(list(file = filesToCheck, quickCheck = TRUE),
                                        dots))
-    } 
+    }
     if(!quickCheck | write) {
       checksums[[1]] <- do.call(.digest,
                 args = append(list(file = filesToCheck, quickCheck = FALSE), dots))
-    } 
+    }
     message("Finished checking local files.")
 
     if (length(filesToCheck)) {
