@@ -7,6 +7,7 @@
   opts <- options()
   opts.spades <- list( # nolint
     spades.cachePath = file.path(tmpdir, "cache"),
+    spades.debug = FALSE, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(tmpdir, "inputs"),
     spades.lowMemory = FALSE,
     spades.modulePath = file.path(tmpdir, "modules"),

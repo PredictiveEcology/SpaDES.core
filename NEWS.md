@@ -5,6 +5,7 @@ version 0.1.0.9000
 
 * remove `grDevices` from Imports as it was not used (#1)
 * fix bug in `zipModule` that omitted the checksum file from being included when `data = FALSE` (#3)
+* default `debug` option in `spades()` now uses the package option `spades.debug` and default is set to `FALSE` (#5)
 
 version 0.1.0
 =============
