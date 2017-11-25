@@ -411,10 +411,24 @@ setMethod(
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
-          message("Downloading ", chksums$actualFile[id], " for module ", module, " ...")
-          download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
-          copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
-          destfile
+
+          if(inherits(try(suppressWarnings(download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)), silent = TRUE), "try-error")){
+            ## if the URL doesn't work allow the user to retrieve it manually
+            message("Cannot download ", xFile, " for module ", module, " ...",
+                    "\nCannot open URL '", x, "'")
+            readline(prompt = paste0("You can try to download this file manually now and put it in ", module, "/data.\nPress [enter] to continue"))
+            ## re-checksums
+            chksums <- checksums(module, path) %>%
+              mutate(renamed = NA, module = module)
+
+          }else{
+            message("Downloading ", chksums$actualFile[id], " for module ", module, " ...")
+
+            download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
+
+            copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+            destfile
+          }
         } else {
           message("  Download data step skipped for ", chksums$actualFile[id],
                   " in module ", module, ". Local copy exists.")
