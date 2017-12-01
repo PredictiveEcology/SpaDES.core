@@ -365,6 +365,7 @@ setMethod(
 #' @author Alex Chubaty
 #' @export
 #' @importFrom dplyr mutate_
+#' @importFrom httr http_error
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #'
@@ -412,20 +413,19 @@ setMethod(
             checkPath(create = TRUE) %>%
             file.path(., xFile)
 
-          if(interactive()) {
-            if(inherits(
-              try(suppressWarnings(
-                download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
-              ),
-              silent = TRUE), "try-error")) {
+            if (httr::http_error(file)) {
               ## if the URL doesn't work allow the user to retrieve it manually
-              message("Cannot download ", xFile, " for module ", module, " ...",
-                      "\nCannot open URL '", x, "'")
-              readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                       module, "/data.\nPress [enter] to continue"))
+              message("Cannot download ", xFile, " for module ", module, " ...\n",
+                      "Cannot open URL '", x, "'.")
+
+              if (interactive()) {
+                readline(prompt = paste0("Try downloading this file manually and put it in ",
+                                         module, "/data/.\nPress [enter] to continue"))
+              }
+
               ## re-checksums
               chksums <- checksums(module, path) %>%
-                mutate(renamed = NA, module = module)
+              mutate(renamed = NA, module = module)
             } else {
               message("Downloading ", chksums$actualFile[id], " for module ", module, " ...")
               download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
@@ -433,27 +433,6 @@ setMethod(
               destfile
             }
           } else {
-            if(inherits(
-              try(suppressWarnings(
-                download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
-              ),
-              silent = TRUE), "try-error")) {
-              ## if the URL doesn't work allow the user to retrieve it manually
-              message("Cannot download ", xFile, " for module ", module, " ...",
-                      "\nCannot open URL '", x, "'",
-                      paste0("\nTry downloading this file manually and put it in ",
-                             module, "/data"))
-              ## re-checksums
-              chksums <- checksums(module, path) %>%
-                mutate(renamed = NA, module = module)
-            } else {
-              message("Downloading ", chksums$actualFile[id], " for module ", module, " ...")
-              download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
-              copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
-              destfile
-            }
-          }
-        } else {
           message("  Download data step skipped for ", chksums$actualFile[id],
                   " in module ", module, ". Local copy exists.")
         }
