@@ -29,22 +29,25 @@
     return(invisible(sim))
   })}
 \usage{
-spades(sim, debug = FALSE, progress = NA, cache, .plotInitialTime = NULL,
-  .saveInitialTime = NULL, notOlderThan = NULL, ...)
+spades(sim, debug = getOption("spades.debug"), progress = NA, cache,
+  .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
+  ...)
 
-\S4method{spades}{simList,ANY,ANY,missing}(sim, debug = FALSE,
+\S4method{spades}{simList,ANY,ANY,missing}(sim,
+  debug = getOption("spades.debug"), progress = NA, cache,
+  .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
+  ...)
+
+\S4method{spades}{ANY,ANY,ANY,logical}(sim, debug = getOption("spades.debug"),
   progress = NA, cache, .plotInitialTime = NULL, .saveInitialTime = NULL,
-  notOlderThan = NULL, ...)
-
-\S4method{spades}{ANY,ANY,ANY,logical}(sim, debug = FALSE, progress = NA,
-  cache, .plotInitialTime = NULL, .saveInitialTime = NULL,
   notOlderThan = NULL, ...)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}
 
 \item{debug}{Optional logical flag or character vector indicating what to print to
-console at each event. See details. Default is \code{FALSE}.}
+console at each event. See details.
+Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{progress}{Logical (\code{TRUE} or \code{FALSE} show a graphical progress bar),
 character (\code{"graphical"}, \code{"text"}) or numeric indicating
@@ -131,6 +134,7 @@ the same mechanism, but it can be used with replication.
 See also the vignette on caching for examples.
 
 If \code{debug} is specified, it can be a logical or character vector.
+If not specified, the package option \code{spades.debug} is used.
 In all cases, something will be printed to the console immediately before each
 event is being executed.
 If \code{TRUE}, then the event immediately following will be printed as it
@@ -161,7 +165,10 @@ mySim <- simInit(
 )
 spades(mySim)
 
-# Different debug options
+# set default debug printing for the current session
+# setOption(spades.debug = TRUE)
+
+# Different debug options (overrides the package option 'spades.debug')
 spades(mySim, debug = TRUE) # Fastest
 spades(mySim, debug = "simList")
 spades(mySim, debug = "print(table(sim$landscape$Fires[]))")

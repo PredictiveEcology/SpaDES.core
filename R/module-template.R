@@ -936,7 +936,7 @@ setMethod("copyModule",
 #' @importFrom reproducible checkPath
 #' @rdname zipModule
 #'
-setGeneric("zipModule", function(name, path, version, data=FALSE, ...) {
+setGeneric("zipModule", function(name, path, version, data = FALSE, ...) {
   standardGeneric("zipModule")
 })
 
@@ -950,15 +950,21 @@ setMethod(
     callingWd <- getwd()
     on.exit(setwd(callingWd), add = TRUE)
     setwd(path)
-    zipFileName = paste0(name, "_", version, ".zip")
-    print(paste("Zipping module into zip file:", zipFileName))
+    zipFileName <- paste0(name, "_", version, ".zip")
+    message(paste("Zipping module into zip file:", zipFileName))
 
     allFiles <- dir(path = file.path(name), recursive = TRUE, full.names = TRUE)
-    allFiles <- grep(paste0(name, "_+.+.zip"), allFiles, value = TRUE, invert = TRUE) # moduleName_....zip only
-    if (!data)
-      allFiles <- grep(file.path(name, "data"),  allFiles, invert = TRUE, value = TRUE)
 
-    zip(zipFileName, files = allFiles, ...)#, extras = c("-x"), ...)
+    # filter out 'moduleName_*.zip' from results
+    allFiles <- grep(paste0(name, "_+.+.zip"), allFiles, value = TRUE, invert = TRUE)
+
+    if (!data) {
+      # filter out all data file but keep the 'CHECKSUMS.txt' file
+      allFiles <- grep(file.path(name, "data"),  allFiles, invert = TRUE, value = TRUE)
+      allFiles <- sort(c(allFiles, file.path(name, "data", "CHECKSUMS.txt")))
+    }
+
+    zip(zipFileName, files = allFiles, ...)
     file.copy(zipFileName, to = paste0(name, "/", zipFileName), overwrite = TRUE)
     file.remove(zipFileName)
 })

@@ -181,7 +181,7 @@ setMethod(
         # if desired version is NA then we need to download most recent version
         if (!is.na(version)) {
           v <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
-                                 defineModuleElement = "version")
+                                   defineModuleElement = "version")
           result <- ifelse(v == numeric_version(version), TRUE, FALSE)
         }
       }
@@ -438,7 +438,8 @@ setMethod(
             to = file.path(dataDir, chksums$expectedFile[id])
           )
         } else {
-          warning("downloadData(", module, "): file ", chksums$expectedFile[id], " wasn't downloaded.", call. = FALSE)
+          warning("downloadData(", module, "): file ", chksums$expectedFile[id],
+                  " wasn't downloaded.", call. = FALSE)
         }
       })
     }
