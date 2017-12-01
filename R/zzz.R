@@ -50,3 +50,4 @@
     options(spades.outputPath = NULL)
   }
 }
+
