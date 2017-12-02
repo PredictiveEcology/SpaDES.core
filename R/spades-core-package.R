@@ -417,9 +417,12 @@
 #'   cache simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
 #'
-#'   \item \code{spades.inputPath}: The default local directory in which to
+#'   \item \code{spades.cachePath}: The default local directory in which to
 #'   look for simulation inputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs}).
+#'
+#'   \item \code{spades.debug}: The default debugging value for \code{spades()}.
+#'   Default is \code{FALSE}.
 #'
 #'   \item \code{spades.lowMemory}: If true, some functions will use more memory
 #'     efficient (but slower) algorithms. Default \code{FALSE}.
