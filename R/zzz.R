@@ -14,7 +14,8 @@
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(tmpdir, "outputs"),
     spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES"
+    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
+    spades.switchPkgNamespaces = TRUE
   )
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
