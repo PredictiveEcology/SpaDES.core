@@ -9,7 +9,7 @@ URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2017-09-01
-Version: 0.1.0.9000
+Version: 0.1.0.9001
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alexander.chubaty@canada.ca",
     role = c("aut", "cre")),
@@ -27,8 +27,6 @@ Depends:
     quickPlot,
     reproducible
 Imports:
-    chron (>= 2.3-50),
-    CircStats (>= 0.2-4),
     data.table (>= 1.10.4),
     DEoptim (>= 2.2-4),
     DiagrammeR (>= 0.8.2),
@@ -93,7 +91,6 @@ Collate:
     'simList-accessors.R'
     'plotting-diagrams.R'
     'plotting.R'
-    'probability.R'
     'progress.R'
     'save.R'
     'simulation-spades.R'
