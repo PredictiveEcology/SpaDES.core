@@ -217,6 +217,7 @@ setMethod(
 #' @note The default is to overwrite any existing files in the case of a conflict.
 #'
 #' @inheritParams getModuleVersion
+#' @inheritParams downloadData
 #'
 #' @param path    Character string giving the location in which to save the
 #'                downloaded module.
@@ -241,7 +242,8 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #'
-setGeneric("downloadModule", function(name, path, version, repo, data, quiet) {
+setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
+                                      quickCheck = FALSE) {
   standardGeneric("downloadModule")
 })
 
@@ -250,8 +252,9 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet) {
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
-                repo = "character", data = "logical", quiet = "logical"),
-  definition = function(name, path, version, repo, data, quiet) {
+                repo = "character", data = "logical", quiet = "logical",
+                quickCheck = "ANY"),
+  definition = function(name, path, version, repo, data, quiet, quickCheck) {
     path <- checkPath(path, create = TRUE)
 
     # check locally for module. only download if doesn't exist locally.
@@ -298,9 +301,10 @@ setMethod(
       if ( all( nzchar(children) & !is.na(children) ) ) {
         tmp <- lapply(children, function(x) {
           f <- if (is.null(childVersions[[x]])) {
-            downloadModule(x, path = path, data = data, version = childVersions[[x]])
+            downloadModule(x, path = path, data = data, version = childVersions[[x]],
+                           quickCheck = quickCheck)
           } else {
-            downloadModule(x, path = path, data = data)
+            downloadModule(x, path = path, data = data, quickCheck = quickCheck)
           }
           files2 <<- append(files2, f[[1]])
           dataList2 <<- bind_rows(dataList2, f[[2]])
@@ -309,7 +313,8 @@ setMethod(
     }
 
     if (data) {
-      dataList <- downloadData(module = name, path = path, quiet = quiet)
+      dataList <- downloadData(module = name, path = path, quiet = quiet,
+                               quickCheck = quickCheck)
     } else {
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
@@ -322,12 +327,13 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
-                repo = "missing", data = "missing", quiet = "missing"),
-  definition = function(name) {
+                repo = "missing", data = "missing", quiet = "missing", quickCheck = "ANY"),
+  definition = function(name, quickCheck) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo"),
-                            data = FALSE, quiet = FALSE)
+                            data = FALSE, quiet = FALSE,
+                            quickCheck = quickCheck)
     return(invisible(files))
 })
 
@@ -335,15 +341,15 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "ANY", version = "ANY",
-                repo = "ANY", data = "ANY", quiet = "ANY"),
-  definition = function(name, path, version, repo, data, quiet) {
+                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "ANY"),
+  definition = function(name, path, version, repo, data, quiet, quickCheck) {
     if (missing(path)) path <- getOption("spades.modulePath")
     if (missing(version)) version <- NA_character_
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
 
-    files <- downloadModule(name, path, version, repo, data, quiet)
+    files <- downloadModule(name, path, version, repo, data, quiet, quickCheck)
     return(invisible(files))
 })
 
@@ -423,7 +429,7 @@ setMethod(
           } else {
             id <- fuzzy
             message("  Used fuzzy matching of filenames. Assuming\n    ",
-                    xFile, " is the source for\n      ", 
+                    xFile, " is the source for\n      ",
                     paste(chksums$expectedFile[id], collapse = ",\n      "))
           }
         }
@@ -461,7 +467,7 @@ setMethod(
           }
           destfile
         } else {
-          message("  Download data step skipped for ", 
+          message("  Download data step skipped for ",
                   paste(chksums$actualFile[id], collapse = ", "),
                   " in module ", module, ". Local copy exists.")
         }
@@ -499,7 +505,8 @@ setMethod(
     if (!is.null(children)) {
       if(length(children)) {
         if ( all( nzchar(children) & !is.na(children) ) ) {
-          chksums2 <- lapply(children, downloadData, path = path, quiet = quiet) %>%
+          chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
+                             quickCheck = quickCheck) %>%
             bind_rows()
         }
       }
@@ -511,7 +518,7 @@ setMethod(
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "missing"),
+  signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY"),
   definition = function(module, quickCheck) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE,
                  quickCheck = quickCheck)
@@ -520,7 +527,7 @@ setMethod(
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "logical"),
+  signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY"),
   definition = function(module, quiet, quickCheck) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet,
                  quickCheck = quickCheck)
@@ -529,7 +536,7 @@ setMethod(
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "character", quiet = "missing"),
+  signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY"),
   definition = function(module, path, quickCheck) {
     downloadData(module = module, path = path, quiet = FALSE,
                  quickCheck = quickCheck)
@@ -602,6 +609,8 @@ setMethod(
 #'                Default is \code{FALSE}, as users should not change this file.
 #'                Module developers should write this file prior to distributing
 #'                their module code, and update accordingly when the data change.
+#'
+#' @inheritParams downloadData
 #'
 #' @param ...     Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
 #'                the digest algorithm can be specified.

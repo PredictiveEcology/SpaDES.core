@@ -160,10 +160,8 @@ doEvent <- function(sim, debug, notOlderThan) {
             }
 
             # This is to create a namespaced module call
-            if(getOption("spades.switchPkgNamespaces")) {
             .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
                               removeOthers = FALSE)
-            }
 
             if (cacheIt) { # means that a module or event is to be cached
               objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
@@ -621,15 +619,10 @@ setMethod(
 
     # timeunits gets accessed every event -- this should only be needed once per simList
     sim@.envir$.timeunits <- timeunits(sim)
-    if(getOption("spades.switchPkgNamespaces")) {
-      on.exit(.modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE))
-    } else {
-      loaded <- lapply(unique(unlist(lapply(sim@depends@dependencies, function(pkgs) pkgs@reqdPkgs))),
-                       require, character.only = TRUE)
-    }
     on.exit({
+      .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
       rm(".timeunits", envir = sim@.envir)
-    })
+    }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {
       if (!is.numeric(.plotInitialTime))

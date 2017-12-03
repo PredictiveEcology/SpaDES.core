@@ -304,9 +304,7 @@ setMethod(
               }
             } else {
               message("Running .inputObjects for ", m)
-              if(getOption("spades.switchPkgNamespaces")) {
-                .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
-              }
+              .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
 
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
