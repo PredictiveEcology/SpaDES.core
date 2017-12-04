@@ -628,54 +628,6 @@ setMethod(
   }
 })
 
-#' \code{F} allows the user to access functions from their module.
-#' It should be unnecessary to use this as namespacing should take care of it.
-#' But, if the user wants to specify a function this way, it will work too.
-#' To access a function from within a module, you can use \code{F(sim)$functionName}.
-#'
-#' @export
-#'
-#' @include simList-class.R
-#' @aliases simList-accessors-function
-#' @rdname F
-#' @inheritParams P
-#' @param functionName Optional character string indicating which function is desired.
-#'
-setGeneric("F", function(sim, module = NULL, functionName = NULL) {
-  standardGeneric("F")
-})
-
-#' @export
-#' @rdname F
-setMethod(
-  "F",
-  signature = ".simList",
-  definition = function(sim, module, functionName) {
-    if (is.null(module)) {
-      module <- sim@current$moduleName
-    }
-    modEnv <- paste0(".-",module)
-    if (length(module) > 0) {
-      if (is.null(functionName)) {
-        return(as.list(sim@.envir[[modEnv]]))
-      } else {
-        return(sim@.envir[[modEnv]][[functionName]])
-      }
-    } else {
-      inSimInit <- grep(sys.calls(), pattern = ".parseModule")
-      if (any(inSimInit)) {
-        module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
-        modEnv <- paste0(".-",module)
-        if (is.null(functionName)) {
-          return(sim@.envir[[modEnv]])
-        } else {
-          return(sim@.envir[[modEnv]][[functionName]])
-        }
-      }
-
-      return(stop("You must specify a module when using the function F"))
-    }
-  })
 
 ################################################################################
 #' Get and set simulation globals.
@@ -1234,6 +1186,7 @@ setReplaceMethod(
        if (!all(is.na(sim@inputs[, "loadTime"]))) {
          newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"]
          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
+
          for (nT in newTime) {
            attributes(nT)$unit <- timeunit(sim)
            sim <- scheduleEvent(sim, nT, "load", "inputs", .first())
@@ -1908,14 +1861,13 @@ setReplaceMethod(
 #' @export
 #' @include simList-class.R
 #' @include times.R
-#' @importFrom chron times
 #' @aliases simList-accessors-times
 #' @rdname simList-accessors-times
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #'
 setGeneric("times", function(x, ...) {
-  chron::times(x, ...)
+  standardGeneric("times")
 })
 
 #' @export
@@ -2346,23 +2298,25 @@ setMethod(
   "events",
   signature = c(".simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) &&
-               (length(sim@events$eventTime) > 0)) {
+    obj <- rbindlist(sim@events)
+    if (is.na(pmatch("second", unit)) &&
+               (length(sim@events) > 0)) {
       # note the above line captures empty eventTime, whereas is.na does not
-      if (any(!is.na(sim@events$eventTime))) {
-        if (!is.null(sim@events$eventTime)) {
-          obj <- copy(sim@events) # don't change original sim
+      if (any(!is.na(obj$eventTime))) {
+        if (!is.null(obj$eventTime)) {
+          #obj$eventTime <- convertTimeunit(obj$eventTime, unit, sim@.envir)
+          #obj
+          #obj <- copy(sim@events) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
-          obj
         }
-      } else {
-        sim@events
-      }
-    } else {
-      sim@events
+       } #else {
+    #     sim@events
+    #   }
+    # } else {
+    #   sim@events
     }
-    return(out)
+    return(obj)
 })
 
 #' @export
@@ -2400,7 +2354,11 @@ setReplaceMethod(
        value[, eventTime := convertTimeunit(eventTime, "second", sim@.envir)]
      }
 
-     sim@events <- value
+     if(NROW(value)) {
+       sim@events <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x,]))
+     } else {
+       sim@events <- list()
+     }
      return(sim)
 })
 
@@ -2408,7 +2366,7 @@ setReplaceMethod(
 #' @inheritParams events
 #'
 #' @export
-#' @importFrom data.table := data.table
+#' @importFrom data.table rbindlist
 #' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @include simList-class.R
@@ -2428,10 +2386,13 @@ setMethod(
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
-          obj <- copy(sim@current) # don't change original sim
-          obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
-          obj[]
-          obj
+          sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit, sim@.envir)
+          sim@current
+          # obj <- copy(sim@current) # don't change original sim
+          # obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
+          # obj[]
+          # obj
+
         }
       } else {
         sim@current
@@ -2439,7 +2400,7 @@ setMethod(
     } else {
       sim@current
     }
-    return(out)
+    return(rbindlist(list(out)))
 })
 
 #' @export
@@ -2470,7 +2431,7 @@ setReplaceMethod("current",
                      stop("Event queue must be a data.table with columns: ",
                           paste(.emptyEventListCols, collapse = ", "), ".")
                    }
-                   sim@current <- value
+                   sim@current <- as.list(value)
                    return(sim)
 })
 
@@ -2493,23 +2454,26 @@ setMethod(
   "completed",
   signature = c(".simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+    obj <- rbindlist(sim@completed)
+    if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
-      compl <- rbindlist(sim@completed)
-      if (any(!is.na(compl$eventTime))) {
-        if (!is.null(compl$eventTime)) {
-          obj <- compl#copy(sim@completed) # don't change original sim
+      #compl <- rbindlist(sim@completed)
+      if (any(!is.na(obj$eventTime))) {
+        if (!is.null(obj$eventTime)) {
+          #if (any(!is.na(obj$eventTime))) {
+        #if (!is.null(obj$eventTime)) {
+          #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+          #sim@completed
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
-          obj
         }
-      } else {
-        rbindlist(sim@completed)
-      }
-    } else {
-      rbindlist(sim@completed)
-    }
-    return(out)
+      } #else {
+        #sim@completed
+      #}
+    } #else {
+      #sim@completed
+    #}
+    return(obj)
 })
 
 #' @export
@@ -2541,7 +2505,11 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
-    sim@completed <- list(value)
+    if(NROW(value)) {
+      sim@completed <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x,]))
+    } else {
+      sim@completed <- list()
+    }
     return(sim)
 })
 

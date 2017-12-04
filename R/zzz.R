@@ -7,6 +7,7 @@
   opts <- options()
   opts.spades <- list( # nolint
     spades.cachePath = file.path(tmpdir, "cache"),
+    spades.debug = FALSE, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(tmpdir, "inputs"),
     spades.lowMemory = FALSE,
     spades.modulePath = file.path(tmpdir, "modules"),
@@ -14,7 +15,8 @@
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(tmpdir, "outputs"),
     spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES"
+    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
+    spades.switchPkgNamespaces = TRUE
   )
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
