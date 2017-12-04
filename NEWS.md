@@ -3,6 +3,7 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.1.0.9000
 ==================
 
+* new option: `spades.switchPkgNamespaces` which allows the user to turn off the SpaDES feature that loads and unloads libraries specific to each module. While useful, it slows down computations, in some cases, by a lot.
 * remove `grDevices` from Imports as it was not used (#1)
 * fix bug in `zipModule` that omitted the checksum file from being included when `data = FALSE` (#3)
 * default `debug` option in `spades()` now uses the package option `spades.debug` and default is set to `FALSE` (#5)

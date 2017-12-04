@@ -1860,14 +1860,13 @@ setReplaceMethod(
 #' @export
 #' @include simList-class.R
 #' @include times.R
-#' @importFrom chron times
 #' @aliases simList-accessors-times
 #' @rdname simList-accessors-times
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #'
 setGeneric("times", function(x, ...) {
-  chron::times(x, ...)
+  standardGeneric("times")
 })
 
 #' @export

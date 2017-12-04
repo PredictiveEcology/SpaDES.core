@@ -212,40 +212,43 @@ setMethod(
 #' @keywords internal
 #' @rdname modifySearchPath
 .modifySearchPath <- function(pkgs, removeOthers = FALSE) {
-  pkgs <- c("SpaDES.core", pkgs)
-  pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
-  pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
+  if(getOption("spades.switchPkgNamespaces")) {
+    pkgs <- c("SpaDES.core", pkgs)
+    pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
+    pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
 
-  # Find all packages that are not in the first sequence after .GlobalEnv
-  whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
+    # Find all packages that are not in the first sequence after .GlobalEnv
+    whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
 
-  if (any(whNotAtTop)) {
-    if (removeOthers) {
-      pkgs <- setdiff(search(), pkgs)
-      pkgs <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
-      whRm <- seq_along(pkgs)
-    } else {
-      whRm <- which(pkgPositions > min(which(whNotAtTop)))
-      whAdd <- which(is.na(pkgPositions))
-    }
+    if (any(whNotAtTop)) {
+      if (removeOthers) {
+        pkgs <- setdiff(search(), pkgs)
+        pkgs <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
+        whRm <- seq_along(pkgs)
+      } else {
+        whRm <- which(pkgPositions > min(which(whNotAtTop)))
+        whAdd <- which(is.na(pkgPositions))
+      }
 
-    if (length(whRm) > 0) { # i.e,. ones that need reordering
-      suppressWarnings(
-        lapply(unique(gsub(pkgs, pattern = "package:", replacement = "")[whRm]), function(pack) {
-          try(detach(paste0("package:", pack), character.only = TRUE), silent = TRUE)
-        })
-      )
-    }
-    if (!removeOthers) {
-      if (length(c(whAdd, whRm))) {
-        suppressMessages(
-          lapply(rev(pkgs[c(whAdd, whRm)]), function(pack) {
-              try(attachNamespace(pack), silent = TRUE)
+      if (length(whRm) > 0) { # i.e,. ones that need reordering
+        suppressWarnings(
+          lapply(unique(gsub(pkgs, pattern = "package:", replacement = "")[whRm]), function(pack) {
+            try(detach(paste0("package:", pack), character.only = TRUE), silent = TRUE)
           })
         )
       }
+      if (!removeOthers) {
+        if (length(c(whAdd, whRm))) {
+          suppressMessages(
+            lapply(rev(pkgs[c(whAdd, whRm)]), function(pack) {
+              try(attachNamespace(pack), silent = TRUE)
+            })
+          )
+        }
+      }
     }
   }
+
 }
 
 
