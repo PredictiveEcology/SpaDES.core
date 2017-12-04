@@ -307,7 +307,7 @@ scheduleEvent <- function(sim,
             #  assumption, that the units are in \code{timeunit}
             if (is.null(attr(eventTime, "unit"))) {
               attributes(eventTime)$unit <- .callingFrameTimeunit(sim)
-              eventTimeInSeconds <- convertTimeunit((
+            eventTimeInSeconds <- as.numeric(convertTimeunit((
                 eventTime -
                   convertTimeunit(sim@simtimes[["start"]],
                                   sim@simtimes[["timeunit"]], sim@.envir,
@@ -315,27 +315,23 @@ scheduleEvent <- function(sim,
               ),
               "seconds",
               sim@.envir, skipChecks = TRUE) +
-                sim@simtimes[["current"]] %>%
-                as.numeric()
+              sim@simtimes[["current"]])
             } else {
               eventTimeInSeconds <-
-                convertTimeunit(eventTime, "seconds", sim@.envir,
-                                skipChecks = TRUE) %>%
-                as.numeric()
+              as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
+                                         skipChecks = TRUE))
             }
           } else {
             # for core modules because they have no metadata
             eventTimeInSeconds <-
-              convertTimeunit(eventTime, "seconds", sim@.envir,
-                              skipChecks = TRUE) %>%
-              as.numeric()
+            as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
+                                       skipChecks = TRUE))
           }
         } else {
           # when eventTime is NA... can't seem to get an example
           eventTimeInSeconds <-
-            convertTimeunit(eventTime, "seconds", sim@.envir,
-                            skipChecks = TRUE) %>%
-            as.numeric()
+          as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
+                          skipChecks = TRUE))
         }
         attributes(eventTimeInSeconds)$unit <- "second"
 
