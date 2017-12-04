@@ -98,8 +98,9 @@
 setClass(
   ".simList",
   slots = list(
-    modules = "list", params = "list", events = "data.table",
-    current = "data.table", completed = "list", depends = ".simDeps",
+    modules = "list", params = "list", events = "list",#data.table",
+    current = "list", #"data.table",
+    completed = "list", depends = ".simDeps",
     simtimes = "list", inputs = "list", outputs = "list", paths = "list"
   ),
   prototype = list(
@@ -108,8 +109,8 @@ setClass(
       .checkpoint = list(interval = NA_real_, file = NULL),
       .progress = list(type = NULL, interval = NULL)
     ),
-    events = .emptyEventListObj,
-    current = .emptyEventListObj,
+    events = list(),#.emptyEventListObj,
+    current = list(), #.emptyEventListObj,
     completed = list(),
     depends = new(".simDeps", dependencies = list(NULL)),
     simtimes = list(

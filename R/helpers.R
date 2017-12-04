@@ -92,7 +92,7 @@ setMethod(
 .refreshEventQueues <- function() {
   assignInMyNamespace(".lengthEventsDT", length(.eventsDT) + 1)
 
-  assignInMyNamespace(".eventsDT", lapply(0:99, function(i) {
+  assignInMyNamespace(".eventsDT", lapply(0:19, function(i) {
     data.table(eventTime = integer(i), moduleName = character(i),
                eventType = character(i), eventPriority = numeric(i))
   }))
@@ -122,7 +122,7 @@ setMethod(
 #' @rdname emptyEventList
 .lengthEventsDT <- length(.eventsDT) + 1
 
-.refreshEventQueues()
+#.refreshEventQueues()
 
 ################################################################################
 #' Default (empty) metadata
