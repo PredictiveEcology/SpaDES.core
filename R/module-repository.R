@@ -423,7 +423,7 @@ setMethod(
           } else {
             id <- fuzzy
             message("  Used fuzzy matching of filenames. Assuming\n    ",
-                    xFile, " is the source for\n      ", 
+                    xFile, " is the source for\n      ",
                     paste(chksums$expectedFile[id], collapse = ",\n      "))
           }
         }
@@ -461,7 +461,7 @@ setMethod(
           }
           destfile
         } else {
-          message("  Download data step skipped for ", 
+          message("  Download data step skipped for ",
                   paste(chksums$actualFile[id], collapse = ", "),
                   " in module ", module, ". Local copy exists.")
         }
