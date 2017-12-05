@@ -212,7 +212,7 @@ setMethod(
 #' @keywords internal
 #' @rdname modifySearchPath
 .modifySearchPath <- function(pkgs, removeOthers = FALSE) {
-  if(getOption("spades.switchPkgNamespaces")) {
+  if (getOption("spades.switchPkgNamespaces")) {
     pkgs <- c("SpaDES.core", pkgs)
     pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
     pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
@@ -256,4 +256,3 @@ setMethod(
 
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
 .pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)], paste0("package:",.pkgEnv$corePackagesVec[-(1:2)]))
-

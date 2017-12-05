@@ -357,7 +357,7 @@ scheduleEvent <- function(sim,
         } else if (eventTimeInSeconds==sim@events[[nrowEvnts]][[1]] & eventPriority>=sim@events[[nrowEvnts]][[4]]){
           needSort <- FALSE
         }
-        if(needSort) {
+        if (needSort) {
           ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
                        unlist(lapply(sim@events, function(x) x$eventPriority)))
           sim@events <- sim@events[ord]

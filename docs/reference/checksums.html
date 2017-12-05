@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -109,13 +109,15 @@ Checksums are computed using <code>SpaDES.core:::.digest</code>, which is simply
 wrapper around <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>.</p>
     
 
-    <pre class="usage"><span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for character,character,logical</span>
-<span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>, <span class='no'>...</span>)
+<span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>,
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>,
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -134,6 +136,12 @@ wrapper around <code><a href='http://www.rdocumentation.org/packages/digest/topi
 Default is <code>FALSE</code>, as users should not change this file.
 Module developers should write this file prior to distributing
 their module code, and update accordingly when the data change.</p></td>
+    </tr>
+    <tr>
+      <th>quickCheck</th>
+      <td><p>Logical. If <code>TRUE</code>, then the check with local data will only
+use <code>file.size</code> instead of <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>. This is
+faster, but less robust.</p></td>
     </tr>
     <tr>
       <th>...</th>

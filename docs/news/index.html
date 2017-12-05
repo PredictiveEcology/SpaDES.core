@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -103,6 +103,16 @@
     </div>
 
     <div class="contents">
+    <div id="version-0-1-0-9000" class="section level1">
+<h1 class="hasAnchor">
+<a href="#version-0-1-0-9000" class="anchor"></a>version 0.1.0.9000</h1>
+<ul>
+<li>new option: <code>spades.switchPkgNamespaces</code> which allows the user to turn off the SpaDES feature that loads and unloads libraries specific to each module. While useful, it slows down computations, in some cases, by a lot.</li>
+<li>remove <code>grDevices</code> from Imports as it was not used (#1)</li>
+<li>fix bug in <code>zipModule</code> that omitted the checksum file from being included when <code>data = FALSE</code> (#3)</li>
+<li>default <code>debug</code> option in <code><a href="../reference/spades.html">spades()</a></code> now uses the package option <code>spades.debug</code> and default is set to <code>FALSE</code> (#5)</li>
+</ul>
+</div>
     <div id="version-0-1-0" class="section level1">
 <h1 class="hasAnchor">
 <a href="#version-0-1-0" class="anchor"></a>version 0.1.0</h1>
@@ -123,6 +133,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#version-0-1-0-9000">0.1.0.9000</a></li>
         <li><a href="#version-0-1-0">0.1.0</a></li>
       </ul>
     </div>
