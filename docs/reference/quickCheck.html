@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Open a file for editing — .fileEdit • SpaDES.core</title>
+<title>The <code>SpaDES.core</code> variable to switch between quick and robust checking — .quickCheck • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -98,44 +98,29 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Open a file for editing</h1>
+    <h1>The <code>SpaDES.core</code> variable to switch between quick and robust checking</h1>
     </div>
 
     
-    <p>RStudio's <code>file.edit</code> behaves differently than <code><a href='http://www.rdocumentation.org/packages/utils/topics/file.edit'>utils::file.edit</a></code>.
-The workaround is to have the user manually open the file if they are using
-RStudio, as suggested in the RStudio support ticket at
-<a href='https://support.rstudio.com/hc/en-us/community/posts/206011308-file-edit-vs-utils-file-edit'>https://support.rstudio.com/hc/en-us/community/posts/206011308-file-edit-vs-utils-file-edit</a>.</p>
+    <p>A variable that can be use by module developers and model users to switch between
+a quick check of functions like downloadData, Cache.
+The module developer must actually use this in their code.</p>
     
 
-    <pre class="usage"><span class='fu'>.fileEdit</span>(<span class='no'>file</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>file</th>
-      <td><p>Character string giving the file path to open.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <pre class="usage"><span class='no'>.quickCheck</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>Invoked for its side effect of opening a file for editing.</p>
+    <p>An object of class <code>logical</code> of length 1.</p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
+      <li><a href="#format">Format</a></li>
           </ul>
-
-    <h2>Author</h2>
-    
-Alex Chubaty
 
   </div>
 </div>

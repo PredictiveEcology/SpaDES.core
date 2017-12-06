@@ -441,12 +441,16 @@
 #'   save simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
 #'
+#'   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
+#'     to ensure a module's required packages are listed first?
+#'     Default \code{TRUE}, which reduces name conflicts among package objects,
+#'     but is not without overhead (\emph{i.e.}, can be slow).
+#'
 #'   \item \code{spades.tolerance}: The default tolerance value used for floating
 #'     point number comparisons. Default \code{.Machine$double.eps^0.5}.
 #'
 #'   \item \code{spades.useragent}: The default user agent to use for downloading
 #'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
-#'
 #' }
 #'
 #' @rdname SpaDES.core-package

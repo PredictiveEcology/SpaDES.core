@@ -74,7 +74,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -172,17 +172,19 @@ setMethod(
 Run a spatial discrete event simulation</p>
     
 
-    <pre class="usage"><span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
+  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>)
 
 <span class='co'># S4 method for simList,ANY,ANY,missing</span>
-<span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>spades</span>(<span class='no'>sim</span>,
+  <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
+  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>)
 
 <span class='co'># S4 method for ANY,ANY,ANY,logical</span>
-<span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='no'>cache</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"spades.debug"</span>),
+  <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
@@ -195,7 +197,8 @@ Run a spatial discrete event simulation</p>
     <tr>
       <th>debug</th>
       <td><p>Optional logical flag or character vector indicating what to print to
-console at each event. See details. Default is <code>FALSE</code>.</p></td>
+console at each event. See details.
+Default is to use the value in <code>getOption("spades.debug")</code>.</p></td>
     </tr>
     <tr>
       <th>progress</th>
@@ -267,6 +270,7 @@ Caching is only based on the input simList. See also <code>experiment</code> for
 the same mechanism, but it can be used with replication.
 See also the vignette on caching for examples.</p>
 <p>If <code>debug</code> is specified, it can be a logical or character vector.
+If not specified, the package option <code>spades.debug</code> is used.
 In all cases, something will be printed to the console immediately before each
 event is being executed.
 If <code>TRUE</code>, then the event immediately following will be printed as it
@@ -310,7 +314,10 @@ See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https:/
 )
 <span class='fu'>spades</span>(<span class='no'>mySim</span>)
 
-<span class='co'># Different debug options</span>
+<span class='co'># set default debug printing for the current session</span>
+<span class='co'># setOption(spades.debug = TRUE)</span>
+
+<span class='co'># Different debug options (overrides the package option 'spades.debug')</span>
 <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='co'># Fastest</span>
 <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='st'>"simList"</span>)
 <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='st'>"print(table(sim$landscape$Fires[]))"</span>)

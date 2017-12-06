@@ -423,9 +423,9 @@ setMethod(
           while(length(fuzzy) == 0) {
             md <- md + 1
             fuzzy <- agrep(xFile, chksums$expectedFile, max.distance = md, ignore.case = TRUE)
-            if(md>=nchar(xFile)) fuzzy <- 0
+            if (md >= nchar(xFile)) fuzzy <- 0
           }
-          if(all(fuzzy==0)) {
+          if (all(fuzzy == 0)) {
             stop("  downloadData() requires that basename(sourceURL) name",
                  " and local filename be at least somewhat similar.")
           } else {
@@ -439,8 +439,8 @@ setMethod(
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
-          xx <- tryCatch(getURL(x, nobody=1L, header=1L), error = function(x) "")
-          checkRemote <- if(nchar(xx)) {
+          xx <- tryCatch(getURL(x, nobody = 1L, header = 1L), error = function(x) "")
+          checkRemote <- if (nchar(xx)) {
             tryCatch({
               grep(strsplit(xx, "\r\n")[[1]],
                    pattern = "Content-Length", value = TRUE) %>%
@@ -452,13 +452,13 @@ setMethod(
           } else { 0 }
 
           needNewDownload <- TRUE
-          if(file.exists(destfile)) {
-            if(checkRemote>0)
-              if(round(file.size(destfile)) == checkRemote )
+          if (file.exists(destfile)) {
+            if (checkRemote > 0)
+              if (round(file.size(destfile)) == checkRemote )
                 needNewDownload <- FALSE
           }
 
-          if(needNewDownload) {
+          if (needNewDownload) {
             # Use Cache next in case multiple objects use same url, e.g., in a .tar file
             message("  Downloading ", xFile, " for module ", module, " ...")
             Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
@@ -505,7 +505,7 @@ setMethod(
     chksums2 <- chksums[0,]
     #children <- moduleMetadata(module, path)$childModules
     if (!is.null(children)) {
-      if(length(children)) {
+      if (length(children)) {
         if ( all( nzchar(children) & !is.na(children) ) ) {
           chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
                              quickCheck = quickCheck) %>%
@@ -570,10 +570,9 @@ setMethod(
   ".digest",
   signature = c(file = "character"),
   definition = function(file, quickCheck, algo = "xxhash64", ...) {
-    if(quickCheck) {
+    if (quickCheck) {
       file.size(file) %>%
         as.character() # need as.character for empty case
-
     } else {
       lapply(file, function(f) {
         digest::digest(object = f, file = TRUE, algo = algo, ...)
@@ -705,20 +704,22 @@ setMethod(
       filesToCheck <- files
     }
 
-    if(is.null(txt$filesize)) {
+    if (is.null(txt$filesize)) {
       quickCheck <- FALSE
       message("  Not possible to use quickCheck in downloadData;\n ",
               "    checksums.txt file does not have filesizes")
     }
-    checksums <- rep(list(rep("", length(filesToCheck))),2)
-    if(quickCheck | write) {
+    checksums <- rep(list(rep("", length(filesToCheck))), 2)
+    if (quickCheck | write) {
       checksums[[2]] <- do.call(.digest,
-                         args = append(list(file = filesToCheck, quickCheck = TRUE),
-                                       dots))
+                                args = append(list(file = filesToCheck, quickCheck = TRUE),
+                                              dots))
     }
-    if(!quickCheck | write) {
+
+    if (!quickCheck | write) {
       checksums[[1]] <- do.call(.digest,
-                args = append(list(file = filesToCheck, quickCheck = FALSE), dots))
+                                args = append(list(file = filesToCheck, quickCheck = FALSE),
+                                              dots))
     }
     message("Finished checking local files.")
 
@@ -741,13 +742,13 @@ setMethod(
         left_join(txt, ., by = "file") %>%
         rename_(expectedFile = "file") %>%
         dplyr::group_by_("expectedFile") %>%
-        {if(!quickCheck) {
+        {if (!quickCheck) {
           mutate_(., result = ~ifelse(checksum.x != checksum.y, "FAIL", "OK"))
         } else {
           mutate_(., result = ~ifelse(filesize.x != filesize.y, "FAIL", "OK"))
         }} %>%
         dplyr::arrange(desc(result)) %>%
-        {if(!quickCheck){
+        {if (!quickCheck){
           select_(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
                   "algorithm.x", "algorithm.y")
         } else {

@@ -2314,7 +2314,7 @@ setReplaceMethod(
        value[, eventTime := convertTimeunit(eventTime, "second", sim@.envir)]
      }
 
-     if(NROW(value)) {
+     if (NROW(value)) {
        sim@events <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x,]))
      } else {
        sim@events <- list()
@@ -2465,8 +2465,8 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
-    if(NROW(value)) {
-      sim@completed <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x,]))
+    if (NROW(value)) {
+      sim@completed <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x, ]))
     } else {
       sim@completed <- list()
     }
