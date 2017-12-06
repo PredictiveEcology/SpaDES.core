@@ -595,21 +595,13 @@ setReplaceMethod("params",
 #' @include simList-class.R
 #' @rdname params
 #'
-setGeneric("P", function(sim, module = NULL, param = NULL) {
-  standardGeneric("P")
-})
-
-#' @export
-#' @rdname params
-setMethod(
-  "P",
-  signature = ".simList",
-  definition = function(sim, module, param) {
-  if (is.null(module)) {
+P <- function(sim, module, param) {
+  if (missing(sim)) stop("P takes a simList as first argument")
+  if (missing(module)) {
     module <- sim@current$moduleName
   }
   if (length(module) > 0) {
-    if (is.null(param)) {
+    if (missing(param)) {
       return(sim@params[[module]])
     } else {
       return(sim@params[[module]][[param]])
@@ -618,7 +610,7 @@ setMethod(
     inSimInit <- grep(sys.calls(), pattern = ".parseModule")
     if (any(inSimInit)) {
       module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
-      if (is.null(param)) {
+      if (missing(param)) {
         return(sim@params[[module]])
       } else {
         return(sim@params[[module]][[param]])
@@ -626,7 +618,7 @@ setMethod(
     }
     return(sim@params)
   }
-})
+}
 
 
 ################################################################################

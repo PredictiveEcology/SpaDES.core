@@ -7,6 +7,7 @@ version 0.1.0.9000
 * remove `grDevices` from Imports as it was not used (#1)
 * fix bug in `zipModule` that omitted the checksum file from being included when `data = FALSE` (#3)
 * default `debug` option in `spades()` now uses the package option `spades.debug` and default is set to `FALSE` (#5)
+* convert `P` to a function, rather than S4 generic and method, for speed.
 
 version 0.1.0
 =============
