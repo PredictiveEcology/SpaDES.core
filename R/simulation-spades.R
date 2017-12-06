@@ -93,7 +93,7 @@ doEvent <- function(sim, debug, notOlderThan) {
       debugDoEvent <- FALSE
 
       # check the module call for validity
-      if (!(all(sapply(debug, identical, FALSE)))) {
+      if (!(all(unlist(lapply(debug, identical, FALSE))))) {
         for (i in seq_along(debug)) {
           if (isTRUE(debug[[i]]) | debug[[i]] == "current") {
             if (NROW(cur) > 0) {
@@ -302,9 +302,9 @@ scheduleEvent <- function(sim,
       if (!is.null(sim@depends@dependencies[[1]])) {
         # first check if this moduleName matches the name of a module
         #  with meta-data (i.e., depends(sim)@dependencies filled)
-        if (moduleName %in% sapply(sim@depends@dependencies, function(x) {
+        if (moduleName %in% unlist(lapply(sim@depends@dependencies, function(x) {
           x@name
-        })) {
+        }))) {
           # If the eventTime doesn't have units, it's a user generated
           #  value, likely because of times in the simInit call.
           #  This must be intercepted, and units added based on this
@@ -695,7 +695,7 @@ setMethod(
       }
     }
 
-    if (!(all(sapply(debug, identical, FALSE)))) {
+    if (!(all(unlist(lapply(debug, identical, FALSE))))) {
       .pkgEnv[[".spadesDebugFirst"]] <- TRUE
       .pkgEnv[[".spadesDebugWidth"]] <- c(9, 10, 9, 13)
     }
