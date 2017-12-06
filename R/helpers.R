@@ -69,8 +69,6 @@ setMethod(
     set(eeldt, , "moduleName", moduleName)
     set(eeldt, , "eventType", eventType)
     set(eeldt, , "eventPriority", eventPriority)
-    # data.table(eventTime = eventTime, moduleName = moduleName,
-    #           eventType = eventType, eventPriority = eventPriority)
     eeldt
     # don't set key because it is set later when used
 })
@@ -82,47 +80,11 @@ setMethod(
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
     copy(.emptyEventListDT)
-    #data.table(eventTime = numeric(0L), moduleName = character(0L),
-    #           eventType = character(0L), eventPriority = numeric(0L))
 })
-
-#' @rdname emptyEventList
-.emptyEventListObj <- .emptyEventList()
-
-.refreshEventQueues <- function() {
-  assignInMyNamespace(".lengthEventsDT", length(.eventsDT) + 1)
-
-  assignInMyNamespace(".eventsDT", lapply(0:19, function(i) {
-    data.table(eventTime = integer(i), moduleName = character(i),
-               eventType = character(i), eventPriority = numeric(i))
-  }))
-  assignInMyNamespace(".singleEventListDT", data.table(eventTime = numeric(1L), moduleName = character(1L),
-                                                       eventType = character(1L), eventPriority = numeric(1L)))
-  assignInMyNamespace(".currentEventDT", .emptyEventList(numeric(1), character(1), character(1), numeric(1)))
-
-}
-
 
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
 
-
-#' @rdname emptyEventList
-.emptyEventListNA <- .emptyEventList(NA_real_, NA_character_, NA_character_, NA_integer_)
-
-#' @rdname emptyEventList
-.currentEventDT <- list()
-
-#' @rdname emptyEventList
-.eventsDT <- list()
-
-#' @rdname emptyEventList
-.numColsEventList <- length(.emptyEventListCols)
-
-#' @rdname emptyEventList
-.lengthEventsDT <- length(.eventsDT) + 1
-
-#.refreshEventQueues()
 
 ################################################################################
 #' Default (empty) metadata
