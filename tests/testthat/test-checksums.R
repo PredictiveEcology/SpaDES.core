@@ -38,7 +38,7 @@ test_that("checksums read and written correctly", {
                     checksum = csums[-1],
                     algorithm = c("xxhash64", "xxhash64", "xxhash64", "xxhash64"),
                     stringsAsFactors = FALSE)
-  write.table(out, csf, eol = "\n", col.names = TRUE, row.names = FALSE)
+  utils::write.table(out, csf, eol = "\n", col.names = TRUE, row.names = FALSE)
 
   txt <- checksums("test_checksums", dirname(dirname(tmpdir)), write = TRUE)
   expect_true(all(colnames(txt) == cnames.w))

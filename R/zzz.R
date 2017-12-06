@@ -24,9 +24,10 @@
   invisible()
 }
 
+#' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
   if (interactive()) {
-    packageStartupMessage("Using SpaDES.core version ", packageVersion("SpaDES.core"), ".")
+    packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     packageStartupMessage("Default paths for SpaDES directories set to:\n",
                           "  cachePath:  ", getOption("spades.cachePath"), "\n",
                           "  inputPath:  ", getOption("spades.inputPath"), "\n",

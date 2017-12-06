@@ -1,4 +1,5 @@
 #' @importFrom stats na.omit
+#' @importFrom utils txtProgressBar setTxtProgressBar winProgressBar
 doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     ids <- na.omit(match(names(P(sim, ".progress")), c("type", "interval")))
@@ -82,6 +83,7 @@ newProgressBar <- function(sim) {
 }
 
 #' @importFrom tcltk setTkProgressBar
+#' @importFrom utils setWinProgressBar globalVariables
 #' @rdname progressBar
 setProgressBar <- function(sim) {
   OS <- tolower(Sys.info()["sysname"])

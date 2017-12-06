@@ -459,5 +459,4 @@
 
 #' @import igraph
 #' @import methods
-#' @import utils
 NULL

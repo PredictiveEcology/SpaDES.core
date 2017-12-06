@@ -395,6 +395,7 @@ if (!isGeneric(".objSizeInclEnviros")) {
 #' See \code{\link[reproducible]{.objSizeInclEnviros}}.
 #'
 #' @importFrom reproducible .objSizeInclEnviros
+#' @importFrom utils object.size
 #' @importMethodsFrom reproducible .objSizeInclEnviros
 #' @inheritParams reproducible::.objSizeInclEnviros
 #' @include simList-class.R

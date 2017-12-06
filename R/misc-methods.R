@@ -144,6 +144,7 @@ setMethod("append_attr",
 #'
 #' @export
 #' @rdname loadPackages
+#' @importFrom utils install.packages installed.packages
 #'
 #' @author Alex Chubaty
 #'

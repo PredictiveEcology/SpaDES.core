@@ -34,6 +34,7 @@ if (getRversion() >= "3.1.0") {
 #' @importFrom data.table data.table rbindlist setkey
 #' @importFrom stringi stri_pad_right stri_pad stri_length
 #' @importFrom reproducible Cache
+#' @importFrom utils write.table
 #' @include helpers.R
 #' @keywords internal
 #' @rdname doEvent

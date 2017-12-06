@@ -249,6 +249,7 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 
 #' @rdname downloadModule
 #' @importFrom reproducible checkPath
+#' @importFrom utils unzip zip
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
@@ -376,6 +377,7 @@ setMethod(
 #' @export
 #' @importFrom dplyr mutate_
 #' @importFrom RCurl getURL
+#' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #'
@@ -647,6 +649,7 @@ setGeneric("checksums", function(module, path, write, quickCheck = FALSE, ...) {
 
 #' @rdname checksums
 #' @importFrom reproducible checkPath
+#' @importFrom utils read.table write.table
 setMethod(
   "checksums",
   signature = c(module = "character", path = "character", write = "logical"),

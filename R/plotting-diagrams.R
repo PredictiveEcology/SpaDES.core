@@ -70,6 +70,7 @@ setGeneric(".sim2gantt", function(sim, n, startDate, width) {
 })
 
 #' @rdname sim2gantt
+#' @importFrom utils tail
 setMethod(
   ".sim2gantt",
   signature(sim = "simList", n = "numeric", startDate = "character", width = "numeric"),
