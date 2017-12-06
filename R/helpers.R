@@ -206,13 +206,19 @@ setMethod(
 #' @param removeOthers Logical. If \code{TRUE}, then only the packages in \code{pkgs}
 #'                     will remain in the search path, i.e., all others will be removed.
 #'
+#' @param skipNamespacing Logical. If \code{FALSE}, then the running of an event in a module
+#'                        will not trigger a rearrangement of the search() path. This will
+#'                        generally speed up module simulations, but may create name
+#'                        conflicts between packages.
+#'
 #' @return Nothing. This is used for its side effects, which are "severe".
 #'
 #' @author Eliot McIntire
 #' @keywords internal
 #' @rdname modifySearchPath
-.modifySearchPath <- function(pkgs, removeOthers = FALSE) {
-  if(getOption("spades.switchPkgNamespaces")) {
+.modifySearchPath <- function(pkgs, removeOthers = FALSE,
+                              skipNamespacing = !getOption("spades.switchPkgNamespaces")) {
+  if (!skipNamespacing) {
     pkgs <- c("SpaDES.core", pkgs)
     pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
     pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())

@@ -4,13 +4,19 @@
 \alias{.modifySearchPath}
 \title{Modify package order in search path}
 \usage{
-.modifySearchPath(pkgs, removeOthers = FALSE)
+.modifySearchPath(pkgs, removeOthers = FALSE,
+  skipNamespacing = !getOption("spades.switchPkgNamespaces"))
 }
 \arguments{
 \item{pkgs}{The packages that are to be placed at the beginning of the search path,}
 
 \item{removeOthers}{Logical. If \code{TRUE}, then only the packages in \code{pkgs}
 will remain in the search path, i.e., all others will be removed.}
+
+\item{skipNamespacing}{Logical. If \code{FALSE}, then the running of an event in a module
+will not trigger a rearrangement of the search() path. This will
+generally speed up module simulations, but may create name
+conflicts between packages.}
 }
 \value{
 Nothing. This is used for its side effects, which are "severe".

@@ -410,6 +410,9 @@ setMethod(
       }
     }
 
+    # Force SpaDES.core to front of search path
+    #.modifySearchPath("SpaDES.core", skipNamespacing = FALSE)
+
     rm(".userSuppliedObjNames", envir=envir(sim))
     ## add name to depends
     if (!is.null(names(sim@depends@dependencies))) {
