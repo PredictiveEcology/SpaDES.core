@@ -644,7 +644,7 @@ setMethod(
     on.exit({
       .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
       rm(".timeunits", envir = sim@.envir)
-    }, add = TRUE)
+    })
 
     if (!is.null(.plotInitialTime)) {
       if (!is.numeric(.plotInitialTime))
