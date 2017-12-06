@@ -2558,7 +2558,7 @@ setMethod(
     if (!is.null(args$filename)) {
       pkgs <- .parseModulePartial(filename = args$filename,
                                   defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% append("SpaDES.core") %>% unique() %>% sort()
+        unlist() %>% unique() %>% sort()
       return(pkgs)
     } else if (!is.null(args$module)) {
       f <- file.path(getOption("spades.modulePath"), args$module, paste0(args$module, ".R"))
