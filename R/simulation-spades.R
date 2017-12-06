@@ -206,12 +206,12 @@ doEvent <- function(sim, debug, notOlderThan) {
         # Do not use pre-existing data.tables that get updated b/c completed will almost
         #  always be large (NROW(completed) > 20), so can't realistically pre-create
         #  many data.tables
-        sim@completed[[lenCompl+1]] <- copy(cur)
+        sim@completed <- append(sim@completed, list(cur))
         if (lenCompl > getOption("spades.nCompleted")) {
           sim@completed <- sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)]
         }
       } else {
-        sim@completed[[1]] <- cur
+        sim@completed <- list(cur)
       }
       # current event completed, replace current with empty
       sim@current <- list()
