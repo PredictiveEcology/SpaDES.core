@@ -149,7 +149,7 @@ setClass(
 setClass("simList",
          contains = ".simList",
          slots = list(.envir = "environment"),
-         prototype = list(.envir = new.env(parent = emptyenv()))
+         prototype = list(.envir = new.env(parent = asNamespace("SpaDES.core"))) #emptyenv()))#
 )
 
 ################################################################################
@@ -207,6 +207,6 @@ setAs(from = "simList", to = "simList_", def = function(from) {
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object) {
-            .Object@.envir <- new.env(parent = .GlobalEnv)
+            .Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
             return(.Object)
 })

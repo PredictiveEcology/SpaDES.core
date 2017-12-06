@@ -2544,7 +2544,7 @@ setMethod(
   definition = function(sim, ...) {
     pkgs <- lapply(depends(sim)@dependencies, function(x) {
         x@reqdPkgs
-      }) %>% unlist() %>% append("SpaDES.core") %>% unique() %>% sort()
+      }) %>% unlist() %>% unique() %>% sort()
     return(pkgs)
 })
 
@@ -2563,7 +2563,7 @@ setMethod(
     } else if (!is.null(args$module)) {
       f <- file.path(getOption("spades.modulePath"), args$module, paste0(args$module, ".R"))
       pkgs <- .parseModulePartial(filename = f, defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% append("SpaDES.core") %>% unique() %>% sort()
+        unlist() %>% unique() %>% sort()
       return(pkgs)
     } else {
       stop("one of sim, modules, or filename must be supplied.")
