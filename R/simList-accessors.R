@@ -2243,7 +2243,6 @@ setMethod(
 #' @export
 #' @family functions to access elements of a \code{simList} object
 #' @importFrom data.table := copy data.table
-#' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @include simList-class.R
 #' @rdname simList-accessors-events
@@ -2327,7 +2326,6 @@ setReplaceMethod(
 #'
 #' @export
 #' @importFrom data.table rbindlist
-#' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @include simList-class.R
 #' @rdname simList-accessors-events
@@ -2399,7 +2397,6 @@ setReplaceMethod("current",
 #' @inheritParams events
 #' @include simList-class.R
 #' @importFrom data.table := data.table
-#' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @export
 #' @rdname simList-accessors-events
