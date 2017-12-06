@@ -1930,19 +1930,21 @@ setReplaceMethod(
 #' @rdname simList-accessors-times
 time..simList <- function(x, unit, ...) {
     if (missing(unit)) {
-      mUnit <- .callingFrameTimeunit(x)
-      if (is.null(mUnit)) {
-        mUnit <- NA_character_
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit)) {
+        unit <- NA_character_
       }
-      unit <- mUnit
     }
-    if (!is.na(unit)) {
-      if (is.na(pmatch("second", unit))) {
+    if(isTRUE(!startsWith(unit, "second"))) {
+
+    #if (!is.na(unit)) {
+      #browser()
+      #if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
         t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
                              skipChecks = TRUE)
         return(t)
-      }
+      #}
     }
     t <- x@simtimes[["current"]]
     return(t)
@@ -1977,35 +1979,15 @@ setReplaceMethod(
 ################################################################################
 #' @inheritParams times
 #' @include times.R
+#' @importFrom stats end
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-times
-#'
-setGeneric("end", function(x, unit, ...) {
-  stats::end(x, ...)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "end",
-  signature = c(".simList", "missing"),
-  definition = function(x) {
-    mUnit <- .callingFrameTimeunit(x)
-    if (is.null(mUnit)) {
-      mUnit <- NA_character_
+end..simList <- function(x, unit, ...) {
+    unit <- .callingFrameTimeunit(x)
+    if (is.null(unit)) {
+      unit <- NA_character_
     }
-    t <- end(x, mUnit)
-    return(t)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "end",
-  signature = c(".simList", "character"),
-  definition = function(x, unit) {
-
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
@@ -2015,7 +1997,7 @@ setMethod(
     }
     t <- x@simtimes$end
     return(t)
-})
+}
 
 #' @export
 #' @rdname simList-accessors-times
@@ -2042,34 +2024,19 @@ setReplaceMethod(
 
 ################################################################################
 #' @inheritParams times
+#' @importFrom stats start
 #' @include simList-class.R
 #' @include times.R
 #' @export
 #' @rdname simList-accessors-times
-#'
-setGeneric("start", function(x, unit, ...) {
-  stats::start(x, ...)
-})
-
-#' @rdname simList-accessors-times
-setMethod(
-  "start",
-  signature = c(".simList", "missing"),
-  definition = function(x) {
-    mUnit <- .callingFrameTimeunit(x)
-    if (is.null(mUnit)) {
-      mUnit <- NA_character_
+start..simList <- function(x, unit = NULL, ...) {
+    if (is.null(unit)) {
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit)) {
+        unit <- NA_character_
+      }
     }
-    t <- start(x, mUnit)
-    return(t)
-})
 
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "start",
-  signature = c(".simList", "character"),
-  definition = function(x, unit) {
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
@@ -2079,7 +2046,7 @@ setMethod(
     }
     t <- x@simtimes$start
     return(t)
-})
+}
 
 #' @export
 #' @rdname simList-accessors-times
