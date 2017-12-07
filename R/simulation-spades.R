@@ -41,46 +41,28 @@ if (getRversion() >= "3.1.0") {
 #'
 doEvent <- function(sim, debug, notOlderThan) {
   if (missing(debug)) debug <- FALSE
-  if (class(sim) != "simList") {
-    # use inherits()?
+  if (!inherits(sim, "simList")) {
     stop("doEvent can only accept a simList object")
   }
 
   # core modules
   core <- .pkgEnv$.coreModules
 
-  cur <- sim@current
-  if (NROW(cur) == 0) {
-    #evnts <- sim@events #events(sim, "second")
+  if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
-    nrowEvnts <- NROW(sim@events)
-    if (nrowEvnts) {
-
-      # Next block  much faster than sim@current <- sim@events[1L,]!
+    if (length(sim@events)) {
       sim@current <- sim@events[[1]]
       sim@events <- sim@events[-1]
-      # if (nrowEvnts < .lengthEventsDT) {
-      #   for (i in 1:.numColsEventList) {
-      #     set(.currentEventDT, 1L, i, sim@events[[i]][[1]])
-      #     set(.eventsDT[[nrowEvnts]], , i, sim@events[[i]][-1])
-      #   }
-      #   sim@current <- .currentEventDT
-      #   sim@events <- .eventsDT[[nrowEvnts]]
-      # } else {
-      #   # above replaces these two lines
-      #   sim@current <- sim@events[1L, ]
-      #   sim@events <- sim@events[-1L, ]
-      # }
     } else {
       # no more events, return empty event list
-      sim@current <- list()#.emptyEventListObj
+      sim@current <- list()
     }
   }
 
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <- sim@current
-  if  (NROW(cur) == 0) {
+  if  (length(cur) == 0) {
     sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
   } else {
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
@@ -90,14 +72,13 @@ doEvent <- function(sim, debug, notOlderThan) {
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
 
-      # Debug internally in the doEvent?
-      debugDoEvent <- FALSE
-
       # check the module call for validity
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
         for (i in seq_along(debug)) {
-          if (isTRUE(debug[[i]]) | debug[[i]] == "current") {
-            if (NROW(cur) > 0) {
+          if (isTRUE(debug[[i]]) | debug[[i]] == "current" | debug[[i]] == "step") {
+            if (length(cur) > 0) {
+              if(debug[[i]] == "step") readline("Press any key to continue...")
+
               evnts1 <- data.frame(current(sim))
               widths <- stri_length(format(evnts1))
               .pkgEnv[[".spadesDebugWidth"]] <- pmax(widths, .pkgEnv[[".spadesDebugWidth"]])
@@ -121,17 +102,15 @@ doEvent <- function(sim, debug, notOlderThan) {
             print(sim)
           } else if (grepl(debug[[i]], pattern = "\\(")) {
             print(eval(parse(text = debug[[i]])))
-          } else if (any(debug[[i]] == unlist(sim@modules))) {
-            if (debug[[i]] == cur[["moduleName"]]) {
-              debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = sim@.envir))
-              on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = sim@.envir))
+          } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
+            fnEnv <- sim@.envir[[paste0("._",cur[["moduleName"]])]]
+            if(is.environment(fnEnv)) {
+              debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+              on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
             }
-          } else if (!any(debug[[i]] == c("step", "browser"))) {
-            print(do.call(debug[[i]], list(sim)))
-          }
+          } else if (!any(debug[[i]] == c("browser"))) {
 
-          if (debug[[i]] == "step") {
-            readline("Press any key to continue...")
+            tryCatch(print(do.call(debug[[i]], list(sim))), error = function(x) NULL)
           }
         }
       }
@@ -139,7 +118,7 @@ doEvent <- function(sim, debug, notOlderThan) {
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
-                                 cur[["eventType"]], debugDoEvent)
+                                 cur[["eventType"]], FALSE)
         } else {
           # for future caching of modules
           cacheIt <- FALSE
@@ -178,7 +157,7 @@ doEvent <- function(sim, debug, notOlderThan) {
             sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[paste0("._", cur[["moduleName"]])]]),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                         debug = debugDoEvent,
+                         debug = FALSE,
                          objects = moduleSpecificObjects,
                          notOlderThan = notOlderThan,
                          outputObjects = moduleSpecificOutputObjects,
@@ -188,7 +167,7 @@ doEvent <- function(sim, debug, notOlderThan) {
           } else {
             sim <- get(moduleCall,
                        envir = sim@.envir[[paste0("._", cur[["moduleName"]])]])(sim, cur[["eventTime"]],
-                                                                                cur[["eventType"]], debugDoEvent)
+                                                                                cur[["eventType"]], FALSE)
           }
         }
       } else {
@@ -204,9 +183,7 @@ doEvent <- function(sim, debug, notOlderThan) {
       # add to list of completed events
       lenCompl <- length(sim@completed)
       if (lenCompl) {
-        # Do not use pre-existing data.tables that get updated b/c completed will almost
-        #  always be large (NROW(completed) > 20), so can't realistically pre-create
-        #  many data.tables
+        # This gets slower as it gets larger. So sad.
         sim@completed <- append(sim@completed, list(cur))
         if (lenCompl > getOption("spades.nCompleted")) {
           sim@completed <- sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)]
@@ -219,12 +196,10 @@ doEvent <- function(sim, debug, notOlderThan) {
     } else {
       # update current simulated time and event
       sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
-      if (NROW(sim@events)) {
+      if (length(sim@events)) {
         # i.e., if no more events
         sim@events <- append(list(sim@current), sim@events)
         sim@current <- list()
-        #sim@events <- rbind(sim@current, sim@events)
-        #        sim@current <- .emptyEventListObj
       }
     }
   }
@@ -338,24 +313,25 @@ scheduleEvent <- function(sim,
           as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
                                      skipChecks = TRUE))
       }
-      attributes(eventTimeInSeconds)$unit <- "second"
+      attr(eventTimeInSeconds, "unit") <- "second"
 
-      #newEvent <- copy(.singleEventListDT)
       newEventList <- list(list(
         eventTime = eventTimeInSeconds,
         moduleName = moduleName,
         eventType = eventType,
         eventPriority = eventPriority
       ))
-      nrowEvnts <- NROW(sim@events)
-      if (nrowEvnts == 0L) {
+      numEvents <- length(sim@events)
+
+      # put new event into event queue
+      if (numEvents == 0L) {
         sim@events <- newEventList
       } else {
         sim@events <- append(sim@events, newEventList)
         needSort <- TRUE
-        if (eventTimeInSeconds>sim@events[[nrowEvnts]][[1]]) {
+        if (eventTimeInSeconds>sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
-        } else if (eventTimeInSeconds==sim@events[[nrowEvnts]][[1]] & eventPriority>=sim@events[[nrowEvnts]][[4]]){
+        } else if (eventTimeInSeconds==sim@events[[numEvents]][[1]] & eventPriority>=sim@events[[numEvents]][[4]]){
           needSort <- FALSE
         }
         if (needSort) {
@@ -363,60 +339,7 @@ scheduleEvent <- function(sim,
                        unlist(lapply(sim@events, function(x) x$eventPriority)))
           sim@events <- sim@events[ord]
         }
-
       }
-
-
-      # for (i in 1:.numColsEventList) set(newEvent, , i, newEventList[[i]])
-      #
-      # # if the event list is empty, set it to consist of newEvent and return;
-      # # otherwise, add newEvent and re-sort (rekey).
-      # #evnts <- sim@events #events(sim, "second")
-      # nrowEvnts <- NROW(sim@events)
-      #
-      # if (nrowEvnts == 0L) {
-      #   sim@events <- newEvent
-      # } else {
-      #   # This is faster than rbindlist below. So, use for smaller event queues
-      #   if (nrowEvnts < .lengthEventsDT) {
-      #
-      #     #for speed -- the special case where there are only one event in the queue
-      #     if (nrowEvnts == 1L) {
-      #       if (eventTimeInSeconds<sim@events[[1]][1]) {
-      #         for (i in 1:.numColsEventList) {
-      #           set(.eventsDT[[nrowEvnts + 2]], , i, c(newEvent[[i]], sim@events[[i]]))
-      #         }
-      #       } else {
-      #         for (i in 1:.numColsEventList) {
-      #           set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
-      #         }
-      #
-      #       }
-      #     } else {
-      #       for (i in 1:.numColsEventList) {
-      #         set(.eventsDT[[nrowEvnts + 2]], , i, c(sim@events[[i]], newEvent[[i]]))
-      #       }
-      #     }
-      #
-      #     sim@events <- .eventsDT[[nrowEvnts + 2]]
-      #   } else {
-      #     sim@events <- rbindlist(list(sim@events, newEvent))
-      #   }
-      #
-      #   needSort <- TRUE
-      #   # only sort if new event is not already at the end
-      #   if (eventTimeInSeconds>sim@events[[1]][nrowEvnts]) {
-      #     needSort <- FALSE
-      #   } else if (eventTimeInSeconds==sim@events[[1]][nrowEvnts] & eventPriority>=sim@events[[4]][nrowEvnts]){
-      #     needSort <- FALSE
-      #   }
-      #
-      #   if (needSort) {
-      #     browser()
-      #
-      #     setkey(sim@events, "eventTime", "eventPriority")
-      #   }
-      # }
     }
   } else {
     warning(
@@ -426,60 +349,11 @@ scheduleEvent <- function(sim,
         "or by using an undefined parameter."
       )
     )
-    #)
   }
 
   return(invisible(sim))
 }
 
-# @rdname scheduleEvent
-#' setMethod(
-#'   "scheduleEvent",
-#'   signature(
-#'     sim = "simList",
-#'     eventTime = "NULL",
-#'     moduleName = "character",
-#'     eventType = "character",
-#'     eventPriority = "numeric"
-#'   ),
-#'   definition = function(sim,
-#'                         eventTime,
-#'                         moduleName,
-#'                         eventType,
-#'                         eventPriority) {
-#'     warning(
-#'       paste(
-#'         "Invalid or missing eventTime. This is usually",
-#'         "caused by an attempt to scheduleEvent at time NULL",
-#'         "or by using an undefined parameter."
-#'       )
-#'     )
-#'     return(invisible(sim))
-#'   })
-#'
-#' #' @rdname scheduleEvent
-#' setMethod(
-#'   "scheduleEvent",
-#'   signature(
-#'     sim = "simList",
-#'     eventTime = "numeric",
-#'     moduleName = "character",
-#'     eventType = "character",
-#'     eventPriority = "missing"
-#'   ),
-#'   definition = function(sim,
-#'                         eventTime,
-#'                         moduleName,
-#'                         eventType,
-#'                         eventPriority) {
-#'     scheduleEvent(
-#'       sim = sim,
-#'       eventTime = eventTime,
-#'       moduleName = moduleName,
-#'       eventType = eventType,
-#'       eventPriority = .normal()
-#'     )
-#'   })
 
 ################################################################################
 #' Run a spatial discrete event simulation
@@ -637,7 +511,6 @@ setMethod(
                         ...) {
     # The event queues are not uncopied data.tables, for speed during simulation
     #  Must, therefore, break connection between spades calls
-    #.refreshEventQueues()
     .pkgEnv$searchPath <- search()
 
     # timeunits gets accessed every event -- this should only be needed once per simList
