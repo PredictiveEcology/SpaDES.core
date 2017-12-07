@@ -183,16 +183,30 @@ doEvent <- function(sim, debug, notOlderThan) {
       # add to list of completed events
       lenCompl <- length(sim@completed)
       if (lenCompl) {
+        # next 4 lines replace sim@completed <- append(sim@completed, list(cur)), which gets slower with size of sim@completed
+        # sim@completed <- append(sim@completed, list(cur))
+        #   following does not: it is more or less O(1). Algorithm from: https://stackoverflow.com/questions/17046336/here-we-go-again-append-an-element-to-a-list-in-r?lq=1
+        #   it basically increases size of list by *2 every time it fills up
+        sim@.envir[["._completedCounter"]] <- sim@.envir[["._completedCounter"]] + 1
         # This gets slower as it gets larger. So sad.
-        sim@completed <- append(sim@completed, list(cur))
+        if(sim@.envir[["._completedCounter"]]==sim@.envir[["._completedSize"]]) {
+          sim@.envir[["._completedSize"]] <- sim@.envir[["._completedSize"]] * 2
+          length(sim@completed) <- sim@.envir[["._completedSize"]]
+        }
+        sim@completed[sim@.envir[["._completedCounter"]]] <- list(cur)
+
         if (lenCompl > getOption("spades.nCompleted")) {
           sim@completed <- sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)]
         }
       } else {
+        sim@.envir[["._completedCounter"]] <- 1
+        sim@.envir[["._completedSize"]] <- 2
         sim@completed <- list(cur)
       }
+
       # current event completed, replace current with empty
       sim@current <- list()
+
     } else {
       # update current simulated time and event
       sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
