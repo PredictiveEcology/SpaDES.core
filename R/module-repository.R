@@ -1,6 +1,7 @@
 ### deal with spurious httr warnings
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("actualFile", "content", "result"))
+  utils::globalVariables(c("actualFile", "checksum.x", "checksum.y", "content",
+                           "expectedFile", "result"))
 }
 
 ################################################################################
@@ -391,7 +392,7 @@ setMethod(
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
 
-    ids <- which( urls == "" | is.na(urls) )
+    ids <- which(urls == "" | is.na(urls))
     to.dl <- if (length(ids)) urls[-ids] else urls
     chksums <- checksums(module, path) %>%
       mutate(renamed = NA, module = module)
@@ -413,27 +414,27 @@ setMethod(
             checkPath(create = TRUE) %>%
             file.path(., xFile)
 
-            if (httr::http_error(file)) {
-              ## if the URL doesn't work allow the user to retrieve it manually
-              message("Cannot download ", xFile, " for module ", module, " ...\n",
-                      "Cannot open URL '", x, "'.")
+          if (httr::http_error(x)) {
+            ## if the URL doesn't work allow the user to retrieve it manually
+            message("Cannot download ", xFile, " for module ", module, ":\n",
+                    "\u2937 cannot open URL '", x, "'.")
 
-              if (interactive()) {
-                readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                         module, "/data/.\nPress [enter] to continue"))
-              }
-
-              ## re-checksums
-              chksums <- checksums(module, path) %>%
-              mutate(renamed = NA, module = module)
-            } else {
-              message("Downloading ", chksums$actualFile[id], " for module ", module, " ...")
-              download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
-              copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
-              destfile
+            if (interactive()) {
+              readline(prompt = paste0("Try downloading this file manually and put it in ",
+                                       module, "/data/.\nPress [enter] to continue"))
             }
+
+            ## re-checksums
+            chksums <- checksums(module, path) %>%
+            mutate(renamed = NA, module = module)
           } else {
-          message("  Download data step skipped for ", chksums$actualFile[id],
+            message("Downloading ", basename(x), " for module ", module, ":")
+            download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
+            copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+            destfile
+          }
+        } else {
+          message("  Download data step skipped for ", basename(x),
                   " in module ", module, ". Local copy exists.")
         }
       })
@@ -643,20 +644,20 @@ setMethod(
     }
 
     message("Checking local files...")
-    if (length(txt$file) & length(files)) {
-      filesToCheck <- files[basename(files) %in% txt$file]
+    filesToCheck <-  if (length(txt$file) & length(files)) {
+      files[basename(files) %in% txt$file]
     } else {
-      filesToCheck <- files
+      files
     }
     checksums <- do.call(.digest, args = append(list(file = filesToCheck), dots))
     message("Finished checking local files.")
 
-    if (length(filesToCheck)) {
-      out <- data.frame(file = basename(filesToCheck), checksum = checksums,
-                        algorithm = dots$algo, stringsAsFactors = FALSE)
+    out <- if (length(filesToCheck)) {
+      data.frame(file = basename(filesToCheck), checksum = checksums,
+                 algorithm = dots$algo, stringsAsFactors = FALSE)
     } else {
-      out <- data.frame(file = character(0), checksum = character(0),
-                        algorithm = character(0), stringsAsFactors = FALSE)
+      data.frame(file = character(0), checksum = character(0),
+                 algorithm = character(0), stringsAsFactors = FALSE)
     }
 
     if (write) {
@@ -664,14 +665,15 @@ setMethod(
       return(out)
     } else {
       results.df <- out %>%
-        mutate_(actualFile = "file") %>%
-        left_join(txt, ., by = "file") %>%
-        rename_(expectedFile = "file") %>%
-        dplyr::group_by_("expectedFile") %>%
-        mutate_(result = ~ifelse(checksum.x != checksum.y, "FAIL", "OK")) %>%
+        dplyr::mutate(actualFile = file) %>%
+        dplyr::left_join(txt, ., by = "file") %>%
+        dplyr::rename(expectedFile = file) %>%
+        dplyr::group_by(expectedFile) %>%
+        dplyr::mutate(result = ifelse(checksum.x != checksum.y, "FAIL", "OK")) %>%
         dplyr::arrange(desc(result)) %>%
-        select_("result", "expectedFile", "actualFile", "checksum.x", "checksum.y", "algorithm.x", "algorithm.y") %>%
-        filter(row_number() == 1L)
+        dplyr::select("result", "expectedFile", "actualFile",
+                      "checksum.x", "checksum.y", "algorithm.x", "algorithm.y") %>%
+        dplyr::filter(row_number() == 1L)
 
       return(results.df)
     }
