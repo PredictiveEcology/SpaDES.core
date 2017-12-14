@@ -283,7 +283,8 @@ setMethod(
       } else {
         # if this is FALSE, it means that events were added by the event
         if (!isTRUE(all.equal(object@events, object2@events)))
-          object2@events <- unique(rbindlist(list(object@events, object2@events)))
+          object2@events <- do.call(unique, args = list(append(object@events, object2@events)))
+          #object2@events <- unique(rbindlist(list(object@events, object2@events)))
       }
       object2@current <- object@current
 
@@ -394,6 +395,7 @@ if (!isGeneric(".objSizeInclEnviros")) {
 #' See \code{\link[reproducible]{.objSizeInclEnviros}}.
 #'
 #' @importFrom reproducible .objSizeInclEnviros
+#' @importFrom utils object.size
 #' @importMethodsFrom reproducible .objSizeInclEnviros
 #' @inheritParams reproducible::.objSizeInclEnviros
 #' @include simList-class.R

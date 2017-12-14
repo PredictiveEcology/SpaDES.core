@@ -15,7 +15,8 @@
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(tmpdir, "outputs"),
     spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES"
+    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
+    spades.switchPkgNamespaces = TRUE
   )
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
@@ -23,9 +24,10 @@
   invisible()
 }
 
+#' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
   if (interactive()) {
-    packageStartupMessage("Using SpaDES.core version ", packageVersion("SpaDES.core"), ".")
+    packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     packageStartupMessage("Default paths for SpaDES directories set to:\n",
                           "  cachePath:  ", getOption("spades.cachePath"), "\n",
                           "  inputPath:  ", getOption("spades.inputPath"), "\n",

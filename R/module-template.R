@@ -13,6 +13,7 @@
 #' @author Alex Chubaty
 #' @keywords internal
 #' @rdname fileEdit
+#' @importFrom utils file.edit
 #'
 .fileEdit <- function(file) {
   if (Sys.getenv("RSTUDIO") == "1") {
@@ -218,7 +219,7 @@ defineModule(sim, list(
   authors = ", getOption("devtools.desc.author",
                          "c(person(c(\"First\", \"Middle\"), \"Last\", email = \"email@example.com\", role = c(\"aut\", \"cre\")))"), ",
   childModules = ", children_char, ",
-  version = list(SpaDES.core = \"", as.character(packageVersion("SpaDES.core")), "\", ",
+  version = list(SpaDES.core = \"", as.character(utils::packageVersion("SpaDES.core")), "\", ",
         name, " = \"0.0.1\"", if (type == "parent") paste0(", ", children, " = \"0.0.1\""),
         "),
   ",
@@ -934,6 +935,7 @@ setMethod("copyModule",
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom reproducible checkPath
+#' @importFrom utils zip
 #' @rdname zipModule
 #'
 setGeneric("zipModule", function(name, path, version, data = FALSE, ...) {

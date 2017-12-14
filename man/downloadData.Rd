@@ -9,15 +9,16 @@
 \alias{downloadData,character,character,missing-method}
 \title{Download module data}
 \usage{
-downloadData(module, path, quiet)
+downloadData(module, path, quiet, quickCheck = FALSE)
 
-\S4method{downloadData}{character,character,logical}(module, path, quiet)
+\S4method{downloadData}{character,character,logical}(module, path, quiet,
+  quickCheck = FALSE)
 
-\S4method{downloadData}{character,missing,missing}(module)
+\S4method{downloadData}{character,missing,missing}(module, quickCheck)
 
-\S4method{downloadData}{character,missing,logical}(module, quiet)
+\S4method{downloadData}{character,missing,logical}(module, quiet, quickCheck)
 
-\S4method{downloadData}{character,character,missing}(module, path)
+\S4method{downloadData}{character,character,missing}(module, path, quickCheck)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}
@@ -25,6 +26,10 @@ downloadData(module, path, quiet)
 \item{path}{Character string giving the path to the module directory.}
 
 \item{quiet}{Logical. This is passed to \code{download.file}. Default is FALSE.}
+
+\item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
+use \code{file.size} instead of \code{digest::digest}. This is
+faster, but less robust.}
 }
 \value{
 Invisibly, a list of downloaded files.

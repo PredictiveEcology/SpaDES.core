@@ -8,17 +8,18 @@
 \alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY-method}
 \title{Download a module from a SpaDES module GitHub repository}
 \usage{
-downloadModule(name, path, version, repo, data, quiet)
+downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE)
 
 
   \S4method{downloadModule}{character,character,character,character,logical,logical}(name,
-  path, version, repo, data, quiet)
+  path, version, repo, data, quiet, quickCheck = FALSE)
 
 
-  \S4method{downloadModule}{character,missing,missing,missing,missing,missing}(name)
+  \S4method{downloadModule}{character,missing,missing,missing,missing,missing}(name,
+  quickCheck)
 
 \S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY}(name, path, version,
-  repo, data, quiet)
+  repo, data, quiet, quickCheck = FALSE)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -37,6 +38,10 @@ specified by the global option \code{spades.moduleRepo}.}
 metadata will be downloaded, if possible. Default if FALSE.}
 
 \item{quiet}{Logical. This is passed to \code{download.file}. Default is FALSE.}
+
+\item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
+use \code{file.size} instead of \code{digest::digest}. This is
+faster, but less robust.}
 }
 \value{
 A list of length 2. The first element is a character vector containing
