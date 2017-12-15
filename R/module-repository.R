@@ -25,7 +25,7 @@ if (getRversion() >= "3.1.0") {
 remoteFileSize <- function(url) {
   contentLength <- vapply(url, function(u) {
     header <- RCurl::url.exists(u, .header = TRUE)
-    status <- as.numeric(header[["status"]])
+    status <- tryCatch(as.numeric(header[["status"]]), error = function(x) 0)
     if (status == 200) {
       as.numeric(header[["Content-Length"]])
     } else {
