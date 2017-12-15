@@ -1,7 +1,7 @@
 ### deal with spurious httr warnings
 if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("actualFile", "checksum.x", "checksum.y", "content",
-                           "expectedFile", "result"))
+                           "expectedFile", "filesize.x", "filesize.y", "result"))
 }
 
 ################################################################################
@@ -768,7 +768,7 @@ setMethod(
         } %>%
         dplyr::arrange(desc(result)) %>%
         {
-          if (quickCheck){
+          if (quickCheck) {
             select(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
                    "algorithm.x", "algorithm.y", "filesize.x", "filesize.y")
           } else {
