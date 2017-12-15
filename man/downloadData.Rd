@@ -28,8 +28,8 @@ downloadData(module, path, quiet, quickCheck = FALSE)
 \item{quiet}{Logical. This is passed to \code{download.file}. Default is FALSE.}
 
 \item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
-use \code{file.size} instead of \code{digest::digest}. This is
-faster, but less robust.}
+use \code{file.size} instead of \code{digest::digest}.
+This is faster, but potentially much less robust.}
 }
 \value{
 Invisibly, a list of downloaded files.

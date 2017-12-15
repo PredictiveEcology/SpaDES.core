@@ -262,6 +262,10 @@ setMethod(
 #'
 #' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
 #'
+#' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
+#'                   use \code{file.size} instead of \code{digest::digest}.
+#'                   This is faster, but potentially much less robust.
+#'
 #' @return A list of length 2. The first element is a character vector containing
 #'    a character vector of extracted files for the module. The second element is
 #'    a \code{tbl} with details about the data that is relevant for the function,
@@ -400,8 +404,8 @@ setMethod(
 #' @param quiet   Logical. This is passed to \code{download.file}. Default is FALSE.
 #'
 #' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
-#'                   use \code{file.size} instead of \code{digest::digest}. This is
-#'                   faster, but less robust.
+#'                   use \code{file.size} instead of \code{digest::digest}.
+#'                   This is faster, but potentially much less robust.
 #'
 #' @return Invisibly, a list of downloaded files.
 #'
