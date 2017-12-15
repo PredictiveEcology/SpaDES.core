@@ -65,7 +65,7 @@ newProgressBar <- function(sim) {
   OS <- tolower(Sys.info()["sysname"])
   if (P(sim, ".progress")$type == "graphical") {
     if (OS == "windows") {
-      pb <- winProgressBar(min = start(sim, tu), max = end(sim, tu),
+      pb <- utils::winProgressBar(min = start(sim, tu), max = end(sim, tu),
                            initial = start(sim, tu))
     } else {
       pb <- tkProgressBar(min = start(sim, tu), max = end(sim, tu),
@@ -75,13 +75,14 @@ newProgressBar <- function(sim) {
     ## see http://shiny.rstudio.com/articles/progress.html
     stop("shiny progress bar not yet implemented")
   } else  if (P(sim, ".progress")$type == "text") {
-    pb <- txtProgressBar(min = start(sim, tu), max = end(sim, tu),
+    pb <- utils::txtProgressBar(min = start(sim, tu), max = end(sim, tu),
                          initial = start(sim, tu), char = ".", style = 3)
   }
   assign(".pb", pb, envir = .pkgEnv)
 }
 
 #' @importFrom tcltk setTkProgressBar
+#' @importFrom utils globalVariables
 #' @rdname progressBar
 setProgressBar <- function(sim) {
   OS <- tolower(Sys.info()["sysname"])
@@ -104,7 +105,7 @@ setProgressBar <- function(sim) {
     ## see http://shiny.rstudio.com/articles/progress.html
     stop("shiny progress bar not yet implemented")
   } else if (P(sim, ".progress")$type == "text") {
-    setTxtProgressBar(pb, round(time(sim, tu), 3))
+    utils::setTxtProgressBar(pb, round(time(sim, tu), 3))
   }
   assign(".pb", pb, envir = .pkgEnv)
 }

@@ -7,11 +7,13 @@
 \alias{checksums,character,character,missing-method}
 \title{Calculate checksums for a module's data files}
 \usage{
-checksums(module, path, write, ...)
+checksums(module, path, write, quickCheck = FALSE, ...)
 
-\S4method{checksums}{character,character,logical}(module, path, write, ...)
+\S4method{checksums}{character,character,logical}(module, path, write,
+  quickCheck = FALSE, ...)
 
-\S4method{checksums}{character,character,missing}(module, path, write, ...)
+\S4method{checksums}{character,character,missing}(module, path, write,
+  quickCheck = FALSE, ...)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}
@@ -22,6 +24,10 @@ checksums(module, path, write, ...)
 Default is \code{FALSE}, as users should not change this file.
 Module developers should write this file prior to distributing
 their module code, and update accordingly when the data change.}
+
+\item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
+use \code{file.size} instead of \code{digest::digest}. This is
+faster, but less robust.}
 
 \item{...}{Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
 the digest algorithm can be specified.}

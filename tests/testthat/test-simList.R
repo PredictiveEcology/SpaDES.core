@@ -140,7 +140,7 @@ test_that("simList object initializes correctly", {
 
   ### required packages
   pkgs <- c("grid", "methods", "RandomFields", "raster", "RColorBrewer", "sp",
-            "SpaDES.core", "SpaDES.tools", "stats", "tkrplot")
+            "SpaDES.tools", "stats", "tkrplot")
   expect_equal(sort(packages(mySim)), sort(pkgs))
 
   reqdPkgs <- lapply(modules, function(m) {

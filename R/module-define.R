@@ -106,6 +106,7 @@
 #' @author Alex Chubaty
 #' @export
 #' @importFrom raster extent
+#' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
 #'

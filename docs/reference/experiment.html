@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -537,7 +537,27 @@ database can only be written to one at a time, so there may be collisions.</p>
 
   <span class='co'># Remove all temp files</span>
   <span class='fu'>unlink</span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-}</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='error'>Error in if (drop) {    ind &lt;- droplevels(ind)}: argument is not interpretable as logical</span></div></pre>
+}</div><div class='img'><img src='experiment-4.png' alt='' width='700' height='432.632880098887' /></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>landscape read from /tmp/RtmppYiL3x/examples/landscapeMaps1/rep1/landscape_year0.rds using readRDS</span></div><div class='output co'>#&gt; <span class='message'>landscape read from /tmp/RtmppYiL3x/examples/landscapeMaps1/rep2/landscape_year0.rds using readRDS</span></div><div class='output co'>#&gt; $expDesign
+#&gt;   input expLevel
+#&gt; 1     1        1
+#&gt; 2     2        2
+#&gt; 
+#&gt; $expVals
+#&gt; [1] 1 2
+#&gt; </div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; $expDesign
+#&gt;   modules expLevel replicate
+#&gt; 1       1        1         1
+#&gt; 2       2        2         1
+#&gt; 3       1        1         2
+#&gt; 4       2        2         2
+#&gt; 
+#&gt; $expVals
+#&gt;                                       modules expLevel
+#&gt; 1 randomLandscapes,fireSpread,caribouMovement        1
+#&gt; 2            randomLandscapes,caribouMovement        2
+#&gt; 3 randomLandscapes,fireSpread,caribouMovement        1
+#&gt; 4            randomLandscapes,caribouMovement        2
+#&gt; </div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='img'><img src='experiment-5.png' alt='' width='700' height='432.632880098887' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

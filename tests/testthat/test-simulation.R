@@ -21,7 +21,7 @@ test_that("simulation runs with simInit and spades", {
   expect_equivalent(end(mySim), 10.0)
 
   # sim results ## NOTE upcoming version of RandomFields completely changes the values!!!
-  if (packageVersion("RandomFields") >= "3.1.20") {
+  if (utils::packageVersion("RandomFields") >= "3.1.20") {
     burnedLast <- c(1435, 1044, 1531, 844, 1093, 1379, 2026, 1181, 469, 1381)
 
     pos_x <- c(33.2872398995189, -17.3422621469692, 8.75313234185035,
