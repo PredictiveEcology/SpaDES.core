@@ -484,10 +484,14 @@ setMethod(
     }
 
     # There are at least 2 options if the expected doesn't match actual
-    wh <- match(chksums$actualFile, chksums$expectedFile) %>% is.na() %>% which()
+    # Next line: left logical: if there is no expectation, then doesn't matter, 
+    #            right logical: if there is no actualFile, then don't change its name
+    wh <- ((match(chksums$actualFile, chksums$expectedFile) %>% is.na()) & 
+          !(chksums$actualFile %>% is.na() )) %>% 
+          which()
     if (length(wh)) {
       chksums[wh, "renamed"] <- sapply(wh, function(id) {
-        if (!is.na(chksums$expectedFile[id])) {
+        if (!is.na(chksums$expectedFile[id])  ) {
           renamed <- file.rename(
             from = file.path(dataDir, chksums$actualFile[id]),
             to = file.path(dataDir, chksums$expectedFile[id])
