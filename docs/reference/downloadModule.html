@@ -151,7 +151,7 @@ metadata will be downloaded, if possible. Default if FALSE.</p></td>
     </tr>
     <tr>
       <th>quiet</th>
-      <td><p>Logical. This is passed to <code>download.file</code>. Default is FALSE.</p></td>
+      <td><p>Logical. This is passed to <code>download.file</code> (default <code>FALSE</code>).</p></td>
     </tr>
     <tr>
       <th>quickCheck</th>
@@ -165,9 +165,9 @@ faster, but less robust.</p></td>
 
     <p>A list of length 2. The first element is a character vector containing
    a character vector of extracted files for the module. The second element is
-   a tbl with details about the data that is relevant for the function, including
-   whether it was downloaded or not, whether it was renamed (because there
-   was a local copy that had the wrong file name).</p>
+   a <code>tbl</code> with details about the data that is relevant for the function,
+   including whether it was downloaded or not, and whether it was renamed
+   (because there was a local copy that had the wrong file name).</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 

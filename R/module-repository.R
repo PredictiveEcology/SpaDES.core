@@ -1,9 +1,41 @@
 ### deal with spurious httr warnings
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("actualFile", "content", "result"))
+  utils::globalVariables(c("actualFile", "checksum.x", "checksum.y", "content",
+                           "expectedFile", "filesize.x", "filesize.y", "result"))
 }
 
-################################################################################
+#' Determine the size of a remotely hosted file
+#'
+#' Query a remote web server to determine the size of a remote file.
+#'
+#' @param url  The url of the remote file.
+#'
+#' @return A numeric indicating the sive of the remote file in bytes.
+#'
+#' @author Eliot McIntire and Alex Chubaty
+#' @export
+#' @importFrom RCurl url.exists
+#'
+#' @examples
+#' urls <- c("https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl",
+#'           "https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip",
+#'           "http://example.com/doesntexist.csv")
+#' try(remoteFileSize(urls))
+#'
+remoteFileSize <- function(url) {
+  contentLength <- vapply(url, function(u) {
+    header <- RCurl::url.exists(u, .header = TRUE)
+    status <- as.numeric(header[["status"]])
+    if (status == 200) {
+      as.numeric(header[["Content-Length"]])
+    } else {
+      0
+    }
+  }, numeric(1))
+
+  return(contentLength)
+}
+
 #' Find the latest module version from a SpaDES module repository
 #'
 #' Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
@@ -228,13 +260,13 @@ setMethod(
 #' @param data    Logical. If TRUE, then the data that is identified in the module
 #'                metadata will be downloaded, if possible. Default if FALSE.
 #'
-#' @param quiet   Logical. This is passed to \code{download.file}. Default is FALSE.
+#' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
 #'
 #' @return A list of length 2. The first element is a character vector containing
 #'    a character vector of extracted files for the module. The second element is
-#'    a tbl with details about the data that is relevant for the function, including
-#'    whether it was downloaded or not, whether it was renamed (because there
-#'    was a local copy that had the wrong file name).
+#'    a \code{tbl} with details about the data that is relevant for the function,
+#'    including whether it was downloaded or not, and whether it was renamed
+#'    (because there was a local copy that had the wrong file name).
 #'
 #' @importFrom httr config GET stop_for_status user_agent write_disk
 #' @export
@@ -376,7 +408,7 @@ setMethod(
 #' @author Alex Chubaty
 #' @export
 #' @importFrom dplyr mutate_
-#' @importFrom RCurl getURL
+#' @importFrom httr http_error
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
@@ -404,7 +436,7 @@ setMethod(
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
 
-    ids <- which( urls == "" | is.na(urls) )
+    ids <- which(urls == "" | is.na(urls))
     to.dl <- if (length(ids)) urls[-ids] else urls
     chksums <- checksums(module, path, quickCheck = quickCheck) %>%
       mutate(renamed = NA, module = module)
@@ -439,44 +471,47 @@ setMethod(
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
-          xx <- tryCatch(getURL(x, nobody = 1L, header = 1L), error = function(x) "")
-          checkRemote <- if (nchar(xx)) {
-            tryCatch({
-              grep(strsplit(xx, "\r\n")[[1]],
-                   pattern = "Content-Length", value = TRUE) %>%
-                strsplit(": ") %>%
-                .[[1]] %>%
-                .[2] %>%
-                as.numeric()
-            }, error = function(x) 0)
-          } else { 0 }
 
-          needNewDownload <- TRUE
-          if (file.exists(destfile)) {
-            if (checkRemote > 0)
-              if (round(file.size(destfile)) == checkRemote )
-                needNewDownload <- FALSE
-          }
+          if (httr::http_error(x)) {
+            ## if the URL doesn't work allow the user to retrieve it manually
+            message("Cannot download ", xFile, " for module ", module, ":\n",
+                    "\u2937 cannot open URL '", x, "'.")
 
-          if (needNewDownload) {
-            # Use Cache next in case multiple objects use same url, e.g., in a .tar file
-            message("  Downloading ", xFile, " for module ", module, " ...")
-            Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
-            copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+            if (interactive()) {
+              readline(prompt = paste0("Try downloading this file manually and put it in ",
+                                       module, "/data/.\nPress [enter] to continue"))
+            }
+
+            ## re-checksums
+            chksums <- checksums(module, path) %>%
+              mutate(renamed = NA, module = module)
           } else {
-            message("  Using local copy of ", xFile, ", whose file size matches its download server",
-                    " at\n    ", x)
+            ## check whether file needs to be downloaded
+            remoteFileSize <- remoteFileSize(x)
+            needNewDownload <- TRUE
+            if (file.exists(destfile)) {
+              if (remoteFileSize > 0)
+                if (round(file.size(destfile)) == remoteFileSize)
+                  needNewDownload <- FALSE
+            }
+
+            ## download if needed, using Cache in case multiple objects use same url
+            ## (e.g., in a .tar file)
+            if (needNewDownload) {
+              message("Downloading ", basename(x), " for module ", module, ":")
+              Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
+              copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+            }
+            destfile
           }
-          destfile
         } else {
-          message("  Download data step skipped for ",
-                  paste(chksums$actualFile[id], collapse = ", "),
+          message("  Download data step skipped for ", basename(x),
                   " in module ", module, ". Local copy exists.")
         }
       })
 
       chksums <- checksums(module, path, quickCheck = quickCheck) %>%
-        mutate(renamed = NA, module = module)
+        dplyr::mutate(renamed = NA, module = module)
     } else if (NROW(chksums) > 0) {
       message("  Download data step skipped for module ", module, ". Local copy exists.")
     } else {
@@ -623,7 +658,7 @@ setMethod(
 #' @return A data.frame with columns: result, expectedFile, actualFile, and checksum.
 #'
 #' @include moduleMetadata.R
-#' @importFrom dplyr arrange desc filter group_by_ left_join mutate rename_ row_number select_
+#' @importFrom dplyr arrange desc filter group_by left_join mutate rename row_number select
 #' @export
 #' @rdname checksums
 #'
@@ -702,10 +737,10 @@ setMethod(
     }
 
     message("Checking local files...")
-    if (length(txt$file) & length(files)) {
-      filesToCheck <- files[basename(files) %in% txt$file]
+    filesToCheck <-  if (length(txt$file) & length(files)) {
+      files[basename(files) %in% txt$file]
     } else {
-      filesToCheck <- files
+      files
     }
 
     if (is.null(txt$filesize)) {
@@ -727,14 +762,12 @@ setMethod(
     }
     message("Finished checking local files.")
 
-    if (length(filesToCheck)) {
-      out <- data.frame(file = basename(filesToCheck), checksum = checksums[[1]],
-                        filesize = checksums[[2]],
-                        algorithm = dots$algo, stringsAsFactors = FALSE)
+    out <- if (length(filesToCheck)) {
+      data.frame(file = basename(filesToCheck), checksum = checksums[[1]],
+                 filesize = checksums[[2]], algorithm = dots$algo, stringsAsFactors = FALSE)
     } else {
-      out <- data.frame(file = character(0), checksum = character(0),
-                        filesize = character(0),
-                        algorithm = character(0), stringsAsFactors = FALSE)
+      data.frame(file = character(0), checksum = character(0), filesize = character(0),
+                 algorithm = character(0), stringsAsFactors = FALSE)
     }
 
     if (write) {
@@ -742,25 +775,28 @@ setMethod(
       return(out)
     } else {
       results.df <- out %>%
-        mutate_(actualFile = "file") %>%
-        left_join(txt, ., by = "file") %>%
-        rename_(expectedFile = "file") %>%
-        dplyr::group_by_("expectedFile") %>%
-        {if (!quickCheck) {
-          mutate_(., result = ~ifelse(checksum.x != checksum.y, "FAIL", "OK"))
-        } else {
-          mutate_(., result = ~ifelse(filesize.x != filesize.y, "FAIL", "OK"))
-        }} %>%
+        dplyr::mutate(actualFile = file) %>%
+        dplyr::left_join(txt, ., by = "file") %>%
+        dplyr::rename(expectedFile = file) %>%
+        dplyr::group_by(expectedFile) %>%
+        {
+          if (quickCheck) {
+            mutate(., result = ifelse(filesize.x != filesize.y, "FAIL", "OK"))
+          } else {
+            mutate(., result = ifelse(checksum.x != checksum.y, "FAIL", "OK"))
+          }
+        } %>%
         dplyr::arrange(desc(result)) %>%
-        {if (!quickCheck){
-          select_(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
-                  "algorithm.x", "algorithm.y")
-        } else {
-          select_(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
-                  "algorithm.x", "algorithm.y",
-                  "filesize.x", "filesize.y")
-        }}  %>%
-        filter(row_number() == 1L)
+        {
+          if (quickCheck) {
+            select(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
+                   "algorithm.x", "algorithm.y", "filesize.x", "filesize.y")
+          } else {
+            select(., "result", "expectedFile", "actualFile", "checksum.x", "checksum.y",
+                   "algorithm.x", "algorithm.y")
+          }
+        } %>%
+        dplyr::filter(row_number() == 1L)
 
       return(results.df)
     }

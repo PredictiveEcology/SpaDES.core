@@ -71,7 +71,7 @@ test_that("downloadData downloads and unzips module data", {
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   f <- downloadModule(m, tmpdir, quiet = TRUE)
-  t1 <- system.time(downloadData(m, tmpdir))
+  t1 <- system.time(downloadData(m, tmpdir, quiet = TRUE))
   result <- checksums(m, tmpdir)$result
   expect_true(all(file.exists(file.path(datadir, filenames))))
   expect_true(all(result == "OK"))

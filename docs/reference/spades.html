@@ -6,29 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "NULL",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) 
-    warning(
-      paste(
-        "Invalid or missing eventTime. This is usually",
-        "caused by an attempt to scheduleEvent at time NULL",
-        "or by using an undefined parameter."
-      )
-    )
-    return(invisible(sim))
-  ) — spades • SpaDES.core</title>
+<title>Run a spatial discrete event simulation — spades • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -120,56 +98,13 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "NULL",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) 
-    warning(
-      paste(
-        "Invalid or missing eventTime. This is usually",
-        "caused by an attempt to scheduleEvent at time NULL",
-        "or by using an undefined parameter."
-      )
-    )
-    return(invisible(sim))
-  )</h1>
+    <h1>Run a spatial discrete event simulation</h1>
     </div>
 
     
-    <p>#' @rdname scheduleEvent
-setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "numeric",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "missing"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) 
-    scheduleEvent(
-      sim = sim,
-      eventTime = eventTime,
-      moduleName = moduleName,
-      eventType = eventType,
-      eventPriority = .normal()
-    )
-  )
-Run a spatial discrete event simulation</p>
+    <p>Here, we implement a simulation in a more modular fashion so it's easier to add
+submodules to the simulation. We use S4 classes and methods, and use `data.table`
+instead of `data.frame` to implement the event queue (because it is much faster).</p>
     
 
     <pre class="usage"><span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
@@ -247,9 +182,6 @@ anything passed in <code>...</code> is unique, i.e., not cached previously.</p><
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).</p>
     <p>The is the workhorse function in the SpaDES package. It runs simulations by
 implementing the rules outlined in the <code>simList</code>.</p>
 <p>This function gives simple access to two sets of module parameters:

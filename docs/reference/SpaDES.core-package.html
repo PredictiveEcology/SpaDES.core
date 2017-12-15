@@ -217,10 +217,10 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
      <code>time</code> </td>
 <td> Current simulation time, in units of longest module.</td>
 </tr><tr><td>
-     <code><a href='simList-accessors-times.html'>start</a></code> </td>
+     <code>start</code> </td>
 <td> Simulation start time, in units of longest module.</td>
 </tr><tr><td>
-     <code><a href='simList-accessors-times.html'>end</a></code> </td>
+     <code>end</code> </td>
 <td> Simulation end time, in units of longest module.</td>
 </tr><tr><td>
      <code><a href='simList-accessors-times.html'>times</a></code> </td>
@@ -366,46 +366,46 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
   Contagion can be modelled using discrete approaches or continuous approaches.
   Several <code>SpaDES.tools</code> functions assist with these:
     <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/adj.html'>adj</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/adj.html'>adj</a></code> </td>
 <td> An optimized (i.e., faster) version of <code><a href='http://www.rdocumentation.org/packages/raster/topics/adjacent'>adjacent</a></code></td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/cir.html'>cir</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/cir.html'>cir</a></code> </td>
 <td> Identify pixels in a circle around a <code><a href='http://www.rdocumentation.org/packages/sp/topics/SpatialPoints-class'>SpatialPoints*</a></code> object</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/directions.html'>directionFromEachPoint</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/directions.html'>directionFromEachPoint</a></code> </td>
 <td> Fast calculation of direction and distance surfaces</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/distances.html'>distanceFromEachPoint</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/distances.html'>distanceFromEachPoint</a></code> </td>
 <td> Fast calculation of distance surfaces</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/rings.html'>rings</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/rings.html'>rings</a></code> </td>
 <td> Identify rings around focal cells (e.g., buffers and donuts)</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/spokes.html'>spokes</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/spokes.html'>spokes</a></code> </td>
 <td> Identify outward radiating spokes from initial points</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/spread.html'>spread</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/spread.html'>spread</a></code> </td>
 <td> Contagious cellular automata</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/wrap.html'>wrap</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/wrap.html'>wrap</a></code> </td>
 <td> Create a torus from a grid</td>
 </tr></table>
     <h3>5.2 Spatial agent methods</h3>
     Agents have several methods and functions specific to them:
     <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/crw.html'>crw</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/crw.html'>crw</a></code> </td>
 <td> Simple correlated random walk function</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/heading.html'>heading</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/heading.html'>heading</a></code> </td>
 <td> Determines the heading between SpatialPoints*</td>
 </tr><tr><td>
     <code><a href='http://quickplot.predictiveecology.org//reference/makeLines.html'>makeLines</a></code> </td>
 <td> Makes <code>SpatialLines</code> object for, e.g., drawing arrows</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/crw.html'>move</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/crw.html'>move</a></code> </td>
 <td> A meta function that can currently only take "crw"</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/specnumperpatch-probs.html'>specificNumPerPatch</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/specnumperpatch-probs.html'>specificNumPerPatch</a></code> </td>
 <td> Initiate a specific number of agents per patch</td>
 </tr></table>
     <h3>5.3 GIS operations</h3>
@@ -421,7 +421,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
   This allows compact representation of, e.g., rasters that have many individual pixels
   that share identical information.
     <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/rasterizeReduce.html'>rasterizeReduced</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/rasterizeReduce.html'>rasterizeReduced</a></code> </td>
 <td> Convert reduced representation to full raster.</td>
 </tr></table>
     <h3>5.5 Colors in <code>Raster*</code> objects</h3>
@@ -441,10 +441,10 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
     It is often useful to build dummy maps with which to build simulation models before all data are available.
   These dummy maps can later be replaced with actual data maps.
     <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/gaussmap.html'>gaussMap</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/gaussmap.html'>gaussMap</a></code> </td>
 <td> Creates a random map using Gaussian random fields</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/randomPolygons.html'>randomPolygons</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/randomPolygons.html'>randomPolygons</a></code> </td>
 <td> Creates a random polygon with specified number of classes</td>
 </tr></table>
     <h3>5.7 Checking for the existence of objects</h3>
@@ -462,25 +462,25 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
   They are intended to make translations from <a href='http://www.gowlland.ca/'>SELES</a>.
   You must know how to use SELES for these to be useful:
     <table><tr><td>1
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELESagentLocation.html'>agentLocation</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/SELESagentLocation.html'>agentLocation</a></code> </td>
 <td> Agent location</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/initiateAgents.html'>initiateAgents</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/initiateAgents.html'>initiateAgents</a></code> </td>
 <td> Initiate agents into a SpatialPointsDataFrame</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELESnumAgents.html'>numAgents</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/SELESnumAgents.html'>numAgents</a></code> </td>
 <td> Number of agents</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELESprobInit.html'>probInit</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/SELESprobInit.html'>probInit</a></code> </td>
 <td> Probability of initiating an agent or event</td>
 </tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELEStransitions.html'>transitions</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/SELEStransitions.html'>transitions</a></code> </td>
 <td> Transition probability</td>
 </tr></table>
     <h3>5.9 Miscellaneous</h3>
     Functions that may be useful within a <code>SpaDES</code> context:
     <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/inRange.html'>inRange</a></code> </td>
+    <code><a href='http://spades.predictiveecology.org/reference/inRange.html'>inRange</a></code> </td>
 <td> Test whether a number lies within range [a,b]</td>
 </tr><tr><td>
     <code>layerNames</code> </td>

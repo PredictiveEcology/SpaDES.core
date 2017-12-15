@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modify package order in search path — .modifySearchPath • SpaDES.core</title>
+<title>Determine the size of a remotely hosted file — remoteFileSize • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -98,47 +98,40 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Modify package order in search path</h1>
+    <h1>Determine the size of a remotely hosted file</h1>
     </div>
 
     
-    <p>Intended for internal use only. It modifies the search path (i.e., <code>search()</code>)
-such that the packages required by the current module are placed first in the
-search path. Note, several "core" packages are not touched; or more specifically,
-they will remain in the search path, but may move down if packages are rearranged.
-The current set of these core packages used by SpaDES can be found here:
-<code><a href='objects.html'>SpaDES.core:::.pkgEnv$corePackages</a></code></p>
+    <p>Query a remote web server to determine the size of a remote file.</p>
     
 
-    <pre class="usage"><span class='fu'>.modifySearchPath</span>(<span class='no'>pkgs</span>, <span class='kw'>removeOthers</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>skipNamespacing</span> <span class='kw'>=</span> !<span class='fu'>getOption</span>(<span class='st'>"spades.switchPkgNamespaces"</span>))</pre>
+    <pre class="usage"><span class='fu'>remoteFileSize</span>(<span class='no'>url</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pkgs</th>
-      <td><p>The packages that are to be placed at the beginning of the search path,</p></td>
-    </tr>
-    <tr>
-      <th>removeOthers</th>
-      <td><p>Logical. If <code>TRUE</code>, then only the packages in <code>pkgs</code>
-will remain in the search path, i.e., all others will be removed.</p></td>
-    </tr>
-    <tr>
-      <th>skipNamespacing</th>
-      <td><p>Logical. If <code>FALSE</code>, then the running of an event in a module
-will not trigger a rearrangement of the search() path. This will
-generally speed up module simulations, but may create name
-conflicts between packages.</p></td>
+      <th>url</th>
+      <td><p>The url of the remote file.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Nothing. This is used for its side effects, which are "severe".</p>
+    <p>A numeric indicating the sive of the remote file in bytes.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='no'>urls</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='st'>"https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl"</span>,
+          <span class='st'>"https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip"</span>,
+          <span class='st'>"http://example.com/doesntexist.csv"</span>)
+<span class='fu'>try</span>(<span class='fu'>remoteFileSize</span>(<span class='no'>urls</span>))</div><div class='output co'>#&gt; https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl 
+#&gt;                                                                        5429 
+#&gt;       https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip 
+#&gt;                                                                     3997384 
+#&gt;                                          http://example.com/doesntexist.csv 
+#&gt;                                                                           0 </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -146,11 +139,13 @@ conflicts between packages.</p></td>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     
-Eliot McIntire
+Eliot McIntire and Alex Chubaty
 
   </div>
 </div>
