@@ -4,7 +4,38 @@ if (getRversion() >= "3.1.0") {
                            "expectedFile", "filesize.x", "filesize.y", "result"))
 }
 
-################################################################################
+#' Determine the size of a remotely hosted file
+#'
+#' Query a remote web server to determine the size of a remote file.
+#'
+#' @param url  The url of the remote file.
+#'
+#' @return A numeric indicating the sive of the remote file in bytes.
+#'
+#' @author Eliot McIntire and Alex Chubaty
+#' @export
+#' @importFrom RCurl url.exists
+#'
+#' @examples
+#' urls <- c("https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl",
+#'           "https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip",
+#'           "http://example.com/doesntexist.csv")
+#' try(remoteFileSize(urls))
+#'
+remoteFileSize <- function(url) {
+  contentLength <- vapply(url, function(u) {
+    header <- RCurl::url.exists(u, .header = TRUE)
+    status <- as.numeric(header[["status"]])
+    if (status == 200) {
+      as.numeric(header[["Content-Length"]])
+    } else {
+      0
+    }
+  }, numeric(1))
+
+  return(contentLength)
+}
+
 #' Find the latest module version from a SpaDES module repository
 #'
 #' Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
@@ -378,7 +409,6 @@ setMethod(
 #' @export
 #' @importFrom dplyr mutate_
 #' @importFrom httr http_error
-#' @importFrom RCurl getURL
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
@@ -454,24 +484,10 @@ setMethod(
 
             ## re-checksums
             chksums <- checksums(module, path) %>%
-            mutate(renamed = NA, module = module)
+              mutate(renamed = NA, module = module)
           } else {
-            ## check remote filesize
-            xx <- tryCatch(getURL(x, nobody = 1L, header = 1L), error = function(x) "")
-            remoteFileSize <- if (nchar(xx)) {
-              tryCatch({
-                grep(strsplit(xx, "\r\n")[[1]],
-                     pattern = "Content-Length", value = TRUE) %>%
-                  strsplit(": ") %>%
-                  .[[1]] %>%
-                  .[2] %>%
-                  as.numeric()
-              }, error = function(x) 0)
-            } else {
-              0
-            }
-
             ## check whether file needs to be downloaded
+            remoteFileSize <- remoteFileSize(x)
             needNewDownload <- TRUE
             if (file.exists(destfile)) {
               if (remoteFileSize > 0)

@@ -25,6 +25,7 @@ version 0.1.0.9000
 * various other speed improvements and bug fixes
 * convert `P` to a function, rather than S4 generic and method, for speed.
 * importFrom only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
+* new function `remoteFileSize` to check the size of remote files
 
 version 0.1.0
 =============
