@@ -16,12 +16,21 @@ getModuleVersion(name, repo)
 \arguments{
 \item{name}{Character string giving the module name.}
 
-\item{repo}{GitHub repository name.
+\item{repo}{GitHub repository name, specified as \code{"username/repositoryname"}.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
-specified by the global option \code{spades.moduleRepo}.}
+specified by the global option \code{spades.moduleRepo}.
+Only \code{master} branches can be used at this point.}
 }
 \description{
 Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
+}
+\details{
+\code{getModuleVersion} extracts a module's version from the module .zip
+         file name. Module .zip files are searched inside in a \code{"/modules"} folder in a
+         GitHub public repository
+}
+\seealso{
+\code{\link{ziModule}} for creating module .zip folders.
 }
 \author{
 Alex Chubaty

@@ -45,7 +45,7 @@ remoteFileSize <- function(url) {
 #' @param repo  GitHub repository name, specified as \code{"username/repositoryname"}.
 #'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 #'              specified by the global option \code{spades.moduleRepo}.
-#'              Only \code{master} branches can be used at this point
+#'              Only \code{master} branches can be used at this point.
 #'
 #' @importFrom httr content GET stop_for_status
 #' @export
@@ -56,6 +56,8 @@ remoteFileSize <- function(url) {
 #'          GitHub public repository
 #'
 #' @author Alex Chubaty
+#'
+#' @seealso \code{\link{ziModule}} for creating module .zip folders.
 #'
 # igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
@@ -245,7 +247,7 @@ setMethod(
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
 #'
 #' Currently only works with a public GitHub repository, where modules are in
-#' a \code{modules} directory in the root tree on the \code{master} branch. Module .zip files
+#' a \code{modules} directory in the root tree on the \code{master} branch. Module .zip files'
 #' names should contain the version number and be inside their respective module folders
 #' - see \code{zipModule} for zip compression of modules.
 #'
@@ -255,7 +257,7 @@ setMethod(
 #'
 #' @note The default is to overwrite any existing files in the case of a conflict.
 #'
-#' @seealso \code{\link{ziModule}} for creating module .zip folders.
+#' @seealso \code{\link{zipModule}} for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
 #' @inheritParams downloadData
@@ -271,6 +273,9 @@ setMethod(
 #'
 #' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
 #'
+#' @param quickCheck Logical. If TRUE, then the check with local data will only use file.size
+#'                   instead of digest::digest. This is faster, but less robust.
+#'
 #' @param overwrite Logical. Should local module files be overwritten in case they exist?
 #'                  Default is FALSE.
 #'
@@ -285,6 +290,7 @@ setMethod(
 #' @rdname downloadModule
 #'
 #' @author Alex Chubaty
+#'
 #'
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
                                       quickCheck = FALSE, overwrite) {
