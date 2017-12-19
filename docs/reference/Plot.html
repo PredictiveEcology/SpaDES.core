@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -102,7 +102,7 @@
     </div>
 
     
-    <p>Extends <code><a href='http://www.rdocumentation.org/packages/quickPlot/topics/Plot'>Plot</a></code> for <code>simList</code> objects.</p>
+    <p>Extends <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>Plot</a></code> for <code>simList</code> objects.</p>
     
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
@@ -118,7 +118,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>...</th>
-      <td><p>A combination of <code>spatialObjects</code> or some non-spatial objects.
+      <td><p>A combination of <code>spatialObjects</code> or non-spatial objects.
+For many object classes, there are specific <code>Plot</code> methods. Where
+there are no specific ones, the base plotting will be used internally.
+This means that for objects with no specific <code>Plot</code> methods,
+many arguments, such as <code>addTo</code>, will not work.
 See details.</p></td>
     </tr>
     <tr>
@@ -259,7 +263,7 @@ let Plot function do it automatically.</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Plot for simList class objects</p>
-<p>See <code><a href='http://www.rdocumentation.org/packages/quickPlot/topics/Plot'>Plot</a></code>. This method strips out stuff
+<p>See <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>Plot</a></code>. This method strips out stuff
 from a simList class object that would make it otherwise not
 reproducibly digestible between sessions, operating systems,
 or machines. This will likely still not allow identical digest
@@ -267,7 +271,7 @@ results across R versions.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='http://www.rdocumentation.org/packages/quickPlot/topics/Plot'>Plot</a></code></p>
+    <p><code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>Plot</a></code></p>
     
 
   </div>

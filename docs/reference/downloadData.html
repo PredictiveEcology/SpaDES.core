@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -107,19 +107,20 @@ directory or if there is a checksum mismatch indicating that the file is not
 the correct one.</p>
     
 
-    <pre class="usage"><span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>)
+    <pre class="usage"><span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for character,character,logical</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>)
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>,
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for character,missing,missing</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>)
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quickCheck</span>)
 
 <span class='co'># S4 method for character,missing,logical</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quiet</span>)
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quiet</span>, <span class='no'>quickCheck</span>)
 
 <span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>)</pre>
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quickCheck</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -135,6 +136,12 @@ the correct one.</p>
     <tr>
       <th>quiet</th>
       <td><p>Logical. This is passed to <code>download.file</code>. Default is FALSE.</p></td>
+    </tr>
+    <tr>
+      <th>quickCheck</th>
+      <td><p>Logical. If <code>TRUE</code>, then the check with local data will only
+use <code>file.size</code> instead of <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>. This is
+faster, but less robust.</p></td>
     </tr>
     </table>
     

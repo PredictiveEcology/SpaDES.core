@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -217,10 +217,10 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
      <code>time</code> </td>
 <td> Current simulation time, in units of longest module.</td>
 </tr><tr><td>
-     <code><a href='simList-accessors-times.html'>start</a></code> </td>
+     <code>start</code> </td>
 <td> Simulation start time, in units of longest module.</td>
 </tr><tr><td>
-     <code><a href='simList-accessors-times.html'>end</a></code> </td>
+     <code>end</code> </td>
 <td> Simulation end time, in units of longest module.</td>
 </tr><tr><td>
      <code><a href='simList-accessors-times.html'>times</a></code> </td>
@@ -399,7 +399,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
     <code><a href='http://spades.predictiveecology.org/reference/heading.html'>heading</a></code> </td>
 <td> Determines the heading between SpatialPoints*</td>
 </tr><tr><td>
-    <code><a href='http://www.rdocumentation.org/packages/quickPlot/topics/makeLines'>makeLines</a></code> </td>
+    <code><a href='http://quickplot.predictiveecology.org//reference/makeLines.html'>makeLines</a></code> </td>
 <td> Makes <code>SpatialLines</code> object for, e.g., drawing arrows</td>
 </tr><tr><td>
     <code><a href='http://spades.predictiveecology.org/reference/crw.html'>move</a></code> </td>
@@ -428,7 +428,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
     We likely will not want the default colours for every map.
   Here are several helper functions to add to, set and get colors of <code>Raster*</code> objects:
     <table><tr><td>
-    <code><a href='http://www.rdocumentation.org/packages/quickPlot/topics/getSetColors'>setColors</a></code> </td>
+    <code><a href='http://quickplot.predictiveecology.org//reference/getSetColors.html'>setColors</a></code> </td>
 <td> Set colours for plotting <code>Raster*</code> objects</td>
 </tr><tr><td>
     <code>getColors</code> </td>
@@ -616,9 +616,11 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
 <li><p><code>spades.cachePath</code>: The default local directory in which to
   cache simulation outputs.
   Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/cache</code>).</p></li>
-<li><p><code>spades.inputPath</code>: The default local directory in which to
+<li><p><code>spades.cachePath</code>: The default local directory in which to
   look for simulation inputs.
   Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/inputs</code>).</p></li>
+<li><p><code>spades.debug</code>: The default debugging value for <code><a href='spades.html'>spades()</a></code>.
+  Default is <code>FALSE</code>.</p></li>
 <li><p><code>spades.lowMemory</code>: If true, some functions will use more memory
     efficient (but slower) algorithms. Default <code>FALSE</code>.</p></li>
 <li><p><code>spades.modulePath</code>: The default local directory where modules
@@ -631,6 +633,10 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
 <li><p><code>spades.outputPath</code>: The default local directory in which to
   save simulation outputs.
   Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/outputs</code>).</p></li>
+<li><p><code>spades.switchPkgNamespaces</code>: Should the search path be modified
+    to ensure a module's required packages are listed first?
+    Default <code>TRUE</code>, which reduces name conflicts among package objects,
+    but is not without overhead (<em>i.e.</em>, can be slow).</p></li>
 <li><p><code>spades.tolerance</code>: The default tolerance value used for floating
     point number comparisons. Default <code>.Machine$double.eps^0.5</code>.</p></li>
 <li><p><code>spades.useragent</code>: The default user agent to use for downloading

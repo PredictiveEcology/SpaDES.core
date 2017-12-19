@@ -410,6 +410,9 @@ setMethod(
       }
     }
 
+    # Force SpaDES.core to front of search path
+    #.modifySearchPath("SpaDES.core", skipNamespacing = FALSE)
+
     rm(".userSuppliedObjNames", envir=envir(sim))
     ## add name to depends
     if (!is.null(names(sim@depends@dependencies))) {
@@ -422,7 +425,7 @@ setMethod(
     ## load core modules
     for (c in core) {
       # schedule each module's init event:
-      .refreshEventQueues()
+      #.refreshEventQueues()
       sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
                            c, "init", .normal())
     }
@@ -518,15 +521,15 @@ setMethod(
     ## load files in the filelist
     if (NROW(inputs) | NROW(inputs(sim))) {
       inputs(sim) <- rbind(inputs(sim), inputs)
-      if (NROW(sim@events[moduleName == "load" &
+      if (NROW(events(sim)[moduleName == "load" &
                            eventType == "inputs" &
                            eventTime == start(sim)]) > 0) {
         sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-        sim@events <- sim@events[!(eventTime == sim@simtimes[["current"]] &
+        events(sim) <- events(sim)[!(eventTime == sim@simtimes[["current"]] &
                                                  moduleName == "load" &
                                                  eventType == "inputs"), ]
       }
-      if (any(sim@events[["eventTime"]] < sim@simtimes[["start"]])) {
+      if (any(events(sim)[["eventTime"]] < sim@simtimes[["start"]])) {
         warning(
           paste0(
             "One or more objects in the inputs filelist was ",
@@ -536,8 +539,8 @@ setMethod(
             "loadTime in ?simInit"
           )
         )
-        sim@events <-
-          sim@events[eventTime >= sim@simtimes[["start"]]]
+        events(sim) <-
+          events(sim)[eventTime >= sim@simtimes[["start"]]]
       }
     }
 

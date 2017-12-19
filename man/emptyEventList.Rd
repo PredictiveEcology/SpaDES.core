@@ -8,13 +8,7 @@
 \alias{.emptyEventList}
 \alias{.emptyEventList,numeric,character,character,numeric-method}
 \alias{.emptyEventList,missing,missing,missing,missing-method}
-\alias{.emptyEventListObj}
 \alias{.emptyEventListCols}
-\alias{.emptyEventListNA}
-\alias{.currentEventDT}
-\alias{.eventsDT}
-\alias{.numColsEventList}
-\alias{.lengthEventsDT}
 \title{Blank (template) event list}
 \format{An object of class \code{data.table} (inherits from \code{data.frame}) with 0 rows and 4 columns.}
 \usage{
@@ -29,19 +23,7 @@
 
 \\S4method{.emptyEventList}{missing,missing,missing,missing}()
 
-.emptyEventListObj
-
 .emptyEventListCols
-
-.emptyEventListNA
-
-.currentEventDT
-
-.eventsDT
-
-.numColsEventList
-
-.lengthEventsDT
 }
 \arguments{
 \item{eventTime}{The time the event is to occur.}

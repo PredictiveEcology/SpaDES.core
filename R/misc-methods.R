@@ -144,6 +144,7 @@ setMethod("append_attr",
 #'
 #' @export
 #' @rdname loadPackages
+#' @importFrom utils install.packages installed.packages
 #'
 #' @author Alex Chubaty
 #'
@@ -177,10 +178,14 @@ setMethod(
 
       loaded <- suppressMessages(sapply(packageList, require, character.only = TRUE,
                                         quiet = TRUE, warn.conflicts = FALSE))
-
       if (any(!loaded)) {
-        stop("Some packages required for the simulation are not installed:\n",
+        alreadyLoaded <- unlist(lapply(packageList[!loaded], isNamespaceLoaded))
+        if(!all(alreadyLoaded)) {
+          stop("Some packages required for the simulation are not installed:\n",
              "    ", paste(names(loaded[-which(loaded)]), collapse = "\n    "))
+        } else {
+          message("Older version(s) of ", paste(collapse = ", ", packageList[!loaded]), " already loaded")
+        }
       }
 
       if (!quiet) {

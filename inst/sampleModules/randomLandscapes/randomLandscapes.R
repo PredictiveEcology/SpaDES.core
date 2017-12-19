@@ -1,5 +1,5 @@
 SpaDES.core.version <- "0.1.0"
-if (packageVersion("SpaDES.core") < SpaDES.core.version) {
+if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'randomLandscapes' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
        "Please update 'SpaDES.core' to use this module.")

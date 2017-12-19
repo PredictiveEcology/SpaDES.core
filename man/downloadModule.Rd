@@ -8,17 +8,18 @@
 \alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY-method}
 \title{Download a module from a SpaDES module GitHub repository}
 \usage{
-downloadModule(name, path, version, repo, data, quiet)
+downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE)
 
 
   \S4method{downloadModule}{character,character,character,character,logical,logical}(name,
-  path, version, repo, data, quiet)
+  path, version, repo, data, quiet, quickCheck = FALSE)
 
 
-  \S4method{downloadModule}{character,missing,missing,missing,missing,missing}(name)
+  \S4method{downloadModule}{character,missing,missing,missing,missing,missing}(name,
+  quickCheck)
 
 \S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY}(name, path, version,
-  repo, data, quiet)
+  repo, data, quiet, quickCheck = FALSE)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -36,14 +37,18 @@ specified by the global option \code{spades.moduleRepo}.}
 \item{data}{Logical. If TRUE, then the data that is identified in the module
 metadata will be downloaded, if possible. Default if FALSE.}
 
-\item{quiet}{Logical. This is passed to \code{download.file}. Default is FALSE.}
+\item{quiet}{Logical. This is passed to \code{download.file} (default \code{FALSE}).}
+
+\item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
+use \code{file.size} instead of \code{digest::digest}. This is
+faster, but less robust.}
 }
 \value{
 A list of length 2. The first element is a character vector containing
    a character vector of extracted files for the module. The second element is
-   a tbl with details about the data that is relevant for the function, including
-   whether it was downloaded or not, whether it was renamed (because there
-   was a local copy that had the wrong file name).
+   a \code{tbl} with details about the data that is relevant for the function,
+   including whether it was downloaded or not, and whether it was renamed
+   (because there was a local copy that had the wrong file name).
 }
 \description{
 Download a .zip file of the module and extract (unzip) it to a user-specified location.
