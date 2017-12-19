@@ -25,7 +25,7 @@ if (getRversion() >= "3.1.0") {
 remoteFileSize <- function(url) {
   contentLength <- vapply(url, function(u) {
     header <- RCurl::url.exists(u, .header = TRUE)
-    status <- as.numeric(header[["status"]])
+    status <- tryCatch(as.numeric(header[["status"]]), error = function(x) 0)
     if (status == 200) {
       as.numeric(header[["Content-Length"]])
     } else {
@@ -273,9 +273,9 @@ setMethod(
 #'
 #' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
 #'
-#' @param quickCheck Logical. If TRUE, then the check with local data will only use file.size
-#'                   instead of digest::digest. This is faster, but less robust.
-#'
+#' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
+#'                   use \code{file.size} instead of \code{digest::digest}.
+#'                   This is faster, but potentially much less robust.
 #' @param overwrite Logical. Should local module files be overwritten in case they exist?
 #'                  Default is FALSE.
 #'
@@ -431,8 +431,8 @@ setMethod(
 #' @param quiet   Logical. This is passed to \code{download.file}. Default is FALSE.
 #'
 #' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
-#'                   use \code{file.size} instead of \code{digest::digest}. This is
-#'                   faster, but less robust.
+#'                   use \code{file.size} instead of \code{digest::digest}.
+#'                   This is faster, but potentially much less robust.
 #'
 #' @return Invisibly, a list of downloaded files.
 #'
@@ -440,7 +440,7 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom dplyr mutate_
+#' @importFrom dplyr mutate
 #' @importFrom httr http_error
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
@@ -472,7 +472,7 @@ setMethod(
     ids <- which(urls == "" | is.na(urls))
     to.dl <- if (length(ids)) urls[-ids] else urls
     chksums <- checksums(module, path, quickCheck = quickCheck) %>%
-      mutate(renamed = NA, module = module)
+      dplyr::mutate(renamed = NA, module = module)
     dataDir <- file.path(path, module, "data" )
 
     if (any(chksums$result == "FAIL") | any(is.na(chksums$result))) {
@@ -517,7 +517,7 @@ setMethod(
 
             ## re-checksums
             chksums <- checksums(module, path) %>%
-              mutate(renamed = NA, module = module)
+              dplyr::mutate(renamed = NA, module = module)
           } else {
             ## check whether file needs to be downloaded
             remoteFileSize <- remoteFileSize(x)
@@ -552,10 +552,14 @@ setMethod(
     }
 
     # There are at least 2 options if the expected doesn't match actual
-    wh <- match(chksums$actualFile, chksums$expectedFile) %>% is.na() %>% which()
+    # Next line: left logical: if there is no expectation, then doesn't matter,
+    #            right logical: if there is no actualFile, then don't change its name
+    wh <- ((match(chksums$actualFile, chksums$expectedFile) %>% is.na()) &
+          !(chksums$actualFile %>% is.na() )) %>%
+          which()
     if (length(wh)) {
       chksums[wh, "renamed"] <- sapply(wh, function(id) {
-        if (!is.na(chksums$expectedFile[id])) {
+        if (!is.na(chksums$expectedFile[id])  ) {
           renamed <- file.rename(
             from = file.path(dataDir, chksums$actualFile[id]),
             to = file.path(dataDir, chksums$expectedFile[id])

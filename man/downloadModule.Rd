@@ -41,11 +41,13 @@ metadata will be downloaded, if possible. Default if FALSE.}
 
 \item{quiet}{Logical. This is passed to \code{download.file} (default \code{FALSE}).}
 
-\item{quickCheck}{Logical. If TRUE, then the check with local data will only use file.size
-instead of digest::digest. This is faster, but less robust.}
+\item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
+use \code{file.size} instead of \code{digest::digest}.
+This is faster, but potentially much less robust.}
 
 \item{overwrite}{Logical. Should local module files be overwritten in case they exist?
 Default is FALSE.}
+
 }
 \value{
 A list of length 2. The first element is a character vector containing
