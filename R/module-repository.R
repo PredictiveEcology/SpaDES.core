@@ -10,13 +10,18 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param name  Character string giving the module name.
 #'
-#' @param repo  GitHub repository name.
+#' @param repo  GitHub repository name, specified as \code{"username/repositoryname"}.
 #'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 #'              specified by the global option \code{spades.moduleRepo}.
+#'              Only \code{master} branches can be used at this point
 #'
 #' @importFrom httr content GET stop_for_status
 #' @export
 #' @rdname getModuleVersion
+#'
+#' @details \code{getModuleVersion} extracts a module's version from the module .zip
+#'          file name. Module .zip files are searched inside in a \code{"/modules"} folder in a
+#'          GitHub public repository
 #'
 #' @author Alex Chubaty
 #'
@@ -208,13 +213,17 @@ setMethod(
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
 #'
 #' Currently only works with a public GitHub repository, where modules are in
-#' a \code{modules} directory in the root tree on the \code{master} branch.
+#' a \code{modules} directory in the root tree on the \code{master} branch. Module .zip files
+#' names should contain the version number and be inside their respective module folders
+#' - see \code{zipModule} for zip compression of modules.
 #'
 #' @note \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
 #' if a value is set. This alleviates 403 errors caused by too-frequent downloads.
 #' Generate a GitHub personal access token at \url{https://github.com/settings/tokens}.
 #'
 #' @note The default is to overwrite any existing files in the case of a conflict.
+#'
+#' @seealso \code{\link{ziModule}} for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
 #'
@@ -229,11 +238,14 @@ setMethod(
 #'
 #' @param quiet   Logical. This is passed to \code{download.file}. Default is FALSE.
 #'
+#' @param overwrite Logical. Should local module files be overwritten in case they exist?
+#'                  Default is FALSE.
+#'
 #' @return A list of length 2. The first element is a character vector containing
-#'    a character vector of extracted files for the module. The second element is
-#'    a tbl with details about the data that is relevant for the function, including
-#'    whether it was downloaded or not, whether it was renamed (because there
-#'    was a local copy that had the wrong file name).
+#'        a character vector of extracted files for the module. The second element is
+#'        a table with details about the data that is relevant for the function, including
+#'        whether it was downloaded or not, whether it was renamed (because there
+#'        was a local copy that had the wrong file name).
 #'
 #' @importFrom httr config GET stop_for_status user_agent write_disk
 #' @export
@@ -241,7 +253,7 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #'
-setGeneric("downloadModule", function(name, path, version, repo, data, quiet) {
+setGeneric("downloadModule", function(name, path, version, repo, data, quiet, overwrite) {
   standardGeneric("downloadModule")
 })
 
@@ -250,12 +262,14 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet) {
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
-                repo = "character", data = "logical", quiet = "logical"),
-  definition = function(name, path, version, repo, data, quiet) {
+                repo = "character", data = "logical", quiet = "logical",
+                overwrite = "logical"),
+  definition = function(name, path, version, repo, data, quiet, overwrite) {
     path <- checkPath(path, create = TRUE)
 
-    # check locally for module. only download if doesn't exist locally.
-    if (!checkModuleLocal(name, path, version)) {
+    # check locally for module. only download if doesn't exist locally,
+    # or if overwrite is wanted
+    if (!checkModuleLocal(name, path, version) | overwrite) {
       # check remotely for module
       checkModule(name, repo)
       if (is.na(version)) version <- getModuleVersion(name, repo)
@@ -270,14 +284,15 @@ setMethod(
       ua <- user_agent(getOption("spades.useragent"))
       pat <- Sys.getenv("GITHUB_PAT")
       request <- if (identical(pat, "")) {
-        GET(zip, ua, write_disk(localzip))
+        GET(zip, ua, write_disk(localzip, overwrite = overwrite))
       } else {
         message("Using GitHub PAT from envvar GITHUB_PAT")
-        GET(zip, ua, config = list(config(token = pat)), write_disk(localzip))
+        GET(zip, ua, config = list(config(token = pat)),
+            write_disk(localzip, overwrite = overwrite))
       }
       stop_for_status(request)
 
-      files <- unzip(localzip, exdir = file.path(path), overwrite = TRUE)
+      files <- unzip(localzip, exdir = file.path(path), overwrite = overwrite)
     } else {
       files <- list.files(file.path(path, name))
     }
@@ -298,9 +313,10 @@ setMethod(
       if ( all( nzchar(children) & !is.na(children) ) ) {
         tmp <- lapply(children, function(x) {
           f <- if (is.null(childVersions[[x]])) {
-            downloadModule(x, path = path, data = data, version = childVersions[[x]])
+            downloadModule(x, path = path, data = data, version = childVersions[[x]],
+                           overwrite = overwrite)
           } else {
-            downloadModule(x, path = path, data = data)
+            downloadModule(x, path = path, data = data, overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
           dataList2 <<- bind_rows(dataList2, f[[2]])
@@ -322,12 +338,13 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
-                repo = "missing", data = "missing", quiet = "missing"),
+                repo = "missing", data = "missing", quiet = "missing",
+                overwrite = "missing"),
   definition = function(name) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo"),
-                            data = FALSE, quiet = FALSE)
+                            data = FALSE, quiet = FALSE, overwrite = FALSE)
     return(invisible(files))
 })
 
@@ -335,15 +352,16 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "ANY", version = "ANY",
-                repo = "ANY", data = "ANY", quiet = "ANY"),
-  definition = function(name, path, version, repo, data, quiet) {
+                repo = "ANY", data = "ANY", quiet = "ANY", overwrite = "ANY"),
+  definition = function(name, path, version, repo, data, quiet, overwrite) {
     if (missing(path)) path <- getOption("spades.modulePath")
     if (missing(version)) version <- NA_character_
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
+    if (missing(overwrite)) overwrite <- FALSE
 
-    files <- downloadModule(name, path, version, repo, data, quiet)
+    files <- downloadModule(name, path, version, repo, data, quiet, overwrite)
     return(invisible(files))
 })
 
