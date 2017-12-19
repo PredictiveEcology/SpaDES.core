@@ -287,7 +287,7 @@ setMethod(
 #' @author Alex Chubaty
 #'
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
-                                      quickCheck = FALSE) {
+                                      quickCheck = FALSE, overwrite) {
   standardGeneric("downloadModule")
 })
 
@@ -298,8 +298,9 @@ setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
                 repo = "character", data = "logical", quiet = "logical",
-                quickCheck = "ANY"),
-  definition = function(name, path, version, repo, data, quiet, quickCheck) {
+                quickCheck = "ANY", overwrite = "logical"),
+  definition = function(name, path, version, repo, data, quiet, quickCheck,
+                        overwrite) {
     path <- checkPath(path, create = TRUE)
 
     # check locally for module. only download if doesn't exist locally,
@@ -349,9 +350,10 @@ setMethod(
         tmp <- lapply(children, function(x) {
           f <- if (is.null(childVersions[[x]])) {
             downloadModule(x, path = path, data = data, version = childVersions[[x]],
-                           quickCheck = quickCheck)
+                           quickCheck = quickCheck, overwrite = overwrite)
           } else {
-            downloadModule(x, path = path, data = data, quickCheck = quickCheck)
+            downloadModule(x, path = path, data = data, quickCheck = quickCheck,
+                           overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
           dataList2 <<- bind_rows(dataList2, f[[2]])
@@ -374,13 +376,14 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
-                repo = "missing", data = "missing", quiet = "missing", quickCheck = "ANY"),
+                repo = "missing", data = "missing", quiet = "missing", quickCheck = "ANY",
+                overwrite = "missing"),
   definition = function(name, quickCheck) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo"),
                             data = FALSE, quiet = FALSE,
-                            quickCheck = quickCheck)
+                            quickCheck = quickCheck, overwrite = FALSE)
     return(invisible(files))
 })
 
@@ -388,8 +391,10 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "ANY", version = "ANY",
-                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "ANY"),
-  definition = function(name, path, version, repo, data, quiet, quickCheck) {
+                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(name, path, version, repo, data, quiet, quickCheck,
+                        overwrite) {
     if (missing(path)) path <- getOption("spades.modulePath")
     if (missing(version)) version <- NA_character_
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
@@ -397,7 +402,7 @@ setMethod(
     if (missing(quiet)) quiet <- FALSE
     if (missing(overwrite)) overwrite <- FALSE
 
-    files <- downloadModule(name, path, version, repo, data, quiet, quickCheck)
+    files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
 })
 
