@@ -416,8 +416,13 @@ setMethod(
 #' Download module data
 #'
 #' Download external data for a module if not already present in the module
-#' directory or if there is a checksum mismatch indicating that the file is not
+#' directory, or if there is a checksum mismatch indicating that the file is not
 #' the correct one.
+#'
+#' \code{downloadData} requires a checksums file to work, as it will only download
+#'  the files specified therein. Hence, module developers should make sure they
+#'  have manually downloaded all the necessary data and ran \code{checksums} to
+#'  build a checksums file.
 #'
 #' @param module  Character string giving the name of the module.
 #'
@@ -430,6 +435,8 @@ setMethod(
 #'                   faster, but less robust.
 #'
 #' @return Invisibly, a list of downloaded files.
+#'
+#' @seealso \code{\link{checksums}} for building a checksums file.
 #'
 #' @author Alex Chubaty
 #' @export
