@@ -14,8 +14,8 @@
 \item{file}{Character vector of file paths.}
 
 \item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
-use \code{file.size} instead of \code{digest::digest}. This is
-faster, but less robust.}
+use \code{file.size} instead of \code{digest::digest}.
+This is faster, but potentially much less robust.}
 
 \item{...}{Additional arguments to \code{digest::digest}.}
 }
