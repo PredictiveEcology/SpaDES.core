@@ -525,11 +525,11 @@ setMethod(
                            eventType == "inputs" &
                            eventTime == start(sim)]) > 0) {
         sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-        events(sim) <- events(sim)[!(eventTime == sim@simtimes[["current"]] &
+        events(sim) <- events(sim)[!(eventTime == time(sim) &
                                                  moduleName == "load" &
                                                  eventType == "inputs"), ]
       }
-      if (any(events(sim)[["eventTime"]] < sim@simtimes[["start"]])) {
+      if (any(events(sim)[["eventTime"]] < start(sim))) {
         warning(
           paste0(
             "One or more objects in the inputs filelist was ",
@@ -540,7 +540,7 @@ setMethod(
           )
         )
         events(sim) <-
-          events(sim)[eventTime >= sim@simtimes[["start"]]]
+          events(sim)[eventTime >= start(sim)]
       }
     }
 
