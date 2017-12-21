@@ -52,12 +52,14 @@ remoteFileSize <- function(url) {
 #' @rdname getModuleVersion
 #'
 #' @details \code{getModuleVersion} extracts a module's version from the module .zip
-#'          file name. Module .zip files are searched inside in a \code{"/modules"} folder in a
+#'          file name.
+#'          Module .zip files are searched inside their respective module 
+#'          folders, which should themselves be in a \code{"/modules"} folder in a
 #'          GitHub public repository
 #'
 #' @author Alex Chubaty
 #'
-#' @seealso \code{\link{ziModule}} for creating module .zip folders.
+#' @seealso \code{\link{zipModule}} for creating module .zip folders.
 #'
 # igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
@@ -247,8 +249,8 @@ setMethod(
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
 #'
 #' Currently only works with a public GitHub repository, where modules are in
-#' a \code{modules} directory in the root tree on the \code{master} branch. Module .zip files'
-#' names should contain the version number and be inside their respective module folders
+#' a \code{modules} directory in the root tree on the \code{master} branch.
+#' Module .zip files' names should contain the version number and be inside their respective module folders
 #' - see \code{zipModule} for zip compression of modules.
 #'
 #' @note \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
@@ -293,7 +295,7 @@ setMethod(
 #'
 #'
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
-                                      quickCheck = FALSE, overwrite) {
+                                      quickCheck = FALSE, overwrite = FALSE) {
   standardGeneric("downloadModule")
 })
 
@@ -334,7 +336,7 @@ setMethod(
       }
       stop_for_status(request)
 
-      files <- unzip(localzip, exdir = file.path(path), overwrite = overwrite)
+      files <- unzip(localzip, exdir = file.path(path), overwrite = TRUE)
     } else {
       files <- list.files(file.path(path, name))
     }
@@ -383,13 +385,13 @@ setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
                 repo = "missing", data = "missing", quiet = "missing", quickCheck = "ANY",
-                overwrite = "missing"),
+                overwrite = "ANY"),
   definition = function(name, quickCheck) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo"),
                             data = FALSE, quiet = FALSE,
-                            quickCheck = quickCheck, overwrite = FALSE)
+                            quickCheck = quickCheck, overwrite = overwrite)
     return(invisible(files))
 })
 
@@ -406,7 +408,6 @@ setMethod(
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
-    if (missing(overwrite)) overwrite <- FALSE
 
     files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
