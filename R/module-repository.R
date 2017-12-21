@@ -53,7 +53,7 @@ remoteFileSize <- function(url) {
 #'
 #' @details \code{getModuleVersion} extracts a module's version from the module .zip
 #'          file name.
-#'          Module .zip files are searched inside their respective module 
+#'          Module .zip files are searched inside their respective module
 #'          folders, which should themselves be in a \code{"/modules"} folder in a
 #'          GitHub public repository
 #'
@@ -435,6 +435,9 @@ setMethod(
 #'                   use \code{file.size} instead of \code{digest::digest}.
 #'                   This is faster, but potentially much less robust.
 #'
+#' @param overwrite Logical. Should local data files be overwritten in case they exist?
+#'                  Default is FALSE
+#'
 #' @return Invisibly, a list of downloaded files.
 #'
 #' @seealso \code{\link{checksums}} for building a checksums file.
@@ -447,7 +450,8 @@ setMethod(
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #'
-setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE) {
+setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
+                                    overwrite = FALSE) {
   standardGeneric("downloadData")
 })
 
@@ -456,8 +460,8 @@ setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE) {
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "logical",
-                quickCheck = "ANY"),
-  definition = function(module, path, quiet, quickCheck) {
+                quickCheck = "ANY", overwrite = "ANY"),
+  definition = function(module, path, quiet, quickCheck, overwrite) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
     urls <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
@@ -476,7 +480,7 @@ setMethod(
       dplyr::mutate(renamed = NA, module = module)
     dataDir <- file.path(path, module, "data" )
 
-    if (any(chksums$result == "FAIL") | any(is.na(chksums$result))) {
+    if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
       setwd(path); on.exit(setwd(cwd), add = TRUE)
 
       files <- sapply(to.dl, function(x) {
@@ -501,7 +505,7 @@ setMethod(
                     paste(chksums$expectedFile[id], collapse = ",\n      "))
           }
         }
-        if (any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) {
+        if ((any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) | overwrite) {
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
@@ -531,23 +535,28 @@ setMethod(
 
             ## download if needed, using Cache in case multiple objects use same url
             ## (e.g., in a .tar file)
-            if (needNewDownload) {
+            if (needNewDownload | overwrite) {
               message("Downloading ", basename(x), " for module ", module, ":")
-              Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
+              Cache(FUN = function(url, tmpFile, overwrite) {
+                GET(url, write_disk(tmpFile, overwrite = overwrite))
+              },
+              url = x, tmpFile = tmpFile, overwrite = overwrite)
+
               copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
             }
             destfile
           }
         } else {
           message("  Download data step skipped for ", basename(x),
-                  " in module ", module, ". Local copy exists.")
+                  " in module ", module, ". Local copy exists and/or overwrite is FALSE.")
         }
       })
 
       chksums <- checksums(module, path, quickCheck = quickCheck) %>%
         dplyr::mutate(renamed = NA, module = module)
     } else if (NROW(chksums) > 0) {
-      message("  Download data step skipped for module ", module, ". Local copy exists.")
+      message("  Download data step skipped for module ", module, ". Local copy exists
+              and/or overwrite is FALSE.")
     } else {
       message("  No data to download for module ", module)
     }
@@ -593,28 +602,31 @@ setMethod(
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY"),
-  definition = function(module, quickCheck) {
+  signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(module, quickCheck, overwrite) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE,
-                 quickCheck = quickCheck)
+                 quickCheck = quickCheck, overwrite = overwrite)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY"),
-  definition = function(module, quiet, quickCheck) {
+  signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(module, quiet, quickCheck, overwrite) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet,
-                 quickCheck = quickCheck)
+                 quickCheck = quickCheck, overwrite = overwrite)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY"),
-  definition = function(module, path, quickCheck) {
+  signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(module, path, quickCheck, overwrite) {
     downloadData(module = module, path = path, quiet = FALSE,
-                 quickCheck = quickCheck)
+                 quickCheck = quickCheck, overwrite = overwrite)
 })
 
 ################################################################################
