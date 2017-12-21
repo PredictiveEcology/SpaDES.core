@@ -9,16 +9,19 @@
 \alias{downloadData,character,character,missing-method}
 \title{Download module data}
 \usage{
-downloadData(module, path, quiet, quickCheck = FALSE)
+downloadData(module, path, quiet, quickCheck = FALSE, overwrite = FALSE)
 
 \S4method{downloadData}{character,character,logical}(module, path, quiet,
-  quickCheck = FALSE)
+  quickCheck = FALSE, overwrite = FALSE)
 
-\S4method{downloadData}{character,missing,missing}(module, quickCheck)
+\S4method{downloadData}{character,missing,missing}(module, quickCheck,
+  overwrite)
 
-\S4method{downloadData}{character,missing,logical}(module, quiet, quickCheck)
+\S4method{downloadData}{character,missing,logical}(module, quiet, quickCheck,
+  overwrite)
 
-\S4method{downloadData}{character,character,missing}(module, path, quickCheck)
+\S4method{downloadData}{character,character,missing}(module, path, quickCheck,
+  overwrite)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}
@@ -30,6 +33,9 @@ downloadData(module, path, quiet, quickCheck = FALSE)
 \item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
 use \code{file.size} instead of \code{digest::digest}.
 This is faster, but potentially much less robust.}
+
+\item{overwrite}{Logical. Should local data files be overwritten in case they exist?
+Default is FALSE}
 }
 \value{
 Invisibly, a list of downloaded files.

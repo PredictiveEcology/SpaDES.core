@@ -26,11 +26,13 @@ Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
 }
 \details{
 \code{getModuleVersion} extracts a module's version from the module .zip
-         file name. Module .zip files are searched inside in a \code{"/modules"} folder in a
+         file name.
+         Module .zip files are searched inside their respective module
+         folders, which should themselves be in a \code{"/modules"} folder in a
          GitHub public repository
 }
 \seealso{
-\code{\link{ziModule}} for creating module .zip folders.
+\code{\link{zipModule}} for creating module .zip folders.
 }
 \author{
 Alex Chubaty

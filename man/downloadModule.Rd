@@ -4,23 +4,23 @@
 \name{downloadModule}
 \alias{downloadModule}
 \alias{downloadModule,character,character,character,character,logical,logical,ANY,logical-method}
-\alias{downloadModule,character,missing,missing,missing,missing,missing,ANY,missing-method}
+\alias{downloadModule,character,missing,missing,missing,missing,missing,ANY,ANY-method}
 \alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
 \title{Download a module from a SpaDES module GitHub repository}
 \usage{
 downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE,
-  overwrite)
+  overwrite = FALSE)
 
 
   \S4method{downloadModule}{character,character,character,character,logical,logical,ANY,logical}(name,
-  path, version, repo, data, quiet, quickCheck = FALSE, overwrite)
+  path, version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)
 
 
-  \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,missing}(name,
+  \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,ANY}(name,
   quickCheck)
 
 \S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name, path,
-  version, repo, data, quiet, quickCheck = FALSE, overwrite)
+  version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -47,7 +47,6 @@ This is faster, but potentially much less robust.}
 
 \item{overwrite}{Logical. Should local module files be overwritten in case they exist?
 Default is FALSE.}
-
 }
 \value{
 A list of length 2. The first element is a character vector containing
@@ -61,8 +60,8 @@ Download a .zip file of the module and extract (unzip) it to a user-specified lo
 }
 \details{
 Currently only works with a public GitHub repository, where modules are in
-a \code{modules} directory in the root tree on the \code{master} branch. Module .zip files'
-names should contain the version number and be inside their respective module folders
+a \code{modules} directory in the root tree on the \code{master} branch.
+Module .zip files' names should contain the version number and be inside their respective module folders
 - see \code{zipModule} for zip compression of modules.
 }
 \note{
