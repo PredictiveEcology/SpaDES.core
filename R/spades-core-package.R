@@ -125,13 +125,14 @@
 #'   }
 #' }
 #'
-#' \subsection{3.7 Modules and dependencies}{
+#' \subsection{3.7 Modules, dependencies, packages}{
 #'   Accessor functions for the \code{depends}, \code{modules}, and \code{.loadOrder} slots.
 #'   These are included for advanced users.
 #'
 #'   \tabular{ll}{
 #'      \code{\link{depends}} \tab List of simulation module dependencies. (advanced)\cr
 #'      \code{\link{modules}} \tab List of simulation modules to be loaded. (advanced)\cr
+#'      \code{\link{packages}} \tab Vector of required R libraries of all modules. (advanced)\cr
 #'   }
 #' }
 #'

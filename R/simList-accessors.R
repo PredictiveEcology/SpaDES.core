@@ -2517,7 +2517,11 @@ setMethod(
 #' @param sim  A \code{simList} object.
 #'
 #' @param ...  Additional arguments.
-#'             Currently only \code{module}, specifying the name of a module,
+#'             Currently only \code{module} or \code{modules} (via partial matching),
+#'             specifying the name or
+#'             vector of names of module(s) (path
+#'             will be taken from getOption("spades.modulePath"), which is set
+#'             with \code{setPaths})
 #'             and \code{filename}, specifying a module filename, are supported.
 #'
 #' @return A sorted character vector of package names.
@@ -2527,7 +2531,7 @@ setMethod(
 #' @family functions to access elements of a \code{simList} object
 #' @rdname packages
 #'
-#' @author Alex Chubaty
+#' @author Alex Chubaty & Eliot McIntire
 #'
 # igraph exports %>% from magrittr
 setGeneric("packages", function(sim, ...) {
@@ -2558,12 +2562,18 @@ setMethod(
                                   defineModuleElement = "reqdPkgs") %>%
         unlist() %>% unique() %>% sort()
       return(pkgs)
-    } else if (!is.null(args$module)) {
-      f <- file.path(getOption("spades.modulePath"), args$module, paste0(args$module, ".R"))
-      pkgs <- .parseModulePartial(filename = f, defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% unique() %>% sort()
+    } else if (any(startsWith(names(args), "module"))) {
+      mods <- args[[pmatch(names(args), x = "module")]]
+      pkgs <- lapply(mods, function(module) {
+        f <- file.path(getOption("spades.modulePath"), module, paste0(module, ".R"))
+        pkgs <- .parseModulePartial(filename = f, defineModuleElement = "reqdPkgs") %>%
+          unlist() %>% unique() %>% sort()
+        pkgs <- pkgs[nzchar(pkgs)]
+        return(pkgs)
+      })
+      names(pkgs) <- mods
       return(pkgs)
     } else {
-      stop("one of sim, modules, or filename must be supplied.")
+      stop("one of sim, module, modules, or filename must be supplied.")
     }
 })
