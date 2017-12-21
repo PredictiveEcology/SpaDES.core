@@ -17,7 +17,11 @@ packages(sim, ...)
 \item{sim}{A \code{simList} object.}
 
 \item{...}{Additional arguments.
-Currently only \code{module}, specifying the name of a module,
+Currently only \code{module} or \code{modules} (via partial matching),
+specifying the name or
+vector of names of module(s) (path
+will be taken from getOption("spades.modulePath"), which is set
+with \code{setPaths})
 and \code{filename}, specifying a module filename, are supported.}
 }
 \value{
@@ -37,5 +41,5 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{times}}
 }
 \author{
-Alex Chubaty
+Alex Chubaty & Eliot McIntire
 }
