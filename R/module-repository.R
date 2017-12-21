@@ -408,6 +408,7 @@ setMethod(
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
+    if (missing(overwrite)) overwrite <- FALSE
 
     files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
