@@ -122,7 +122,7 @@ test_that("experiment does not work correctly", {
   expect_false(identical(sims[[1]]$landscape$Fires, sims[[3]]$landscape$Fires))
 
   # Test clearSimEnv argument... i.e., clearing of the final objects
-  expect_equal(length(ls(sims[[1]])), 10)
+  expect_equal(length(ls(sims[[1]])), 12)
   set.seed(1232)
   sims2 <- experiment(mySimNoRL, replicates = 2, clearSimEnv = TRUE,
                       inputs = lapply(landscapeFiles, function(filenames) {
