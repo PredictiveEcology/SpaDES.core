@@ -62,7 +62,7 @@ Suggests:
     testthat (>= 1.0.2),
     tkrplot
 Remotes: 
-  PredictiveEcology/reproducible
+    PredictiveEcology/reproducible
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
