@@ -2558,23 +2558,27 @@ setMethod(
   signature(sim = "missing"),
   definition = function(sim, ...) {
     args <- list(...)
-    if (!is.null(args$filename)) {
-      pkgs <- .parseModulePartial(filename = args$filename,
-                                  defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% unique() %>% sort()
-      return(pkgs)
+    if (any(startsWith(names(args), "file")))  {
+      paths <- args$filename
+      mods <- sub(basename(paths), replacement = "", pattern = ".R")
     } else if (any(startsWith(names(args), "module"))) {
+      prefix <- if (any(startsWith(names(args), "path"))) {
+          args[[pmatch(names(args), x = "path")]]
+        } else {
+          getOption("spades.modulePath")
+        }
       mods <- args[[pmatch(names(args), x = "module")]]
-      pkgs <- lapply(mods, function(module) {
-        f <- file.path(getOption("spades.modulePath"), module, paste0(module, ".R"))
-        pkgs <- .parseModulePartial(filename = f, defineModuleElement = "reqdPkgs") %>%
-          unlist() %>% unique() %>% sort()
-        pkgs <- pkgs[nzchar(pkgs)]
-        return(pkgs)
-      })
-      names(pkgs) <- mods
-      return(pkgs)
+      paths <- file.path(prefix, mods, paste0(mods, ".R"))
     } else {
       stop("one of sim, module, modules, or filename must be supplied.")
     }
+    pkgs <- lapply(paths, function(path) {
+      pkgs <- .parseModulePartial(filename = path, defineModuleElement = "reqdPkgs") %>%
+        unlist() %>% unique()
+      if (!is.null(pkgs)) pkgs <- sort(pkgs)
+      pkgs <- pkgs[nzchar(pkgs)]
+      return(pkgs)
+    })
+    names(pkgs) <- mods
+    return(pkgs)
 })
