@@ -317,3 +317,26 @@ test_that("test-load.R: more tests", {
     expect_message(sim3 <- spades(sim2), "time 20")
   }
 })
+
+test_that("test-load.R: interval loading of objects from .GlobalEnv", {
+  tmpdir <- file.path(tempdir(), "test_load", rndstr()) %>% checkPath(create = TRUE)
+
+  on.exit({
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  times <- 0:10
+  test1 <- "hi"
+  newModule("test", path = tempdir())
+
+  a <- simInit(inputs = data.frame(obj = "test1", loadTimes = times), times = list(start = 0, end = 2),
+               modules = list("test"), paths = list(modulePath = tempdir()))
+  expect_equal(test1, a$test1)
+  a <- spades(a)
+  expect_equal(test1, a$test1)
+  test1 <- "lo"
+  end(a) <- 3
+  a <- spades(a)
+  expect_equal(test1, a$test1)
+
+})
