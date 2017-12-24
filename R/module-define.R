@@ -605,7 +605,7 @@ setMethod(
   if (any(needRenameArgs)) {
     colnames(inputDF)[needRenameArgs] <- .fileTableInCols[pmatch("arg", .fileTableInCols)]
   }
-  columns <- pmatch(.fileTableInCols, names(inputDF))
+  columns <- pmatch(substr(.fileTableInCols,1,c(3,5,1,3,5,5,3,5)), names(inputDF))
   setnames(inputDF, old = colnames(inputDF)[na.omit(columns)],
            new = .fileTableInCols[!is.na(columns)])
   if (any(is.na(columns))) {
@@ -665,7 +665,7 @@ setMethod(
     colnames(outputDF)[needRenameArgs] <-
       .fileTableOutCols[pmatch("arg", .fileTableOutCols)]
   }
-  columns <- pmatch(.fileTableOutCols, names(outputDF))
+  columns <- pmatch(substr(.fileTableOutCols,1,c(3,5,1,3,5,5,3)), names(outputDF))
   setnames(outputDF, old = colnames(outputDF)[na.omit(columns)],
            new = .fileTableOutCols[!is.na(columns)])
 
