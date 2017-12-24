@@ -320,9 +320,11 @@ test_that("test-load.R: more tests", {
 
 test_that("test-load.R: interval loading of objects from .GlobalEnv", {
   tmpdir <- file.path(tempdir(), "test_load", rndstr()) %>% checkPath(create = TRUE)
-
+  cwd <- getwd()
+  setwd(tmpdir)
   on.exit({
     unlink(tmpdir, recursive = TRUE)
+    setwd(cwd)
   }, add = TRUE)
 
   times <- 0:10

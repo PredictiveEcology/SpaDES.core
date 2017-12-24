@@ -1300,7 +1300,7 @@ setReplaceMethod(
 #' outputs(sim)
 #'
 #' # read one back in just to test it all worked as planned
-#' newObj <- read.csv(dir(tmpdir, pattern = "second10.csv", full.name = TRUE))
+#' newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
 #' newObj
 #'
 #' # using saving with SpaDES-aware methods

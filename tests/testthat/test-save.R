@@ -93,7 +93,7 @@ test_that("saving csv files does not work correctly", {
    sim2 <- spades(sim2)
    outputs(sim2)
    # read one back in just to test it all worked as planned
-   newObj <- read.csv(dir(savePath, pattern = "second10.csv", full.name = TRUE))
+   newObj <- read.csv(dir(savePath, pattern = "year10.csv", full.name = TRUE))
    expect_false(identical(df1, newObj))
 
 })
