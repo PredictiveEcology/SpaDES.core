@@ -354,7 +354,7 @@ setMethod(
 
     timeunits <- findSmallestTU(sim, modules(sim))
 
-    if (length(timeunits) == 0) timeunits <- list("second") # no modules at all
+    if (length(timeunits) == 0) timeunits <- list(moduleDefaults$timeunit) # no timeunits or no modules at all
 
     if (!is.null(times$unit)) {
       message(

@@ -214,8 +214,8 @@ setMethod(
 # are put into the simList. To use objects and functions, use sim$xxx.
 defineModule(sim, list(
   name = \"", name, "\",
-  description = \"insert module description here\",
-  keywords = c(\"insert key words here\"),
+  description = ", moduleDefaults$description, ", #\"insert module description here\",
+  keywords = ", moduleDefaults$keywords, ", # c(\"insert key words here\"),
   authors = ", getOption("devtools.desc.author",
                          "c(person(c(\"First\", \"Middle\"), \"Last\", email = \"email@example.com\", role = c(\"aut\", \"cre\")))"), ",
   childModules = ", children_char, ",
@@ -223,14 +223,14 @@ defineModule(sim, list(
         name, " = \"0.0.1\"", if (type == "parent") paste0(", ", children, " = \"0.0.1\""),
         "),
   ",
-  if (type == "child") "spatialExtent = raster::extent(rep(NA_real_, 4)),
-  timeframe = as.POSIXlt(c(NA, NA)),
+  if (type == "child") {paste0("spatialExtent = ", deparse(moduleDefaults$extent) ,",")},
+  "timeframe = ", deparse(moduleDefaults$timeframe), ",
   ",
-  "timeunit = \"year\"," ,"
+  "timeunit = ", deparse(moduleDefaults$timeunit), "," ,"
   citation = list(\"citation.bib\"),
   documentation = list(\"README.txt\", \"", name, ".Rmd\")",
-  if (type == "child") ",
-  reqdPkgs = list(),
+  if (type == "child") {paste0(",
+  reqdPkgs = ", deparse(moduleDefaults$reqdPkgs), ",
   parameters = rbind(
     #defineParameter(\"paramName\", \"paramClass\", value, min, max, \"parameter description\"),
     defineParameter(\".plotInitialTime\", \"numeric\", NA, NA, NA, \"This describes the simulation time at which the first plot event should occur\"),
@@ -246,7 +246,7 @@ defineModule(sim, list(
   outputObjects = bind_rows(
     #createsOutput(\"objectName\", \"objectClass\", \"output object description\", ...),
     createsOutput(objectName = NA, objectClass = NA, desc = NA)
-  )","
+  )")},"
 ))\n",
       file = filenameR, fill = FALSE, sep = "")
 
