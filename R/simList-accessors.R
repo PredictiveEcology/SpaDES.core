@@ -2546,7 +2546,8 @@ setMethod(
   definition = function(sim, ...) {
     pkgs <- lapply(depends(sim)@dependencies, function(x) {
         x@reqdPkgs
-      }) %>% unlist() %>% unique() %>% sort()
+      }) %>% unlist() %>% unique()
+    if (!is.null(pkgs)) pkgs <- sort(pkgs)
     return(pkgs)
 })
 
