@@ -60,10 +60,12 @@ test_that("empty defineModule", {
   b <- depends(sim)
   out <- lapply(names(moduleDefaults), function(modDef) {
     if (modDef != "version") {
-      if (modDef != "extent") {
+      if (all(!(c("extent", "timeframe") %in% modDef))) {
         expect_identical(slot(b@dependencies[[1]], modDef),moduleDefaults[[modDef]])
-      } else {
+      } else if (modDef == "extent") {
         expect_identical(slot(b@dependencies[[1]], "spatialExtent"),eval(moduleDefaults[[modDef]]))
+      } else if (modDef == "timeframe") {
+        expect_identical(slot(b@dependencies[[1]], "timeframe"),eval(moduleDefaults[[modDef]]))
       }
 
     }
