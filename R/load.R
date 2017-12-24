@@ -179,11 +179,13 @@ setMethod(
           if (is.na(filelist$file[y])) {
             # i.e., only for objects
             objList <- list()
-            if (exists(filelist$objectName[y], envir = .GlobalEnv)) {
-              objList <- list(get(filelist$objectName[y], envir = .GlobalEnv))
+            if (exists(filelist$objectName[y])) {#, envir = .GlobalEnv)) {
+              objList <- list(get(filelist$objectName[y]))#, envir = .GlobalEnv))
               names(objList) <- filelist$objectName[y]
             } else {
-              objList2 <- .findObjects(filelist$objectName[y])
+              objListEnv <- quickPlot:::where2(filelist$objectName[y])
+              objList <- list(get(filelist$objectName[y], objListEnv))
+              #objList <- .findObjects(filelist$objectName[y])
               names(objList) <- filelist$objectName[y]
             }
             if (length(objList) > 0) {
