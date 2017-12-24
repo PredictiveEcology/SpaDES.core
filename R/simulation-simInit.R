@@ -119,6 +119,7 @@ if (getRversion() >= "3.1.0") {
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
+#' @importFrom reproducible Require
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -262,11 +263,10 @@ setMethod(
                         notOlderThan) {
 
     # For namespacing of each module; keep a snapshot of the search path
-    .pkgEnv$searchPath <- search()
-    on.exit({
-      .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
-    })
-
+    # .pkgEnv$searchPath <- search()
+    # on.exit({
+    #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
+    # })
     paths <- lapply(paths, checkPath, create = TRUE)
 
     objNames <- names(objects)
@@ -297,6 +297,9 @@ setMethod(
     sim <- new("simList")
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
+
+    message("Loading all required packages")
+    Require(c(unique(unlist(packages(modules=unlist(modules), path = paths$modulePath)), "SpaDES.core")))
 
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.

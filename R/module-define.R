@@ -55,7 +55,13 @@
 #'                              This is currently not parsed by SpaDES;
 #'                              it is for human readers only.\cr\cr
 #'    \code{reqdPkgs} \tab List of R package names required by the module. These
-#'                         packages will be loaded when \code{simInit} is called. \cr
+#'                         packages will be loaded when \code{simInit} is called.
+#'                         \code{\link[reproducible]{Require}} will be used internally
+#'                         to load if available, and install if not available.
+#'                         Because \code{\link[reproducible]{Require}} can also download from
+#'                         GitHub.com, these packages can specify package names stored
+#'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}.
+#'                         \cr
 #'    \code{parameters} \tab A data.frame specifying the parameters used in the module.
 #'                           Usually produced by \code{rbind}-ing the outputs of multiple
 #'                           \code{\link{defineParameter}} calls. These parameters indicate
@@ -178,17 +184,6 @@ setMethod(
         "Please see ?defineModule and ?.moduleDeps for more info.\n",
         "All metadata elements must be present and valid."
       ))
-    }
-
-    # provide default values for missing metadata elements
-    if (identical(x$reqdPkgs, list())) {
-      x$reqdPkgs <- list()
-    } else if (is.null(na.omit(x$reqdPkgs))) {
-      x$reqdPkgs <- list()
-    } else if (any(!nzchar(na.omit(x$reqdPkgs)))) {
-      x$reqdPkgs <- list()
-    } else {
-      loadPackages(x$reqdPkgs)
     }
 
     ## enforce/coerce types for the user-supplied param list
