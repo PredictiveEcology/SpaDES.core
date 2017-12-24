@@ -299,7 +299,8 @@ setMethod(
     sim@modules <- modules  ## will be updated below
 
     message("Loading all required packages")
-    Require(c(unique(unlist(packages(modules=unlist(modules), path = paths$modulePath)), "SpaDES.core")))
+    Require(c(unique(unlist(packages(modules=unlist(modules), path = paths(sim)$modulePath)),
+                     "SpaDES.core")))
 
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
