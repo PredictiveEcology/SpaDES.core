@@ -236,7 +236,7 @@ test_that("simInit with R subfolder scripts", {
   expect_true(sum(grepl(unlist(lapply(ls(mySim@.envir, all.names = TRUE), function(x) {
     if (is.environment(mySim@.envir[[x]])) ls(envir = mySim@.envir[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.envir$._child1$a(2) == 3)
+  expect_true(mySim@.envir$child1Fns$a(2) == 3)
 })
 
 test_that("simulation runs with simInit with duplicate modules named", {

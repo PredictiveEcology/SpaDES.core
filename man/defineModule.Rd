@@ -173,6 +173,9 @@ values set to defaults
 }
 
 }
+\seealso{
+moduleDefaults
+}
 \author{
 Alex Chubaty
 }

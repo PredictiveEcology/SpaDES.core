@@ -206,7 +206,7 @@ if (interactive()) {
   #  are real data, then rerun the POM function next,
   #  comparing these "data" with the simulated values
   #  using Mean Absolute Deviation
-  outData <- spades(Copy(mySim), .plotInitialTime = NA)
+  outData <- spades(reproducible::Copy(mySim), .plotInitialTime = NA)
 
   # Extract the "true" data, in this case, the "proportion of cells burned"
   # Function defined that will use landscape$Fires map from simList,
@@ -287,7 +287,7 @@ if (interactive()) {
     ### data
 
     # make a copy of simList because it will possibly be altered by spades call
-    sim1 <- Copy(sim)
+    sim1 <- reproducible::Copy(sim)
 
     # take the parameters and assign them to simList
     params(sim1)$fireSpread$spreadprob <- pars[1]

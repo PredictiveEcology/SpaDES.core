@@ -103,7 +103,7 @@ doEvent <- function(sim, debug, notOlderThan) {
           } else if (grepl(debug[[i]], pattern = "\\(")) {
             print(eval(parse(text = debug[[i]])))
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
-            fnEnv <- sim@.envir[[paste0("._",cur[["moduleName"]])]]
+            fnEnv <- sim@.envir[[paste0(cur[["moduleName"]], "Fns")]]
             if(is.environment(fnEnv)) {
               debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
               on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
@@ -154,7 +154,7 @@ doEvent <- function(sim, debug, notOlderThan) {
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
                                  modules = cur[["moduleName"]])
-            sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[paste0("._", cur[["moduleName"]])]]),
+            sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[paste0(cur[["moduleName"]], "Fns")]]),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                          debug = FALSE,
@@ -166,7 +166,7 @@ doEvent <- function(sim, debug, notOlderThan) {
                          userTags = c("function:doEvent"))
           } else {
             sim <- get(moduleCall,
-                       envir = sim@.envir[[paste0("._", cur[["moduleName"]])]])(sim, cur[["eventTime"]],
+                       envir = sim@.envir[[paste0(cur[["moduleName"]], "Fns")]])(sim, cur[["eventTime"]],
                                                                                 cur[["eventType"]], FALSE)
           }
         }

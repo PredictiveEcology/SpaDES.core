@@ -158,7 +158,7 @@ setMethod(
         defineModuleItem <- grepl(pattern = "defineModule", parsedFile)
 
         # duplicate -- put in namespaces location
-        funs <- paste0("._",m) # generic name for hidden environment
+        funs <- paste0(m, "Fns") # generic name for hidden environment
         sim@.envir[[funs]] <- new.env(parent = sim@.envir)
         eval(parsedFile[!defineModuleItem], envir = sim@.envir[[funs]])
 

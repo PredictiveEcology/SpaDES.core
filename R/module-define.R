@@ -3,7 +3,6 @@
 #' Where individual elements are missing in \code{defineModule},
 #' these defaults will be used.
 #' @export
-#' @
 #'
 moduleDefaults <- list(
   timeunit = "year",
