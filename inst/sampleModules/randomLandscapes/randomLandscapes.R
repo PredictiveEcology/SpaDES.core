@@ -57,7 +57,7 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
     eventType,
     init = {
       # do stuff for this event
-      sim <- sim$randomLandscapesInit(sim)
+      sim <- Init(sim)
 
       # schedule the next events
       sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, "randomLandscapes", "plot", .last())
@@ -83,7 +83,7 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 ## event functions
-randomLandscapesInit <- function(sim) {
+Init <- function(sim) {
   if (is.null(P(sim)$inRAM)) {
     inMemory <- FALSE
   } else {
