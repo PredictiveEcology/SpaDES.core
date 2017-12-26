@@ -222,11 +222,10 @@ defineModule(sim, list(
   version = list(SpaDES.core = \"", as.character(utils::packageVersion("SpaDES.core")), "\", ",
         name, " = \"0.0.1\"", if (type == "parent") paste0(", ", children, " = \"0.0.1\""),
         "),
-  ",
-  if (type == "child") {paste0("spatialExtent = ", deparse(moduleDefaults$extent) ,",")},
-  "timeframe = ", deparse(moduleDefaults$timeframe), ",
-  ",
-  "timeunit = ", deparse(moduleDefaults$timeunit), "," ,"
+  ", if (type == "child") {paste0("spatialExtent = ", deparse(moduleDefaults$extent) ,",")},
+  "
+  timeframe = ", deparse(moduleDefaults$timeframe), ",
+  timeunit = ", deparse(moduleDefaults$timeunit), ",","
   citation = list(\"citation.bib\"),
   documentation = list(\"README.txt\", \"", name, ".Rmd\")",
   if (type == "child") {paste0(",
