@@ -1985,9 +1985,10 @@ setReplaceMethod(
 #' @export
 #' @rdname simList-accessors-times
 end..simList <- function(x, unit, ...) {
-    unit <- .callingFrameTimeunit(x)
-    if (is.null(unit)) {
-      unit <- NA_character_
+    if (missing(unit)) {
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit))
+        unit <- NA_character_
     }
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
