@@ -298,7 +298,6 @@ setMethod(
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
 
-    message("Loading all required packages")
     Require(c(unique(unlist(packages(modules=unlist(modules), path = paths(sim)$modulePath)),
                      "SpaDES.core")))
 
