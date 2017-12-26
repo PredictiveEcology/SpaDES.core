@@ -2576,7 +2576,11 @@ setMethod(
     pkgs <- lapply(paths, function(path) {
       pkgs <- .parseModulePartial(filename = path, defineModuleElement = "reqdPkgs") %>%
         unlist() %>% unique()
-      if (!is.null(pkgs)) pkgs <- sort(pkgs)
+      if (!is.null(pkgs)) {
+        pkgs <- sort(pkgs)
+      } else {
+        pkgs <- character(0)
+      }
       pkgs <- pkgs[nzchar(pkgs)]
       return(pkgs)
     })
