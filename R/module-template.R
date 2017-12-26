@@ -211,7 +211,9 @@ setMethod(
 
     cat("
 # Everything in this file gets sourced during simInit, and all functions and objects
-# are put into the simList. To use objects and functions, use sim$xxx.
+# are put into the simList. To use objects, use sim$xxx, and are thus globally available
+# to all modules. Functions can be used without sim$ as they are namespaced, like functions
+# in R packages. If exact location is required, functions will be: sim$<moduleName>Fns$FunctionName
 defineModule(sim, list(
   name = \"", name, "\",
   description = ", moduleDefaults$description, ", #\"insert module description here\",
