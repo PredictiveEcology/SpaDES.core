@@ -120,13 +120,13 @@ test_that("timeunits with child and parent modules work correctly", {
   }, add = TRUE)
 
   #suppressMessages({
-    newModule("grandpar1", ".", type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
-    newModule("par1", ".", type = "parent", children = c("child4", "child3"), open = FALSE)
-    newModule("child1", ".", open = FALSE)
-    newModule("child2", ".", open = FALSE)
-    newModule("child3", ".", open = FALSE)
-    newModule("child4", ".", open = FALSE)
-    newModule("child5", ".", open = FALSE)
+    newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
+    newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)
+    newModule("child1", tmpdir, open = FALSE)
+    newModule("child2", tmpdir, open = FALSE)
+    newModule("child3", tmpdir, open = FALSE)
+    newModule("child4", tmpdir, open = FALSE)
+    newModule("child5", tmpdir, open = FALSE)
     #})
 
   fileName <- "child2/child2.R"
@@ -149,12 +149,12 @@ test_that("timeunits with child and parent modules work correctly", {
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "month"') # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
-  mySim <- simInit(modules = list("grandpar1", "par1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1", "par1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month")
 
   # If only listing the one module and it is a parent, then use it regardless of whether
   #  it is shortest or longest
-  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "year")
 
   fileName <- "grandpar1/grandpar1.R"
@@ -164,14 +164,14 @@ test_that("timeunits with child and parent modules work correctly", {
 
   # If only listing the one module and it is a parent, then use it regardless of whether
   #  it is shortest or longest
-  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "hour")
 
-  mySim <- simInit(modules = list("grandpar1", "child5"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1", "child5"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "second")
 
   suppressMessages(
-    newModule("grandpar1", ".", type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
+    newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
   )
   fileName <- "grandpar1/grandpar1.R"
   xxx <- readLines(fileName)
@@ -179,24 +179,24 @@ test_that("timeunits with child and parent modules work correctly", {
   cat(xxx1, file = fileName, sep = "\n")
 
   # If parent has NA for timeunit, then take smallest of children
-  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "day")
 
   suppressMessages(
-    newModule("grandpar2", ".", type = "parent", children = c("child1", "child6", "par1"), open = FALSE)
+    newModule("grandpar2", tmpdir, type = "parent", children = c("child1", "child6", "par1"), open = FALSE)
   )
   fileName <- "grandpar2/grandpar2.R"
   xxx <- readLines(fileName)
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = "timeunit = NA") # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
-  suppressMessages(newModule("child6", ".", open = FALSE))
+  suppressMessages(newModule("child6", tmpdir, open = FALSE))
   fileName <- "child6/child6.R"
   xxx <- readLines(fileName)
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = "timeunit = NA") # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
   # If parent has NA for timeunit, then take smallest of children
-  mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month") # because par1 is month, grandpar1 is NA
 })

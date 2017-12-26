@@ -65,18 +65,22 @@ setMethod(
     defineModuleElement = "character"
   ),
   definition = function(filename, defineModuleElement) {
-    parsedFile <- parse(filename)
-    defineModuleItem <- grepl(pattern = "defineModule", parsedFile)
-    pf <- parsedFile[defineModuleItem]
+    if (file.exists(filename)) {
+      parsedFile <- parse(filename)
+      defineModuleItem <- grepl(pattern = "defineModule", parsedFile)
+      pf <- parsedFile[defineModuleItem]
 
-    namesParsedList <- names(parsedFile[defineModuleItem][[1]][[3]])
+      namesParsedList <- names(parsedFile[defineModuleItem][[1]][[3]])
 
-    element <- (namesParsedList == defineModuleElement)
-    out <- pf[[1]][[3]][element][[1]]
-    out <- tryCatch(
-      eval(out),
-      error = function(x) out
-    )
+      element <- (namesParsedList == defineModuleElement)
+      out <- pf[[1]][[3]][element][[1]]
+      out <- tryCatch(
+        eval(out),
+        error = function(x) out
+      )
+    } else {
+      out <- NULL
+    }
     return(out)
 })
 
