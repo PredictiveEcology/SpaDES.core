@@ -298,8 +298,10 @@ setMethod(
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
 
-    Require(c(unique(unlist(packages(modules=unlist(modules), path = paths(sim)$modulePath)),
-                     "SpaDES.core")))
+    reqdPkgs <- packages(modules=unlist(modules), path = paths(sim)$modulePath)
+    if (length(unlist(reqdPkgs))) {
+      Require(c(unique(unlist(reqdPkgs), "SpaDES.core")))
+    }
 
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
