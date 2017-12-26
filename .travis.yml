@@ -26,6 +26,8 @@ matrix:
         packages:
         - libgdal1-dev
         - libproj-dev
+    r_packages:
+      - devtools
     r_github_packages:
       - jimhester/lintr
     before_install:
