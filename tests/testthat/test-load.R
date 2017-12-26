@@ -319,6 +319,7 @@ test_that("test-load.R: more tests", {
 })
 
 test_that("test-load.R: interval loading of objects from .GlobalEnv", {
+  library(igraph)
   tmpdir <- file.path(tempdir(), "test_load", rndstr()) %>% checkPath(create = TRUE)
   cwd <- getwd()
   setwd(tmpdir)
