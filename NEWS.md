@@ -27,6 +27,7 @@ version 0.1.0.9000
 * convert `P` to a function, rather than S4 generic and method, for speed.
 * importFrom only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
 * new function `remoteFileSize` to check the size of remote files
+* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object
 
 version 0.1.0
 =============
