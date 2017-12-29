@@ -31,6 +31,8 @@ matrix:
     before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
+    before_script:
+    - Rscript -e 'install.packages("devtools", type = "source")'
     after_success:
     - Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
     - Rscript -e 'lintr::lint_package()'
