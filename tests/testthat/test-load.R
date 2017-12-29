@@ -174,6 +174,32 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
     expect_message(spades(sim2), "forestAge")
     expect_true(all(c("DEM", "forestAge", "forestCover") %in% ls(sim2)))
     rm(sim2)
+
+    # test without package specified
+    dt <- data.table::data.table(a = 1, b = 2)
+    tmpFile <- tempfile()
+    write.table(dt, file = tmpFile, sep = "\t", col.names = TRUE, row.names = FALSE)
+    inputs <- data.frame(
+      files = tmpFile,
+      functions = "data.table::fread",
+      stringsAsFactors = FALSE
+    )
+    sim2 <- simInit(times = times, params = parameters, modules = modules,
+                    paths = paths, inputs = inputs)
+    expect_equal(sim2@.envir[[basename(tmpFile)]], dt)
+
+    inputs <- data.frame(
+      files = tmpFile,
+      functions = "fread",
+      stringsAsFactors = FALSE
+    )
+    try(detach("package:data.table"), silent = TRUE)
+    expect_error(simInit(times = times, params = parameters, modules = modules,
+                    paths = paths, inputs = inputs), "'inputs' often requires")
+    library(data.table)
+    expect_message(simInit(times = times, params = parameters, modules = modules,
+                         paths = paths, inputs = inputs), paste(basename(tmpFile)))
+
   }
 })
 
@@ -289,11 +315,16 @@ test_that("test-load.R: more tests", {
   sim <- simInit()
   test <- 1:10
   tmpFile <- file.path(tmpdir, "test.rds")
-  saveRDS(test, file = tmpFile)
+  save(test, file = tmpFile)
 
   # Test for data.frame being kept as data.frame even with only one column
   expect_silent(inputs(sim) <- data.frame(file = tmpFile))
 
+  bb <- simInit(inputs = data.frame(files = tmpFile, fun = "load"))
+  expect_identical(bb$test, test)
+
+  bb <- simInit(inputs = data.frame(files = tmpFile, fun = "load", package = "base"))
+  expect_identical(bb$test, test)
 
   # Test for incremental loading via intervals
   if (require(rgdal, quietly = TRUE)) {
@@ -341,5 +372,36 @@ test_that("test-load.R: interval loading of objects from .GlobalEnv", {
   end(a) <- 3
   a <- spades(a)
   expect_equal(test1, a$test1)
+
+  # Renamed using arguments
+  times <- 0:10
+  test1 <- "hi"
+  newModule("test", path = tempdir())
+
+  a1 <- 1
+  a2 <- 2
+  args <- lapply(1:2, function(x) {
+    list(x = paste0("a", x),
+         envir = environment())
+  })
+  names(args) <- rep("x", length(args))
+  inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "get", package = "base", arguments = I(args))
+  a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
+  a <- spades(a)
+  expect_identical(a1, a$a)
+
+  end(a) <- 3
+  a <- spades(a)
+  expect_identical(a2, a$a)
+
+  # same, but without package specified
+  inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "get", arguments = I(args))
+  a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
+  a <- spades(a)
+  expect_identical(a1, a$a)
+
+  end(a) <- 3
+  a <- spades(a)
+  expect_identical(a2, a$a)
 
 })
