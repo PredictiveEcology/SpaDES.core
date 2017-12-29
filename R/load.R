@@ -178,11 +178,8 @@ setMethod(
 
           if (is.na(filelist$file[y])) {
             # i.e., only for objects
-            obNam <- strsplit(filelist$objectName[y], split="@|\\$|\\[\\[")[[1]][1]
-            objList <- list(dynGet(obNam))
-
-            # objListEnv <- quickPlot::whereInStack(filelist$objectName[y])
-            # objList <- list(get(filelist$objectName[y], objListEnv))
+            objListEnv <- quickPlot::whereInStack(filelist$objectName[y])
+            objList <- list(get(filelist$objectName[y], objListEnv))
             names(objList) <- filelist$objectName[y]
 
             if (length(objList) > 0) {
