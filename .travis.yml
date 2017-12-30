@@ -1,6 +1,5 @@
 sudo: required
 language: r
-cache: packages
 cran: https://cran.rstudio.com/
 env:
   global:
