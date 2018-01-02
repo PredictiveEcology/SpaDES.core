@@ -307,7 +307,7 @@ setMethod(
                              userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
               }
             } else {
-              message("Running .inputObjects for ", m)
+              message(crayon::green("Running .inputObjects for ", m), sep = "")
               .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
 
               # ensure backwards compatibility with non-namespaced modules
