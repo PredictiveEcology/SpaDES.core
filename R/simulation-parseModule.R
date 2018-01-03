@@ -42,6 +42,11 @@ setMethod(
 #'
 #' @param defineModuleElement Character string indicating which of the list
 #'                            elements in defineModule should be extracted
+#' @param envir Optional environment in which to store parsed code. This may be
+#'              useful if the same file is being parsed multiple times. This
+#'              function will check in that envir for the parsed file before
+#'              parsing again. If the \code{envir} is transient, then this will
+#'              have no effect.
 #'
 #' @author Eliot McIntire
 #' @export
@@ -51,7 +56,7 @@ setMethod(
 #' @rdname parseModule
 #'
 setGeneric(".parseModulePartial",
-           function(sim, modules, filename, defineModuleElement) {
+           function(sim, modules, filename, defineModuleElement, envir = NULL) {
              standardGeneric(".parseModulePartial")
 })
 
@@ -62,18 +67,18 @@ setMethod(
     sim = "missing",
     modules = "missing",
     filename = "character",
-    defineModuleElement = "character"
+    defineModuleElement = "character",
+    envir = "ANY"
   ),
-  definition = function(filename, defineModuleElement) {
-    if (file.exists(filename)) {
-      parsedFile <- parse(filename)
-      defineModuleItem <- grepl(pattern = "defineModule", parsedFile)
-      pf <- parsedFile[defineModuleItem]
+  definition = function(filename, defineModuleElement, envir) {
 
-      namesParsedList <- names(parsedFile[defineModuleItem][[1]][[3]])
+    if (file.exists(filename)) {
+      tmp <- parseConditional(envir = envir, filename = filename) # parse file, conditioned on it
+                                                                  #  not already been done
+      namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
 
       element <- (namesParsedList == defineModuleElement)
-      out <- pf[[1]][[3]][element][[1]]
+      out <- tmp[["pf"]][[1]][[3]][element][[1]]
       out <- tryCatch(
         eval(out),
         error = function(x) out
@@ -91,16 +96,18 @@ setMethod(
     sim = "simList",
     modules = "list",
     filename = "missing",
-    defineModuleElement = "character"
+    defineModuleElement = "character",
+    envir = "ANY"
   ),
-  definition = function(sim, modules, defineModuleElement) {
+  definition = function(sim, modules, defineModuleElement, envir = NULL) {
     out <- list()
     for (j in seq_along(modules)) {
       m <- modules[[j]][1]
       filename <-
         paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
       out[[m]] <- .parseModulePartial(filename = filename,
-                                      defineModuleElement = defineModuleElement)
+                                      defineModuleElement = defineModuleElement,
+                                      envir = envir)
     }
     return(out)
 })
@@ -121,6 +128,7 @@ setMethod(
 #'                             then the \code{.inputObjects} code will be skipped.
 #'
 #' @param notOlderThan Passed to \code{Cache} that may be used for .inputObjects function call.
+#' @inheritParams .parseModulePartial
 #'
 #' @param ... All \code{simInit} parameters.
 #'
@@ -135,20 +143,21 @@ setMethod(
 #' @rdname parseModule
 #'
 setGeneric(".parseModule",
-           function(sim, modules, userSuppliedObjNames = NULL, notOlderThan, ...) {
+           function(sim, modules, userSuppliedObjNames = NULL, envir = NULL,
+                    notOlderThan, ...) {
              standardGeneric(".parseModule")
 })
 
 #' @rdname parseModule
 setMethod(
   ".parseModule",
-  signature(sim = "simList", modules = "list"),
-  definition = function(sim, modules, userSuppliedObjNames, notOlderThan, ...) {
+  signature(sim = "simList", modules = "list", envir = "ANY"),
+  definition = function(sim, modules, userSuppliedObjNames, envir, notOlderThan, ...) {
     all_children <- list()
     children <- list()
     parent_ids <- integer()
     dots <- list(...)
-    if (!is.null(dots$objects)) objs <- dots$objects
+    if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
     for (j in .unparsed(modules)) {
       m <- modules[[j]][1]
       prevNamedModules <- if (!is.null(unlist(sim@depends@dependencies))) {
@@ -158,18 +167,16 @@ setMethod(
       }
       if (!(m %in% prevNamedModules)) { # This is about duplicate named modules
         filename <- paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
-        parsedFile <- parse(filename)
-        defineModuleItem <- grepl(pattern = "defineModule", parsedFile)
+        tmp <- parseConditional(envir = envir, filename = filename)
 
         # duplicate -- put in namespaces location
-        funs <- paste0(m, "Fns") # generic name for hidden environment
-        sim@.envir[[funs]] <- new.env(parent = sim@.envir)
-        eval(parsedFile[!defineModuleItem], envir = sim@.envir[[funs]])
+        sim@.envir[[m]] <- new.env(parent = sim@.envir)
+        eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir[[m]])
 
-        doesntUseNamespacing <- isTRUE(any(grepl(paste0("^", m), ls(sim@.envir[[funs]]))))
+        doesntUseNamespacing <- isTRUE(any(grepl(paste0("^", m), ls(sim@.envir[[m]]))))
         # evaluate the rest of the parsed file
         if (doesntUseNamespacing)
-          eval(parsedFile[!defineModuleItem], envir = sim@.envir)
+          eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir)
 
         # parse any scripts in R subfolder
         RSubFolder <- file.path(dirname(filename), "R")
@@ -180,16 +187,16 @@ setMethod(
             if (doesntUseNamespacing)
               eval(parsedFile1, envir = sim@.envir)
             # duplicate -- put in namespaces location
-            eval(parsedFile1, envir = sim@.envir[[funs]])
+            eval(parsedFile1, envir = sim@.envir[[m]])
           }
         }
 
         # evaluate all but inputObjects and outputObjects part of 'defineModule'
         #  This allow user to use params(sim) in their inputObjects
-        namesParsedList <- names(parsedFile[defineModuleItem][[1]][[3]])
+        namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
         inObjs <- (namesParsedList == "inputObjects")
         outObjs <- (namesParsedList == "outputObjects")
-        pf <- parsedFile[defineModuleItem]
+        pf <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
         pf[[1]][[3]] <- pf[[1]][[3]][!(inObjs | outObjs)]
         sim <- suppressWarnings(eval(pf))
 
@@ -213,7 +220,7 @@ setMethod(
           }
         }
         # override immediately with user supplied values
-        pars <- list(...)$params
+        pars <- list(...)[["params"]]
         if (!is.null(pars[[m]])) {
           if (length(pars[[m]]) > 0) {
             sim@params[[m]][names(pars[[m]])] <- pars[[m]]
@@ -221,7 +228,7 @@ setMethod(
         }
 
         # do inputObjects and outputObjects
-        pf <- parsedFile[defineModuleItem]
+        pf <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
         if (any(inObjs)) {
           sim@depends@dependencies[[i]]@inputObjects <- data.frame(
             rbindlist(fill = TRUE,
@@ -255,15 +262,15 @@ setMethod(
         # If user supplies the needed objects, then test whether all are supplied.
         # If they are all supplied, then skip the .inputObjects code
         cacheIt <- FALSE
-        allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects$objectName %in% userSuppliedObjNames
+        allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in% userSuppliedObjNames
         if (!all(allObjsProvided)) {
-          if (!is.null(sim@.envir[[funs]]$.inputObjects)) {
-            list2env(objs[sim@depends@dependencies[[i]]@inputObjects$objectName[allObjsProvided]],
+          if (!is.null(sim@.envir[[m]][[".inputObjects"]])) {
+            list2env(objs[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                      envir = sim@.envir)
             a <- sim@params[[m]][[".useCache"]]
             if (!is.null(a)) {
-              if (".useCache" %in% names(list(...)$params)) {  # user supplied values
-                b <- list(...)$params[[i]]$.useCache
+              if (".useCache" %in% names(list(...)[["params"]])) {  # user supplied values
+                b <- list(...)[["params"]][[i]][[".useCache"]]
                 if (!is.null(b)) a <- b
               }
               #.useCache is a parameter
@@ -290,17 +297,17 @@ setMethod(
                                                 pattern = m, value = TRUE),
                                            na.omit(objNam))
                 moduleSpecificOutputObjects <- objNam
-                sim <- Cache(FUN = sim@.envir$.inputObjects, sim = sim,
+                sim <- Cache(FUN = sim@.envir[[".inputObjects"]], sim = sim,
                              objects = moduleSpecificObjects,
                              notOlderThan = notOlderThan,
                              outputObjects = moduleSpecificOutputObjects,
                              userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
               } else {
-                moduleSpecificObjects <- c(grep(ls(sim@.envir[[funs]], all.names = TRUE),
+                moduleSpecificObjects <- c(grep(ls(sim@.envir[[m]], all.names = TRUE),
                                                 pattern = m, value = TRUE),
                                            na.omit(objNam))
                 moduleSpecificOutputObjects <- objNam
-                sim <- Cache(FUN = sim@.envir[[funs]]$.inputObjects, sim = sim,
+                sim <- Cache(FUN = sim@.envir[[m]][[".inputObjects"]], sim = sim,
                              objects = moduleSpecificObjects,
                              notOlderThan = notOlderThan,
                              outputObjects = moduleSpecificOutputObjects,
@@ -312,10 +319,10 @@ setMethod(
 
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
-                sim <- sim@.envir$.inputObjects(sim)
+                sim <- sim@.envir[[".inputObjects"]](sim)
                 rm(".inputObjects", envir = sim@.envir)
               } else {
-                sim <- sim@.envir[[funs]]$.inputObjects(sim)
+                sim <- sim@.envir[[m]][[".inputObjects"]](sim)
               }
 
             }
@@ -340,3 +347,25 @@ setMethod(
 
     return(sim)
 })
+
+parseConditional <- function(envir = NULL, filename = character()) {
+  if (!is.null(envir)) {
+    if (is.null(envir[[filename]])) {
+      envir[[filename]] <- new.env(parent = envir)
+      needParse <- TRUE
+    } else {
+      needParse <- FALSE
+    }
+    tmp <- envir[[filename]]
+  } else {
+    tmp <- list()
+    needParse <- TRUE
+  }
+
+  if (needParse) {
+    tmp[["parsedFile"]] <- parse(filename)
+    tmp[["defineModuleItem"]] <- grepl(pattern = "defineModule", tmp[["parsedFile"]])
+    tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
+  }
+  return(tmp)
+}

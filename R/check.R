@@ -161,6 +161,9 @@ setMethod(
       ### check whether each param in simInit occurs in a module's .R file
       globalsFound <- list()
       for (uM in userModules) {
+          tmp <- parseConditional(envir = sim@.envir[[".parsedFiles"]][[paste(path, "/", uM, "/", uM, ".R", sep = "")]],
+                                  filename = paste(path, "/", uM, "/", uM, ".R", sep = ""))
+          deparse(tmp$parsedFile)
         # check global params
         if (length(globalParams) > 0) {
           for (i in 1:length(globalParams)) {

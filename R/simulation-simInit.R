@@ -295,24 +295,33 @@ setMethod(
 
     # create simList object for the simulation
     sim <- new("simList")
+
+    # Make a temporary place to store parsed module files
+    sim@.envir[[".parsedFiles"]] <- new.env(parent = sim@.envir)
+    on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )
+
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
 
-    reqdPkgs <- packages(modules=unlist(modules), path = paths(sim)$modulePath)
+    reqdPkgs <- packages(modules=unlist(modules), path = paths(sim)$modulePath,
+                         envir = sim@.envir[[".parsedFiles"]])
     if (length(unlist(reqdPkgs))) {
       Require(c(unique(unlist(reqdPkgs), "SpaDES.core")))
     }
 
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
-    timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
+    # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
 
     allTimeUnits <- FALSE
 
     findSmallestTU <- function(sim, mods) {
-      out <- lapply(.parseModulePartial(sim, mods, defineModuleElement = "childModules"), as.list)
+      out <- lapply(.parseModulePartial(sim, mods,
+                                        defineModuleElement = "childModules",
+                                        envir = sim@.envir[[".parsedFiles"]]), as.list)
       isParent <- lapply(out, length) > 0
-      tu <- .parseModulePartial(sim, mods, defineModuleElement = "timeunit")
+      tu <- .parseModulePartial(sim, mods, defineModuleElement = "timeunit",
+                                envir = sim@.envir[[".parsedFiles"]])
       hasTU <- !is.na(tu)
       out[hasTU] <- tu[hasTU]
       if (!all(hasTU)) {
@@ -329,7 +338,8 @@ setMethod(
 
     # recursive function to extract parent and child structures
     buildModuleGraph <- function(sim, mods) {
-      out <- lapply(.parseModulePartial(sim, mods, defineModuleElement = "childModules"), as.list)
+      out <- lapply(.parseModulePartial(sim, modules = mods, defineModuleElement = "childModules",
+                                        envir = sim@.envir[[".parsedFiles"]]), as.list)
       isParent <- lapply(out, length) > 0
       to <- unlist(lapply(out, function(x) {
           if (length(x) == 0) {
@@ -400,7 +410,8 @@ setMethod(
     modulesLoaded <- append(modulesLoaded, core)
 
     ## source module metadata and code files
-    lapply(modules(sim), function(m) moduleVersion(m, sim = sim))
+    lapply(modules(sim), function(m) moduleVersion(m, sim = sim,
+                                                   envir = sim@.envir[[".parsedFiles"]]))
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
@@ -408,6 +419,7 @@ setMethod(
       sim <- .parseModule(sim,
                           sim@modules,
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
+                          envir = sim@.envir[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
                           objects = objects, paths = paths)
       if (length(.unparsed(sim@modules)) == 0) {
