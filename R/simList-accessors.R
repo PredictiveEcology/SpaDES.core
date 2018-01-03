@@ -2543,6 +2543,7 @@ setMethod(
 #'             will be taken from getOption("spades.modulePath"), which is set
 #'             with \code{setPaths})
 #'             and \code{filename}, specifying a module filename, are supported.
+#' @inheritParams .parseModulePartial
 #'
 #' @return A sorted character vector of package names.
 #'
@@ -2554,7 +2555,7 @@ setMethod(
 #' @author Alex Chubaty & Eliot McIntire
 #'
 # igraph exports %>% from magrittr
-setGeneric("packages", function(sim, ...) {
+setGeneric("packages", function(sim, modules, paths, filenames, envir, ...) {
   standardGeneric("packages")
 })
 
@@ -2567,7 +2568,7 @@ setMethod(
     pkgs <- lapply(depends(sim)@dependencies, function(x) {
         x@reqdPkgs
       }) %>% unlist() %>% unique()
-    if (!is.null(pkgs)) pkgs <- sort(pkgs)
+      if (!is.null(pkgs)) pkgs <- sort(pkgs)
     return(pkgs)
 })
 
@@ -2584,19 +2585,25 @@ setMethod(
     } else if (any(startsWith(names(args), "module"))) {
       prefix <- if (any(startsWith(names(args), "path"))) {
           args[[pmatch(names(args), x = "path")]]
-        } else {
-          getOption("spades.modulePath")
-        }
+          } else {
+            getOption("spades.modulePath")
+          }
       mods <- args[[pmatch(names(args), x = "module")]]
       paths <- file.path(prefix, mods, paste0(mods, ".R"))
-    } else {
-      stop("one of sim, module, modules, or filename must be supplied.")
-    }
-    pkgs <- lapply(paths, function(path) {
-      pkgs <- .parseModulePartial(filename = path, defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% unique()
-      if (!is.null(pkgs)) {
-        pkgs <- sort(pkgs)
+      } else {
+        stop("one of sim, module, modules, or filename must be supplied.")
+      }
+
+      if (missing(envir)) {
+        envir <- NULL
+      }
+
+      pkgs <- lapply(paths, function(paths) {
+        pkgs <- .parseModulePartial(filename = paths, defineModuleElement = "reqdPkgs",
+                                    envir = envir) %>%
+          unlist() %>% unique()
+        if (!is.null(pkgs)) {
+          pkgs <- sort(pkgs)
       } else {
         pkgs <- character(0)
       }
