@@ -2536,13 +2536,16 @@ setMethod(
 #'
 #' @param sim  A \code{simList} object.
 #'
-#' @param ...  Additional arguments.
-#'             Currently only \code{module} or \code{modules} (via partial matching),
-#'             specifying the name or
-#'             vector of names of module(s) (path
-#'             will be taken from getOption("spades.modulePath"), which is set
+#' @param modules Character vector, specifying the name or
+#'             vector of names of module(s)
+#' @param paths Character vector, specifying the name or
+#'             vector of names of paths(s) for those modules. If path not specified,
+#'             it will be taken from getOption("spades.modulePath"), which is set
 #'             with \code{setPaths})
-#'             and \code{filename}, specifying a module filename, are supported.
+#' @param filenames Character vector specifying filenames of modules (i.e.
+#'                 combined path & module. If this is specified, then \code{modules} and
+#'                 \code{path} are ignored.
+#'
 #' @inheritParams .parseModulePartial
 #'
 #' @return A sorted character vector of package names.
@@ -2563,33 +2566,32 @@ setGeneric("packages", function(sim, modules, paths, filenames, envir, ...) {
 #' @rdname packages
 setMethod(
   "packages",
-  signature(sim = ".simList"),
-  definition = function(sim, ...) {
-    pkgs <- lapply(depends(sim)@dependencies, function(x) {
+  signature(sim = "ANY"),
+  definition = function(sim, modules, paths, filenames, envir, ...) {
+    if (missing(sim)) { # can either have no sim, or can have a sim that is incomplete,
+                        #   i.e., with no reqdPkgs slot filled
+      depsInSim <- list(NULL)
+    } else {
+      depsInSim <- depends(sim)@dependencies
+    }
+
+    if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,
+                                    #  if not NULL, one will be reqdPkgs
+      pkgs <- lapply(depsInSim, function(x) {
         x@reqdPkgs
       }) %>% unlist() %>% unique()
       if (!is.null(pkgs)) pkgs <- sort(pkgs)
-    return(pkgs)
-})
-
-#' @export
-#' @rdname packages
-setMethod(
-  "packages",
-  signature(sim = "missing"),
-  definition = function(sim, ...) {
-    args <- list(...)
-    if (any(startsWith(names(args), "file")))  {
-      paths <- args$filename
-      mods <- sub(basename(paths), replacement = "", pattern = ".R")
-    } else if (any(startsWith(names(args), "module"))) {
-      prefix <- if (any(startsWith(names(args), "path"))) {
-          args[[pmatch(names(args), x = "path")]]
+    } else {
+      if (!missing(filenames))  {
+        paths <- filenames
+        modules <- sub(basename(paths), replacement = "", pattern = ".R")
+      } else if (!missing("modules")) {
+        prefix <- if (!missing("paths")) {
+            paths
           } else {
             getOption("spades.modulePath")
           }
-      mods <- args[[pmatch(names(args), x = "module")]]
-      paths <- file.path(prefix, mods, paste0(mods, ".R"))
+        paths <- file.path(prefix, modules, paste0(modules, ".R"))
       } else {
         stop("one of sim, module, modules, or filename must be supplied.")
       }
@@ -2604,12 +2606,13 @@ setMethod(
           unlist() %>% unique()
         if (!is.null(pkgs)) {
           pkgs <- sort(pkgs)
-      } else {
-        pkgs <- character(0)
-      }
-      pkgs <- pkgs[nzchar(pkgs)]
-      return(pkgs)
-    })
-    names(pkgs) <- mods
+        } else {
+          pkgs <- character(0)
+        }
+        pkgs <- pkgs[nzchar(pkgs)]
+        return(pkgs)
+      })
+      names(pkgs) <- modules
+    }
     return(pkgs)
 })
