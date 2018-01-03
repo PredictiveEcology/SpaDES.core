@@ -288,14 +288,15 @@ setMethod(
             }
 
             if (cacheIt) {
-              objNam <- sim@depends@dependencies[[i]]@outputObjects$objectName
               message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
+              objNam <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+
 
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
                 moduleSpecificObjects <- c(grep(ls(sim@.envir, all.names = TRUE),
                                                 pattern = m, value = TRUE),
-                                           na.omit(objNam))
+                                           na.omit(objNam) )
                 moduleSpecificOutputObjects <- objNam
                 sim <- Cache(FUN = sim@.envir[[".inputObjects"]], sim = sim,
                              objects = moduleSpecificObjects,
