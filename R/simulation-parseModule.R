@@ -281,8 +281,8 @@ setMethod(
             }
 
             if (cacheIt) {
-              message("Using cached copy of .inputObjects for ", m)
               objNam <- sim@depends@dependencies[[i]]@outputObjects$objectName
+              message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
 
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {

@@ -954,7 +954,7 @@ setMethod(
     on.exit(setwd(callingWd), add = TRUE)
     setwd(path)
     zipFileName <- paste0(name, "_", version, ".zip")
-    message(paste("Zipping module into zip file:", zipFileName))
+    message(crayon::green(paste("Zipping module into zip file:", zipFileName)), sep = "")
 
     allFiles <- dir(path = file.path(name), recursive = TRUE, full.names = TRUE)
 

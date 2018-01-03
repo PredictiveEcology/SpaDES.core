@@ -126,7 +126,7 @@ setMethod(
     request <- if (identical(pat, "")) {
       GET(apiurl, ua)
     } else {
-      message("Using GitHub PAT from envvar GITHUB_PAT")
+      message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
       GET(apiurl, ua, config = list(config(token = pat)))
     }
     stop_for_status(request)
@@ -312,7 +312,7 @@ setMethod(
       request <- if (identical(pat, "")) {
         GET(zip, ua, write_disk(localzip))
       } else {
-        message("Using GitHub PAT from envvar GITHUB_PAT")
+        message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
         GET(zip, ua, config = list(config(token = pat)), write_disk(localzip))
       }
       stop_for_status(request)
@@ -355,7 +355,7 @@ setMethod(
     } else {
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
-    message("Download complete for module ", name, ".")
+    message(crayon::magenta("Download complete for module ", name, ".", sep = ""))
 
     return(list(c(files, files2), bind_rows(dataList, dataList2)))
 })
@@ -466,9 +466,9 @@ setMethod(
                  " and local filename be at least somewhat similar.")
           } else {
             id <- fuzzy
-            message("  Used fuzzy matching of filenames. Assuming\n    ",
+            message(crayon::magenta("  Used fuzzy matching of filenames. Assuming\n    ",
                     xFile, " is the source for\n      ",
-                    paste(chksums$expectedFile[id], collapse = ",\n      "))
+                    paste(chksums$expectedFile[id], collapse = ",\n      "), sep = ""))
           }
         }
         if (any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) {
@@ -478,8 +478,8 @@ setMethod(
 
           if (httr::http_error(x)) {
             ## if the URL doesn't work allow the user to retrieve it manually
-            message("Cannot download ", xFile, " for module ", module, ":\n",
-                    "\u2937 cannot open URL '", x, "'.")
+            message(crayon::magenta("Cannot download ", xFile, " for module ", module, ":\n",
+                    "\u2937 cannot open URL '", x, "'.", sep = ""))
 
             if (interactive()) {
               readline(prompt = paste0("Try downloading this file manually and put it in ",
@@ -502,24 +502,25 @@ setMethod(
             ## download if needed, using Cache in case multiple objects use same url
             ## (e.g., in a .tar file)
             if (needNewDownload) {
-              message("Downloading ", basename(x), " for module ", module, ":")
+              message(crayon::magenta("Downloading ", basename(x), " for module ", module, ":", sep = ""))
               Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
               copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
             }
             destfile
           }
         } else {
-          message("  Download data step skipped for ", basename(x),
-                  " in module ", module, ". Local copy exists.")
+          message(crayon::magenta("  Download data step skipped for ", basename(x),
+                  " in module ", module, ". Local copy exists.", sep = ""))
         }
       })
 
       chksums <- checksums(module, path, quickCheck = quickCheck) %>%
         dplyr::mutate(renamed = NA, module = module)
     } else if (NROW(chksums) > 0) {
-      message("  Download data step skipped for module ", module, ". Local copy exists.")
+      message(crayon::magenta("  Download data step skipped for module ", module,
+                              ". Local copy exists.", sep = ""))
     } else {
-      message("  No data to download for module ", module)
+      message(crayon::magenta("  No data to download for module ", module, sep = ""))
     }
 
     # There are at least 2 options if the expected doesn't match actual
@@ -740,7 +741,7 @@ setMethod(
       }
     }
 
-    message("Checking local files...")
+    message(crayon::magenta("Checking local files...", sep = ""))
     filesToCheck <-  if (length(txt$file) & length(files)) {
       files[basename(files) %in% txt$file]
     } else {
@@ -749,8 +750,8 @@ setMethod(
 
     if (is.null(txt$filesize)) {
       quickCheck <- FALSE
-      message("  Not possible to use quickCheck in downloadData;\n ",
-              "    checksums.txt file does not have filesizes")
+      message(crayon::magenta("  Not possible to use quickCheck in downloadData;\n ",
+              "    checksums.txt file does not have filesizes", sep = ""))
     }
     checksums <- rep(list(rep("", length(filesToCheck))), 2)
     if (quickCheck | write) {
@@ -764,7 +765,7 @@ setMethod(
                                 args = append(list(file = filesToCheck, quickCheck = FALSE),
                                               dots))
     }
-    message("Finished checking local files.")
+    message(crayon::magenta("Finished checking local files.", sep = ""))
 
     out <- if (length(filesToCheck)) {
       data.frame(file = basename(filesToCheck), checksum = checksums[[1]],
