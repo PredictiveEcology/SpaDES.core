@@ -2610,6 +2610,7 @@ setMethod(
           pkgs <- character(0)
         }
         pkgs <- pkgs[nzchar(pkgs)]
+        pkgs <- unique(c("SpaDES.core", pkgs))
         return(pkgs)
       })
       names(pkgs) <- modules
