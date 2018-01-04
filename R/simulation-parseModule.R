@@ -171,7 +171,14 @@ setMethod(
 
         # duplicate -- put in namespaces location
         sim@.envir[[m]] <- new.env(parent = sim@.envir)
-        eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir[[m]])
+        # load all code into simList@.envir[[moduleName]]
+        # The simpler line commented below will not allow actual code to be put into module,
+        #  e.g., startSim <- start(sim)
+        #  The more complex one following will allow that.
+        # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir[[m]])
+        activeCode <- list()
+        activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                           sim@.envir[[m]])
 
         doesntUseNamespacing <- isTRUE(any(grepl(paste0("^", m), ls(sim@.envir[[m]]))))
         # evaluate the rest of the parsed file
@@ -184,10 +191,15 @@ setMethod(
         if (length(RScript) > 0) {
           for (Rfiles in RScript) {
             parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
-            if (doesntUseNamespacing)
-              eval(parsedFile1, envir = sim@.envir)
+            if (doesntUseNamespacing) {
+              #eval(parsedFile1, envir = sim@.envir)
+              evalWithActiveCode(parsedFile1, sim@.envir)
+            }
+
             # duplicate -- put in namespaces location
-            eval(parsedFile1, envir = sim@.envir[[m]])
+            #eval(parsedFile1, envir = sim@.envir[[m]])
+            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.envir[[m]])
+
           }
         }
 
@@ -196,12 +208,24 @@ setMethod(
         namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
         inObjs <- (namesParsedList == "inputObjects")
         outObjs <- (namesParsedList == "outputObjects")
-        pf <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
-        pf[[1]][[3]] <- pf[[1]][[3]][!(inObjs | outObjs)]
-        sim <- suppressWarnings(eval(pf))
+        pf <- tmp$pf#tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
+        pf[[1]][[3]] <- pf[[1]][[3]][!(inObjs | outObjs)] # because it is parsed, there is an expression (the [[1]]),
+                                           # then a function with defineModule, sim, and then the list (the [[3]])
+
+        # allows active code e.g., `startSim <- start(sim)` to be parsed, then useable
+        #  inside of the defineModule. First,
+        #  load anything that is active code into an environment whose parent is here (and thus has
+        #  access to sim), then move the depends (only) back to main sim
+        env <- new.env(parent = parent.frame())
+        if (any(unlist(activeCode)))  {
+            list2env(as.list(sim@.envir[[m]]), env)
+        }
+        out <- suppressWarnings(eval(pf, envir = env))
+        for(dep in out@depends@dependencies) {
+          sim <- .addDepends(sim, dep)
+        }
 
         # check that modulename == filename
-        fname <- unlist(strsplit(basename(filename), "[.][r|R]$"))
         k <- length(sim@depends@dependencies)
 
         if (sim@depends@dependencies[[k]]@name == m) {
@@ -228,7 +252,7 @@ setMethod(
         }
 
         # do inputObjects and outputObjects
-        pf <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
+        pf <- tmp$pf # tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
         if (any(inObjs)) {
           sim@depends@dependencies[[i]]@inputObjects <- data.frame(
             rbindlist(fill = TRUE,
@@ -369,4 +393,19 @@ parseConditional <- function(envir = NULL, filename = character()) {
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }
   return(tmp)
+}
+
+evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame()) {
+  ll <- lapply(parsedModuleNoDefineModule,
+               function(x) tryCatch(eval(x, envir = envir), error = function(y) "ERROR"))
+  activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
+
+  if (any(activeCode)) {
+    env <- new.env(parent = parentFrame);
+    aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
+      eval(ac, envir = env)
+    })
+    list2env(as.list(env), envir)
+  }
+  activeCode
 }
