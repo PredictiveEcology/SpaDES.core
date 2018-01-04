@@ -17,6 +17,7 @@ version 0.1.0.9000
 
     - the core DES is now built around lists, rather than data.table. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
     - `.parseModule` and `.parseModuePartial` now put their parsed content into a temporary environment (`sim@.envir$.parsedFiles$<Full Filename>)` during the `simInit`, which gets re-used. Previously, files were parsed multiple times in a given `simInit` call. Several functions now have `envir` argument to pass this through (including `moduleVersion`, `packages`, `checkParams`)
+    
 * remove `grDevices` from Imports as it was not used (#1)
 * remove `chron` and `CircStats` dependencies
 * remove functions `dwrpnorm2` and move to package `SpaDES.tools`
