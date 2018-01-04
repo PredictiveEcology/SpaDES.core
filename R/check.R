@@ -162,11 +162,12 @@ setMethod(
       globalsFound <- list()
       readFile <- list()
       for (uM in userModules) {
-        readFile[[uM]] <- if (!is.null(sim@.envir[[".parsedFiles"]][[paste(path, "/", uM, "/", uM, ".R", sep = "")]])) {
+        filename <- paste(path, "/", uM, "/", uM, ".R", sep = "")
+        readFile[[uM]] <- if (!is.null(sim@.envir[[".parsedFiles"]][[filename]])) {
           # a little faster to use already parsed objects -- might have happened earlier during simInit,
           #   if this checkParams was run from simInit
-          tmp <- parseConditional(envir = sim@.envir[[".parsedFiles"]][[paste(path, "/", uM, "/", uM, ".R", sep = "")]],
-                                  filename = paste(path, "/", uM, "/", uM, ".R", sep = ""))
+          tmp <- parseConditional(envir = sim@.envir[[".parsedFiles"]],
+                                  filename = filename)
           deparse(tmp$parsedFile)
         } else {
           readLines(paste(path, "/", uM, "/", uM, ".R",
