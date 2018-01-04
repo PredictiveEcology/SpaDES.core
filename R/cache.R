@@ -170,10 +170,10 @@ setMethod(
 
         whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
         if (isTRUE(useCacheVals[[whCurrent]])) {
-          cat(crayon::green("Using cached copy of", cur$moduleName, "module\n"), sep = "")
+          cat(crayon::green("Using cached copy of", cur$moduleName, "module\n", sep = ""))
         } else {
-          cat(crayon::green("Using cached copy of", cur$eventType, "event in", cur$moduleName, "module\n"),
-              sep = "")
+          cat(crayon::green("Using cached copy of", cur$eventType, "event in", cur$moduleName, "module\n",
+              sep = ""))
         }
       }
 
