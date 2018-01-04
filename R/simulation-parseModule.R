@@ -328,8 +328,7 @@ setMethod(
                              outputObjects = moduleSpecificOutputObjects,
                              userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
               } else {
-                moduleSpecificObjects <- c(grep(ls(sim@.envir[[m]], all.names = TRUE),
-                                                pattern = m, value = TRUE),
+                moduleSpecificObjects <- c(ls(sim@.envir[[m]], all.names = TRUE),
                                            na.omit(objNam))
                 moduleSpecificOutputObjects <- objNam
                 sim <- Cache(FUN = sim@.envir[[m]][[".inputObjects"]], sim = sim,

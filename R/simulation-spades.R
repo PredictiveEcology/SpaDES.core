@@ -147,9 +147,10 @@ doEvent <- function(sim, debug, notOlderThan) {
 
           if (cacheIt) { # means that a module or event is to be cached
             objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
-            moduleSpecificObjects <- c(grep(ls(sim@.envir, all.names = TRUE),
-                                            pattern = cur[["moduleName"]], value = TRUE),
-                                       na.omit(objNam))
+            moduleSpecificObjects <-
+              c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
+                ls(sim@.envir[[cur[["moduleName"]]]], all.names = TRUE), # functions in the namespaced location
+                na.omit(objNam)) # objects outputted by module
             moduleSpecificOutputObjects <- objNam
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
