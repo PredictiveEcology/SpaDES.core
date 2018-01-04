@@ -655,6 +655,13 @@ setMethod(
 #'                Module developers should write this file prior to distributing
 #'                their module code, and update accordingly when the data change.
 #'
+#' @param checksumFile The filename of the checksums file to read or write to. The default
+#'                     is CHECKSUMS.txt located at
+#'                     \code{file.path(path, module, "data", checksumFile)}. It is likely
+#'                     not a good idea to change this, and should only be used in
+#'                     cases such as
+#'                     \code{Cache}, which can evaluate if the checksumFile has changed.
+#'
 #' @inheritParams downloadData
 #'
 #' @param ...     Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
@@ -686,7 +693,8 @@ setMethod(
 #' checksums(moduleName, modulePath, write = TRUE)
 #' }
 #'
-setGeneric("checksums", function(module, path, write, quickCheck = FALSE, ...) {
+setGeneric("checksums", function(module, path, write, quickCheck = FALSE,
+                                 checksumFile = file.path(path, "CHECKSUMS.txt"), ...) {
   standardGeneric("checksums")
 })
 
@@ -696,12 +704,12 @@ setGeneric("checksums", function(module, path, write, quickCheck = FALSE, ...) {
 setMethod(
   "checksums",
   signature = c(module = "character", path = "character", write = "logical"),
-  definition = function(module, path, write, quickCheck, ...) {
+  definition = function(module, path, write, quickCheck, checksumFile, ...) {
     defaultHashAlgo <- "xxhash64"
     defaultWriteHashAlgo <- "xxhash64"
     dots <- list(...)
     path <- checkPath(path, create = FALSE) %>% file.path(., module, "data")
-    checksumFile <- file.path(path, "CHECKSUMS.txt")
+    #checksumFile <- file.path(path, "CHECKSUMS.txt")
 
     if (!write) {
       stopifnot(file.exists(checksumFile))
