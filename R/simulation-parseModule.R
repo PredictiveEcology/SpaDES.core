@@ -315,42 +315,41 @@ setMethod(
 
             if (cacheIt) {
               message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
-              objNam <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+              moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
 
-
+              #browser(expr = m == "LBMR")
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
-                moduleSpecificObjects <- c(grep(ls(sim@.envir, all.names = TRUE),
+                objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
                                                 pattern = m, value = TRUE),
-                                           na.omit(objNam) )
-                moduleSpecificOutputObjects <- objNam
-                sim <- Cache(FUN = sim@.envir[[".inputObjects"]], sim = sim,
-                             objects = moduleSpecificObjects,
-                             notOlderThan = notOlderThan,
-                             outputObjects = moduleSpecificOutputObjects,
-                             userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
+                                           na.omit(moduleSpecificInputObjects) )
+                .inputObjects <- sim@.envir[[".inputObjects"]]
               } else {
-                moduleSpecificObjects <- c(ls(sim@.envir[[m]], all.names = TRUE),
-                                           na.omit(objNam))
-                moduleSpecificOutputObjects <- objNam
-                sim <- Cache(FUN = sim@.envir[[m]][[".inputObjects"]], sim = sim,
-                             objects = moduleSpecificObjects,
-                             notOlderThan = notOlderThan,
-                             outputObjects = moduleSpecificOutputObjects,
-                             userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
+                # moduleSpecificObjs <- ls(sim@.envir[[m]], all.names = TRUE)
+                # moduleSpecificObjs <- paste(m, moduleSpecificObjs, sep = ":")
+                moduleSpecificObjs <- paste(m, ".inputObjects", sep = ":")
+                objectsToEvaluateForCaching <- c(moduleSpecificObjs)#,
+                                           #na.omit(moduleSpecificInputObjects))
+                .inputObjects <- sim@.envir[[m]][[".inputObjects"]]
               }
+              sim <- Cache(FUN = .inputObjects, sim = sim,
+                           objects = objectsToEvaluateForCaching,
+                           notOlderThan = notOlderThan,
+                           outputObjects = moduleSpecificInputObjects,
+                           userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
+
             } else {
               message(crayon::green("Running .inputObjects for ", m, sep = ""))
               .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
 
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
-                sim <- sim@.envir[[".inputObjects"]](sim)
+                .inputObjects <- sim@.envir[[".inputObjects"]]
                 rm(".inputObjects", envir = sim@.envir)
               } else {
-                sim <- sim@.envir[[m]][[".inputObjects"]](sim)
+                .inputObjects <- sim@.envir[[m]][[".inputObjects"]]
               }
-
+              sim <- .inputObjects(sim)
             }
           }
         }
