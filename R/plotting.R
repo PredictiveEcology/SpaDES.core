@@ -44,7 +44,7 @@ setMethod(
     if (any(plotables)) {
       plotObjects <- mget(plotList[plotables], sim@.envir) %>%
         append(., list(env = sim@.envir))
-      do.call(Plot, plotObjects)
+      Plot(plotObjects)
     }
   })
 
