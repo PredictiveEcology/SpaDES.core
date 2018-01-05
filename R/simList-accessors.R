@@ -2579,7 +2579,7 @@ setMethod(
                                     #  if not NULL, one will be reqdPkgs
       pkgs <- lapply(depsInSim, function(x) {
         x@reqdPkgs
-      }) %>% unlist() %>% unique()
+      }) %>% unlist() %>% c("SpaDES.core") %>% unique()
       if (!is.null(pkgs)) pkgs <- sort(pkgs)
     } else {
       if (!missing(filenames))  {
