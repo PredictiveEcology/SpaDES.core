@@ -143,7 +143,7 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                     capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time()))))
+                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time()))))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time())
   dev.off()
 
@@ -228,4 +228,97 @@ test_that("test .prepareOutput", {
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
 
   clearCache(tmpdir)
+})
+
+test_that("test .robustDigest for simLists", {
+  library(igraph)
+  library(reproducible)
+
+  tmpdir <- tempdir()
+  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    setwd(cwd)
+    detach("package:reproducible")
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  modName <- "test"
+  newModule(modName, path = tmpdir)
+  fileName <- file.path(modName, paste0(modName,".R"))
+  newCode <- "\"hi\"" # this will be added below in 2 different spots
+
+  args = list(modules = list("test"),
+              paths = list(modulePath = tmpdir, cachePath = tmpCache),
+              params = list(test = list(.useCache = ".inputObjects")))
+
+  try(clearCache(x = tmpCache), silent = TRUE)
+
+  expect_message(do.call(simInit, args),
+                 regexp = "Using or creating cached copy",
+                 all = TRUE)
+  expect_message(do.call(simInit, args),
+                 regexp = "Using or creating cached copy|loading cached result",
+                 all = TRUE)
+
+
+  # make change to .inputObjects code -- should rerun .inputObjects
+  xxx <- readLines(fileName)
+  startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
+  editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
+  editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine]
+  xxx[editBelowLine + 1] <- newCode
+  cat(xxx, file = fileName, sep = "\n")
+
+  expect_message(do.call(simInit, args),
+                 regexp = "Using or creating cached copy",
+                 all = TRUE)
+  expect_message(do.call(simInit, args),
+                 regexp = "Using or creating cached copy|loading cached result",
+                 all = TRUE)
+
+  # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
+  xxx <- readLines(fileName)
+  startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
+  editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
+  editBelowLine <- editBelowLines[editBelowLines < startOfFunctionLine][1]
+  xxx[editBelowLine + 1] <- newCode
+  cat(xxx, file = fileName, sep = "\n")
+
+  expect_message(do.call(simInit, args),
+                 regexp = "Using or creating cached copy|loading cached result",
+                 all = TRUE)
+
+
+  # In some other location, test during spades call
+  newModule(modName, path = tmpdir)
+  try(clearCache(x = tmpCache), silent = TRUE)
+  args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
+  bbb <- do.call(simInit, args)
+  expect_silent(spades(bbb))
+  expect_output(spades(bbb),
+                 regexp = "Using cached copy of init",
+                 all = TRUE)
+
+  # make a change in Init function
+  xxx <- readLines(fileName)
+  startOfFunctionLine <- grep(xxx, pattern = "^Init")
+  editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
+  editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine][1]
+  xxx[editBelowLine + 1] <- newCode
+  cat(xxx, file = fileName, sep = "\n")
+
+  bbb <- do.call(simInit, args)
+  expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
+
+  # should NOT use Cached copy, so no message
+  expect_silent(spades(bbb))
+  expect_output(spades(bbb),
+                regexp = "Using cached copy of init",
+                all = TRUE)
+
+
 })

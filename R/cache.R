@@ -23,9 +23,10 @@ if (!isGeneric(".robustDigest")) {
 #' @author Eliot Mcintire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
-#' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst
+#' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst .orderDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
+#' @aliases Cache
 #' @rdname robustDigest
 #' @seealso \code{\link[reproducible]{.robustDigest}}
 #'
@@ -34,15 +35,48 @@ setMethod(
   signature = "simList",
   definition = function(object, objects, compareRasterFileLength, algo,
                         digestPathContent, classOptions) {
-    allObjs <- ls(object@.envir, all.names = TRUE)
-    objectsToDigest <- sort(allObjs, method = "radix")
-    if (!missing(objects)) {
+    outerObjs <- ls(object@.envir, all.names = TRUE)
+    moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.envir)
+    moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
+    allObjsInSimList <- append(list(".envir" = outerObjs), moduleObjs)
+    allEnvsInSimList <- append(list(object@.envir), moduleEnvirs)
+
+    ord <- .orderDotsUnderscoreFirst(allObjsInSimList)
+    allObjsInSimList <- allObjsInSimList[ord]
+    allEnvsInSimList <- allEnvsInSimList[ord]
+
+    isObjectEmpty <- if (!missing(objects)) {
       if (!is.null(objects)) {
-        objectsToDigest <- objectsToDigest[objectsToDigest %in% objects]
+        FALSE
+      } else {
+        TRUE
       }
+    } else {
+      TRUE
+    }
+    if (!isObjectEmpty) {
+      # objects may be provided in a namespaced format: modName:objName -- e.g. coming from .parseModule
+      objects1 <- strsplit(objects, split = ":")
+      lens <- unlist(lapply(objects1, length))
+      objects1ByMod <- unlist(lapply(objects1[lens>1], function(x) x[1]))
+      mods <- unique(objects1ByMod)
+      objects2 <- lapply(mods, function(mod) {
+        unlist(lapply(objects1[lens>1][objects1ByMod == mod], function(x) x[[2]]))
+      })
+      names(objects2) <- mods
+      objects <- append(list(".envir" = unlist(objects1[lens==1])), objects2)
+    } else {
+      objects <- allObjsInSimList
     }
 
-    envirHash <- .robustDigest(mget(objectsToDigest, envir = object@.envir))
+    envirHash <- lapply(seq(allObjsInSimList), function(objs) {
+      objectsToDigest <- sort(allObjsInSimList[[objs]], method = "radix")
+      objectsToDigest <- objectsToDigest[objectsToDigest %in% objects[[names(allObjsInSimList)[objs]]]]
+      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]))
+    })
+    names(envirHash) = names(allObjsInSimList)
+    lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
+    envirHash <- envirHash[lens]
 
     # Copy all parts except environment, clear that, then convert to list
     object <- Copy(object, objects = FALSE, queues = FALSE)
