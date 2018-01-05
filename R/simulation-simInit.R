@@ -8,17 +8,42 @@ if (getRversion() >= "3.1.0") {
 #' Create a new simulation object, the "sim" object. This object is implemented
 #' using an \code{environment} where all objects and functions are placed.
 #' Since environments in \code{R} are
-#' pass by reference, "putting" objects in the sim object does no actual copy. This
-#' is also the location of all parameters, and other important simulation information, such
+#' pass by reference, "putting" objects in the sim object does no actual copy. The
+#' \code{simList} also stores all parameters,
+#' and other important simulation information, such
 #' as times, paths, modules, and module load order. See more details below.
 #'
-#' Calling this simInit function does several things including the following:
-#' - sources all module files, placing all function definitions in the sim object
-#' - optionally copies objects from the global environment to the sim object
-#' - optionally loads objects from disk
-#' - schedules all "init" events from all modules
-#' - assesses module dependencies via the inputs and outputs identified in their metadata
-#' - determines time units of modules and how they fit together
+#' \subsection{Calling this \code{simInit} function does the following:}{
+#'   \tabular{lll}{
+#'   \bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
+#'   fills \code{simList} slots \tab places the arguments \code{times},
+#'     \code{params}, \code{modules}, \code{paths} into equivalently named
+#'     \code{simList} slots \tab \code{times},
+#'     \code{params}, \code{modules}, \code{paths}\cr
+#'   sources all module files \tab places all function definitions in the
+#'     \code{simList}, specifically, into a sub-environment of the main
+#'     \code{simList} environment: e.g., \code{sim$<moduleName>$function1}
+#'     (see section on \bold{Scoping}) \tab \code{modules} \cr
+#'   copies objects \tab from the global environment to the
+#'     \code{simList} environment \tab \code{objects} \cr
+#'   loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
+#'   schedule object loading/copying \tab Objects can be loaded into the
+#'     \code{simList} at any time during a simulation  \tab \code{inputs} \cr
+#'   schedule object saving \tab Objects can be saved to disk at any arbitrary
+#'     time during the simulation. If specified here, this will be in addition
+#'     to any saving due code inside a module (i.e., a module may manually
+#'     run \code{write.table(...)} \tab \code{outputs} \cr
+#'   schedules "init" events \tab from all modules (see \code{\link{events}})
+#'        \tab automatic  \cr
+#'   assesses module dependencies \tab via the inputs and outputs identified in their
+#'     metadata. This gives the order of the \code{.inputObjects} and \code{init}
+#'     events. This can be overridden by \code{loadOrder}. \tab automatic \cr
+#'   determines time unit \tab takes time units of modules
+#'       and how they fit together \tab \code{times} or automatic \cr
+#'   runs \code{.inputObjects} functions \tab from every module
+#'     \emph{in the module order as determined above} \tab automatic
+#'   }
+#' }
 #'
 #' \code{params} can only contain updates to any parameters that are defined in
 #' the metadata of modules. Take the example of a module named, \code{Fire}, which
@@ -49,11 +74,17 @@ if (getRversion() >= "3.1.0") {
 #'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
 #' }
 #'
+#' @section Caching:
+#'
+#' Using caching with \code{SpaDES} is vital when building re-useable and reproducible
+#' content. Please see the vignette dedicated to this topic. See
+#' \url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html}
+#'
 #' @note
-#' The user can opt to run a simpler simInit call without inputs, outputs, and times.
+#' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
 #' These can be added later with the accessor methods (See example). These are not required for initializing the
 #' simulation via simInit. \code{modules}, \code{paths}, \code{params}, and \code{objects}
-#' are all needed for initialization.
+#' are all needed for successful initialization.
 #'
 #' @param times A named list of numeric simulation start and end times
 #'        (e.g., \code{times = list(start = 0.0, end = 10.0)}).
@@ -100,10 +131,12 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param notOlderThan A time, as in from \code{Sys.time()}. This is passed into
 #'                     the \code{Cache} function that wraps \code{.inputObjects}.
-#'                     If the module has a parameter, \code{.useCache} and it is
-#'                     \code{TRUE}, then the \code{.inputObjects} will be cached.
-#'                     Passing the current time into to \code{notOlderThan} will cause the
-#'                     Cache to be refreshed, i.e., rerun.
+#'                     If the module uses the \code{.useCache} parameter and it is
+#'                     set to \code{TRUE} or \code{".inputObjects"},
+#'                     then the \code{.inputObjects} will be cached.
+#'                     Setting \code{notOlderThan = Sys.time()} will cause the
+#'                     cached versions of \code{.inputObjects} to be refreshed,
+#'                     i.e., rerun.
 #'
 #' @return A \code{simList} simulation object, pre-initialized from values
 #' specified in the arguments supplied.
@@ -136,7 +169,7 @@ if (getRversion() >= "3.1.0") {
 #'  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' )
-#' spades(mySim, .plotInitialTime = NA)
+#' spades(mySim) # shows plotting
 #'
 #' # Change more parameters, removing plotting
 #' mySim <- simInit(
