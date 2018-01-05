@@ -303,7 +303,7 @@ setMethod(
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
 
-    reqdPkgs <- packages(modules=unlist(modules), path = paths(sim)$modulePath,
+    reqdPkgs <- packages(modules=unlist(modules), paths = paths(sim)$modulePath,
                          envir = sim@.envir[[".parsedFiles"]])
     if (length(unlist(reqdPkgs))) {
       Require(c(unique(unlist(reqdPkgs), "SpaDES.core")))
