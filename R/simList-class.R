@@ -208,5 +208,6 @@ setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object) {
             .Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
+            attr(.Object@.envir, "name") <- "sim"
             return(.Object)
 })

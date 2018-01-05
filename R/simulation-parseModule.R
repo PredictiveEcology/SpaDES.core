@@ -171,6 +171,8 @@ setMethod(
 
         # duplicate -- put in namespaces location
         sim@.envir[[m]] <- new.env(parent = sim@.envir)
+        attr(sim@.envir[[m]], "name") <- m
+
         # load all code into simList@.envir[[moduleName]]
         # The simpler line commented below will not allow actual code to be put into module,
         #  e.g., startSim <- start(sim)
