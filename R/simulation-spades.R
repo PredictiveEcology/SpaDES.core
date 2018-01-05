@@ -412,7 +412,12 @@ scheduleEvent <- function(sim,
 #'
 #' @return Invisibly returns the modified \code{simList} object.
 #'
-#' @seealso \code{\link{simInit}}, \code{\link{SpaDES.core-package}}, \code{\link[reproducible]{Cache}}
+#' @seealso \code{\link{SpaDES.core-package}},
+#' \code{\link{experiment}} for using replication with \code{spades},
+#' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
+#' \url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html} which
+#' uses \code{\link[reproducible]{Cache}}.
+#'
 #'
 #' @details
 #' The is the workhorse function in the SpaDES package. It runs simulations by
@@ -459,8 +464,6 @@ scheduleEvent <- function(sim,
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
 #' @rdname spades
-#' @seealso \code{\link{experiment}} for using replication with \code{spades}.
-#'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Fransisco, CA: No Starch Press, Inc..
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
