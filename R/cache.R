@@ -168,7 +168,16 @@ setMethod(
         paste0("function:spades")
       ) # add this because it will be an outer function, if there are events occurring
     } else {
-      userTags <- NULL
+      scalls <- sys.calls()
+      parseModuleFrameNum <- grep(scalls, pattern = "(^.parseModule)")[2]
+      if (!is.na(parseModuleFrameNum)) {
+        inObj <- grepl(scalls, pattern = ".inputObjects")
+        if (any(!is.na(inObj))) {
+          userTags <- c("function:.inputObjects")
+        }
+      } else {
+        userTags <- NULL
+      }
     }
     userTags
   })
