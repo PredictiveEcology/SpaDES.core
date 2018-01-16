@@ -160,6 +160,12 @@ setMethod(
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
     for (j in .unparsed(modules)) {
       m <- modules[[j]][1]
+      sim@current$moduleName <- m
+      sim@current$eventType <- ".inputObjects"
+      on.exit({
+        sim@current <- list()
+        return(sim)
+      })
       prevNamedModules <- if (!is.null(unlist(sim@depends@dependencies))) {
         unlist(lapply(sim@depends@dependencies, function(x) slot(x, "name")))
       } else {
