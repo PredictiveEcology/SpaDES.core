@@ -174,6 +174,9 @@ setMethod(
         inObj <- grepl(scalls, pattern = ".inputObjects")
         if (any(!is.na(inObj))) {
           userTags <- c("function:.inputObjects")
+          userTags1 <- tryCatch(paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
+                                error = function(x) NULL)
+          userTags <- c(userTags, userTags1)
         }
       } else {
         userTags <- NULL
