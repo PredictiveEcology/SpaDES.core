@@ -160,12 +160,13 @@ setMethod(
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
     for (j in .unparsed(modules)) {
       m <- modules[[j]][1]
-      sim@current$moduleName <- m
-      sim@current$eventType <- ".inputObjects"
-      on.exit({
-        sim@current <- list()
-        return(sim)
-      })
+      newEventList <- list(
+        eventTime = start(sim),
+        moduleName = m,
+        eventType = ".inputObjects",
+        eventPriority = .normal()
+      )
+      sim@current <- newEventList
       prevNamedModules <- if (!is.null(unlist(sim@depends@dependencies))) {
         unlist(lapply(sim@depends@dependencies, function(x) slot(x, "name")))
       } else {
@@ -342,7 +343,8 @@ setMethod(
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
                            outputObjects = moduleSpecificInputObjects,
-                           userTags = c(paste0("module:",m),paste0("eventType:.inputObjects")))
+                           userTags = c(paste0("module:",m),paste0("eventType:.inputObjects",
+                                                                   "function:.inputObjects")))
 
             } else {
               message(crayon::green("Running .inputObjects for ", m, sep = ""))
@@ -375,7 +377,7 @@ setMethod(
       append_attr(modules, all_children)
     } %>%
       unique()
-
+    sim@current <- list()
     return(sim)
 })
 
