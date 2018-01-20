@@ -105,8 +105,10 @@ doEvent <- function(sim, debug, notOlderThan) {
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
             fnEnv <- sim@.envir[[cur[["moduleName"]]]] # paste0(cur[["moduleName"]], "Fns")]]
             if(is.environment(fnEnv)) {
-              debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
-              on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+              if (all(debug %in% cur[c("moduleName", "eventType")])) {
+                debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+                on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+              }
             }
           } else if (!any(debug[[i]] == c("browser"))) {
 
