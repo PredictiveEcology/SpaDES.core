@@ -1829,6 +1829,33 @@ setReplaceMethod(
     return(sim)
 })
 
+
+#################
+#' @description
+#' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
+#' \code{dataPath}, like \code{currentModule},is namespaced. This means that when
+#' it is used inside a module, then it will return \emph{that model-specific} information.
+#' For instance, if used inside a module called \code{"movingAgent"},
+#' then \code{currentModule(sim)}
+#' will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
+#' \code{file.path(modulePath(sim), "movingAgent", "data")}
+#'
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("dataPath", function(sim) {
+  standardGeneric("dataPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setMethod("dataPath",
+          signature = ".simList",
+          definition = function(sim) {
+            return(file.path(modulePath(sim), currentModule(sim), "data"))
+          })
+
 ################################################################################
 #' Time usage in \code{SpaDES}
 #'
@@ -2232,7 +2259,9 @@ setMethod(
 #' Simulation event lists
 #'
 #' Accessor functions for the \code{events} and \code{completed} slots of a
-#' \code{simList} object.
+#' \code{simList} object. These path functions will extract the values that were
+#' provided to the \code{simInit} function in the \code{path} argument.
+#'
 #' By default, the event lists are shown when the \code{simList} object is printed,
 #' thus most users will not require direct use of these methods.
 #' \tabular{ll}{

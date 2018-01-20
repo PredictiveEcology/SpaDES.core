@@ -66,15 +66,17 @@ Returns or sets the value of the slot from the \code{simList} object.
 }
 \description{
 Accessor functions for the \code{events} and \code{completed} slots of a
-\code{simList} object.
+\code{simList} object. These path functions will extract the values that were
+provided to the \code{simInit} function in the \code{path} argument.
+}
+\details{
 By default, the event lists are shown when the \code{simList} object is printed,
 thus most users will not require direct use of these methods.
 \tabular{ll}{
    \code{events} \tab Scheduled simulation events (the event queue).\cr
    \code{completed} \tab Completed simulation events.\cr
 }
-}
-\details{
+
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \note{

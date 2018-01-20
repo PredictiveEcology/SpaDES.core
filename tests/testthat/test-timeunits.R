@@ -199,4 +199,22 @@ test_that("timeunits with child and parent modules work correctly", {
   # If parent has NA for timeunit, then take smallest of children
   mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month") # because par1 is month, grandpar1 is NA
+
+
+  ### Tese dataPath and currentModule function, which is namespaced
+  xxx <- readLines(fileName)
+  initLine <- grep(xxx, pattern = "Init\\(sim\\)")
+  xxx1 <- c(xxx[seq(initLine)], "  sim$dp <- dataPath(sim)",
+            "  sim$cm <- currentModule(sim)", xxx[seq(length(xxx)-initLine)+initLine],
+            "  cm1 <- currentModule(sim)", "  dp1 <- dataPath(sim)")
+  cat(xxx1, file = fileName, sep = "\n")
+  mySim <- simInit(modules = list(dirname(fileName)), paths = list(modulePath = tmpdir))
+  expect_true(mySim[[dirname(fileName)]]$cm1 == file.path(dirname(fileName)))
+  expect_true(mySim[[dirname(fileName)]]$dp1 == file.path(dirname(fileName), "data"))
+
+
+  mySimOut <- spades(mySim)
+  expect_true(mySimOut$dp == file.path(dirname(fileName), "data"))
+  expect_true(mySimOut$cm == file.path(dirname(fileName)))
+
 })

@@ -36,6 +36,7 @@ version 0.1.0.9000
 * convert `P` to a function, rather than S4 generic and method, for speed.
 * importFrom only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
 * new function `remoteFileSize` to check the size of remote files
+* new namespaced function `dataPath` will return `file.path(modulePath(sim), currentModule(sim), "data")`, which will return a different path, depending on which module it is placed inside.
 * add crayon to imports -- now messages are more colour coded
 * bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object
 
