@@ -191,7 +191,7 @@ test_that("timeunits with child and parent modules work correctly", {
   cat(xxx1, file = fileName, sep = "\n")
 
   suppressMessages(newModule("child6", tmpdir, open = FALSE))
-  fileName <- "child6/child6.R"
+  fileName <- file.path(tmpdir, "child6/child6.R")
   xxx <- readLines(fileName)
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = "timeunit = NA") # nolint
   cat(xxx1, file = fileName, sep = "\n")
@@ -203,18 +203,18 @@ test_that("timeunits with child and parent modules work correctly", {
 
   ### Tese dataPath and currentModule function, which is namespaced
   xxx <- readLines(fileName)
+  modName <- basename(dirname(fileName))
   initLine <- grep(xxx, pattern = "Init\\(sim\\)")
   xxx1 <- c(xxx[seq(initLine)], "  sim$dp <- dataPath(sim)",
             "  sim$cm <- currentModule(sim)", xxx[seq(length(xxx)-initLine)+initLine],
             "  cm1 <- currentModule(sim)", "  dp1 <- dataPath(sim)")
   cat(xxx1, file = fileName, sep = "\n")
-  mySim <- simInit(modules = list(dirname(fileName)), paths = list(modulePath = tmpdir))
-  expect_true(mySim[[dirname(fileName)]]$cm1 == file.path(dirname(fileName)))
-  expect_true(mySim[[dirname(fileName)]]$dp1 == file.path(dirname(fileName), "data"))
-
+  mySim <- simInit(modules = list(modName), paths = list(modulePath = tmpdir))
+  expect_true(mySim[[modName]]$cm1 == file.path(modName))
+  expect_true(mySim[[modName]]$dp1 == file.path(dirname(fileName), "data"))
 
   mySimOut <- spades(mySim)
   expect_true(mySimOut$dp == file.path(dirname(fileName), "data"))
-  expect_true(mySimOut$cm == file.path(dirname(fileName)))
+  expect_true(mySimOut$cm == file.path(modName))
 
 })
