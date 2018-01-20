@@ -37,7 +37,7 @@ test_that("test cache", {
   expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
-  expect_true(NROW(out) == 16) # will become 15 with new experiment caching stuff
+  expect_true(NROW(out[tagKey != "otherFunctions"]) == 16) #
   expect_message(sims <- Cache(experiment, mySim, replicates = 2, cache = TRUE),
                  "loading cached result from previous spades call")
 
