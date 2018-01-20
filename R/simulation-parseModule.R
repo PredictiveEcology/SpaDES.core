@@ -362,6 +362,17 @@ setMethod(
           }
         }
       } else {
+        alreadyIn <- names(sim@depends@dependencies) %in% m
+        if (any(alreadyIn)) {
+          children <- as.list(sim@depends@dependencies[[which(alreadyIn)]]@childModules) %>%
+            lapply(., `attributes<-`, list(parsed = FALSE))
+          all_children <- append_attr(all_children, children)
+        }
+        # remove parent module from the list
+        if (length(children)) {
+          parent_ids <- c(parent_ids, which(unlist(modules(sim))==m))
+        }
+
         message("Duplicate module, ",m,", specified. Skipping loading it twice.")
       }
 
