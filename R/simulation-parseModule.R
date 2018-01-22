@@ -339,10 +339,16 @@ setMethod(
                                            #na.omit(moduleSpecificInputObjects))
                 .inputObjects <- sim@.envir[[m]][[".inputObjects"]]
               }
-              sim <- Cache(FUN = .inputObjects, sim = sim,
+
+              args <- as.list(formals(.inputObjects))
+              env <- environment()
+              args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
+              args[["sim"]] <- sim
+
+              sim <- Cache(FUN = do.call, .inputObjects, args = args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
-                           outputObjects = moduleSpecificInputObjects,
+                           outputObjects = moduleSpecificInputObjects, digestPathContent = TRUE,
                            userTags = c(paste0("module:",m),paste0("eventType:.inputObjects",
                                                                    "function:.inputObjects")))
 

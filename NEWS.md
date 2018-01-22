@@ -31,6 +31,7 @@ version 0.1.0.9000
     - in `zipModule` that omitted the checksum file from being included when `data = FALSE` (#3)
     - caching of `.inputObjects` functions was evaluating outputObjects instead of inputObjects. Now corrected.
 
+* If `.inputObjects` contains arguments other than just sim, these will be evaluated as function inputs by the Cache mechanism (via .useCache), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in `asPath`, then any change to the underlying file will cause a re-cache.  e.g., `.inputObjects <- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }`
 * default `debug` option in `spades()` now uses the package option `spades.debug` and default is set to `FALSE` (#5)
 * various other speed improvements and bug fixes
 * convert `P` to a function, rather than S4 generic and method, for speed.
