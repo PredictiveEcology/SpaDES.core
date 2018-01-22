@@ -529,8 +529,6 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
-    # The event queues are not uncopied data.tables, for speed during simulation
-    #  Must, therefore, break connection between spades calls
     .pkgEnv$searchPath <- search()
 
     # timeunits gets accessed every event -- this should only be needed once per simList

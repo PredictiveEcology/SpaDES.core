@@ -85,10 +85,11 @@ setMethod(
     # Replace the .list slot with the hashes of the slots
     object@.list <- envirHash
 
-    # Remove paths as they are system dependent and not relevant for digest
+    # Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
     #  i.e., if the same file is located in a different place, that is ok
-    object@paths <- .robustDigest(lapply(object@paths, asPath),
-                                  digestPathContent = digestPathContent)
+    object@paths <- list()
+    #object@paths <- .robustDigest(lapply(object@paths, asPath),
+    #                              digestPathContent = digestPathContent)
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
