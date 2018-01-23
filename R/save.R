@@ -18,7 +18,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   } else if (eventType == "later") {
     sim <- saveFiles(sim)
   } else if (eventType == "end") {
-    message(paste0("Files saved. Use outputs(your simList) for details"))
+    message(crayon::green(paste0("Files saved. Use outputs(your simList) for details")), sep = "")
   }
 
   return(invisible(sim))

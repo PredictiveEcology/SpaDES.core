@@ -211,26 +211,27 @@ setMethod(
 
     cat("
 # Everything in this file gets sourced during simInit, and all functions and objects
-# are put into the simList. To use objects and functions, use sim$xxx.
+# are put into the simList. To use objects, use sim$xxx, and are thus globally available
+# to all modules. Functions can be used without sim$ as they are namespaced, like functions
+# in R packages. If exact location is required, functions will be: sim$<moduleName>$FunctionName
 defineModule(sim, list(
   name = \"", name, "\",
-  description = \"insert module description here\",
-  keywords = c(\"insert key words here\"),
+  description = ", moduleDefaults$description, ", #\"insert module description here\",
+  keywords = ", moduleDefaults$keywords, ", # c(\"insert key words here\"),
   authors = ", getOption("devtools.desc.author",
                          "c(person(c(\"First\", \"Middle\"), \"Last\", email = \"email@example.com\", role = c(\"aut\", \"cre\")))"), ",
   childModules = ", children_char, ",
   version = list(SpaDES.core = \"", as.character(utils::packageVersion("SpaDES.core")), "\", ",
         name, " = \"0.0.1\"", if (type == "parent") paste0(", ", children, " = \"0.0.1\""),
         "),
-  ",
-  if (type == "child") "spatialExtent = raster::extent(rep(NA_real_, 4)),
-  timeframe = as.POSIXlt(c(NA, NA)),
-  ",
-  "timeunit = \"year\"," ,"
+  ", if (type == "child") {paste0("spatialExtent = ", deparse(moduleDefaults$extent) ,",")},
+  "
+  timeframe = ", deparse(moduleDefaults$timeframe), ",
+  timeunit = ", deparse(moduleDefaults$timeunit), ",","
   citation = list(\"citation.bib\"),
   documentation = list(\"README.txt\", \"", name, ".Rmd\")",
-  if (type == "child") ",
-  reqdPkgs = list(),
+  if (type == "child") {paste0(",
+  reqdPkgs = ", deparse(moduleDefaults$reqdPkgs), ",
   parameters = rbind(
     #defineParameter(\"paramName\", \"paramClass\", value, min, max, \"parameter description\"),
     defineParameter(\".plotInitialTime\", \"numeric\", NA, NA, NA, \"This describes the simulation time at which the first plot event should occur\"),
@@ -246,7 +247,7 @@ defineModule(sim, list(
   outputObjects = bind_rows(
     #createsOutput(\"objectName\", \"objectClass\", \"output object description\", ...),
     createsOutput(objectName = NA, objectClass = NA, desc = NA)
-  )","
+  )")},"
 ))\n",
       file = filenameR, fill = FALSE, sep = "")
 
@@ -387,7 +388,7 @@ Event2 <- function(sim) {
   return(invisible(sim))
 }
 
-.inputObjects = function(sim) {
+.inputObjects <- function(sim) {
   # Any code written here will be run during the simInit for the purpose of creating
   # any objects required by this module and identified in the inputObjects element of defineModule.
   # This is useful if there is something required before simulation to produce the module
@@ -953,7 +954,7 @@ setMethod(
     on.exit(setwd(callingWd), add = TRUE)
     setwd(path)
     zipFileName <- paste0(name, "_", version, ".zip")
-    message(paste("Zipping module into zip file:", zipFileName))
+    message(crayon::green(paste("Zipping module into zip file:", zipFileName)), sep = "")
 
     allFiles <- dir(path = file.path(name), recursive = TRUE, full.names = TRUE)
 

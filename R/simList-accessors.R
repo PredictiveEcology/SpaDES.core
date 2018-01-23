@@ -1090,6 +1090,25 @@ setReplaceMethod("progressType",
 #'   spades(sim)
 #' }
 #'
+#'   # Example showing loading multiple objects from global environment onto the
+#'   #   same object in the simList, but at different load times
+#'   a1 <- 1
+#'   a2 <- 2
+#'   # Note arguments must be a list of NROW(inputs), with each element itself being a list,
+#'   #  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time
+#'   args <- lapply(1:2, function(x) {
+#'                  list(x = paste0("a", x),
+#'                       envir = environment()) # may be necessary to specify in which envir a1, a2
+#'                                              # are located, if not in an interactive sessino
+#'                  })
+#'   inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
+#'   a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
+#'   a <- spades(a)
+#'   identical(a1, a$a)
+#'
+#'   end(a) <- 3
+#'   a <- spades(a) # different object (a2) loaded onto a$a
+#'   identical(a2, a$a)
 #'
 #' # Clean up after
 #' unlink(tmpdir, recursive = TRUE)
@@ -1300,7 +1319,7 @@ setReplaceMethod(
 #' outputs(sim)
 #'
 #' # read one back in just to test it all worked as planned
-#' newObj <- read.csv(dir(tmpdir, pattern = "second10.csv", full.name = TRUE))
+#' newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
 #' newObj
 #'
 #' # using saving with SpaDES-aware methods
@@ -1471,7 +1490,7 @@ setGeneric("inputArgs", function(sim) {
 setMethod("inputArgs",
           signature = ".simList",
           definition = function(sim) {
-            return(sim@inputs$args)
+            return(sim@inputs[[.fileTableInCols[pmatch("arg", .fileTableInCols)]]])
 })
 
 #' @export
@@ -1810,6 +1829,33 @@ setReplaceMethod(
     return(sim)
 })
 
+
+#################
+#' @description
+#' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
+#' \code{dataPath}, like \code{currentModule},is namespaced. This means that when
+#' it is used inside a module, then it will return \emph{that model-specific} information.
+#' For instance, if used inside a module called \code{"movingAgent"},
+#' then \code{currentModule(sim)}
+#' will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
+#' \code{file.path(modulePath(sim), "movingAgent", "data")}
+#'
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("dataPath", function(sim) {
+  standardGeneric("dataPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setMethod("dataPath",
+          signature = ".simList",
+          definition = function(sim) {
+            return(file.path(modulePath(sim), currentModule(sim), "data"))
+          })
+
 ################################################################################
 #' Time usage in \code{SpaDES}
 #'
@@ -1985,9 +2031,10 @@ setReplaceMethod(
 #' @export
 #' @rdname simList-accessors-times
 end..simList <- function(x, unit, ...) {
-    unit <- .callingFrameTimeunit(x)
-    if (is.null(unit)) {
-      unit <- NA_character_
+    if (missing(unit)) {
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit))
+        unit <- NA_character_
     }
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
@@ -2212,7 +2259,9 @@ setMethod(
 #' Simulation event lists
 #'
 #' Accessor functions for the \code{events} and \code{completed} slots of a
-#' \code{simList} object.
+#' \code{simList} object. These path functions will extract the values that were
+#' provided to the \code{simInit} function in the \code{path} argument.
+#'
 #' By default, the event lists are shown when the \code{simList} object is printed,
 #' thus most users will not require direct use of these methods.
 #' \tabular{ll}{
@@ -2516,9 +2565,17 @@ setMethod(
 #'
 #' @param sim  A \code{simList} object.
 #'
-#' @param ...  Additional arguments.
-#'             Currently only \code{module}, specifying the name of a module,
-#'             and \code{filename}, specifying a module filename, are supported.
+#' @param modules Character vector, specifying the name or
+#'             vector of names of module(s)
+#' @param paths Character vector, specifying the name or
+#'             vector of names of paths(s) for those modules. If path not specified,
+#'             it will be taken from getOption("spades.modulePath"), which is set
+#'             with \code{setPaths})
+#' @param filenames Character vector specifying filenames of modules (i.e.
+#'                 combined path & module. If this is specified, then \code{modules} and
+#'                 \code{path} are ignored.
+#'
+#' @inheritParams .parseModulePartial
 #'
 #' @return A sorted character vector of package names.
 #'
@@ -2527,10 +2584,10 @@ setMethod(
 #' @family functions to access elements of a \code{simList} object
 #' @rdname packages
 #'
-#' @author Alex Chubaty
+#' @author Alex Chubaty & Eliot McIntire
 #'
 # igraph exports %>% from magrittr
-setGeneric("packages", function(sim, ...) {
+setGeneric("packages", function(sim, modules, paths, filenames, envir, ...) {
   standardGeneric("packages")
 })
 
@@ -2538,32 +2595,54 @@ setGeneric("packages", function(sim, ...) {
 #' @rdname packages
 setMethod(
   "packages",
-  signature(sim = ".simList"),
-  definition = function(sim, ...) {
-    pkgs <- lapply(depends(sim)@dependencies, function(x) {
-        x@reqdPkgs
-      }) %>% unlist() %>% unique() %>% sort()
-    return(pkgs)
-})
-
-#' @export
-#' @rdname packages
-setMethod(
-  "packages",
-  signature(sim = "missing"),
-  definition = function(sim, ...) {
-    args <- list(...)
-    if (!is.null(args$filename)) {
-      pkgs <- .parseModulePartial(filename = args$filename,
-                                  defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% unique() %>% sort()
-      return(pkgs)
-    } else if (!is.null(args$module)) {
-      f <- file.path(getOption("spades.modulePath"), args$module, paste0(args$module, ".R"))
-      pkgs <- .parseModulePartial(filename = f, defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% unique() %>% sort()
-      return(pkgs)
+  signature(sim = "ANY"),
+  definition = function(sim, modules, paths, filenames, envir, ...) {
+    if (missing(sim)) { # can either have no sim, or can have a sim that is incomplete,
+                        #   i.e., with no reqdPkgs slot filled
+      depsInSim <- list(NULL)
     } else {
-      stop("one of sim, modules, or filename must be supplied.")
+      depsInSim <- depends(sim)@dependencies
     }
+
+    if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,
+                                    #  if not NULL, one will be reqdPkgs
+      pkgs <- lapply(depsInSim, function(x) {
+        x@reqdPkgs
+      }) %>% unlist() %>% c("SpaDES.core") %>% unique()
+      if (!is.null(pkgs)) pkgs <- sort(pkgs)
+    } else {
+      if (!missing(filenames))  {
+        paths <- filenames
+        modules <- sub(basename(paths), replacement = "", pattern = ".R")
+      } else if (!missing("modules")) {
+        prefix <- if (!missing("paths")) {
+            paths
+          } else {
+            getOption("spades.modulePath")
+          }
+        paths <- file.path(prefix, modules, paste0(modules, ".R"))
+      } else {
+        stop("one of sim, module, modules, or filename must be supplied.")
+      }
+
+      if (missing(envir)) {
+        envir <- NULL
+      }
+
+      pkgs <- lapply(paths, function(paths) {
+        pkgs <- .parseModulePartial(filename = paths, defineModuleElement = "reqdPkgs",
+                                    envir = envir) %>%
+          unlist() %>% unique()
+        if (!is.null(pkgs)) {
+          pkgs <- sort(pkgs)
+        } else {
+          pkgs <- character(0)
+        }
+        pkgs <- pkgs[nzchar(pkgs)]
+        pkgs <- unique(c("SpaDES.core", pkgs))
+        return(pkgs)
+      })
+      names(pkgs) <- modules
+    }
+    return(pkgs)
 })

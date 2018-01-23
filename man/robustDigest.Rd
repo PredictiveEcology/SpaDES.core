@@ -3,6 +3,7 @@
 \docType{methods}
 \name{.robustDigest,simList-method}
 \alias{.robustDigest,simList-method}
+\alias{Cache}
 \title{\code{.robustDigest} for \code{simList} class objects}
 \usage{
 \S4method{.robustDigest}{simList}(object, objects,

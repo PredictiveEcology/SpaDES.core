@@ -109,6 +109,7 @@ setMethod(
 #'               Default is to use the \code{spades.modulePath} option.
 #'
 #' @inheritParams spades
+#' @inheritParams .parseModulePartial
 #'
 #' @return \code{numeric_version} indicating the module's version.
 #'
@@ -120,7 +121,7 @@ setMethod(
 #'
 #' @example inst/examples/example_moduleVersion.R
 #'
-setGeneric("moduleVersion", function(module, path, sim) {
+setGeneric("moduleVersion", function(module, path, sim, envir = NULL) {
   standardGeneric("moduleVersion")
 })
 
@@ -128,10 +129,10 @@ setGeneric("moduleVersion", function(module, path, sim) {
 #' @rdname moduleVersion
 setMethod(
   "moduleVersion",
-  signature = c(module = "character", path = "character", sim = "missing"),
-  definition = function(module, path) {
+  signature = c(module = "character", path = "character", sim = "missing", envir = "ANY"),
+  definition = function(module, path, envir) {
   v <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                           defineModuleElement = "version")
+                           defineModuleElement = "version", envir = envir)
   if (is.null(names(v))) {
     as.numeric_version(v) ## SpaDES < 1.3.1.9044
   } else {
@@ -143,18 +144,20 @@ setMethod(
 #' @rdname moduleVersion
 setMethod(
   "moduleVersion",
-  signature = c(module = "character", path = "missing", sim = "missing"),
-  definition = function(module) {
-    moduleVersion(module = module, path = getOption("spades.modulePath"))
+  signature = c(module = "character", path = "missing", sim = "missing", envir = "ANY"),
+  definition = function(module, envir) {
+    moduleVersion(module = module, path = getOption("spades.modulePath"),
+                  envir = envir)
 })
 
 #' @export
 #' @rdname moduleVersion
 setMethod(
   "moduleVersion",
-  signature = c(module = "character", path = "missing", sim = "simList"),
-  definition = function(module, sim) {
-    v <- .parseModulePartial(sim = sim, modules = list(module), defineModuleElement = "version") %>%
+  signature = c(module = "character", path = "missing", sim = "simList", envir = "ANY"),
+  definition = function(module, sim, envir) {
+    v <- .parseModulePartial(sim = sim, modules = list(module),
+                             defineModuleElement = "version", envir = envir) %>%
       `[[`(module)
 
     if (is.null(names(v))) {

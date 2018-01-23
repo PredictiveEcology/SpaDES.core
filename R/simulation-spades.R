@@ -103,10 +103,12 @@ doEvent <- function(sim, debug, notOlderThan) {
           } else if (grepl(debug[[i]], pattern = "\\(")) {
             print(eval(parse(text = debug[[i]])))
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
-            fnEnv <- sim@.envir[[paste0("._",cur[["moduleName"]])]]
+            fnEnv <- sim@.envir[[cur[["moduleName"]]]] # paste0(cur[["moduleName"]], "Fns")]]
             if(is.environment(fnEnv)) {
-              debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
-              on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+              if (all(debug %in% cur[c("moduleName", "eventType")])) {
+                debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+                on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+              }
             }
           } else if (!any(debug[[i]] == c("browser"))) {
 
@@ -147,14 +149,15 @@ doEvent <- function(sim, debug, notOlderThan) {
 
           if (cacheIt) { # means that a module or event is to be cached
             objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
-            moduleSpecificObjects <- c(grep(ls(sim@.envir, all.names = TRUE),
-                                            pattern = cur[["moduleName"]], value = TRUE),
-                                       na.omit(objNam))
+            moduleSpecificObjects <-
+              c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
+                ls(sim@.envir[[cur[["moduleName"]]]], all.names = TRUE), # functions in the namespaced location
+                na.omit(objNam)) # objects outputted by module
             moduleSpecificOutputObjects <- objNam
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
                                  modules = cur[["moduleName"]])
-            sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[paste0("._", cur[["moduleName"]])]]),
+            sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[cur[["moduleName"]]]]), #[[paste0(cur[["moduleName"]], "Fns")]]),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                          debug = FALSE,
@@ -166,8 +169,8 @@ doEvent <- function(sim, debug, notOlderThan) {
                          userTags = c("function:doEvent"))
           } else {
             sim <- get(moduleCall,
-                       envir = sim@.envir[[paste0("._", cur[["moduleName"]])]])(sim, cur[["eventTime"]],
-                                                                                cur[["eventType"]], FALSE)
+                       envir = sim@.envir[[cur[["moduleName"]]]])( #[[paste0(cur[["moduleName"]], "Fns")]]
+                         sim, cur[["eventTime"]], cur[["eventType"]], FALSE)
           }
         }
       } else {
@@ -411,7 +414,12 @@ scheduleEvent <- function(sim,
 #'
 #' @return Invisibly returns the modified \code{simList} object.
 #'
-#' @seealso \code{\link{simInit}}, \code{\link{SpaDES.core-package}}, \code{\link[reproducible]{Cache}}
+#' @seealso \code{\link{SpaDES.core-package}},
+#' \code{\link{experiment}} for using replication with \code{spades},
+#' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
+#' \url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html} which
+#' uses \code{\link[reproducible]{Cache}}.
+#'
 #'
 #' @details
 #' The is the workhorse function in the SpaDES package. It runs simulations by
@@ -458,8 +466,6 @@ scheduleEvent <- function(sim,
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
 #' @rdname spades
-#' @seealso \code{\link{experiment}} for using replication with \code{spades}.
-#'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Fransisco, CA: No Starch Press, Inc..
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
@@ -523,8 +529,6 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
-    # The event queues are not uncopied data.tables, for speed during simulation
-    #  Must, therefore, break connection between spades calls
     .pkgEnv$searchPath <- search()
 
     # timeunits gets accessed every event -- this should only be needed once per simList

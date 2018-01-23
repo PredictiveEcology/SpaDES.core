@@ -120,13 +120,13 @@ test_that("timeunits with child and parent modules work correctly", {
   }, add = TRUE)
 
   #suppressMessages({
-    newModule("grandpar1", ".", type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
-    newModule("par1", ".", type = "parent", children = c("child4", "child3"), open = FALSE)
-    newModule("child1", ".", open = FALSE)
-    newModule("child2", ".", open = FALSE)
-    newModule("child3", ".", open = FALSE)
-    newModule("child4", ".", open = FALSE)
-    newModule("child5", ".", open = FALSE)
+    newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
+    newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)
+    newModule("child1", tmpdir, open = FALSE)
+    newModule("child2", tmpdir, open = FALSE)
+    newModule("child3", tmpdir, open = FALSE)
+    newModule("child4", tmpdir, open = FALSE)
+    newModule("child5", tmpdir, open = FALSE)
     #})
 
   fileName <- "child2/child2.R"
@@ -149,12 +149,12 @@ test_that("timeunits with child and parent modules work correctly", {
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "month"') # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
-  mySim <- simInit(modules = list("grandpar1", "par1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1", "par1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month")
 
   # If only listing the one module and it is a parent, then use it regardless of whether
   #  it is shortest or longest
-  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "year")
 
   fileName <- "grandpar1/grandpar1.R"
@@ -164,14 +164,14 @@ test_that("timeunits with child and parent modules work correctly", {
 
   # If only listing the one module and it is a parent, then use it regardless of whether
   #  it is shortest or longest
-  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "hour")
 
-  mySim <- simInit(modules = list("grandpar1", "child5"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1", "child5"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "second")
 
   suppressMessages(
-    newModule("grandpar1", ".", type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
+    newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
   )
   fileName <- "grandpar1/grandpar1.R"
   xxx <- readLines(fileName)
@@ -179,24 +179,91 @@ test_that("timeunits with child and parent modules work correctly", {
   cat(xxx1, file = fileName, sep = "\n")
 
   # If parent has NA for timeunit, then take smallest of children
-  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "day")
 
   suppressMessages(
-    newModule("grandpar2", ".", type = "parent", children = c("child1", "child6", "par1"), open = FALSE)
+    newModule("grandpar2", tmpdir, type = "parent", children = c("child1", "child6", "par1"), open = FALSE)
   )
   fileName <- "grandpar2/grandpar2.R"
   xxx <- readLines(fileName)
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = "timeunit = NA") # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
-  suppressMessages(newModule("child6", ".", open = FALSE))
-  fileName <- "child6/child6.R"
+
+  ## child6 is used for further module testing
+  suppressMessages(newModule("child6", tmpdir, open = FALSE))
+  fileName <- file.path(tmpdir, "child6/child6.R")
   xxx <- readLines(fileName)
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = "timeunit = NA") # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
   # If parent has NA for timeunit, then take smallest of children
-  mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = "."))
+  mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month") # because par1 is month, grandpar1 is NA
+
+
+  ### Tese dataPath and currentModule function, which is namespaced
+  xxx <- readLines(fileName)
+  modName <- basename(dirname(fileName))
+  initLine <- grep(xxx, pattern = "Init\\(sim\\)")
+  xxx1 <- c(xxx[seq(initLine)], "  sim$dp <- dataPath(sim)",
+            "  sim$cm <- currentModule(sim)", xxx[seq(length(xxx)-initLine)+initLine],
+            "  cm1 <- currentModule(sim)", "  dp1 <- dataPath(sim)")
+  cat(xxx1, file = fileName, sep = "\n")
+  mySim <- simInit(modules = list(modName), paths = list(modulePath = tmpdir))
+  expect_true(mySim[[modName]]$cm1 == file.path(modName))
+  expect_true(mySim[[modName]]$dp1 == file.path(dirname(fileName), "data"))
+
+  mySimOut <- spades(mySim)
+  expect_true(mySimOut$dp == file.path(dirname(fileName), "data"))
+  expect_true(mySimOut$cm == file.path(modName))
+
+
+  ######
+  theFile <- file.path(tmpdir, "test")
+  write.table(x = data.frame(1), file = theFile)
+
+  xxx <- readLines(fileName)
+  modName <- basename(dirname(fileName))
+  lineOfInterest1 <- tail(grep(xxx, pattern = "expectsInput"),1)
+  xxx1 <- c(xxx[seq(lineOfInterest1-1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
+            xxx[seq(length(xxx)-lineOfInterest1)+lineOfInterest1])
+  cat(xxx1, file = fileName, sep = "\n")
+
+  lineOfInterest <- grep(xxx1, pattern = ".inputObjects <- ")
+  xxx1 <- c(xxx1[seq(lineOfInterest - 1)], "  .inputObjects <- function(sim, a = asPath(file.path(inputPath(sim), \"test\"))) {",
+            "  sim$b <- a",
+            xxx1[seq(length(xxx1)-lineOfInterest)+lineOfInterest])
+  cat(xxx1, file = fileName, sep = "\n")
+
+  cacheDir <- file.path(tmpdir, "cache")
+  try(clearCache(cacheDir), silent = TRUE)
+  expect_silent(expect_message(mySim <- simInit(modules = list(modName),
+                                  paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                                  params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE, "Using or creating cached")
+  )
+
+  # pulls cached value
+  expect_message(expect_output(mySim <- simInit(modules = list(modName),
+                                 paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                   params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
+                 all = TRUE, "Using or creating cached")
+  expect_true(identical(mySim$b, asPath(theFile)))
+
+  # Change the file that is in the arguments to .inputObjects
+  write.table(x = data.frame(sample(1e6,1)), file = theFile)
+  # Cache should force a rerun -- i.e., not cached value
+  expect_silent(expect_message(mySim <- simInit(modules = list(modName),
+                                                paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                                                params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE, "Using or creating cached")
+  )
+
+  # pulls cached value
+  expect_message(expect_output(mySim <- simInit(modules = list(modName),
+                                                paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                                                params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
+                 all = TRUE, "Using or creating cached")
+
+
 })

@@ -21,7 +21,8 @@ Updated \code{simList} object.
 }
 \description{
 Specify a new module's metadata as well as object and package dependencies.
-Packages are loaded during this call.
+Packages are loaded during this call. Any or all of these can be missing, with missing
+values set to defaults
 }
 \section{Required metadata elements}{
 
@@ -75,7 +76,13 @@ Packages are loaded during this call.
                              This is currently not parsed by SpaDES;
                              it is for human readers only.\cr\cr
    \code{reqdPkgs} \tab List of R package names required by the module. These
-                        packages will be loaded when \code{simInit} is called. \cr
+                        packages will be loaded when \code{simInit} is called.
+                        \code{\link[reproducible]{Require}} will be used internally
+                        to load if available, and install if not available.
+                        Because \code{\link[reproducible]{Require}} can also download from
+                        GitHub.com, these packages can specify package names stored
+                        on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}.
+                        \cr
    \code{parameters} \tab A data.frame specifying the parameters used in the module.
                           Usually produced by \code{rbind}-ing the outputs of multiple
                           \code{\link{defineParameter}} calls. These parameters indicate
@@ -165,6 +172,9 @@ Packages are loaded during this call.
 
 }
 
+}
+\seealso{
+moduleDefaults
 }
 \author{
 Alex Chubaty

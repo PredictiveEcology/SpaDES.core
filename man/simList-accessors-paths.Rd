@@ -28,6 +28,8 @@
 \alias{modulePath<-}
 \alias{modulePath<-}
 \alias{modulePath<-,.simList-method}
+\alias{dataPath}
+\alias{dataPath,.simList-method}
 \title{Specify paths for modules, inputs, and outputs}
 \usage{
 paths(sim)
@@ -69,6 +71,10 @@ modulePath(sim)
 modulePath(sim) <- value
 
 \S4method{modulePath}{.simList}(sim) <- value
+
+dataPath(sim)
+
+\S4method{dataPath}{.simList}(sim)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -81,6 +87,14 @@ Returns or sets the value of the slot from the \code{simList} object.
 }
 \description{
 Accessor functions for the \code{paths} slot in a \code{simList} object.
+
+\code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
+\code{dataPath}, like \code{currentModule},is namespaced. This means that when
+it is used inside a module, then it will return \emph{that model-specific} information.
+For instance, if used inside a module called \code{"movingAgent"},
+then \code{currentModule(sim)}
+will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
+\code{file.path(modulePath(sim), "movingAgent", "data")}
 }
 \details{
 These are ways to add or access the file paths used by \code{\link{spades}}.

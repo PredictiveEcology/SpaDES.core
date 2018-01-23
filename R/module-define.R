@@ -1,8 +1,30 @@
+#' Defaults values used in defineModule
+#'
+#' Where individual elements are missing in \code{defineModule},
+#' these defaults will be used.
+#' @export
+#'
+moduleDefaults <- list(
+  timeunit = "year",
+  name = NA_character_,
+  description = NA_character_,
+  keywords = NA_character_,
+  authors = person("unknown"),
+  childModules = character(0),
+  version = quote(as.numeric_version(x$version)),
+  extent = quote(raster::extent(rep(NA_real_, 4))),
+  timeframe = quote(as.POSIXlt(c(NA, NA))),
+  citation = list(),
+  documentation = list(),
+  reqdPkgs = list()
+)
+
 ################################################################################
 #' Define a new module.
 #'
 #' Specify a new module's metadata as well as object and package dependencies.
-#' Packages are loaded during this call.
+#' Packages are loaded during this call. Any or all of these can be missing, with missing
+#' values set to defaults
 #'
 #' @section Required metadata elements:
 #'
@@ -55,7 +77,13 @@
 #'                              This is currently not parsed by SpaDES;
 #'                              it is for human readers only.\cr\cr
 #'    \code{reqdPkgs} \tab List of R package names required by the module. These
-#'                         packages will be loaded when \code{simInit} is called. \cr
+#'                         packages will be loaded when \code{simInit} is called.
+#'                         \code{\link[reproducible]{Require}} will be used internally
+#'                         to load if available, and install if not available.
+#'                         Because \code{\link[reproducible]{Require}} can also download from
+#'                         GitHub.com, these packages can specify package names stored
+#'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}.
+#'                         \cr
 #'    \code{parameters} \tab A data.frame specifying the parameters used in the module.
 #'                           Usually produced by \code{rbind}-ing the outputs of multiple
 #'                           \code{\link{defineParameter}} calls. These parameters indicate
@@ -109,6 +137,7 @@
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
+#' @seealso moduleDefaults
 #'
 #' @examples
 #' \dontrun{
@@ -175,35 +204,33 @@ setMethod(
       warning(paste0(
         "The \'", x$name, "\' module is missing the metadata for:\n",
         paste(" - ", metadataMissing, collapse = "\n"), "\n",
-        "Please see ?defineModule and ?.moduleDeps for more info.\n",
-        "All metadata elements must be present and valid."
+        "Using default values, which may not be desireable.\n",
+        "See moduleDefaults"
       ))
-    }
-
-    # provide default values for missing metadata elements
-    if (identical(x$reqdPkgs, list())) {
-      x$reqdPkgs <- list()
-    } else if (is.null(na.omit(x$reqdPkgs))) {
-      x$reqdPkgs <- list()
-    } else if (any(!nzchar(na.omit(x$reqdPkgs)))) {
-      x$reqdPkgs <- list()
-    } else {
-      loadPackages(x$reqdPkgs)
     }
 
     ## enforce/coerce types for the user-supplied param list
     lapply(c("name", "description", "keywords"), function(z) {
       x[[z]] <<- if ( is.null(x[[z]]) || (length(x[[z]]) == 0) ) {
-        NA_character_
+        moduleDefaults[[z]]
       } else {
         as.character(x[[z]])
       }
     })
 
-    x$childModules <- x$childModules %>% as.character() %>% na.omit() %>% as.character()
+    x$childModules <- if ( is.null(x$childModules) ) {
+      moduleDefaults$childModules
+    } else {
+      if( isTRUE(is.na(x$childModules)) ) {
+        moduleDefaults$childModules
+      } else {
+        x$childModules %>% as.character() %>% na.omit() %>% as.character()
+      }
+    }
+
 
     x$authors <- if ( is.null(x$authors) || is.na(x$authors) ) {
-      person("unknown")
+      moduleDefaults$authors
     } else {
       as.person(x$authors)
     }
@@ -211,17 +238,17 @@ setMethod(
     ## maintain backwards compatibility with SpaDES versions prior to 1.3.1.9044
     ## where `version` was a single `numeric_version` value instead of named list
     x$version <- if (is.null(names(x$version))) {
-      as.numeric_version(x$version) ## SpaDES < 1.3.1.9044
+      eval(moduleDefaults$version) ## SpaDES < 1.3.1.9044
     } else {
       as.numeric_version(x$version[[x$name]]) ## SpaDES >= 1.3.1.9044
     }
 
     x$spatialExtent <- if (!is(x$spatialExtent, "Extent")) {
       if (is.null(x$spatialExtent)) {
-        extent(rep(NA_real_, 4))
+        eval(moduleDefaults$extent)
       } else {
         if (is.na(x$spatialExtent)) {
-          extent(rep(NA_real_, 4))
+          moduleDefaults$extent
         } else {
           extent(x$spatialExtent)
         }
@@ -229,18 +256,18 @@ setMethod(
     }
 
     x$timeframe <- if ( is.null(x$timeframe) || is.na(x$timeframe) ) {
-      as.POSIXlt(c(NA, NA))
+      eval(moduleDefaults$timeframe)
     } else if (!is.numeric.POSIXt(x$timeframe)) {
       as.POSIXlt(x$timeframe)
     } %>% `[`(1:2)
 
     if ( is.null(x$timeunit) || is.na(x$timeunit) ) {
-      x$timeunit <- NA_character_
+      x$timeunit <- moduleDefaults$timeunit
     }
 
     lapply(c("citation", "documentation", "reqdPkgs"), function(z) {
       x[[z]] <<- if (is.null(x[[z]])) {
-        list()
+        moduleDefaults[[z]]
       } else {
         as.list(x[[z]])
       }
@@ -577,7 +604,7 @@ setMethod(
   if (any(needRenameArgs)) {
     colnames(inputDF)[needRenameArgs] <- .fileTableInCols[pmatch("arg", .fileTableInCols)]
   }
-  columns <- pmatch(.fileTableInCols, names(inputDF))
+  columns <- pmatch(substr(.fileTableInCols,1,c(3,5,1,3,5,5,3,5)), names(inputDF))
   setnames(inputDF, old = colnames(inputDF)[na.omit(columns)],
            new = .fileTableInCols[!is.na(columns)])
   if (any(is.na(columns))) {
@@ -637,7 +664,7 @@ setMethod(
     colnames(outputDF)[needRenameArgs] <-
       .fileTableOutCols[pmatch("arg", .fileTableOutCols)]
   }
-  columns <- pmatch(.fileTableOutCols, names(outputDF))
+  columns <- pmatch(substr(.fileTableOutCols,1,c(3,5,1,3,5,5,3)), names(outputDF))
   setnames(outputDF, old = colnames(outputDF)[na.omit(columns)],
            new = .fileTableOutCols[!is.na(columns)])
 

@@ -23,9 +23,10 @@ if (!isGeneric(".robustDigest")) {
 #' @author Eliot Mcintire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
-#' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst
+#' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst .orderDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
+#' @aliases Cache
 #' @rdname robustDigest
 #' @seealso \code{\link[reproducible]{.robustDigest}}
 #'
@@ -34,15 +35,48 @@ setMethod(
   signature = "simList",
   definition = function(object, objects, compareRasterFileLength, algo,
                         digestPathContent, classOptions) {
-    allObjs <- ls(object@.envir, all.names = TRUE)
-    objectsToDigest <- sort(allObjs, method = "radix")
-    if (!missing(objects)) {
+    outerObjs <- ls(object@.envir, all.names = TRUE)
+    moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.envir)
+    moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
+    allObjsInSimList <- append(list(".envir" = outerObjs), moduleObjs)
+    allEnvsInSimList <- append(list(object@.envir), moduleEnvirs)
+
+    ord <- .orderDotsUnderscoreFirst(allObjsInSimList)
+    allObjsInSimList <- allObjsInSimList[ord]
+    allEnvsInSimList <- allEnvsInSimList[ord]
+
+    isObjectEmpty <- if (!missing(objects)) {
       if (!is.null(objects)) {
-        objectsToDigest <- objectsToDigest[objectsToDigest %in% objects]
+        FALSE
+      } else {
+        TRUE
       }
+    } else {
+      TRUE
+    }
+    if (!isObjectEmpty) {
+      # objects may be provided in a namespaced format: modName:objName -- e.g. coming from .parseModule
+      objects1 <- strsplit(objects, split = ":")
+      lens <- unlist(lapply(objects1, length))
+      objects1ByMod <- unlist(lapply(objects1[lens>1], function(x) x[1]))
+      mods <- unique(objects1ByMod)
+      objects2 <- lapply(mods, function(mod) {
+        unlist(lapply(objects1[lens>1][objects1ByMod == mod], function(x) x[[2]]))
+      })
+      names(objects2) <- mods
+      objects <- append(list(".envir" = unlist(objects1[lens==1])), objects2)
+    } else {
+      objects <- allObjsInSimList
     }
 
-    envirHash <- .robustDigest(mget(objectsToDigest, envir = object@.envir))
+    envirHash <- lapply(seq(allObjsInSimList), function(objs) {
+      objectsToDigest <- sort(allObjsInSimList[[objs]], method = "radix")
+      objectsToDigest <- objectsToDigest[objectsToDigest %in% objects[[names(allObjsInSimList)[objs]]]]
+      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]))
+    })
+    names(envirHash) = names(allObjsInSimList)
+    lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
+    envirHash <- envirHash[lens]
 
     # Copy all parts except environment, clear that, then convert to list
     object <- Copy(object, objects = FALSE, queues = FALSE)
@@ -51,10 +85,11 @@ setMethod(
     # Replace the .list slot with the hashes of the slots
     object@.list <- envirHash
 
-    # Remove paths as they are system dependent and not relevant for digest
+    # Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
     #  i.e., if the same file is located in a different place, that is ok
-    object@paths <- .robustDigest(lapply(object@paths, asPath),
-                                  digestPathContent = digestPathContent)
+    object@paths <- list()
+    #object@paths <- .robustDigest(lapply(object@paths, asPath),
+    #                              digestPathContent = digestPathContent)
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
@@ -134,7 +169,19 @@ setMethod(
         paste0("function:spades")
       ) # add this because it will be an outer function, if there are events occurring
     } else {
-      userTags <- NULL
+      scalls <- sys.calls()
+      parseModuleFrameNum <- grep(scalls, pattern = "(^.parseModule)")[2]
+      if (!is.na(parseModuleFrameNum)) {
+        inObj <- grepl(scalls, pattern = ".inputObjects")
+        if (any(!is.na(inObj))) {
+          userTags <- c("function:.inputObjects")
+          userTags1 <- tryCatch(paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
+                                error = function(x) NULL)
+          userTags <- c(userTags, userTags1)
+        }
+      } else {
+        userTags <- NULL
+      }
     }
     userTags
   })
@@ -162,20 +209,18 @@ setMethod(
   definition = function(object, functionName) {
     cur <- current(object)
     if (NROW(cur)) {
-      if (cur$eventTime <= end(object)) {
-        whichCached <- grep(".useCache", object@params)
-        useCacheVals <- lapply(whichCached, function(x) {
-          object@params[[x]]$.useCache
-        })
+      whichCached <- grep(".useCache", object@params)
+      useCacheVals <- lapply(whichCached, function(x) {
+        object@params[[x]]$.useCache
+      })
 
-        whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
-        if (isTRUE(useCacheVals[[whCurrent]])) {
-          cat("Using cached copy of", cur$moduleName, "module\n")
-        } else {
-          cat("Using cached copy of", cur$eventType, "event in", cur$moduleName, "module\n")
-        }
+      whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
+      if (isTRUE(useCacheVals[[whCurrent]])) {
+        cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n"))
+      } else {
+        cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
+                         cur$moduleName, "module\n"))
       }
-
     } else {
       .cacheMessage(NULL, functionName)
     }
@@ -204,7 +249,10 @@ setMethod(
   ".checkCacheRepo",
   signature = "list",
   definition = function(object, create) {
+
+    object <- .findSimList(object)
     whSimList <- unlist(lapply(object, is, "simList"))
+
     if (any(whSimList)) {
       cacheRepo <- object[whSimList][[1]]@paths$cachePath # just take the first simList, if there are >1
     } else {
@@ -244,7 +292,8 @@ setMethod(
   signature = "simList",
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
-    whSimList <- which(unlist(lapply(tmpl, is, "simList")))
+    tmpl <- .findSimList(tmpl)
+    whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1] # only take first simList -- may be a problem
     origEnv <- tmpl[[whSimList[1]]]@.envir
     isListOfSimLists <- if (is.list(object)) {
       if (is(object[[1]], "simList")) TRUE else FALSE
@@ -257,7 +306,7 @@ setMethod(
       for (i in seq_along(object)) {
         # need to keep the list(...) slots ...
         # i.e., Caching of simLists is mostly about objects in .envir
-        object2[[i]] <- Copy(list(...)[[whSimList]], objects = FALSE)
+        object2[[i]] <- Copy(tmpl[[whSimList]], objects = FALSE)
         object2[[i]]@.envir <- object[[i]]@.envir
         object2[[i]]@completed <- object[[i]]@completed
         object2[[i]]@simtimes <- object[[i]]@simtimes
@@ -271,9 +320,9 @@ setMethod(
         list2env(mget(lsOrigEnv[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
                  envir = object2[[i]]@.envir)        }
     } else {
-      # need to keep the list(...) slots ...
+      # need to keep the tmpl slots ...
       # i.e., Caching of simLists is mostly about objects in .envir
-      object2 <- Copy(list(...)[[whSimList]], objects = FALSE)
+      object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
       object2@.envir <- object@.envir
       object2@completed <- object@completed
       if (NROW(current(object2)) == 0) {
@@ -409,3 +458,27 @@ setMethod(
   definition = function(object) {
     object.size(as.list(object@.envir, all.names = TRUE)) + object.size(object)
 })
+
+
+#' Find simList in a nested list
+#'
+#' THis is recursive, so it will find the all simLists even if they are deeply nested.
+#'
+#' @param x any object, used here only when it is a list with at least one
+#'        \code{simList} in it
+#' @rdname findSimList
+.findSimList <- function(x) {
+  if (is.list(x)) {
+    out <- lapply(x, .findSimList)
+    out <- unlist(out, recursive = TRUE, use.names = FALSE) # get rid of NULL
+    if (is.null(out)) out <- list(NULL)
+  } else {
+    out <- inherits(x, "simList")
+    if (out) {
+      out <- x
+    } else {
+      out <- NULL
+    }
+  }
+  return(out)
+}

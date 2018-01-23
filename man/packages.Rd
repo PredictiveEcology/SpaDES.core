@@ -3,22 +3,35 @@
 \docType{methods}
 \name{packages}
 \alias{packages}
-\alias{packages,.simList-method}
-\alias{packages,missing-method}
+\alias{packages,ANY-method}
 \title{Get module or simulation package dependencies}
 \usage{
-packages(sim, ...)
+packages(sim, modules, paths, filenames, envir, ...)
 
-\S4method{packages}{.simList}(sim, ...)
-
-\S4method{packages}{missing}(sim, ...)
+\S4method{packages}{ANY}(sim, modules, paths, filenames, envir, ...)
 }
 \arguments{
 \item{sim}{A \code{simList} object.}
 
-\item{...}{Additional arguments.
-Currently only \code{module}, specifying the name of a module,
-and \code{filename}, specifying a module filename, are supported.}
+\item{modules}{Character vector, specifying the name or
+vector of names of module(s)}
+
+\item{paths}{Character vector, specifying the name or
+vector of names of paths(s) for those modules. If path not specified,
+it will be taken from getOption("spades.modulePath"), which is set
+with \code{setPaths})}
+
+\item{filenames}{Character vector specifying filenames of modules (i.e.
+combined path & module. If this is specified, then \code{modules} and
+\code{path} are ignored.}
+
+\item{envir}{Optional environment in which to store parsed code. This may be
+useful if the same file is being parsed multiple times. This
+function will check in that envir for the parsed file before
+parsing again. If the \code{envir} is transient, then this will
+have no effect.}
+
+\item{...}{All \code{simInit} parameters.}
 }
 \value{
 A sorted character vector of package names.
@@ -37,5 +50,5 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{times}}
 }
 \author{
-Alex Chubaty
+Alex Chubaty & Eliot McIntire
 }

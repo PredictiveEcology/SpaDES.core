@@ -72,7 +72,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       }
 
       # do stuff for this event
-      sim <- sim$fireSpreadInit(sim)
+      sim <- Init(sim)
 
       # schedule the next events
       sim <- scheduleEvent(sim, P(sim)$startTime, "fireSpread", "burn")
@@ -81,7 +81,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     burn = {
       # do stuff for this event
-      sim <- sim$fireSpreadBurn(sim)
+      sim <- Burn(sim)
 
       # schedule the next events
       sim <- scheduleEvent(sim, time(sim), "fireSpread", "stats") # do stats immediately following burn
@@ -89,7 +89,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     stats = {
       # do stuff for this event
-      sim <- sim$fireSpreadStats(sim)
+      sim <- Stats(sim)
 
       # schedule the next event
       ## stats scheduling done by burn event
@@ -139,7 +139,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 ## event functions
-fireSpreadInit <- function(sim) {
+Init <- function(sim) {
   landscapes <- sim[[P(sim)$stackName]]
 
   ### create burn map that tracks fire locations over time
@@ -156,7 +156,7 @@ fireSpreadInit <- function(sim) {
   return(invisible(sim))
 }
 
-fireSpreadBurn <- function(sim) {
+Burn <- function(sim) {
   landscapes <- sim[[P(sim)$stackName]]
 
   Fires <- spread(landscapes[[1]],
@@ -178,7 +178,7 @@ fireSpreadBurn <- function(sim) {
   return(invisible(sim))
 }
 
-fireSpreadStats <- function(sim) {
+Stats <- function(sim) {
   npix <- sim[[globals(sim)$burnStats]]
 
   landscapes <- sim[[P(sim)$stackName]]
