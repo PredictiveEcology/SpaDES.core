@@ -269,7 +269,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   checkPath(tmpdir, create = TRUE)
   setwd(tmpdir)
   on.exit(unlink(tmpdir, force = TRUE, recursive = TRUE))
-  newModule("test", tmpdir)
+  newModule("test", tmpdir, open = FALSE)
 
   sim <- simInit()
 

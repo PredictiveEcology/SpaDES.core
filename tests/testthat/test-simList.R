@@ -260,10 +260,9 @@ test_that("simList object initializes correctly", {
   ## test with outputs
   ras = raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
   abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
-  #tempRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
 
   tmpdir <- tempdir()
-  newModule(name = "test", path = file.path(tmpdir, "modules"))
+  newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
   obj = list(abundRasters = abundRasters)#,
              #tempRasters = tempRasters)
   paths = list(modulePath = file.path(tmpdir, "modules"))
