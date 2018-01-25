@@ -1,50 +1,48 @@
-## New submission
+## resubmission
 
-This is a spin off of an existing CRAN package (`SpaDES`), which we have split due to growing package size.
+This is a minor update to our package.
 
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 14.04        (travis-ci), R 3.3.3
+* Ubuntu 14.04.5      (travis-ci), R 3.3.3
+* Windows              (appveyor), R 3.3.2
 * Windows              (appveyor), R 3.3.3
 * Windows 7               (local), R 3.3.3
 
 ### Current R versions
-* macOS Sierra         (local), R 3.4.1
-* OS X El Capitan  (travis-ci), R 3.4.1
-* Ubuntu 14.04     (travis-ci), R 3.4.1
-* Ubuntu 16.04         (local), R 3.4.1
-* Windows           (appveyor), R 3.4.1
-* Windows        (win-builder), R 3.4.1
-* Windows 7            (local), R 3.4.1
+* OSX Sierra 10.12.6 (travis-ci), R 3.4.3 YES
+* Ubuntu 14.04.5     (travis-ci), R 3.4.2 YES
+* Debian 4.9.51          (local), R 3.4.3
+* Windows             (appveyor), R 3.4.3
+* Windows          (win-builder), R 3.4.3
+* Windows 7              (local), R 3.4.3 YES
 
 ### Development R version
-* Debian:testing (rocker/r-devel), R 3.5.0 (2017-07-26 r72972)
-* Ubuntu 14.04        (travis-ci), R 3.5.0 (2017-08-28 r73148)
-* Ubuntu 16.04            (local), R 3.5.0 (2017-08-28 r73148)
-* Windows              (appveyor), R 3.5.0 (2017-08-27 r73146)
-* Windows           (win-builder), R 3.5.0 (2017-08-27 r73145)
+* Ubuntu 14.04        (travis-ci), R 3.5.0 (2018-01-24 r74157)
+* Windows                 (local), R 3.5.0 (2018-01-24 r74157)
+* Windows           (win-builder), R 3.5.0 (2018-01-24 r74157)
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs
+There are no errors, warnings, or notes in any of the above.
 
-There was 1 NOTE:
+There were 1 NOTE, which is not a new note for this package:
 
-1. There are multiple parts to this note:
+    Package suggested but not available for checking: 'fastshp'
 
-    a. This is a new package submission:
-    
-            Maintainer: 'Alex Chubaty <alexander.chubaty@canada.ca>'
-            
-            New submission
+We provide instructions for the user to install the suggested `fastshp` package.
 
-    b. Some words were flagged as possibly mispelled, but they are false positives.
-     
-            Possibly mis-spelled words in DESCRIPTION: 
-              DES (5:58, 6:65)
-              modularity (7:16)
-              
+The `fastshp` package in Suggests is optionally installed from Rforge and not required to use the package; it simply speeds up some of the plotting. Instructions for installation are provided in the README and via a message to the user. We believe this should satisfy the CRAN policy requirement regarding additional dependencies.
+
+        Suggests or Enhances not in mainstream repositories:
+          fastshp
+      
+        Availability using Additional_repositories specification:
+          fastshp   yes   http://rforge.net
+
+
+
 ## Downstream dependencies
 
 There are currently no downstream dependencies of this package.
