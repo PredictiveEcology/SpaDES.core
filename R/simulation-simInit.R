@@ -8,17 +8,42 @@ if (getRversion() >= "3.1.0") {
 #' Create a new simulation object, the "sim" object. This object is implemented
 #' using an \code{environment} where all objects and functions are placed.
 #' Since environments in \code{R} are
-#' pass by reference, "putting" objects in the sim object does no actual copy. This
-#' is also the location of all parameters, and other important simulation information, such
+#' pass by reference, "putting" objects in the sim object does no actual copy. The
+#' \code{simList} also stores all parameters,
+#' and other important simulation information, such
 #' as times, paths, modules, and module load order. See more details below.
 #'
-#' Calling this simInit function does several things including the following:
-#' - sources all module files, placing all function definitions in the sim object
-#' - optionally copies objects from the global environment to the sim object
-#' - optionally loads objects from disk
-#' - schedules all "init" events from all modules
-#' - assesses module dependencies via the inputs and outputs identified in their metadata
-#' - determines time units of modules and how they fit together
+#' \subsection{Calling this \code{simInit} function does the following:}{
+#'   \tabular{lll}{
+#'   \bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
+#'   fills \code{simList} slots \tab places the arguments \code{times},
+#'     \code{params}, \code{modules}, \code{paths} into equivalently named
+#'     \code{simList} slots \tab \code{times},
+#'     \code{params}, \code{modules}, \code{paths}\cr
+#'   sources all module files \tab places all function definitions in the
+#'     \code{simList}, specifically, into a sub-environment of the main
+#'     \code{simList} environment: e.g., \code{sim$<moduleName>$function1}
+#'     (see section on \bold{Scoping}) \tab \code{modules} \cr
+#'   copies objects \tab from the global environment to the
+#'     \code{simList} environment \tab \code{objects} \cr
+#'   loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
+#'   schedule object loading/copying \tab Objects can be loaded into the
+#'     \code{simList} at any time during a simulation  \tab \code{inputs} \cr
+#'   schedule object saving \tab Objects can be saved to disk at any arbitrary
+#'     time during the simulation. If specified here, this will be in addition
+#'     to any saving due code inside a module (i.e., a module may manually
+#'     run \code{write.table(...)} \tab \code{outputs} \cr
+#'   schedules "init" events \tab from all modules (see \code{\link{events}})
+#'        \tab automatic  \cr
+#'   assesses module dependencies \tab via the inputs and outputs identified in their
+#'     metadata. This gives the order of the \code{.inputObjects} and \code{init}
+#'     events. This can be overridden by \code{loadOrder}. \tab automatic \cr
+#'   determines time unit \tab takes time units of modules
+#'       and how they fit together \tab \code{times} or automatic \cr
+#'   runs \code{.inputObjects} functions \tab from every module
+#'     \emph{in the module order as determined above} \tab automatic
+#'   }
+#' }
 #'
 #' \code{params} can only contain updates to any parameters that are defined in
 #' the metadata of modules. Take the example of a module named, \code{Fire}, which
@@ -49,11 +74,17 @@ if (getRversion() >= "3.1.0") {
 #'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
 #' }
 #'
+#' @section Caching:
+#'
+#' Using caching with \code{SpaDES} is vital when building re-useable and reproducible
+#' content. Please see the vignette dedicated to this topic. See
+#' \url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html}
+#'
 #' @note
-#' The user can opt to run a simpler simInit call without inputs, outputs, and times.
+#' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
 #' These can be added later with the accessor methods (See example). These are not required for initializing the
 #' simulation via simInit. \code{modules}, \code{paths}, \code{params}, and \code{objects}
-#' are all needed for initialization.
+#' are all needed for successful initialization.
 #'
 #' @param times A named list of numeric simulation start and end times
 #'        (e.g., \code{times = list(start = 0.0, end = 10.0)}).
@@ -100,10 +131,12 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param notOlderThan A time, as in from \code{Sys.time()}. This is passed into
 #'                     the \code{Cache} function that wraps \code{.inputObjects}.
-#'                     If the module has a parameter, \code{.useCache} and it is
-#'                     \code{TRUE}, then the \code{.inputObjects} will be cached.
-#'                     Passing the current time into to \code{notOlderThan} will cause the
-#'                     Cache to be refreshed, i.e., rerun.
+#'                     If the module uses the \code{.useCache} parameter and it is
+#'                     set to \code{TRUE} or \code{".inputObjects"},
+#'                     then the \code{.inputObjects} will be cached.
+#'                     Setting \code{notOlderThan = Sys.time()} will cause the
+#'                     cached versions of \code{.inputObjects} to be refreshed,
+#'                     i.e., rerun.
 #'
 #' @return A \code{simList} simulation object, pre-initialized from values
 #' specified in the arguments supplied.
@@ -119,6 +152,7 @@ if (getRversion() >= "3.1.0") {
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
+#' @importFrom reproducible Require
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -135,7 +169,7 @@ if (getRversion() >= "3.1.0") {
 #'  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' )
-#' spades(mySim, .plotInitialTime = NA)
+#' spades(mySim) # shows plotting
 #'
 #' # Change more parameters, removing plotting
 #' mySim <- simInit(
@@ -262,11 +296,10 @@ setMethod(
                         notOlderThan) {
 
     # For namespacing of each module; keep a snapshot of the search path
-    .pkgEnv$searchPath <- search()
-    on.exit({
-      .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
-    })
-
+    # .pkgEnv$searchPath <- search()
+    # on.exit({
+    #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
+    # })
     paths <- lapply(paths, checkPath, create = TRUE)
 
     objNames <- names(objects)
@@ -295,19 +328,33 @@ setMethod(
 
     # create simList object for the simulation
     sim <- new("simList")
+
+    # Make a temporary place to store parsed module files
+    sim@.envir[[".parsedFiles"]] <- new.env(parent = sim@.envir)
+    on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )
+
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
 
+    reqdPkgs <- packages(modules=unlist(modules), paths = paths(sim)$modulePath,
+                         envir = sim@.envir[[".parsedFiles"]])
+    if (length(unlist(reqdPkgs))) {
+      Require(c(unique(unlist(reqdPkgs), "SpaDES.core")))
+    }
+
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
-    timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
+    # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
 
     allTimeUnits <- FALSE
 
     findSmallestTU <- function(sim, mods) {
-      out <- lapply(.parseModulePartial(sim, mods, defineModuleElement = "childModules"), as.list)
+      out <- lapply(.parseModulePartial(sim, mods,
+                                        defineModuleElement = "childModules",
+                                        envir = sim@.envir[[".parsedFiles"]]), as.list)
       isParent <- lapply(out, length) > 0
-      tu <- .parseModulePartial(sim, mods, defineModuleElement = "timeunit")
+      tu <- .parseModulePartial(sim, mods, defineModuleElement = "timeunit",
+                                envir = sim@.envir[[".parsedFiles"]])
       hasTU <- !is.na(tu)
       out[hasTU] <- tu[hasTU]
       if (!all(hasTU)) {
@@ -324,7 +371,8 @@ setMethod(
 
     # recursive function to extract parent and child structures
     buildModuleGraph <- function(sim, mods) {
-      out <- lapply(.parseModulePartial(sim, mods, defineModuleElement = "childModules"), as.list)
+      out <- lapply(.parseModulePartial(sim, modules = mods, defineModuleElement = "childModules",
+                                        envir = sim@.envir[[".parsedFiles"]]), as.list)
       isParent <- lapply(out, length) > 0
       to <- unlist(lapply(out, function(x) {
           if (length(x) == 0) {
@@ -351,7 +399,7 @@ setMethod(
 
     timeunits <- findSmallestTU(sim, modules(sim))
 
-    if (length(timeunits) == 0) timeunits <- list("second") # no modules at all
+    if (length(timeunits) == 0) timeunits <- list(moduleDefaults$timeunit) # no timeunits or no modules at all
 
     if (!is.null(times$unit)) {
       message(
@@ -395,7 +443,8 @@ setMethod(
     modulesLoaded <- append(modulesLoaded, core)
 
     ## source module metadata and code files
-    lapply(modules(sim), function(m) moduleVersion(m, sim = sim))
+    lapply(modules(sim), function(m) moduleVersion(m, sim = sim,
+                                                   envir = sim@.envir[[".parsedFiles"]]))
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
@@ -403,12 +452,16 @@ setMethod(
       sim <- .parseModule(sim,
                           sim@modules,
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
+                          envir = sim@.envir[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
                           objects = objects, paths = paths)
       if (length(.unparsed(sim@modules)) == 0) {
         all_parsed <- TRUE
       }
     }
+
+    # Force SpaDES.core to front of search path
+    #.modifySearchPath("SpaDES.core", skipNamespacing = FALSE)
 
     rm(".userSuppliedObjNames", envir=envir(sim))
     ## add name to depends
@@ -422,7 +475,7 @@ setMethod(
     ## load core modules
     for (c in core) {
       # schedule each module's init event:
-      .refreshEventQueues()
+      #.refreshEventQueues()
       sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
                            c, "init", .normal())
     }
@@ -518,15 +571,15 @@ setMethod(
     ## load files in the filelist
     if (NROW(inputs) | NROW(inputs(sim))) {
       inputs(sim) <- rbind(inputs(sim), inputs)
-      if (NROW(sim@events[moduleName == "load" &
+      if (NROW(events(sim)[moduleName == "load" &
                            eventType == "inputs" &
                            eventTime == start(sim)]) > 0) {
         sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-        sim@events <- sim@events[!(eventTime == sim@simtimes[["current"]] &
+        events(sim) <- events(sim)[!(eventTime == time(sim) &
                                                  moduleName == "load" &
                                                  eventType == "inputs"), ]
       }
-      if (any(sim@events[["eventTime"]] < sim@simtimes[["start"]])) {
+      if (any(events(sim)[["eventTime"]] < start(sim))) {
         warning(
           paste0(
             "One or more objects in the inputs filelist was ",
@@ -536,8 +589,8 @@ setMethod(
             "loadTime in ?simInit"
           )
         )
-        sim@events <-
-          sim@events[eventTime >= sim@simtimes[["start"]]]
+        events(sim) <-
+          events(sim)[eventTime >= start(sim)]
       }
     }
 

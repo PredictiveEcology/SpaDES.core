@@ -11,6 +11,7 @@ if (getRversion() >= "3.1.0") {
 #' @export
 #' @importFrom dplyr mutate
 #' @importFrom stats na.omit
+#' @importFrom utils capture.output
 #' @include simList-class.R
 #' @rdname show-method
 setMethod(
@@ -595,21 +596,13 @@ setReplaceMethod("params",
 #' @include simList-class.R
 #' @rdname params
 #'
-setGeneric("P", function(sim, module = NULL, param = NULL) {
-  standardGeneric("P")
-})
-
-#' @export
-#' @rdname params
-setMethod(
-  "P",
-  signature = ".simList",
-  definition = function(sim, module, param) {
-  if (is.null(module)) {
+P <- function(sim, module, param) {
+  if (missing(sim)) stop("P takes a simList as first argument")
+  if (missing(module)) {
     module <- sim@current$moduleName
   }
   if (length(module) > 0) {
-    if (is.null(param)) {
+    if (missing(param)) {
       return(sim@params[[module]])
     } else {
       return(sim@params[[module]][[param]])
@@ -618,7 +611,7 @@ setMethod(
     inSimInit <- grep(sys.calls(), pattern = ".parseModule")
     if (any(inSimInit)) {
       module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
-      if (is.null(param)) {
+      if (missing(param)) {
         return(sim@params[[module]])
       } else {
         return(sim@params[[module]][[param]])
@@ -626,56 +619,8 @@ setMethod(
     }
     return(sim@params)
   }
-})
+}
 
-#' \code{F} allows the user to access functions from their module.
-#' It should be unnecessary to use this as namespacing should take care of it.
-#' But, if the user wants to specify a function this way, it will work too.
-#' To access a function from within a module, you can use \code{F(sim)$functionName}.
-#'
-#' @export
-#'
-#' @include simList-class.R
-#' @aliases simList-accessors-function
-#' @rdname F
-#' @inheritParams P
-#' @param functionName Optional character string indicating which function is desired.
-#'
-setGeneric("F", function(sim, module = NULL, functionName = NULL) {
-  standardGeneric("F")
-})
-
-#' @export
-#' @rdname F
-setMethod(
-  "F",
-  signature = ".simList",
-  definition = function(sim, module, functionName) {
-    if (is.null(module)) {
-      module <- sim@current$moduleName
-    }
-    modEnv <- paste0(".-",module)
-    if (length(module) > 0) {
-      if (is.null(functionName)) {
-        return(as.list(sim@.envir[[modEnv]]))
-      } else {
-        return(sim@.envir[[modEnv]][[functionName]])
-      }
-    } else {
-      inSimInit <- grep(sys.calls(), pattern = ".parseModule")
-      if (any(inSimInit)) {
-        module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
-        modEnv <- paste0(".-",module)
-        if (is.null(functionName)) {
-          return(sim@.envir[[modEnv]])
-        } else {
-          return(sim@.envir[[modEnv]][[functionName]])
-        }
-      }
-
-      return(stop("You must specify a module when using the function F"))
-    }
-  })
 
 ################################################################################
 #' Get and set simulation globals.
@@ -1145,6 +1090,25 @@ setReplaceMethod("progressType",
 #'   spades(sim)
 #' }
 #'
+#'   # Example showing loading multiple objects from global environment onto the
+#'   #   same object in the simList, but at different load times
+#'   a1 <- 1
+#'   a2 <- 2
+#'   # Note arguments must be a list of NROW(inputs), with each element itself being a list,
+#'   #  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time
+#'   args <- lapply(1:2, function(x) {
+#'                  list(x = paste0("a", x),
+#'                       envir = environment()) # may be necessary to specify in which envir a1, a2
+#'                                              # are located, if not in an interactive sessino
+#'                  })
+#'   inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
+#'   a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
+#'   a <- spades(a)
+#'   identical(a1, a$a)
+#'
+#'   end(a) <- 3
+#'   a <- spades(a) # different object (a2) loaded onto a$a
+#'   identical(a2, a$a)
 #'
 #' # Clean up after
 #' unlink(tmpdir, recursive = TRUE)
@@ -1234,6 +1198,7 @@ setReplaceMethod(
        if (!all(is.na(sim@inputs[, "loadTime"]))) {
          newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"]
          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
+
          for (nT in newTime) {
            attributes(nT)$unit <- timeunit(sim)
            sim <- scheduleEvent(sim, nT, "load", "inputs", .first())
@@ -1354,7 +1319,7 @@ setReplaceMethod(
 #' outputs(sim)
 #'
 #' # read one back in just to test it all worked as planned
-#' newObj <- read.csv(dir(tmpdir, pattern = "second10.csv", full.name = TRUE))
+#' newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
 #' newObj
 #'
 #' # using saving with SpaDES-aware methods
@@ -1525,7 +1490,7 @@ setGeneric("inputArgs", function(sim) {
 setMethod("inputArgs",
           signature = ".simList",
           definition = function(sim) {
-            return(sim@inputs$args)
+            return(sim@inputs[[.fileTableInCols[pmatch("arg", .fileTableInCols)]]])
 })
 
 #' @export
@@ -1864,6 +1829,33 @@ setReplaceMethod(
     return(sim)
 })
 
+
+#################
+#' @description
+#' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
+#' \code{dataPath}, like \code{currentModule},is namespaced. This means that when
+#' it is used inside a module, then it will return \emph{that model-specific} information.
+#' For instance, if used inside a module called \code{"movingAgent"},
+#' then \code{currentModule(sim)}
+#' will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
+#' \code{file.path(modulePath(sim), "movingAgent", "data")}
+#'
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("dataPath", function(sim) {
+  standardGeneric("dataPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setMethod("dataPath",
+          signature = ".simList",
+          definition = function(sim) {
+            return(file.path(modulePath(sim), currentModule(sim), "data"))
+          })
+
 ################################################################################
 #' Time usage in \code{SpaDES}
 #'
@@ -1908,14 +1900,13 @@ setReplaceMethod(
 #' @export
 #' @include simList-class.R
 #' @include times.R
-#' @importFrom chron times
 #' @aliases simList-accessors-times
 #' @rdname simList-accessors-times
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #'
 setGeneric("times", function(x, ...) {
-  chron::times(x, ...)
+  standardGeneric("times")
 })
 
 #' @export
@@ -1986,19 +1977,21 @@ setReplaceMethod(
 #' @rdname simList-accessors-times
 time..simList <- function(x, unit, ...) {
     if (missing(unit)) {
-      mUnit <- .callingFrameTimeunit(x)
-      if (is.null(mUnit)) {
-        mUnit <- NA_character_
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit)) {
+        unit <- NA_character_
       }
-      unit <- mUnit
     }
-    if (!is.na(unit)) {
-      if (is.na(pmatch("second", unit))) {
+    if(isTRUE(!startsWith(unit, "second"))) {
+
+    #if (!is.na(unit)) {
+      #browser()
+      #if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
         t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
                              skipChecks = TRUE)
         return(t)
-      }
+      #}
     }
     t <- x@simtimes[["current"]]
     return(t)
@@ -2033,35 +2026,16 @@ setReplaceMethod(
 ################################################################################
 #' @inheritParams times
 #' @include times.R
+#' @importFrom stats end
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-times
-#'
-setGeneric("end", function(x, unit, ...) {
-  stats::end(x, ...)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "end",
-  signature = c(".simList", "missing"),
-  definition = function(x) {
-    mUnit <- .callingFrameTimeunit(x)
-    if (is.null(mUnit)) {
-      mUnit <- NA_character_
+end..simList <- function(x, unit, ...) {
+    if (missing(unit)) {
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit))
+        unit <- NA_character_
     }
-    t <- end(x, mUnit)
-    return(t)
-})
-
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "end",
-  signature = c(".simList", "character"),
-  definition = function(x, unit) {
-
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
@@ -2071,7 +2045,7 @@ setMethod(
     }
     t <- x@simtimes$end
     return(t)
-})
+}
 
 #' @export
 #' @rdname simList-accessors-times
@@ -2098,34 +2072,19 @@ setReplaceMethod(
 
 ################################################################################
 #' @inheritParams times
+#' @importFrom stats start
 #' @include simList-class.R
 #' @include times.R
 #' @export
 #' @rdname simList-accessors-times
-#'
-setGeneric("start", function(x, unit, ...) {
-  stats::start(x, ...)
-})
-
-#' @rdname simList-accessors-times
-setMethod(
-  "start",
-  signature = c(".simList", "missing"),
-  definition = function(x) {
-    mUnit <- .callingFrameTimeunit(x)
-    if (is.null(mUnit)) {
-      mUnit <- NA_character_
+start..simList <- function(x, unit = NULL, ...) {
+    if (is.null(unit)) {
+      unit <- .callingFrameTimeunit(x)
+      if (is.null(unit)) {
+        unit <- NA_character_
+      }
     }
-    t <- start(x, mUnit)
-    return(t)
-})
 
-#' @export
-#' @rdname simList-accessors-times
-setMethod(
-  "start",
-  signature = c(".simList", "character"),
-  definition = function(x, unit) {
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
@@ -2135,7 +2094,7 @@ setMethod(
     }
     t <- x@simtimes$start
     return(t)
-})
+}
 
 #' @export
 #' @rdname simList-accessors-times
@@ -2300,7 +2259,9 @@ setMethod(
 #' Simulation event lists
 #'
 #' Accessor functions for the \code{events} and \code{completed} slots of a
-#' \code{simList} object.
+#' \code{simList} object. These path functions will extract the values that were
+#' provided to the \code{simInit} function in the \code{path} argument.
+#'
 #' By default, the event lists are shown when the \code{simList} object is printed,
 #' thus most users will not require direct use of these methods.
 #' \tabular{ll}{
@@ -2331,7 +2292,6 @@ setMethod(
 #' @export
 #' @family functions to access elements of a \code{simList} object
 #' @importFrom data.table := copy data.table
-#' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @include simList-class.R
 #' @rdname simList-accessors-events
@@ -2346,23 +2306,25 @@ setMethod(
   "events",
   signature = c(".simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) &&
-               (length(sim@events$eventTime) > 0)) {
+    obj <- rbindlist(sim@events)
+    if (is.na(pmatch("second", unit)) &&
+               (length(sim@events) > 0)) {
       # note the above line captures empty eventTime, whereas is.na does not
-      if (any(!is.na(sim@events$eventTime))) {
-        if (!is.null(sim@events$eventTime)) {
-          obj <- copy(sim@events) # don't change original sim
+      if (any(!is.na(obj$eventTime))) {
+        if (!is.null(obj$eventTime)) {
+          #obj$eventTime <- convertTimeunit(obj$eventTime, unit, sim@.envir)
+          #obj
+          #obj <- copy(sim@events) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
-          obj
         }
-      } else {
-        sim@events
-      }
-    } else {
-      sim@events
+       } #else {
+    #     sim@events
+    #   }
+    # } else {
+    #   sim@events
     }
-    return(out)
+    return(obj)
 })
 
 #' @export
@@ -2400,7 +2362,11 @@ setReplaceMethod(
        value[, eventTime := convertTimeunit(eventTime, "second", sim@.envir)]
      }
 
-     sim@events <- value
+     if (NROW(value)) {
+       sim@events <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x,]))
+     } else {
+       sim@events <- list()
+     }
      return(sim)
 })
 
@@ -2408,8 +2374,7 @@ setReplaceMethod(
 #' @inheritParams events
 #'
 #' @export
-#' @importFrom data.table := data.table
-#' @importFrom lazyeval interp
+#' @importFrom data.table rbindlist
 #' @importFrom stats setNames
 #' @include simList-class.R
 #' @rdname simList-accessors-events
@@ -2428,10 +2393,13 @@ setMethod(
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
-          obj <- copy(sim@current) # don't change original sim
-          obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
-          obj[]
-          obj
+          sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit, sim@.envir)
+          sim@current
+          # obj <- copy(sim@current) # don't change original sim
+          # obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
+          # obj[]
+          # obj
+
         }
       } else {
         sim@current
@@ -2439,7 +2407,7 @@ setMethod(
     } else {
       sim@current
     }
-    return(out)
+    return(rbindlist(list(out)))
 })
 
 #' @export
@@ -2470,7 +2438,7 @@ setReplaceMethod("current",
                      stop("Event queue must be a data.table with columns: ",
                           paste(.emptyEventListCols, collapse = ", "), ".")
                    }
-                   sim@current <- value
+                   sim@current <- as.list(value)
                    return(sim)
 })
 
@@ -2478,7 +2446,6 @@ setReplaceMethod("current",
 #' @inheritParams events
 #' @include simList-class.R
 #' @importFrom data.table := data.table
-#' @importFrom lazyeval interp
 #' @importFrom stats setNames
 #' @export
 #' @rdname simList-accessors-events
@@ -2493,23 +2460,26 @@ setMethod(
   "completed",
   signature = c(".simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+    obj <- rbindlist(sim@completed)
+    if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
-      compl <- rbindlist(sim@completed)
-      if (any(!is.na(compl$eventTime))) {
-        if (!is.null(compl$eventTime)) {
-          obj <- compl#copy(sim@completed) # don't change original sim
+      #compl <- rbindlist(sim@completed)
+      if (any(!is.na(obj$eventTime))) {
+        if (!is.null(obj$eventTime)) {
+          #if (any(!is.na(obj$eventTime))) {
+        #if (!is.null(obj$eventTime)) {
+          #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+          #sim@completed
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
           obj[]
-          obj
         }
-      } else {
-        rbindlist(sim@completed)
-      }
-    } else {
-      rbindlist(sim@completed)
-    }
-    return(out)
+      } #else {
+        #sim@completed
+      #}
+    } #else {
+      #sim@completed
+    #}
+    return(obj)
 })
 
 #' @export
@@ -2541,7 +2511,11 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
-    sim@completed <- list(value)
+    if (NROW(value)) {
+      sim@completed <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x, ]))
+    } else {
+      sim@completed <- list()
+    }
     return(sim)
 })
 
@@ -2591,9 +2565,17 @@ setMethod(
 #'
 #' @param sim  A \code{simList} object.
 #'
-#' @param ...  Additional arguments.
-#'             Currently only \code{module}, specifying the name of a module,
-#'             and \code{filename}, specifying a module filename, are supported.
+#' @param modules Character vector, specifying the name or
+#'             vector of names of module(s)
+#' @param paths Character vector, specifying the name or
+#'             vector of names of paths(s) for those modules. If path not specified,
+#'             it will be taken from getOption("spades.modulePath"), which is set
+#'             with \code{setPaths})
+#' @param filenames Character vector specifying filenames of modules (i.e.
+#'                 combined path & module. If this is specified, then \code{modules} and
+#'                 \code{path} are ignored.
+#'
+#' @inheritParams .parseModulePartial
 #'
 #' @return A sorted character vector of package names.
 #'
@@ -2602,10 +2584,10 @@ setMethod(
 #' @family functions to access elements of a \code{simList} object
 #' @rdname packages
 #'
-#' @author Alex Chubaty
+#' @author Alex Chubaty & Eliot McIntire
 #'
 # igraph exports %>% from magrittr
-setGeneric("packages", function(sim, ...) {
+setGeneric("packages", function(sim, modules, paths, filenames, envir, ...) {
   standardGeneric("packages")
 })
 
@@ -2613,32 +2595,54 @@ setGeneric("packages", function(sim, ...) {
 #' @rdname packages
 setMethod(
   "packages",
-  signature(sim = ".simList"),
-  definition = function(sim, ...) {
-    pkgs <- lapply(depends(sim)@dependencies, function(x) {
-        x@reqdPkgs
-      }) %>% unlist() %>% append("SpaDES.core") %>% unique() %>% sort()
-    return(pkgs)
-})
-
-#' @export
-#' @rdname packages
-setMethod(
-  "packages",
-  signature(sim = "missing"),
-  definition = function(sim, ...) {
-    args <- list(...)
-    if (!is.null(args$filename)) {
-      pkgs <- .parseModulePartial(filename = args$filename,
-                                  defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% append("SpaDES.core") %>% unique() %>% sort()
-      return(pkgs)
-    } else if (!is.null(args$module)) {
-      f <- file.path(getOption("spades.modulePath"), args$module, paste0(args$module, ".R"))
-      pkgs <- .parseModulePartial(filename = f, defineModuleElement = "reqdPkgs") %>%
-        unlist() %>% append("SpaDES.core") %>% unique() %>% sort()
-      return(pkgs)
+  signature(sim = "ANY"),
+  definition = function(sim, modules, paths, filenames, envir, ...) {
+    if (missing(sim)) { # can either have no sim, or can have a sim that is incomplete,
+                        #   i.e., with no reqdPkgs slot filled
+      depsInSim <- list(NULL)
     } else {
-      stop("one of sim, modules, or filename must be supplied.")
+      depsInSim <- depends(sim)@dependencies
     }
+
+    if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,
+                                    #  if not NULL, one will be reqdPkgs
+      pkgs <- lapply(depsInSim, function(x) {
+        x@reqdPkgs
+      }) %>% unlist() %>% c("SpaDES.core") %>% unique()
+      if (!is.null(pkgs)) pkgs <- sort(pkgs)
+    } else {
+      if (!missing(filenames))  {
+        paths <- filenames
+        modules <- sub(basename(paths), replacement = "", pattern = ".R")
+      } else if (!missing("modules")) {
+        prefix <- if (!missing("paths")) {
+            paths
+          } else {
+            getOption("spades.modulePath")
+          }
+        paths <- file.path(prefix, modules, paste0(modules, ".R"))
+      } else {
+        stop("one of sim, module, modules, or filename must be supplied.")
+      }
+
+      if (missing(envir)) {
+        envir <- NULL
+      }
+
+      pkgs <- lapply(paths, function(paths) {
+        pkgs <- .parseModulePartial(filename = paths, defineModuleElement = "reqdPkgs",
+                                    envir = envir) %>%
+          unlist() %>% unique()
+        if (!is.null(pkgs)) {
+          pkgs <- sort(pkgs)
+        } else {
+          pkgs <- character(0)
+        }
+        pkgs <- pkgs[nzchar(pkgs)]
+        pkgs <- unique(c("SpaDES.core", pkgs))
+        return(pkgs)
+      })
+      names(pkgs) <- modules
+    }
+    return(pkgs)
 })

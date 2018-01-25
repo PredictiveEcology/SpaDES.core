@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -110,7 +110,8 @@ The current set of these core packages used by SpaDES can be found here:
 <code><a href='objects.html'>SpaDES.core:::.pkgEnv$corePackages</a></code></p>
     
 
-    <pre class="usage"><span class='fu'>.modifySearchPath</span>(<span class='no'>pkgs</span>, <span class='kw'>removeOthers</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>.modifySearchPath</span>(<span class='no'>pkgs</span>, <span class='kw'>removeOthers</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>skipNamespacing</span> <span class='kw'>=</span> !<span class='fu'>getOption</span>(<span class='st'>"spades.switchPkgNamespaces"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -123,6 +124,13 @@ The current set of these core packages used by SpaDES can be found here:
       <th>removeOthers</th>
       <td><p>Logical. If <code>TRUE</code>, then only the packages in <code>pkgs</code>
 will remain in the search path, i.e., all others will be removed.</p></td>
+    </tr>
+    <tr>
+      <th>skipNamespacing</th>
+      <td><p>Logical. If <code>FALSE</code>, then the running of an event in a module
+will not trigger a rearrangement of the search() path. This will
+generally speed up module simulations, but may create name
+conflicts between packages.</p></td>
     </tr>
     </table>
     

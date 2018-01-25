@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -100,7 +100,11 @@
     <div class="page-header">
       <h1>
         Reference
+<<<<<<< HEAD
         <small>version&nbsp;0.1.0</small>
+=======
+        <small>version&nbsp;0.1.0.9002</small>
+>>>>>>> development
       </h1>
     </div>
 
@@ -243,12 +247,6 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="dwrpnorm2.html">dwrpnorm2</a></code> </p>
-          </td>
-          <td><p>Vectorized wrapped normal density function</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="eventDiagram.html">eventDiagram</a></code> </p>
           </td>
           <td><p>Simulation event diagram</p></td>
@@ -276,15 +274,6 @@
             <p><code><a href="fileName.html">fileName</a></code> </p>
           </td>
           <td><p>Extract filename (without extension) of a file</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="F.html">F</a></code> </p>
-          </td>
-          <td><p><code>F</code> allows the user to access functions from their module.
-It should be unnecessary to use this as namespacing should take care of it.
-But, if the user wants to specify a function this way, it will work too.
-To access a function from within a module, you can use <code><a href='reference/objects.html'>F(sim)$functionName</a></code>.</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -486,9 +475,21 @@ To access a function from within a module, you can use <code><a href='reference/
         </tr><tr>
           <!--  -->
           <td>
+            <p><code><a href="quickCheck.html">.quickCheck</a></code> </p>
+          </td>
+          <td><p>The <code>SpaDES.core</code> variable to switch between quick and robust checking</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
             <p><code><a href="rasterToMemory.html">rasterToMemory</a></code> </p>
           </td>
           <td><p>Read raster to memory</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="remoteFileSize.html">remoteFileSize</a></code> </p>
+          </td>
+          <td><p>Determine the size of a remotely hosted file</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -584,29 +585,7 @@ To access a function from within a module, you can use <code><a href='reference/
           <td>
             <p><code><a href="spades.html">spades</a></code> </p>
           </td>
-          <td><p>setMethod(
-  "scheduleEvent",
-  signature(
-    sim = "simList",
-    eventTime = "NULL",
-    moduleName = "character",
-    eventType = "character",
-    eventPriority = "numeric"
-  ),
-  definition = function(sim,
-                        eventTime,
-                        moduleName,
-                        eventType,
-                        eventPriority) 
-    warning(
-      paste(
-        "Invalid or missing eventTime. This is usually",
-        "caused by an attempt to scheduleEvent at time NULL",
-        "or by using an undefined parameter."
-      )
-    )
-    return(invisible(sim))
-  )</p></td>
+          <td><p>Run a spatial discrete event simulation</p></td>
         </tr><tr>
           <!--  -->
           <td>

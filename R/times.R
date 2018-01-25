@@ -180,33 +180,29 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
     if (is.null(unit)) unit <- NA_character_
     if (!is.character(unit)) stop("unit must be a character")
   }
-  if (!is.na(unit)) {
-    out <- switch(unit,
-                  second = secondsInSeconds,
-                  seconds = secondsInSeconds,
-                  hour = hoursInSeconds,
-                  hours = hoursInSeconds,
-                  day = daysInSeconds,
-                  days = daysInSeconds,
-                  week = weeksInSeconds,
-                  weeks = weeksInSeconds,
-                  month = monthsInSeconds,
-                  months = monthsInSeconds,
-                  year = yearsInSeconds,
-                  years = yearsInSeconds)
-  } else {
-    out <- 0
-  }
+  out <- switch(unit,
+                second = secondsInSeconds,
+                seconds = secondsInSeconds,
+                hour = hoursInSeconds,
+                hours = hoursInSeconds,
+                day = daysInSeconds,
+                days = daysInSeconds,
+                week = weeksInSeconds,
+                weeks = weeksInSeconds,
+                month = monthsInSeconds,
+                months = monthsInSeconds,
+                year = yearsInSeconds,
+                years = yearsInSeconds,
+                # Allow for user defined time units in metadata - null is result
+                #  from switch fn above if it does not appear. So search through SpaDES
+                # functions first above, then check user defined units
+                #attributes(out)$unit = "second"
+                if(checkTimeunit(unit, envir)) {
+                  as.numeric(get(paste0("d", unit), envir = envir)(1))
+                  } else {
+                    NULL
+                  })
 
-  # Allow for user defined time units in metadata - null is result
-  #  from switch fn above if it does not appear. So search through SpaDES
-  # functions first above, then check user defined units
-  if (is.null(out)) {
-    if (checkTimeunit(unit, envir)) {
-      out <- as.numeric(get(paste0("d", unit), envir = envir)(1))
-    }
-  }
-  #attributes(out)$unit = "second"
   return(out)
 }
 ################################################################################
@@ -238,14 +234,19 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   }
 
   timeUnit <- attr(time, "unit")
-  # Assume default of seconds if time has no units
-  if (!is.character(timeUnit)) {
-    attr(time, "unit") <- timeUnit <- "second"
-  }
-  if (is.na(timeUnit)) timeUnit <- "NA" # for startsWith next
 
-  if (!all(startsWith(c(unit, timeUnit), "second"))) {
-    if (!is.na(timeUnit) & !is.na(unit)) {
+  if (!skipChecks) {
+    # Assume default of seconds if time has no units
+    if (!is.character(timeUnit)) {
+      attr(time, "unit") <- timeUnit <- "second"
+    }
+    if (is.na(timeUnit)) timeUnit <- "NA" # for startsWith next
+  }
+  # Commenting out these two sections -- very rare for the simulation
+  #  *and* the units requested to be in seconds
+  # Also, NA is handled by inSeconds
+  #if (!all(startsWith(c(unit, timeUnit), "second"))) {
+  #  if (!is.na(timeUnit) & !is.na(unit)) {
       # confirm that units are usable by SpaDES
       #  This has been commented out, because it is too slow to check every time
       #  This should be checked at defineMetadata stage, rather than every
@@ -253,23 +254,26 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
       #checkTimeunit(c(timeUnit, unit), envir)
 
       # if timeUnit is same as unit, skip calculations
-      if (unit != timeUnit) {
+  if (is.null(timeUnit)) timeUnit <- "NA" # for next line
+  if (unit != timeUnit) {
         if (timeUnit == "second") {
-          time <- time * 1 / inSeconds(unit, envir, skipChecks = TRUE)
+          time <- time / inSeconds(unit, envir, skipChecks = TRUE)
         } else if (unit == "second") {
-          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) / 1
+          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE)
         } else {
           time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) /
                           inSeconds(unit, envir, skipChecks = TRUE)
         }
         attr(time, "unit") <- unit
       }
-    } else {
-      # if timeunit is NA
-      time <- 0
-      attr(time, "unit") <- unit
-    }
-  }
+  #   } else {
+  #     # if timeunit is NA
+  #     time <- 0
+  #     attr(time, "unit") <- unit
+  #   }
+  # } else {
+  #
+  # }
   return(time)
 }
 ################################################################################

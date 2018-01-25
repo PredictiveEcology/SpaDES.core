@@ -9,18 +9,19 @@
 \alias{.parseModule,simList,list-method}
 \title{Parse and initialize a module}
 \usage{
-.parseModulePartial(sim, modules, filename, defineModuleElement)
+.parseModulePartial(sim, modules, filename, defineModuleElement, envir = NULL)
 
 \S4method{.parseModulePartial}{missing,missing,character,character}(filename,
-  defineModuleElement)
+  defineModuleElement, envir)
 
 \S4method{.parseModulePartial}{simList,list,missing,character}(sim, modules,
-  defineModuleElement)
+  defineModuleElement, envir = NULL)
 
-.parseModule(sim, modules, userSuppliedObjNames = NULL, notOlderThan, ...)
+.parseModule(sim, modules, userSuppliedObjNames = NULL, envir = NULL,
+  notOlderThan, ...)
 
 \S4method{.parseModule}{simList,list}(sim, modules,
-  userSuppliedObjNames = NULL, notOlderThan, ...)
+  userSuppliedObjNames = NULL, envir = NULL, notOlderThan, ...)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object.}
@@ -31,6 +32,12 @@
 
 \item{defineModuleElement}{Character string indicating which of the list
 elements in defineModule should be extracted}
+
+\item{envir}{Optional environment in which to store parsed code. This may be
+useful if the same file is being parsed multiple times. This
+function will check in that envir for the parsed file before
+parsing again. If the \code{envir} is transient, then this will
+have no effect.}
 
 \item{userSuppliedObjNames}{Character string (or \code{NULL}, the default)
 indicating the names of objects that user has passed

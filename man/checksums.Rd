@@ -7,11 +7,14 @@
 \alias{checksums,character,character,missing-method}
 \title{Calculate checksums for a module's data files}
 \usage{
-checksums(module, path, write, ...)
+checksums(module, path, write, quickCheck = FALSE,
+  checksumFile = file.path(path, "CHECKSUMS.txt"), ...)
 
-\S4method{checksums}{character,character,logical}(module, path, write, ...)
+\S4method{checksums}{character,character,logical}(module, path, write,
+  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"), ...)
 
-\S4method{checksums}{character,character,missing}(module, path, write, ...)
+\S4method{checksums}{character,character,missing}(module, path, write,
+  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"), ...)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}
@@ -22,6 +25,17 @@ checksums(module, path, write, ...)
 Default is \code{FALSE}, as users should not change this file.
 Module developers should write this file prior to distributing
 their module code, and update accordingly when the data change.}
+
+\item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
+use \code{file.size} instead of \code{digest::digest}.
+This is faster, but potentially much less robust.}
+
+\item{checksumFile}{The filename of the checksums file to read or write to. The default
+is CHECKSUMS.txt located at
+\code{file.path(path, module, "data", checksumFile)}. It is likely
+not a good idea to change this, and should only be used in
+cases such as
+\code{Cache}, which can evaluate if the checksumFile has changed.}
 
 \item{...}{Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
 the digest algorithm can be specified.}

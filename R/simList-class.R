@@ -98,8 +98,9 @@
 setClass(
   ".simList",
   slots = list(
-    modules = "list", params = "list", events = "data.table",
-    current = "data.table", completed = "list", depends = ".simDeps",
+    modules = "list", params = "list", events = "list",#data.table",
+    current = "list", #"data.table",
+    completed = "list", depends = ".simDeps",
     simtimes = "list", inputs = "list", outputs = "list", paths = "list"
   ),
   prototype = list(
@@ -108,8 +109,8 @@ setClass(
       .checkpoint = list(interval = NA_real_, file = NULL),
       .progress = list(type = NULL, interval = NULL)
     ),
-    events = .emptyEventListObj,
-    current = .emptyEventListObj,
+    events = list(),#.emptyEventListObj,
+    current = list(), #.emptyEventListObj,
     completed = list(),
     depends = new(".simDeps", dependencies = list(NULL)),
     simtimes = list(
@@ -148,7 +149,7 @@ setClass(
 setClass("simList",
          contains = ".simList",
          slots = list(.envir = "environment"),
-         prototype = list(.envir = new.env(parent = emptyenv()))
+         prototype = list(.envir = new.env(parent = asNamespace("SpaDES.core"))) #emptyenv()))#
 )
 
 ################################################################################
@@ -206,6 +207,7 @@ setAs(from = "simList", to = "simList_", def = function(from) {
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object) {
-            .Object@.envir <- new.env(parent = .GlobalEnv)
+            .Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
+            attr(.Object@.envir, "name") <- "sim"
             return(.Object)
 })

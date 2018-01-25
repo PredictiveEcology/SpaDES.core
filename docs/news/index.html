@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -103,6 +103,46 @@
     </div>
 
     <div class="contents">
+    <div id="version-0-1-0-9000" class="section level1">
+<h1 class="hasAnchor">
+<a href="#version-0-1-0-9000" class="anchor"></a>version 0.1.0.9000</h1>
+<ul>
+<li>
+<p>environments in modules are now as follows:</p>
+<ul>
+<li>Functions defined in a module are sourced into an environment located here: <code>sim@.envir$._&lt;moduleName&gt;</code>, and it is a is a child of <code>sim@.envir</code>. This environment is hidden (with ls(sim)). To see it, <code>ls(envir(sim), all.names = TRUE)</code>
+</li>
+<li>
+<code>sim@.envir</code> is a child of <code>SpaDES.core</code>
+</li>
+</ul>
+</li>
+<li>
+<p>scoping from within a function that is defined in a module is thus:</p>
+<ul>
+<li>
+<code>sim@.envir$._&lt;moduleName&gt;</code> –&gt; <code>sim@.envir</code> –&gt; <code>SpaDES.core</code> –&gt; <code>base</code> –&gt; <code>.GlobalEnv</code> –&gt; <code>search()</code>
+</li>
+</ul>
+</li>
+<li>the core DES is now built around lists, rather than data.table. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., <code><a href="../reference/simList-accessors-events.html">events(sim)</a></code>, <code><a href="../reference/simList-accessors-events.html">completed(sim)</a></code>) of the event queues still show <code>data.table</code> objects, but these are made on the fly.</li>
+<li>remove <code>grDevices</code> from Imports as it was not used (#1)</li>
+<li>remove <code>chron</code> and <code>CircStats</code> dependencies</li>
+<li>remove functions <code>dwrpnorm2</code> and move to package <code>SpaDES.tools</code>
+</li>
+<li>remove unused function <code>F()</code> due to conflicts with <code>F</code>/<code>FALSE</code>.</li>
+<li>improved download of module data: added new <code>quickCheck</code> argument</li>
+<li>improved download of modules: use fuzzy matching</li>
+<li>new option: <code>spades.switchPkgNamespaces</code> which allows the user to turn off the <code>SpaDES</code> feature that loads and unloads libraries specific to each module. While useful, it slows down computations, in some cases, by a lot.</li>
+<li>fix bug in <code>zipModule</code> that omitted the checksum file from being included when <code>data = FALSE</code> (#3)</li>
+<li>default <code>debug</code> option in <code><a href="../reference/spades.html">spades()</a></code> now uses the package option <code>spades.debug</code> and default is set to <code>FALSE</code> (#5)</li>
+<li>various other speed improvements and bug fixes</li>
+<li>convert <code>P</code> to a function, rather than S4 generic and method, for speed.</li>
+<li>importFrom only used functions from <code>utils</code> due to name conflicts with <code><a href="http://www.rdocumentation.org/packages/raster/topics/stack">raster::stack</a></code> and <code><a href="http://www.rdocumentation.org/packages/utils/topics/stack">utils::stack</a></code>
+</li>
+<li><p>new function <code>remoteFileSize</code> to check the size of remote files</p></li>
+</ul>
+</div>
     <div id="version-0-1-0" class="section level1">
 <h1 class="hasAnchor">
 <a href="#version-0-1-0" class="anchor"></a>version 0.1.0</h1>
@@ -123,6 +163,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#version-0-1-0-9000">0.1.0.9000</a></li>
         <li><a href="#version-0-1-0">0.1.0</a></li>
       </ul>
     </div>

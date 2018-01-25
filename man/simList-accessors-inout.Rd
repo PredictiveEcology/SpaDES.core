@@ -253,6 +253,25 @@ if (require("rgdal", quietly = TRUE)) {
   spades(sim)
 }
 
+  # Example showing loading multiple objects from global environment onto the
+  #   same object in the simList, but at different load times
+  a1 <- 1
+  a2 <- 2
+  # Note arguments must be a list of NROW(inputs), with each element itself being a list,
+  #  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time
+  args <- lapply(1:2, function(x) {
+                 list(x = paste0("a", x),
+                      envir = environment()) # may be necessary to specify in which envir a1, a2
+                                             # are located, if not in an interactive sessino
+                 })
+  inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
+  a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
+  a <- spades(a)
+  identical(a1, a$a)
+
+  end(a) <- 3
+  a <- spades(a) # different object (a2) loaded onto a$a
+  identical(a2, a$a)
 
 # Clean up after
 unlink(tmpdir, recursive = TRUE)
@@ -298,7 +317,7 @@ sim <- spades(sim)
 outputs(sim)
 
 # read one back in just to test it all worked as planned
-newObj <- read.csv(dir(tmpdir, pattern = "second10.csv", full.name = TRUE))
+newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
 newObj
 
 # using saving with SpaDES-aware methods

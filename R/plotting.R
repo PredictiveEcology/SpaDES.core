@@ -40,11 +40,11 @@ setMethod(
     sim <- list(...)[[1]]
     plotList <- ls(sim@.envir, all.names = TRUE)
     plotables <- sapply(plotList, function(x)
-      is(get(x, envir = sim@.envir), ".spadesPlottables"))
+      is(get(x, envir = sim@.envir), ".quickPlottables"))
     if (any(plotables)) {
       plotObjects <- mget(plotList[plotables], sim@.envir) %>%
         append(., list(env = sim@.envir))
-      do.call(Plot, plotObjects)
+      Plot(plotObjects)
     }
   })
 

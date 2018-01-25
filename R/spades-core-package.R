@@ -125,13 +125,14 @@
 #'   }
 #' }
 #'
-#' \subsection{3.7 Modules and dependencies}{
+#' \subsection{3.7 Modules, dependencies, packages}{
 #'   Accessor functions for the \code{depends}, \code{modules}, and \code{.loadOrder} slots.
 #'   These are included for advanced users.
 #'
 #'   \tabular{ll}{
 #'      \code{\link{depends}} \tab List of simulation module dependencies. (advanced)\cr
 #'      \code{\link{modules}} \tab List of simulation modules to be loaded. (advanced)\cr
+#'      \code{\link{packages}} \tab Vector of required R libraries of all modules. (advanced)\cr
 #'   }
 #' }
 #'
@@ -417,9 +418,12 @@
 #'   cache simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
 #'
-#'   \item \code{spades.inputPath}: The default local directory in which to
+#'   \item \code{spades.cachePath}: The default local directory in which to
 #'   look for simulation inputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs}).
+#'
+#'   \item \code{spades.debug}: The default debugging value for \code{spades()}.
+#'   Default is \code{FALSE}.
 #'
 #'   \item \code{spades.lowMemory}: If true, some functions will use more memory
 #'     efficient (but slower) algorithms. Default \code{FALSE}.
@@ -438,12 +442,16 @@
 #'   save simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
 #'
+#'   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
+#'     to ensure a module's required packages are listed first?
+#'     Default \code{TRUE}, which reduces name conflicts among package objects,
+#'     but is not without overhead (\emph{i.e.}, can be slow).
+#'
 #'   \item \code{spades.tolerance}: The default tolerance value used for floating
 #'     point number comparisons. Default \code{.Machine$double.eps^0.5}.
 #'
 #'   \item \code{spades.useragent}: The default user agent to use for downloading
 #'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
-#'
 #' }
 #'
 #' @rdname SpaDES.core-package
@@ -456,5 +464,4 @@
 
 #' @import igraph
 #' @import methods
-#' @import utils
 NULL

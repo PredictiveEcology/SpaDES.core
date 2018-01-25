@@ -3,6 +3,7 @@
 \docType{methods}
 \name{.robustDigest,simList-method}
 \alias{.robustDigest,simList-method}
+\alias{Cache}
 \title{\code{.robustDigest} for \code{simList} class objects}
 \usage{
 \S4method{.robustDigest}{simList}(object, objects,
@@ -29,7 +30,7 @@ Default 1e6. Passed to \code{.prepareFileBackedRaster}.}
 
 \item{digestPathContent}{Logical. Should arguments that are of class \code{Path}
 (see examples below) have their name digested
-(\code{FALSE}; default), or their file contents (\code{TRUE}).}
+(\code{FALSE}), or their file contents (\code{TRUE}; default).}
 
 \item{classOptions}{Optional list. This will pass into \code{.robustDigest} for
 specific classes. Should be options that the \code{.robustDigest} knows what

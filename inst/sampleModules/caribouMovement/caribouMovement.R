@@ -1,5 +1,5 @@
 SpaDES.core.version <- "0.1.0"
-if (packageVersion("SpaDES.core") < SpaDES.core.version) {
+if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'caribouMovement' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
        "Please update 'SpaDES.core' to use this module.")
@@ -62,7 +62,7 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
       checkObject(sim, name = P(sim)$stackName, layer = "habitatQuality")
 
       # do stuff for this event
-      sim <- sim$caribouMovementInit(sim)
+      sim <- Init(sim)
 
       # schedule the next event
       sim <- scheduleEvent(sim, P(sim)$moveInitialTime,
@@ -74,7 +74,7 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     move = {
       # do stuff for this event
-      sim <- sim$caribouMovementMove(sim)
+      sim <- Move(sim)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + P(sim)$moveInterval, "caribouMovement", "move")
@@ -113,7 +113,7 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 ## event functions
-caribouMovementInit <- function(sim) {
+Init <- function(sim) {
   yrange <- c(ymin(sim[[P(sim)$stackName]]),
               ymax(sim[[P(sim)$stackName]]))
   xrange <- c(xmin(sim[[P(sim)$stackName]]),
@@ -137,7 +137,7 @@ caribouMovementInit <- function(sim) {
   return(invisible(sim))
 }
 
-caribouMovementMove <- function(sim) {
+Move <- function(sim) {
   # crop any caribou that went off maps
   sim$caribou <- crop(sim$caribou, sim[[P(sim)$stackName]])
   if (length(sim$caribou) == 0) stop("All agents are off map")

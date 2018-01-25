@@ -8,13 +8,13 @@
 \alias{moduleVersion,character,missing,simList-method}
 \title{Parse and extract a module's version}
 \usage{
-moduleVersion(module, path, sim)
+moduleVersion(module, path, sim, envir = NULL)
 
-\S4method{moduleVersion}{character,character,missing}(module, path)
+\S4method{moduleVersion}{character,character,missing}(module, path, envir)
 
-\S4method{moduleVersion}{character,missing,missing}(module)
+\S4method{moduleVersion}{character,missing,missing}(module, envir)
 
-\S4method{moduleVersion}{character,missing,simList}(module, sim)
+\S4method{moduleVersion}{character,missing,simList}(module, sim, envir)
 }
 \arguments{
 \item{module}{Character string. Your module's name.}
@@ -23,6 +23,12 @@ moduleVersion(module, path, sim)
 Default is to use the \code{spades.modulePath} option.}
 
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}
+
+\item{envir}{Optional environment in which to store parsed code. This may be
+useful if the same file is being parsed multiple times. This
+function will check in that envir for the parsed file before
+parsing again. If the \code{envir} is transient, then this will
+have no effect.}
 }
 \value{
 \code{numeric_version} indicating the module's version.
