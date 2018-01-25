@@ -78,7 +78,11 @@ setMethod(
       namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
 
       element <- (namesParsedList == defineModuleElement)
-      out <- tmp[["pf"]][[1]][[3]][element][[1]]
+      if (any(element)) {
+        out <- tmp[["pf"]][[1]][[3]][element][[1]]
+      } else {
+        out <- list()
+      }
       out <- tryCatch(
         eval(out),
         error = function(x) out
