@@ -34,6 +34,18 @@
 <![endif]-->
 
 
+<!-- Google analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58633549-6', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
   </head>
 
   <body>
@@ -68,10 +80,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
   </ul>
 </li>
@@ -100,11 +112,7 @@
     <div class="page-header">
       <h1>
         Reference
-<<<<<<< HEAD
-        <small>version&nbsp;0.1.0</small>
-=======
-        <small>version&nbsp;0.1.0.9002</small>
->>>>>>> development
+        <small>version&nbsp;0.1.1</small>
       </h1>
     </div>
 
@@ -150,15 +158,15 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="checkModuleLocal.html">checkModuleLocal</a></code> </p>
-          </td>
-          <td><p>Check for the existence of a module locally</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="checkModule.html">checkModule</a></code> </p>
           </td>
           <td><p>Check for the existence of a remote module</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="checkModuleLocal.html">checkModuleLocal</a></code> </p>
+          </td>
+          <td><p>Check for the existence of a module locally</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -193,15 +201,15 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="copyModule.html">copyModule</a></code> </p>
-          </td>
-          <td><p>Create a copy of an existing module</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="Copy.html">Copy</a></code> </p>
           </td>
           <td><p>Copy for simList class objects</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="copyModule.html">copyModule</a></code> </p>
+          </td>
+          <td><p>Create a copy of an existing module</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -277,6 +285,12 @@
         </tr><tr>
           <!--  -->
           <td>
+            <p><code><a href="findSimList.html">.findSimList</a></code> </p>
+          </td>
+          <td><p>Find simList in a nested list</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
             <p><code><a href="getModuleVersion.html">getModuleVersion</a></code> </p>
           </td>
           <td><p>Find the latest module version from a SpaDES module repository</p></td>
@@ -307,15 +321,15 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="ls-method.html">ls.simList</a></code> <code><a href="ls-method.html">ls</a></code> <code><a href="ls-method.html">objects.simList</a></code> <code><a href="ls-method.html">objects</a></code> </p>
-          </td>
-          <td><p>List simulation objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="ls_str-method.html">ls.str.simList</a></code> <code><a href="ls_str-method.html">ls.str</a></code> </p>
           </td>
           <td><p>List simulation objects and their structure</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="ls-method.html">ls.simList</a></code> <code><a href="ls-method.html">ls</a></code> <code><a href="ls-method.html">objects.simList</a></code> <code><a href="ls-method.html">objects</a></code> </p>
+          </td>
+          <td><p>List simulation objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -334,6 +348,12 @@
             <p><code><a href="moduleCoverage.html">moduleCoverage</a></code> </p>
           </td>
           <td><p>Calculate module coverage of unit tests</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="moduleDefaults.html">moduleDefaults</a></code> </p>
+          </td>
+          <td><p>Defaults values used in defineModule</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -361,6 +381,12 @@
         </tr><tr>
           <!--  -->
           <td>
+            <p><code><a href="newModule.html">newModule</a></code> </p>
+          </td>
+          <td><p>Create new module from template</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
             <p><code><a href="newModuleCode.html">newModuleCode</a></code> </p>
           </td>
           <td><p>Create new module code file</p></td>
@@ -370,12 +396,6 @@
             <p><code><a href="newModuleDocumentation.html">newModuleDocumentation</a></code> </p>
           </td>
           <td><p>Create new module documentation</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="newModule.html">newModule</a></code> </p>
-          </td>
-          <td><p>Create new module from template</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -463,15 +483,15 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="progressBar.html">newProgressBar</a></code> <code><a href="progressBar.html">setProgressBar</a></code> </p>
-          </td>
-          <td><p>Progress bar</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="progress.html">progressInterval</a></code> <code><a href="progress.html">progressInterval<-</a></code> <code><a href="progress.html">progressType</a></code> <code><a href="progress.html">progressType<-</a></code> </p>
           </td>
           <td><p>Get and set simulation progress bar details</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="progressBar.html">newProgressBar</a></code> <code><a href="progressBar.html">setProgressBar</a></code> </p>
+          </td>
+          <td><p>Progress bar</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -553,7 +573,7 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="simList-accessors-paths.html">paths</a></code> <code><a href="simList-accessors-paths.html">paths<-</a></code> <code><a href="simList-accessors-paths.html">cachePath</a></code> <code><a href="simList-accessors-paths.html">cachePath<-</a></code> <code><a href="simList-accessors-paths.html">inputPath</a></code> <code><a href="simList-accessors-paths.html">inputPath<-</a></code> <code><a href="simList-accessors-paths.html">outputPath</a></code> <code><a href="simList-accessors-paths.html">outputPath<-</a></code> <code><a href="simList-accessors-paths.html">modulePath</a></code> <code><a href="simList-accessors-paths.html">modulePath<-</a></code> </p>
+            <p><code><a href="simList-accessors-paths.html">paths</a></code> <code><a href="simList-accessors-paths.html">paths<-</a></code> <code><a href="simList-accessors-paths.html">cachePath</a></code> <code><a href="simList-accessors-paths.html">cachePath<-</a></code> <code><a href="simList-accessors-paths.html">inputPath</a></code> <code><a href="simList-accessors-paths.html">inputPath<-</a></code> <code><a href="simList-accessors-paths.html">outputPath</a></code> <code><a href="simList-accessors-paths.html">outputPath<-</a></code> <code><a href="simList-accessors-paths.html">modulePath</a></code> <code><a href="simList-accessors-paths.html">modulePath<-</a></code> <code><a href="simList-accessors-paths.html">dataPath</a></code> </p>
           </td>
           <td><p>Specify paths for modules, inputs, and outputs</p></td>
         </tr><tr>
@@ -636,7 +656,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
