@@ -64,6 +64,7 @@ Suggests:
     tkrplot
 Remotes: 
     PredictiveEcology/quickPlot
+    PredictiveEcology/reproducible
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
