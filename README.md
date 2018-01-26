@@ -1,4 +1,7 @@
+<img src="https://github.com/PredictiveEcology/SpaDES/raw/master/docs/images/SpaDES.png"; style="max-width: 80px; float: right; padding-right: 10px; padding-top:10px;">
+
 # SpaDES.core
+
 
 [![Build Status](https://travis-ci.org/PredictiveEcology/SpaDES.core.svg?branch=master)](https://travis-ci.org/PredictiveEcology/SpaDES.core)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/2fxqhgk6miv2fytd/branch/master?svg=true)](https://ci.appveyor.com/project/achubaty/spades-core/branch/master)
