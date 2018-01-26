@@ -34,6 +34,18 @@
 <![endif]-->
 
 
+<!-- Google analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58633549-6', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
   </head>
 
   <body>
@@ -68,10 +80,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
   </ul>
 </li>
@@ -105,8 +117,9 @@
     <p>Create a new simulation object, the "sim" object. This object is implemented
 using an <code>environment</code> where all objects and functions are placed.
 Since environments in <code>R</code> are
-pass by reference, "putting" objects in the sim object does no actual copy. This
-is also the location of all parameters, and other important simulation information, such
+pass by reference, "putting" objects in the sim object does no actual copy. The
+<code>simList</code> also stores all parameters,
+and other important simulation information, such
 as times, paths, modules, and module load order. See more details below.</p>
     
 
@@ -197,10 +210,12 @@ load order will be determined automatically.</p></td>
       <th>notOlderThan</th>
       <td><p>A time, as in from <code>Sys.time()</code>. This is passed into
 the <code>Cache</code> function that wraps <code>.inputObjects</code>.
-If the module has a parameter, <code>.useCache</code> and it is
-<code>TRUE</code>, then the <code>.inputObjects</code> will be cached.
-Passing the current time into to <code>notOlderThan</code> will cause the
-Cache to be refreshed, i.e., rerun.</p></td>
+If the module uses the <code>.useCache</code> parameter and it is
+set to <code>TRUE</code> or <code>".inputObjects"</code>,
+then the <code>.inputObjects</code> will be cached.
+Setting <code>notOlderThan = Sys.time()</code> will cause the
+cached versions of <code>.inputObjects</code> to be refreshed,
+i.e., rerun.</p></td>
     </tr>
     </table>
     
@@ -211,14 +226,64 @@ specified in the arguments supplied.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Calling this simInit function does several things including the following:
-- sources all module files, placing all function definitions in the sim object
-- optionally copies objects from the global environment to the sim object
-- optionally loads objects from disk
-- schedules all "init" events from all modules
-- assesses module dependencies via the inputs and outputs identified in their metadata
-- determines time units of modules and how they fit together
-    <code>params</code> can only contain updates to any parameters that are defined in
+    <h3>Calling this <code>simInit</code> function does the following:</h3>
+    <table><tr><td>
+  <b>What</b> </td>
+<td> <b>Details</b> </td>
+<td> <b>Argument(s) to use</b> </td>
+</tr><tr><td>
+  fills <code>simList</code> slots </td>
+<td> places the arguments <code>times</code>,
+    <code>params</code>, <code>modules</code>, <code>paths</code> into equivalently named
+    <code>simList</code> slots </td>
+<td> <code>times</code>,
+    <code>params</code>, <code>modules</code>, <code>paths</code></td>
+</tr><tr><td>
+  sources all module files </td>
+<td> places all function definitions in the
+    <code>simList</code>, specifically, into a sub-environment of the main
+    <code>simList</code> environment: e.g., <code>sim$&lt;moduleName&gt;$function1</code>
+    (see section on <b>Scoping</b>) </td>
+<td> <code>modules</code> </td>
+</tr><tr><td>
+  copies objects </td>
+<td> from the global environment to the
+    <code>simList</code> environment </td>
+<td> <code>objects</code> </td>
+</tr><tr><td>
+  loads objects </td>
+<td> from disk into the <code>simList</code> </td>
+<td> <code>inputs</code> </td>
+</tr><tr><td>
+  schedule object loading/copying </td>
+<td> Objects can be loaded into the
+    <code>simList</code> at any time during a simulation  </td>
+<td> <code>inputs</code> </td>
+</tr><tr><td>
+  schedule object saving </td>
+<td> Objects can be saved to disk at any arbitrary
+    time during the simulation. If specified here, this will be in addition
+    to any saving due code inside a module (i.e., a module may manually
+    run <code>write.table(...)</code> </td>
+<td> <code>outputs</code> </td>
+</tr><tr><td>
+  schedules "init" events </td>
+<td> from all modules (see <code><a href='simList-accessors-events.html'>events</a></code>)
+       </td>
+<td> automatic  </td>
+</tr><tr><td>
+  assesses module dependencies </td>
+<td> via the inputs and outputs identified in their
+    metadata. This gives the order of the <code>.inputObjects</code> and <code>init</code>
+    events. This can be overridden by <code>loadOrder</code>. </td>
+<td> automatic </td>
+</tr><tr><td>
+  determines time unit </td>
+<td> takes time units of modules
+      and how they fit together </td>
+<td> <code>times</code> or automatic </td>
+</tr></table>
+<p><code>params</code> can only contain updates to any parameters that are defined in
 the metadata of modules. Take the example of a module named, <code>Fire</code>, which
 has a parameter named <code>.plotInitialTime</code>. In the metadata of that module,
 it says <code>TRUE</code>. Here we can override that default with:
@@ -242,10 +307,17 @@ the defaults are as follows:</p><ul>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The user can opt to run a simpler simInit call without inputs, outputs, and times.
+    <p>The user can opt to run a simpler <code>simInit</code> call without inputs, outputs, and times.
 These can be added later with the accessor methods (See example). These are not required for initializing the
 simulation via simInit. <code>modules</code>, <code>paths</code>, <code>params</code>, and <code>objects</code>
-are all needed for initialization.</p>
+are all needed for successful initialization.</p>
+    
+    <h2 class="hasAnchor" id="caching"><a class="anchor" href="#caching"></a>Caching</h2>
+
+    
+    <p>Using caching with <code>SpaDES</code> is vital when building re-useable and reproducible
+content. Please see the vignette dedicated to this topic. See
+<a href='https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html'>https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html</a></p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -270,7 +342,7 @@ are all needed for initialization.</p>
  <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
  <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 )
-<span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>mySim</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
+<span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>mySim</span>) <span class='co'># shows plotting</span>
 
 <span class='co'># Change more parameters, removing plotting</span>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'>simInit</span>(
@@ -378,6 +450,8 @@ are all needed for initialization.</p>
 
       <li><a href="#note">Note</a></li>
 
+      <li><a href="#caching">Caching</a></li>
+
       <li><a href="#references">References</a></li>
 
       <li><a href="#see-also">See also</a></li>
@@ -398,7 +472,7 @@ Alex Chubaty and Eliot McIntire
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

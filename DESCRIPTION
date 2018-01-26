@@ -41,7 +41,6 @@ Imports:
     methods,
     parallel,
     R.utils (>= 2.5.0),
-    RandomFields (>= 3.1.24),
     raster (>= 2.5-8),
     RCurl (>= 1.95-4.8),
     stats,
@@ -60,8 +59,7 @@ Suggests:
     rgenoud,
     rmarkdown,
     SpaDES.tools,
-    testthat (>= 1.0.2),
-    tkrplot
+    testthat (>= 1.0.2)
 Remotes: 
     PredictiveEcology/quickPlot,
     PredictiveEcology/reproducible
