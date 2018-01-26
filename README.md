@@ -1,4 +1,5 @@
-<img src="https://github.com/PredictiveEcology/SpaDES/raw/master/docs/images/SpaDES.png"; style="max-width: 80px; float: right; padding-right: 10px; padding-top:10px;">
+
+<img align="right" width="80" src="https://github.com/PredictiveEcology/SpaDES/raw/master/docs/images/SpaDES.png">
 
 # SpaDES.core
 
