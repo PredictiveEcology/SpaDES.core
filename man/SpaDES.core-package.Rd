@@ -491,11 +491,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Alex M Chubaty \email{alexander.chubaty@canada.ca}
+\strong{Maintainer}: Eliot J B McIntire \email{eliot.mcintire@canada.ca}
 
 Authors:
 \itemize{
-  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca}
+  \item Alex M Chubaty \email{alexander.chubaty@canada.ca}
 }
 
 Other contributors:
