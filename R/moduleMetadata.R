@@ -131,12 +131,12 @@ setMethod(
   "moduleVersion",
   signature = c(module = "character", path = "character", sim = "missing", envir = "ANY"),
   definition = function(module, path, envir) {
-  v <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                           defineModuleElement = "version", envir = envir)
-  if (is.null(names(v))) {
-    as.numeric_version(v) ## SpaDES < 1.3.1.9044
-  } else {
-    as.numeric_version(v[[module]]) ## SpaDES >= 1.3.1.9044
+    v <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                             defineModuleElement = "version", envir = envir)
+    if (is.null(names(v))) {
+      as.numeric_version(v) ## SpaDES < 1.3.1.9044
+    } else {
+      as.numeric_version(v[[module]]) ## SpaDES >= 1.3.1.9044
   }
 })
 
