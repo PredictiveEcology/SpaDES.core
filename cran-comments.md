@@ -14,7 +14,7 @@ This is a major update to our package. Many external and internal changes, as de
 * Windows 7               (local), R 3.4.2
 
 ### Current R versions
-* OSX Sierra 10.12.6 (travis-ci), R 3.4.3
+* OSX Sierra 10.12.6 (travis-ci), R 3.4.3 
 * Ubuntu 14.04.5     (travis-ci), R 3.4.2
 * Debian 4.9.51          (local), R 3.4.3
 * Windows             (appveyor), R 3.4.3
@@ -24,7 +24,6 @@ This is a major update to our package. Many external and internal changes, as de
 ### Development R version
 * Ubuntu 14.04        (travis-ci), R 3.5.0 (2018-01-24 r74157)
 * Windows                 (local), R 3.5.0 (2018-01-24 r74157) 
-* Windows           (win-builder), R 3.5.0 (2018-01-24 r74157)
 
 ## R CMD check results
 

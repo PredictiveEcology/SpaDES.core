@@ -491,7 +491,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Eliot J B McIntire \email{eliot.mcintire@canada.ca}
+\strong{Maintainer}: Eliot J B McIntire \email{eliotmcintire@gmail}
 
 Authors:
 \itemize{
