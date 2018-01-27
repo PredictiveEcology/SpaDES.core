@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate random strings — rndstr • SpaDES.core</title>
+<title>Generate random strings � rndstr • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -33,6 +33,18 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Google analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58633549-6', 'auto');
+  ga('send', 'pageview');
+
+</script>
 
   </head>
 
@@ -68,10 +80,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
   </ul>
 </li>
@@ -157,9 +169,18 @@ first character of the string (useful if being used for object names).</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>set.seed</span>(<span class='fl'>11</span>)
-<span class='fu'>rndstr</span>()</div><div class='output co'>#&gt; [1] "o0v04X5h"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "T7arUQJztk"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] "9tcGml3t"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "u17ovkpcOD" "o6f3fduEkR" "H0wPvBqjdr" "vOaB8KazKb" "cubCGqqcWx"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] "okmd3uve" "QpbEOdmL" "atOeLbAd" "OFppcgGJ" "D8H5rOFi"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "WrwfchZa" "x41RHDXG" "lw8tgHMZ" "JyrGdwAk" "TiyLfLFD"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "hbEztiCfgO"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "j2ZbgP6LHD" "kN4mS69oPh" "phHSmcUZ7J" "VzgLkiAcIU" "xa1GIVGA9Z"</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'>set.seed</span>(<span class='fl'>11</span>)
+<span class='fu'>rndstr</span>()
+<span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -184,7 +205,7 @@ Alex Chubaty and Eliot McIntire
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

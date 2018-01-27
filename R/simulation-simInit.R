@@ -78,7 +78,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' Using caching with \code{SpaDES} is vital when building re-useable and reproducible
 #' content. Please see the vignette dedicated to this topic. See
-#' \url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html}
+#' \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
 #'
 #' @note
 #' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.

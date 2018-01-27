@@ -484,18 +484,18 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://spades-core.predictiveecology.org/}
+  \item \url{http://spades-core.predictiveecology.org/}
   \item \url{https://github.com/PredictiveEcology/SpaDES.core}
   \item Report bugs at \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Alex M Chubaty \email{alexander.chubaty@canada.ca}
+\strong{Maintainer}: Eliot J B McIntire \email{eliotmcintire@gmail}
 
 Authors:
 \itemize{
-  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca}
+  \item Alex M Chubaty \email{alexander.chubaty@canada.ca}
 }
 
 Other contributors:

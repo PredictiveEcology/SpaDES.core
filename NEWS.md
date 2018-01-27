@@ -1,6 +1,6 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.1.0.9000
+version 0.1.1
 ==================
 
 * uses reproducible::Require instead of SpaDES.core::loadPackages to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`

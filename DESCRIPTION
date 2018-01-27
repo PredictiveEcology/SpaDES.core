@@ -6,7 +6,7 @@ Description: Provide the core discrete event simulation (DES) framework for
     facilitate modularity, and easily enable the user to include additional
     functionality by running user-built simulation modules.
 URL:
-    https://spades-core.predictiveecology.org/,
+    http://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2018-01-25
 Version: 0.1.1
@@ -41,7 +41,6 @@ Imports:
     methods,
     parallel,
     R.utils (>= 2.5.0),
-    RandomFields (>= 3.1.24),
     raster (>= 2.5-8),
     RCurl (>= 1.95-4.8),
     stats,
@@ -60,10 +59,7 @@ Suggests:
     rgenoud,
     rmarkdown,
     SpaDES.tools,
-    testthat (>= 1.0.2),
-    tkrplot
-Remotes: 
-    PredictiveEcology/quickPlot
+    testthat (>= 1.0.2)
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues

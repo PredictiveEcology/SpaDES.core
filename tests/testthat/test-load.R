@@ -361,7 +361,7 @@ test_that("test-load.R: interval loading of objects from .GlobalEnv", {
 
   times <- 0:10
   test1 <- "hi"
-  newModule("test", path = tempdir())
+  newModule("test", path = tempdir(), open = FALSE)
 
   a <- simInit(inputs = data.frame(obj = "test1", loadTimes = times), times = list(start = 0, end = 2),
                modules = list("test"), paths = list(modulePath = tempdir()))
@@ -376,7 +376,7 @@ test_that("test-load.R: interval loading of objects from .GlobalEnv", {
   # Renamed using arguments
   times <- 0:10
   test1 <- "hi"
-  newModule("test", path = tempdir())
+  newModule("test", path = tempdir(), open = FALSE)
 
   a1 <- 1
   a2 <- 2

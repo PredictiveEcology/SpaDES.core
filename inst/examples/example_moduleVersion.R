@@ -9,7 +9,7 @@ mySim <- simInit(
    params = list(
      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
    ),
-   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+   modules = list("caribouMovement"),
    paths = list(modulePath = path)
 )
 moduleVersion("caribouMovement", sim = mySim)

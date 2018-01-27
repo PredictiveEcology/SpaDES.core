@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculate checksums for a module's data files — checksums • SpaDES.core</title>
+<title>Calculate checksums for a module's data files � checksums • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -33,6 +33,18 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Google analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58633549-6', 'auto');
+  ga('send', 'pageview');
+
+</script>
 
   </head>
 
@@ -68,10 +80,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
   </ul>
 </li>
@@ -109,15 +121,16 @@ Checksums are computed using <code>SpaDES.core:::.digest</code>, which is simply
 wrapper around <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>.</p>
     
 
-    <pre class="usage"><span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>checksumFile</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='no'>path</span>, <span class='st'>"CHECKSUMS.txt"</span>), <span class='no'>...</span>)
 
 <span class='co'># S4 method for character,character,logical</span>
 <span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>checksumFile</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='no'>path</span>, <span class='st'>"CHECKSUMS.txt"</span>), <span class='no'>...</span>)
 
 <span class='co'># S4 method for character,character,missing</span>
 <span class='fu'>checksums</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>write</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>checksumFile</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='no'>path</span>, <span class='st'>"CHECKSUMS.txt"</span>), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -140,8 +153,17 @@ their module code, and update accordingly when the data change.</p></td>
     <tr>
       <th>quickCheck</th>
       <td><p>Logical. If <code>TRUE</code>, then the check with local data will only
-use <code>file.size</code> instead of <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>. This is
-faster, but less robust.</p></td>
+use <code>file.size</code> instead of <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>.
+This is faster, but potentially much less robust.</p></td>
+    </tr>
+    <tr>
+      <th>checksumFile</th>
+      <td><p>The filename of the checksums file to read or write to. The default
+is CHECKSUMS.txt located at
+<code>file.path(path, module, "data", checksumFile)</code>. It is likely
+not a good idea to change this, and should only be used in
+cases such as
+<code>Cache</code>, which can evaluate if the checksumFile has changed.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -187,8 +209,9 @@ To update your <code class="file">CHECKSUMS.txt</code> files using the new algor
 
 <span class='co'># 2. calculate file checksums and write to file (this will overwrite CHECKSUMS.txt)</span>
 <span class='fu'>checksums</span>(<span class='no'>moduleName</span>, <span class='no'>modulePath</span>, <span class='kw'>write</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='co'># }</span><div class='input'>
-</div></pre>
+<span class='co'># }</span># NOT RUN {
+# }
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -217,7 +240,7 @@ Alex Chubaty
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

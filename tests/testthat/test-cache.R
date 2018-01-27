@@ -247,7 +247,7 @@ test_that("test .robustDigest for simLists", {
   }, add = TRUE)
 
   modName <- "test"
-  newModule(modName, path = tmpdir)
+  newModule(modName, path = tmpdir, open = FALSE)
   fileName <- file.path(modName, paste0(modName,".R"))
   newCode <- "\"hi\"" # this will be added below in 2 different spots
 
@@ -294,7 +294,7 @@ test_that("test .robustDigest for simLists", {
 
 
   # In some other location, test during spades call
-  newModule(modName, path = tmpdir)
+  newModule(modName, path = tmpdir, open = FALSE)
   try(clearCache(x = tmpCache), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)

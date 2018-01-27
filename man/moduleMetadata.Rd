@@ -42,7 +42,7 @@ mySim <- simInit(
    params = list(
      .globals = list(stackName = "landscape")
    ),
-   modules = list("fireSpread"),
+   modules = list("caribouMovement"),
    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 )
 moduleMetadata(sim = mySim)

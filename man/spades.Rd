@@ -155,7 +155,7 @@ Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 \code{\link{SpaDES.core-package}},
 \code{\link{experiment}} for using replication with \code{spades},
 \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
-\url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html} which
+\url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html} which
 uses \code{\link[reproducible]{Cache}}.
 }
 \author{

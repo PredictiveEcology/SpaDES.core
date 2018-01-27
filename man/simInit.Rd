@@ -165,7 +165,7 @@ are all needed for successful initialization.
 
 Using caching with \code{SpaDES} is vital when building re-useable and reproducible
 content. Please see the vignette dedicated to this topic. See
-\url{https://cran.r-project.org/web/packages/SpaDES/vignettes/iii-cache.html}
+\url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
 }
 
 \examples{
