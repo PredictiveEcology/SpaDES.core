@@ -27,7 +27,7 @@ This is a major update to our package. Many external and internal changes, as de
 
 ## R CMD check results
 
-There is one error related to a missing tk85.dll on win-builder 32 bit. We have tested it on Windows 32 bit with R 3.4.0 (no error), R 3.4.1  (no error), R 3.4.2 (error) and R 3.4.3 (error), R 3.5 (R-devel) (no error) Windows, and it only occurs on R 3.4.3 . There is are no other combinations of Windows, Linux, Mac and R-old release, R-release, and R-devel to have the error. The error indicates that tk85.dll is not present; however, tk86.dll *is* present and delivered with R, so there is something in some internals somewhere that is searching for a mismatched dll between the one being requested and the one that is shipped with R. We feel that this is not something that our package can address. 
+There is one *intermittent* error related to a missing tk85.dll on windows R 3.4.3, 32 bit. We have tested it on Windows 32 bit with R 3.4.0 (no error), R 3.4.1  (no error), R 3.4.2 (error) and R 3.4.3 (intermittent error), R 3.5 (R-devel) (no error) Windows, and it only occurs on R 3.4.3 . There is are no other combinations of Windows, Linux, Mac and R-old release, R-release, and R-devel to have the error. The error indicates that tk85.dll is not present; however, tk86.dll *is* present and delivered with R, so there is something in some internals somewhere that is searching for a mismatched dll between the one being requested and the one that is shipped with R. This error is occurring because of the package RandomFields from which we import one function. We feel that this is not something that our package can address. 
 
 ## Downstream dependencies
 
