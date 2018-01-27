@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert numeric to character with padding — paddedFloatToChar • SpaDES.core</title>
+<title>Convert numeric to character with padding � paddedFloatToChar • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -149,8 +149,11 @@ Passed to <code><a href='http://www.rdocumentation.org/packages/stringi/topics/s
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>)</div><div class='output co'>#&gt; [1] "1.250"</div><div class='input'><span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>, <span class='kw'>padL</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>padR</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] "001.25000"</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>)
+<span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>, <span class='kw'>padL</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>padR</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

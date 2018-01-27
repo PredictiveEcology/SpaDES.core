@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get and set simulation parameters. — params • SpaDES.core</title>
+<title>Get and set simulation parameters. � params • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -198,51 +198,14 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>modules</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='st'>"randomLandscapes"</span>)
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>modules</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='st'>"randomLandscapes"</span>)
 <span class='no'>paths</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='no'>modules</span>, <span class='kw'>paths</span> <span class='kw'>=</span> <span class='no'>paths</span>,
                  <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)))
-<span class='fu'>parameters</span>(<span class='no'>mySim</span>)</div><div class='output co'>#&gt; $randomLandscapes
-#&gt; $randomLandscapes$inRAM
-#&gt;   paramClass default  min   max                              paramDesc
-#&gt; 1    logical   FALSE TRUE FALSE should the raster be stored in memory?
-#&gt; 
-#&gt; $randomLandscapes$nx
-#&gt;   paramClass default min max                                         paramDesc
-#&gt; 2    numeric     100  10 500 size of map (number of pixels) in the x dimension
-#&gt; 
-#&gt; $randomLandscapes$ny
-#&gt;   paramClass default min max                                         paramDesc
-#&gt; 3    numeric     100  10 500 size of map (number of pixels) in the y dimension
-#&gt; 
-#&gt; $randomLandscapes$stackName
-#&gt;   paramClass   default min max               paramDesc
-#&gt; 4  character landscape  NA  NA name of the RasterStack
-#&gt; 
-#&gt; $randomLandscapes$.plotInitialTime
-#&gt;   paramClass default min max                         paramDesc
-#&gt; 5    numeric       0   0  NA time to schedule first plot event
-#&gt; 
-#&gt; $randomLandscapes$.plotInterval
-#&gt;   paramClass default min max                         paramDesc
-#&gt; 6    numeric      NA  NA  NA time interval between plot events
-#&gt; 
-#&gt; $randomLandscapes$.saveInitialTime
-#&gt;   paramClass default min max                         paramDesc
-#&gt; 7    numeric      NA  NA  NA time to schedule first save event
-#&gt; 
-#&gt; $randomLandscapes$.saveInterval
-#&gt;   paramClass default min max                         paramDesc
-#&gt; 8    numeric      NA  NA  NA time interval between save events
-#&gt; 
-#&gt; $randomLandscapes$.useCache
-#&gt;   paramClass default        min max
-#&gt; 9    logical   FALSE init, plot  NA
-#&gt;                                           paramDesc
-#&gt; 9 should the module result be cached for future use
-#&gt; 
-#&gt; </div><div class='input'>
-</div></pre>
+<span class='fu'>parameters</span>(<span class='no'>mySim</span>)
+
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

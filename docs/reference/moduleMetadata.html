@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse and extract module metadata — moduleMetadata • SpaDES.core</title>
+<title>Parse and extract module metadata � moduleMetadata • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -157,7 +157,8 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
 <span class='no'>sampleModules</span> <span class='kw'>&lt;-</span> <span class='fu'>dir</span>(<span class='no'>path</span>)
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleMetadata</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='no'>path</span>)
 
@@ -167,106 +168,11 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
    <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(
      <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)
    ),
-   <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"fireSpread"</span>),
+   <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"caribouMovement"</span>),
    <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 )
-<span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>)</div><div class='output co'>#&gt; $name
-#&gt; [1] "fireSpread"
-#&gt; 
-#&gt; $description
-#&gt; [1] "Simulate fire ignition and spread on a landscape, where spread probability varies according to percent pine. Fire size statistics are collected immediately after each burn event. Requires a global simulation parameter `stackName` be set."
-#&gt; 
-#&gt; $keywords
-#&gt; [1] "fire"              "percolation model" "spread algorithm" 
-#&gt; 
-#&gt; $childModules
-#&gt; character(0)
-#&gt; 
-#&gt; $authors
-#&gt; [1] "Alex M Chubaty &lt;alexander.chubaty@canada.ca&gt; [aut, cre]" 
-#&gt; [2] "Eliot J B McIntire &lt;eliot.mcintire@canada.ca&gt; [aut, cre]"
-#&gt; [3] "Steve Cumming &lt;Steve.Cumming@sbf.ulaval.ca&gt; [aut]"       
-#&gt; 
-#&gt; $version
-#&gt; $version$SpaDES.core
-#&gt; [1] "0.1.0"
-#&gt; 
-#&gt; $version$SpaDES.tools
-#&gt; [1] "0.1.0"
-#&gt; 
-#&gt; $version$fireSpread
-#&gt; [1] "1.6.0"
-#&gt; 
-#&gt; 
-#&gt; $spatialExtent
-#&gt; class       : Extent 
-#&gt; xmin        : NA 
-#&gt; xmax        : NA 
-#&gt; ymin        : NA 
-#&gt; ymax        : NA 
-#&gt; 
-#&gt; $timeframe
-#&gt; [1] NA NA
-#&gt; 
-#&gt; $timeunit
-#&gt; [1] "year"
-#&gt; 
-#&gt; $citation
-#&gt; list()
-#&gt; 
-#&gt; $documentation
-#&gt; list()
-#&gt; 
-#&gt; $reqdPkgs
-#&gt; $reqdPkgs[[1]]
-#&gt; [1] "methods"
-#&gt; 
-#&gt; $reqdPkgs[[2]]
-#&gt; [1] "raster"
-#&gt; 
-#&gt; $reqdPkgs[[3]]
-#&gt; [1] "RColorBrewer"
-#&gt; 
-#&gt; $reqdPkgs[[4]]
-#&gt; [1] "SpaDES.tools"
-#&gt; 
-#&gt; 
-#&gt; $parameters
-#&gt;           paramName paramClass      default        min          max
-#&gt; 1         stackName  character    landscape         NA           NA
-#&gt; 2            nFires    numeric           10          1          100
-#&gt; 3               its    numeric        1e+06      1e+06        1e+06
-#&gt; 4       persistprob    numeric            0          0            1
-#&gt; 5    returnInterval    numeric            1          1            1
-#&gt; 6        spreadprob    numeric        0.225       0.05          0.5
-#&gt; 7         startTime    numeric start(si....          0     end(sim)
-#&gt; 8  .plotInitialTime    numeric   start(sim) start(sim) end(sim) + 1
-#&gt; 9     .plotInterval    numeric            1          1            1
-#&gt; 10 .saveInitialTime    numeric           NA         NA           NA
-#&gt; 11    .saveInterval    numeric           NA         NA           NA
-#&gt;                                     paramDesc
-#&gt; 1                     name of the RasterStack
-#&gt; 2                 number of fires to initiate
-#&gt; 3        number of iterations for fire spread
-#&gt; 4   probability of fire persisting in a pixel
-#&gt; 5                        fire return interval
-#&gt; 6  probability of fire spreading into a pixel
-#&gt; 7               time of initial fire ignition
-#&gt; 8           time to schedule first plot event
-#&gt; 9           time interval between plot events
-#&gt; 10          time to schedule first save event
-#&gt; 11          time interval between save events
-#&gt; 
-#&gt; $inputObjects
-#&gt;                       objectName objectClass desc sourceURL
-#&gt; 1 P(sim, "fireSpread")$stackName RasterStack &lt;NA&gt;      &lt;NA&gt;
-#&gt; 2         globals(sim)$burnStats     numeric &lt;NA&gt;      &lt;NA&gt;
-#&gt; 
-#&gt; $outputObjects
-#&gt;                       objectName objectClass desc other
-#&gt; 1 P(sim, "fireSpread")$stackName RasterStack &lt;NA&gt;    NA
-#&gt; 2         globals(sim)$burnStats     numeric &lt;NA&gt;    NA
-#&gt; </div></pre>
+<span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

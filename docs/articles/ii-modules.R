@@ -16,7 +16,7 @@
 #    timeframe = as.POSIXlt(c(NA, NA)),
 #    timeunit = NA_real_,
 #    citation = list(),
-#    reqdPkgs = list("raster", "RColorBrewer", "tkrplot", "RandomFields"),
+#    reqdPkgs = list("raster", "RColorBrewer", "SpaDES.tools"),
 #    parameters = rbind(
 #      defineParameter("stackName", "character", "randomLandscape", NA, NA, "..."),
 #      defineParameter("nx", "numeric", 100L, NA, NA, "size of map (number ..."),
