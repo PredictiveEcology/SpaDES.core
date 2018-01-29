@@ -164,7 +164,8 @@ setMethod(
       for (uM in userModules) {
         filename <- paste(path, "/", uM, "/", uM, ".R", sep = "")
         readFile[[uM]] <- if (!is.null(sim@.envir[[".parsedFiles"]][[filename]])) {
-          # a little faster to use already parsed objects -- might have happened earlier during simInit,
+          # a little faster to use already parsed objects --
+          #   might have happened earlier during simInit,
           #   if this checkParams was run from simInit
           tmp <- parseConditional(envir = sim@.envir[[".parsedFiles"]],
                                   filename = filename)
@@ -276,4 +277,3 @@ setMethod(
     }
     return(invisible(allFound))
 })
-

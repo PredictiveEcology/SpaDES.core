@@ -71,10 +71,11 @@ setMethod(
 
     envirHash <- lapply(seq(allObjsInSimList), function(objs) {
       objectsToDigest <- sort(allObjsInSimList[[objs]], method = "radix")
-      objectsToDigest <- objectsToDigest[objectsToDigest %in% objects[[names(allObjsInSimList)[objs]]]]
+      objectsToDigest <- objectsToDigest[objectsToDigest %in%
+                                           objects[[names(allObjsInSimList)[objs]]]]
       .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]))
     })
-    names(envirHash) = names(allObjsInSimList)
+    names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
     envirHash <- envirHash[lens]
 
@@ -293,7 +294,8 @@ setMethod(
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
     tmpl <- .findSimList(tmpl)
-    whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1] # only take first simList -- may be a problem
+    # only take first simList -- may be a problem:
+    whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
     origEnv <- tmpl[[whSimList[1]]]@.envir
     isListOfSimLists <- if (is.list(object)) {
       if (is(object[[1]], "simList")) TRUE else FALSE
