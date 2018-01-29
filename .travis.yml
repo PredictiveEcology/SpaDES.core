@@ -11,8 +11,12 @@ matrix:
     r: 3.3.0
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
     before_install:
@@ -23,8 +27,12 @@ matrix:
     r: oldrel
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
     before_install:
@@ -35,8 +43,12 @@ matrix:
     r: release
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
     r_github_packages:
@@ -55,8 +67,12 @@ matrix:
     r: devel
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
     before_install:
