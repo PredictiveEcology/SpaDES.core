@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Filter objects by class � classFilter • SpaDES.core</title>
+<title>Filter objects by class — classFilter • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -183,7 +183,7 @@ These (known) cases are checked manually and corrected.</p>
   <span class='fu'>classFilter</span>(<span class='fu'>ls</span>(), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"lm"</span>)
   <span class='fu'>classFilter</span>(<span class='fu'>ls</span>(), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"lm"</span>, <span class='kw'>exclude</span> <span class='kw'>=</span> <span class='st'>"glm"</span>)
   <span class='fu'>rm</span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='no'>d</span>, <span class='no'>f</span>, <span class='no'>g</span>, <span class='no'>h</span>)
-<span class='co'># }</span><span class='co'># NOT RUN {</span>
+<span class='co'># }</span><div class='input'>
 <span class='co'>## from local (e.g., function) environment</span>
 <span class='fu'>local</span>({
   <span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'>environment</span>()
@@ -209,15 +209,8 @@ These (known) cases are checked manually and corrected.</p>
 <span class='no'>e</span>$<span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='fu'>sample</span>(<span class='fl'>1L</span>:<span class='fl'>10L</span>) <span class='co'># class `numeric`, `integer`</span>
 <span class='no'>e</span>$<span class='no'>g</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>( <span class='fu'>jitter</span>(<span class='no'>e</span>$<span class='no'>d</span>) ~ <span class='no'>e</span>$<span class='no'>d</span> ) <span class='co'># class `lm`</span>
 <span class='no'>e</span>$<span class='no'>h</span> <span class='kw'>&lt;-</span> <span class='fu'>glm</span>( <span class='fu'>jitter</span>(<span class='no'>e</span>$<span class='no'>d</span>) ~ <span class='no'>e</span>$<span class='no'>d</span> ) <span class='co'># class `lm`, `glm`</span>
-<span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='st'>"character"</span>, <span class='st'>"list"</span>), <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='kw'>exclude</span> <span class='kw'>=</span> <span class='st'>"integer"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"lm"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"lm"</span>, <span class='kw'>exclude</span> <span class='kw'>=</span> <span class='st'>"glm"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='fu'>rm</span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='no'>d</span>, <span class='no'>f</span>, <span class='no'>g</span>, <span class='no'>h</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='fu'>rm</span>(<span class='no'>e</span>)
-
-<span class='co'># }</span></pre>
+<span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='st'>"character"</span>, <span class='st'>"list"</span>), <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='output co'>#&gt; [1] "a" "b"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='output co'>#&gt; [1] "d" "f"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='kw'>exclude</span> <span class='kw'>=</span> <span class='st'>"integer"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='output co'>#&gt; [1] "d"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"lm"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='output co'>#&gt; [1] "g" "h"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'>ls</span>(<span class='no'>e</span>), <span class='kw'>include</span> <span class='kw'>=</span> <span class='st'>"lm"</span>, <span class='kw'>exclude</span> <span class='kw'>=</span> <span class='st'>"glm"</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='output co'>#&gt; [1] "g"</div><div class='input'><span class='fu'>rm</span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='no'>d</span>, <span class='no'>f</span>, <span class='no'>g</span>, <span class='no'>h</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>e</span>)
+<span class='fu'>rm</span>(<span class='no'>e</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run an experiment using <code><a href='spades.html'>spades</a></code> � experiment • SpaDES.core</title>
+<title>Run an experiment using <code><a href='spades.html'>spades</a></code> — experiment • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -328,8 +328,7 @@ database can only be written to one at a time, so there may be collisions.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='kw'>if</span> (<span class='fu'>interactive</span>()) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'>interactive</span>()) {
   <span class='fu'>library</span>(<span class='no'>igraph</span>) <span class='co'># use %&gt;% in a few examples</span>
   <span class='fu'>library</span>(<span class='no'>raster</span>)
 
@@ -550,8 +549,35 @@ database can only be written to one at a time, so there may be collisions.</p>
 
   <span class='co'># Remove all temp files</span>
   <span class='fu'>unlink</span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-}
-<span class='co'># }</span></pre>
+}</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘raster’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:SpaDES.core’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    select</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: SpaDES.tools</span></div><div class='output co'>#&gt; <span class='message'>Using SpaDES.tools version 0.1.0.</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: grid</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘grid’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:SpaDES.core’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    gpar</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:quickPlot’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    gpar</span></div><div class='img'><img src='experiment-1.png' alt='' width='700' height='432.632880098887' /></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='img'><img src='experiment-2.png' alt='' width='700' height='432.632880098887' /></div><div class='output co'>#&gt; <span class='message'>landscape read from /var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T//RtmpGWKucV/examples/landscapeMaps1/rep1/landscape_year0.rds using readRDS</span></div><div class='output co'>#&gt; <span class='message'>landscape read from /var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T//RtmpGWKucV/examples/landscapeMaps1/rep2/landscape_year0.rds using readRDS</span></div><div class='output co'>#&gt; $expDesign
+#&gt;   input expLevel
+#&gt; 1     1        1
+#&gt; 2     2        2
+#&gt; 
+#&gt; $expVals
+#&gt; [1] 1 2
+#&gt; </div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; $expDesign
+#&gt;   modules expLevel replicate
+#&gt; 1       1        1         1
+#&gt; 2       2        2         1
+#&gt; 3       1        1         2
+#&gt; 4       2        2         2
+#&gt; 
+#&gt; $expVals
+#&gt;                                       modules expLevel
+#&gt; 1 randomLandscapes,fireSpread,caribouMovement        1
+#&gt; 2            randomLandscapes,caribouMovement        2
+#&gt; 3 randomLandscapes,fireSpread,caribouMovement        1
+#&gt; 4            randomLandscapes,caribouMovement        2
+#&gt; </div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='img'><img src='experiment-3.png' alt='' width='700' height='432.632880098887' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

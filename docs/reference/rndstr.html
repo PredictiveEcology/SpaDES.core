@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate random strings � rndstr • SpaDES.core</title>
+<title>Generate random strings — rndstr • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -169,18 +169,9 @@ first character of the string (useful if being used for object names).</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>set.seed</span>(<span class='fl'>11</span>)
-<span class='fu'>rndstr</span>()
-<span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-<span class='fu'>rndstr</span>(<span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>)
-<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='co'># }</span></pre>
+    <pre class="examples"><div class='input'><span class='fu'>set.seed</span>(<span class='fl'>11</span>)
+<span class='fu'>rndstr</span>()</div><div class='output co'>#&gt; [1] "o0v04X5h"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "T7arUQJztk"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] "9tcGml3t"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "u17ovkpcOD" "o6f3fduEkR" "H0wPvBqjdr" "vOaB8KazKb" "cubCGqqcWx"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] "okmd3uve" "QpbEOdmL" "atOeLbAd" "OFppcgGJ" "D8H5rOFi"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "WrwfchZa" "x41RHDXG" "lw8tgHMZ" "JyrGdwAk" "TiyLfLFD"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "hbEztiCfgO"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "j2ZbgP6LHD" "kN4mS69oPh" "phHSmcUZ7J" "VzgLkiAcIU" "xa1GIVGA9Z"</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

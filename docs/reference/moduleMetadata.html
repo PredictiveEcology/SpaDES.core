@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse and extract module metadata � moduleMetadata • SpaDES.core</title>
+<title>Parse and extract module metadata — moduleMetadata • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -157,8 +157,7 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
+    <pre class="examples"><div class='input'><span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
 <span class='no'>sampleModules</span> <span class='kw'>&lt;-</span> <span class='fu'>dir</span>(<span class='no'>path</span>)
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleMetadata</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='no'>path</span>)
 
@@ -171,8 +170,105 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
    <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"caribouMovement"</span>),
    <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 )
-<span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>)
-<span class='co'># }</span></pre>
+<span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>)</div><div class='output co'>#&gt; $name
+#&gt; [1] "caribouMovement"
+#&gt; 
+#&gt; $description
+#&gt; [1] "Simulate caribou movement via correlated random walk."
+#&gt; 
+#&gt; $keywords
+#&gt; [1] "caribou"                         "individual based movement model"
+#&gt; [3] "correlated random walk"         
+#&gt; 
+#&gt; $childModules
+#&gt; character(0)
+#&gt; 
+#&gt; $authors
+#&gt; [1] "Eliot J B McIntire &lt;eliot.mcintire@canada.ca&gt; [aut, cre]"
+#&gt; 
+#&gt; $version
+#&gt; $version$SpaDES.core
+#&gt; [1] "0.1.0"
+#&gt; 
+#&gt; $version$SpaDES.tools
+#&gt; [1] "0.1.0"
+#&gt; 
+#&gt; $version$caribouMovement
+#&gt; [1] "1.6.0"
+#&gt; 
+#&gt; 
+#&gt; $spatialExtent
+#&gt; class       : Extent 
+#&gt; xmin        : NA 
+#&gt; xmax        : NA 
+#&gt; ymin        : NA 
+#&gt; ymax        : NA 
+#&gt; 
+#&gt; $timeframe
+#&gt; [1] NA NA
+#&gt; 
+#&gt; $timeunit
+#&gt; [1] "month"
+#&gt; 
+#&gt; $citation
+#&gt; list()
+#&gt; 
+#&gt; $documentation
+#&gt; list()
+#&gt; 
+#&gt; $reqdPkgs
+#&gt; $reqdPkgs[[1]]
+#&gt; [1] "grid"
+#&gt; 
+#&gt; $reqdPkgs[[2]]
+#&gt; [1] "raster"
+#&gt; 
+#&gt; $reqdPkgs[[3]]
+#&gt; [1] "sp"
+#&gt; 
+#&gt; $reqdPkgs[[4]]
+#&gt; [1] "stats"
+#&gt; 
+#&gt; $reqdPkgs[[5]]
+#&gt; [1] "SpaDES.tools"
+#&gt; 
+#&gt; 
+#&gt; $parameters
+#&gt;          paramName paramClass      default          min      max
+#&gt; 1        stackName  character    landscape           NA       NA
+#&gt; 2  moveInitialTime    numeric start(si.... start(si.... end(sim)
+#&gt; 3     moveInterval    numeric            1            1        1
+#&gt; 4                N    numeric          100           10     1000
+#&gt; 5            torus    logical        FALSE        FALSE     TRUE
+#&gt; 6 .plotInitialTime    numeric   start(sim)         -Inf      Inf
+#&gt; 7    .plotInterval    numeric            1         -Inf      Inf
+#&gt; 8 .saveInitialTime    numeric           NA         -Inf      Inf
+#&gt; 9    .saveInterval    numeric           NA         -Inf      Inf
+#&gt;                                  paramDesc
+#&gt; 1                  name of the RasterStack
+#&gt; 2    time to schedule first movement event
+#&gt; 3    time interval between movoment events
+#&gt; 4                initial number of caribou
+#&gt; 5 should the map wrap around like a torus?
+#&gt; 6        time to schedule first plot event
+#&gt; 7        time interval between plot events
+#&gt; 8        time to schedule first save event
+#&gt; 9        time interval between save events
+#&gt; 
+#&gt; $inputObjects
+#&gt;                            objectName objectClass                         desc
+#&gt; 1 P(sim, "caribouMovement")$stackName RasterStack layername = "habitatQuality"
+#&gt;   sourceURL
+#&gt; 1      &lt;NA&gt;
+#&gt; 
+#&gt; $outputObjects
+#&gt;                            objectName            objectClass
+#&gt; 1 P(sim, "caribouMovement")$stackName            RasterStack
+#&gt; 2                             caribou SpatialPointsDataFrame
+#&gt;                           desc
+#&gt; 1 layername = "habitatQuality"
+#&gt; 2                         &lt;NA&gt;
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

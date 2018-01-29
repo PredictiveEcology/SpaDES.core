@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Determine the size of a remotely hosted file � remoteFileSize • SpaDES.core</title>
+<title>Determine the size of a remotely hosted file — remoteFileSize • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -134,13 +134,16 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>urls</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='st'>"https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl"</span>,
+    <pre class="examples"><div class='input'><span class='no'>urls</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='st'>"https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl"</span>,
           <span class='st'>"https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip"</span>,
           <span class='st'>"http://example.com/doesntexist.csv"</span>)
-<span class='fu'>try</span>(<span class='fu'>remoteFileSize</span>(<span class='no'>urls</span>))
-
-<span class='co'># }</span></pre>
+<span class='fu'>try</span>(<span class='fu'>remoteFileSize</span>(<span class='no'>urls</span>))</div><div class='output co'>#&gt; https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl 
+#&gt;                                                                        5429 
+#&gt;       https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip 
+#&gt;                                                                     3997384 
+#&gt;                                          http://example.com/doesntexist.csv 
+#&gt;                                                                           0 </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

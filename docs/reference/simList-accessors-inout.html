@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Inputs and outputs � inputs • SpaDES.core</title>
+<title>Inputs and outputs — inputs • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -321,8 +321,7 @@ rules of recycling for each <code>fun</code>.</td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'>#######################</span>
+    <pre class="examples"><div class='input'><span class='co'>#######################</span>
 <span class='co'># inputs</span>
 <span class='co'>#######################</span>
 
@@ -336,11 +335,13 @@ rules of recycling for each <code>fun</code>.</td>
 <span class='no'>tmpFile</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='no'>tmpdir</span>, <span class='st'>"test.rds"</span>)
 <span class='fu'>saveRDS</span>(<span class='no'>test</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>)
 <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>) <span class='co'># using only required column, "file"</span>
-<span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='co'># see that it is not yet loaded, but when it is scheduled to be loaded</span>
-<span class='no'>simOut</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-<span class='fu'>inputs</span>(<span class='no'>simOut</span>) <span class='co'># confirm it was loaded</span>
-<span class='no'>simOut</span>$<span class='no'>test</span>
-
+<span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='co'># see that it is not yet loaded, but when it is scheduled to be loaded</span></div><div class='output co'>#&gt;                                                                                  file
+#&gt; 1 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/inputs/test.rds
+#&gt;       fun package objectName loadTime loaded arguments intervals
+#&gt; 1 readRDS    base       test        0     NA        NA        NA</div><div class='input'><span class='no'>simOut</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; <span class='message'>test read from /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/inputs/test.rds using readRDS</span></div><div class='input'><span class='fu'>inputs</span>(<span class='no'>simOut</span>) <span class='co'># confirm it was loaded</span></div><div class='output co'>#&gt;                                                                                  file
+#&gt; 1 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/inputs/test.rds
+#&gt;       fun package objectName loadTime loaded arguments intervals
+#&gt; 1 readRDS    base       test        0   TRUE        NA        NA</div><div class='input'><span class='no'>simOut</span>$<span class='no'>test</span></div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'>
 <span class='co'># can put data.frame for inputs directly inside simInit call</span>
 <span class='no'>allTifs</span> <span class='kw'>&lt;-</span> <span class='fu'>dir</span>(<span class='fu'>system.file</span>(<span class='st'>"maps"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"quickPlot"</span>),
                <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"tif"</span>)
@@ -375,8 +376,15 @@ rules of recycling for each <code>fun</code>.</td>
   )
   <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>filelist</span>
   <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-}
-
+}</div><div class='output co'>#&gt; <span class='message'>rgdal: version: 1.2-16, (SVN revision 701)</span>
+#&gt; <span class='message'> Geospatial Data Abstraction Library extensions to R successfully loaded</span>
+#&gt; <span class='message'> Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20</span>
+#&gt; <span class='message'> Path to GDAL shared files: /usr/local/Cellar/gdal2/2.2.3/share/gdal</span>
+#&gt; <span class='message'> GDAL binary built with GEOS: TRUE </span>
+#&gt; <span class='message'> Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]</span>
+#&gt; <span class='message'> Path to PROJ.4 shared files: (autodetected)</span>
+#&gt; <span class='message'> Linking to sp version: 1.2-6 </span></div><div class='output co'>#&gt; <span class='message'>DEM read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestAge read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestCover read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>habitatQuality read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>percentPine read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps1 read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps2 read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps3 read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps4 read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps5 read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps5 read from /Users/achubaty/Library/R/3.4/library/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span>
+#&gt; <span class='message'>  at time 10</span></div><div class='input'>
   <span class='co'># Example showing loading multiple objects from global environment onto the</span>
   <span class='co'>#   same object in the simList, but at different load times</span>
   <span class='no'>a1</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>
@@ -390,13 +398,9 @@ rules of recycling for each <code>fun</code>.</td>
                  })
   <span class='no'>inputs</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"a"</span>, <span class='kw'>loadTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>2</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"base::get"</span>, <span class='kw'>arguments</span> <span class='kw'>=</span> <span class='fu'>I</span>(<span class='no'>args</span>))
   <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>inputs</span> <span class='kw'>=</span> <span class='no'>inputs</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>1</span>))
-  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>)
-  <span class='fu'>identical</span>(<span class='no'>a1</span>, <span class='no'>a</span>$<span class='no'>a</span>)
-
+  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; <span class='message'>a loaded into simList</span></div><div class='input'>  <span class='fu'>identical</span>(<span class='no'>a1</span>, <span class='no'>a</span>$<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
   <span class='fu'>end</span>(<span class='no'>a</span>) <span class='kw'>&lt;-</span> <span class='fl'>3</span>
-  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>) <span class='co'># different object (a2) loaded onto a$a</span>
-  <span class='fu'>identical</span>(<span class='no'>a2</span>, <span class='no'>a</span>$<span class='no'>a</span>)
-
+  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>) <span class='co'># different object (a2) loaded onto a$a</span></div><div class='output co'>#&gt; <span class='message'>a loaded into simList</span></div><div class='input'>  <span class='fu'>identical</span>(<span class='no'>a2</span>, <span class='no'>a</span>$<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'># Clean up after</span>
 <span class='fu'>unlink</span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
@@ -413,16 +417,55 @@ rules of recycling for each <code>fun</code>.</td>
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"tempObj"</span>),
                <span class='kw'>outputs</span> <span class='kw'>=</span> <span class='fu'>data.frame</span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"tempObj"</span>),
                <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))
-<span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see what will be saved, when, what filename</span>
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-<span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename</span>
-
+<span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see what will be saved, when, what filename</span></div><div class='output co'>#&gt;   objectName
+#&gt; 1    tempObj
+#&gt;                                                                                             file
+#&gt; 1 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year10.rds
+#&gt;       fun package saveTime saved arguments
+#&gt; 1 saveRDS    base       10    NA        NA</div><div class='input'><span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
+<span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename</span></div><div class='output co'>#&gt;   objectName
+#&gt; 1    tempObj
+#&gt;                                                                                             file
+#&gt; 1 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year10.rds
+#&gt;       fun package saveTime saved arguments
+#&gt; 1 saveRDS    base       10  TRUE        NA</div><div class='input'>
 <span class='co'># Also can add using assignment after a simList object has been made</span>
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"tempObj"</span>), <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))
 <span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"tempObj"</span>, <span class='kw'>saveTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>)
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-<span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename.</span>
-
+<span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename.</span></div><div class='output co'>#&gt;    objectName saveTime
+#&gt; 1     tempObj        1
+#&gt; 2     tempObj        2
+#&gt; 3     tempObj        3
+#&gt; 4     tempObj        4
+#&gt; 5     tempObj        5
+#&gt; 6     tempObj        6
+#&gt; 7     tempObj        7
+#&gt; 8     tempObj        8
+#&gt; 9     tempObj        9
+#&gt; 10    tempObj       10
+#&gt;                                                                                              file
+#&gt; 1  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year01.rds
+#&gt; 2  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year02.rds
+#&gt; 3  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year03.rds
+#&gt; 4  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year04.rds
+#&gt; 5  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year05.rds
+#&gt; 6  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year06.rds
+#&gt; 7  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year07.rds
+#&gt; 8  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year08.rds
+#&gt; 9  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year09.rds
+#&gt; 10 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year10.rds
+#&gt;        fun package saved arguments
+#&gt; 1  saveRDS    base  TRUE        NA
+#&gt; 2  saveRDS    base  TRUE        NA
+#&gt; 3  saveRDS    base  TRUE        NA
+#&gt; 4  saveRDS    base  TRUE        NA
+#&gt; 5  saveRDS    base  TRUE        NA
+#&gt; 6  saveRDS    base  TRUE        NA
+#&gt; 7  saveRDS    base  TRUE        NA
+#&gt; 8  saveRDS    base  TRUE        NA
+#&gt; 9  saveRDS    base  TRUE        NA
+#&gt; 10 saveRDS    base  TRUE        NA</div><div class='input'>
 <span class='co'># can do highly variable saving</span>
 <span class='no'>tempObj2</span> <span class='kw'>&lt;-</span> <span class='fu'>paste</span>(<span class='st'>"val"</span>,<span class='fl'>1</span>:<span class='fl'>10</span>)
 <span class='no'>df1</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>col1</span> <span class='kw'>=</span> <span class='no'>tempObj</span>, <span class='kw'>col2</span> <span class='kw'>=</span> <span class='no'>tempObj2</span>)
@@ -438,16 +481,47 @@ rules of recycling for each <code>fun</code>.</td>
 <span class='co'>#   argument for 6th row in data.frame (corresponding to the write.csv function)</span>
 <span class='fu'>outputArgs</span>(<span class='no'>sim</span>)<span class='kw'>[[</span><span class='fl'>6</span>]] <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>row.names</span><span class='kw'>=</span><span class='fl'>FALSE</span>)
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-<span class='fu'>outputs</span>(<span class='no'>sim</span>)
-
+<span class='fu'>outputs</span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt;   objectName saveTime       fun package
+#&gt; 1    tempObj        1   saveRDS    base
+#&gt; 2    tempObj        4   saveRDS    base
+#&gt; 3   tempObj2        2   saveRDS    base
+#&gt; 4   tempObj2        6   saveRDS    base
+#&gt; 5   tempObj2        7   saveRDS    base
+#&gt; 6        df1       10 write.csv   utils
+#&gt;                                                                                              file
+#&gt; 1  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year01.rds
+#&gt; 2  /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj_year04.rds
+#&gt; 3 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj2_year02.rds
+#&gt; 4 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj2_year06.rds
+#&gt; 5 /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/tempObj2_year07.rds
+#&gt; 6      /private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpGWKucV/outputs/df1_year10.csv
+#&gt;   saved arguments
+#&gt; 1  TRUE        NA
+#&gt; 2  TRUE        NA
+#&gt; 3  TRUE        NA
+#&gt; 4  TRUE        NA
+#&gt; 5  TRUE        NA
+#&gt; 6  TRUE     FALSE</div><div class='input'>
 <span class='co'># read one back in just to test it all worked as planned</span>
 <span class='no'>newObj</span> <span class='kw'>&lt;-</span> <span class='fu'>read.csv</span>(<span class='fu'>dir</span>(<span class='no'>tmpdir</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"year10.csv"</span>, <span class='kw'>full.name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
-<span class='no'>newObj</span>
-
+<span class='no'>newObj</span></div><div class='output co'>#&gt;    col1   col2
+#&gt; 1     1  val 1
+#&gt; 2     2  val 2
+#&gt; 3     3  val 3
+#&gt; 4     4  val 4
+#&gt; 5     5  val 5
+#&gt; 6     6  val 6
+#&gt; 7     7  val 7
+#&gt; 8     8  val 8
+#&gt; 9     9  val 9
+#&gt; 10   10 val 10</div><div class='input'>
 <span class='co'># using saving with SpaDES-aware methods</span>
 <span class='co'># To see current ones SpaDES can do</span>
-<span class='fu'><a href='loadFiles.html'>.saveFileExtensions</a></span>()
-
+<span class='fu'><a href='loadFiles.html'>.saveFileExtensions</a></span>()</div><div class='output co'>#&gt;   exts         fun package
+#&gt; 1  rds     saveRDS    base
+#&gt; 4  grd writeRaster  raster
+#&gt; 3  csv   write.csv   utils
+#&gt; 2  txt write.table   utils</div><div class='input'>
 <span class='fu'>library</span>(<span class='no'>raster</span>)
 <span class='kw'>if</span> (<span class='fu'>require</span>(<span class='no'>rgdal</span>)) {
   <span class='no'>ras</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/raster'>raster</a></span>(<span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>5</span>)
@@ -466,10 +540,8 @@ rules of recycling for each <code>fun</code>.</td>
   <span class='fu'>outputs</span>(<span class='no'>simOut</span>)
   <span class='no'>newRas</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/raster'>raster</a></span>(<span class='fu'>dir</span>(<span class='no'>tmpdir</span>, <span class='kw'>full.name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>".tif"</span>))
   <span class='fu'>all.equal</span>(<span class='no'>newRas</span>, <span class='no'>ras</span>) <span class='co'># Should be TRUE</span>
-}
-<span class='co'># Clean up after</span>
-<span class='fu'>unlink</span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='co'># }</span></pre>
+}</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='co'># Clean up after</span>
+<span class='fu'>unlink</span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
