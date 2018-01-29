@@ -55,16 +55,17 @@ setMethod(
       TRUE
     }
     if (!isObjectEmpty) {
-      # objects may be provided in a namespaced format: modName:objName -- e.g. coming from .parseModule
+      # objects may be provided in a namespaced format: modName:objName --
+      # e.g., coming from .parseModule
       objects1 <- strsplit(objects, split = ":")
       lens <- unlist(lapply(objects1, length))
-      objects1ByMod <- unlist(lapply(objects1[lens>1], function(x) x[1]))
+      objects1ByMod <- unlist(lapply(objects1[lens > 1], function(x) x[1]))
       mods <- unique(objects1ByMod)
       objects2 <- lapply(mods, function(mod) {
-        unlist(lapply(objects1[lens>1][objects1ByMod == mod], function(x) x[[2]]))
+        unlist(lapply(objects1[lens > 1][objects1ByMod == mod], function(x) x[[2]]))
       })
       names(objects2) <- mods
-      objects <- append(list(".envir" = unlist(objects1[lens==1])), objects2)
+      objects <- append(list(".envir" = unlist(objects1[lens == 1])), objects2)
     } else {
       objects <- allObjsInSimList
     }
@@ -100,7 +101,7 @@ setMethod(
       if (!is.null(deps[[i]])) {
         object@depends@dependencies[[i]] <- lapply(
           slotNames(object@depends@dependencies[[i]]), function(x) {
-          slot(object@depends@dependencies[[i]],x)
+          slot(object@depends@dependencies[[i]], x)
         })
         names(object@depends@dependencies[[i]]) <- slotNames(deps[[i]])
         object@depends@dependencies[[i]][["timeframe"]] <- as.Date(deps[[i]]@timeframe)
@@ -123,7 +124,7 @@ setMethod(
     obj <- list()
     obj$.list <- object@.list
 
-    obj[nonDotList] <- lapply(nonDotList, function(x) {fastdigest(slot(object, x))})
+    obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
@@ -255,7 +256,8 @@ setMethod(
     whSimList <- unlist(lapply(object, is, "simList"))
 
     if (any(whSimList)) {
-      cacheRepo <- object[whSimList][[1]]@paths$cachePath # just take the first simList, if there are >1
+      # just take the first simList, if there are >1
+      cacheRepo <- object[whSimList][[1]]@paths$cachePath
     } else {
       doEventFrameNum <- grep(sys.calls(), pattern = "(^doEvent)|(^.parseModule)")[2]
       if (!is.na(doEventFrameNum)) {
@@ -266,7 +268,7 @@ setMethod(
         #checkPath(cacheRepo, create = TRUE) #SpaDES dependency
       }
     }
-    checkPath(path = cacheRepo, create=create)
+    checkPath(path = cacheRepo, create = create)
   })
 
 if (!isGeneric(".prepareOutput")) {
@@ -320,7 +322,8 @@ setMethod(
         # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
         #          envir = object2[[i]]@.envir)
         list2env(mget(lsOrigEnv[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
-                 envir = object2[[i]]@.envir)        }
+                 envir = object2[[i]]@.envir)
+      }
     } else {
       # need to keep the tmpl slots ...
       # i.e., Caching of simLists is mostly about objects in .envir

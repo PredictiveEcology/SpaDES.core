@@ -215,7 +215,7 @@ setMethod(
         # read in and cleanup/isolate the global params in the module's .R file
         moduleParams <- grep("globals\\(sim\\)\\$", readFile[[uM]], value = TRUE) %>%
           strsplit(., " ") %>%
-          unlist(lapply(., function(x) x[nzchar(x, keepNA=TRUE)] )) %>%
+          unlist(lapply(., function(x) x[nzchar(x, keepNA = TRUE)])) %>%
           grep("globals\\(sim\\)\\$", ., value = TRUE) %>%
           gsub(",", "", .) %>%
           gsub("\\)\\)", "", .) %>%

@@ -168,7 +168,7 @@ setMethod(
     if (length(packageList)) {
       if (install) {
         repos <- getOption("repos")
-        if ( is.null(repos) | any(repos == "") ) {
+        if (is.null(repos) | any(repos == "")) {
           repos <- "https://cran.rstudio.com"
         }
         installed <- unname(installed.packages()[, "Package"])
@@ -180,11 +180,12 @@ setMethod(
                                         quiet = TRUE, warn.conflicts = FALSE))
       if (any(!loaded)) {
         alreadyLoaded <- unlist(lapply(packageList[!loaded], isNamespaceLoaded))
-        if(!all(alreadyLoaded)) {
+        if (!all(alreadyLoaded)) {
           stop("Some packages required for the simulation are not installed:\n",
              "    ", paste(names(loaded[-which(loaded)]), collapse = "\n    "))
         } else {
-          message("Older version(s) of ", paste(collapse = ", ", packageList[!loaded]), " already loaded")
+          message("Older version(s) of ",
+                  paste(collapse = ", ", packageList[!loaded]), " already loaded")
         }
       }
 
@@ -445,9 +446,9 @@ setMethod(
       # -------------------- #
       # using `inherits` doesn't work as expected in some cases,
       #  so we tweak the 'include' to work with those cases:
-      if ( ("numeric" %in% include) &
-           (inherits(get(w, envir = envir), "integer")) ) {
-             include <- c(include, "integer")
+      if (("numeric" %in% include) &
+          (inherits(get(w, envir = envir), "integer")) ) {
+        include <- c(include, "integer")
       }
       # --- end tweaking --- #
 
@@ -554,7 +555,8 @@ setMethod(
 #' @param inputPath   The default local directory in which to look for simulation inputs
 #'                    If not specified, defaults to \code{~/SpaDES/inputs}.
 #'
-#' @param modulePath  The default local directory where modules and data will be downloaded and stored.
+#' @param modulePath  The default local directory where modules and data will be
+#'                    downloaded and stored.
 #'                    If not specified, defaults to \code{~/SpaDES/modules}.
 #'
 #' @param outputPath  The default local directory in which to save simulation outputs.
