@@ -387,8 +387,8 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
-                repo = "missing", data = "missing", quiet = "missing", quickCheck = "ANY",
-                overwrite = "ANY"),
+                repo = "missing", data = "missing", quiet = "missing",
+                quickCheck = "ANY", overwrite = "ANY"),
   definition = function(name, quickCheck) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
