@@ -445,7 +445,7 @@ setMethod(
 #' @author Alex Chubaty
 #' @export
 #' @importFrom dplyr mutate
-#' @importFrom httr http_error
+#' @importFrom RCurl url.exists
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
@@ -510,14 +510,14 @@ setMethod(
             checkPath(create = TRUE) %>%
             file.path(., xFile)
 
-          if (httr::http_error(x)) {
+          if (!RCurl::url.exists(x)) {
             ## if the URL doesn't work allow the user to retrieve it manually
             message(crayon::magenta("Cannot download ", xFile, " for module ", module, ":\n",
                     "\u2937 cannot open URL '", x, "'.", sep = ""))
 
             if (interactive()) {
               readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                       module, "/data/.\nPress [enter] to continue"))
+                                       module, "/data/\nPress [enter] to continue"))
             }
 
             ## re-checksums
