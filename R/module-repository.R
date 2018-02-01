@@ -10,7 +10,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param url  The url of the remote file.
 #'
-#' @return A numeric indicating the sive of the remote file in bytes.
+#' @return A numeric indicating the size of the remote file in bytes.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
@@ -42,7 +42,7 @@ remoteFileSize <- function(url) {
 #'
 #' @param name  Character string giving the module name.
 #'
-#' @param repo  GitHub repository name, specified as \code{"username/repositoryname"}.
+#' @param repo  GitHub repository name, specified as \code{"username/repo"}.
 #'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 #'              specified by the global option \code{spades.moduleRepo}.
 #'              Only \code{master} branches can be used at this point.
@@ -51,15 +51,18 @@ remoteFileSize <- function(url) {
 #' @export
 #' @rdname getModuleVersion
 #'
-#' @details \code{getModuleVersion} extracts a module's version from the module .zip
-#'          file name.
-#'          Module .zip files are searched inside their respective module
-#'          folders, which should themselves be in a \code{"/modules"} folder in a
-#'          GitHub public repository
+#' @details \code{getModuleVersion} extracts a module's most recent version by
+#'          looking at the module \file{.zip} files contained in the module directory.
+#'          It takes the most recent version, based on the name of the zip file.
+#'
+#'          See the modules vignette for details of module directory structure
+#'          (\url{http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+#'          and see our SpaDES-modules repo for details of module repository structure
+#'          (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 #'
 #' @author Alex Chubaty
 #'
-#' @seealso \code{\link{zipModule}} for creating module .zip folders.
+#' @seealso \code{\link{zipModule}} for creating module \file{.zip} folders.
 #'
 # igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
@@ -250,8 +253,8 @@ setMethod(
 #'
 #' Currently only works with a public GitHub repository, where modules are in
 #' a \code{modules} directory in the root tree on the \code{master} branch.
-#' Module .zip files' names should contain the version number and be inside their respective module folders
-#' - see \code{zipModule} for zip compression of modules.
+#' Module .zip files' names should contain the version number and be inside their
+#' respective module folders (see \code{\link{zipModule}} for zip compression of modules).
 #'
 #' @note \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
 #' if a value is set. This alleviates 403 errors caused by too-frequent downloads.
@@ -270,16 +273,17 @@ setMethod(
 #' @param version The module version to download. (If not specified, or \code{NA},
 #'                the most recent version will be retrieved.)
 #'
-#' @param data    Logical. If TRUE, then the data that is identified in the module
-#'                metadata will be downloaded, if possible. Default if FALSE.
+#' @param data    Logical. If \code{TRUE}, then the data that is identified in the
+#'                module metadata will be downloaded, if possible. Default \code{FALSE}.
 #'
 #' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
 #'
 #' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
 #'                   use \code{file.size} instead of \code{digest::digest}.
 #'                   This is faster, but potentially much less robust.
+#'
 #' @param overwrite Logical. Should local module files be overwritten in case they exist?
-#'                  Default is FALSE.
+#'                  Default \code{FALSE}.
 #'
 #' @return A list of length 2. The first element is a character vector containing
 #'    a character vector of extracted files for the module. The second element is

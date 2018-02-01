@@ -31,13 +31,13 @@ downloaded module.}
 \item{version}{The module version to download. (If not specified, or \code{NA},
 the most recent version will be retrieved.)}
 
-\item{repo}{GitHub repository name, specified as \code{"username/repositoryname"}.
+\item{repo}{GitHub repository name, specified as \code{"username/repo"}.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
 Only \code{master} branches can be used at this point.}
 
-\item{data}{Logical. If TRUE, then the data that is identified in the module
-metadata will be downloaded, if possible. Default if FALSE.}
+\item{data}{Logical. If \code{TRUE}, then the data that is identified in the
+module metadata will be downloaded, if possible. Default \code{FALSE}.}
 
 \item{quiet}{Logical. This is passed to \code{download.file} (default \code{FALSE}).}
 
@@ -46,7 +46,7 @@ use \code{file.size} instead of \code{digest::digest}.
 This is faster, but potentially much less robust.}
 
 \item{overwrite}{Logical. Should local module files be overwritten in case they exist?
-Default is FALSE.}
+Default \code{FALSE}.}
 }
 \value{
 A list of length 2. The first element is a character vector containing
@@ -61,8 +61,8 @@ Download a .zip file of the module and extract (unzip) it to a user-specified lo
 \details{
 Currently only works with a public GitHub repository, where modules are in
 a \code{modules} directory in the root tree on the \code{master} branch.
-Module .zip files' names should contain the version number and be inside their respective module folders
-- see \code{zipModule} for zip compression of modules.
+Module .zip files' names should contain the version number and be inside their
+respective module folders (see \code{\link{zipModule}} for zip compression of modules).
 }
 \note{
 \code{downloadModule} uses the \code{GITHUB_PAT} environment variable

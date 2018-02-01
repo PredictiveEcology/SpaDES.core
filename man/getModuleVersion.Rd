@@ -16,7 +16,7 @@ getModuleVersion(name, repo)
 \arguments{
 \item{name}{Character string giving the module name.}
 
-\item{repo}{GitHub repository name, specified as \code{"username/repositoryname"}.
+\item{repo}{GitHub repository name, specified as \code{"username/repo"}.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
 Only \code{master} branches can be used at this point.}
@@ -25,14 +25,17 @@ Only \code{master} branches can be used at this point.}
 Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
 }
 \details{
-\code{getModuleVersion} extracts a module's version from the module .zip
-         file name.
-         Module .zip files are searched inside their respective module
-         folders, which should themselves be in a \code{"/modules"} folder in a
-         GitHub public repository
+\code{getModuleVersion} extracts a module's most recent version by
+         looking at the module \file{.zip} files contained in the module directory.
+         It takes the most recent version, based on the name of the zip file.
+
+         See the modules vignette for details of module directory structure
+         (\url{http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+         and see our SpaDES-modules repo for details of module repository structure
+         (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 }
 \seealso{
-\code{\link{zipModule}} for creating module .zip folders.
+\code{\link{zipModule}} for creating module \file{.zip} folders.
 }
 \author{
 Alex Chubaty

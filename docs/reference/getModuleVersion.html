@@ -134,11 +134,26 @@
     </tr>
     <tr>
       <th>repo</th>
-      <td><p>GitHub repository name.
+      <td><p>GitHub repository name, specified as <code>"username/repo"</code>.
 Default is <code>"PredictiveEcology/SpaDES-modules"</code>, which is
-specified by the global option <code>spades.moduleRepo</code>.</p></td>
+specified by the global option <code>spades.moduleRepo</code>.
+Only <code>master</code> branches can be used at this point.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>getModuleVersion</code> extracts a module's most recent version by
+         looking at the module <code class="file">.zip</code> files contained in the module directory.
+         It takes the most recent version, based on the name of the zip file.</p>
+<p>See the modules vignette for details of module directory structure
+         (<a href='http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename'>http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename</a>),
+         and see our SpaDES-modules repo for details of module repository structure
+         (<a href='https://github.com/PredictiveEcology/SpaDES-modules'>https://github.com/PredictiveEcology/SpaDES-modules</a>).</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <p><code><a href='zipModule.html'>zipModule</a></code> for creating module <code class="file">.zip</code> folders.</p>
     
 
   </div>
@@ -146,7 +161,11 @@ specified by the global option <code>spades.moduleRepo</code>.</p></td>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#details">Details</a></li>
+
+      <li><a href="#see-also">See also</a></li>
+          </ul>
 
     <h2>Author</h2>
     
