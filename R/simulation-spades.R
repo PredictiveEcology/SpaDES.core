@@ -65,7 +65,9 @@ doEvent <- function(sim, debug, notOlderThan) {
   if  (length(cur) == 0) {
     sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
   } else {
+
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
+      fnEnv <- sim@.envir[[cur[["moduleName"]]]]
       # update current simulated time
       sim@simtimes[["current"]] <- cur[["eventTime"]]
 
@@ -103,7 +105,6 @@ doEvent <- function(sim, debug, notOlderThan) {
           } else if (grepl(debug[[i]], pattern = "\\(")) {
             print(eval(parse(text = debug[[i]])))
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
-            fnEnv <- sim@.envir[[cur[["moduleName"]]]] # paste0(cur[["moduleName"]], "Fns")]]
             if(is.environment(fnEnv)) {
               if (all(debug %in% cur[c("moduleName", "eventType")])) {
                 debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
@@ -122,6 +123,12 @@ doEvent <- function(sim, debug, notOlderThan) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]], FALSE)
         } else {
+          if (!is.environment(fnEnv))
+            stop("It looks like one of your modules has created an object in the simList",
+                 " that has the same name as this module, ", cur[["moduleName"]],
+                 ", i.e., there is a sim$", cur[["moduleName"]], " <- ... in a module. ",
+                 " Currently, this is not allowed. Please rename the object.", call. = FALSE)
+
           # for future caching of modules
           cacheIt <- FALSE
           a <- sim@params[[cur[["moduleName"]]]][[".useCache"]]
@@ -151,13 +158,13 @@ doEvent <- function(sim, debug, notOlderThan) {
             objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
             moduleSpecificObjects <-
               c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
-                ls(sim@.envir[[cur[["moduleName"]]]], all.names = TRUE), # functions in the namespaced location
+                ls(fnEnv, all.names = TRUE), # functions in the namespaced location
                 na.omit(objNam)) # objects outputted by module
             moduleSpecificOutputObjects <- objNam
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
                                  modules = cur[["moduleName"]])
-            sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[cur[["moduleName"]]]]), #[[paste0(cur[["moduleName"]], "Fns")]]),
+            sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                          debug = FALSE,
@@ -169,8 +176,7 @@ doEvent <- function(sim, debug, notOlderThan) {
                          userTags = c("function:doEvent"))
           } else {
             sim <- get(moduleCall,
-                       envir = sim@.envir[[cur[["moduleName"]]]])( #[[paste0(cur[["moduleName"]], "Fns")]]
-                         sim, cur[["eventTime"]], cur[["eventType"]], FALSE)
+                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]], FALSE)
           }
         }
       } else {
