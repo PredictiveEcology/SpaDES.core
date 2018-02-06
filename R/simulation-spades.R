@@ -123,11 +123,6 @@ doEvent <- function(sim, debug, notOlderThan) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]], FALSE)
         } else {
-          if (!is.environment(fnEnv))
-            stop("It looks like one of your modules has created an object in the simList",
-                 " that has the same name as this module, ", cur[["moduleName"]],
-                 ", i.e., there is a sim$", cur[["moduleName"]], " <- ... in a module. ",
-                 " Currently, this is not allowed. Please rename the object.", call. = FALSE)
 
           # for future caching of modules
           cacheIt <- FALSE
