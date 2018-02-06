@@ -6,7 +6,6 @@ test_that("module templates work", {
   path <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
 
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     detach("package:knitr")
     unlink(path, recursive = TRUE)
