@@ -6,7 +6,7 @@ if (interactive()) {
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-      fireSpread = list(nFires = 5),
+      fireSpread = list(nfires = 5),
       randomLandscapes = list(nx = 300, ny = 300)
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
@@ -22,18 +22,18 @@ if (interactive()) {
   outData <- spades(reproducible::Copy(mySim), .plotInitialTime = NA)
 
   # Extract the "true" data, in this case, the "proportion of cells burned"
-  # Function defined that will use landscape$Fires map from simList,
-  #  i.e., sim$landscape$Fires
+  # Function defined that will use landscape$fires map from simList,
+  #  i.e., sim$landscape$fires
   #  the return value being compared via MAD with propCellBurnedData
   propCellBurnedFn <- function(landscape) {
-    sum(getValues(landscape$Fires) > 0) / ncell(landscape$Fires)
+    sum(getValues(landscape$fires) > 0) / ncell(landscape$fires)
   }
   # visualize the burned maps of true "data"
   propCellBurnedData <- propCellBurnedFn(outData$landscape)
   clearPlot()
   if (interactive()) {
-    Fires <- outData$landscape$Fires # Plot doesn't do well with many nested layers
-    Plot(Fires)
+    fires <- outData$landscape$fires # Plot doesn't do well with many nested layers
+    Plot(fires)
   }
 
   # Example 1 - 1 parameter
@@ -58,18 +58,18 @@ if (interactive()) {
 
   # Example 2 - 2 parameters
   # Function defined that will use caribou from sim$caribou, with
-  #  the return value being compared via MAD with NPattern
+  #  the return value being compared via MAD with nPattern
   #  module, parameter N, is from 10 to 1000)
   caribouFn <- function(caribou) length(caribou)
 
   # Extract "data" from simList object (normally, this would be actual data)
-  NPattern <- caribouFn(outData$caribou)
+  nPattern <- caribouFn(outData$caribou)
 
   aTime <- Sys.time()
   parsToVary <- c("spreadprob", "N")
   out2 <- POM(mySim, parsToVary,
               list(propCellBurnedData = propCellBurnedFn,
-                   NPattern = caribouFn), logObjFnVals = TRUE)
+                   nPattern = caribouFn), logObjFnVals = TRUE)
                    #optimControl = list(parallelType = 1))
                    #cl = cl) # not yet implemented, waiting for DEoptim
   bTime <- Sys.time()
@@ -96,7 +96,7 @@ if (interactive()) {
   #   - pass data that will be used internally for objective function
   objFnEx <- function(pars, # param values
                       sim, # simList object
-                      NPattern, propCellBurnedData, caribouFn, propCellBurnedFn) {
+                      nPattern, propCellBurnedData, caribouFn, propCellBurnedFn) {
     ### data
 
     # make a copy of simList because it will possibly be altered by spades call
@@ -111,9 +111,9 @@ if (interactive()) {
 
     # calculate outputs
     propCellBurnedOut <- propCellBurnedFn(out$landscape)
-    NPattern_Out <- caribouFn(out$caribou)
+    nPattern_Out <- caribouFn(out$caribou)
 
-    minimizeFn <- abs(NPattern_Out - NPattern) +
+    minimizeFn <- abs(nPattern_Out - nPattern) +
                   abs(propCellBurnedOut - propCellBurnedData)
 
     # have more info reported to console, if desired
@@ -133,7 +133,7 @@ if (interactive()) {
   # Change optimization parameters to alter how convergence is achieved
   out5 <- POM(mySim, params = c("spreadprob", "N"),
               objFn = objFnEx,
-              NPattern = NPattern,
+              nPattern = nPattern,
               propCellBurnedData = propCellBurnedData,
               caribouFn = caribouFn,
               propCellBurnedFn = propCellBurnedFn,
@@ -151,7 +151,7 @@ if (interactive()) {
   library(DEoptim)
   out7 <- DEoptim(fn = objFnEx,
                  sim = mySim,
-                 NPattern = NPattern,
+                 nPattern = nPattern,
                  propCellBurnedData = propCellBurnedData,
                  caribouFn = caribouFn,
                  propCellBurnedFn = propCellBurnedFn,

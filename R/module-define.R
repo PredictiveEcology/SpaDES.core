@@ -211,25 +211,25 @@ setMethod(
 
     ## enforce/coerce types for the user-supplied param list
     lapply(c("name", "description", "keywords"), function(z) {
-      x[[z]] <<- if ( is.null(x[[z]]) || (length(x[[z]]) == 0) ) {
+      x[[z]] <<- if (is.null(x[[z]]) || (length(x[[z]]) == 0)) {
         moduleDefaults[[z]]
       } else {
         as.character(x[[z]])
       }
     })
 
-    x$childModules <- if ( is.null(x$childModules) ) {
+    x$childModules <- if (is.null(x$childModules)) {
       moduleDefaults$childModules
     } else {
-      if( isTRUE(is.na(x$childModules)) ) {
+      if (isTRUE(is.na(x$childModules))) {
         moduleDefaults$childModules
       } else {
-        x$childModules %>% as.character() %>% na.omit() %>% as.character()
+        x$childModules %>% as.character() %>% na.omit() %>% as.character() # nolint
       }
     }
 
 
-    x$authors <- if ( is.null(x$authors) || is.na(x$authors) ) {
+    x$authors <- if (is.null(x$authors) || is.na(x$authors)) {
       moduleDefaults$authors
     } else {
       as.person(x$authors)
@@ -255,13 +255,13 @@ setMethod(
       }
     }
 
-    x$timeframe <- if ( is.null(x$timeframe) || is.na(x$timeframe) ) {
+    x$timeframe <- if (is.null(x$timeframe) || is.na(x$timeframe)) {
       eval(moduleDefaults$timeframe)
     } else if (!is.numeric.POSIXt(x$timeframe)) {
       as.POSIXlt(x$timeframe)
-    } %>% `[`(1:2)
+    } %>% `[`(1:2) # nolint
 
-    if ( is.null(x$timeunit) || is.na(x$timeunit) ) {
+    if (is.null(x$timeunit) || is.na(x$timeunit)) {
       x$timeunit <- moduleDefaults$timeunit
     }
 
@@ -272,12 +272,12 @@ setMethod(
         as.list(x[[z]])
       }
     })
-    if ( is.null(x$parameters) ) {
+    if (is.null(x$parameters)) {
       x$parameters <- defineParameter()
     } else {
-      if ( is(x$parameters, "data.frame") ) {
-        if ( !all(colnames(x$parameters) %in% colnames(defineParameter())) ||
-             !all(colnames(defineParameter()) %in% colnames(x$parameters)) ) {
+      if (is(x$parameters, "data.frame")) {
+        if (!all(colnames(x$parameters) %in% colnames(defineParameter())) ||
+            !all(colnames(defineParameter()) %in% colnames(x$parameters))) {
           stop("invalid data.frame `parameters` in module `", x$name, "`")
         }
       } else {
@@ -289,8 +289,8 @@ setMethod(
       x$inputObjects <- .inputObjects()
     } else {
       if (is(x$inputObjects, "data.frame")) {
-        if ( !all(colnames(x$inputObjects) %in% colnames(.inputObjects())) ||
-             !all(colnames(.inputObjects()) %in% colnames(x$inputObjects)) ) {
+        if (!all(colnames(x$inputObjects) %in% colnames(.inputObjects())) ||
+            !all(colnames(.inputObjects()) %in% colnames(x$inputObjects))) {
           stop("invalid data.frame `inputObjects` in module `", x$name, "`:\n",
                "provided: ", paste(colnames(x$inputObjects), collapse = ", "),
                "expected: ", paste(colnames(.inputObjects()), collapse = ", "))
@@ -313,8 +313,8 @@ setMethod(
       x$outputObjects <- .outputObjects()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        if ( !all(colnames(x$outputObjects) %in% colnames(.outputObjects())) ||
-             !all(colnames(.outputObjects()) %in% colnames(x$outputObjects)) ) {
+        if (!all(colnames(x$outputObjects) %in% colnames(.outputObjects())) ||
+            !all(colnames(.outputObjects()) %in% colnames(x$outputObjects))) {
           stop("invalid data.frame `outputObjects` in module `", x$name, "`:",
                "provided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
                "expected: ", paste(colnames(.outputObjects()), collapse = ", "))
@@ -411,7 +411,7 @@ setMethod("defineParameter",
                     default = "ANY", min = "missing", max = "missing",
                     desc = "character"),
           definition = function(name, class, default, desc) {
-            NAtypes <- c("character", "complex", "integer", "logical", "numeric")
+            NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
             if (class %in% NAtypes) {
               # coerce `min` and `max` to same type as `default`
               min <- as(NA, class)
@@ -604,7 +604,7 @@ setMethod(
   if (any(needRenameArgs)) {
     colnames(inputDF)[needRenameArgs] <- .fileTableInCols[pmatch("arg", .fileTableInCols)]
   }
-  columns <- pmatch(substr(.fileTableInCols,1,c(3,5,1,3,5,5,3,5)), names(inputDF))
+  columns <- pmatch(substr(.fileTableInCols, 1, c(3, 5, 1, 3, 5, 5, 3, 5)), names(inputDF))
   setnames(inputDF, old = colnames(inputDF)[na.omit(columns)],
            new = .fileTableInCols[!is.na(columns)])
   if (any(is.na(columns))) {
@@ -616,7 +616,7 @@ setMethod(
   }
 
   if (any(is.na(inputDF[, "objectName"]))) {
-    inputDF[is.na(inputDF$objectName), "objectName"] <- fileName(inputDF[is.na(inputDF$objectName), "file"])
+    inputDF[is.na(inputDF$objectName), "objectName"] <- fileName(inputDF[is.na(inputDF$objectName), "file"]) # nolint
   }
 
   # correct those for which a specific function is supplied in filelistDT$fun
@@ -635,7 +635,7 @@ setMethod(
     if (any(is.na(inputDF2[, "fun"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]) )
+      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]))
       inputDF2$fun[is.na(inputDF2$fun)] <- .fileExts[exts, "fun"]
     }
 
@@ -664,7 +664,7 @@ setMethod(
     colnames(outputDF)[needRenameArgs] <-
       .fileTableOutCols[pmatch("arg", .fileTableOutCols)]
   }
-  columns <- pmatch(substr(.fileTableOutCols,1,c(3,5,1,3,5,5,3)), names(outputDF))
+  columns <- pmatch(substr(.fileTableOutCols, 1, c(3, 5, 1, 3, 5, 5, 3)), names(outputDF))
   setnames(outputDF, old = colnames(outputDF)[na.omit(columns)],
            new = .fileTableOutCols[!is.na(columns)])
 
@@ -689,11 +689,11 @@ setMethod(
     .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
     exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA=TRUE))) {
-      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA=TRUE))] <- .fileExts$fun[1]
+    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
     }
     if (any(is.na(outputDF[, "fun"]))) {
-      exts <- na.omit(match(exts, .fileExts[, "exts"]) )
+      exts <- na.omit(match(exts, .fileExts[, "exts"]))
       outputDF$fun[is.na(outputDF$fun)] <- .fileExts[exts, "fun"]
     }
   }
@@ -702,8 +702,8 @@ setMethod(
     .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
     exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA=TRUE))) {
-      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA=TRUE))] <- .fileExts$package[1]
+    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
     }
     if (any(is.na(outputDF[, "package"]))) {
       exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]) )
@@ -712,4 +712,3 @@ setMethod(
   }
   return(outputDF)
 }
-

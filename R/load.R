@@ -45,7 +45,7 @@ fileName <- function(x) {
 #'
 #' @author Eliot McIntire and Alex Chubaty
 fileExt <- function(x) {
-  NAs <- is.na(x)
+  NAs <- is.na(x) # nolint
   out <- rep(NA, length(x))
   if (!any(NAs)) {
     filenames <- basename(unlist(x[!NAs]))
@@ -62,7 +62,7 @@ fileExt <- function(x) {
 }
 
 # The load doEvent
-doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) {
+doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
   if (eventType == "inputs") {
     sim <- loadFiles(sim)
   }
@@ -178,9 +178,9 @@ setMethod(
           nam <- names(arguments[y])
           if (is.na(filelist$file[y])) {
             # i.e., only for objects
-            if(!is.na(loadFun[y])) {
+            if (!is.na(loadFun[y])) {
               if (is.na(loadPackage[y])) {
-                if (exists(loadFun[y]) ) {
+                if (exists(loadFun[y])) {
                   objList <- list(do.call(get(loadFun[y]), arguments[[y]]))
                 } else {
                   stop("'inputs' often requires (like now) that package be specified",
@@ -188,7 +188,7 @@ setMethod(
                 }
 
               } else {
-                objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]]))
+                objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
               }
 
             } else {
@@ -250,14 +250,14 @@ setMethod(
 
             if (loadFun[y] == "raster") {
               message(paste0(
-                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y],
+                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
                 "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")",
                 ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
                        paste("\n  at time", filelist[y, "loadTime"]), "")
               ))
             } else {
               message(paste0(
-                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y],
+                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
                 ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
                        paste("\n   at time", filelist[y, "loadTime"]), "")
               ))

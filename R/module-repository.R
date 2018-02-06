@@ -10,7 +10,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param url  The url of the remote file.
 #'
-#' @return A numeric indicating the sive of the remote file in bytes.
+#' @return A numeric indicating the size of the remote file in bytes.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
@@ -42,15 +42,27 @@ remoteFileSize <- function(url) {
 #'
 #' @param name  Character string giving the module name.
 #'
-#' @param repo  GitHub repository name.
+#' @param repo  GitHub repository name, specified as \code{"username/repo"}.
 #'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 #'              specified by the global option \code{spades.moduleRepo}.
+#'              Only \code{master} branches can be used at this point.
 #'
 #' @importFrom httr content GET stop_for_status
 #' @export
 #' @rdname getModuleVersion
 #'
+#' @details \code{getModuleVersion} extracts a module's most recent version by
+#'          looking at the module \file{.zip} files contained in the module directory.
+#'          It takes the most recent version, based on the name of the zip file.
+#'
+#'          See the modules vignette for details of module directory structure
+#'          (\url{http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+#'          and see our SpaDES-modules repo for details of module repository structure
+#'          (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
+#'
 #' @author Alex Chubaty
+#'
+#' @seealso \code{\link{zipModule}} for creating module \file{.zip} folders.
 #'
 # igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
@@ -241,12 +253,16 @@ setMethod(
 #'
 #' Currently only works with a public GitHub repository, where modules are in
 #' a \code{modules} directory in the root tree on the \code{master} branch.
+#' Module .zip files' names should contain the version number and be inside their
+#' respective module folders (see \code{\link{zipModule}} for zip compression of modules).
 #'
 #' @note \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
 #' if a value is set. This alleviates 403 errors caused by too-frequent downloads.
 #' Generate a GitHub personal access token at \url{https://github.com/settings/tokens}.
 #'
 #' @note The default is to overwrite any existing files in the case of a conflict.
+#'
+#' @seealso \code{\link{zipModule}} for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
 #' @inheritParams downloadData
@@ -257,14 +273,17 @@ setMethod(
 #' @param version The module version to download. (If not specified, or \code{NA},
 #'                the most recent version will be retrieved.)
 #'
-#' @param data    Logical. If TRUE, then the data that is identified in the module
-#'                metadata will be downloaded, if possible. Default if FALSE.
+#' @param data    Logical. If \code{TRUE}, then the data that is identified in the
+#'                module metadata will be downloaded, if possible. Default \code{FALSE}.
 #'
 #' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
 #'
 #' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
 #'                   use \code{file.size} instead of \code{digest::digest}.
 #'                   This is faster, but potentially much less robust.
+#'
+#' @param overwrite Logical. Should local module files be overwritten in case they exist?
+#'                  Default \code{FALSE}.
 #'
 #' @return A list of length 2. The first element is a character vector containing
 #'    a character vector of extracted files for the module. The second element is
@@ -278,8 +297,9 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #'
+#'
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
-                                      quickCheck = FALSE) {
+                                      quickCheck = FALSE, overwrite = FALSE) {
   standardGeneric("downloadModule")
 })
 
@@ -290,12 +310,14 @@ setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
                 repo = "character", data = "logical", quiet = "logical",
-                quickCheck = "ANY"),
-  definition = function(name, path, version, repo, data, quiet, quickCheck) {
+                quickCheck = "ANY", overwrite = "logical"),
+  definition = function(name, path, version, repo, data, quiet, quickCheck,
+                        overwrite) {
     path <- checkPath(path, create = TRUE)
 
-    # check locally for module. only download if doesn't exist locally.
-    if (!checkModuleLocal(name, path, version)) {
+    # check locally for module. only download if doesn't exist locally,
+    # or if overwrite is wanted
+    if (!checkModuleLocal(name, path, version) | overwrite) {
       # check remotely for module
       checkModule(name, repo)
       if (is.na(version)) version <- getModuleVersion(name, repo)
@@ -310,7 +332,7 @@ setMethod(
       ua <- user_agent(getOption("spades.useragent"))
       pat <- Sys.getenv("GITHUB_PAT")
       request <- if (identical(pat, "")) {
-        GET(zip, ua, write_disk(localzip))
+        GET(zip, ua, write_disk(localzip, overwrite = overwrite))
       } else {
         message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
         GET(zip, ua, config = list(config(token = pat)), write_disk(localzip))
@@ -339,9 +361,10 @@ setMethod(
         tmp <- lapply(children, function(x) {
           f <- if (is.null(childVersions[[x]])) {
             downloadModule(x, path = path, data = data, version = childVersions[[x]],
-                           quickCheck = quickCheck)
+                           quickCheck = quickCheck, overwrite = overwrite)
           } else {
-            downloadModule(x, path = path, data = data, quickCheck = quickCheck)
+            downloadModule(x, path = path, data = data, quickCheck = quickCheck,
+                           overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
           dataList2 <<- bind_rows(dataList2, f[[2]])
@@ -364,13 +387,14 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
-                repo = "missing", data = "missing", quiet = "missing", quickCheck = "ANY"),
+                repo = "missing", data = "missing", quiet = "missing",
+                quickCheck = "ANY", overwrite = "ANY"),
   definition = function(name, quickCheck) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo"),
                             data = FALSE, quiet = FALSE,
-                            quickCheck = quickCheck)
+                            quickCheck = quickCheck, overwrite = overwrite)
     return(invisible(files))
 })
 
@@ -378,15 +402,18 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "ANY", version = "ANY",
-                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "ANY"),
-  definition = function(name, path, version, repo, data, quiet, quickCheck) {
+                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(name, path, version, repo, data, quiet, quickCheck,
+                        overwrite) {
     if (missing(path)) path <- getOption("spades.modulePath")
     if (missing(version)) version <- NA_character_
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
+    if (missing(overwrite)) overwrite <- FALSE
 
-    files <- downloadModule(name, path, version, repo, data, quiet, quickCheck)
+    files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
 })
 
@@ -394,8 +421,13 @@ setMethod(
 #' Download module data
 #'
 #' Download external data for a module if not already present in the module
-#' directory or if there is a checksum mismatch indicating that the file is not
+#' directory, or if there is a checksum mismatch indicating that the file is not
 #' the correct one.
+#'
+#' \code{downloadData} requires a checksums file to work, as it will only download
+#'  the files specified therein. Hence, module developers should make sure they
+#'  have manually downloaded all the necessary data and ran \code{checksums} to
+#'  build a checksums file.
 #'
 #' @param module  Character string giving the name of the module.
 #'
@@ -407,17 +439,23 @@ setMethod(
 #'                   use \code{file.size} instead of \code{digest::digest}.
 #'                   This is faster, but potentially much less robust.
 #'
+#' @param overwrite Logical. Should local data files be overwritten in case they exist?
+#'                  Default is FALSE
+#'
 #' @return Invisibly, a list of downloaded files.
+#'
+#' @seealso \code{\link{checksums}} for building a checksums file.
 #'
 #' @author Alex Chubaty
 #' @export
 #' @importFrom dplyr mutate
-#' @importFrom httr http_error
+#' @importFrom RCurl url.exists
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #'
-setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE) {
+setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
+                                    overwrite = FALSE) {
   standardGeneric("downloadData")
 })
 
@@ -426,8 +464,8 @@ setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE) {
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "logical",
-                quickCheck = "ANY"),
-  definition = function(module, path, quiet, quickCheck) {
+                quickCheck = "ANY", overwrite = "ANY"),
+  definition = function(module, path, quiet, quickCheck, overwrite) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
     urls <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
@@ -446,7 +484,7 @@ setMethod(
       dplyr::mutate(renamed = NA, module = module)
     dataDir <- file.path(path, module, "data" )
 
-    if (any(chksums$result == "FAIL") | any(is.na(chksums$result))) {
+    if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
       setwd(path); on.exit(setwd(cwd), add = TRUE)
 
       files <- sapply(to.dl, function(x) {
@@ -471,19 +509,19 @@ setMethod(
                     paste(chksums$expectedFile[id], collapse = ",\n      "), sep = ""))
           }
         }
-        if (any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) {
+        if ((any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) | overwrite) {
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
             file.path(., xFile)
 
-          if (httr::http_error(x)) {
+          if (!RCurl::url.exists(x)) {
             ## if the URL doesn't work allow the user to retrieve it manually
             message(crayon::magenta("Cannot download ", xFile, " for module ", module, ":\n",
                     "\u2937 cannot open URL '", x, "'.", sep = ""))
 
             if (interactive()) {
               readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                       module, "/data/.\nPress [enter] to continue"))
+                                       module, "/data/\nPress [enter] to continue"))
             }
 
             ## re-checksums
@@ -564,28 +602,31 @@ setMethod(
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY"),
-  definition = function(module, quickCheck) {
+  signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(module, quickCheck, overwrite) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE,
-                 quickCheck = quickCheck)
+                 quickCheck = quickCheck, overwrite = overwrite)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY"),
-  definition = function(module, quiet, quickCheck) {
+  signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(module, quiet, quickCheck, overwrite) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet,
-                 quickCheck = quickCheck)
+                 quickCheck = quickCheck, overwrite = overwrite)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY"),
-  definition = function(module, path, quickCheck) {
+  signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY",
+                overwrite = "ANY"),
+  definition = function(module, path, quickCheck, overwrite) {
     downloadData(module = module, path = path, quiet = FALSE,
-                 quickCheck = quickCheck)
+                 quickCheck = quickCheck, overwrite = overwrite)
 })
 
 ################################################################################

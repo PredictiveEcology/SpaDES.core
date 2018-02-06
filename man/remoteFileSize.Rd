@@ -10,7 +10,7 @@ remoteFileSize(url)
 \item{url}{The url of the remote file.}
 }
 \value{
-A numeric indicating the sive of the remote file in bytes.
+A numeric indicating the size of the remote file in bytes.
 }
 \description{
 Query a remote web server to determine the size of a remote file.

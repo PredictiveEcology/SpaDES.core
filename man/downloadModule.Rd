@@ -3,23 +3,24 @@
 \docType{methods}
 \name{downloadModule}
 \alias{downloadModule}
-\alias{downloadModule,character,character,character,character,logical,logical-method}
-\alias{downloadModule,character,missing,missing,missing,missing,missing-method}
-\alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY-method}
+\alias{downloadModule,character,character,character,character,logical,logical,ANY,logical-method}
+\alias{downloadModule,character,missing,missing,missing,missing,missing,ANY,ANY-method}
+\alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
 \title{Download a module from a SpaDES module GitHub repository}
 \usage{
-downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE)
+downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE,
+  overwrite = FALSE)
 
 
-  \S4method{downloadModule}{character,character,character,character,logical,logical}(name,
-  path, version, repo, data, quiet, quickCheck = FALSE)
+  \S4method{downloadModule}{character,character,character,character,logical,logical,ANY,logical}(name,
+  path, version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)
 
 
-  \S4method{downloadModule}{character,missing,missing,missing,missing,missing}(name,
+  \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,ANY}(name,
   quickCheck)
 
-\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY}(name, path, version,
-  repo, data, quiet, quickCheck = FALSE)
+\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name, path,
+  version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -30,18 +31,22 @@ downloaded module.}
 \item{version}{The module version to download. (If not specified, or \code{NA},
 the most recent version will be retrieved.)}
 
-\item{repo}{GitHub repository name.
+\item{repo}{GitHub repository name, specified as \code{"username/repo"}.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
-specified by the global option \code{spades.moduleRepo}.}
+specified by the global option \code{spades.moduleRepo}.
+Only \code{master} branches can be used at this point.}
 
-\item{data}{Logical. If TRUE, then the data that is identified in the module
-metadata will be downloaded, if possible. Default if FALSE.}
+\item{data}{Logical. If \code{TRUE}, then the data that is identified in the
+module metadata will be downloaded, if possible. Default \code{FALSE}.}
 
 \item{quiet}{Logical. This is passed to \code{download.file} (default \code{FALSE}).}
 
 \item{quickCheck}{Logical. If \code{TRUE}, then the check with local data will only
 use \code{file.size} instead of \code{digest::digest}.
 This is faster, but potentially much less robust.}
+
+\item{overwrite}{Logical. Should local module files be overwritten in case they exist?
+Default \code{FALSE}.}
 }
 \value{
 A list of length 2. The first element is a character vector containing
@@ -56,6 +61,8 @@ Download a .zip file of the module and extract (unzip) it to a user-specified lo
 \details{
 Currently only works with a public GitHub repository, where modules are in
 a \code{modules} directory in the root tree on the \code{master} branch.
+Module .zip files' names should contain the version number and be inside their
+respective module folders (see \code{\link{zipModule}} for zip compression of modules).
 }
 \note{
 \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
@@ -63,6 +70,9 @@ if a value is set. This alleviates 403 errors caused by too-frequent downloads.
 Generate a GitHub personal access token at \url{https://github.com/settings/tokens}.
 
 The default is to overwrite any existing files in the case of a conflict.
+}
+\seealso{
+\code{\link{zipModule}} for creating module .zip folders.
 }
 \author{
 Alex Chubaty

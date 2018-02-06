@@ -20,7 +20,8 @@ If not specified, defaults to \code{~/SpaDES/cache}.}
 \item{inputPath}{The default local directory in which to look for simulation inputs
 If not specified, defaults to \code{~/SpaDES/inputs}.}
 
-\item{modulePath}{The default local directory where modules and data will be downloaded and stored.
+\item{modulePath}{The default local directory where modules and data will be
+downloaded and stored.
 If not specified, defaults to \code{~/SpaDES/modules}.}
 
 \item{outputPath}{The default local directory in which to save simulation outputs.
