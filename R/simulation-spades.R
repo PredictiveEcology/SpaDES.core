@@ -65,7 +65,9 @@ doEvent <- function(sim, debug, notOlderThan) {
   if  (length(cur) == 0) {
     sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
   } else {
+
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
+      fnEnv <- sim@.envir[[cur[["moduleName"]]]]
       # update current simulated time
       sim@simtimes[["current"]] <- cur[["eventTime"]]
 
@@ -103,7 +105,6 @@ doEvent <- function(sim, debug, notOlderThan) {
           } else if (grepl(debug[[i]], pattern = "\\(")) {
             print(eval(parse(text = debug[[i]])))
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
-            fnEnv <- sim@.envir[[cur[["moduleName"]]]] # paste0(cur[["moduleName"]], "Fns")]]
             if(is.environment(fnEnv)) {
               if (all(debug %in% cur[c("moduleName", "eventType")])) {
                 debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
@@ -122,6 +123,7 @@ doEvent <- function(sim, debug, notOlderThan) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]], FALSE)
         } else {
+
           # for future caching of modules
           cacheIt <- FALSE
           a <- sim@params[[cur[["moduleName"]]]][[".useCache"]]
@@ -151,13 +153,13 @@ doEvent <- function(sim, debug, notOlderThan) {
             objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
             moduleSpecificObjects <-
               c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
-                ls(sim@.envir[[cur[["moduleName"]]]], all.names = TRUE), # functions in the namespaced location
+                ls(fnEnv, all.names = TRUE), # functions in the namespaced location
                 na.omit(objNam)) # objects outputted by module
             moduleSpecificOutputObjects <- objNam
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
                                  modules = cur[["moduleName"]])
-            sim <- Cache(FUN = get(moduleCall, envir = sim@.envir[[cur[["moduleName"]]]]), #[[paste0(cur[["moduleName"]], "Fns")]]),
+            sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                          debug = FALSE,
@@ -169,8 +171,7 @@ doEvent <- function(sim, debug, notOlderThan) {
                          userTags = c("function:doEvent"))
           } else {
             sim <- get(moduleCall,
-                       envir = sim@.envir[[cur[["moduleName"]]]])( #[[paste0(cur[["moduleName"]], "Fns")]]
-                         sim, cur[["eventTime"]], cur[["eventType"]], FALSE)
+                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]], FALSE)
           }
         }
       } else {
@@ -444,18 +445,31 @@ scheduleEvent <- function(sim,
 #' the same mechanism, but it can be used with replication.
 #' See also the vignette on caching for examples.
 #'
+#' @section \code{debug}:
+#'
 #' If \code{debug} is specified, it can be a logical or character vector.
-#' If not specified, the package option \code{spades.debug} is used.
-#' In all cases, something will be printed to the console immediately before each
-#' event is being executed.
-#' If \code{TRUE}, then the event immediately following will be printed as it
-#' runs (equivalent to \code{current(sim)}).
-#' If a character string, then it can be one of the many \code{simList} accessors,
-#' such as \code{events}, \code{params}, \code{"simList"} (print the entire simList),
-#' or any R expression.
-#' If an R expression it will be evaluated with access to the \code{sim} object.
-#' If this is more than one character string, then all will be printed to the
-#' screen in their sequence.
+#' If not specified, the package option \code{spades.debug} is used. The following
+#' options for debug are available:
+#'
+#' \tabular{ll}{
+#'   \code{TRUE} \tab the event immediately following will be printed as it
+#' runs (equivalent to \code{current(sim)}).\cr
+#'   function name (as character string) \tab If a function, then it will be run on the
+#'                                            simList, e.g., "time" will run
+#'                                            \code{time(sim)} at each event.\cr
+#'   moduleName (as character string) \tab All calls to that module will be entered
+#'                                         interactively\cr
+#'   eventName (as character string) \tab All calls that have that event name (in any module)
+#'                                        will be entered interactively\cr
+#'   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+#'                                             will be entered into. \cr
+#'   Any other R expression  \tab Will be evaluated with access to the simList as 'sim'.
+#'                                If this is more than one character string, then all will
+#'                                be printed to the screen in their sequence. \cr
+#' }
+#'
+#'
+#'
 #'
 #' @note The debug option is primarily intended to facilitate building simulation
 #' models by the user.

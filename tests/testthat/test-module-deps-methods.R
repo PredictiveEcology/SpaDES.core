@@ -158,7 +158,6 @@ test_that("3 levels of parent and child modules load and show correctly", {
   setwd(tmpdir)
 
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     setwd(cwd)
     unlink(tmpdir, recursive = TRUE)
