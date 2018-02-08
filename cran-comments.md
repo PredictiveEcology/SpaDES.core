@@ -12,10 +12,6 @@ This is a major update to our package. Many external and internal changes, as de
 * Windows              (appveyor), R 3.3.3
 * Windows 7               (local), R 3.3.3
 
-* Windows 7               (local), R 3.4.0
-* Windows 7               (local), R 3.4.1
-* Windows 7               (local), R 3.4.2
-
 ### Current R versions
 * OSX Sierra 10.12.6 (travis-ci), R 3.4.3 
 * Ubuntu 14.04.5     (travis-ci), R 3.4.3
