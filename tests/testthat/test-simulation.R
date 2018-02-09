@@ -151,7 +151,6 @@ test_that("spades calls with different signatures don't work", {
   setwd(tmpdir)
 
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     setwd(cwd)
     unlink(tmpdir, recursive = TRUE)
@@ -221,7 +220,6 @@ test_that("simInit with R subfolder scripts", {
   setwd(tmpdir)
 
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     setwd(cwd)
     unlink(tmpdir, recursive = TRUE)

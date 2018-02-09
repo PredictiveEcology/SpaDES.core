@@ -17,7 +17,7 @@ downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE,
 
 
   \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,ANY}(name,
-  quickCheck)
+  quickCheck, overwrite)
 
 \S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name, path,
   version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)

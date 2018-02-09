@@ -371,6 +371,7 @@ setMethod(
             }
           }
         }
+        lockBinding(m, sim@.envir)
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% m
         if (any(alreadyIn)) {

@@ -4,7 +4,6 @@ test_that("test cache", {
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -60,7 +59,7 @@ test_that("test event-level cache", {
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
 
   on.exit({
-    detach("package:reproducible")
+
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -111,7 +110,7 @@ test_that("test module-level cache", {
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
-    detach("package:reproducible")
+
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -182,7 +181,7 @@ test_that("test .prepareOutput", {
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
-    detach("package:reproducible")
+
     detach("package:igraph")
     detach("package:raster")
     unlink(tmpdir, recursive = TRUE)
@@ -241,7 +240,7 @@ test_that("test .robustDigest for simLists", {
 
   on.exit({
     setwd(cwd)
-    detach("package:reproducible")
+
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
