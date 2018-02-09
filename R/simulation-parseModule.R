@@ -377,8 +377,10 @@ setMethod(
 
         # search for conflicts in function names with common problems
         conflictingFnsByElement <- lapply(sim@.envir[[m]], function(x) {
-          fg <- findGlobals(x)
-          conflictingFnsSimple %in% fg
+          if (is.function(x)) {
+            fg <- findGlobals(x)
+            conflictingFnsSimple %in% fg
+          }
         })
         hasConflicts <- unlist(lapply(conflictingFnsByElement, any))
         if (any(hasConflicts)) {
