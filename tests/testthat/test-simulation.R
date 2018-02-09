@@ -158,10 +158,10 @@ test_that("spades calls with different signatures don't work", {
 
   a <- simInit()
   a1 <- Copy(a)
-  expect_silent(spades(a))
-  expect_output(spades(a, debug = TRUE), "eventTime")
-  expect_silent(spades(a, .plotInitialTime = NA))
-  expect_silent(spades(a, .saveInitialTime = NA))
+  expect_output(spades(a), "eventTime")
+  expect_silent(spades(a, debug = FALSE))
+  expect_silent(spades(a, debug = FALSE, .plotInitialTime = NA))
+  expect_silent(spades(a, debug = FALSE, .saveInitialTime = NA))
   expect_output(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
   expect_output(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
@@ -179,8 +179,8 @@ test_that("spades calls with different signatures don't work", {
     expect_output(spades(a, progress = "text", debug = TRUE), "20%")
     expect_output(spades(a, progress = "text"), "..........| 100%")
   }
-  expect_silent(spades(a, progress = FALSE))
-  expect_silent(spades(a, progress = "rr"))
+  expect_silent(spades(a, debug = FALSE, progress = FALSE))
+  expect_silent(spades(a, debug = FALSE, progress = "rr"))
 
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
   a <- Copy(a1)

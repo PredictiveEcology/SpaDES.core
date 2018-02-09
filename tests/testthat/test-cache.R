@@ -297,7 +297,7 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
-  expect_silent(spades(bbb))
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb),
                  regexp = "Using cached copy of init",
                  all = TRUE)
@@ -314,7 +314,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
-  expect_silent(spades(bbb))
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb),
                 regexp = "Using cached copy of init",
                 all = TRUE)
