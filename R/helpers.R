@@ -226,3 +226,21 @@ setMethod(
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
 .pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
                              paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
+
+# These are known functions that will definitely cause conflicts unless they are
+# prefixed by their packages.
+conflictingFns <- c("\\<raster::levels\\>", "\\<raster::scale\\>")
+conflictingFnsClean <- gsub(pattern = "\\\\<", conflictingFns, replacement = "")
+conflictingFnsClean <- gsub(pattern = "\\\\>", conflictingFnsClean, replacement = "")
+
+conflictingFnsSimple <- gsub(conflictingFns, pattern = "^.*::", replacement = "\\\\<")
+conflictingFnsSimple <- gsub(pattern = "\\\\<", conflictingFnsSimple, replacement = "")
+conflictingFnsSimple <- gsub(pattern = "\\\\>", conflictingFnsSimple, replacement = "")
+
+clashingFns <- c("\\<quickPlot::Plot\\>")
+clashingFnsClean <- gsub(pattern = "\\\\<", clashingFns, replacement = "")
+clashingFnsClean <- gsub(pattern = "\\\\>", clashingFnsClean, replacement = "")
+
+clashingFnsSimple <- gsub(clashingFns, pattern = "^.*::", replacement = "\\\\<")
+clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = "")
+clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")

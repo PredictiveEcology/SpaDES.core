@@ -141,6 +141,7 @@ setMethod(
 #' @author Alex Chubaty and Eliot McIntire
 #' @keywords internal
 #' @importFrom reproducible Cache
+#' @importFrom codetools findGlobals checkUsageEnv
 #' @include environment.R
 #' @include module-dependencies-class.R
 #' @include simList-class.R
@@ -328,7 +329,6 @@ setMethod(
               message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
               moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
 
-              #browser(expr = m == "LBMR")
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
                 objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
@@ -371,6 +371,46 @@ setMethod(
             }
           }
         }
+
+        # From codetools -- experimental
+        checkUsageEnv(sim@.envir[[m]])
+
+        # search for conflicts in function names with common problems
+        conflictingFnsByElement <- lapply(sim@.envir[[m]], function(x) {
+          fg <- findGlobals(x)
+          conflictingFnsSimple %in% fg
+        })
+        hasConflicts <- unlist(lapply(conflictingFnsByElement, any))
+        if (any(hasConflicts)) {
+          theFns <- names(hasConflicts)[hasConflicts]
+          names(theFns) <- theFns
+          conflictingFnsByConflict <- lapply(theFns, function(x) {
+            fg <- findGlobals(get(x, sim@.envir[[m]]))
+            problemFns <- fg[fg %in% conflictingFnsSimple]
+          })
+
+          whichFnsWithPackage <- unlist(lapply(conflictingFnsByElement[hasConflicts],
+                                        function(z) conflictingFnsClean[z]))
+          xx <- paste0(paste(conflictingFnsByConflict, sep = ", "),
+                       ": used inside ", paste(names(conflictingFnsByConflict), sep = ", "))
+          message("Module ", m, " uses the following functions that conflict",
+                  " with base functions:\n", xx,
+                  "\nIt is a good idea to be explicit about the package sources",
+                  "\ne.g., ", paste(whichFnsWithPackage, collapse = ", "))
+        }
+
+        clashingFuns <- names(sim@.envir[[m]]) %in% clashingFnsSimple
+        if (any(clashingFuns)) {
+          fnNames <- clashingFnsClean[clashingFnsClean %in% names(sim@.envir[[m]])]
+          message("You have defined ",
+                  paste(names(sim@.envir[[m]])[clashingFuns], collapse = ", "),
+                  " in the ", m, " module, which conflicts with ",
+                  paste(fnNames, collapse = ", "), ". It is recommended that you rename",
+                  " that function")
+
+        }
+
+
         lockBinding(m, sim@.envir)
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% m
