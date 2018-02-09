@@ -53,4 +53,3 @@
     options(spades.outputPath = NULL)
   }
 }
-
