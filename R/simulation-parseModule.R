@@ -403,7 +403,7 @@ setMethod(
 
         clashingFuns <- names(sim@.envir[[m]]) %in% clashingFnsSimple
         if (any(clashingFuns)) {
-          fnNames <- clashingFnsClean[clashingFnsClean %in% names(sim@.envir[[m]])]
+          fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
           message("You have defined ",
                   paste(names(sim@.envir[[m]])[clashingFuns], collapse = ", "),
                   " in the ", m, " module, which conflicts with ",
