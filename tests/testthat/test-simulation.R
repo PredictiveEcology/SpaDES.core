@@ -417,4 +417,12 @@ test_that("conflicting function types", {
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = "child4"))
   expect_true(all(grepl(mm,
             pattern = c("child4: b, d, f are extracted|child4: g is assigned|Running .input"))))
+
+  cat(xxx[1:lineWithInit], "
+      sim$child4 <- 1
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_error(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+               c("child4: You have created an object"))
 })

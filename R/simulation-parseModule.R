@@ -372,6 +372,7 @@ setMethod(
           }
         }
 
+    ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
         # From codetools -- experimental
         aa <- capture.output(
                        checkUsageEnv(sim@.envir[[m]], suppressParamUnused = FALSE,
@@ -385,8 +386,12 @@ setMethod(
           message(paste(crayon::blue(aa), collapse = "\n"))
         }
 
-        # search for all sim$xx <-  or sim[[xxx]] <- in module code
+    # search for all sim$xx <-  or sim[[xxx]] <- in module code
         findAllSimAssigns <- findAllSims(sim@.envir[[m]], findSimAssigns)
+        if (m %in% findAllSimAssigns) {
+          stop(m, ": You have created an object with the same name as the module. ",
+               "Currently, this is not allowed.", call. = FALSE)
+        }
         missingFromMetaData <- findAllSimAssigns[!(findAllSimAssigns %in%
                               sim@depends@dependencies[[k]]@outputObjects$objectName)]
         if (length(missingFromMetaData)) {
@@ -398,7 +403,7 @@ setMethod(
           )))
         }
 
-        # search for all '<- sim$' or '<- sim[[xxx]]' in module code
+    # search for all '<- sim$' or '<- sim[[xxx]]' in module code
         findAllSimGets <- findAllSims(sim@.envir[[m]], findSimGets)
         missingFromMetaDataInputs <- findAllSimGets[!(findAllSimGets %in%
                                                      sim@depends@dependencies[[k]]@inputObjects$objectName)]
@@ -411,7 +416,7 @@ setMethod(
                   )))
         }
 
-        # search for conflicts in function names with common problems
+    # search for conflicts in function names with common problems
         conflictingFnsByElement <- lapply(sim@.envir[[m]], function(x) {
           if (is.function(x)) {
             fg <- findGlobals(x)
@@ -437,6 +442,7 @@ setMethod(
                   "\ne.g., ", paste(whichFnsWithPackage, collapse = ", "))
         }
 
+    # search for conflicts in module function names with common problems
         clashingFuns <- names(sim@.envir[[m]]) %in% clashingFnsSimple
         if (any(clashingFuns)) {
           fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
@@ -447,7 +453,6 @@ setMethod(
                   " that function")
 
         }
-
 
         lockBinding(m, sim@.envir)
       } else {
