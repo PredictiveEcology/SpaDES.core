@@ -393,7 +393,7 @@ test_that("conflicting function types", {
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-                 "These objects are assigned to sim")
+                 "child4: r is assigned")
 
   cat(xxx[1:(lineWithInit - 1)], "
       a <- function(x) {
@@ -408,11 +408,13 @@ test_that("conflicting function types", {
   cat(xxx[1:lineWithInit], "
       a <- sim$b
       d <- sim$d
-      return(list(a,d))
+      f <- sim[['f']]
+      sim$g <- f
+      return(list(a, d, f, sim))
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-                 "child4: b, d are extracted")
-
-  })
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = "child4"))
+  expect_true(all(grepl(mm,
+            pattern = c("child4: b, d, f are extracted|child4: g is assigned|Running .input"))))
+})
