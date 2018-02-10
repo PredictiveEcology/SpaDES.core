@@ -405,4 +405,14 @@ test_that("conflicting function types", {
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
                  "a: parameter")
 
+  cat(xxx[1:lineWithInit], "
+      a <- sim$b
+      d <- sim$d
+      return(list(a,d))
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+                 "child4: b, d are extracted")
+
   })
