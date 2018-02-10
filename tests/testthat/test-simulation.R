@@ -393,7 +393,7 @@ test_that("conflicting function types", {
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-                 "raster::scale")
+                 "These objects are assigned to sim")
 
   cat(xxx[1:(lineWithInit - 1)], "
       a <- function(x) {

@@ -395,14 +395,14 @@ setMethod(
           if (all(is.na(y))) y <- character()
           if (length(y)) {
             evalY <- unlist(lapply(y, function(yParts) {
-              tryCatch(eval(parse(text = yParts)), error = function(x) y)
+              tryCatch(eval(parse(text = yParts)), error = function(x) yParts)
             }))
-            if (evalY != y) y <- evalY
+            if (!identical(evalY, y)) y <- evalY
           }
           y
         })))
         missingFromMetaData <- findAllSimAssigns[!(findAllSimAssigns %in%
-                              sim@depends@dependencies[[j]]@outputObjects$objectName)]
+                              sim@depends@dependencies[[k]]@outputObjects$objectName)]
         if (length(missingFromMetaData)) {
           message("These objects are assigned to sim in module ", m,
                   ", but are not in outputObjects:\n",
