@@ -368,8 +368,8 @@ plotFun <- function(sim) {
 Event1 <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  sim$event1Test1 <- \" this is test for event 1. \" # for dummy unit test
-  sim$event1Test2 <- 999 # for dummy unit test
+  # sim$event1Test1 <- \" this is test for event 1. \" # for dummy unit test
+  # sim$event1Test2 <- 999 # for dummy unit test
 
 
   # ! ----- STOP EDITING ----- ! #
@@ -380,8 +380,8 @@ Event1 <- function(sim) {
 Event2 <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  sim$event2Test1 <- \" this is test for event 2. \" # for dummy unit test
-  sim$event2Test2 <- 777  # for dummy unit test
+  # sim$event2Test1 <- \" this is test for event 2. \" # for dummy unit test
+  # sim$event2Test2 <- 777  # for dummy unit test
 
 
   # ! ----- STOP EDITING ----- ! #
