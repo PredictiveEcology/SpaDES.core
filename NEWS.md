@@ -7,6 +7,7 @@ version 0.1.1.9000
 
     - conflicts with known common functions (raster::level, raster::scale, quickPlot::Plot)
     - use checkCodeEnv on every function inside a module
+* checking for sim$xxx occurrences in modules, comparing to outputs in metadata
 * option `spades.debug` set to TRUE by default, instead of FALSE. This is better for new users.
 * `newModule` template modified slightly based on workshop feedback
 * `setPaths` now only sets the directories that are passed into it
