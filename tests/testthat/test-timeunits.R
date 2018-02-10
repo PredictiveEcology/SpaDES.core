@@ -241,14 +241,14 @@ test_that("timeunits with child and parent modules work correctly", {
   try(clearCache(cacheDir), silent = TRUE)
   expect_silent(expect_message(mySim <- simInit(modules = list(modName),
                                   paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                  params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE, "Using or creating cached")
+                                  params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE, "Using or creating cached|child6: b, dp, cm are assigned|child6: b is declared in inputObjects")
   )
 
   # pulls cached value
   expect_message(expect_output(mySim <- simInit(modules = list(modName),
                                  paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                    params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
-                 all = TRUE, "Using or creating cached")
+                 all = TRUE, "Using or creating cached|child6: b, dp, cm are assigned|child6: b is declared in inputObjects")
   expect_true(identical(mySim$b, asPath(theFile)))
 
   # Change the file that is in the arguments to .inputObjects
@@ -256,14 +256,14 @@ test_that("timeunits with child and parent modules work correctly", {
   # Cache should force a rerun -- i.e., not cached value
   expect_silent(expect_message(mySim <- simInit(modules = list(modName),
                                                 paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                                params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE, "Using or creating cached")
+                                                params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE, "Using or creating cached|child6: b, dp, cm are assigned|child6: b is declared in inputObjects")
   )
 
   # pulls cached value
   expect_message(expect_output(mySim <- simInit(modules = list(modName),
                                                 paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                                                 params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
-                 all = TRUE, "Using or creating cached")
+                 all = TRUE, "Using or creating cached|child6: b, dp, cm are assigned|child6: b is declared in inputObjects")
 
 
 })
