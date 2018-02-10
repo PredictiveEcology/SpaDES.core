@@ -247,22 +247,52 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 
 
 .findSims <- function(x, type) {
-  if (type == "get") {
-    grepPattern <- "^sim"
-    xPart <- 3
-  } else if (type == "assign") {
-    grepPattern <- "sim"
-    xPart <- 2
-  } else {
-    character()
-  }
   if (is.atomic(x) || is.name(x)) {
     character()
   } else if (is.call(x)) {
-    #if (identical(x[[1]], quote(`<-`)) && is.name(x[[2]])) {
-    if (identical(x[[1]], quote(`<-`)) && any(grepl(grepPattern, x[[xPart]]))) {
+    paramsPattern <- "\\<P\\(sim\\>|\\<globals\\(sim\\>|\\<params\\(sim\\>"
+    if (type == "get") {
+      grepPattern <- paste0("\\<sim\\>|", paramsPattern)
+      xPart <- 3
+      test <- if (length(x) > 2) {
+        if (identical(x[[1]], quote(`<-`))) {
+          tc <- tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
+                     function(y) NA)
+          if (isTRUE(tc)) {
+            TRUE
+          } else {
+            if (is.na(tc)) {
+              FALSE
+            } else {
+              return(character()) # short circuit the return b/c no longer of right side
+            }
+          }
+        } else {
+          tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
+                           function(y) FALSE)
+        }
+      } else {
+        tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
+                         function(y) FALSE)
+      }
+    } else if (type == "assign") {
+      grepPattern <- "\\<sim\\>"
+      xPart <- 2
+      test <- identical(x[[1]], quote(`<-`)) && any(grepl(grepPattern, deparse(x[[xPart]])))
+    } else {
+      test <- FALSE
+      character()
+    }
+
+    if (test) {
       if (as.character(x[[xPart]])[1] %in% c("$", "[[")) {
-        lhs <- as.character(x[[xPart]])[3]
+        if (grepl(gsub(paramsPattern, pattern = "\\\\<", replacement = "^"),
+                  deparse(x[[xPart]]))) {
+          lhs <- deparse(x[[xPart]])
+        } else {
+          lhs <- as.character(x[[xPart]])[3]
+        }
+
       } else {
         lhs <- character()
       }

@@ -347,18 +347,17 @@ test_that("conflicting function types", {
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 
-  #newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)
-  #newModule("child3", tmpdir, open = FALSE)
-  newModule("child4", tmpdir, open = FALSE)
-  fileName <- "child4/child4.R"
+  m <- "child4"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
   xxx <- readLines(fileName)
   lineWithInit <- grep(xxx, pattern = "^Init")
 
 
   xxx1 <- gsub(xxx, pattern = 'plotFun', replacement = 'Plot') # nolint
   cat(xxx1, file = fileName, sep = "\n")
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-                 "You have defined Plot")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 paste0(m, ": Plot is defined"))
 
   # do functions like raster::levels
   cat(xxx[1:lineWithInit], "
@@ -370,8 +369,8 @@ test_that("conflicting function types", {
       ",
               xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-                 "Module child4 uses the following functions", "raster::levels")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 paste0(m, ": the following function\\(s\\) is used that"))
 
   cat(xxx[1:lineWithInit], "
       library(raster)
@@ -380,7 +379,7 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  "raster::scale")
 
   ###
@@ -392,8 +391,8 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-                 "child4: r is assigned")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 paste0(m, ": r is assigned"))
 
   cat(xxx[1:(lineWithInit - 1)], "
       a <- function(x) {
@@ -402,7 +401,7 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  "a: parameter")
 
   cat(xxx[1:lineWithInit], "
@@ -414,20 +413,18 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = "child4"))
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-            pattern = c("child4: b, d, f are extracted|child4: g is assigned|Running .input"))))
+            pattern = c(paste0(m, ": b, d, f are used|child4: g is assigned|Running .input")))))
 
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_error(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-               c("child4: You have created an object"))
+  expect_error(simInit(paths = list(modulePath = tmpdir), modules = m),
+               c(paste0(m, ": You have created an object")))
 
-
-  #
   # declared in inputObjects
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   cat(xxx[1:(lineWithInputObjects-1)], "
@@ -435,8 +432,8 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-               c("child4: a is declared in inputObjects"))
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+               c(paste0(m, ": a is declared in inputObjects")))
 
   # declared in outputObjects
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
@@ -445,8 +442,8 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
-               c("child4: b is declared in outputObjects"))
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+               c(paste0(m, ": b is declared in outputObjects")))
 
   cat(xxx[1:(lineWithInputObjects-1)], "
       expectsInput('a', 'numeric', '', '')
@@ -457,8 +454,8 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = "child4"))
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-    pattern = c("child4: b is declared in outputObjects|child4: a is declared in inputObjects|Running .input"))))
+    pattern = c(paste0(m, ": b is declared in outputObjects|child4: a is declared in inputObjects|Running .input")))))
 
 })

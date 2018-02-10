@@ -448,8 +448,8 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   look for simulation inputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs}).
 
-  \item \code{spades.debug}: The default debugging value for \code{spades()}.
-  Default is \code{FALSE}.
+  \item \code{spades.debug}: The default debugging value \code{debug}
+  argument in \code{spades()}. Default is \code{TRUE}.
 
   \item \code{spades.lowMemory}: If true, some functions will use more memory
     efficient (but slower) algorithms. Default \code{FALSE}.
@@ -467,6 +467,9 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   \item \code{spades.outputPath}: The default local directory in which to
   save simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
+
+  \item \code{spades.runCodeChecks}: Should the various code checks be run
+  during \code{simInit}. Default is \code{TRUE}.
 
   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
     to ensure a module's required packages are listed first?

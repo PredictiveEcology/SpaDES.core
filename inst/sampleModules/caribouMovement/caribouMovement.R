@@ -45,8 +45,6 @@ defineModule(sim, list(
                  sourceURL = NA_character_)
   ),
   outputObjects = bind_rows(
-    createsOutput(objectName = P(sim, "caribouMovement")$stackName,
-                  objectClass = "RasterStack", desc = "layername = \"habitatQuality\""),
     createsOutput(objectName = "caribou", objectClass = "SpatialPointsDataFrame",
                   desc = NA_character_)
   )

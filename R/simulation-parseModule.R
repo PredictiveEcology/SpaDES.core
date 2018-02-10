@@ -390,7 +390,7 @@ setMethod(
           parent_ids <- c(parent_ids, which(unlist(modules(sim))==m))
         }
 
-        message("Duplicate module, ",m,", specified. Skipping loading it twice.")
+        message("Duplicate module, ", m, ", specified. Skipping loading it twice.")
       }
 
       # update parse status of the module
@@ -451,7 +451,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     if (is.function(moduleEnv[[x]])) {
       aa <- deparse(moduleEnv[[x]])
       bb <- as.call(parse(text = aa))
-      y <- .findSims(bb, type = type) #findSimGets
+      y <- .findSims(bb, type = type)
       y <- na.omit(y)
       if (all(is.na(y))) y <- character()
       if (length(y)) {
@@ -463,12 +463,29 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
           })
         }
         names(y) <- rep(x, length(y))
+        y <- y[!unlist(lapply(y, is.na))]
+        y <- y[unlist(lapply(y, is.character))]
       }
       y
     }
   })))
 }
 
+
+#' Runs a series of code checks during simInit
+#'
+#' This uses codetools::codeCheck for function consistency, and
+#' codetools::findGlobals to check for function collisions with known,
+#' common function collisions (raster::stack, raster::scale)
+#'
+#' @param m module name
+#' @param message rest of message
+#'
+#' @return
+#' A message with that starts with paste0(m, ":", message)
+#'
+#' @keywords internal
+#' @rdname runCodeChecks
 .runCodeChecks <- function(sim, m, k) {
   # From codetools -- experimental
   aa <- capture.output(
@@ -479,71 +496,63 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   aa <- grep(aa, pattern = "doEvent.*: parameter", invert = TRUE, value = TRUE)
 
   if (length(aa)) {
-    message(crayon::blue("There are possible function errors"))
-    message(paste(crayon::blue(aa), collapse = "\n"))
+    .parseMessage(m, message(paste(aa, collapse = "\n")))
   }
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
-  findAllSimAssigns <- .findAllSims(environment(),
+  findSimAssigns <- .findAllSims(environment(),
                                    sim@.envir[[m]], type = "assign")
 
-  missingFromModule <-
-    sim@depends@dependencies[[k]]@outputObjects$objectName[
-      !(sim@depends@dependencies[[k]]@outputObjects$objectName %in%
-          findAllSimAssigns)]
-  missingFromModule <- na.omit(missingFromModule)
-  if (length(missingFromModule)) {
-    verb <- c("is", "are")[1 + as.numeric(length(missingFromModule)>1)]
-    message(crayon::blue(paste0(m, ": ", paste(missingFromModule, collapse = ", "),
-                                " ",verb," declared in outputObjects, ",
-                                "but it is not used in the module"
-    )))
+  inputObjNames <- sim@depends@dependencies[[k]]@inputObjects$objectName
+  outputObjNames <- sim@depends@dependencies[[k]]@outputObjects$objectName
+
+  missingFrmMod <- outputObjNames[!(outputObjNames %in% findSimAssigns)]
+  missingFrmMod <- na.omit(missingFrmMod)
+  if (length(missingFrmMod)) {
+    verb <- .verb(missingFrmMod)
+    .parseMessage(m, paste0(paste(missingFrmMod, collapse = ", "),
+        " ",verb," declared in outputObjects, ", "but it is not used in the module"
+    ))
   }
 
-  if (length(findAllSimAssigns)) {
+  if (length(findSimAssigns)) {
     # does module name occur as a sim$ assign
-    if (m %in% findAllSimAssigns) {
+    if (m %in% findSimAssigns) {
       stop(m, ": You have created an object with the same name as the module. ",
            "Currently, this is not allowed.", call. = FALSE)
     }
-    missingFromMetaData <- findAllSimAssigns[!(findAllSimAssigns %in%
-                                                 sim@depends@dependencies[[k]]@outputObjects$objectName)]
+    missingInMetadata <- findSimAssigns[!(findSimAssigns %in%
+                                                 outputObjNames)]
 
-    if (length(missingFromMetaData)) {
-      verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaData)>1)]
-      message(crayon::blue(paste0(m, ": ", paste(missingFromMetaData, collapse = ", "),
-                                  " ",verb," assigned to sim inside ",
-                                  paste(unique(names(missingFromMetaData)), collapse = ", "),
-                                  ", but ",verb," not declared in outputObjects"
-      )))
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      .parseMessage(m, paste0(paste(missingInMetadata, collapse = ", "),
+        " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
+        ", but ",verb," not declared in outputObjects"
+      ))
     }
-
   }
 
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-  findAllSimGets <- .findAllSims(environment(),
+  findSimGets <- .findAllSims(environment(),
                                 sim@.envir[[m]], type = "get")
-  missingFromMetaDataInputs <- findAllSimGets[!(findAllSimGets %in%
-                                                  sim@depends@dependencies[[k]]@inputObjects$objectName)]
-  missingFromModule <-
-    sim@depends@dependencies[[k]]@inputObjects$objectName[
-      !(sim@depends@dependencies[[k]]@inputObjects$objectName %in%
-          findAllSimGets)]
-  missingFromModule <- na.omit(missingFromModule)
-  if (length(missingFromMetaDataInputs)) {
-    verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaDataInputs)>1)]
-    message(crayon::blue(paste0(m, ": ", paste(missingFromMetaDataInputs, collapse = ", "),
-                                " ",verb," extracted from sim inside ",
-                                paste(unique(names(missingFromMetaDataInputs)), collapse = ", "),
-                                ", but ",verb," not declared in inputObjects"
-    )))
+  missingInMetadata <- findSimGets[!(findSimGets %in% inputObjNames)]
+  missingFrmMod <- inputObjNames[!(inputObjNames %in% findSimGets)]
+  missingFrmMod <- unique(na.omit(missingFrmMod))
+  if (length(missingInMetadata)) {
+    verb <- .verb(unique(missingInMetadata))
+    .parseMessage(m, paste0(paste(unique(missingInMetadata), collapse = ", "),
+                            " ",verb," used from sim inside ",
+                            paste(unique(names(missingInMetadata)), collapse = ", "),
+                            ", but ",verb," not declared in inputObjects"
+    ))
   }
-  if (length(missingFromModule)) {
-    verb <- c("is", "are")[1 + as.numeric(length(missingFromModule)>1)]
-    message(crayon::blue(paste0(m, ": ", paste(missingFromModule, collapse = ", "),
+  if (length(missingFrmMod)) {
+    verb <- .verb(missingFrmMod)
+    .parseMessage(m, paste0(paste(missingFrmMod, collapse = ", "),
                                 " ",verb," declared in inputObjects, ",
                                 "but it is not used in the module"
-    )))
+    ))
   }
 
   # search for conflicts in function names with common problems
@@ -566,22 +575,55 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
                                          function(z) conflictingFnsClean[z]))
     xx <- paste0(paste(conflictingFnsByConflict, sep = ", "),
                  ": used inside ", paste(names(conflictingFnsByConflict), sep = ", "))
-    message("Module ", m, " uses the following functions that conflict",
+    verb <- .verb(xx)
+    .parseMessage(m, paste0("the following function(s) ", verb," used that conflict(s)",
             " with base functions:\n", xx,
             "\nIt is a good idea to be explicit about the package sources",
-            "\ne.g., ", paste(whichFnsWithPackage, collapse = ", "))
+            "\ne.g., ", paste(whichFnsWithPackage, collapse = ", ")))
   }
 
   # search for conflicts in module function names with common problems
-  clashingFuns <- names(sim@.envir[[m]]) %in% clashingFnsSimple
-  if (any(clashingFuns)) {
+  clashingFuns <- names(sim@.envir[[m]])[names(sim@.envir[[m]]) %in% clashingFnsSimple]
+  if (length(clashingFuns)) {
     fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
-    message("You have defined ",
-            paste(names(sim@.envir[[m]])[clashingFuns], collapse = ", "),
-            " in the ", m, " module, which conflicts with ",
-            paste(fnNames, collapse = ", "), ". It is recommended that you rename",
-            " that function")
-
+    verb <- .verb(clashingFuns)
+    .parseMessage(m, paste0(
+            paste(clashingFuns, collapse = ", "), " ", verb,
+            " defined, which ", verb, " in conflict with ",
+            paste(fnNames, collapse = ", "), ". It is recommended to ",
+            " use non-conflicting function names"))
   }
 
+}
+
+#' Prepend module name to a message
+#'
+#' Also makes it blue.
+#'
+#' @param m module name
+#' @param message rest of message
+#'
+#' @return
+#' A message with that starts with paste0(m, ":", message)
+#'
+#' @keywords internal
+#' @rdname parseMessage
+.parseMessage <- function(m, message) {
+  message(crayon::blue(
+    paste0(m, ": ", message)
+  ))
+}
+
+#' Chose verb conjugation for "to be"
+#'
+#' @param item The item to accord conjugation with. If length 1, then "is"
+#' else "are"
+#'
+#' @return
+#' "is" or "are"
+#'
+#' @keywords internal
+#' @rdname verb
+.verb <- function(item) {
+  c("is", "are")[1 + as.numeric(length(item)>1)]
 }
