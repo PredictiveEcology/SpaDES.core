@@ -385,63 +385,30 @@ setMethod(
           message(paste(crayon::blue(aa), collapse = "\n"))
         }
 
-        findAllSimAssigns <- unlist(unique(lapply(names(sim@.envir[[m]]), function(x) {
-          if (is.function(sim@.envir[[m]][[x]])) {
-            aa <- deparse(sim@.envir[[m]][[x]])
-            bb <- as.call(parse(text = aa))
-            y <- findSimAssigns(bb)
-            y <- na.omit(y)
-            if (all(is.na(y))) y <- character()
-            if (length(y)) {
-              hasSim <- grepl(y, pattern = "sim")
-              if (length(y[hasSim])) {
-                y[hasSim] <- lapply(y[hasSim], function(yParts) {
-                  tryCatch(eval(parse(text = yParts)), error = function(x) yParts)
-                })
-              }
-              names(y) <- rep(x, length(y))
-            }
-            y
-          }
-        })))
+        # search for all sim$xx <-  or sim[[xxx]] <- in module code
+        findAllSimAssigns <- findAllSims(sim@.envir[[m]], findSimAssigns)
         missingFromMetaData <- findAllSimAssigns[!(findAllSimAssigns %in%
                               sim@depends@dependencies[[k]]@outputObjects$objectName)]
         if (length(missingFromMetaData)) {
           verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaData)>1)]
           message(crayon::blue(paste0(m, ": ", paste(missingFromMetaData, collapse = ", "),
-                  " ",verb," are assigned to sim inside ",
+                  " ",verb," assigned to sim inside ",
                   paste(unique(names(missingFromMetaData)), collapse = ", "),
                   ", but ",verb," not declared in outputObjects"
           )))
         }
 
-
-        findAllSimGets <- unlist(unique(lapply(names(sim@.envir[[m]]), function(x) {
-          if (is.function(sim@.envir[[m]][[x]])) {
-            aa <- deparse(sim@.envir[[m]][[x]])
-            bb <- as.call(parse(text = aa))
-            y <- findSimGets(bb)
-            y <- na.omit(y)
-            if (all(is.na(y))) y <- character()
-            if (length(y)) {
-              evalY <- unlist(lapply(y, function(yParts) {
-                tryCatch(eval(parse(text = yParts)), error = function(x) yParts)
-              }))
-              if (!identical(evalY, y)) y <- evalY
-              names(y) <- rep(x, length(y))
-            }
-            y
-          }
-        })))
+        # search for all '<- sim$' or '<- sim[[xxx]]' in module code
+        findAllSimGets <- findAllSims(sim@.envir[[m]], findSimGets)
         missingFromMetaDataInputs <- findAllSimGets[!(findAllSimGets %in%
                                                      sim@depends@dependencies[[k]]@inputObjects$objectName)]
         if (length(missingFromMetaDataInputs)) {
           verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaDataInputs)>1)]
-          message(m, ": ", paste(missingFromMetaDataInputs, collapse = ", "),
+          message(crayon::blue(paste0(m, ": ", paste(missingFromMetaDataInputs, collapse = ", "),
                   " ",verb," extracted from sim inside ",
                   paste(unique(names(missingFromMetaDataInputs)), collapse = ", "),
                   ", but ",verb," not declared in inputObjects"
-                  )
+                  )))
         }
 
         # search for conflicts in function names with common problems
@@ -549,4 +516,26 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     list2env(as.list(env), envir)
   }
   activeCode
+}
+
+findAllSims <- function(moduleEnv, fun = findSimAssigns) {
+  unlist(unique(lapply(names(moduleEnv), function(x) {
+    if (is.function(moduleEnv[[x]])) {
+      aa <- deparse(moduleEnv[[x]])
+      bb <- as.call(parse(text = aa))
+      y <- fun(bb) #findSimGets
+      y <- na.omit(y)
+      if (all(is.na(y))) y <- character()
+      if (length(y)) {
+        hasSim <- grepl(y, pattern = "sim")
+        if (length(y[hasSim])) {
+          y[hasSim] <- lapply(y[hasSim], function(yParts) {
+            tryCatch(eval(parse(text = yParts)), error = function(x) yParts)
+          })
+        }
+        names(y) <- rep(x, length(y))
+      }
+      y
+    }
+  })))
 }
