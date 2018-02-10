@@ -387,26 +387,52 @@ setMethod(
         }
 
     # search for all sim$xx <-  or sim[[xxx]] <- in module code
-        findAllSimAssigns <- findAllSims(sim@.envir[[m]], findSimAssigns)
-        if (m %in% findAllSimAssigns) {
-          stop(m, ": You have created an object with the same name as the module. ",
-               "Currently, this is not allowed.", call. = FALSE)
-        }
-        missingFromMetaData <- findAllSimAssigns[!(findAllSimAssigns %in%
-                              sim@depends@dependencies[[k]]@outputObjects$objectName)]
-        if (length(missingFromMetaData)) {
-          verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaData)>1)]
-          message(crayon::blue(paste0(m, ": ", paste(missingFromMetaData, collapse = ", "),
-                  " ",verb," assigned to sim inside ",
-                  paste(unique(names(missingFromMetaData)), collapse = ", "),
-                  ", but ",verb," not declared in outputObjects"
+        findAllSimAssigns <- findAllSims(environment(),
+                                         sim@.envir[[m]], findSimAssigns)
+
+        missingFromModule <-
+          sim@depends@dependencies[[k]]@outputObjects$objectName[
+            !(sim@depends@dependencies[[k]]@outputObjects$objectName %in%
+                findAllSimAssigns)]
+        missingFromModule <- na.omit(missingFromModule)
+        if (length(missingFromModule)) {
+          verb <- c("is", "are")[1 + as.numeric(length(missingFromModule)>1)]
+          message(crayon::blue(paste0(m, ": ", paste(missingFromModule, collapse = ", "),
+                                      " ",verb," declared in outputObjects, ",
+                                      "but it is not used in the module"
           )))
         }
 
+        if (length(findAllSimAssigns)) {
+          # does module name occur as a sim$ assign
+          if (m %in% findAllSimAssigns) {
+            stop(m, ": You have created an object with the same name as the module. ",
+                 "Currently, this is not allowed.", call. = FALSE)
+          }
+          missingFromMetaData <- findAllSimAssigns[!(findAllSimAssigns %in%
+                                                       sim@depends@dependencies[[k]]@outputObjects$objectName)]
+
+          if (length(missingFromMetaData)) {
+            verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaData)>1)]
+            message(crayon::blue(paste0(m, ": ", paste(missingFromMetaData, collapse = ", "),
+                                        " ",verb," assigned to sim inside ",
+                                        paste(unique(names(missingFromMetaData)), collapse = ", "),
+                                        ", but ",verb," not declared in outputObjects"
+            )))
+          }
+
+        }
+
     # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-        findAllSimGets <- findAllSims(sim@.envir[[m]], findSimGets)
+        findAllSimGets <- findAllSims(environment(),
+                                      sim@.envir[[m]], findSimGets)
         missingFromMetaDataInputs <- findAllSimGets[!(findAllSimGets %in%
                                                      sim@depends@dependencies[[k]]@inputObjects$objectName)]
+        missingFromModule <-
+          sim@depends@dependencies[[k]]@inputObjects$objectName[
+            !(sim@depends@dependencies[[k]]@inputObjects$objectName %in%
+                findAllSimGets)]
+        missingFromModule <- na.omit(missingFromModule)
         if (length(missingFromMetaDataInputs)) {
           verb <- c("is", "are")[1 + as.numeric(length(missingFromMetaDataInputs)>1)]
           message(crayon::blue(paste0(m, ": ", paste(missingFromMetaDataInputs, collapse = ", "),
@@ -414,6 +440,13 @@ setMethod(
                   paste(unique(names(missingFromMetaDataInputs)), collapse = ", "),
                   ", but ",verb," not declared in inputObjects"
                   )))
+        }
+        if (length(missingFromModule)) {
+          verb <- c("is", "are")[1 + as.numeric(length(missingFromModule)>1)]
+          message(crayon::blue(paste0(m, ": ", paste(missingFromModule, collapse = ", "),
+                                      " ",verb," declared in inputObjects, ",
+                                      "but it is not used in the module"
+          )))
         }
 
     # search for conflicts in function names with common problems
@@ -523,7 +556,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   activeCode
 }
 
-findAllSims <- function(moduleEnv, fun = findSimAssigns) {
+findAllSims <- function(envToFindSim, moduleEnv, fun = findSimAssigns) {
   unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
       aa <- deparse(moduleEnv[[x]])
@@ -535,7 +568,8 @@ findAllSims <- function(moduleEnv, fun = findSimAssigns) {
         hasSim <- grepl(y, pattern = "sim")
         if (length(y[hasSim])) {
           y[hasSim] <- lapply(y[hasSim], function(yParts) {
-            tryCatch(eval(parse(text = yParts)), error = function(x) yParts)
+            tryCatch(eval(parse(text = yParts), envir = envToFindSim),
+                     error = function(x) yParts)
           })
         }
         names(y) <- rep(x, length(y))

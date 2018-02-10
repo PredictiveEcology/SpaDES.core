@@ -275,7 +275,7 @@ findSimGets <- function(x) {
     character()
   } else if (is.call(x)) {
     #if (identical(x[[1]], quote(`<-`)) && is.name(x[[2]])) {
-    if (identical(x[[1]], quote(`<-`)) && any(grepl("sim", x[[3]]))) {
+    if (identical(x[[1]], quote(`<-`)) && any(grepl("^sim", x[[3]]))) {
       if (as.character(x[[3]])[1] %in% c("$", "[[")) {
         lhs <- as.character(x[[3]])[3]
       } else {

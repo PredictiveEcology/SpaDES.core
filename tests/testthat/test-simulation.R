@@ -425,4 +425,40 @@ test_that("conflicting function types", {
 
   expect_error(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
                c("child4: You have created an object"))
+
+
+  #
+  # declared in inputObjects
+  lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
+  cat(xxx[1:(lineWithInputObjects-1)], "
+      expectsInput('a', 'numeric', '', '')
+      ",
+      xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+               c("child4: a is declared in inputObjects"))
+
+  # declared in outputObjects
+  lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
+  cat(xxx[1:(lineWithOutputObjects-1)], "
+      createsOutput('b', 'numeric', '')
+      ",
+      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+               c("child4: b is declared in outputObjects"))
+
+  cat(xxx[1:(lineWithInputObjects-1)], "
+      expectsInput('a', 'numeric', '', '')
+      ",
+      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)],
+      "
+      createsOutput('b', 'numeric', '')
+      ",
+      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = "child4"))
+  expect_true(all(grepl(mm,
+    pattern = c("child4: b is declared in outputObjects|child4: a is declared in inputObjects|Running .input"))))
+
 })
