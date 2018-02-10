@@ -244,3 +244,28 @@ clashingFnsClean <- gsub(pattern = "\\\\>", clashingFnsClean, replacement = "")
 clashingFnsSimple <- gsub(clashingFns, pattern = "^.*::", replacement = "\\\\<")
 clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = "")
 clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")
+
+
+findSimAssigns <- function(x) {
+  if (is.atomic(x) || is.name(x)) {
+    character()
+  } else if (is.call(x)) {
+    #if (identical(x[[1]], quote(`<-`)) && is.name(x[[2]])) {
+    if (identical(x[[1]], quote(`<-`)) && any(grepl("sim", x[[2]]))) {
+      if (as.character(x[[2]])[1] %in% c("$", "[[")) {
+        lhs <- as.character(x[[2]])[3]
+      } else {
+        lhs <- character()
+      }
+    } else {
+      lhs <- character()
+    }
+
+    unique(c(lhs, unlist(lapply(x, findSimAssigns))))
+  } else if (is.pairlist(x)) {
+    unique(unlist(lapply(x, findSimAssigns)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x),
+         call. = FALSE)
+  }
+}
