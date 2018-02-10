@@ -137,8 +137,7 @@ from multiple modules all at once, with say:
 
 We implement a discrete event simulation in a more modular fashion so it is
 easier to add modules to the simulation. We use S4 classes and methods,
-and use \code{data.table} instead of \code{data.frame} to implement the event
-queue (because it is much faster).
+and fast lists to manage the event queue.
 
 \code{paths} specifies the location of the module source files,
 the data input files, and the saving output files. If no paths are specified
@@ -160,6 +159,21 @@ These can be added later with the accessor methods (See example). These are not 
 simulation via simInit. \code{modules}, \code{paths}, \code{params}, and \code{objects}
 are all needed for successful initialization.
 }
+\section{Parsing}{
+
+
+The \code{simInit} function will attempt to find usage of sim$xxx
+or sim[['xxx']] on either side of the assignement "<-" operator.
+It will compare these to the module metadata, specifically
+\code{inputObjects} for cases where objects or "gotten" from the
+simList and \code{outputObjects} for cases where objects are
+assigned to the simList.
+
+It will also attempt to find potential, common function name conflicts
+with things like scale and stack (both in base and raster), and
+Plot (in quickPlot and some modules).
+}
+
 \section{Caching}{
 
 
