@@ -246,38 +246,23 @@ clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = ""
 clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")
 
 
-findSimAssigns <- function(x) {
-  if (is.atomic(x) || is.name(x)) {
-    character()
-  } else if (is.call(x)) {
-    #if (identical(x[[1]], quote(`<-`)) && is.name(x[[2]])) {
-    if (identical(x[[1]], quote(`<-`)) && any(grepl("sim", x[[2]]))) {
-      if (as.character(x[[2]])[1] %in% c("$", "[[")) {
-        lhs <- as.character(x[[2]])[3]
-      } else {
-        lhs <- character()
-      }
-    } else {
-      lhs <- character()
-    }
-
-    unique(c(lhs, unlist(lapply(x, findSimAssigns))))
-  } else if (is.pairlist(x)) {
-    unique(unlist(lapply(x, findSimAssigns)))
+.findSims <- function(x, type) {
+  if (type == "get") {
+    grepPattern <- "^sim"
+    xPart <- 3
+  } else if (type == "assign") {
+    grepPattern <- "sim"
+    xPart <- 2
   } else {
-    stop("Don't know how to handle type ", typeof(x),
-         call. = FALSE)
+    character()
   }
-}
-
-findSimGets <- function(x) {
   if (is.atomic(x) || is.name(x)) {
     character()
   } else if (is.call(x)) {
     #if (identical(x[[1]], quote(`<-`)) && is.name(x[[2]])) {
-    if (identical(x[[1]], quote(`<-`)) && any(grepl("^sim", x[[3]]))) {
-      if (as.character(x[[3]])[1] %in% c("$", "[[")) {
-        lhs <- as.character(x[[3]])[3]
+    if (identical(x[[1]], quote(`<-`)) && any(grepl(grepPattern, x[[xPart]]))) {
+      if (as.character(x[[xPart]])[1] %in% c("$", "[[")) {
+        lhs <- as.character(x[[xPart]])[3]
       } else {
         lhs <- character()
       }
@@ -285,9 +270,9 @@ findSimGets <- function(x) {
       lhs <- character()
     }
 
-    unique(c(lhs, unlist(lapply(x, findSimGets))))
+    unique(c(lhs, unlist(lapply(x, .findSims, type = type))))
   } else if (is.pairlist(x)) {
-    unique(unlist(lapply(x, findSimGets)))
+    unique(unlist(lapply(x, .findSims, type = type)))
   } else {
     stop("Don't know how to handle type ", typeof(x),
          call. = FALSE)
