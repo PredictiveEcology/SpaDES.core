@@ -373,7 +373,18 @@ setMethod(
         }
 
         # From codetools -- experimental
-        checkUsageEnv(sim@.envir[[m]])
+        aa <- capture.output(
+                       checkUsageEnv(sim@.envir[[m]], suppressParamUnused = FALSE,
+                       suppressUndefined = FALSE, suppressLocalUnused = FALSE,
+                       suppressPartialMatchArgs = FALSE, suppressNoLocalFun = FALSE,
+                       suppressFundefMismatch = FALSE))
+        aa <- grep(aa, pattern = "doEvent.*: parameter", invert = TRUE, value = TRUE)
+
+        if (length(aa)) {
+          message(crayon::blue("There are possible function errors"))
+          message(paste(crayon::blue(aa), collapse = "\n"))
+        }
+
         findAllSimAssigns <- unlist(unique(lapply(names(sim@.envir[[m]]), function(x) {
           if (is.function(sim@.envir[[m]][[x]])) {
             aa <- deparse(sim@.envir[[m]][[x]])
