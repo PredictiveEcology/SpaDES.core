@@ -13,7 +13,8 @@ test_that("simulation runs with simInit and spades", {
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
-  mySim <- simInit(times, params, modules, objects = list(), paths) %>% spades()
+  mySim <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE)
 
   # simtime
   expect_equivalent(time(mySim), 10.0)
@@ -332,3 +333,76 @@ test_that("simulation runs with simInit with duplicate modules named", {
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
 })
+
+
+test_that("conflicting function types", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  #newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)
+  #newModule("child3", tmpdir, open = FALSE)
+  newModule("child4", tmpdir, open = FALSE)
+  fileName <- "child4/child4.R"
+  xxx <- readLines(fileName)
+  lineWithInit <- grep(xxx, pattern = "^Init")
+
+
+  xxx1 <- gsub(xxx, pattern = 'plotFun', replacement = 'Plot') # nolint
+  cat(xxx1, file = fileName, sep = "\n")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+                 "You have defined Plot")
+
+  # do functions like raster::levels
+  cat(xxx[1:lineWithInit], "
+      library(raster)
+      r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      r <- ratify(r)
+      rat <- levels(r)[[1]]
+      levels(r) <- rat
+      ",
+              xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+                 "Module child4 uses the following functions", "raster::levels")
+
+  cat(xxx[1:lineWithInit], "
+      library(raster)
+      r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      r <- scale(r)
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+                 "raster::scale")
+
+  ###
+  cat(xxx[1:lineWithInit], "
+      library(raster)
+      r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      r <- raster::scale(r)
+      sim$r <- r
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+                 "raster::scale")
+
+  cat(xxx[1:(lineWithInit - 1)], "
+      a <- function(x) {
+         b <- b + 1
+      }
+      ",
+      xxx[(lineWithInit):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = "child4"),
+                 "a: parameter")
+
+  })
