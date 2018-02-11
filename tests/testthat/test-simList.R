@@ -4,7 +4,7 @@ test_that("simList object initializes correctly", {
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape")
   )
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
