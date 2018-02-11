@@ -463,7 +463,12 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
           })
         }
         names(y) <- rep(x, length(y))
-        y <- y[!unlist(lapply(y, is.na))]
+        isNull <- unlist(lapply(y, is.null))
+        if (any(isNull))
+          y <- y[!unlist(isNull)]
+        isNA <- unlist(lapply(y, is.na))
+        if (any(isNA))
+          y <- y[!isNA]
         y <- y[unlist(lapply(y, is.character))]
       }
       y
