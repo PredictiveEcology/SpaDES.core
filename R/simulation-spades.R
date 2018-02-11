@@ -121,7 +121,7 @@ doEvent <- function(sim, debug, notOlderThan) {
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
-                                 cur[["eventType"]], FALSE)
+                                 cur[["eventType"]])
         } else {
 
           # for future caching of modules
@@ -162,7 +162,6 @@ doEvent <- function(sim, debug, notOlderThan) {
             sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                         debug = FALSE,
                          objects = moduleSpecificObjects,
                          notOlderThan = notOlderThan,
                          outputObjects = moduleSpecificOutputObjects,
@@ -171,7 +170,7 @@ doEvent <- function(sim, debug, notOlderThan) {
                          userTags = c("function:doEvent"))
           } else {
             sim <- get(moduleCall,
-                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]], FALSE)
+                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]])
           }
         }
       } else {

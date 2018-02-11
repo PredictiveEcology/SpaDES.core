@@ -256,7 +256,7 @@ defineModule(sim, list(
 ## event types
 #   - type `init` is required for initialiazation
 
-doEvent.", name, " = function(sim, eventTime, eventType, debug = FALSE) {
+doEvent.", name, " = function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {
