@@ -250,7 +250,7 @@ test_that("simList test all signatures", {
     }
 
     # needs paths and params; many defaults are fine
-    expect_equal(sum(successes, na.rm = TRUE), 192)
+      expect_equal(sum(successes, na.rm = TRUE), 192)
   }
 })
 

@@ -541,7 +541,11 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
   findSimGets <- .findAllSims(environment(),
                                 sim@.envir[[m]], type = "get")
+  # compare to inputObjNames -- this is about inputs
   missingInMetadata <- findSimGets[!(findSimGets %in% inputObjNames)]
+  # compare to outputObjNames -- this allows the case where module doesn't
+  #  take it as an inputObject, but it is created within the module
+  missingInMetadata <- missingInMetadata[!(missingInMetadata %in% outputObjNames)]
   missingFrmMod <- inputObjNames[!(inputObjNames %in% findSimGets)]
   missingFrmMod <- unique(na.omit(missingFrmMod))
   if (length(missingInMetadata)) {
