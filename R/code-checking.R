@@ -285,7 +285,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   if (length(clashingFuns)) {
     fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
     verb <- .verb(clashingFuns)
-    hadParseMessage <- .parseMessage(m, paste0(
+    hadParseMessage <- .parseMessage(m, "", paste0(
             paste(clashingFuns, collapse = ", "), " ", verb,
             " defined, which ", verb, " in conflict with ",
             paste(fnNames, collapse = ", "), ". It is recommended to ",
@@ -308,8 +308,13 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 #' @keywords internal
 #' @rdname parseMessage
 .parseMessage <- function(m, problem, message) {
+  sub <- if (nzchar(problem)) {
+    paste0(" -- ", problem)
+  } else {
+    ""
+  }
   message(crayon::magenta(
-    paste0(m, " -- ", problem, ": ", message)
+    paste0(m, sub, ": ", message)
   ))
   return(TRUE)
 }
