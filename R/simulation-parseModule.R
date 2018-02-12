@@ -376,7 +376,8 @@ setMethod(
         if (isTRUE(getOption("spades.moduleCodeChecks")) ||
             length(names(getOption("spades.moduleCodeChecks"))) > 1) {
           ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
-          codeCheckMsgs <- append(codeCheckMsgs, capture_messages(.runCodeChecks(sim, m, k)))
+          codeCheckMsgs <- append(codeCheckMsgs,
+                                  capture.output(type = "message", .runCodeChecks(sim, m, k)))
         } # End of code checking
 
         lockBinding(m, sim@.envir)
