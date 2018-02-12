@@ -5,12 +5,15 @@
 \alias{.findElement}
 \title{Find all references to sim$}
 \usage{
-.findElementsInEnv(envToFindSim, moduleEnv, type)
+.findElementsInEnv(envToFindSim = parent.frame(),
+  moduleEnv = parent.frame(), type)
 
 .findElement(x, type)
 }
 \arguments{
-\item{envToFindSim}{An environment where sim is defined}
+\item{envToFindSim}{An environment where sim is defined. This is used when
+the element accessing the simList is actually a call, e.g.,
+\code{sim[[P(sim)$stackName]]}}
 
 \item{moduleEnv}{The environment where the module functions are}
 
@@ -25,6 +28,12 @@ A character string with all sim objects found
 Find all references to sim$
 }
 \details{
+\code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
+function code to a call, and then pass it to \code{.findElements}. It also does
+some cleaning for duplications, \code{NA} values, and cases where the element
+inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
+simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
+
 When \bold{\code{type = "get"}}, the function scans for sim$xxx or sim[["xxx"]]] on
 the RHS of an assignment operator or when there is no assignment. When
 \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
@@ -34,7 +43,8 @@ scans for all functions (i.e., "globals") being used. This is similar to
 
 \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
 \code{type = "assign"}. Usually this is a test of existence of that object, in
-order to assign to that object.
+order to assign to that object. It is only reading it to determine whether or
+not it should write to it.
 }
 \author{
 Eliot McIntire

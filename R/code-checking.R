@@ -112,7 +112,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
       }
 
       unique(c(lhs, unlist(lapply(x, .findElement, type = type))))
-    } else if (identical(type, "assign")) {
+    } else if (identical(type, "get")) {
       if (identical(x[[1]], quote(is.null))) {
         # This is case where module may check for absense of a sim object with is.null
         #   This shouldn't make a message
@@ -122,9 +122,15 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
         # if on the left side of a function, deleted those from x, we don't care here
         x <- x[-(1:2)]
       } else {
-        if (as.character(x)[1] %in% c("$", "[[") &&
+        if (as.character(x)[1] %in% c("$") &&
             identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
           simObj <- as.character(x[[3]])
+        } else if (as.character(x)[1] %in% "[[" &&
+                   identical(as.character(x[[2]]), "sim") && is.character(x[[3]])) {
+          simObj <- x[[3]]
+        } else if (as.character(x)[1] %in% "[[" &&
+                   identical(as.character(x[[2]]), "sim") && is.call(x[[3]])) {
+          simObj <- deparse(x[[3]])
         } else {
           simObj <- character()
         }
@@ -167,32 +173,17 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 .runCodeChecks <- function(sim, m, k) {
   hadParseMessage <- FALSE # initiate this which will be changed if there are
                            #   parse messages
-  # From codetools
-  checks <- if (isTRUE(getOption("spades.moduleCodeChecks"))) {
-    list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
-         suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-         skipWith = TRUE)
-  } else {
-      getOption("spades.moduleCodeChecks")
-  }
 
-  aa <- capture.output(
-    do.call(checkUsageEnv, args = append(list(env = sim@.envir[[m]]), checks))
-  )
-  aa <- grep(aa, pattern = "doEvent.*: parameter", invert = TRUE, value = TRUE)
-
-  if (length(aa)) {
-    hadParseMessage <- .parseMessage(m, "module code",
-                                     paste0("\n  ", paste(aa, collapse = "\n")))
-  }
-
+  #############################################################
+  ###### Sim Assignments ######################################
+  #############################################################
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
   findSimAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
 
   inputObjNames <- sim@depends@dependencies[[k]]@inputObjects$objectName
   outputObjNames <- sim@depends@dependencies[[k]]@outputObjects$objectName
 
-  if (length(findSimAssigns)) {
+  if (length(outputObjNames)) {
     missingFrmMod <- outputObjNames[!(outputObjNames %in% findSimAssigns)]
     missingFrmMod <- unique(na.omit(missingFrmMod))
     if (length(missingFrmMod)) {
@@ -203,6 +194,9 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
                                               "but ", verb, " not used in the module"
       ))
     }
+  }
+
+  if (length(findSimAssigns)) {
 
     # does module name occur as a sim$ assign
     if (m %in% findSimAssigns) {
@@ -239,11 +233,14 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     }
   }
 
+  #############################################################
+  ###### Sim Gets #############################################
+  #############################################################
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
   findSimGets <- .findElementsInEnv(environment(),
                                 sim@.envir[[m]], type = "get")
   # compare to inputObjNames -- this is about inputs
-  if (length(findSimGets)) {
+  if (length(inputObjNames)) {
     missingFrmMod <- inputObjNames[!(inputObjNames %in% findSimGets)]
     missingFrmMod <- unique(na.omit(missingFrmMod))
     if (length(missingFrmMod)) {
@@ -254,7 +251,9 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
                            " not used in the module"
       ))
     }
+  }
 
+  if (length(findSimGets)) {
     simGetsNotInIO <- findSimGets[names(findSimGets) != ".inputObjects"]
     simGetsInIO <- findSimGets[names(findSimGets) == ".inputObjects"]
 
@@ -265,7 +264,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
       hadParseMessage <-
         .parseMessage(m, "inputObjects",
                       paste0(paste(unique(missingInMetadata), collapse = ", "),
-                      " ",verb," assigned to sim inside ",
+                      " ",verb," used from sim inside ",
                       paste(unique(names(missingInMetadata)), collapse = ", "),
                       ", but ",verb," not declared in inputObjects"
       ))
@@ -285,6 +284,9 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 
   }
 
+  #############################################################
+  #######  Conflicting Functions ##############################
+  #############################################################
   # search for conflicts in function names with common problems like raster::levels
   fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
   hasConflicts <- fg[fg %in% conflictingFnsSimple]
@@ -312,6 +314,32 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
             paste(fnNames, collapse = ", "), ". It is recommended to ",
             " use non-conflicting function names"))
   }
+
+  #############################################################
+  ##### checkUsage -- From codetools ##########################
+  #############################################################
+  checks <- if (isTRUE(getOption("spades.moduleCodeChecks"))) {
+    list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
+         suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
+         skipWith = TRUE)
+  } else {
+    getOption("spades.moduleCodeChecks")
+  }
+
+  checkUsageMsg <- capture.output(
+    do.call(checkUsageEnv, args = append(list(env = sim@.envir[[m]]), checks))
+  )
+  checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
+                        invert = TRUE, value = TRUE)
+
+  if (length(checkUsageMsg)) {
+    hadParseMessage <- .parseMessage(m, "module code",
+                                     paste0("\n  ", paste(checkUsageMsg, collapse = "\n")))
+  }
+
+  #############################################################
+  ###### Message if all clean #################################
+  #############################################################
   if (!hadParseMessage) message(crayon::magenta("Module code appears clean"))
   return(invisible())
 }
