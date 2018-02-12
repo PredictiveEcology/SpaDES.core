@@ -13,7 +13,9 @@
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
-    spades.runCodeChecks = TRUE,
+    spades.moduleCodeChecks = list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
+                                suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
+                                skipWith = TRUE),
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "http://github.com/PredictiveEcology/SpaDES"

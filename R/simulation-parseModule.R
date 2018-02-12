@@ -372,7 +372,8 @@ setMethod(
           }
         }
 
-        if (getOption("spades.runCodeChecks")) {
+        if (isTRUE(getOption("spades.moduleCodeChecks")) ||
+            length(names(getOption("spades.moduleCodeChecks"))) > 1) {
           ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
           .runCodeChecks(sim, m, k)
         } # End of code checking
