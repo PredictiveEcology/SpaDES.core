@@ -39,14 +39,10 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     if (is.function(moduleEnv[[x]])) {
       aa <- deparse(moduleEnv[[x]])
       bb <- as.call(parse(text = aa))
-      if (type == "get") {
-        y <- .findGetSims(bb)
-      } else {
-        y <- .findAssignSims(bb)
-      }
-      y <- na.omit(y)
-      if (all(is.na(y))) y <- character()
+      y <- .findSims(bb, type = type)
       if (length(y)) {
+        y <- na.omit(y)
+        if (all(is.na(y))) y <- character()
         hasSim <- grepl(y, pattern = "sim")
         if (length(y[hasSim])) {
           y[hasSim] <- lapply(y[hasSim], function(yParts) {
@@ -72,64 +68,53 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 #' @keywords internal
 #' @param x A call in which to search for sim
 #' @rdname findSims
-.findAssignSims <- function(x) {
+.findSims <- function(x, type) {
   if (is.atomic(x) || is.name(x)) {
     character()
   } else if (is.call(x)) {
-    if (identical(x[[1]], quote(`<-`))) {
-      # if it is an assign, only keep left hand side
-      x <- x[[2]]
-      if (as.character(x)[1] %in% c("$", "[[") &&
-          identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
-        lhs <- as.character(x[[3]])
+    if (identical(type, "assign")) {
+      if (identical(x[[1]], quote(`<-`))) {
+        # if it is an assign, only keep left hand side
+        x <- x[[2]]
+        if (as.character(x)[1] %in% c("$", "[[") &&
+            identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
+          lhs <- as.character(x[[3]])
+        } else {
+          lhs <- character()
+        }
       } else {
         lhs <- character()
       }
-    } else {
-      lhs <- character()
-    }
 
-    unique(c(lhs, unlist(lapply(x, .findAssignSims))))
-  } else if (is.pairlist(x)) {
-    unique(unlist(lapply(x, .findAssignSims)))
-  } else {
-    stop("Don't know how to handle type ", typeof(x),
-         call. = FALSE)
-  }
-}
-
-#' @inheritParams .findAssignSims
-#' @keywords internal
-#' @rdname findSims
-.findGetSims <- function(x) {
-  if (is.atomic(x) || is.name(x)) {
-    character()
-  } else if (is.call(x)) {
-    if (identical(x[[1]], quote(is.null))) {
-      # This is case where module may check for absense of a sim object with is.null
-      #   This shouldn't make a message
-      return(character())
-    } else if (identical(x[[1]], quote(`<-`)) ) {
-      simObj <- character()
-      # if on the left side of a function, deleted those from x, we don't care here
-      x <- x[-(1:2)]
-    } else {
-      if (as.character(x)[1] %in% c("$", "[[") &&
-          identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
-        simObj <- as.character(x[[3]])
-      } else {
+      unique(c(lhs, unlist(lapply(x, .findSims, type = type))))
+    } else if (identical(type, "assign")) {
+      if (identical(x[[1]], quote(is.null))) {
+        # This is case where module may check for absense of a sim object with is.null
+        #   This shouldn't make a message
+        return(character())
+      } else if (identical(x[[1]], quote(`<-`)) ) {
         simObj <- character()
+        # if on the left side of a function, deleted those from x, we don't care here
+        x <- x[-(1:2)]
+      } else {
+        if (as.character(x)[1] %in% c("$", "[[") &&
+            identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
+          simObj <- as.character(x[[3]])
+        } else {
+          simObj <- character()
+        }
       }
+      unique(c(simObj, unlist(lapply(x, .findSims, type = type))))
     }
-    unique(c(simObj, unlist(lapply(x, .findGetSims))))
   } else if (is.pairlist(x)) {
-    unique(unlist(lapply(x, .findGetSims)))
+    unique(unlist(lapply(x, .findSims, type = type)))
   } else {
     stop("Don't know how to handle type ", typeof(x),
          call. = FALSE)
   }
-
 }
+
+
 
 #' Runs a series of code checks during simInit
 #'
@@ -162,7 +147,8 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   aa <- grep(aa, pattern = "doEvent.*: parameter", invert = TRUE, value = TRUE)
 
   if (length(aa)) {
-    hadParseMessage <- .parseMessage(m, "", message(paste(aa, collapse = "\n")))
+    hadParseMessage <- .parseMessage(m, "module code",
+                                     paste0("\n  ", paste(aa, collapse = "\n")))
   }
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code

@@ -2,15 +2,12 @@
 % Please edit documentation in R/code-checking.R
 \name{.findAllSims}
 \alias{.findAllSims}
-\alias{.findAssignSims}
-\alias{.findGetSims}
+\alias{.findSims}
 \title{Find all references to sim$}
 \usage{
 .findAllSims(envToFindSim, moduleEnv, type)
 
-.findAssignSims(x)
-
-.findGetSims(x)
+.findSims(x, type)
 }
 \arguments{
 \item{envToFindSim}{An environment where sim is defined}
