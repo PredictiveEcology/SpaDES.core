@@ -159,6 +159,7 @@ setMethod(
   signature(sim = "simList", modules = "list", envir = "ANY"),
   definition = function(sim, modules, userSuppliedObjNames, envir, notOlderThan, ...) {
     all_children <- list()
+    codeCheckMsgs <- list()
     children <- list()
     parent_ids <- integer()
     dots <- list(...)
@@ -375,7 +376,7 @@ setMethod(
         if (isTRUE(getOption("spades.moduleCodeChecks")) ||
             length(names(getOption("spades.moduleCodeChecks"))) > 1) {
           ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
-          .runCodeChecks(sim, m, k)
+          codeCheckMsgs <- append(codeCheckMsgs, capture_messages(.runCodeChecks(sim, m, k)))
         } # End of code checking
 
         lockBinding(m, sim@.envir)
@@ -407,6 +408,10 @@ setMethod(
     } %>%
       unique()
     sim@current <- list()
+
+    if (length(codeCheckMsgs))
+      message(unique(unlist(codeCheckMsgs)))
+
     return(sim)
 })
 
