@@ -411,7 +411,7 @@ setMethod(
     sim@current <- list()
 
     if (length(codeCheckMsgs))
-      message(unique(unlist(codeCheckMsgs)))
+      message(paste(unique(unlist(codeCheckMsgs)), collapse = "\n"))
 
     return(sim)
 })
