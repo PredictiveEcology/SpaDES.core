@@ -246,53 +246,80 @@ clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = ""
 clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")
 
 
-.findSims <- function(x, type) {
+# .findSims <- function(x, type) {
+#   if (is.atomic(x) || is.name(x)) {
+#     character()
+#   } else if (is.call(x)) {
+#     paramsPattern <- "\\<P\\(sim\\>|\\<globals\\(sim\\>|\\<params\\(sim\\>"
+#     if (type == "get") {
+#       grepPattern <- paste0("\\<sim\\>|", paramsPattern)
+#       xPart <- 3
+#       test <- if (length(x) > 2) {
+#         if (identical(x[[1]], quote(`<-`))) {
+#           tc <- tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
+#                      function(y) NA)
+#           if (isTRUE(tc)) {
+#             TRUE
+#           } else {
+#             if (is.na(tc)) {
+#               FALSE
+#             } else {
+#               return(character()) # short circuit the return b/c no longer of right side
+#             }
+#           }
+#         } else { # not an assignment
+#           tryCatch(any(grepl(grepPattern, deparse(x))), error =
+#                            function(y) FALSE)
+#         }
+#       } else {
+#         tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
+#                          function(y) FALSE)
+#       }
+#     } else if (type == "assign") {
+#       grepPattern <- "\\<sim\\>"
+#       xPart <- 2
+#       test <- identical(x[[1]], quote(`<-`)) && any(grepl(grepPattern, deparse(x[[xPart]])))
+#     } else {
+#       test <- FALSE
+#       character()
+#     }
+#
+#     if (test) {
+#       if (as.character(x)[1] %in% c("$", "[[")) {
+#         if (grepl(gsub(paramsPattern, pattern = "\\\\<", replacement = "^"),
+#                   deparse(x))) {
+#           lhs <- deparse(x[[xPart]])
+#         } else {
+#           lhs <- as.character(x[[xPart]])
+#         }
+#
+#       } else {
+#         lhs <- character()
+#       }
+#     } else {
+#       lhs <- character()
+#     }
+#
+#     unique(c(lhs, unlist(lapply(x, .findSims, type = type))))
+#   } else if (is.pairlist(x)) {
+#     unique(unlist(lapply(x, .findSims, type = type)))
+#   } else {
+#     stop("Don't know how to handle type ", typeof(x),
+#          call. = FALSE)
+#   }
+# }
+
+
+.findAssignSims <- function(x) {
   if (is.atomic(x) || is.name(x)) {
     character()
   } else if (is.call(x)) {
-    paramsPattern <- "\\<P\\(sim\\>|\\<globals\\(sim\\>|\\<params\\(sim\\>"
-    if (type == "get") {
-      grepPattern <- paste0("\\<sim\\>|", paramsPattern)
-      xPart <- 3
-      test <- if (length(x) > 2) {
-        if (identical(x[[1]], quote(`<-`))) {
-          tc <- tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
-                     function(y) NA)
-          if (isTRUE(tc)) {
-            TRUE
-          } else {
-            if (is.na(tc)) {
-              FALSE
-            } else {
-              return(character()) # short circuit the return b/c no longer of right side
-            }
-          }
-        } else {
-          tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
-                           function(y) FALSE)
-        }
-      } else {
-        tryCatch(any(grepl(grepPattern, deparse(x[[xPart]]))), error =
-                         function(y) FALSE)
-      }
-    } else if (type == "assign") {
-      grepPattern <- "\\<sim\\>"
-      xPart <- 2
-      test <- identical(x[[1]], quote(`<-`)) && any(grepl(grepPattern, deparse(x[[xPart]])))
-    } else {
-      test <- FALSE
-      character()
-    }
-
-    if (test) {
-      if (as.character(x[[xPart]])[1] %in% c("$", "[[")) {
-        if (grepl(gsub(paramsPattern, pattern = "\\\\<", replacement = "^"),
-                  deparse(x[[xPart]]))) {
-          lhs <- deparse(x[[xPart]])
-        } else {
-          lhs <- as.character(x[[xPart]])[3]
-        }
-
+    if (identical(x[[1]], quote(`<-`))) {
+      # if it is an assign, only keep left hand side
+      x <- x[[2]]
+      if (as.character(x)[1] %in% c("$", "[[") &&
+          identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
+        lhs <- as.character(x[[3]])
       } else {
         lhs <- character()
       }
@@ -300,11 +327,41 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
       lhs <- character()
     }
 
-    unique(c(lhs, unlist(lapply(x, .findSims, type = type))))
+    unique(c(lhs, unlist(lapply(x, .findAssignSims))))
   } else if (is.pairlist(x)) {
-    unique(unlist(lapply(x, .findSims, type = type)))
+    unique(unlist(lapply(x, .findAssignSims)))
   } else {
     stop("Don't know how to handle type ", typeof(x),
          call. = FALSE)
   }
+}
+
+.findGetSims <- function(x) {
+  if (is.atomic(x) || is.name(x)) {
+    character()
+  } else if (is.call(x)) {
+    if (identical(x[[1]], quote(is.null))) {
+      # This is case where module may check for absense of a sim object with is.null
+      #   This shouldn't make a message
+      return(character())
+    } else if (identical(x[[1]], quote(`<-`)) ) {
+      simObj <- character()
+      # if on the left side of a function, deleted those from x, we don't care here
+      x <- x[-(1:2)]
+    } else {
+      if (as.character(x)[1] %in% c("$", "[[") &&
+          identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
+        simObj <- as.character(x[[3]])
+      } else {
+        simObj <- character()
+      }
+    }
+    unique(c(simObj, unlist(lapply(x, .findGetSims))))
+  } else if (is.pairlist(x)) {
+    unique(unlist(lapply(x, .findGetSims)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x),
+         call. = FALSE)
+  }
+
 }

@@ -448,11 +448,15 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 }
 
 .findAllSims <- function(envToFindSim, moduleEnv, type) {
-  unlist(unique(lapply(names(moduleEnv), function(x) {
+  out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
       aa <- deparse(moduleEnv[[x]])
       bb <- as.call(parse(text = aa))
-      y <- .findSims(bb, type = type)
+      if (type == "get") {
+        y <- .findGetSims(bb)
+      } else {
+        y <- .findAssignSims(bb)
+      }
       y <- na.omit(y)
       if (all(is.na(y))) y <- character()
       if (length(y)) {
@@ -475,6 +479,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
       y
     }
   })))
+  return(out)
 }
 
 
@@ -493,48 +498,68 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #' @keywords internal
 #' @rdname runCodeChecks
 .runCodeChecks <- function(sim, m, k) {
+  hadParseMessage <- FALSE # initiate this which will be changed if there are parse messages
   # From codetools -- experimental
+  checks <- if (isTRUE(getOption("spades.moduleCodeChecks"))) {
+    list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
+         suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
+         skipWith = TRUE)
+  } else {
+      getOption("spades.moduleCodeChecks")
+  }
+
   aa <- capture.output(
-    checkUsageEnv(sim@.envir[[m]], suppressParamUnused = FALSE,
-                  suppressUndefined = FALSE, suppressLocalUnused = FALSE,
-                  suppressPartialMatchArgs = FALSE, suppressNoLocalFun = FALSE,
-                  suppressFundefMismatch = FALSE))
+    do.call(checkUsageEnv, args = append(list(env = sim@.envir[[m]]), checks))
+  )
   aa <- grep(aa, pattern = "doEvent.*: parameter", invert = TRUE, value = TRUE)
 
   if (length(aa)) {
-    .parseMessage(m, message(paste(aa, collapse = "\n")))
+    hadParseMessage <- .parseMessage(m, "", message(paste(aa, collapse = "\n")))
   }
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
   findSimAssigns <- .findAllSims(environment(),
-                                   sim@.envir[[m]], type = "assign")
+                                  sim@.envir[[m]], type = "assign")
 
   inputObjNames <- sim@depends@dependencies[[k]]@inputObjects$objectName
   outputObjNames <- sim@depends@dependencies[[k]]@outputObjects$objectName
 
-  missingFrmMod <- outputObjNames[!(outputObjNames %in% findSimAssigns)]
-  missingFrmMod <- na.omit(missingFrmMod)
-  if (length(missingFrmMod)) {
-    verb <- .verb(missingFrmMod)
-    .parseMessage(m, paste0(paste(missingFrmMod, collapse = ", "),
-        " ",verb," declared in outputObjects, ", "but it is not used in the module"
-    ))
-  }
-
   if (length(findSimAssigns)) {
+    missingFrmMod <- outputObjNames[!(outputObjNames %in% findSimAssigns)]
+    missingFrmMod <- unique(na.omit(missingFrmMod))
+    if (length(missingFrmMod)) {
+      verb <- .verb(missingFrmMod)
+      hadParseMessage <- .parseMessage(m, "module code", paste0(paste(missingFrmMod, collapse = ", "),
+          " ",verb," declared in outputObjects, ", "but ", verb, " not used in the module"
+      ))
+    }
+
     # does module name occur as a sim$ assign
     if (m %in% findSimAssigns) {
       stop(m, ": You have created an object with the same name as the module. ",
            "Currently, this is not allowed.", call. = FALSE)
     }
-    missingInMetadata <- findSimAssigns[!(findSimAssigns %in%
-                                                 outputObjNames)]
 
+    simAssignsNotInIO <- findSimAssigns[names(findSimAssigns) != ".inputObjects"]
+    simAssignsInIO <- findSimAssigns[names(findSimAssigns) == ".inputObjects"]
+
+    # First do all but .inputObjects, i.e,. outputObjects
+    missingInMetadata <- simAssignsNotInIO[!(simAssignsNotInIO %in% outputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      .parseMessage(m, paste0(paste(missingInMetadata, collapse = ", "),
+      hadParseMessage <- .parseMessage(m, "outputObjects", paste0(paste(missingInMetadata, collapse = ", "),
         " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
         ", but ",verb," not declared in outputObjects"
+      ))
+    }
+
+    # Now do .inputObjects, i.e., inputObjects
+    missingInMetadata <- simAssignsInIO[!(simAssignsInIO %in% inputObjNames)]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <- .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
+                                               " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
+                                               ", but ",verb," not declared in inputObjects"
       ))
     }
   }
@@ -543,26 +568,39 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   findSimGets <- .findAllSims(environment(),
                                 sim@.envir[[m]], type = "get")
   # compare to inputObjNames -- this is about inputs
-  missingInMetadata <- findSimGets[!(findSimGets %in% inputObjNames)]
-  # compare to outputObjNames -- this allows the case where module doesn't
-  #  take it as an inputObject, but it is created within the module
-  missingInMetadata <- missingInMetadata[!(missingInMetadata %in% outputObjNames)]
-  missingFrmMod <- inputObjNames[!(inputObjNames %in% findSimGets)]
-  missingFrmMod <- unique(na.omit(missingFrmMod))
-  if (length(missingInMetadata)) {
-    verb <- .verb(unique(missingInMetadata))
-    .parseMessage(m, paste0(paste(unique(missingInMetadata), collapse = ", "),
-                            " ",verb," used from sim inside ",
-                            paste(unique(names(missingInMetadata)), collapse = ", "),
-                            ", but ",verb," not declared in inputObjects"
-    ))
-  }
-  if (length(missingFrmMod)) {
-    verb <- .verb(missingFrmMod)
-    .parseMessage(m, paste0(paste(missingFrmMod, collapse = ", "),
-                                " ",verb," declared in inputObjects, ",
-                                "but it is not used in the module"
-    ))
+  if (length(findSimGets)) {
+    missingFrmMod <- inputObjNames[!(inputObjNames %in% findSimGets)]
+    missingFrmMod <- unique(na.omit(missingFrmMod))
+    if (length(missingFrmMod)) {
+      verb <- .verb(missingFrmMod)
+      hadParseMessage <- .parseMessage(m, "module code",
+                    paste0(paste(missingFrmMod, collapse = ", "), " ",verb,
+                           " declared in inputObjects, ", "but ", verb, " not used in the module"
+      ))
+    }
+
+    simGetsNotInIO <- findSimGets[names(findSimGets) != ".inputObjects"]
+    simGetsInIO <- findSimGets[names(findSimGets) == ".inputObjects"]
+
+    missingInMetadata <- simGetsNotInIO[!(simGetsNotInIO %in% c(inputObjNames, outputObjNames))]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <- .parseMessage(m, "inputObjects", paste0(paste(unique(missingInMetadata), collapse = ", "),
+                                              " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
+                                              ", but ",verb," not declared in inputObjects"
+      ))
+    }
+
+    # Now do .inputObjects, i.e., inputObjects
+    missingInMetadata <- simGetsInIO[!(simGetsInIO %in% inputObjNames)]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <- .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
+                                              " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
+                                              ", but ",verb," not declared in inputObjects"
+      ))
+    }
+
   }
 
   # search for conflicts in function names with common problems
@@ -586,7 +624,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     xx <- paste0(paste(conflictingFnsByConflict, sep = ", "),
                  ": used inside ", paste(names(conflictingFnsByConflict), sep = ", "))
     verb <- .verb(xx)
-    .parseMessage(m, paste0("the following function(s) ", verb," used that conflict(s)",
+    hadParseMessage <- .parseMessage(m, paste0("the following function(s) ", verb," used that conflict(s)",
             " with base functions:\n", xx,
             "\nIt is a good idea to be explicit about the package sources",
             "\ne.g., ", paste(whichFnsWithPackage, collapse = ", ")))
@@ -597,13 +635,14 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   if (length(clashingFuns)) {
     fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
     verb <- .verb(clashingFuns)
-    .parseMessage(m, paste0(
+    hadParseMessage <- .parseMessage(m, paste0(
             paste(clashingFuns, collapse = ", "), " ", verb,
             " defined, which ", verb, " in conflict with ",
             paste(fnNames, collapse = ", "), ". It is recommended to ",
             " use non-conflicting function names"))
   }
-
+  if (!hadParseMessage) message("Module code appears clean")
+  return(invisible())
 }
 
 #' Prepend module name to a message
@@ -618,10 +657,11 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #'
 #' @keywords internal
 #' @rdname parseMessage
-.parseMessage <- function(m, message) {
-  message(crayon::blue(
-    paste0(m, ": ", message)
+.parseMessage <- function(m, problem, message) {
+  message(crayon::magenta(
+    paste0(m, " -- ", problem, ": ", message)
   ))
+  return(TRUE)
 }
 
 #' Chose verb conjugation for "to be"
