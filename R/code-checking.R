@@ -24,22 +24,40 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 
 #' Find all references to sim$
 #'
-#' @param envToFindSim An environment where sim is defined
+#' @param envToFindSim An environment where sim is defined. This is used when
+#'                     the element accessing the simList is actually a call, e.g.,
+#'                     \code{sim[[P(sim)$stackName]]}
 #' @param moduleEnv The environment where the module functions are
-#' @param type Either "get" or "assign" indicating which side of <- we are searching
+#' @param type Either "get", "assign", or "globals". See details.
+#'
+#'
+#' @details
+#' \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
+#' function code to a call, and then pass it to \code{.findElements}. It also does
+#' some cleaning for duplications, \code{NA} values, and cases where the element
+#' inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
+#' simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
+#'
+#' When \bold{\code{type = "get"}}, the function scans for sim$xxx or sim[["xxx"]]] on
+#' the RHS of an assignment operator or when there is no assignment. When
+#' \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
+#' LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
+#' scans for all functions (i.e., "globals") being used. This is similar to
+#' \code{\link[codetools]{findGlobals}}, but faster.
 #'
 #' @return
 #' A character string with all sim objects found
 #'
 #' @author Eliot McIntire
 #' @keywords internal
-#' @rdname findSims
-.findAllSimsInEnv <- function(envToFindSim, moduleEnv, type) {
+#' @rdname findElements
+.findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(),
+                               type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
       aa <- deparse(moduleEnv[[x]])
       bb <- as.call(parse(text = aa))
-      y <- .findSims(bb, type = type)
+      y <- .findElement(bb, type = type)
       if (length(y)) {
         y <- na.omit(y)
         if (all(is.na(y))) y <- character()
@@ -67,8 +85,15 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 
 #' @keywords internal
 #' @param x A call in which to search for sim
-#' @rdname findSims
-.findSims <- function(x, type) {
+#' @inheritParams .findElementsInEnv
+#' @details
+#' \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
+#' \code{type = "assign"}. Usually this is a test of existence of that object, in
+#' order to assign to that object. It is only reading it to determine whether or
+#' not it should write to it.
+#'
+#' @rdname findElements
+.findElement <- function(x, type) {
   if (is.atomic(x) || is.name(x)) {
     character()
   } else if (is.call(x)) {
@@ -86,7 +111,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
         lhs <- character()
       }
 
-      unique(c(lhs, unlist(lapply(x, .findSims, type = type))))
+      unique(c(lhs, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "assign")) {
       if (identical(x[[1]], quote(is.null))) {
         # This is case where module may check for absense of a sim object with is.null
@@ -104,10 +129,19 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
           simObj <- character()
         }
       }
-      unique(c(simObj, unlist(lapply(x, .findSims, type = type))))
+      unique(c(simObj, unlist(lapply(x, .findElement, type = type))))
+    } else if (identical(type, "globals")) {
+      if (identical(x[[1]], quote(`<-`)) && is.call(x[[2]])) { # left side function assign
+        lhs <- paste0(as.character(x[[2]][[1]]), as.character(x)[[1]])
+      } else if (is.name(x[[1]])) {
+        lhs <- as.character(x[[1]])
+      } else {
+        lhs <- character()
+      }
+      unique(c(lhs, unlist(lapply(x, .findElement, type = type))))
     }
   } else if (is.pairlist(x)) {
-    unique(unlist(lapply(x, .findSims, type = type)))
+    unique(unlist(lapply(x, .findElement, type = type)))
   } else {
     stop("Don't know how to handle type ", typeof(x),
          call. = FALSE)
@@ -133,7 +167,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 .runCodeChecks <- function(sim, m, k) {
   hadParseMessage <- FALSE # initiate this which will be changed if there are
                            #   parse messages
-  # From codetools -- experimental
+  # From codetools
   checks <- if (isTRUE(getOption("spades.moduleCodeChecks"))) {
     list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
          suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
@@ -153,7 +187,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   }
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
-  findSimAssigns <- .findAllSimsInEnv(environment(), sim@.envir[[m]], type = "assign")
+  findSimAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
 
   inputObjNames <- sim@depends@dependencies[[k]]@inputObjects$objectName
   outputObjNames <- sim@depends@dependencies[[k]]@outputObjects$objectName
@@ -206,7 +240,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   }
 
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-  findSimGets <- .findAllSimsInEnv(environment(),
+  findSimGets <- .findElementsInEnv(environment(),
                                 sim@.envir[[m]], type = "get")
   # compare to inputObjNames -- this is about inputs
   if (length(findSimGets)) {
@@ -251,41 +285,28 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 
   }
 
-  # search for conflicts in function names with common problems
-  conflictingFnsByElement <- lapply(sim@.envir[[m]], function(x) {
-    if (is.function(x)) {
-      fg <- findGlobals(x)
-      conflictingFnsSimple %in% fg
-    }
-  })
-  hasConflicts <- unlist(lapply(conflictingFnsByElement, any))
-  if (any(hasConflicts)) {
-    theFns <- names(hasConflicts)[hasConflicts]
+  # search for conflicts in function names with common problems like raster::levels
+  fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
+  hasConflicts <- fg[fg %in% conflictingFnsSimple]
+  if (length(hasConflicts)) {
+    theFns <- names(hasConflicts)
     names(theFns) <- theFns
-    conflictingFnsByConflict <- lapply(theFns, function(x) {
-      fg <- findGlobals(get(x, sim@.envir[[m]]))
-      problemFns <- fg[fg %in% conflictingFnsSimple]
-    })
-
-    whichFnsWithPackage <- unlist(lapply(conflictingFnsByElement[hasConflicts],
-                                         function(z) conflictingFnsClean[z]))
-    xx <- paste0(paste(conflictingFnsByConflict, sep = ", "),
-                 ": used inside ", paste(names(conflictingFnsByConflict), sep = ", "))
-    verb <- .verb(xx)
+    whichFnsWithPackage <- conflictingFnsClean[conflictingFnsSimple %in% hasConflicts]
+    verb <- .verb(length(whichFnsWithPackage))
     hadParseMessage <-
-      .parseMessage(m, paste0("the following function(s) ", verb,
+      .parseMessage(m, "module code", paste0("the following function(s) ", verb,
             " used that conflict(s)",
-            " with base functions:\n", xx,
-            "\nIt is a good idea to be explicit about the package sources",
-            "\ne.g., ", paste(whichFnsWithPackage, collapse = ", ")))
+            "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
+            "\n  It is a good idea to be explicit about the package sources",
+            ", e.g., ", paste(whichFnsWithPackage, collapse = ", ")))
   }
 
-  # search for conflicts in module function names with common problems
+  # search for conflicts in module function names with common problems, like quickPlot::Plot
   clashingFuns <- names(sim@.envir[[m]])[names(sim@.envir[[m]]) %in% clashingFnsSimple]
   if (length(clashingFuns)) {
     fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
     verb <- .verb(clashingFuns)
-    hadParseMessage <- .parseMessage(m, "", paste0(
+    hadParseMessage <- .parseMessage(m, "module functions", paste0(
             paste(clashingFuns, collapse = ", "), " ", verb,
             " defined, which ", verb, " in conflict with ",
             paste(fnNames, collapse = ", "), ". It is recommended to ",
