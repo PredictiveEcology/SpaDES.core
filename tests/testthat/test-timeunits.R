@@ -249,7 +249,7 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_message(expect_output(mySim <- simInit(modules = list(modName),
                                  paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                    params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
-                 all = TRUE, "Using or creating cached|child6 -- outputObjects: dp, cm are assigned")
+                 all = TRUE, "Using or creating cached|child6 -- outputObjects: dp, cm are assigned|child6 -- module code: b is")
   expect_true(identical(mySim$b, asPath(theFile)))
 
   # Change the file that is in the arguments to .inputObjects
@@ -258,14 +258,15 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_silent(expect_message(mySim <- simInit(modules = list(modName),
                                                 paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                                                 params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE,
-                               "Using or creating cached|child6 -- outputObjects: dp, cm are assigned")
+                               "Using or creating cached|child6 -- outputObjects: dp, cm are assigned|child6 -- module code: b is declared")
   )
 
   # pulls cached value
   expect_message(expect_output(mySim <- simInit(modules = list(modName),
                                                 paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                                params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
-                 all = TRUE, "Using or creating cached|child6 -- outputObjects: dp, cm are assigned")
+                                                params = list("child6"= list(.useCache = ".inputObjects"))),
+                               regexp = "  Using cached"),
+                 all = TRUE, "Using or creating cached|child6 -- outputObjects: dp, cm are assigned|child6 -- module code: b is declared")
 
 
 })

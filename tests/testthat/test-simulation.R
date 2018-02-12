@@ -419,7 +419,7 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-            pattern = c(paste0(m, " -- inputObjects: b, d, f, hi are used|child4 - outputObjects: g is assigned|Running .input")))))
+            pattern = c(paste0(m, " -- inputObjects: b, d, f, hi are used|child4 -- outputObjects: g is assigned|Running .input")))))
 
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
