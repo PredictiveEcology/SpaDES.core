@@ -468,8 +468,11 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   save simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
 
-  \item \code{spades.runCodeChecks}: Should the various code checks be run
-  during \code{simInit}. Default is \code{TRUE}.
+  \item \code{spades.moduleCodeChecks}: Should the various code checks be run
+  during \code{simInit}. These are passed to codetools::checkUsage.
+  Default is given by the function, plus these :\code{list(suppressParamUnused = FALSE,
+  suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
+  skipWith = TRUE)}.
 
   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
     to ensure a module's required packages are listed first?

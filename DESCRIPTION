@@ -78,6 +78,7 @@ Collate:
     'cache.R'
     'check.R'
     'checkpoint.R'
+    'code-checking.R'
     'copy.R'
     'experiment.R'
     'simulation-parseModule.R'
