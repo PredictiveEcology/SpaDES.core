@@ -34,7 +34,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 #' @author Eliot McIntire
 #' @keywords internal
 #' @rdname findSims
-.findAllSims <- function(envToFindSim, moduleEnv, type) {
+.findAllSimsInEnv <- function(envToFindSim, moduleEnv, type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
       aa <- deparse(moduleEnv[[x]])
@@ -131,7 +131,8 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 #' @keywords internal
 #' @rdname runCodeChecks
 .runCodeChecks <- function(sim, m, k) {
-  hadParseMessage <- FALSE # initiate this which will be changed if there are parse messages
+  hadParseMessage <- FALSE # initiate this which will be changed if there are
+                           #   parse messages
   # From codetools -- experimental
   checks <- if (isTRUE(getOption("spades.moduleCodeChecks"))) {
     list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
@@ -152,8 +153,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   }
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
-  findSimAssigns <- .findAllSims(environment(),
-                                  sim@.envir[[m]], type = "assign")
+  findSimAssigns <- .findAllSimsInEnv(environment(), sim@.envir[[m]], type = "assign")
 
   inputObjNames <- sim@depends@dependencies[[k]]@inputObjects$objectName
   outputObjNames <- sim@depends@dependencies[[k]]@outputObjects$objectName
@@ -163,8 +163,10 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     missingFrmMod <- unique(na.omit(missingFrmMod))
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
-      hadParseMessage <- .parseMessage(m, "module code", paste0(paste(missingFrmMod, collapse = ", "),
-          " ",verb," declared in outputObjects, ", "but ", verb, " not used in the module"
+      hadParseMessage <- .parseMessage(m, "module code",
+                                       paste0(paste(missingFrmMod, collapse = ", "),
+                                              " ",verb," declared in outputObjects, ",
+                                              "but ", verb, " not used in the module"
       ))
     }
 
@@ -181,9 +183,11 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     missingInMetadata <- simAssignsNotInIO[!(simAssignsNotInIO %in% outputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <- .parseMessage(m, "outputObjects", paste0(paste(missingInMetadata, collapse = ", "),
-        " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
-        ", but ",verb," not declared in outputObjects"
+      hadParseMessage <- .parseMessage(m, "outputObjects",
+        paste0(paste(missingInMetadata, collapse = ", "),
+          " ",verb," assigned to sim inside ",
+          paste(unique(names(missingInMetadata)), collapse = ", "),
+          ", but ",verb," not declared in outputObjects"
       ))
     }
 
@@ -191,15 +195,18 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     missingInMetadata <- simAssignsInIO[!(simAssignsInIO %in% inputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <- .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
-                                               " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
-                                               ", but ",verb," not declared in inputObjects"
-      ))
+      hadParseMessage <-
+        .parseMessage(m, "inputObjects",
+                      paste0(paste(missingInMetadata, collapse = ", "),
+                             " ",verb," assigned to sim inside ",
+                             paste(unique(names(missingInMetadata)), collapse = ", "),
+                             ", but ",verb," not declared in inputObjects"
+                      ))
     }
   }
 
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-  findSimGets <- .findAllSims(environment(),
+  findSimGets <- .findAllSimsInEnv(environment(),
                                 sim@.envir[[m]], type = "get")
   # compare to inputObjNames -- this is about inputs
   if (length(findSimGets)) {
@@ -209,19 +216,24 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
       verb <- .verb(missingFrmMod)
       hadParseMessage <- .parseMessage(m, "module code",
                     paste0(paste(missingFrmMod, collapse = ", "), " ",verb,
-                           " declared in inputObjects, ", "but ", verb, " not used in the module"
+                           " declared in inputObjects, ", "but ", verb,
+                           " not used in the module"
       ))
     }
 
     simGetsNotInIO <- findSimGets[names(findSimGets) != ".inputObjects"]
     simGetsInIO <- findSimGets[names(findSimGets) == ".inputObjects"]
 
-    missingInMetadata <- simGetsNotInIO[!(simGetsNotInIO %in% c(inputObjNames, outputObjNames))]
+    missingInMetadata <- simGetsNotInIO[!(simGetsNotInIO %in%
+                                            c(inputObjNames, outputObjNames))]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <- .parseMessage(m, "inputObjects", paste0(paste(unique(missingInMetadata), collapse = ", "),
-                                              " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
-                                              ", but ",verb," not declared in inputObjects"
+      hadParseMessage <-
+        .parseMessage(m, "inputObjects",
+                      paste0(paste(unique(missingInMetadata), collapse = ", "),
+                      " ",verb," assigned to sim inside ",
+                      paste(unique(names(missingInMetadata)), collapse = ", "),
+                      ", but ",verb," not declared in inputObjects"
       ))
     }
 
@@ -229,9 +241,11 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     missingInMetadata <- simGetsInIO[!(simGetsInIO %in% inputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <- .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
-                                              " ",verb," assigned to sim inside ", paste(unique(names(missingInMetadata)), collapse = ", "),
-                                              ", but ",verb," not declared in inputObjects"
+      hadParseMessage <-
+        .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
+        " ",verb," assigned to sim inside ",
+        paste(unique(names(missingInMetadata)), collapse = ", "),
+        ", but ",verb," not declared in inputObjects"
       ))
     }
 
@@ -258,7 +272,9 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
     xx <- paste0(paste(conflictingFnsByConflict, sep = ", "),
                  ": used inside ", paste(names(conflictingFnsByConflict), sep = ", "))
     verb <- .verb(xx)
-    hadParseMessage <- .parseMessage(m, paste0("the following function(s) ", verb," used that conflict(s)",
+    hadParseMessage <-
+      .parseMessage(m, paste0("the following function(s) ", verb,
+            " used that conflict(s)",
             " with base functions:\n", xx,
             "\nIt is a good idea to be explicit about the package sources",
             "\ne.g., ", paste(whichFnsWithPackage, collapse = ", ")))
