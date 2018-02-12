@@ -73,7 +73,7 @@ if (getRversion() >= "3.1.0") {
 #'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
 #' }
 #'
-#' @section Parsing:
+#' @section Parsing and Checking Code:
 #'
 #' The \code{simInit} function will attempt to find usage of sim$xxx
 #' or sim[['xxx']] on either side of the assignement "<-" operator.
@@ -85,6 +85,14 @@ if (getRversion() >= "3.1.0") {
 #' It will also attempt to find potential, common function name conflicts
 #' with things like scale and stack (both in base and raster), and
 #' Plot (in quickPlot and some modules).
+#'
+#' \emph{This code checking is young and may get false positives and
+#' false negatives -- i.e., miss things}. It also takes computational
+#' time, which may be undesireable in operational code.
+#' To turn off checking (i.e.,
+#' if there are too many false positives and negatives), set
+#' the option \code{spades.moduleCodeChecks} to \code{FALSE},
+#' e.g., \code{options(spades.moduleCodeChecks = FALSE)}
 #'
 #' @section Caching:
 #'
