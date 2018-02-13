@@ -141,6 +141,7 @@ setMethod(
 #' @author Alex Chubaty and Eliot McIntire
 #' @keywords internal
 #' @importFrom reproducible Cache
+#' @importFrom codetools findGlobals checkUsageEnv
 #' @include environment.R
 #' @include module-dependencies-class.R
 #' @include simList-class.R
@@ -158,6 +159,7 @@ setMethod(
   signature(sim = "simList", modules = "list", envir = "ANY"),
   definition = function(sim, modules, userSuppliedObjNames, envir, notOlderThan, ...) {
     all_children <- list()
+    codeCheckMsgs <- list()
     children <- list()
     parent_ids <- integer()
     dots <- list(...)
@@ -328,7 +330,6 @@ setMethod(
               message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
               moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
 
-              #browser(expr = m == "LBMR")
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
                 objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
@@ -371,6 +372,14 @@ setMethod(
             }
           }
         }
+
+        if (isTRUE(getOption("spades.moduleCodeChecks")) ||
+            length(names(getOption("spades.moduleCodeChecks"))) > 1) {
+          ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
+          codeCheckMsgs <- append(codeCheckMsgs,
+                                  capture.output(type = "message", .runCodeChecks(sim, m, k)))
+        } # End of code checking
+
         lockBinding(m, sim@.envir)
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% m
@@ -384,7 +393,7 @@ setMethod(
           parent_ids <- c(parent_ids, which(unlist(modules(sim))==m))
         }
 
-        message("Duplicate module, ",m,", specified. Skipping loading it twice.")
+        message("Duplicate module, ", m, ", specified. Skipping loading it twice.")
       }
 
       # update parse status of the module
@@ -400,6 +409,26 @@ setMethod(
     } %>%
       unique()
     sim@current <- list()
+
+    # Messaging at end -- don't print parent module messages (as there should be nothing)
+    #  Also, collapse if all are clean
+    if (length(codeCheckMsgs)) {
+      if (length(parent_ids) < length(modules)) {
+        modCodeClean <- allCleanMessage
+        mess <- if (all(grepl(codeCheckMsgs, pattern = modCodeClean))) {
+          mess <- gsub(codeCheckMsgs,
+               pattern = paste(paste0(unlist(modules), ": "), collapse = "|"),
+               replacement = "")
+          unique(mess)
+
+        } else {
+          paste(unique(unlist(codeCheckMsgs)), collapse = "\n")
+        }
+        message(mess)
+      }
+    }
+
+
     return(sim)
 })
 
@@ -439,3 +468,4 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   }
   activeCode
 }
+

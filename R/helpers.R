@@ -226,3 +226,4 @@ setMethod(
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
 .pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
                              paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
+

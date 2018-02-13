@@ -1984,14 +1984,9 @@ time..simList <- function(x, unit, ...) {
     }
     if(isTRUE(!startsWith(unit, "second"))) {
 
-    #if (!is.na(unit)) {
-      #browser()
-      #if (is.na(pmatch("second", unit))) {
-        # i.e., if not in same units as simulation
-        t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
-                             skipChecks = TRUE)
-        return(t)
-      #}
+      t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
+                           skipChecks = TRUE)
+      return(t)
     }
     t <- x@simtimes[["current"]]
     return(t)

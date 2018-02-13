@@ -4,7 +4,7 @@ test_that("simList object initializes correctly", {
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape")
   )
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
@@ -250,7 +250,7 @@ test_that("simList test all signatures", {
     }
 
     # needs paths and params; many defaults are fine
-    expect_equal(sum(successes, na.rm = TRUE), 192)
+      expect_equal(sum(successes, na.rm = TRUE), 192)
   }
 })
 

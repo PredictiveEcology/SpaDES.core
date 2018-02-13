@@ -257,10 +257,10 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache), silent = TRUE)
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy",
+                 regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result",
+                 regexp = "Using or creating cached copy|Using cached copy|module code",
                  all = TRUE)
 
 
@@ -273,10 +273,10 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy",
+                 regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result",
+                 regexp = "Using or creating cached copy|loading cached result|module code",
                  all = TRUE)
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -288,7 +288,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result",
+                 regexp = "Using or creating cached copy|loading cached result|module code",
                  all = TRUE)
 
 
@@ -297,7 +297,7 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
-  expect_silent(spades(bbb))
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb),
                  regexp = "Using cached copy of init",
                  all = TRUE)
@@ -314,7 +314,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
-  expect_silent(spades(bbb))
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb),
                 regexp = "Using cached copy of init",
                 all = TRUE)
