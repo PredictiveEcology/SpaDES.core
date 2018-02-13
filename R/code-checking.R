@@ -94,6 +94,7 @@ mustAssignToSim <- c("scheduleEvent", "saveFiles")
       y
     }
   })))
+  if (is.null(out)) out <- character()
   return(out)
 }
 
