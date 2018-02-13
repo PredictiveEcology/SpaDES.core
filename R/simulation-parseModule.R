@@ -223,14 +223,16 @@ setMethod(
         namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
         inObjs <- (namesParsedList == "inputObjects")
         outObjs <- (namesParsedList == "outputObjects")
-        pf <- tmp$pf#tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
-        pf[[1]][[3]] <- pf[[1]][[3]][!(inObjs | outObjs)] # because it is parsed, there is an expression (the [[1]]),
-                                           # then a function with defineModule, sim, and then the list (the [[3]])
+        pf <- tmp$pf # tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
+
+        # because it is parsed, there is an expression (the [[1]]),
+        # then a function with defineModule, sim, and then the list (the [[3]])
+        pf[[1]][[3]] <- pf[[1]][[3]][!(inObjs | outObjs)]
 
         # allows active code e.g., `startSim <- start(sim)` to be parsed, then useable
-        #  inside of the defineModule. First,
-        #  load anything that is active code into an environment whose parent is here (and thus has
-        #  access to sim), then move the depends (only) back to main sim
+        #  inside of the defineModule.
+        #  First, load anything that is active code into an environment whose parent
+        #  is here (and thus has access to sim), then move the depends (only) back to main sim
         env <- new.env(parent = parent.frame())
         if (any(unlist(activeCode)))  {
             list2env(as.list(sim@.envir[[m]]), env)

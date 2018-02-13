@@ -357,7 +357,7 @@ setMethod(
                             algorithm.y = character(0),
                             stringsAsFactors = FALSE)
     if (!is.null(children)) {
-      if ( all( nzchar(children) & !is.na(children) ) ) {
+      if (all(nzchar(children) & !is.na(children))) {
         tmp <- lapply(children, function(x) {
           f <- if (is.null(childVersions[[x]])) {
             downloadModule(x, path = path, data = data, version = childVersions[[x]],
