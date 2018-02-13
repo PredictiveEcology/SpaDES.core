@@ -103,7 +103,6 @@ test_that("downloadData downloads and unzips module data", {
   }
 })
 
-
 test_that("downloadModule allows overwriting existing modules", {
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
@@ -119,15 +118,18 @@ test_that("downloadModule allows overwriting existing modules", {
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE)[[1]] %>% unlist() %>% as.character()
+  downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE)[[1]]
+  %>% unlist() %>% as.character()
 
-  original_f <- file.path(tmpdir, m) %>% list.files(., full.names = TRUE, pattern = ".R$") %>% file.info()
+  original_f <- file.path(tmpdir, m) %>%
+    list.files(., full.names = TRUE, pattern = ".R$") %>% file.info()
 
   expect_error(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
 
   downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = TRUE)
 
-  new_f <- file.path(tmpdir, m) %>% list.files(., full.names = TRUE, pattern = ".R$") %>% file.info()
+  new_f <- file.path(tmpdir, m) %>%
+    list.files(., full.names = TRUE, pattern = ".R$") %>% file.info()
 
   expect_true(original_f$mtime < new_f$mtime)
 
