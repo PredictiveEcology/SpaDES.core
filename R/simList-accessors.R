@@ -2025,6 +2025,10 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-times
+end <- function(x, ...) UseMethod("end")
+
+#' @export
+#' @rdname simList-accessors-times
 end..simList <- function(x, unit, ...) {
     if (missing(unit)) {
       unit <- .callingFrameTimeunit(x)
@@ -2070,6 +2074,10 @@ setReplaceMethod(
 #' @importFrom stats start
 #' @include simList-class.R
 #' @include times.R
+#' @export
+#' @rdname simList-accessors-times
+start <- function(x, ...) UseMethod("start")
+
 #' @export
 #' @rdname simList-accessors-times
 start..simList <- function(x, unit = NULL, ...) {
