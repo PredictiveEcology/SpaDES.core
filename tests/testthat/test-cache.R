@@ -257,10 +257,10 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache), silent = TRUE)
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Module code",
+                 regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Using cached copy|Module code",
+                 regexp = "Using or creating cached copy|Using cached copy|module code",
                  all = TRUE)
 
 
@@ -273,10 +273,10 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Module code",
+                 regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result|Module code",
+                 regexp = "Using or creating cached copy|loading cached result|module code",
                  all = TRUE)
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -288,7 +288,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result|Module code",
+                 regexp = "Using or creating cached copy|loading cached result|module code",
                  all = TRUE)
 
 
