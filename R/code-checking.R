@@ -23,8 +23,9 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 
 # module functions that must end with return(sim) or the like
 mustBeReturnSim <- c("doEvent\\..*")
-
 mustAssignToSim <- c("scheduleEvent", "saveFiles")
+
+allCleanMessage <- "module code appears clean"
 #' Find all references to sim$
 #'
 #' @param envToFindSim An environment where sim is defined. This is used when
@@ -393,7 +394,7 @@ mustAssignToSim <- c("scheduleEvent", "saveFiles")
   #############################################################
   ###### Message if all clean #################################
   #############################################################
-  if (!hadParseMessage) message(crayon::magenta("Module code appears clean"))
+  if (!hadParseMessage) .parseMessage(m, "", allCleanMessage)
   return(invisible())
 }
 
@@ -415,8 +416,15 @@ mustAssignToSim <- c("scheduleEvent", "saveFiles")
   } else {
     ""
   }
+
+  message <- if (nzchar(message)) {
+    paste0(": ", message)
+  } else {
+    ""
+  }
+
   message(crayon::magenta(
-    paste0(m, sub, ": ", message)
+    paste0(m, sub, message)
   ))
   return(TRUE)
 }

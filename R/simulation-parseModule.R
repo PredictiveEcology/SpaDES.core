@@ -410,8 +410,24 @@ setMethod(
       unique()
     sim@current <- list()
 
-    if (length(codeCheckMsgs))
-      message(paste(unique(unlist(codeCheckMsgs)), collapse = "\n"))
+    # Messaging at end -- don't print parent module messages (as there should be nothing)
+    #  Also, collapse if all are clean
+    if (length(codeCheckMsgs)) {
+      if (length(parent_ids) < length(modules)) {
+        modCodeClean <- allCleanMessage
+        mess <- if (all(grepl(codeCheckMsgs, pattern = modCodeClean))) {
+          mess <- gsub(codeCheckMsgs,
+               pattern = paste(paste0(unlist(modules), ": "), collapse = "|"),
+               replacement = "")
+          unique(mess)
+
+        } else {
+          paste(unique(unlist(codeCheckMsgs)), collapse = "\n")
+        }
+        message(mess)
+      }
+    }
+
 
     return(sim)
 })
