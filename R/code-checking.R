@@ -151,9 +151,21 @@ allCleanMessage <- "module code appears clean"
         #   This shouldn't make a message
         return(character())
       } else if (identical(x[[1]], quote(`<-`)) ) {
+        if (length(x[[2]]) > 1) {
+          if (is.call(x[[2]][[2]])) {
+            assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
+          } else {
+            assigner <- FALSE
+          }
+        } else {
+          assigner <- FALSE
+        }
+        if (!assigner) {
+          x <- x[-(1:2)]
+        }
         out <- character()
+        #if (is.call(x[[2]][[2]]))
         # if on the left side of a function, deleted those from x, we don't care here
-        x <- x[-(1:2)]
       } else {
         out <- .parsingSim(x)
       }
