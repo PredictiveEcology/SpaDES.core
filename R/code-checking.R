@@ -199,6 +199,16 @@ allCleanMessage <- "module code appears clean"
   hadParseMessage <- FALSE # initiate this which will be changed if there are
                            #   parse messages
 
+  inputObjNames <- na.omit(sim@depends@dependencies[[k]]@inputObjects$objectName)
+  outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
+  # search for all sim$xx <-  or sim[[xxx]] <- in module code
+  simAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
+  simAssignsInDotInputObjects <- simAssigns[names(simAssigns)==".inputObjects"]
+  simAssignsNotInDotInputObjects <- simAssigns[names(simAssigns)!=".inputObjects"]
+  # search for all '<- sim$' or '<- sim[[xxx]]' in module code
+  simGets <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "get")
+  simGetsInDotInputObjects <- simGets[names(simGets)==".inputObjects"]
+  simGetsNotInDotInputObjects <- simGets[names(simGets)!=".inputObjects"]
 
   #############################################################
   ###### Key fns return sim ###################################
@@ -231,15 +241,10 @@ allCleanMessage <- "module code appears clean"
   #############################################################
   ###### Sim Assignments ######################################
   #############################################################
-  # search for all sim$xx <-  or sim[[xxx]] <- in module code
-  findSimAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
-
-  inputObjNames <- sim@depends@dependencies[[k]]@inputObjects$objectName
-  outputObjNames <- sim@depends@dependencies[[k]]@outputObjects$objectName
-
-  if (length(outputObjNames)) {
-    missingFrmMod <- outputObjNames[!(outputObjNames %in% findSimAssigns)]
-    missingFrmMod <- unique(na.omit(missingFrmMod))
+  # 1
+  if (length(outputObjNames)) { #
+    missingFrmMod <- outputObjNames[!(outputObjNames) %in% simAssignsNotInDotInputObjects]
+    missingFrmMod <- unique(missingFrmMod)
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
       hadParseMessage <- .parseMessage(m, "module code",
@@ -250,123 +255,31 @@ allCleanMessage <- "module code appears clean"
     }
   }
 
-  if (length(findSimAssigns)) {
-
-    # does module name occur as a sim$ assign
-    if (m %in% findSimAssigns) {
-      stop(m, ": You have created an object with the same name as the module. ",
-           "Currently, this is not allowed.", call. = FALSE)
-    }
-
-    simAssignsNotInIO <- findSimAssigns[names(findSimAssigns) != ".inputObjects"]
-    simAssignsInIO <- findSimAssigns[names(findSimAssigns) == ".inputObjects"]
-
-    # First do all but .inputObjects, i.e,. outputObjects
-    missingInMetadata <- simAssignsNotInIO[!(simAssignsNotInIO %in% outputObjNames)]
-    if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadParseMessage <- .parseMessage(m, "outputObjects",
-        paste0(paste(missingInMetadata, collapse = ", "),
-          " ",verb," assigned to sim inside ",
-          paste(unique(names(missingInMetadata)), collapse = ", "),
-          ", but ",verb," not declared in outputObjects"
-      ))
-    }
-
-    # Now do .inputObjects, i.e., inputObjects
-    missingInMetadata <- simAssignsInIO[!(simAssignsInIO %in% inputObjNames)]
-    if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadParseMessage <-
-        .parseMessage(m, "inputObjects",
-                      paste0(paste(missingInMetadata, collapse = ", "),
-                             " ",verb," assigned to sim inside ",
-                             paste(unique(names(missingInMetadata)), collapse = ", "),
-                             ", but ",verb," not declared in inputObjects"
-                      ))
-    }
-  }
-
-  #############################################################
-  ###### Sim Gets #############################################
-  #############################################################
-  # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-  findSimGets <- .findElementsInEnv(environment(),
-                                sim@.envir[[m]], type = "get")
-  # compare to inputObjNames -- this is about inputs
+  # 2
   if (length(inputObjNames)) {
-    missingFrmMod <- inputObjNames[!(inputObjNames %in% findSimGets)]
+    # inputObjects -- Assign in .inputObjects
+    missingFrmMod <- inputObjNames[!(inputObjNames %in% simAssignsInDotInputObjects)]
+    missingFrmMod <- unique(missingFrmMod)
+    if (length(missingFrmMod)) {
+      verb <- .verb(missingFrmMod)
+      hadParseMessage <- .parseMessage(m, "module code",
+                                       paste0(paste(missingFrmMod, collapse = ", "),
+                                              " ",verb," declared in inputObjects, ",
+                                              "but no default(s) ", verb, " provided in .inputObjects"
+                                       ))
+    }
+
+    # inputObjects -- Gets
+    missingFrmMod <- inputObjNames[!(inputObjNames %in% simGets)]
     missingFrmMod <- unique(na.omit(missingFrmMod))
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
       hadParseMessage <- .parseMessage(m, "module code",
-                    paste0(paste(missingFrmMod, collapse = ", "), " ",verb,
-                           " declared in inputObjects, ", "but ", verb,
-                           " not used in the module"
-      ))
+                                       paste0(paste(missingFrmMod, collapse = ", "), " ",verb,
+                                              " declared in inputObjects, ", "but ", verb,
+                                              " not used in the module"
+                                       ))
     }
-  }
-
-  if (length(findSimGets)) {
-    simGetsNotInIO <- findSimGets[names(findSimGets) != ".inputObjects"]
-    simGetsInIO <- findSimGets[names(findSimGets) == ".inputObjects"]
-
-    missingInMetadata <- simGetsNotInIO[!(simGetsNotInIO %in%
-                                            c(inputObjNames, outputObjNames))]
-    if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadParseMessage <-
-        .parseMessage(m, "inputObjects",
-                      paste0(paste(unique(missingInMetadata), collapse = ", "),
-                      " ",verb," used from sim inside ",
-                      paste(unique(names(missingInMetadata)), collapse = ", "),
-                      ", but ",verb," not declared in inputObjects"
-      ))
-    }
-
-    # Now do .inputObjects, i.e., inputObjects
-    missingInMetadata <- simGetsInIO[!(simGetsInIO %in% inputObjNames)]
-    if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadParseMessage <-
-        .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
-        " ",verb," assigned to sim inside ",
-        paste(unique(names(missingInMetadata)), collapse = ", "),
-        ", but ",verb," not declared in inputObjects"
-      ))
-    }
-
-  }
-
-  #############################################################
-  #######  Conflicting Functions ##############################
-  #############################################################
-  # search for conflicts in function names with common problems like raster::levels
-  fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
-  hasConflicts <- fg[fg %in% conflictingFnsSimple]
-  if (length(hasConflicts)) {
-    theFns <- names(hasConflicts)
-    names(theFns) <- theFns
-    whichFnsWithPackage <- conflictingFnsClean[conflictingFnsSimple %in% hasConflicts]
-    verb <- .verb(length(whichFnsWithPackage))
-    hadParseMessage <-
-      .parseMessage(m, "module code", paste0("the following function(s) ", verb,
-            " used that conflict(s)",
-            "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
-            "\n  It is a good idea to be explicit about the package sources",
-            ", e.g., ", paste(whichFnsWithPackage, collapse = ", ")))
-  }
-
-  # search for conflicts in module function names with common problems, like quickPlot::Plot
-  clashingFuns <- names(sim@.envir[[m]])[names(sim@.envir[[m]]) %in% clashingFnsSimple]
-  if (length(clashingFuns)) {
-    fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
-    verb <- .verb(clashingFuns)
-    hadParseMessage <- .parseMessage(m, "module functions", paste0(
-            paste(clashingFuns, collapse = ", "), " ", verb,
-            " defined, which ", verb, " in conflict with ",
-            paste(fnNames, collapse = ", "), ". It is recommended to ",
-            " use non-conflicting function names"))
   }
 
   #############################################################
@@ -388,7 +301,107 @@ allCleanMessage <- "module code appears clean"
 
   if (length(checkUsageMsg)) {
     hadParseMessage <- .parseMessage(m, "module code",
-                                     paste0("\n  ", paste(checkUsageMsg, collapse = "\n")))
+                                     paste0("\n  ", paste(checkUsageMsg, collapse = "\n  ")))
+  }
+
+
+
+  #############################################################
+  #######  Conflicting Functions ##############################
+  #############################################################
+  # search for conflicts in function names with common problems like raster::levels
+  fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
+  hasConflicts <- fg[fg %in% conflictingFnsSimple]
+  if (length(hasConflicts)) {
+    theFns <- names(hasConflicts)
+    names(theFns) <- theFns
+    whichFnsWithPackage <- conflictingFnsClean[conflictingFnsSimple %in% hasConflicts]
+    verb <- .verb(length(whichFnsWithPackage))
+    hadParseMessage <-
+      .parseMessage(m, "module code", paste0("the following function(s) ", verb,
+                                             " used that conflict(s)",
+                                             "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
+                                             "\n  It is a good idea to be explicit about the package sources",
+                                             ", e.g., ", paste(whichFnsWithPackage, collapse = ", ")))
+  }
+
+  if (length(simAssigns)) {
+
+    # does module name occur as a sim$ assign
+    if (m %in% simAssigns) {
+      stop(m, ": You have created an object with the same name as the module. ",
+           "Currently, this is not allowed.", call. = FALSE)
+    }
+
+    # First do all but .inputObjects, i.e,. outputObjects
+    missingInMetadata <- simAssignsNotInDotInputObjects[!(simAssignsNotInDotInputObjects %in% outputObjNames)]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <- .parseMessage(m, "outputObjects",
+        paste0(paste(missingInMetadata, collapse = ", "),
+          " ",verb," assigned to sim inside ",
+          paste(unique(names(missingInMetadata)), collapse = ", "),
+          ", but ",verb," not declared in outputObjects"
+      ))
+    }
+
+    # Now do .inputObjects, i.e., inputObjects
+    missingInMetadata <- simAssignsInDotInputObjects[!(simAssignsInDotInputObjects %in% inputObjNames)]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <-
+        .parseMessage(m, "inputObjects",
+                      paste0(paste(missingInMetadata, collapse = ", "),
+                             " ",verb," assigned to sim inside ",
+                             paste(unique(names(missingInMetadata)), collapse = ", "),
+                             ", but ",verb," not declared in inputObjects"
+                      ))
+    }
+  }
+
+  #############################################################
+  ###### Sim Gets #############################################
+  #############################################################
+  # compare to inputObjNames -- this is about inputs
+  if (length(simGets)) {
+    missingInMetadata <- simGetsNotInDotInputObjects[!(simGetsNotInDotInputObjects %in%
+                                            c(inputObjNames, outputObjNames))]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <-
+        .parseMessage(m, "inputObjects",
+                      paste0(paste(unique(missingInMetadata), collapse = ", "),
+                      " ",verb," used from sim inside ",
+                      paste(unique(names(missingInMetadata)), collapse = ", "),
+                      ", but ",verb," not declared in inputObjects"
+      ))
+    }
+
+    # Now do .inputObjects, i.e., inputObjects
+    missingInMetadata <- simGetsInDotInputObjects[!(simGetsInDotInputObjects %in% inputObjNames)]
+    if (length(missingInMetadata)) {
+      verb <- .verb(missingInMetadata)
+      hadParseMessage <-
+        .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
+        " ",verb," used from sim inside ",
+        paste(unique(names(missingInMetadata)), collapse = ", "),
+        ", but ",verb," not declared in inputObjects"
+      ))
+    }
+
+  }
+
+
+  # search for conflicts in module function names with common problems, like quickPlot::Plot
+  clashingFuns <- names(sim@.envir[[m]])[names(sim@.envir[[m]]) %in% clashingFnsSimple]
+  if (length(clashingFuns)) {
+    fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
+    verb <- .verb(clashingFuns)
+    hadParseMessage <- .parseMessage(m, "module functions", paste0(
+            paste(clashingFuns, collapse = ", "), " ", verb,
+            " defined, which ", verb, " in conflict with ",
+            paste(fnNames, collapse = ", "), ". It is recommended to ",
+            " use non-conflicting function names"))
   }
 
   #############################################################

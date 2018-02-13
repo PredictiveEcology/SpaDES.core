@@ -488,4 +488,53 @@ test_that("conflicting function types", {
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  c(paste0(m, " -- module code: doEvent.",m," must return")))
 
+
+  lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
+  lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
+  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")
+  cat(xxx[1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei2', 'numeric', '', ''),
+      expectsInput('ei3', 'numeric', '', '')
+      ",
+      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co2', 'numeric', ''),
+      createsOutput('co3', 'numeric', '')
+      ",
+      xxx[(lineWithOutputObjects+1):lineWithInit], "
+      a <- sim$b
+      sim$g <- f
+      fff <- sim$ei2
+      fff <- sim$co3
+      sim$co1 <- 123
+      ",
+      xxx[(lineWithInit+1):lineWithDotInputObjects], "
+      a <- sim$b
+      sim$g <- 1
+      sim$ei1 <- 4
+      fff <- sim$ei1
+      fff <- sim$co3
+      sim$co1 <- 123
+      ",
+      xxx[(lineWithDotInputObjects+1):length(xxx)],
+      sep = "\n", fill = FALSE, file = fileName)
+
+  fullMessage <- c(
+    "child4 -- module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+    "child4 -- module code: ei2, ei3 are declared in inputObjects, but no default(s) are provided in .inputObjects",
+    "child4 -- module code: ei3 is declared in inputObjects, but is not used in the module",
+    "child4 -- module code: ",
+    "  .inputObjects: local variable ‘a’ assigned but may not be used",
+    "  .inputObjects: local variable ‘fff’ assigned but may not be used",
+    "  Init: local variable ‘a’ assigned but may not be used",
+    "  Init: local variable ‘fff’ assigned but may not be used",
+    "child4 -- outputObjects: g is assigned to sim inside Init, but is not declared in outputObjects",
+    "child4 -- inputObjects: g, co1 are assigned to sim inside .inputObjects, but are not declared in inputObjects",
+    "child4 -- inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
+    "child4 -- inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in inputObjects")
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 c(paste0(m, paste(fullMessage, collapse = "|"))))
+
 })
