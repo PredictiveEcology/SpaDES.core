@@ -61,8 +61,6 @@ Suggests:
     rmarkdown,
     SpaDES.tools,
     testthat (>= 1.0.2)
-Remotes:
-    PredictiveEcology/SpaDES.tools
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
