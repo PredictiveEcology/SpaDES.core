@@ -21,7 +21,10 @@ clashingFnsSimple <- gsub(clashingFns, pattern = "^.*::", replacement = "\\\\<")
 clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = "")
 clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")
 
+# module functions that must end with return(sim) or the like
+mustBeReturnSim <- c("doEvent\\..*")
 
+mustAssignToSim <- c("scheduleEvent", "saveFiles")
 #' Find all references to sim$
 #'
 #' @param envToFindSim An environment where sim is defined. This is used when
@@ -55,14 +58,25 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
                                type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
-      aa <- deparse(moduleEnv[[x]])
-      bb <- as.call(parse(text = aa))
-      y <- .findElement(bb, type = type)
+      xAsString <- deparse(moduleEnv[[x]])
+      xAsCall <- as.call(parse(text = xAsString))
+      if (identical(type, "returnSim")) {
+        if (grepl(x, pattern = mustBeReturnSim)) {
+          # only pull out last line
+          # must end with sim or return(sim) or return(invisible(sim))
+          xAsString <- xAsString[length(xAsString)-1]
+          xAsCall <- as.call(parse(text = xAsString))
+        } else {
+          xAsCall <- ""
+        }
+      }
+      y <- .findElement(xAsCall, type = type)
       if (length(y)) {
         y <- na.omit(y)
         if (all(is.na(y))) y <- character()
         hasSim <- grepl(y, pattern = "sim")
-        if (length(y[hasSim])) {
+        isSim <- grepl(y, pattern = "^sim$")
+        if (length(y[hasSim & !isSim])) {
           y[hasSim] <- lapply(y[hasSim], function(yParts) {
             tryCatch(eval(parse(text = yParts), envir = envToFindSim),
                      error = function(x) yParts)
@@ -94,57 +108,66 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 #'
 #' @rdname findElements
 .findElement <- function(x, type) {
-  if (is.atomic(x) || is.name(x)) {
+  if (is.atomic(x)) {
     character()
+  } else if (is.name(x)) {
+    if (identical(type, "returnSim")) { # This is intended for only the last line of a function
+      out <- as.character(x)
+    } else {
+      character()
+    }
   } else if (is.call(x)) {
     if (identical(type, "assign")) {
+
       if (identical(x[[1]], quote(`<-`))) {
         # if it is an assign, only keep left hand side
         x <- x[[2]]
-        if (as.character(x)[1] %in% c("$", "[[") &&
-            identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
-          lhs <- as.character(x[[3]])
-        } else {
-          lhs <- character()
-        }
+        out <- .parsingSim(x)
       } else {
-        lhs <- character()
+        out <- character()
       }
 
-      unique(c(lhs, unlist(lapply(x, .findElement, type = type))))
+      unique(c(out, unlist(lapply(x, .findElement, type = type))))
+    } else if (identical(type, "assignToSim")) {
+      if (identical(x[[1]], quote(`<-`)) && (any(grepl(x, pattern = paste(mustAssignToSim, collapse="|"))))) {
+        if (identical(x[[2]], quote(sim))) {
+          out <- character()
+          x <- "" # clear x so it doesn't go any further in these cases
+        } else {
+          out <- character()
+        }
+      } else if (is.name(x[[1]]) & (any(grepl(x[[1]], pattern = paste(mustAssignToSim, collapse="|"))))) {
+        out <- as.character(x[[1]])
+        x <- "" # clear x so it doesn't go any further in these cases
+      } else {
+        out <- character()
+      }
+      unique(c(out, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "get")) {
       if (identical(x[[1]], quote(is.null))) {
         # This is case where module may check for absense of a sim object with is.null
         #   This shouldn't make a message
         return(character())
       } else if (identical(x[[1]], quote(`<-`)) ) {
-        simObj <- character()
+        out <- character()
         # if on the left side of a function, deleted those from x, we don't care here
         x <- x[-(1:2)]
       } else {
-        if (as.character(x)[1] %in% c("$") &&
-            identical(as.character(x[[2]]), "sim") && is.name(x[[3]])) {
-          simObj <- as.character(x[[3]])
-        } else if (as.character(x)[1] %in% "[[" &&
-                   identical(as.character(x[[2]]), "sim") && is.character(x[[3]])) {
-          simObj <- x[[3]]
-        } else if (as.character(x)[1] %in% "[[" &&
-                   identical(as.character(x[[2]]), "sim") && is.call(x[[3]])) {
-          simObj <- deparse(x[[3]])
-        } else {
-          simObj <- character()
-        }
+        out <- .parsingSim(x)
       }
-      unique(c(simObj, unlist(lapply(x, .findElement, type = type))))
+      unique(c(out, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "globals")) {
       if (identical(x[[1]], quote(`<-`)) && is.call(x[[2]])) { # left side function assign
-        lhs <- paste0(as.character(x[[2]][[1]]), as.character(x)[[1]])
+        out <- paste0(as.character(x[[2]][[1]]), as.character(x)[[1]])
       } else if (is.name(x[[1]])) {
-        lhs <- as.character(x[[1]])
+        out <- as.character(x[[1]])
       } else {
-        lhs <- character()
+        out <- character()
       }
-      unique(c(lhs, unlist(lapply(x, .findElement, type = type))))
+      unique(c(out, unlist(lapply(x, .findElement, type = type))))
+    } else { # all other cases, just return empty
+      out <- character()
+      unique(c(out, unlist(lapply(x, .findElement, type = type))))
     }
   } else if (is.pairlist(x)) {
     unique(unlist(lapply(x, .findElement, type = type)))
@@ -174,6 +197,35 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   hadParseMessage <- FALSE # initiate this which will be changed if there are
                            #   parse messages
 
+
+  #############################################################
+  ###### Key fns return sim ###################################
+  #############################################################
+  returnsSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "returnSim")
+  returnsSim <- tapply(returnsSim, names(returnsSim), function(xx) any(xx == "sim"))
+  if (!all(returnsSim)) {
+    verb <- .verb(returnsSim)
+    hadParseMessage <- .parseMessage(m, "module code",
+                                     paste0(paste(names(returnsSim), collapse = ", "),
+                                            " must return the sim, e.g., return(invisible(sim))"
+                                     ))
+
+  }
+
+  #############################################################
+  ###### Key fns outputs get assigned to sim ##################
+  #############################################################
+  assignToSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assignToSim")
+  if (length(assignToSim)) {
+    verb <- .verb(assignToSim)
+    hadParseMessage <- .parseMessage(m, "module code",
+                                     paste0(paste(assignToSim, collapse = ", "),
+                                            " inside ", paste(names(assignToSim), collapse = ", "),
+                                            " must assign to the sim, e.g., sim <- scheduleEvent(sim, ...)"
+                                     ))
+
+  }
+
   #############################################################
   ###### Sim Assignments ######################################
   #############################################################
@@ -191,7 +243,7 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
       hadParseMessage <- .parseMessage(m, "module code",
                                        paste0(paste(missingFrmMod, collapse = ", "),
                                               " ",verb," declared in outputObjects, ",
-                                              "but ", verb, " not used in the module"
+                                              "but ", verb, " not assigned in the module"
       ))
     }
   }
@@ -382,3 +434,23 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
   c("is", "are")[1 + as.numeric(length(item)>1)]
 }
 
+#' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
+#' \code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}
+#' @keywords internal
+#' @inheritParams .findElements
+#' @rdname findElements
+.parsingSim <- function(x) {
+  if (as.character(x)[1] %in% c("$") &&
+      grepl(deparse(x[[2]]), "sim|sim@.envir") && is.name(x[[3]])) {
+    out <- as.character(x[[3]])
+  } else if (as.character(x)[1] %in% "[[" &&
+             grepl(deparse(x[[2]]), "sim|sim@.envir") && is.character(x[[3]])) {
+    out <- x[[3]]
+  } else if (as.character(x)[1] %in% "[[" &&
+             grepl(deparse(x[[2]]), "sim|sim@.envir") && is.call(x[[3]])) {
+    out <- deparse(x[[3]])
+  } else {
+    out <- character()
+  }
+  return(out)
+}

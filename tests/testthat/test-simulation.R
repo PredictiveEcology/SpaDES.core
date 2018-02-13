@@ -412,14 +412,20 @@ test_that("conflicting function types", {
       d <- sim$d
       f <- sim[['f']]
       f <- sim[[P(sim)$value]]
+      r <- sim@.envir$d1
+      r1 <- sim@.envir[['test']]
       sim$g <- f
+      sim@.envir$g1 <- f
       return(list(a, d, f, sim))
       ",
       xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-            pattern = c(paste0(m, " -- inputObjects: b, d, f, hi are used|child4 -- outputObjects: g is assigned|Running .input")))))
+            pattern = c(paste0(m, " -- inputObjects: b, d, f, hi, d1, test are used|",
+                               "child4 -- outputObjects: g, g1 are assigned|",
+                               "Running .input|",
+                               "local variable")))))
 
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
@@ -461,5 +467,25 @@ test_that("conflicting function types", {
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
     pattern = c(paste0(m, " -- module code: b is declared in outputObjects|child4 -- module code: a is declared in inputObjects|Running .input")))))
+
+  # assign to sim for functions like scheduleEvent
+  lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
+  xxx1 <- xxx
+  xxx1[lineWithScheduleEvent] <- sub(xxx[lineWithScheduleEvent], pattern = "sim <- scheduleEvent", replacement = "scheduleEvent")
+  cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 c(paste0(m, " -- module code: scheduleEvent inside doEvent.child4 must")))
+
+  # Return sim in doEvent
+  patt <- "return\\(invisible\\(sim\\)\\)"
+  lineWithReturnSim <- grep(xxx, pattern = patt)[1]
+  xxx1 <- xxx
+  xxx1[lineWithReturnSim] <- sub(xxx[lineWithReturnSim], pattern = patt,
+                                     replacement = "return(invisible())")
+  cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 c(paste0(m, " -- module code: doEvent.",m," must return")))
 
 })

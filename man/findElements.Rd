@@ -3,12 +3,15 @@
 \name{.findElementsInEnv}
 \alias{.findElementsInEnv}
 \alias{.findElement}
+\alias{.parsingSim}
 \title{Find all references to sim$}
 \usage{
 .findElementsInEnv(envToFindSim = parent.frame(),
   moduleEnv = parent.frame(), type)
 
 .findElement(x, type)
+
+.parsingSim(x)
 }
 \arguments{
 \item{envToFindSim}{An environment where sim is defined. This is used when
@@ -26,6 +29,9 @@ A character string with all sim objects found
 }
 \description{
 Find all references to sim$
+
+\code{.parsingSim} will pull out the various ways to use sim, e.g.,
+\code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}
 }
 \details{
 \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
