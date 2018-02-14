@@ -397,7 +397,7 @@ setMethod("defineParameter",
             #  e.g., start(sim)
             if (!any(is.na(default), is.na(min), is.na(max))) {
               if (!all(is(default, class), is(min, class), is(max, class))) {
-                message(crayon::magenta("NOTE: Parameter '", name, "' is not of spcified type '",
+                message(crayon::magenta("NOTE: Parameter '", name, "' is not of specified type '",
                                         class, "'.", sep = ""))
               }
             }
