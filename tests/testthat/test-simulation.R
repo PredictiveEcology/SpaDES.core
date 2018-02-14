@@ -501,12 +501,13 @@ test_that("conflicting function types", {
       xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co2', 'numeric', ''),
-      createsOutput('co3', 'numeric', '')
+      createsOutput('co3', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
       ",
       xxx[(lineWithOutputObjects+1):lineWithInit], "
       a <- sim$b
       sim$g <- f
-      holy(sim$ei4) <- f
+      holy(sim$co4) <- f
       moly(sim$aaa) <- f
       fff <- sim$ei2
       fff <- sim$co3
@@ -526,13 +527,13 @@ test_that("conflicting function types", {
   fullMessage <- c(
     "child4 -- module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
     "child4 -- module code: ei2, ei3, ei4 are declared in inputObjects, but no default(s) are provided in .inputObjects",
-    "child4 -- module code: ei3 is declared in inputObjects, but is not used in the module",
+    "child4 -- module code: ei3, ei4 are declared in inputObjects, but are not used in the module",
     "child4 -- module code: ",
     "  .inputObjects: local variable ‘a’ assigned but may not be used",
-    "  .inputObjects: local variable ‘fff’ assigned but may not be used",
-    "  Init: local variable ‘a’ assigned but may not be used",
-    "  Init: local variable ‘fff’ assigned but may not be used",
-    "child4 -- outputObjects: g is assigned to sim inside Init, but is not declared in outputObjects",
+    ".inputObjects: local variable ‘fff’ assigned but may not be used",
+    "Init: local variable ‘a’ assigned but may not be used",
+    "Init: local variable ‘fff’ assigned but may not be used",
+    "child4 -- outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
     "child4 -- inputObjects: g, co1 are assigned to sim inside .inputObjects, but are not declared in inputObjects",
     "child4 -- inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
     "child4 -- inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in inputObjects"

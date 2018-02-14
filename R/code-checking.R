@@ -124,7 +124,7 @@ allCleanMessage <- "module code appears clean"
       if (identical(x[[1]], quote(`<-`))) {
         # if it is an assign, only keep left hand side
         x <- x[[2]]
-        out <- .parsingSim(x)
+        out <- .parsingSim(x, type = type)
       } else {
         out <- character()
       }
@@ -167,7 +167,7 @@ allCleanMessage <- "module code appears clean"
         #if (is.call(x[[2]][[2]]))
         # if on the left side of a function, deleted those from x, we don't care here
       } else {
-        out <- .parsingSim(x)
+        out <- .parsingSim(x, type = type)
       }
       unique(c(out, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "globals")) {
@@ -473,7 +473,7 @@ allCleanMessage <- "module code appears clean"
 #' @keywords internal
 #' @inheritParams .findElements
 #' @rdname findElements
-.parsingSim <- function(x) {
+.parsingSim <- function(x, type) {
   if (as.character(x)[1] %in% c("$") &&
       grepl(deparse(x[[2]]), "sim|sim@.envir") && is.name(x[[3]])) {
     out <- as.character(x[[3]])
@@ -484,7 +484,11 @@ allCleanMessage <- "module code appears clean"
              grepl(deparse(x[[2]]), "sim|sim@.envir") && is.call(x[[3]])) {
     out <- deparse(x[[3]])
   } else {
-    out <- character()
+    if (type == "assign") {
+      out <- .findElement(x, type = "get")
+    } else {
+      out <- character()
+    }
   }
   return(out)
 }
