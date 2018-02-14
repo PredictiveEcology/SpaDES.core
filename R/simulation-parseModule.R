@@ -237,7 +237,17 @@ setMethod(
         if (any(unlist(activeCode)))  {
             list2env(as.list(sim@.envir[[m]]), env)
         }
-        out <- suppressWarnings(eval(pf, envir = env))
+
+        # Evaluate defineModule into the sim environment
+        mess <- capture.output(type = "message",
+                               out <- suppressWarnings(eval(pf, envir = env)))
+        if (length(mess))
+          codeCheckMsgs <- append(codeCheckMsgs,
+                                capture.output(type = "message",
+                                               hasMessage <- .parseMessage(m, "",
+                                                             paste(mess, collapse = "\n  ")
+                                                             ))
+        )
         for(dep in out@depends@dependencies) {
           sim <- .addDepends(sim, dep)
         }

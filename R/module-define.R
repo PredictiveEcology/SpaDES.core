@@ -397,7 +397,9 @@ setMethod("defineParameter",
             #  e.g., start(sim)
             if (!any(is.na(default), is.na(min), is.na(max))) {
               if (!all(is(default, class), is(min, class), is(max, class))) {
-                message(crayon::magenta("NOTE: Parameter '", name, "' is not of specified type '",
+                # any messages here are captured if this is run from .parseModule
+                #   It will append module name
+                message(crayon::magenta("defineParameter: ", name, "' is not of spcified type '",
                                         class, "'.", sep = ""))
               }
             }
