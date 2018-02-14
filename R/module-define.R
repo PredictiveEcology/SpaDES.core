@@ -397,7 +397,7 @@ setMethod("defineParameter",
             # we can't just coerece these because it wouldn't allow for character,
             #  e.g., start(sim)
             if (!all(inherits(default, class), inherits(min, class), inherits(max, class))) {
-              message(crayon::magenta("NOTE: Parameter '", name, "' is not of spcified type '",
+              message(crayon::magenta("NOTE: Parameter '", name, "' is not of specified type '",
                                       class, "'.", sep = ""))
             }
 
