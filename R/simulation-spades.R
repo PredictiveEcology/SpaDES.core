@@ -41,7 +41,9 @@ if (getRversion() >= "3.1.0") {
 #'
 doEvent <- function(sim, debug, notOlderThan) {
   if (missing(debug)) debug <- FALSE
-  if (!inherits(sim, "simList")) {
+  #if (!inherits(sim, "simList")) stop("sim must be a simList")
+  #if (!is(sim, "simList")) stop("sim must be a simList")
+  if (class(sim) != "simList") { # faster than `is` and `inherits`
     stop("doEvent can only accept a simList object")
   }
 
@@ -276,8 +278,10 @@ scheduleEvent <- function(sim,
                           moduleName,
                           eventType,
                           eventPriority) {
-  if (!inherits(sim, "simList")) stop("sim must be a simList")
+  #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
+  if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+
   if (!is.numeric(eventTime)) {
     if (is.na(eventTime)) {
       eventTime <- NA_real_
