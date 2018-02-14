@@ -335,7 +335,7 @@ setMethod(
         GET(zip, ua, write_disk(localzip, overwrite = overwrite))
       } else {
         message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
-        GET(zip, ua, config = list(config(token = pat)), write_disk(localzip))
+        GET(zip, ua, config = list(config(token = pat)), write_disk(localzip, overwrite = overwrite))
       }
       stop_for_status(request)
 
@@ -411,6 +411,7 @@ setMethod(
     if (missing(repo)) repo <- getOption("spades.moduleRepo")
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
+    if (missing(quickCheck)) quickCheck <- FALSE
     if (missing(overwrite)) overwrite <- FALSE
 
     files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
