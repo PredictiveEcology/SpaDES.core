@@ -389,12 +389,12 @@ setMethod("defineParameter",
                     min = "ANY", max = "ANY", desc = "character"),
           definition = function(name, class, default, min, max, desc) {
 
-            # coerce `default`, `min`, and `max` to same specified type
-            # These next lines commented out because it doesn't allow for character e.g.,
-            #   start(sim)
-            #default <- as(default, class)
-            #min <- as(min, class)
-            #max <- as(max, class)
+            # warn if `default`, `min`, and `max` aren't the specified type
+            # we can't just coerece these because it wouldn't allow for character,
+            #  e.g., start(sim)
+            if (!all(inherits(default, class), inherits(min, class), inherits(max, class))) {
+              warning("Parameter '", name, "' is not of spcified type '", class, "'.")
+            }
 
             # previously used `substitute()` instead of `I()`,
             # but it did not allow for a vector to be passed with `c()`
