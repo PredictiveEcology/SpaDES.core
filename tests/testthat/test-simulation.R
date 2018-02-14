@@ -363,14 +363,22 @@ test_that("conflicting function types", {
   cat(xxx[1:lineWithInit], "
       library(raster)
       r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      r1 <- r
+      r1 <- scale(r1)
       r <- ratify(r)
-      rat <- levels(r)[[1]]
+      rat <- raster::levels(r)[[1]]
+
       levels(r) <- rat
       ",
               xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 "the following function\\(s\\) is used that")
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+
+  fullMessage <- c("the following function\\(s\\) is used that",
+                   "raster::scale", "scale")
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
+  nonMessage <- c("raster::levels", "levels")
+  expect_false(all(unlist(lapply(nonMessage, function(x) any(grepl(mm, pattern = x))))))
 
   cat(xxx[1:lineWithInit], "
       library(raster)
@@ -421,6 +429,13 @@ test_that("conflicting function types", {
       xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+
+  fullMessage <- c(" -- inputObjects: b, d, f, hi, d1, test are used",
+                          "child4 -- outputObjects: g, g1 are assigned",
+                          "Running .input",
+                          "local variable")
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
+
   expect_true(all(grepl(mm,
             pattern = c(paste0(m, " -- inputObjects: b, d, f, hi, d1, test are used|",
                                "child4 -- outputObjects: g, g1 are assigned|",

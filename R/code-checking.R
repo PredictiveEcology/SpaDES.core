@@ -120,7 +120,6 @@ allCleanMessage <- "module code appears clean"
     }
   } else if (is.call(x)) {
     if (identical(type, "assign")) {
-
       if (identical(x[[1]], quote(`<-`))) {
         # if it is an assign, only keep left hand side
         x <- x[[2]]
@@ -153,7 +152,11 @@ allCleanMessage <- "module code appears clean"
       } else if (identical(x[[1]], quote(`<-`)) ) {
         if (length(x[[2]]) > 1) {
           if (is.call(x[[2]][[2]])) {
+            if (any(grepl(x[[2]][[2]], pattern = ".envir"))) {# i.e., sim@.envir
+              assigner <- FALSE
+            } else {
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
+            }
           } else {
             if (identical(as.character(x[[2]])[1], "[") | identical(as.character(x[[2]])[1], "[[")) {
               assigner <- TRUE
@@ -176,9 +179,24 @@ allCleanMessage <- "module code appears clean"
       unique(c(out, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "globals")) {
       if (identical(x[[1]], quote(`<-`)) && is.call(x[[2]])) { # left side function assign
+
+        # This labels it with an assignment arrow -- e.g., levels<-
         out <- paste0(as.character(x[[2]][[1]]), as.character(x)[[1]])
+        if (length(x[[2]]) > 2) {
+          x[[2]] <- x[[2]][-(1:2)]
+        } else {
+          x[[2]] <- x[[2]][[2]]
+        }
       } else if (is.name(x[[1]])) {
         out <- as.character(x[[1]])
+      } else if (any(as.character(x[[1]]) %in% conflictingFnsSimple)) {
+        tmp <- deparse(x[[1]])
+        if (tmp %in% conflictingFnsClean) {
+          out <- tmp
+          x <- ""
+        } else {
+          out <- character()
+        }
       } else {
         out <- character()
       }
@@ -309,6 +327,7 @@ allCleanMessage <- "module code appears clean"
     getOption("spades.moduleCodeChecks")
   }
 
+  #browser()
   checkUsageMsg <- capture.output(
     do.call(checkUsageEnv, args = append(list(env = sim@.envir[[m]]), checks))
   )
