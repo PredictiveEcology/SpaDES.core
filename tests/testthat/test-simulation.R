@@ -567,3 +567,35 @@ test_that("conflicting function types", {
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
 
 })
+
+
+test_that("scheduleEvent with NA logical in a non-standard parameter", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m <- "test"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  xxx <- readLines(fileName)
+  #lineWithInit <- grep(xxx, pattern = "^Init")
+
+  xxx1 <- gsub(xxx, pattern = '.plotInitialTime', replacement = '.plotInitialTim') # nolint
+  xxx2 <- gsub(",$", grep(".plotInitialTim\\>", xxx1, value = TRUE)[1], replacement = "")
+  xxx3 <- parse(text = xxx2)
+  # show that it is logical
+  expect_true(is.logical(eval(xxx3)$default[[1]]))
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  expect_true(all(unlist(lapply(c("Running .inputObjects", "module code appears clean"),
+                                function(x) any(grepl(mm, pattern = x))))))
+
+})
+
