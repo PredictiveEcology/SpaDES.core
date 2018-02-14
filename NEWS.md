@@ -3,13 +3,15 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.1.1.9000
 ==================
 
-* use codetools to check for various code problems including
+* fix bug where `start` and `end` were not properly exported
+* use `codetools` to check for various code problems including:
 
-    - conflicts with known common functions (raster::level, raster::scale, quickPlot::Plot)
-    - use checkCodeEnv on every function inside a module
-* checking for sim$xxx occurrences in modules, comparing to outputs in metadata
-* new option `spades.runCodeChecks`, which is TRUE by default. This turns on or off the new code checking.
-* option `spades.debug` set to TRUE by default, instead of FALSE. This is better for new users.
+    - conflicts with known common functions (`raster::level`, `raster::scale`, `quickPlot::Plot`)
+    - use `checkCodeEnv` on every function inside a module
+
+* checking for `sim$xxx` occurrences in modules, comparing to outputs in metadata
+* new option `spades.runCodeChecks`, which is `TRUE` by default. This turns on or off the new code checking.
+* option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
 * `newModule` template modified slightly based on workshop feedback
 * `setPaths` now only sets the directories that are passed into it
 * `downloadData` gets a logical `overwrite` argument.
