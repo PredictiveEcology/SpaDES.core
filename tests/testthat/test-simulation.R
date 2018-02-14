@@ -107,8 +107,8 @@ test_that("simulation runs with simInit and spades", {
   #     25.6514918771879, -25.7249927901813, 46.5803504144238, -46.9702484362805,
   #     30.3177776221904, 11.1446124689632, 46.5656200410542, 42.6072217133873,
   #     -26.5944387764709, 30.3706355061775, -39.2953280003378, -6.61414387806415
-  #   )
-  #
+#   )
+#
   #   pos_y <- c(
   #     11.2259177001642, -48.2749285467045, -19.2693150119305, -30.1955629122566,
   #     -5.16274098908813, 19.7263653977621, -18.3682115225133, 11.738367415035,
@@ -135,8 +135,8 @@ test_that("simulation runs with simInit and spades", {
   #     15.4977777956788, 20.7609180017956, 31.0985715416653, -34.7622261504206,
   #     18.6274139594293, 43.0727309557879, -18.0134694585456, 39.5790564364162,
   #     12.5097325118235, -31.4932896470479, 37.7529892755605, -30.960625150814
-  #   )
-  # }
+#   )
+#   }
 
   expect_equal(mySim$npixelsburned, burnedLast)
   expect_equivalent(mySim$caribou$x, pos_x)
@@ -546,10 +546,10 @@ test_that("conflicting function types", {
     "child4 -- module code: ei2, ei3, ei4 are declared in inputObjects, but no default(s) are provided in .inputObjects",
     "child4 -- module code: ei3 is declared in inputObjects, but is not used in the module",
     "child4 -- module code: ",
-    "  .inputObjects: local variable ‘a’ assigned but may not be used",
-    ".inputObjects: local variable ‘fff’ assigned but may not be used",
-    "Init: local variable ‘a’ assigned but may not be used",
-    "Init: local variable ‘fff’ assigned but may not be used",
+    "  .inputObjects: local variable 'a' assigned but may not be used",
+    ".inputObjects: local variable 'fff' assigned but may not be used",
+    "Init: local variable 'a' assigned but may not be used",
+    "Init: local variable 'fff' assigned but may not be used",
     "child4 -- outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
     "child4 -- inputObjects: g, co1 are assigned to sim inside .inputObjects, but are not declared in inputObjects",
     "child4 -- inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
@@ -562,6 +562,8 @@ test_that("conflicting function types", {
 
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- gsub("‘", mm, replacement = "'")
+  mm <- gsub("’", mm, replacement = "'")
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
 
 })

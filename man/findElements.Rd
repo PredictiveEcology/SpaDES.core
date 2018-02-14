@@ -11,7 +11,7 @@
 
 .findElement(x, type)
 
-.parsingSim(x)
+.parsingSim(x, type)
 }
 \arguments{
 \item{envToFindSim}{An environment where sim is defined. This is used when
