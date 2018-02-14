@@ -276,7 +276,7 @@ scheduleEvent <- function(sim,
                           moduleName,
                           eventType,
                           eventPriority) {
-  if (!inherits(sim) == "simList") stop("sim must be a simList")
+  if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
   if (!is.numeric(eventTime)) {
     if (is.na(eventTime)) {
