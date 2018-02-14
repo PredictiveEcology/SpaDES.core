@@ -121,17 +121,18 @@ test_that("downloadModule can overwrite existing modules", {
   downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE)
 
   original_f <- file.path(tmpdir, m) %>%
-    list.files(., full.names = TRUE, pattern = ".R$") %>% file.info()
+    list.files(., full.names = TRUE, pattern = "[.]R$") %>%
+    file.info()
 
   expect_error(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
 
   downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = TRUE)
 
   new_f <- file.path(tmpdir, m) %>%
-    list.files(., full.names = TRUE, pattern = ".R$") %>% file.info()
+    list.files(., full.names = TRUE, pattern = "[.]R$") %>%
+    file.info()
 
   expect_true(original_f$mtime < new_f$mtime)
-
 })
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
@@ -153,8 +154,8 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
   d_expected <- moduleMetadata("LCC2005", tmpdir)$childModules %>%
-    c(m, "data", "testthat") %>% sort()
+    c(m, "data", "testthat") %>%
+    sort()
 
   expect_equal(d, d_expected)
-
 })
