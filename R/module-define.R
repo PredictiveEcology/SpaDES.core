@@ -392,13 +392,14 @@ setMethod("defineParameter",
           signature(name = "character", class = "character", default = "ANY",
                     min = "ANY", max = "ANY", desc = "character"),
           definition = function(name, class, default, min, max, desc) {
-
-            # warn if `default`, `min`, and `max` aren't the specified type
+            # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
             # we can't just coerece these because it wouldn't allow for character,
             #  e.g., start(sim)
-            if (!all(inherits(default, class), inherits(min, class), inherits(max, class))) {
-              message(crayon::magenta("NOTE: Parameter '", name, "' is not of specified type '",
-                                      class, "'.", sep = ""))
+            if (!any(is.na(default), is.na(min), is.na(max))) {
+              if (!all(is(default, class), is(min, class), is(max, class))) {
+                message(crayon::magenta("NOTE: Parameter '", name, "' is not of specified type '",
+                                        class, "'.", sep = ""))
+              }
             }
 
             # previously used `substitute()` instead of `I()`,
