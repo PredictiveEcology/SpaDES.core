@@ -357,6 +357,10 @@ setMethod(
 #'
 #' Used to specify a parameter's name, value, and set a default.
 #'
+#' @note Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
+#'       real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
+#'       See \code{\link{NA}}.
+#'
 #' @param name      Character string giving the parameter name.
 #' @param class     Character string giving the parameter class.
 #' @param default   The default value to use when none is specified by the user.
@@ -393,7 +397,8 @@ setMethod("defineParameter",
             # we can't just coerece these because it wouldn't allow for character,
             #  e.g., start(sim)
             if (!all(inherits(default, class), inherits(min, class), inherits(max, class))) {
-              warning("Parameter '", name, "' is not of spcified type '", class, "'.")
+              message(crayon::magenta("NOTE: Parameter '", name, "' is not of spcified type '",
+                                      class, "'.", sep = ""))
             }
 
             # previously used `substitute()` instead of `I()`,
