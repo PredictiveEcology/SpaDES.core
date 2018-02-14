@@ -155,7 +155,11 @@ allCleanMessage <- "module code appears clean"
           if (is.call(x[[2]][[2]])) {
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
           } else {
-            assigner <- FALSE
+            if (identical(as.character(x[[2]])[1], "[") | identical(as.character(x[[2]])[1], "[[")) {
+              assigner <- TRUE
+            } else {
+              assigner <- FALSE
+            }
           }
         } else {
           assigner <- FALSE
@@ -485,7 +489,13 @@ allCleanMessage <- "module code appears clean"
     out <- deparse(x[[3]])
   } else {
     if (type == "assign") {
-      out <- .findElement(x, type = "get")
+      if (is.name(x)) {
+        out <- character()
+      } else if (identical(as.character(x)[1], "[") | identical(as.character(x)[1], "[[")) {
+        out <- character()
+      } else {
+        out <- .findElement(x, type = "get")
+      }
     } else {
       out <- character()
     }

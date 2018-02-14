@@ -512,6 +512,8 @@ test_that("conflicting function types", {
       fff <- sim$ei2
       fff <- sim$co3
       sim$co1 <- 123
+      xx <- c(1,2)
+      xx[sim$ei4] <- NA
       ",
       xxx[(lineWithInit+1):lineWithDotInputObjects], "
       a <- sim$b
@@ -527,7 +529,7 @@ test_that("conflicting function types", {
   fullMessage <- c(
     "child4 -- module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
     "child4 -- module code: ei2, ei3, ei4 are declared in inputObjects, but no default(s) are provided in .inputObjects",
-    "child4 -- module code: ei3, ei4 are declared in inputObjects, but are not used in the module",
+    "child4 -- module code: ei3 is declared in inputObjects, but is not used in the module",
     "child4 -- module code: ",
     "  .inputObjects: local variable ‘a’ assigned but may not be used",
     ".inputObjects: local variable ‘fff’ assigned but may not be used",
