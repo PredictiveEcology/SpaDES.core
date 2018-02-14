@@ -399,7 +399,7 @@ setMethod("defineParameter",
               if (!all(is(default, class), is(min, class), is(max, class))) {
                 # any messages here are captured if this is run from .parseModule
                 #   It will append module name
-                message(crayon::magenta("defineParameter: ", name, "' is not of spcified type '",
+                message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
                                         class, "'.", sep = ""))
               }
             }
