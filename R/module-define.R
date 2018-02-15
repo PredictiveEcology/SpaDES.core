@@ -395,8 +395,11 @@ setMethod("defineParameter",
             # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
             # we can't just coerece these because it wouldn't allow for character,
             #  e.g., start(sim)
-            if (!any(is.na(default), is.na(min), is.na(max))) {
-              if (!all(is(default, class), is(min, class), is(max, class))) {
+            anyNAs <- c(is.na(default), is.na(min), is.na(max))
+            if (!all(anyNAs)) {
+              # if some or all are NA -- need to check
+              if (!all(is(c(default, min, max)[!anyNAs], class))) {
+                #if (!all(is(default, class), is(min, class), is(max, class))) {
                 # any messages here are captured if this is run from .parseModule
                 #   It will append module name
                 message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
