@@ -430,10 +430,10 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
-  fullMessage <- c(": inputObjects: b, d, f, hi, d1, test are used",
-                          "child4: outputObjects: g, g1 are assigned",
-                          "Running .input",
-                          "local variable")
+  fullMessage <- c("Running inputObjects for child4",
+                   "child4: module code: the following function  with base functions: scale  It is a good idea to be explicit about the package sources, eg, raster::scale"
+  )
+  mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
 
   cat(xxx[1:lineWithInit], "
@@ -535,25 +535,21 @@ test_that("conflicting function types", {
       xxx[(lineWithDotInputObjects+1):length(xxx)],
       sep = "\n", fill = FALSE, file = fileName)
 
-  fullMessage <- c(
-    "Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-    "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
-    "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
-    "child4: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
-    "child4: module code: inputObjects: local variable ‘fff’ assigned but may not be used ",
-    "child4: module code: Init: local variable ‘a’ assigned but may not be used ",
-    "child4: module code: Init: local variable ‘fff’ assigned but may not be used ",
-    "child4: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
-    "child4: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
-    "child4: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
-    "child4: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects"
-    )
+  fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
+                   "child4: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
+                   "child4: module code: inputObjects: local variable ‘fff’ assigned but may not be used ",
+                   "child4: module code: Init: local variable ‘a’ assigned but may not be used ",
+                   "child4: module code: Init: local variable ‘fff’ assigned but may not be used ",
+                   "child4: outputObjects: g, aaa are assigned to sim inside Init, but is not declared in outputObjects",
+                   "child4: inputObjects: g, co1 are assigned to sim inside inputObjects, but is not declared in inputObjects",
+                   "child4: inputObjects: b, aaa are used from sim inside Init, but is not declared in inputObjects",
+                   "child4: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects"
+  )
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
-  mm <- gsub(".{1}\\[.{2}m", "", mm)
-  mm <- gsub("\\n", "", mm)
-  mm <- gsub("\\(.*\\)", "", mm)
-  mm <- gsub("\\.", "", mm)
+  mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
 
 })
@@ -700,33 +696,32 @@ test_that("messaging with multiple modules", {
       xxx1[[2]][(lineWithDotInputObjects+1):length(xxx1[[2]])],
       sep = "\n", fill = FALSE, file = fileNames[2])
 
-  fullMessage <- c(
-    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-    "defineParameter: 'saveInitialTime' is not of specified type 'character'",
-    "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-    "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
-    "test: module code: ei3 is declared in inputObjects, but is not used in the module",
-    "test: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
-    "test: module code: inputObjects: local variable ‘fff’ assigned but may not be used ",
-    "test: module code: Init: local variable ‘a’ assigned but may not be used ",
-    "test: module code: Init: local variable ‘fff’ assigned but may not be used ",
-    "test: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
-    "test: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
-    "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
-    "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
-    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-    "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
-    "test2: module code: ei1, ei4 are declared in inputObjects, but no default are provided in inputObjects",
-    "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
-    "test2: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
-    "test2: module code: Init: local variable ‘a’ assigned but may not be used ",
-    "test2: inputObjects: co1 is assigned to sim inside inputObjects, but is not declared in inputObjects",
-    "test2: inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
-    "test2: inputObjects: b is used from sim inside inputObjects, but is not declared in inputObjects",
-    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-    "defineParameter: 'hello' is not of specified type 'character'",
-    "Running inputObjects for test3", "test3: module code appears clean",
-    "Running inputObjects for test4", "test4: module code appears clean"
+  fullMessage <- c("defineParameter: 'plotInitialTime' is not of specified type 'character'",
+                   "defineParameter: 'saveInitialTime' is not of specified type 'character'",
+                   "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "test: module code: ei3 is declared in inputObjects, but is not used in the module",
+                   "test: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
+                   "test: module code: inputObjects: local variable ‘fff’ assigned but may not be used ",
+                   "test: module code: Init: local variable ‘a’ assigned but may not be used ",
+                   "test: module code: Init: local variable ‘fff’ assigned but may not be used ",
+                   "test: outputObjects: g, aaa are assigned to sim inside Init, but is not declared in outputObjects",
+                   "test: inputObjects: g, co1 are assigned to sim inside inputObjects, but is not declared in inputObjects",
+                   "test: inputObjects: b, aaa are used from sim inside Init, but is not declared in inputObjects",
+                   "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
+                   "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+                   "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
+                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
+                   "test2: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
+                   "test2: module code: Init: local variable ‘a’ assigned but may not be used ",
+                   "test2: inputObjects: co1 is assigned to sim inside inputObjects, but is not declared in inputObjects",
+                   "test2: inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
+                   "test2: inputObjects: b is used from sim inside inputObjects, but is not declared in inputObjects",
+                   "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+                   "defineParameter: 'hello' is not of specified type 'character'",
+                   "Running inputObjects for test3", "test3: module code appears clean",
+                   "Running inputObjects for test4", "test4: module code appears clean"
   )
 
   xxx1[[1]][20:25]
@@ -735,13 +730,9 @@ test_that("messaging with multiple modules", {
   }
 
   mm1 <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
-  mm1 <- gsub(".{1}\\[.{2}m", "", mm1)
-  mm1 <- gsub("\\n", "", mm1)
-  mm1 <- gsub("\\(.*\\)", "", mm1)
-  mm1 <- gsub("\\.", "", mm1)
+  mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage,
                                 function(x) any(grepl(mm1, pattern = x))))))
-
 
 })
 

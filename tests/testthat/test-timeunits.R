@@ -246,27 +246,49 @@ test_that("timeunits with child and parent modules work correctly", {
   )
 
   # pulls cached value
-  expect_message(expect_output(mySim <- simInit(modules = list(modName),
-                                 paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                   params = list("child6"= list(.useCache = ".inputObjects"))), regexp = "  Using cached"),
-                 all = TRUE, "Using or creating cached|child6 -- outputObjects: dp, cm are assigned|child6 -- module code: b is")
+  mm1 <- capture_messages(
+    mySim <- simInit(modules = list(modName),
+                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                     params = list("child6"= list(.useCache = ".inputObjects")))
+  )
+  mm1 <- cleanMessage(mm1)
+  fullMessage <- c("Using or creating cached copy of inputObjects for child6",
+    "child6: module code: b is declared in inputObjects, but is not used in the module",
+    "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
+  )
+  expect_true(all(unlist(lapply(fullMessage,
+                                function(x) any(grepl(mm1, pattern = x))))))
+
   expect_true(identical(mySim$b, asPath(theFile)))
 
   # Change the file that is in the arguments to .inputObjects
   write.table(x = data.frame(sample(1e6,1)), file = theFile)
   # Cache should force a rerun -- i.e., not cached value
-  expect_silent(expect_message(mySim <- simInit(modules = list(modName),
-                                                paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                                params = list("child6"= list(.useCache = ".inputObjects"))), all = TRUE,
-                               "Using or creating cached|child6 -- outputObjects: dp, cm are assigned|child6 -- module code: b is declared")
+  mm1 <- capture_messages(mySim <- simInit(modules = list(modName),
+                                           paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                                           params = list("child6"= list(.useCache = ".inputObjects"))))
+
+  mm1 <- cleanMessage(mm1)
+  fullMessage <- c("Using or creating cached copy of inputObjects for child6",
+                   "child6: module code: b is declared in inputObjects, but is not used in the module",
+                   "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
   )
+  expect_true(all(unlist(lapply(fullMessage,
+                                function(x) any(grepl(mm1, pattern = x))))))
 
   # pulls cached value
-  expect_message(expect_output(mySim <- simInit(modules = list(modName),
-                                                paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                                params = list("child6"= list(.useCache = ".inputObjects"))),
-                               regexp = "  Using cached"),
-                 all = TRUE, "Using or creating cached|child6 -- outputObjects: dp, cm are assigned|child6 -- module code: b is declared")
+  mm1 <- capture_messages(mm2 <- capture_output(mySim <- simInit(modules = list(modName),
+                                           paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                                           params = list("child6"= list(.useCache = ".inputObjects")))
+  ))
+  mm1 <- cleanMessage(mm1)
+  fullMessage <- c("Using or creating cached copy of inputObjects for child6",
+                   "child6: module code: b is declared in inputObjects, but is not used in the module",
+                   "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
+  )
+  expect_true(all(unlist(lapply(fullMessage,
+                                function(x) any(grepl(mm1, pattern = x))))))
+  expect_true(grepl("Using cached", mm2))
 
 
 })
