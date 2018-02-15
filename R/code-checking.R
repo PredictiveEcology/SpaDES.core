@@ -369,26 +369,27 @@ allCleanMessage <- "module code appears clean"
     # First do all but .inputObjects, i.e,. outputObjects
     missingInMetadata <- simAssignsNotInDotInputObjects[!(simAssignsNotInDotInputObjects %in% outputObjNames)]
     if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadPrevMessage <- .parseMessage(m, "outputObjects",
-        paste0(paste(missingInMetadata, collapse = ", "),
-          " ",verb," assigned to sim inside ",
-          paste(unique(names(missingInMetadata)), collapse = ", "),
-          ", but ",verb," not declared in outputObjects"
-      ))
+      missingInMetadataByFn <- tapply(missingInMetadata, names(missingInMetadata), unique)
+      verbs <- lapply(missingInMetadataByFn, .verb)
+      hadPrevMessage <- any(unlist(
+        lapply(names(missingInMetadataByFn), function(fn)
+          .parseMessage(m, "outputObjects", paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
+                                                  " ",verbs[[fn]]," assigned to sim inside ",
+                                                  fn, ", but ",verbs[[fn]]," not declared in outputObjects"
+          )))))
     }
 
     # Now do .inputObjects, i.e., inputObjects
     missingInMetadata <- simAssignsInDotInputObjects[!(simAssignsInDotInputObjects %in% inputObjNames)]
     if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadPrevMessage <-
-        .parseMessage(m, "inputObjects",
-                      paste0(paste(missingInMetadata, collapse = ", "),
-                             " ",verb," assigned to sim inside ",
-                             paste(unique(names(missingInMetadata)), collapse = ", "),
-                             ", but ",verb," not declared in inputObjects"
-                      ))
+      missingInMetadataByFn <- tapply(missingInMetadata, names(missingInMetadata), unique)
+      verbs <- lapply(missingInMetadataByFn, .verb)
+      hadPrevMessage <- any(unlist(
+        lapply(names(missingInMetadataByFn), function(fn)
+          .parseMessage(m, "inputObjects", paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
+                                                  " ",verbs[[fn]]," assigned to sim inside ",
+                                                  fn, ", but ",verbs[[fn]]," not declared in inputObjects"
+          )))))
     }
   }
 
@@ -400,14 +401,15 @@ allCleanMessage <- "module code appears clean"
     missingInMetadata <- simGetsNotInDotInputObjects[!(simGetsNotInDotInputObjects %in%
                                             c(inputObjNames, outputObjNames))]
     if (length(missingInMetadata)) {
-      verb <- .verb(missingInMetadata)
-      hadPrevMessage <-
-        .parseMessage(m, "inputObjects",
-                      paste0(paste(unique(missingInMetadata), collapse = ", "),
-                      " ",verb," used from sim inside ",
-                      paste(unique(names(missingInMetadata)), collapse = ", "),
-                      ", but ",verb," not declared in inputObjects"
-      ))
+
+      missingInMetadataByFn <- tapply(missingInMetadata, names(missingInMetadata), unique)
+      verbs <- lapply(missingInMetadataByFn, .verb)
+      hadPrevMessage <- any(unlist(
+        lapply(names(missingInMetadataByFn), function(fn)
+          .parseMessage(m, "inputObjects", paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
+                                                   " ",verbs[[fn]]," used from sim inside ",
+                                                   fn, ", but ",verbs[[fn]]," not declared in inputObjects"
+          )))))
     }
 
     # Now do .inputObjects, i.e., inputObjects
