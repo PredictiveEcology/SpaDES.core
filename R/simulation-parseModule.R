@@ -159,7 +159,7 @@ setMethod(
   signature(sim = "simList", modules = "list", envir = "ANY"),
   definition = function(sim, modules, userSuppliedObjNames, envir, notOlderThan, ...) {
     all_children <- list()
-    codeCheckMsgs <- list()
+    codeCheckMsgs <- character()
     children <- list()
     parent_ids <- integer()
     dots <- list(...)
@@ -244,6 +244,7 @@ setMethod(
         }
 
         # Evaluate defineModule into the sim environment
+        # Capture messages which will be about defineParameter at the moment
         mess <- capture.output(type = "message",
                                out <- suppressWarnings(eval(pf, envir = env)))
         if (length(mess))
@@ -390,12 +391,23 @@ setMethod(
           }
         }
 
-        if (isTRUE(getOption("spades.moduleCodeChecks")) ||
-            length(names(getOption("spades.moduleCodeChecks"))) > 1) {
-          ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
-          codeCheckMsgs <- append(codeCheckMsgs,
-                                  capture.output(type = "message",
-                                                 .runCodeChecks(sim, m, k)))
+        ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
+        opt <- getOption("spades.moduleCodeChecks")
+        if (isTRUE(opt) || length(names(opt)) > 1) {
+          mess <- capture.output(type = "message", .runCodeChecks(sim, m, k))
+          if (any(endsWith(mess, allCleanMessage))) {
+            if (length(codeCheckMsgs)==0) {
+              codeCheckMsgs <- mess
+            } else {
+              whichAreCurrentMod <- startsWith(codeCheckMsgs, m)
+              if (sum(startsWith(codeCheckMsgs[whichAreCurrentMod], m))==0) {
+                codeCheckMsgs <- append(codeCheckMsgs[!whichAreCurrentMod], mess)
+              } 
+              
+              
+            }
+            
+          }
         } # End of code checking
 
         lockBinding(m, sim@.envir)
@@ -462,7 +474,9 @@ setMethod(
         } else {
           paste(unique(unlist(codeCheckMsgs)), collapse = "\n")
         }
+        message("###### Module Code Checking ########")
         message(mess)
+        message("###### Module Code Checking ########")
       }
     }
 
