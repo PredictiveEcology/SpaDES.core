@@ -433,6 +433,26 @@ setMethod(
     if (length(codeCheckMsgs)) {
       if (length(parent_ids) < length(modules)) {
         modCodeClean <- allCleanMessage
+
+        # Trying to put the sections in order by module -- this is very experiment and may need to be deleted
+        codeCheckMsgsNoColr <- gsub(".{1}\\[.{2}m", "", codeCheckMsgs)
+        HasSpacePrefix <- grep("^  ", codeCheckMsgsNoColr)
+        getModNameIndex <- HasSpacePrefix[c(0, which(diff(HasSpacePrefix)>1))+1]-1
+        HasSpacePrefix[which(diff(HasSpacePrefix)==1)]
+        copyForward <- unlist(lapply(strsplit(codeCheckMsgsNoColr[getModNameIndex], split = " -- "),
+                                     function (x) x[[1]]))
+        codeCheckMsgsNoColr[HasSpacePrefix] <-
+          paste0(copyForward[c(0, cumsum(diff(HasSpacePrefix)>1))+1],
+                 " --", codeCheckMsgsNoColr[HasSpacePrefix])
+        justModuleNames <-
+          unlist(lapply(strsplit(codeCheckMsgsNoColr, split = " |:|--"),
+                        function (x) x[[1]]))
+        justModuleNamesFac <- factor(justModuleNames)
+        justModuleNamesFac <- factor(justModuleNames, levels = unique(justModuleNames))
+        eventualOrder <- order(justModuleNamesFac)
+        codeCheckMsgs <- codeCheckMsgs[eventualOrder]
+        ###  END OF ORDERING SECTION
+
         mess <- if (all(grepl(codeCheckMsgs, pattern = modCodeClean))) {
           mess <- gsub(codeCheckMsgs,
                pattern = paste(paste0(unlist(modules), ": "), collapse = "|"),
