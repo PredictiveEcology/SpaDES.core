@@ -249,11 +249,10 @@ setMethod(
                                out <- suppressWarnings(eval(pf, envir = env)))
         if (length(mess))
           codeCheckMsgs <- append(codeCheckMsgs,
-                                capture.output(type = "message",
-                                               hasMessage <- .parseMessage(m, "",
-                                                             paste(mess, collapse = "\n  ")
-                                                             ))
-        )
+                                  capture.output(type = "message",
+                                    hasMessage <- unique(unlist(lapply(mess, function(x)
+                                      .parseMessage(m, "", x))))))
+
         for(dep in out@depends@dependencies) {
           sim <- .addDepends(sim, dep)
         }
@@ -394,20 +393,11 @@ setMethod(
         ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
         opt <- getOption("spades.moduleCodeChecks")
         if (isTRUE(opt) || length(names(opt)) > 1) {
-          mess <- capture.output(type = "message", .runCodeChecks(sim, m, k))
-          if (any(endsWith(mess, allCleanMessage))) {
-            if (length(codeCheckMsgs)==0) {
-              codeCheckMsgs <- mess
-            } else {
-              whichAreCurrentMod <- startsWith(codeCheckMsgs, m)
-              if (sum(startsWith(codeCheckMsgs[whichAreCurrentMod], m))==0) {
-                codeCheckMsgs <- append(codeCheckMsgs[!whichAreCurrentMod], mess)
-              } 
-              
-              
-            }
-            
-          }
+          # the code will always have magenta colour, which has an m
+          codeCheckMsgsThisMod <- any(grepl(paste0("m", m, ":"), codeCheckMsgs))
+          mess <- capture.output(type = "message", .runCodeChecks(sim, m, k, codeCheckMsgsThisMod))
+          codeCheckMsgs <- append(codeCheckMsgs, mess)
+
         } # End of code checking
 
         lockBinding(m, sim@.envir)
@@ -445,24 +435,25 @@ setMethod(
     if (length(codeCheckMsgs)) {
       if (length(parent_ids) < length(modules)) {
         modCodeClean <- allCleanMessage
-
         # Trying to put the sections in order by module -- this is very experiment and may need to be deleted
-        codeCheckMsgsNoColr <- gsub(".{1}\\[.{2}m", "", codeCheckMsgs)
-        HasSpacePrefix <- grep("^  ", codeCheckMsgsNoColr)
-        getModNameIndex <- HasSpacePrefix[c(0, which(diff(HasSpacePrefix)>1))+1]-1
-        HasSpacePrefix[which(diff(HasSpacePrefix)==1)]
-        copyForward <- unlist(lapply(strsplit(codeCheckMsgsNoColr[getModNameIndex], split = " -- "),
-                                     function (x) x[[1]]))
-        codeCheckMsgsNoColr[HasSpacePrefix] <-
-          paste0(copyForward[c(0, cumsum(diff(HasSpacePrefix)>1))+1],
-                 " --", codeCheckMsgsNoColr[HasSpacePrefix])
-        justModuleNames <-
-          unlist(lapply(strsplit(codeCheckMsgsNoColr, split = " |:|--"),
-                        function (x) x[[1]]))
-        justModuleNamesFac <- factor(justModuleNames)
-        justModuleNamesFac <- factor(justModuleNames, levels = unique(justModuleNames))
-        eventualOrder <- order(justModuleNamesFac)
-        codeCheckMsgs <- codeCheckMsgs[eventualOrder]
+        if (FALSE) {
+          codeCheckMsgs <- gsub(".{1}\\[.{2}m", "", codeCheckMsgs)
+          # HasSpacePrefix <- grep("^  ", codeCheckMsgsNoColr)
+          # getModNameIndex <- HasSpacePrefix[c(0, which(diff(HasSpacePrefix)>1))+1]-1
+          # HasSpacePrefix[which(diff(HasSpacePrefix)==1)]
+          # copyForward <- unlist(lapply(strsplit(codeCheckMsgsNoColr[getModNameIndex], split = " -- "),
+          #                              function (x) x[[1]]))
+          # codeCheckMsgsNoColr[HasSpacePrefix] <-
+          #   paste0(copyForward[c(0, cumsum(diff(HasSpacePrefix)>1))+1],
+          #          " --", codeCheckMsgsNoColr[HasSpacePrefix])
+          # justModuleNames <-
+          #   unlist(lapply(strsplit(codeCheckMsgsNoColr, split = " |:|--"),
+          #                 function (x) x[[1]]))
+          # justModuleNamesFac <- factor(justModuleNames)
+          # justModuleNamesFac <- factor(justModuleNames, levels = unique(justModuleNames))
+          # eventualOrder <- order(justModuleNamesFac)
+          # codeCheckMsgs <- codeCheckMsgs[eventualOrder]
+        }
         ###  END OF ORDERING SECTION
 
         mess <- if (all(grepl(codeCheckMsgs, pattern = modCodeClean))) {

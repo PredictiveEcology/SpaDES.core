@@ -4,10 +4,14 @@
 \alias{.runCodeChecks}
 \title{Runs a series of code checks during simInit}
 \usage{
-.runCodeChecks(sim, m, k)
+.runCodeChecks(sim, m, k, hadPrevMessage = FALSE)
 }
 \arguments{
+\item{sim}{simList}
+
 \item{m}{module name}
+
+\item{hadPrevMessage}{}
 
 \item{message}{rest of message}
 }

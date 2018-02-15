@@ -430,17 +430,11 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
-  fullMessage <- c(" -- inputObjects: b, d, f, hi, d1, test are used",
-                          "child4 -- outputObjects: g, g1 are assigned",
+  fullMessage <- c(": inputObjects: b, d, f, hi, d1, test are used",
+                          "child4: outputObjects: g, g1 are assigned",
                           "Running .input",
                           "local variable")
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
-
-  expect_true(all(grepl(mm,
-            pattern = c(paste0(m, " -- inputObjects: b, d, f, hi, d1, test are used|",
-                               "child4 -- outputObjects: g, g1 are assigned|",
-                               "Running .input|",
-                               "local variable")))))
 
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
@@ -458,7 +452,7 @@ test_that("conflicting function types", {
       xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-               c(paste0(m, " -- module code: a is declared in inputObjects")))
+               c(paste0(m, ": module code: a is declared in inputObjects")))
 
   # declared in outputObjects
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
@@ -468,7 +462,7 @@ test_that("conflicting function types", {
       xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-               c(paste0(m, " -- module code: b is declared in outputObjects")))
+               c(paste0(m, ": module code: b is declared in outputObjects")))
 
   cat(xxx[1:(lineWithInputObjects-1)], "
       expectsInput('a', 'numeric', '', '')
@@ -481,7 +475,7 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-    pattern = c(paste0(m, " -- module code: b is declared in outputObjects|child4 -- module code: a is declared in inputObjects|Running .input")))))
+    pattern = c(paste0(m, ": module code: b is declared in outputObjects|child4: module code: a is declared in inputObjects|Running .input")))))
 
   # assign to sim for functions like scheduleEvent
   lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
@@ -490,7 +484,7 @@ test_that("conflicting function types", {
   cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 c(paste0(m, " -- module code: scheduleEvent inside doEvent.child4 must")))
+                 c(paste0(m, ": module code: scheduleEvent inside doEvent.child4 must")))
 
   # Return sim in doEvent
   patt <- "return\\(invisible\\(sim\\)\\)"
@@ -501,7 +495,7 @@ test_that("conflicting function types", {
   cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 c(paste0(m, " -- module code: doEvent.",m," must return")))
+                 c(paste0(m, ": module code: doEvent.",m," must return")))
 
 
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
@@ -542,28 +536,24 @@ test_that("conflicting function types", {
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c(
-    "child4 -- module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-    "child4 -- module code: ei2, ei3, ei4 are declared in inputObjects, but no default(s) are provided in .inputObjects",
-    "child4 -- module code: ei3 is declared in inputObjects, but is not used in the module",
-    "child4 -- module code: ",
-    "  .inputObjects: local variable 'a' assigned but may not be used",
-    ".inputObjects: local variable 'fff' assigned but may not be used",
-    "Init: local variable 'a' assigned but may not be used",
-    "Init: local variable 'fff' assigned but may not be used",
-    "child4 -- outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
-    "child4 -- inputObjects: g, co1 are assigned to sim inside .inputObjects, but are not declared in inputObjects",
-    "child4 -- inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
-    "child4 -- inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in inputObjects"
+    "Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+    "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+    "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
+    "child4: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
+    "child4: module code: inputObjects: local variable ‘fff’ assigned but may not be used ",
+    "child4: module code: Init: local variable ‘a’ assigned but may not be used ",
+    "child4: module code: Init: local variable ‘fff’ assigned but may not be used ",
+    "child4: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
+    "child4: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
+    "child4: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
+    "child4: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects"
     )
 
-  fullMessage <- gsub(fullMessage, pattern = "\\.", replacement = "\\\\.")
-  fullMessage <- gsub(fullMessage, pattern = "\\(", replacement = "\\\\(")
-  fullMessage <- gsub(fullMessage, pattern = "\\)", replacement = "\\\\)")
-
-
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
-  mm <- gsub("‘", mm, replacement = "'")
-  mm <- gsub("’", mm, replacement = "'")
+  mm <- gsub(".{1}\\[.{2}m", "", mm)
+  mm <- gsub("\\n", "", mm)
+  mm <- gsub("\\(.*\\)", "", mm)
+  mm <- gsub("\\.", "", mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
 
 })
@@ -596,6 +586,162 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(unlist(lapply(c("Running .inputObjects", "module code appears clean"),
                                 function(x) any(grepl(mm, pattern = x))))))
+
+})
+
+test_that("messaging with multiple modules", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m1 <- "test"
+  m2 <- "test2"
+  m3 <- "test3"
+  m4 <- "test4"
+  m <- c(m1, m2, m3, m4)
+  newModule(m1, tmpdir, open = FALSE)
+  newModule(m2, tmpdir, open = FALSE)
+  newModule(m3, tmpdir, open = FALSE)
+  newModule(m4, tmpdir, open = FALSE)
+  #lapply(m, newModule, tmpdir, open = FALSE)
+  fileNames <- file.path(dir(tmpdir), paste0(dir(tmpdir),".R"))
+  xxx <- lapply(fileNames, readLines)
+  set.seed(113)
+
+
+  lineWithInit <- grep(xxx[[1]], pattern = "^Init")
+  lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
+  lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+
+  xxx1 <- list()
+  #lapply(seq(m), function(yy) sample(c("character", "numeric", "logical"), size = 3, replace = TRUE))
+  xxx1[[1]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
+                   "\\.plotInitialTime\", \"character\", 1", xxx[[1]])
+  xxx1[[1]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
+                   "\\.saveInitialTime\", \"character\", FALSE", xxx1[[1]])
+  xxx1[[1]] <- gsub("\\.saveInterval\", \"numeric\", NA",
+                   "\\testtime\", \"logical\", NA_real_", xxx1[[1]])
+
+  xxx1[[2]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
+                   "\\.plotInitialTime\", \"character\", TRUE", xxx[[2]])
+  xxx1[[2]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
+                   "\\.saveInitialTime\", \"character\", 'c'", xxx1[[2]])
+  xxx1[[2]] <- gsub("\\.saveInterval\", \"numeric\", NA",
+                   "\\testtime\", \"character\", NA_real_", xxx1[[2]])
+
+  xxx1[[3]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
+                   "\\.plotInitialTime\", \"character\", 1", xxx[[3]])
+  xxx1[[3]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
+                   "\\hello\", \"character\", 1", xxx1[[3]])
+  xxx1[[3]] <- gsub("\\.saveInterval\", \"numeric\", NA",
+                   "\\testtime\", \"logical\", NA_real_", xxx1[[3]])
+  xxx1[[4]] <- xxx[[4]] # clean one
+
+  cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei2', 'numeric', '', ''),
+      expectsInput('ei3', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx1[[1]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co2', 'numeric', ''),
+      createsOutput('co3', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx1[[1]][(lineWithOutputObjects+1):lineWithInit], "
+      a <- sim$b
+      sim$g <- f
+      holy(sim$co4) <- f
+      moly(sim$aaa) <- f
+      fff <- sim$ei2
+      fff <- sim$co3
+      sim$co1 <- 123
+      xx <- c(1,2)
+      xx[sim$ei4] <- NA
+      ",
+      xxx1[[1]][(lineWithInit+1):lineWithDotInputObjects], "
+      a <- sim$b
+      sim$g <- 1
+      sim$ei1 <- 4
+      fff <- sim$ei1
+      fff <- sim$co3
+      sim$co1 <- 123
+      ",
+      xxx1[[1]][(lineWithDotInputObjects+1):length(xxx1[[1]])],
+      sep = "\n", fill = FALSE, file = fileNames[1])
+
+
+  cat(xxx1[[2]][1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx1[[2]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx1[[2]][(lineWithOutputObjects+1):lineWithInit], "
+      a <- sim$b
+      xx <- c(1,2)
+      xx[sim$ei4] <- NA
+      ",
+      xxx1[[2]][(lineWithInit+1):lineWithDotInputObjects], "
+      a <- sim$b
+      sim$co1 <- 123
+      ",
+      xxx1[[2]][(lineWithDotInputObjects+1):length(xxx1[[2]])],
+      sep = "\n", fill = FALSE, file = fileNames[2])
+
+  fullMessage <- c(
+    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+    "defineParameter: 'saveInitialTime' is not of specified type 'character'",
+    "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+    "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+    "test: module code: ei3 is declared in inputObjects, but is not used in the module",
+    "test: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
+    "test: module code: inputObjects: local variable ‘fff’ assigned but may not be used ",
+    "test: module code: Init: local variable ‘a’ assigned but may not be used ",
+    "test: module code: Init: local variable ‘fff’ assigned but may not be used ",
+    "test: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
+    "test: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
+    "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
+    "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
+    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+    "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
+    "test2: module code: ei1, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+    "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
+    "test2: module code: inputObjects: local variable ‘a’ assigned but may not be used ",
+    "test2: module code: Init: local variable ‘a’ assigned but may not be used ",
+    "test2: inputObjects: co1 is assigned to sim inside inputObjects, but is not declared in inputObjects",
+    "test2: inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
+    "test2: inputObjects: b is used from sim inside inputObjects, but is not declared in inputObjects",
+    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+    "defineParameter: 'hello' is not of specified type 'character'",
+    "Running inputObjects for test3", "test3: module code appears clean",
+    "Running inputObjects for test4", "test4: module code appears clean"
+  )
+
+  xxx1[[1]][20:25]
+  for(y in 3:4) {
+    cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
+  }
+
+  mm1 <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
+  mm1 <- gsub(".{1}\\[.{2}m", "", mm1)
+  mm1 <- gsub("\\n", "", mm1)
+  mm1 <- gsub("\\(.*\\)", "", mm1)
+  mm1 <- gsub("\\.", "", mm1)
+  expect_true(all(unlist(lapply(fullMessage,
+                                function(x) any(grepl(mm1, pattern = x))))))
+
 
 })
 

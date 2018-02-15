@@ -221,17 +221,17 @@ allCleanMessage <- "module code appears clean"
 #' codetools::findGlobals to check for function collisions with known,
 #' common function collisions (raster::stack, raster::scale)
 #'
+#' @param sim simList
 #' @param m module name
 #' @param message rest of message
+#' @param hadPrevMessage
 #'
 #' @return
 #' A message with that starts with paste0(m, ":", message)
 #'
 #' @keywords internal
 #' @rdname runCodeChecks
-.runCodeChecks <- function(sim, m, k) {
-  hadParseMessage <- FALSE # initiate this which will be changed if there are
-                           #   parse messages
+.runCodeChecks <- function(sim, m, k, hadPrevMessage = FALSE) {
 
   inputObjNames <- na.omit(sim@depends@dependencies[[k]]@inputObjects$objectName)
   outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
@@ -251,7 +251,7 @@ allCleanMessage <- "module code appears clean"
   returnsSim <- tapply(returnsSim, names(returnsSim), function(xx) any(xx == "sim"))
   if (!all(returnsSim)) {
     verb <- .verb(returnsSim)
-    hadParseMessage <- .parseMessage(m, "module code",
+    hadPrevMessage <- .parseMessage(m, "module code",
                                      paste0(paste(names(returnsSim), collapse = ", "),
                                             " must return the sim, e.g., return(invisible(sim))"
                                      ))
@@ -264,7 +264,7 @@ allCleanMessage <- "module code appears clean"
   assignToSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assignToSim")
   if (length(assignToSim)) {
     verb <- .verb(assignToSim)
-    hadParseMessage <- .parseMessage(m, "module code",
+    hadPrevMessage <- .parseMessage(m, "module code",
                                      paste0(paste(assignToSim, collapse = ", "),
                                             " inside ", paste(names(assignToSim), collapse = ", "),
                                             " must assign to the sim, e.g., sim <- scheduleEvent(sim, ...)"
@@ -281,7 +281,7 @@ allCleanMessage <- "module code appears clean"
     missingFrmMod <- unique(missingFrmMod)
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
-      hadParseMessage <- .parseMessage(m, "module code",
+      hadPrevMessage <- .parseMessage(m, "module code",
                                        paste0(paste(missingFrmMod, collapse = ", "),
                                               " ",verb," declared in outputObjects, ",
                                               "but ", verb, " not assigned in the module"
@@ -296,7 +296,7 @@ allCleanMessage <- "module code appears clean"
     missingFrmMod <- unique(missingFrmMod)
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
-      hadParseMessage <- .parseMessage(m, "module code",
+      hadPrevMessage <- .parseMessage(m, "module code",
                                        paste0(paste(missingFrmMod, collapse = ", "),
                                               " ",verb," declared in inputObjects, ",
                                               "but no default(s) ", verb, " provided in .inputObjects"
@@ -308,7 +308,7 @@ allCleanMessage <- "module code appears clean"
     missingFrmMod <- unique(na.omit(missingFrmMod))
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
-      hadParseMessage <- .parseMessage(m, "module code",
+      hadPrevMessage <- .parseMessage(m, "module code",
                                        paste0(paste(missingFrmMod, collapse = ", "), " ",verb,
                                               " declared in inputObjects, ", "but ", verb,
                                               " not used in the module"
@@ -327,16 +327,14 @@ allCleanMessage <- "module code appears clean"
     getOption("spades.moduleCodeChecks")
   }
 
-  #browser()
   checkUsageMsg <- capture.output(
     do.call(checkUsageEnv, args = append(list(env = sim@.envir[[m]]), checks))
   )
   checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
                         invert = TRUE, value = TRUE)
-
   if (length(checkUsageMsg)) {
-    hadParseMessage <- .parseMessage(m, "module code",
-                                     paste0("\n  ", paste(checkUsageMsg, collapse = "\n  ")))
+    hadPrevMessage <- unique(unlist(lapply(checkUsageMsg, function(x)
+      .parseMessage(m, "module code", message = x))))
   }
 
 
@@ -352,7 +350,7 @@ allCleanMessage <- "module code appears clean"
     names(theFns) <- theFns
     whichFnsWithPackage <- conflictingFnsClean[conflictingFnsSimple %in% hasConflicts]
     verb <- .verb(length(whichFnsWithPackage))
-    hadParseMessage <-
+    hadPrevMessage <-
       .parseMessage(m, "module code", paste0("the following function(s) ", verb,
                                              " used that conflict(s)",
                                              "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
@@ -372,7 +370,7 @@ allCleanMessage <- "module code appears clean"
     missingInMetadata <- simAssignsNotInDotInputObjects[!(simAssignsNotInDotInputObjects %in% outputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <- .parseMessage(m, "outputObjects",
+      hadPrevMessage <- .parseMessage(m, "outputObjects",
         paste0(paste(missingInMetadata, collapse = ", "),
           " ",verb," assigned to sim inside ",
           paste(unique(names(missingInMetadata)), collapse = ", "),
@@ -384,7 +382,7 @@ allCleanMessage <- "module code appears clean"
     missingInMetadata <- simAssignsInDotInputObjects[!(simAssignsInDotInputObjects %in% inputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <-
+      hadPrevMessage <-
         .parseMessage(m, "inputObjects",
                       paste0(paste(missingInMetadata, collapse = ", "),
                              " ",verb," assigned to sim inside ",
@@ -403,7 +401,7 @@ allCleanMessage <- "module code appears clean"
                                             c(inputObjNames, outputObjNames))]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <-
+      hadPrevMessage <-
         .parseMessage(m, "inputObjects",
                       paste0(paste(unique(missingInMetadata), collapse = ", "),
                       " ",verb," used from sim inside ",
@@ -416,7 +414,7 @@ allCleanMessage <- "module code appears clean"
     missingInMetadata <- simGetsInDotInputObjects[!(simGetsInDotInputObjects %in% inputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadParseMessage <-
+      hadPrevMessage <-
         .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
         " ",verb," used from sim inside ",
         paste(unique(names(missingInMetadata)), collapse = ", "),
@@ -432,7 +430,7 @@ allCleanMessage <- "module code appears clean"
   if (length(clashingFuns)) {
     fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
     verb <- .verb(clashingFuns)
-    hadParseMessage <- .parseMessage(m, "module functions", paste0(
+    hadPrevMessage <- .parseMessage(m, "module functions", paste0(
             paste(clashingFuns, collapse = ", "), " ", verb,
             " defined, which ", verb, " in conflict with ",
             paste(fnNames, collapse = ", "), ". It is recommended to ",
@@ -442,7 +440,7 @@ allCleanMessage <- "module code appears clean"
   #############################################################
   ###### Message if all clean #################################
   #############################################################
-  if (!hadParseMessage) .parseMessage(m, "", allCleanMessage)
+  if (!hadPrevMessage) .parseMessage(m, "", allCleanMessage)
   return(invisible())
 }
 
@@ -460,7 +458,7 @@ allCleanMessage <- "module code appears clean"
 #' @rdname parseMessage
 .parseMessage <- function(m, problem, message) {
   sub <- if (nzchar(problem)) {
-    paste0(" -- ", problem)
+    paste0(": ", problem)
   } else {
     ""
   }
