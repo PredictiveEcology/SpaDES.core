@@ -508,6 +508,7 @@ Other contributors:
 \itemize{
   \item Yong Luo \email{yluo1@lakeheadu.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
+  \item Ceres Barros \email{cbarros@mail.ubc.ca} [contributor]
   \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
 
