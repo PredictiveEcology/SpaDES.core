@@ -37,7 +37,7 @@ The default is \file{CHECKSUMS.txt} located at
 \code{file.path(path, module, "data", checksumFile)}.
 It is likely not a good idea to change this, and should
 only be used in cases such as \code{Cache}, which can
-evaluate if the \rode{checksumFile} has changed.}
+evaluate if the \code{checksumFile} has changed.}
 
 \item{files}{A character vector of length 1 or more if only a subset of files should be
 checked in the CHECKSUMS.txt file}

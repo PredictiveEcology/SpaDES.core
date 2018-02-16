@@ -724,7 +724,7 @@ setMethod(
 #'                     \code{file.path(path, module, "data", checksumFile)}.
 #'                     It is likely not a good idea to change this, and should
 #'                     only be used in cases such as \code{Cache}, which can
-#'                     evaluate if the \rode{checksumFile} has changed.
+#'                     evaluate if the \code{checksumFile} has changed.
 #'
 #' @inheritParams downloadData
 #'
