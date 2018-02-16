@@ -219,7 +219,6 @@ setMethod(
             # duplicate -- put in namespaces location
             #eval(parsedFile1, envir = sim@.envir[[m]])
             activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.envir[[m]])
-
           }
         }
 
@@ -248,12 +247,13 @@ setMethod(
         mess <- capture.output(type = "message",
                                out <- suppressWarnings(eval(pf, envir = env)))
         if (length(mess))
-          codeCheckMsgs <- append(codeCheckMsgs,
-                                  capture.output(type = "message",
-                                    hasMessage <- unique(unlist(lapply(mess, function(x)
-                                      .parseMessage(m, "", x))))))
+          codeCheckMsgs <- append(
+            codeCheckMsgs,
+            capture.output(type = "message",
+                           hasMessage <- unique(unlist(lapply(mess, function(x)
+                             .parseMessage(m, "", x))))))
 
-        for(dep in out@depends@dependencies) {
+        for (dep in out@depends@dependencies) {
           sim <- .addDepends(sim, dep)
         }
 
@@ -293,6 +293,7 @@ setMethod(
             )
           )
         }
+
         if (any(outObjs)) {
           sim@depends@dependencies[[i]]@outputObjects <- data.frame(
             rbindlist(fill = TRUE,
@@ -318,14 +319,16 @@ setMethod(
         # If user supplies the needed objects, then test whether all are supplied.
         # If they are all supplied, then skip the .inputObjects code
         cacheIt <- FALSE
-        allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in% userSuppliedObjNames
+        allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
+          userSuppliedObjNames
         if (!all(allObjsProvided)) {
           if (!is.null(sim@.envir[[m]][[".inputObjects"]])) {
-            list2env(objs[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
+            list2env(objs[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
                      envir = sim@.envir)
             a <- sim@params[[m]][[".useCache"]]
             if (!is.null(a)) {
-              if (".useCache" %in% names(list(...)[["params"]])) {  # user supplied values
+              # user supplied values
+              if (".useCache" %in% names(list(...)[["params"]])) {
                 b <- list(...)[["params"]][[i]][[".useCache"]]
                 if (!is.null(b)) a <- b
               }
@@ -344,14 +347,15 @@ setMethod(
             }
 
             if (cacheIt) {
-              message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
-              moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+              message(crayon::green("Using or creating cached copy of .inputObjects for ",
+                                    m, sep = ""))
+              moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] # nolint
 
               # ensure backwards compatibility with non-namespaced modules
               if (doesntUseNamespacing) {
                 objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
-                                                pattern = m, value = TRUE),
-                                           na.omit(moduleSpecificInputObjects) )
+                                                      pattern = m, value = TRUE),
+                                                 na.omit(moduleSpecificInputObjects))
                 .inputObjects <- sim@.envir[[".inputObjects"]]
               } else {
                 # moduleSpecificObjs <- ls(sim@.envir[[m]], all.names = TRUE)
@@ -364,15 +368,18 @@ setMethod(
 
               args <- as.list(formals(.inputObjects))
               env <- environment()
-              args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
+              args <- lapply(args[unlist(lapply(args, function(x)
+                all(nzchar(x))))], eval, envir = env)
               args[["sim"]] <- sim
 
               sim <- Cache(FUN = do.call, .inputObjects, args = args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
-                           outputObjects = moduleSpecificInputObjects, digestPathContent = TRUE,
-                           userTags = c(paste0("module:",m),paste0("eventType:.inputObjects",
-                                                                   "function:.inputObjects")))
+                           outputObjects = moduleSpecificInputObjects,
+                           digestPathContent = TRUE,
+                           userTags = c(paste0("module:", m),
+                                        paste0("eventType:.inputObjects",
+                                               "function:.inputObjects")))
 
             } else {
               message(crayon::green("Running .inputObjects for ", m, sep = ""))
@@ -410,7 +417,7 @@ setMethod(
         }
         # remove parent module from the list
         if (length(children)) {
-          parent_ids <- c(parent_ids, which(unlist(modules(sim))==m))
+          parent_ids <- c(parent_ids, which(unlist(modules(sim)) == m))
         }
 
         message("Duplicate module, ", m, ", specified. Skipping loading it twice.")
@@ -435,7 +442,8 @@ setMethod(
     if (length(codeCheckMsgs)) {
       if (length(parent_ids) < length(modules)) {
         modCodeClean <- allCleanMessage
-        # Trying to put the sections in order by module -- this is very experiment and may need to be deleted
+        # Trying to put the sections in order by module --
+        #   this is very experimental and may need to be deleted
         if (FALSE) {
           codeCheckMsgs <- gsub(".{1}\\[.{2}m", "", codeCheckMsgs)
           # HasSpacePrefix <- grep("^  ", codeCheckMsgsNoColr)
@@ -458,8 +466,8 @@ setMethod(
 
         mess <- if (all(grepl(codeCheckMsgs, pattern = modCodeClean))) {
           mess <- gsub(codeCheckMsgs,
-               pattern = paste(paste0(unlist(modules), ": "), collapse = "|"),
-               replacement = "")
+                       pattern = paste(paste0(unlist(modules), ": "), collapse = "|"),
+                       replacement = "")
           unique(mess)
 
         } else {
@@ -470,7 +478,6 @@ setMethod(
         message("###### Module Code Checking ########")
       }
     }
-
 
     return(sim)
 })
@@ -511,4 +518,3 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   }
   activeCode
 }
-
