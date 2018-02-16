@@ -498,6 +498,14 @@ setMethod(
 
     if (!is.null(files)) {
       chksums <- chksums[chksums$expectedFile %in% basename(files),]
+      fileMatching <- agrepl(basename(files), basename(to.dl))
+      if (!any(fileMatching)) {
+        stop("Could not match the SourceURLs for ",to.dl[fileMatching],
+             " to particular files in the CHECKSUMS.txt.",
+             "\nPerhaps add an entry in inputObjects whose downloaded filename is closer",
+             " to the online dataset name")
+      }
+      to.dl <- to.dl[fileMatching]
     }
 
     if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
