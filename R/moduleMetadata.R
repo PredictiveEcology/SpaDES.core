@@ -45,7 +45,7 @@ setMethod(
            function(xx) {
              pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                         defineModuleElement = xx)
-             out2 <- try(eval(pmp), silent = TRUE)
+             out2 <- suppressMessages(try(eval(pmp), silent = TRUE))
              if (is(out2, "try-error")) {
                inner2 <- lapply(pmp, function(yyy) {
                  # pmp is whole rbind statement
@@ -63,7 +63,8 @@ setMethod(
                })
                out2 <- as.call(inner2)
              }
-             return(eval(out2))
+             aa <- capture.output(type = "message", bb <- eval(out2))
+             return(bb)
           })
 
     names(metadata) <- defineModuleListItems
