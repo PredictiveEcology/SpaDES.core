@@ -111,7 +111,7 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
   c(extractedArchives, archivePath)
 }
 
-#' Add a prefix or suffix to a filename.
+#' Add a prefix or suffix to the basename part of a file path
 #'
 #' Prepend (or postpend) a filename with a prefix (or suffix).
 #' If the directory name of the file cannot be ascertained from its path,
@@ -130,12 +130,12 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
 #' @examples
 #' # file's full path is specified (i.e., dirname is known)
 #' myFile <- file.path("~/data", "file.tif")
-#' SpaDES.tools:::.prefix(myFile, "small_")    ## "/home/username/data/small_file.tif"
-#' SpaDES.tools:::.suffix(myFile, "_cropped") ## "/home/username/data/myFile_cropped.shp"
+#' SpaDES.tools::.prefix(myFile, "small_")    ## "/home/username/data/small_file.tif"
+#' SpaDES.tools::.suffix(myFile, "_cropped") ## "/home/username/data/myFile_cropped.shp"
 #'
 #' # file's full path is not specified
-#' SpaDES.tools:::.prefix("myFile.shp", "small")    ## "./small_myFile.shp"
-#' SpaDES.tools:::.suffix("myFile.shp", "_cropped") ## "./myFile_cropped.shp"
+#' SpaDES.tools::.prefix("myFile.shp", "small")    ## "./small_myFile.shp"
+#' SpaDES.tools::.suffix("myFile.shp", "_cropped") ## "./myFile_cropped.shp"
 #'
 .prefix <- function(f, prefix = "") {
   file.path(dirname(f), paste0(prefix, basename(f)))
