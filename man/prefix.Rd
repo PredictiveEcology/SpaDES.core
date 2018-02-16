@@ -37,4 +37,3 @@ Jean Marchal
 
 Alex Chubaty
 }
-\keyword{internal}

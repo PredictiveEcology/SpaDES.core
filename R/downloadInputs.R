@@ -123,8 +123,8 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
 #'
 #' @author Jean Marchal
 #' @author Alex Chubaty
+#' @export
 #' @importFrom tools file_ext file_path_sans_ext
-#' @keywords internal
 #' @rdname prefix
 #'
 #' @examples
@@ -141,7 +141,7 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
   file.path(dirname(f), paste0(prefix, basename(f)))
 }
 
-#' @keywords internal
+#' @export
 #' @rdname prefix
 .suffix <- function(f, suffix = "") {
   file.path(dirname(f), paste0(tools::file_path_sans_ext(basename(f)), suffix,
