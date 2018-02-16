@@ -183,9 +183,9 @@ setMethod(
         tmp <- parseConditional(envir = envir, filename = filename)
 
         # duplicate -- put in namespaces location
-        # If caching is being used, it is possible that it is bound
+        # If caching is being used, it is possible that exists
         if (!is.null(sim@.envir[[m]])) {
-          unlockBinding(m, sim@.envir)
+          rm(list = m, envir = sim@.envir)
         }
 
         sim@.envir[[m]] <- new.env(parent = sim@.envir)
