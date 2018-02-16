@@ -434,8 +434,8 @@ test_that("conflicting function types", {
                    "defineParameter: 'plotInterval' is not of specified type 'numeric'",
                    "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
                    "defineParameter: 'saveInterval' is not of specified type 'numeric'",
-                   "Running inputObjects for child4", "child4: module code: Init: local variable.{0,2}r.{0,2}assigned but may not be used ",
-                   "child4: module code: Init: local variable.{0,2}r1.{0,2}assigned but may not be used ",
+                   "Running inputObjects for child4", "child4: module code: Init: local variable.{0,4}r.{0,4}assigned but may not be used ",
+                   "child4: module code: Init: local variable.{0,4}r1.{0,4}assigned but may not be used ",
                    "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in outputObjects",
                    "child4: inputObjects: b, d, f, hi, d1, test are used from sim inside Init, but are not declared in inputObjects"
   )
