@@ -23,7 +23,7 @@ This is faster, but potentially much less robust.}
 A character vector of hashes.
 }
 \description{
-Internal function. Wrapper for \code{\link[digest]{digest}} using md5sum.
+Internal function. Wrapper for \code{\link[digest]{digest}} using \code{xxhash64}.
 }
 \author{
 Alex Chubaty
