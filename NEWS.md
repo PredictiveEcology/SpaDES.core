@@ -3,6 +3,7 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.1.1.9000
 ==================
 
+* new function `prepInputs` to handle download, extract, crop/mask/reproject etc.
 * fix bug where `start` and `end` were not properly exported
 * use `codetools` to check for various code problems including:
 
