@@ -443,6 +443,13 @@ setMethod(
 #' @param overwrite Logical. Should local data files be overwritten in case they exist?
 #'                  Default is FALSE
 #'
+#' @param files A character vector of length 1 or more if only a subset of files should be
+#'              checked in the CHECKSUMS.txt file
+#'
+#' @param checked The result of a previous checksums(...) call. This should only be used when
+#'         there is no possibility that the file has changed, i.e., if \code{downloadData} is
+#'         called from inside another function
+#'
 #' @return Invisibly, a list of downloaded files.
 #'
 #' @seealso \code{\link{checksums}} for building a checksums file.
@@ -456,7 +463,8 @@ setMethod(
 #' @rdname downloadData
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
-                                    overwrite = FALSE) {
+                                    overwrite = FALSE, files = NULL,
+                                    checked = NULL) {
   standardGeneric("downloadData")
 })
 
@@ -465,8 +473,8 @@ setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "logical",
-                quickCheck = "ANY", overwrite = "ANY"),
-  definition = function(module, path, quiet, quickCheck, overwrite) {
+                quickCheck = "ANY", overwrite = "ANY", files = "ANY", checked = "ANY"),
+  definition = function(module, path, quiet, quickCheck, overwrite, files, checked) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
     urls <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
@@ -481,9 +489,18 @@ setMethod(
 
     ids <- which(urls == "" | is.na(urls))
     to.dl <- if (length(ids)) urls[-ids] else urls
-    chksums <- checksums(module, path, quickCheck = quickCheck) %>%
+    if (is.null(checked)) {
+      chksums <- checksums(module, path, quickCheck = quickCheck, files = files)
+    } else {
+      chksums <- checked
+    }
+    chksums <- chksums %>%
       dplyr::mutate(renamed = NA, module = module)
     dataDir <- file.path(path, module, "data" )
+
+    if (!is.null(files)) {
+      chksums <- chksums[chksums$expectedFile %in% basename(files),]
+    }
 
     if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
       setwd(path); on.exit(setwd(cwd), add = TRUE)
@@ -510,6 +527,8 @@ setMethod(
                     paste(chksums$expectedFile[id], collapse = ",\n      "), sep = ""))
           }
         }
+        # Only do files that were requested, but allow fuzzy matching
+        xFile <- xFile[xFile %in% basename(files)]
         if ((any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) | overwrite) {
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
@@ -526,7 +545,7 @@ setMethod(
             }
 
             ## re-checksums
-            chksums <- checksums(module, path) %>%
+            chksums <- checksums(module, path, files = files, quickCheck = quickCheck) %>%
               dplyr::mutate(renamed = NA, module = module)
           } else {
             ## check whether file needs to be downloaded
@@ -542,7 +561,7 @@ setMethod(
             ## (e.g., in a .tar file)
             if (needNewDownload) {
               message(crayon::magenta("Downloading ", basename(x), " for module ", module, ":", sep = ""))
-              Cache(download.file, x, destfile = tmpFile, mode = "wb", quiet = quiet)
+              download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
               copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
             }
             destfile
@@ -553,7 +572,7 @@ setMethod(
         }
       })
 
-      chksums <- checksums(module, path, quickCheck = quickCheck) %>%
+      chksums <- checksums(module, path, quickCheck = quickCheck, files = files) %>%
         dplyr::mutate(renamed = NA, module = module)
     } else if (NROW(chksums) > 0) {
       message(crayon::magenta("  Download data step skipped for module ", module,
@@ -604,30 +623,33 @@ setMethod(
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY",
-                overwrite = "ANY"),
-  definition = function(module, quickCheck, overwrite) {
+                overwrite = "ANY", files = "ANY", checked = "ANY"),
+  definition = function(module, quickCheck, overwrite, files, checked) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE,
-                 quickCheck = quickCheck, overwrite = overwrite)
+                 quickCheck = quickCheck, overwrite = overwrite, files = files,
+                 checked = checked)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY",
-                overwrite = "ANY"),
-  definition = function(module, quiet, quickCheck, overwrite) {
+                overwrite = "ANY", files = "ANY", checked = "ANY"),
+  definition = function(module, quiet, quickCheck, overwrite, files, checked) {
     downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet,
-                 quickCheck = quickCheck, overwrite = overwrite)
+                 quickCheck = quickCheck, overwrite = overwrite, files = files,
+                 checked = checked)
 })
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY",
-                overwrite = "ANY"),
-  definition = function(module, path, quickCheck, overwrite) {
+                overwrite = "ANY", files = "ANY", checked = "ANY"),
+  definition = function(module, path, quickCheck, overwrite, files, checked) {
     downloadData(module = module, path = path, quiet = FALSE,
-                 quickCheck = quickCheck, overwrite = overwrite)
+                 quickCheck = quickCheck, overwrite = overwrite, files = files,
+                 checked = checked)
 })
 
 ################################################################################
@@ -736,7 +758,8 @@ setMethod(
 #' }
 #'
 setGeneric("checksums", function(module, path, write, quickCheck = FALSE,
-                                 checksumFile = file.path(path, "CHECKSUMS.txt"), ...) {
+                                 checksumFile = file.path(path, "CHECKSUMS.txt"),
+                                 files = NULL, ...) {
   standardGeneric("checksums")
 })
 
@@ -745,8 +768,9 @@ setGeneric("checksums", function(module, path, write, quickCheck = FALSE,
 #' @importFrom utils read.table write.table
 setMethod(
   "checksums",
-  signature = c(module = "character", path = "character", write = "logical"),
-  definition = function(module, path, write, quickCheck, checksumFile, ...) {
+  signature = c(module = "character", path = "character", quickCheck = "ANY",
+                write = "logical", files = "ANY"),
+  definition = function(module, path, write, quickCheck, checksumFile, files, ...) {
     defaultHashAlgo <- "xxhash64"
     defaultWriteHashAlgo <- "xxhash64"
     dots <- list(...)
@@ -759,8 +783,10 @@ setMethod(
       file.create(checksumFile)
     }
 
-    files <- list.files(path, full.names = TRUE) %>%
-      grep(basename(checksumFile), ., value = TRUE, invert = TRUE)
+    if (is.null(files)) {
+      files <- list.files(path, full.names = TRUE) %>%
+        grep(basename(checksumFile), ., value = TRUE, invert = TRUE)
+    }
 
     txt <- if (!write && file.info(checksumFile)$size > 0) {
       read.table(checksumFile, header = TRUE, stringsAsFactors = FALSE)
@@ -797,6 +823,7 @@ setMethod(
     } else {
       files
     }
+    filesToCheck <- filesToCheck[file.exists(filesToCheck)]
 
     if (is.null(txt$filesize)) {
       quickCheck <- FALSE
@@ -860,7 +887,8 @@ setMethod(
 #' @rdname checksums
 setMethod(
   "checksums",
-  signature = c(module = "character", path = "character", write = "missing"),
-  definition = function(module, path, quickCheck, ...) {
-    checksums(module, path, write = FALSE, quickCheck = quickCheck, ...)
+  signature = c(module = "character", path = "character", quickCheck = "ANY",
+                write = "missing", files = "ANY"),
+  definition = function(module, path, quickCheck, files, ...) {
+    checksums(module, path, write = FALSE, quickCheck = quickCheck, files = files, ...)
 })

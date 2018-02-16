@@ -8,13 +8,15 @@
 \title{Calculate checksums for a module's data files}
 \usage{
 checksums(module, path, write, quickCheck = FALSE,
-  checksumFile = file.path(path, "CHECKSUMS.txt"), ...)
+  checksumFile = file.path(path, "CHECKSUMS.txt"), files = NULL, ...)
 
 \S4method{checksums}{character,character,logical}(module, path, write,
-  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"), ...)
+  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"),
+  files = NULL, ...)
 
 \S4method{checksums}{character,character,missing}(module, path, write,
-  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"), ...)
+  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"),
+  files = NULL, ...)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}
@@ -36,6 +38,9 @@ is CHECKSUMS.txt located at
 not a good idea to change this, and should only be used in
 cases such as
 \code{Cache}, which can evaluate if the checksumFile has changed.}
+
+\item{files}{A character vector of length 1 or more if only a subset of files should be
+checked in the CHECKSUMS.txt file}
 
 \item{...}{Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
 the digest algorithm can be specified.}

@@ -9,19 +9,20 @@
 \alias{downloadData,character,character,missing-method}
 \title{Download module data}
 \usage{
-downloadData(module, path, quiet, quickCheck = FALSE, overwrite = FALSE)
+downloadData(module, path, quiet, quickCheck = FALSE, overwrite = FALSE,
+  files = NULL, checked = NULL)
 
 \S4method{downloadData}{character,character,logical}(module, path, quiet,
-  quickCheck = FALSE, overwrite = FALSE)
+  quickCheck = FALSE, overwrite = FALSE, files = NULL, checked = NULL)
 
 \S4method{downloadData}{character,missing,missing}(module, quickCheck,
-  overwrite)
+  overwrite, files, checked)
 
 \S4method{downloadData}{character,missing,logical}(module, quiet, quickCheck,
-  overwrite)
+  overwrite, files, checked)
 
 \S4method{downloadData}{character,character,missing}(module, path, quickCheck,
-  overwrite)
+  overwrite, files, checked)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}
@@ -36,6 +37,13 @@ This is faster, but potentially much less robust.}
 
 \item{overwrite}{Logical. Should local data files be overwritten in case they exist?
 Default is FALSE}
+
+\item{files}{A character vector of length 1 or more if only a subset of files should be
+checked in the CHECKSUMS.txt file}
+
+\item{checked}{The result of a previous checksums(...) call. This should only be used when
+there is no possibility that the file has changed, i.e., if \code{downloadData} is
+called from inside another function}
 }
 \value{
 Invisibly, a list of downloaded files.
