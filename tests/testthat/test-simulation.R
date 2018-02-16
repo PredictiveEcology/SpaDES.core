@@ -228,8 +228,8 @@ test_that("simInit with R subfolder scripts", {
 
   newModule("child1", ".", open = FALSE)
   cat(file = file.path("child1", "R", "script.R"),
-      "a <- function(r) {
-          r + 1
+      "a <- function(poiuoiu) {
+          poiuoiu + 1
       }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
   expect_true(sum(grepl(unlist(lapply(ls(mySim@.envir, all.names = TRUE), function(x) {
@@ -362,13 +362,13 @@ test_that("conflicting function types", {
   # do functions like raster::levels
   cat(xxx[1:lineWithInit], "
       library(raster)
-      r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
-      r1 <- r
-      r1 <- scale(r1)
-      r <- ratify(r)
-      rat <- raster::levels(r)[[1]]
+      poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      poiuoiu <- poiuoiu
+      poiuoiu <- scale(poiuoiu)
+      poiuoiu <- ratify(poiuoiu)
+      rat <- raster::levels(poiuoiu)[[1]]
 
-      levels(r) <- rat
+      levels(poiuoiu) <- rat
       ",
               xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
@@ -382,8 +382,8 @@ test_that("conflicting function types", {
 
   cat(xxx[1:lineWithInit], "
       library(raster)
-      r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
-      r <- scale(r)
+      poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      poiuoiu <- scale(poiuoiu)
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
@@ -393,14 +393,14 @@ test_that("conflicting function types", {
   ###
   cat(xxx[1:lineWithInit], "
       library(raster)
-      r <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
-      r <- raster::scale(r)
-      sim$r <- r
+      poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      poiuoiu <- raster::scale(poiuoiu)
+      sim$poiuoiu <- poiuoiu
       ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 "r is assigned")
+                 "poiuoiu is assigned")
 
   cat(xxx[1:(lineWithInit - 1)], "
       a <- function(x) {
@@ -420,8 +420,8 @@ test_that("conflicting function types", {
       d <- sim$d
       f <- sim[['f']]
       f <- sim[[P(sim)$value]]
-      r <- sim@.envir$d1
-      r1 <- sim@.envir[['test']]
+      poiuoiu <- sim@.envir$d1
+      qwerqwer <- sim@.envir[['test']]
       sim$g <- f
       sim@.envir$g1 <- f
       return(list(a, d, f, sim))
@@ -434,8 +434,8 @@ test_that("conflicting function types", {
                    "defineParameter: 'plotInterval' is not of specified type 'numeric'",
                    "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
                    "defineParameter: 'saveInterval' is not of specified type 'numeric'",
-                   "Running inputObjects for child4", "child4: module code: Init: local variable.{0,4}r.{0,4}assigned but may not be used ",
-                   "child4: module code: Init: local variable.{0,4}r1.{0,4}assigned but may not be used ",
+                   "child4: module code: Init: local variable.*qwerqwer.*assigned but may not be used ",
+                   "Running inputObjects for child4", "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used ",
                    "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in outputObjects",
                    "child4: inputObjects: b, d, f, hi, d1, test are used from sim inside Init, but are not declared in inputObjects"
   )
@@ -545,10 +545,10 @@ test_that("conflicting function types", {
   fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
                    "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
                    "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
-                   "child4: module code: inputObjects: local variable.{0,2}a.{0,2}assigned but may not be used ",
-                   "child4: module code: inputObjects: local variable.{0,2}fff.{0,2}assigned but may not be used ",
-                   "child4: module code: Init: local variable.{0,2}a.{0,2}assigned but may not be used ",
-                   "child4: module code: Init: local variable.{0,2}fff.{0,2}assigned but may not be used ",
+                   "child4: module code: inputObjects: local variable.*a.*assigned but may not be used ",
+                   "child4: module code: inputObjects: local variable.*fff.*assigned but may not be used ",
+                   "child4: module code: Init: local variable.*a.*assigned but may not be used ",
+                   "child4: module code: Init: local variable.*fff.*assigned but may not be used ",
                    "child4: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
                    "child4: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
                    "child4: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
@@ -708,10 +708,10 @@ test_that("messaging with multiple modules", {
                    "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
                    "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
                    "test: module code: ei3 is declared in inputObjects, but is not used in the module",
-                   "test: module code: inputObjects: local variable.{0,2}a.{0,2}assigned but may not be used ",
-                   "test: module code: inputObjects: local variable.{0,2}fff.{0,2}assigned but may not be used ",
-                   "test: module code: Init: local variable.{0,2}a.{0,2}assigned but may not be used ",
-                   "test: module code: Init: local variable.{0,2}fff.{0,2}assigned but may not be used ",
+                   "test: module code: inputObjects: local variable.*a.*assigned but may not be used ",
+                   "test: module code: inputObjects: local variable.*fff.*assigned but may not be used ",
+                   "test: module code: Init: local variable.*a.*assigned but may not be used ",
+                   "test: module code: Init: local variable.*fff.*assigned but may not be used ",
                    "test: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
                    "test: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
                    "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
@@ -720,8 +720,8 @@ test_that("messaging with multiple modules", {
                    "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
                    "test2: module code: ei1, ei4 are declared in inputObjects, but no default are provided in inputObjects",
                    "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
-                   "test2: module code: inputObjects: local variable.{0,2}a.{0,2}assigned but may not be used ",
-                   "test2: module code: Init: local variable.{0,2}a.{0,2}assigned but may not be used ",
+                   "test2: module code: inputObjects: local variable.*a.*assigned but may not be used ",
+                   "test2: module code: Init: local variable.*a.*assigned but may not be used ",
                    "test2: inputObjects: co1 is assigned to sim inside inputObjects, but is not declared in inputObjects",
                    "test2: inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
                    "test2: inputObjects: b is used from sim inside inputObjects, but is not declared in inputObjects",
