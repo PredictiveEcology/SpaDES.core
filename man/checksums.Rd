@@ -32,12 +32,12 @@ their module code, and update accordingly when the data change.}
 use \code{file.size} instead of \code{digest::digest}.
 This is faster, but potentially much less robust.}
 
-\item{checksumFile}{The filename of the checksums file to read or write to. The default
-is CHECKSUMS.txt located at
-\code{file.path(path, module, "data", checksumFile)}. It is likely
-not a good idea to change this, and should only be used in
-cases such as
-\code{Cache}, which can evaluate if the checksumFile has changed.}
+\item{checksumFile}{The filename of the checksums file to read or write to.
+The default is \file{CHECKSUMS.txt} located at
+\code{file.path(path, module, "data", checksumFile)}.
+It is likely not a good idea to change this, and should
+only be used in cases such as \code{Cache}, which can
+evaluate if the \code{checksumFile} has changed.}
 
 \item{files}{A character vector of length 1 or more if only a subset of files should be
 checked in the CHECKSUMS.txt file}
@@ -46,7 +46,8 @@ checked in the CHECKSUMS.txt file}
 the digest algorithm can be specified.}
 }
 \value{
-A data.frame with columns: result, expectedFile, actualFile, and checksum.
+A \code{data.frame} with columns: \code{result}, \code{expectedFile},
+        \code{actualFile}, and \code{checksum}.
 }
 \description{
 Verify (and optionally write) checksums for data files in a module's

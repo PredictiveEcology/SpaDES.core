@@ -77,7 +77,6 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
 
   filesInArchive <- Cache(funWArgs$fun, archivePath[1], list = TRUE)
   if ("Name" %in% names(filesInArchive)) filesInArchive <- filesInArchive$Name # for zips
-  browser()
 
   if (length(archivePath) > 1) {
     .unzipOrUnTar(funWArgs$fun, funWArgs$args, files = basename(archivePath[2]))
@@ -87,7 +86,8 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
   } else if (any(needed %in% basename(filesInArchive))) {
     message(paste("  Extracting from archive:", basename(archivePath[1])))
     .unzipOrUnTar(funWArgs$fun, funWArgs$args, files = filesInArchive[basename(filesInArchive) %in% needed])
-  } else { # don't have a 2nd archive, and don't have our needed file
+  } else {
+    # don't have a 2nd archive, and don't have our needed file
     isArchive <- grepl(file_ext(filesInArchive), pattern = "(zip|tar)", ignore.case = TRUE)
 
     if (any(isArchive)) {

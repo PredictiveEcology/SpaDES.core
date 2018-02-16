@@ -328,7 +328,6 @@ setMethod(
                     "/master/modules/", name, "/", name, "_", version, ".zip") # nolint
       localzip <- file.path(path, basename(zip))
 
-      ##download.file(zip, destfile = localzip, mode = "wb", quiet = quiet)
       ua <- user_agent(getOption("spades.useragent"))
       pat <- Sys.getenv("GITHUB_PAT")
       request <- if (identical(pat, "")) {
@@ -463,8 +462,7 @@ setMethod(
 #' @rdname downloadData
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
-                                    overwrite = FALSE, files = NULL,
-                                    checked = NULL) {
+                                    overwrite = FALSE, files = NULL, checked = NULL) {
   standardGeneric("downloadData")
 })
 
@@ -512,7 +510,7 @@ setMethod(
         if (length(id) == 0) {
           fuzzy <- integer()
           md <- 1
-          while(length(fuzzy) == 0) {
+          while (length(fuzzy) == 0) {
             md <- md + 1
             fuzzy <- agrep(xFile, chksums$expectedFile, max.distance = md, ignore.case = TRUE)
             if (md >= nchar(xFile)) fuzzy <- 0
@@ -562,7 +560,8 @@ setMethod(
             ## download if needed, using Cache in case multiple objects use same url
             ## (e.g., in a .tar file)
             if (needNewDownload) {
-              message(crayon::magenta("Downloading ", basename(x), " for module ", module, ":", sep = ""))
+              message(crayon::magenta("Downloading ", basename(x), " for module ",
+                                      module, ":", sep = ""))
               download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
               copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
             }
@@ -580,7 +579,7 @@ setMethod(
       message(crayon::magenta("  Download data step skipped for module ", module,
                               ". Local copy exists.", sep = ""))
     } else {
-      message(crayon::magenta("  No data to download for module ", module, sep = ""))
+      message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
     }
 
     # There are at least 2 options if the expected doesn't match actual
@@ -657,7 +656,7 @@ setMethod(
 ################################################################################
 #' Calculate the hashes of multiple files
 #'
-#' Internal function. Wrapper for \code{\link[digest]{digest}} using md5sum.
+#' Internal function. Wrapper for \code{\link[digest]{digest}} using \code{xxhash64}.
 #'
 #' @param file  Character vector of file paths.
 #' @inheritParams downloadData
@@ -681,12 +680,11 @@ setMethod(
   signature = c(file = "character"),
   definition = function(file, quickCheck, algo = "xxhash64", ...) {
     if (quickCheck) {
-      file.size(file) %>%
-        as.character() # need as.character for empty case
+      file.size(file) %>% as.character() # need as.character for empty case
     } else {
       lapply(file, function(f) {
         digest::digest(object = f, file = TRUE, algo = algo, ...)
-      }) %>% unlist() %>% unname() %>% as.character() # need as.character for empty case
+      }) %>% unlist() %>% unname() %>% as.character() # need as.character for empty case # nolint
     }
 })
 
@@ -721,19 +719,20 @@ setMethod(
 #'                Module developers should write this file prior to distributing
 #'                their module code, and update accordingly when the data change.
 #'
-#' @param checksumFile The filename of the checksums file to read or write to. The default
-#'                     is CHECKSUMS.txt located at
-#'                     \code{file.path(path, module, "data", checksumFile)}. It is likely
-#'                     not a good idea to change this, and should only be used in
-#'                     cases such as
-#'                     \code{Cache}, which can evaluate if the checksumFile has changed.
+#' @param checksumFile The filename of the checksums file to read or write to.
+#'                     The default is \file{CHECKSUMS.txt} located at
+#'                     \code{file.path(path, module, "data", checksumFile)}.
+#'                     It is likely not a good idea to change this, and should
+#'                     only be used in cases such as \code{Cache}, which can
+#'                     evaluate if the \code{checksumFile} has changed.
 #'
 #' @inheritParams downloadData
 #'
 #' @param ...     Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
 #'                the digest algorithm can be specified.
 #'
-#' @return A data.frame with columns: result, expectedFile, actualFile, and checksum.
+#' @return A \code{data.frame} with columns: \code{result}, \code{expectedFile},
+#'         \code{actualFile}, and \code{checksum}.
 #'
 #' @include moduleMetadata.R
 #' @importFrom dplyr arrange desc filter group_by left_join mutate rename row_number select
@@ -777,7 +776,6 @@ setMethod(
     defaultWriteHashAlgo <- "xxhash64"
     dots <- list(...)
     path <- checkPath(path, create = FALSE) %>% file.path(., module, "data")
-    #checksumFile <- file.path(path, "CHECKSUMS.txt")
 
     if (!write) {
       stopifnot(file.exists(checksumFile))
