@@ -528,7 +528,9 @@ setMethod(
           }
         }
         # Only do files that were requested, but allow fuzzy matching
-        xFile <- xFile[xFile %in% basename(files)]
+        if (!is.null(files)) {
+          xFile <- xFile[xFile %in% basename(files)]
+        }
         if ((any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) | overwrite) {
           tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
             checkPath(create = TRUE) %>%
