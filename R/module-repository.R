@@ -549,7 +549,8 @@ setMethod(
 
             if (interactive()) {
               readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                       module, "/data/\nPress [enter] to continue"))
+                                       file.path(path, module, "data"),
+                                       "/\nPress [enter] to continue"))
             }
 
             ## re-checksums

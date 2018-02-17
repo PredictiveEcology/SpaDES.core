@@ -24,12 +24,12 @@ it is assumed to be in the current working directory.
 \examples{
 # file's full path is specified (i.e., dirname is known)
 myFile <- file.path("~/data", "file.tif")
-SpaDES.tools::.prefix(myFile, "small_")    ## "/home/username/data/small_file.tif"
-SpaDES.tools::.suffix(myFile, "_cropped") ## "/home/username/data/myFile_cropped.shp"
+.prefix(myFile, "small_")    ## "/home/username/data/small_file.tif"
+.suffix(myFile, "_cropped") ## "/home/username/data/myFile_cropped.shp"
 
 # file's full path is not specified
-SpaDES.tools::.prefix("myFile.shp", "small")    ## "./small_myFile.shp"
-SpaDES.tools::.suffix("myFile.shp", "_cropped") ## "./myFile_cropped.shp"
+.prefix("myFile.shp", "small")    ## "./small_myFile.shp"
+.suffix("myFile.shp", "_cropped") ## "./myFile_cropped.shp"
 
 }
 \author{
