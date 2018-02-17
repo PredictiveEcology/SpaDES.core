@@ -511,7 +511,7 @@ setMethod(
     if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
       setwd(path); on.exit(setwd(cwd), add = TRUE)
 
-      files <- sapply(to.dl, function(x) {
+      files1 <- sapply(to.dl, function(x) {
         xFile <- gsub("[?!]", "_", basename(x))
         destfile <- file.path(dataDir, xFile)
         id <- which(chksums$expectedFile == xFile)
