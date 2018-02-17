@@ -215,8 +215,14 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 
   targetFile <- basename(targetFile)
   targetFilePath <- file.path(destinationPath, targetFile)
-  archive <- basename(archive)
-  archivePath <- file.path(destinationPath, archive)
+
+  if (!is.null(archive)) {
+    archive <- basename(archive)
+    archivePath <- file.path(destinationPath, archive)
+    filesToCheck <- c(targetFilePath, archivePath)
+  } else {
+    filesToCheck <- targetFilePath
+  }
 
   # Here we assume that if destinationPath has not been updated checksums don't need to
   # be rerun. This is useful for WEB apps.
@@ -246,7 +252,8 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     #Cache(
   moduleName <- basename(dirname(dirname(chksumsFilePath)))
   modulePath <- dirname(dirname(dirname(chksumsFilePath)))
-  checkSums <- checksums(files = c(targetFilePath, archivePath),
+  browser(expr=targetFile=="speciesTraits.csv")
+  checkSums <- checksums(files = filesToCheck,
           module = moduleName,
           path = modulePath,
           checksumFile = asPath(chksumsFilePath),
@@ -276,19 +283,23 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 
   if (mismatch) {
     if (is.null(archive)) {
-      downloadFromWebDB(targetFile, targetFilePath, dataset)
-
-      if (quickCheck) {
-        fileSize <- file.size(asPath(targetFilePath))
-
-        if (checksums[["filesize"]] != fileSize)
-          warning("The version downloaded of ", targetFile, " does not match the checksums.")
-
+      if (is.null(dataset)) {
+        browser()
       } else {
-        checkSum <- digest(asPath(targetFilePath), algo = checksums[["algorithm"]], file = TRUE)
+        downloadFromWebDB(targetFile, targetFilePath, dataset)
 
-        if (checksums[["checksum"]] != checkSum)
-          warning("The version downloaded of ", targetFile, " does not match the checksums.")
+        if (quickCheck) {
+          fileSize <- file.size(asPath(targetFilePath))
+
+          if (checksums[["filesize"]] != fileSize)
+            warning("The version downloaded of ", targetFile, " does not match the checksums.")
+
+        } else {
+          checkSum <- digest(asPath(targetFilePath), algo = checksums[["algorithm"]], file = TRUE)
+
+          if (checksums[["checksum"]] != checkSum)
+            warning("The version downloaded of ", targetFile, " does not match the checksums.")
+        }
       }
     } else {
       result <- checkSums[checkSums$expectedFile == targetFile, ]$result
@@ -298,6 +309,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
         if (missing(dataset)) {
           downloadData(moduleName, modulePath, files = archivePath[1], checked = checkSums,
                        quickCheck = quickCheck)
+
         } else {
           downloadFromWebDB(archive, archivePath, dataset)
         }
