@@ -52,7 +52,7 @@ downloadFromWebDB <- function(filename, filepath, dataset = NULL) {
 #' Extract zip or tar archive files, possibly nested in other zip or tar
 #' archives.
 #'
-#' @param archivePath Character string giving the path of the archive
+#' @param archive Character string giving the path of the archive
 #' containing the \code{file} to be extracted.
 #'
 #' @param destinationPath Character string giving the path where \code{needed} will be
@@ -69,22 +69,22 @@ downloadFromWebDB <- function(filename, filepath, dataset = NULL) {
 #' @importFrom tools file_ext
 #' @rdname extractFromArchive
 #'
-extractFromArchive <- function(archivePath, destinationPath = dirname(archivePath),
+extractFromArchive <- function(archive, destinationPath = dirname(archive),
                                needed, extractedArchives = NULL) {
-  args <- list(archivePath[1], exdir = destinationPath[1])
+  args <- list(archive[1], exdir = destinationPath[1])
 
-  funWArgs <- .whichExtractFn(archivePath[1], args)
+  funWArgs <- .whichExtractFn(archive[1], args)
 
-  filesInArchive <- Cache(funWArgs$fun, archivePath[1], list = TRUE)
+  filesInArchive <- Cache(funWArgs$fun, archive[1], list = TRUE)
   if ("Name" %in% names(filesInArchive)) filesInArchive <- filesInArchive$Name # for zips
 
-  if (length(archivePath) > 1) {
-    .unzipOrUnTar(funWArgs$fun, funWArgs$args, files = basename(archivePath[2]))
+  if (length(archive) > 1) {
+    .unzipOrUnTar(funWArgs$fun, funWArgs$args, files = basename(archive[2]))
     # recursion, removing one archive
-    extractFromArchive(archivePath[-1], destinationPath = destinationPath,
+    extractFromArchive(archive[-1], destinationPath = destinationPath,
                        needed = needed, extractedArchives = extractedArchives)
   } else if (any(needed %in% basename(filesInArchive))) {
-    message(paste("  Extracting from archive:", basename(archivePath[1])))
+    message(paste("  Extracting from archive:", basename(archive[1])))
     .unzipOrUnTar(funWArgs$fun, funWArgs$args, files = filesInArchive[basename(filesInArchive) %in% needed])
   } else {
     # don't have a 2nd archive, and don't have our needed file
@@ -101,14 +101,14 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
         extractedArchives,
         unlist(
           lapply(file.path(destinationPath, arch), function(ap)
-            extractFromArchive(archivePath = ap, destinationPath = destinationPath,
+            extractFromArchive(archive = ap, destinationPath = destinationPath,
                                needed = needed, extractedArchives = extractedArchives))
         )
       )
     }
 
   }
-  c(extractedArchives, archivePath)
+  c(extractedArchives, archive)
 }
 
 #' Add a prefix or suffix to the basename part of a file path
@@ -194,6 +194,8 @@ extractFromArchive <- function(archivePath, destinationPath = dirname(archivePat
 #' @param cacheTags Character vector with Tags. These Tags will be added to the
 #' repository along with the artifact.
 #'
+#' @param ... Passed to pkg::fun
+#'
 #' @author Eliot McIntire
 #' @author Jean Marchal
 #' @export
@@ -209,7 +211,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
                        writeCropped = TRUE, addTagsByObject = NULL,
-                       quickCheck = FALSE, cacheTags = "") {
+                       quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...) {
   message("Preparing: ", targetFile)
   # destinationPath <- file.path(modulePath, moduleName, "data")
 
@@ -217,9 +219,8 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
   targetFilePath <- file.path(destinationPath, targetFile)
 
   if (!is.null(archive)) {
-    archive <- basename(archive)
-    archivePath <- file.path(destinationPath, archive)
-    filesToCheck <- c(targetFilePath, archivePath)
+    archive <- file.path(destinationPath, basename(archive))
+    filesToCheck <- c(targetFilePath, archive)
   } else {
     filesToCheck <- targetFilePath
   }
@@ -234,101 +235,48 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
   notOlderThan <- if (length(capturedOutput) == 0) Sys.time()
 
   chksumsFilePath <- file.path(destinationPath, "CHECKSUMS.txt")
-  # if (file.exists(chksumsFilePath)) {
-  #   checkSums <- data.table(
-  #     Cache(
-  #       read.table,
-  #       asPath(chksumsFilePath),
-  #       header = TRUE,
-  #       stringsAsFactors = FALSE,
-  #       digestPathContent = TRUE,
-  #       notOlderThan = notOlderThan,
-  #       userTags = cacheTags,
-  #       quickCheck = quickCheck
-  #     )
-  #   )
-  # }
-  #checkSums <- data.table(
-    #Cache(
   moduleName <- basename(dirname(dirname(chksumsFilePath)))
   modulePath <- dirname(dirname(dirname(chksumsFilePath)))
-  browser(expr=targetFile=="speciesTraits.csv")
   checkSums <- checksums(files = filesToCheck,
           module = moduleName,
           path = modulePath,
           checksumFile = asPath(chksumsFilePath),
           write = FALSE,
-          quickCheck = quickCheck#,
-          # notOlderThan = notOlderThan,
-          # userTags = cacheTags,
-          # quickCheck = quickCheck
-    #)
+          quickCheck = quickCheck
   )
   result <- checkSums[checkSums$expectedFile == targetFile, ]$result
   mismatch <- !isTRUE(result == "OK")
 
-  # Check if the checkSums match, otherwise download or extract the file
-  #checksums <- checkSums[file == targetFile, ]
-
-  # result <- if (file.exists(asPath(targetFilePath))) {
-  #   if (quickCheck) {
-  #     file.size(asPath(targetFilePath))
-  #   } else {
-  #     Cache(digest, asPath(targetFilePath), checksums[["algorithm"]], file = TRUE,
-  #           notOlderThan = notOlderThan) == checksums[["checksum"]]
-  #   }
-  # } else NA
-#
-#   mismatch <- !isTRUE(result)
-
   if (mismatch) {
-    if (is.null(archive)) {
+    fileToDownload <- if (is.null(archive)) {
       if (is.null(dataset)) {
-        browser()
+        targetFile
       } else {
-        downloadFromWebDB(targetFile, targetFilePath, dataset)
-
-        if (quickCheck) {
-          fileSize <- file.size(asPath(targetFilePath))
-
-          if (checksums[["filesize"]] != fileSize)
-            warning("The version downloaded of ", targetFile, " does not match the checksums.")
-
-        } else {
-          checkSum <- digest(asPath(targetFilePath), algo = checksums[["algorithm"]], file = TRUE)
-
-          if (checksums[["checksum"]] != checkSum)
-            warning("The version downloaded of ", targetFile, " does not match the checksums.")
-        }
+        downloadFromWebDB(basename(archive), dirname(archive))
+        NULL
       }
-    } else {
-      result <- checkSums[checkSums$expectedFile == targetFile, ]$result
-      mismatch <- !isTRUE(result == "OK")
+    } else if (is.null(dataset)) {
+      archive[1]
+    }
 
-      if (mismatch) {
-        if (missing(dataset)) {
-          downloadData(moduleName, modulePath, files = archivePath[1], checked = checkSums,
-                       quickCheck = quickCheck)
+    # The download step
+    if (!is.null(fileToDownload))
+      downloadData(moduleName, modulePath, files = fileToDownload,
+                 checked = checkSums, quickCheck = quickCheck)
 
-        } else {
-          downloadFromWebDB(archive, archivePath, dataset)
-        }
-      }
-
-      extractFromArchive(archivePath = archivePath, destinationPath = destinationPath,
-                         needed = c(targetFile, alsoExtract))
+    if (!is.null(archive)) {
+      extractFromArchive(archive = archive, destinationPath = destinationPath,
+                       needed = c(targetFile, alsoExtract))
     }
   }
 
   f <- getFromNamespace(fun, pkg)
 
   if (fun == "raster" && pkg == "raster") {
-    x <- f(targetFilePath)
+    x <- f(targetFilePath, ...)
   } else {
-    x <- Cache(f, targetFilePath, userTags = cacheTags)
+    x <- Cache(f, targetFilePath, userTags = cacheTags, ...)
   }
-
-  # objClass <- is(x)
 
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
@@ -538,10 +486,10 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 maskInputs <- function(x, studyArea) {
   message("  Masking")
 
-  if (is(x, "RasterStack"))
+#  if (is(x, "RasterStack"))
     fastMask(x = x, polygon = studyArea)
-  else
-    raster::mask(x = x, mask = studyArea)
+#  else
+#    raster::mask(x = x, mask = studyArea)
 }
 
 #' Write module inputs on disk
@@ -583,8 +531,8 @@ writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
 }
 
 #' @importFrom utils untar unzip
-.whichExtractFn <- function(archivePath, args) {
-  ext <- tolower(file_ext(archivePath))
+.whichExtractFn <- function(archive, args) {
+  ext <- tolower(file_ext(archive))
   if (ext == "zip") {
     fun <- unzip
     args <- c(args, list(junkpaths = TRUE))

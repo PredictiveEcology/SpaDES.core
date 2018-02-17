@@ -8,7 +8,7 @@ prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
   destinationPath = NULL, fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
-  quickCheck = FALSE, cacheTags = "")
+  quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
@@ -57,6 +57,10 @@ the default, uses \code{\link[digest]{digest}}}
 
 \item{cacheTags}{Character vector with Tags. These Tags will be added to the
 repository along with the artifact.}
+
+\item{notOlderThan}{load an artifact from the database only if it was created after notOlderThan.}
+
+\item{...}{Passed to pkg::fun}
 }
 \description{
 This function can be used to prepare module inputs from raw data. It
