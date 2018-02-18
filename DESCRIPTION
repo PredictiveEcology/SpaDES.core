@@ -67,7 +67,8 @@ Suggests:
     rmarkdown,
     testthat (>= 1.0.2)
 Remotes: 
-    PredictiveEcology/webDatabases
+    PredictiveEcology/webDatabases,
+    PredictiveEcology/quickPlot
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
