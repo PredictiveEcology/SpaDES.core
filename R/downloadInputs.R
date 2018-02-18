@@ -5,7 +5,7 @@ if (getRversion() >= "3.1.0") {
 #' Download file from web databases
 #'
 #' This function can be used to download a file from a web database listed in
-#'\link[webDatabases]{urls}.
+#'\link[webDatabases]{webDatabases}.
 #'
 #' @param filename Character string naming the file to be downloaded.
 #'
@@ -16,13 +16,15 @@ if (getRversion() >= "3.1.0") {
 #' for download. Allows for restricting the lookup for the url to a dataset,
 #' thus avoiding filename collision.
 #'
+#' @inheritParams prepInputs
+#'
 #' @author Jean Marchal
 #' @importFrom httr authenticate GET progress write_disk
-#' @importFrom webDatabases urls
+#' @importFrom webDatabases webDatabases
 #' @rdname downloadFromWebDB
 #'
-downloadFromWebDB <- function(filename, filepath, dataset = NULL) {
-  urls <- webDatabases::urls
+downloadFromWebDB <- function(filename, filepath, dataset = NULL, quickCheck = FALSE) {
+  urls <- webDatabases(local = quickCheck)
 
   if (!is.null(set <- dataset))
     urls <- urls[grepl(dataset, pattern = set, fixed = TRUE)]
@@ -153,7 +155,8 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' This function can be used to prepare module inputs from raw data. It
 #' runs several other functions, conditionally and sequentially:
 #' \code{downloadFromWebDB} or \code{downloadData},
-#' \code{extractFromArchive}.
+#' \code{extractFromArchive}.  NOTE: This function is still experimental: use
+#' with caution.
 #'
 #' @param targetFile Character string giving the path to the eventual
 #'                   file (raster, shapefile, csv, etc.) that will be
@@ -252,7 +255,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
       if (is.null(dataset)) {
         targetFile
       } else {
-        downloadFromWebDB(basename(archive), dirname(archive))
+        downloadFromWebDB(basename(archive), dirname(archive), quickCheck = quickCheck)
         NULL
       }
     } else if (is.null(dataset)) {

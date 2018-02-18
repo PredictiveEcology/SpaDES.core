@@ -4,7 +4,7 @@
 \alias{downloadFromWebDB}
 \title{Download file from web databases}
 \usage{
-downloadFromWebDB(filename, filepath, dataset = NULL)
+downloadFromWebDB(filename, filepath, dataset = NULL, quickCheck = FALSE)
 }
 \arguments{
 \item{filename}{Character string naming the file to be downloaded.}
@@ -15,10 +15,14 @@ written.}
 \item{dataset}{Optional character string representing the dataset of interest
 for download. Allows for restricting the lookup for the url to a dataset,
 thus avoiding filename collision.}
+
+\item{quickCheck}{Logical. If \code{TRUE}, then all Caching that occurs will
+be based on the much faster but less robust file.info. \code{FALSE},
+the default, uses \code{\link[digest]{digest}}}
 }
 \description{
 This function can be used to download a file from a web database listed in
-\link[webDatabases]{urls}.
+\link[webDatabases]{webDatabases}.
 }
 \author{
 Jean Marchal

@@ -66,7 +66,8 @@ repository along with the artifact.}
 This function can be used to prepare module inputs from raw data. It
 runs several other functions, conditionally and sequentially:
 \code{downloadFromWebDB} or \code{downloadData},
-\code{extractFromArchive}.
+\code{extractFromArchive}.  NOTE: This function is still experimental: use
+with caution.
 }
 \author{
 Eliot McIntire
