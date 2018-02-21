@@ -19,7 +19,7 @@ if (getRversion() >= "3.1.0") {
 #' @inheritParams prepInputs
 #'
 #' @author Jean Marchal
-#' @importFrom httr authenticate GET progress write_disk
+#' @importFrom httr authenticate GET http_error progress write_disk
 #' @importFrom webDatabases webDatabases
 #' @rdname downloadFromWebDB
 #'
