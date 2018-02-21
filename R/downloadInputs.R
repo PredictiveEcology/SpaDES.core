@@ -251,15 +251,20 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
   mismatch <- !isTRUE(result == "OK")
 
   if (mismatch) {
-    fileToDownload <- if (is.null(archive)) {
+    fileToDownload <- if (is.null(archive[1])) {
       if (is.null(dataset)) {
         targetFile
       } else {
-        downloadFromWebDB(basename(archive), dirname(archive), quickCheck = quickCheck)
+        downloadFromWebDB(targetFile, destinationPath, quickCheck = quickCheck)
         NULL
       }
-    } else if (is.null(dataset)) {
-      archive[1]
+    } else {
+      if (is.null(dataset)) {
+        archive[1]
+      } else {
+        downloadFromWebDB(archive, destinationPath, quickCheck = quickCheck)
+        NULL
+      }
     }
 
     # The download step
