@@ -6,24 +6,24 @@ if (getRversion() >= "3.1.0") {
 # These are known functions that will definitely cause conflicts unless they are
 # prefixed by their packages.
 conflictingFns <- c("\\<raster::levels\\>", "\\<raster::scale\\>")
+clashingFns <- c("\\<quickPlot::Plot\\>")
+mustBeReturnSim <- c("doEvent\\..*") # module functions that must end with return(sim) or the like
+mustAssignToSim <- c("scheduleEvent", "saveFiles") # module functions that must assign to sim <-
+ignoreObjectsGet <- c(".userSuppliedObjNames") # objects that shouldn't return an error if "used"
+ignoreObjectsAssign <- c("") # objects that shouldn't return an error if "assigned"
+
 conflictingFnsClean <- gsub(pattern = "\\\\<", conflictingFns, replacement = "")
 conflictingFnsClean <- gsub(pattern = "\\\\>", conflictingFnsClean, replacement = "")
-
 conflictingFnsSimple <- gsub(conflictingFns, pattern = "^.*::", replacement = "\\\\<")
 conflictingFnsSimple <- gsub(pattern = "\\\\<", conflictingFnsSimple, replacement = "")
 conflictingFnsSimple <- gsub(pattern = "\\\\>", conflictingFnsSimple, replacement = "")
 
-clashingFns <- c("\\<quickPlot::Plot\\>")
 clashingFnsClean <- gsub(pattern = "\\\\<", clashingFns, replacement = "")
 clashingFnsClean <- gsub(pattern = "\\\\>", clashingFnsClean, replacement = "")
-
 clashingFnsSimple <- gsub(clashingFns, pattern = "^.*::", replacement = "\\\\<")
 clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = "")
 clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")
 
-# module functions that must end with return(sim) or the like
-mustBeReturnSim <- c("doEvent\\..*")
-mustAssignToSim <- c("scheduleEvent", "saveFiles")
 
 allCleanMessage <- "module code appears clean"
 #' Find all references to sim$
@@ -237,10 +237,12 @@ allCleanMessage <- "module code appears clean"
   outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
   simAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
+  simAssigns <- simAssigns[!(simAssigns %in% ignoreObjectsAssign)]
   simAssignsInDotInputObjects <- simAssigns[names(simAssigns)==".inputObjects"]
   simAssignsNotInDotInputObjects <- simAssigns[names(simAssigns)!=".inputObjects"]
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
   simGets <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "get")
+  simGets <- simGets[!(simGets %in% ignoreObjectsGet)]
   simGetsInDotInputObjects <- simGets[names(simGets)==".inputObjects"]
   simGetsNotInDotInputObjects <- simGets[names(simGets)!=".inputObjects"]
 
@@ -292,7 +294,7 @@ allCleanMessage <- "module code appears clean"
   # 2
   if (length(inputObjNames)) {
     # inputObjects -- Assign in .inputObjects
-    missingFrmMod <- inputObjNames[!(inputObjNames %in% simAssignsInDotInputObjects)]
+      missingFrmMod <- inputObjNames[!(inputObjNames %in% simAssignsInDotInputObjects)]
     missingFrmMod <- unique(missingFrmMod)
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
@@ -355,7 +357,9 @@ allCleanMessage <- "module code appears clean"
                                              " used that conflict(s)",
                                              "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
                                              "\n  It is a good idea to be explicit about the package sources",
-                                             ", e.g., ", paste(whichFnsWithPackage, collapse = ", ")))
+                                             ", e.g., ", paste(whichFnsWithPackage, collapse = ", "),
+                                             " but only for the 'get' functions, not the 'set' function ","
+                                             (e.g., don't change when on the left hand side of an assignement operator)"))
   }
 
   if (length(simAssigns)) {
