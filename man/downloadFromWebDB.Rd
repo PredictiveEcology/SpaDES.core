@@ -18,7 +18,7 @@ thus avoiding filename collision.}
 }
 \description{
 This function can be used to download a file from a web database listed in
-\link[webDatabases]{urls}.
+\code{webDatabases:::urls}.
 }
 \author{
 Jean Marchal

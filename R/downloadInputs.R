@@ -5,7 +5,7 @@ if (getRversion() >= "3.1.0") {
 #' Download file from web databases
 #'
 #' This function can be used to download a file from a web database listed in
-#'\link[webDatabases]{urls}.
+#' \code{webDatabases:::urls}.
 #'
 #' @param filename Character string naming the file to be downloaded.
 #'
@@ -18,11 +18,11 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @author Jean Marchal
 #' @importFrom httr authenticate GET progress write_disk
-#' @importFrom webDatabases urls
+#' @importFrom utils getFromNamespace
 #' @rdname downloadFromWebDB
 #'
 downloadFromWebDB <- function(filename, filepath, dataset = NULL) {
-  urls <- webDatabases::urls
+  urls <- getFromNamespace("webDatabases", "urls")
 
   if (!is.null(set <- dataset))
     urls <- urls[grepl(dataset, pattern = set, fixed = TRUE)]
