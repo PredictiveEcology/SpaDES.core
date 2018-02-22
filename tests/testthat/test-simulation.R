@@ -548,6 +548,7 @@ test_that("conflicting function types", {
       fff <- sim$ei1
       fff <- sim$co3
       sim$co1 <- 123
+      aaa <- sim$.userSuppliedObjNames # in the ignoreObjects
       ",
       xxx[(lineWithDotInputObjects+1):length(xxx)],
       sep = "\n", fill = FALSE, file = fileName)

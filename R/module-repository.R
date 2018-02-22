@@ -498,12 +498,20 @@ setMethod(
 
     if (!is.null(files)) {
       chksums <- chksums[chksums$expectedFile %in% basename(files),]
+      fileMatching <- agrepl(basename(files), basename(to.dl))
+      if (!any(fileMatching)) {
+        stop("Could not match the SourceURLs for ",to.dl[fileMatching],
+             " to particular files in the CHECKSUMS.txt.",
+             "\nPerhaps add an entry in inputObjects whose downloaded filename is closer",
+             " to the online dataset name")
+      }
+      to.dl <- to.dl[fileMatching]
     }
 
     if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
       setwd(path); on.exit(setwd(cwd), add = TRUE)
 
-      files <- sapply(to.dl, function(x) {
+      files1 <- sapply(to.dl, function(x) {
         xFile <- gsub("[?!]", "_", basename(x))
         destfile <- file.path(dataDir, xFile)
         id <- which(chksums$expectedFile == xFile)
@@ -541,7 +549,8 @@ setMethod(
 
             if (interactive()) {
               readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                       module, "/data/\nPress [enter] to continue"))
+                                       file.path(path, module, "data"),
+                                       "/\nPress [enter] to continue"))
             }
 
             ## re-checksums
