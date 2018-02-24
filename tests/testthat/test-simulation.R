@@ -775,3 +775,46 @@ test_that("messaging with multiple modules", {
 
 })
 
+
+test_that("Module code checking -- bizarre pipe with matrix product with backtick", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m <- "child4"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  xxx <- readLines(fileName)
+  lineWithInit <- grep(xxx, pattern = "^Init")
+  xxx1 <- xxx
+  cat(xxx[1:lineWithInit], "
+    sim$bvcx <- matrix(1:2) %>% `%*%` (2:3)
+    sim$b <- matrix(1:2) %>% t()
+
+    sim$a <- 1
+    ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  simInit(paths = list(modulePath = tmpdir), modules = m)
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- cleanMessage(mm)
+
+  fullMessage1 <- c("Running inputObjects for child4",
+                   "child4: module code: Init could not be code checked, perhaps because of complex backticks",
+                   "child4: module code: doEventchild4, Init must return the sim, eg, return")
+  fullMessage2 <- c("Running inputObjects for child4",
+                   # if (interactive()) "child4: module code: Init could not be code checked, perhaps because of complex backticks",
+                   "child4: outputObjects: bvcx, b, a are assigned to sim inside Init, but are not declared in outputObjects"
+  )
+  test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
+  test2 <- all(unlist(lapply(fullMessage2, function(x) any(grepl(mm, pattern = x)))))
+  expect_true(test1 || test2)
+
+})

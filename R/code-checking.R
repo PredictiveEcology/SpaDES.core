@@ -59,19 +59,27 @@ allCleanMessage <- "module code appears clean"
                                type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
-      xAsString <- deparse(moduleEnv[[x]])
-      xAsCall <- as.call(parse(text = xAsString))
-      if (identical(type, "returnSim")) {
-        if (grepl(x, pattern = mustBeReturnSim)) {
-          # only pull out last line
-          # must end with sim or return(sim) or return(invisible(sim))
-          xAsString <- xAsString[length(xAsString)-1]
-          xAsCall <- as.call(parse(text = xAsString))
-        } else {
-          xAsCall <- ""
+      #browser(expr = "Init" %in% x)
+      xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
+      parsedXAsString <- tryCatch(parse(text = xAsString), error = function(yy) NULL)
+      if (is.null(parsedXAsString)>0) {
+        y = "could not be code checked, perhaps because of complex backticks"
+      } else {
+        #browser(expr="Init" %in% x)
+        xAsCall <- as.call(parsedXAsString)
+
+        if (identical(type, "returnSim")) {
+          if (grepl(x, pattern = mustBeReturnSim)) {
+            # only pull out last line
+            # must end with sim or return(sim) or return(invisible(sim))
+            xAsString <- xAsString[length(xAsString)-1]
+            xAsCall <- as.call(parse(text = xAsString))
+          } else {
+            xAsCall <- ""
+          }
         }
+        y <- .findElement(xAsCall, type = type)
       }
-      y <- .findElement(xAsCall, type = type)
       if (length(y)) {
         y <- na.omit(y)
         if (all(is.na(y))) y <- character()
@@ -94,6 +102,7 @@ allCleanMessage <- "module code appears clean"
       }
       y
     }
+
   })))
   if (is.null(out)) out <- character()
   return(out)
@@ -238,19 +247,56 @@ allCleanMessage <- "module code appears clean"
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
   simAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
   simAssigns <- simAssigns[!(simAssigns %in% ignoreObjectsAssign)]
-  simAssignsInDotInputObjects <- simAssigns[names(simAssigns)==".inputObjects"]
-  simAssignsNotInDotInputObjects <- simAssigns[names(simAssigns)!=".inputObjects"]
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
   simGets <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "get")
   simGets <- simGets[!(simGets %in% ignoreObjectsGet)]
+
+  returnsSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "returnSim")
+  returnsSim <- tapply(returnsSim, names(returnsSim), function(xx) any(xx == "sim"))
+
+  assignToSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assignToSim")
+
+  fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
+  hasConflicts <- fg[fg %in% conflictingFnsSimple]
+
+  # Can't code check:
+  allChecks <- list(simAssigns = simAssigns, simGets = simGets, returnsSim = returnsSim, assignToSim = assignToSim, fg = fg)
+  cantCodeCheck <- lapply(allChecks, function(xx) grepl("could not be code checked", xx))
+  anyCantCodeCheck <- unlist(lapply(cantCodeCheck, any))
+  if (any(anyCantCodeCheck)) {
+    cant <- lapply(names(cantCodeCheck[anyCantCodeCheck]), function(objName) {
+      localObj <- allChecks[[objName]]
+      localObj[cantCodeCheck[[objName]]]
+    })
+    dfCant <- data.frame(names = names(unlist(cant)), cant = unlist(cant), stringsAsFactors = FALSE)
+    dfCant <- unique(dfCant)
+    cant <- dfCant$cant
+    names(cant) <- dfCant$names
+
+    if (length(cant)) {
+      verb <- .verb(cant)
+      hadPrevMessage <- .parseMessage(m, "module code",
+                                      paste0(paste(names(cant), collapse = ", "),
+                                             " ", cant
+                                      ))
+
+    }
+
+    allChecks[anyCantCodeCheck] <- lapply(names(cantCodeCheck[anyCantCodeCheck]), function(objName) {
+      localObj <- allChecks[[objName]]
+      localObj[!cantCodeCheck[[objName]]]
+    })
+    list2env(allChecks, envir = environment())
+  }
+
+  simAssignsInDotInputObjects <- simAssigns[names(simAssigns)==".inputObjects"]
+  simAssignsNotInDotInputObjects <- simAssigns[names(simAssigns)!=".inputObjects"]
   simGetsInDotInputObjects <- simGets[names(simGets)==".inputObjects"]
   simGetsNotInDotInputObjects <- simGets[names(simGets)!=".inputObjects"]
 
   #############################################################
   ###### Key fns return sim ###################################
   #############################################################
-  returnsSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "returnSim")
-  returnsSim <- tapply(returnsSim, names(returnsSim), function(xx) any(xx == "sim"))
   if (!all(returnsSim)) {
     verb <- .verb(returnsSim)
     hadPrevMessage <- .parseMessage(m, "module code",
@@ -263,7 +309,6 @@ allCleanMessage <- "module code appears clean"
   #############################################################
   ###### Key fns outputs get assigned to sim ##################
   #############################################################
-  assignToSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assignToSim")
   if (length(assignToSim)) {
     verb <- .verb(assignToSim)
     hadPrevMessage <- .parseMessage(m, "module code",
@@ -345,8 +390,6 @@ allCleanMessage <- "module code appears clean"
   #######  Conflicting Functions ##############################
   #############################################################
   # search for conflicts in function names with common problems like raster::levels
-  fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
-  hasConflicts <- fg[fg %in% conflictingFnsSimple]
   if (length(hasConflicts)) {
     theFns <- names(hasConflicts)
     names(theFns) <- theFns
