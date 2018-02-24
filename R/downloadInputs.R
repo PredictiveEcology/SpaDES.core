@@ -19,7 +19,7 @@ if (getRversion() >= "3.1.0") {
 #' @inheritParams prepInputs
 #'
 #' @author Jean Marchal
-#' @importFrom httr authenticate GET progress write_disk
+#' @importFrom httr authenticate GET http_error progress write_disk
 #' @importFrom webDatabases webDatabases
 #' @rdname downloadFromWebDB
 #'
@@ -29,23 +29,25 @@ downloadFromWebDB <- function(filename, filepath, dataset = NULL, quickCheck = F
   if (!is.null(set <- dataset))
     urls <- urls[grepl(dataset, pattern = set, fixed = TRUE)]
 
-  for (i in 1:nrow(urls)) {
-    if (any(filename == urls$files[[i]])) {
-      authenticate <- if (!is.na(urls$password[[i]])) {
-          split <- strsplit(urls$password[[i]], split = "[:]")[[1]]
-          httr::authenticate(split[1L], split[2L])
-      }
-
-      message("  Downloading ", filename)
-
-      httr::GET(
-        url = paste0(urls$url[[i]], filename),
-        authenticate,
-        httr::progress(),
-        httr::write_disk(filepath, overwrite = TRUE)
-      )
-      break
+  if (any(wh <- filename == urls$files)) {
+    authenticate <- if (!is.na(urls$password[wh])) {
+      split <- strsplit(urls$password[wh], split = "[:]")[[1]]
+      httr::authenticate(split[1L], split[2L])
     }
+
+    url <- urls$url[wh]
+
+    if (httr::http_error(url))
+      stop ("Can not access url", url)
+
+    message("  Downloading ", filename)
+
+    httr::GET(
+      url = paste0(url, filename),
+      authenticate,
+      httr::progress(),
+      httr::write_disk(filepath, overwrite = TRUE)
+    )
   }
 }
 
@@ -251,15 +253,25 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
   mismatch <- !isTRUE(result == "OK")
 
   if (mismatch) {
-    fileToDownload <- if (is.null(archive)) {
+    fileToDownload <- if (is.null(archive[1])) {
       if (is.null(dataset)) {
         targetFile
       } else {
-        downloadFromWebDB(basename(archive), dirname(archive), quickCheck = quickCheck)
+        downloadFromWebDB(targetFile, file.path(destinationPath, targetFile), quickCheck = quickCheck)
         NULL
       }
-    } else if (is.null(dataset)) {
-      archive[1]
+    } else {
+      result <- checkSums[checkSums$expectedFile == basename(archive), ]$result
+      mismatch <- !isTRUE(result == "OK")
+
+      if (mismatch) {
+        if (is.null(dataset)) {
+          archive[1]
+        } else {
+          downloadFromWebDB(basename(archive), archive, quickCheck = quickCheck)
+          NULL
+        }
+      }
     }
 
     # The download step
