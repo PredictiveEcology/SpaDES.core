@@ -42,6 +42,7 @@ Imports:
     igraph (>= 1.0.1),
     lubridate (>= 1.3.3),
     methods,
+    pryr,
     parallel,
     R.utils (>= 2.5.0),
     raster (>= 2.5-8),

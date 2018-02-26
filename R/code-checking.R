@@ -54,6 +54,7 @@ allCleanMessage <- "module code appears clean"
 #'
 #' @author Eliot McIntire
 #' @keywords internal
+#' @importFrom pryr fun_body
 #' @rdname findElements
 .findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(),
                                type) {
@@ -61,14 +62,14 @@ allCleanMessage <- "module code appears clean"
     if (is.function(moduleEnv[[x]])) {
       #browser(expr = "Init" %in% x)
       xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
-      parsedXAsString <- tryCatch(parse(text = xAsString), error = function(yy) NULL)
-      if (is.null(parsedXAsString)>0) {
+        parsedXAsString <- tryCatch(parse(text = xAsString), error = function(yy) NULL)
+        if (is.null(parsedXAsString)>0) {
         y = "could not be code checked, perhaps because of complex backticks"
-      } else {
-        #browser(expr="Init" %in% x)
-        xAsCall <- as.call(parsedXAsString)
+        } else {
+          #browser(expr="Init" %in% x)
+          xAsCall <- as.call(parsedXAsString)
 
-        if (identical(type, "returnSim")) {
+          if (identical(type, "returnSim")) {
           if (grepl(x, pattern = mustBeReturnSim)) {
             # only pull out last line
             # must end with sim or return(sim) or return(invisible(sim))
@@ -77,9 +78,9 @@ allCleanMessage <- "module code appears clean"
           } else {
             xAsCall <- ""
           }
+          }
+          y <- .findElement(xAsCall, type = type)
         }
-        y <- .findElement(xAsCall, type = type)
-      }
       if (length(y)) {
         y <- na.omit(y)
         if (all(is.na(y))) y <- character()
