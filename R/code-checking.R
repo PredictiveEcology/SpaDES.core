@@ -60,27 +60,50 @@ allCleanMessage <- "module code appears clean"
                                type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
-      #browser(expr = "Init" %in% x)
+
+      #xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
       xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
+
+      if (identical(type, "returnSim")) {
+        xAsCall <- .isLastLineSim(x = x, xAsString = xAsString)
+        y <- .findElement(xAsCall, type = type)
+      } else {
+
         parsedXAsString <- tryCatch(parse(text = xAsString), error = function(yy) NULL)
+
+        # In some cases, e.g., Jean Marchal's
         if (is.null(parsedXAsString)>0) {
-        y = "could not be code checked, perhaps because of complex backticks"
+
+          aa <- fun_body(moduleEnv[[x]])
+          bb <- aa[-c(1, length(aa))]
+          funStarts <- grep("^    [[:alpha:]]", bb)
+          bb[funStarts] <- gsub("^    ", "", bb[funStarts])
+          funEnds <- funStarts - 1
+
+          y <- lapply(seq(funStarts)[-length(funStarts)], function(yy) {
+            parsedXAsString <- tryCatch(parse(text = bb[seq(funStarts[yy], funEnds[yy + 1])]), error = function(yy) NULL)
+            if (!is.null(parsedXAsString)) {
+              xAsCall <- as.call(parsedXAsString)
+              if (identical(type, "returnSim")) {
+                browser()
+                xAsCall <- .isLastLineSim(x = x, xAsString = bb[seq(funStarts[yy], funEnds[yy + 1])])
+              }
+              y <- .findElement(xAsCall, type = type)
+            } else {
+              #y = strsplit(bb[funStarts[yy]], split = "\\s+")[[1]][1]
+              y <- paste0("could not be code checked for call starting with '",bb[funStarts[yy]], "'")
+            }
+          })
         } else {
           #browser(expr="Init" %in% x)
           xAsCall <- as.call(parsedXAsString)
 
           if (identical(type, "returnSim")) {
-          if (grepl(x, pattern = mustBeReturnSim)) {
-            # only pull out last line
-            # must end with sim or return(sim) or return(invisible(sim))
-            xAsString <- xAsString[length(xAsString)-1]
-            xAsCall <- as.call(parse(text = xAsString))
-          } else {
-            xAsCall <- ""
-          }
+            xAsCall <- .isLastLineSim(x = x, xAsString = xAsString)
           }
           y <- .findElement(xAsCall, type = type)
         }
+      }
       if (length(y)) {
         y <- na.omit(y)
         if (all(is.na(y))) y <- character()
@@ -276,10 +299,13 @@ allCleanMessage <- "module code appears clean"
 
     if (length(cant)) {
       verb <- .verb(cant)
-      hadPrevMessage <- .parseMessage(m, "module code",
-                                      paste0(paste(names(cant), collapse = ", "),
-                                             " ", cant
-                                      ))
+      hadPrevMessage <- lapply(seq(cant), function(cantNamesIndex) {
+        cantUnique <- cant[names(cant) == cant[cantNamesIndex]]
+        .parseMessage(m, "module code",
+                      paste(paste0(names(cant)[cantNamesIndex], " ", cant[cantNamesIndex]), collapse = "\n")
+                      )
+      })
+
 
     }
 
@@ -580,4 +606,16 @@ allCleanMessage <- "module code appears clean"
     }
   }
   return(out)
+}
+
+.isLastLineSim <- function(x, xAsString) {
+  if (grepl(x, pattern = mustBeReturnSim)) {
+    # only pull out last line
+    # must end with sim or return(sim) or return(invisible(sim))
+    xAsString <- xAsString[length(xAsString)-1]
+    xAsCall <- as.call(parse(text = xAsString))
+  } else {
+    xAsCall <- ""
+  }
+
 }

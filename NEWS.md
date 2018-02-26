@@ -6,13 +6,14 @@ version 0.1.1.9000
 * add package dependency `webDatabases`, `pryr`
 * new function `prepInputs` to handle download, extract, crop/mask/reproject etc.
 * fix bug where `start` and `end` were not properly exported
-* use `codetools` to check for various code problems including:
+* introduction of code checking for modules, currently turned on or off by an option `spades.moduleCodeChecks`, which is `TRUE` by default. Code checking includes various types:
     
-    - conflicts with known common functions (`raster::level`, `raster::scale`, `quickPlot::Plot`)
+    - use `codetools` to check for various code problems including:
+    - detects conflicts with known common functions (`raster::level`, `raster::scale`, `quickPlot::Plot`)
     - use `checkCodeEnv` on every function inside a module
+    - checking for `sim$xxx` occurrences in modules, comparing to `outputObjects` in metadata if used in assignment (i.e., left hand side of assign operator), or comparing to `inputObjects` if used on the right hand side
+    - check that all objects declared in `inputObjects` have default values assigned in the `.inputObjects` function
     
-* checking for `sim$xxx` occurrences in modules, comparing to outputs in metadata
-* new option `spades.moduleCodeChecks`, which is `TRUE` by default. This turns on or off the new code checking.
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
 * `newModule` template modified slightly based on workshop feedback
 * `setPaths` now only sets the directories that are passed into it

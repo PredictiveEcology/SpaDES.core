@@ -763,20 +763,10 @@ test_that("messaging with multiple modules", {
                                 function(x) any(grepl(mm1, pattern = x))))))
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
   mm <- cleanMessage(mm)
-  # for (x in seq(fullMessage)) {
-  #   lineNum <- "757"
-  #   theGrepEach <- grepl(mm, pattern = fullMessage[x])
-  #   theGrep <- any(theGrepEach)
-  #   if (!theGrep) {
-  #     cat(paste("\nline ", lineNum, theGrep, fullMessage[x], "\n              ", paste(mm, collapse = "\n               "), collapse = ""), file = tempfile(), append = TRUE)
-  #   }
-  #   expect_true(theGrep)
-  # }
-
 })
 
 
-test_that("Module code checking -- bizarre pipe with matrix product with backtick", {
+test_that("Module code checking -- pipe with matrix product with backtick & data.table", {
   library(igraph)
   tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
   cwd <- getwd()
@@ -795,26 +785,53 @@ test_that("Module code checking -- bizarre pipe with matrix product with backtic
   lineWithInit <- grep(xxx, pattern = "^Init")
   xxx1 <- xxx
   cat(xxx[1:lineWithInit], "
+    checksums1 <- structure(list(result = c('OK', 'OK'),
+                                           expectedFile = c('Land_Cover_2010_TIFF.zip','NA_LandCover_2010_25haMMU.tif'),
+                                           actualFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif'),
+                                           checksum.x = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+                                           checksum.y = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+                                           algorithm.x = c('xxhash64', 'xxhash64'),
+                                           algorithm.y = c('xxhash64', 'xxhash64'),
+                                           renamed = c(NA, NA),
+                                           module = c('simplifyLCCVeg',  'simplifyLCCVeg')),
+                                      .Names = c('result', 'expectedFile', 'actualFile',
+                                                 'checksum.x', 'checksum.y', 'algorithm.x', 'algorithm.y', 'renamed',
+                                                 'module'),
+                                      row.names = c(NA, -2L),
+                                      class = c('grouped_df', 'tbl_df', 'tbl', 'data.frame'),
+                                      vars = 'expectedFile',
+                                      indices = list(0L, 1L),
+                                      group_sizes = c(1L, 1L),
+                                      biggest_group_size = 1L,
+                                      labels = structure(list(expectedFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif')),
+                                                         .Names = 'expectedFile',
+                                                         row.names = c(NA, -2L),
+                                                         class = 'data.frame', vars = 'expectedFile'))
+
+    result1 <- checksums1[checksums1$expectedFile == 'NA_LandCover_2010_25haMMU.tif',]$result
+
     sim$bvcx <- matrix(1:2) %>% `%*%` (2:3)
+    sim$bvcx2 <- matrix(1:2) %>% \"%*%\" (2:3)
     sim$b <- matrix(1:2) %>% t()
 
     sim$a <- 1
     ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  simInit(paths = list(modulePath = tmpdir), modules = m)
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   mm <- cleanMessage(mm)
 
   fullMessage1 <- c("Running inputObjects for child4",
-                   "child4: module code: Init could not be code checked, perhaps because of complex backticks",
-                   "child4: module code: doEventchild4, Init must return the sim, eg, return")
-  fullMessage2 <- c("Running inputObjects for child4",
-                   # if (interactive()) "child4: module code: Init could not be code checked, perhaps because of complex backticks",
-                   "child4: outputObjects: bvcx, b, a are assigned to sim inside Init, but are not declared in outputObjects"
+                   "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
+                   "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
+  fullMessageNonInteractive <- c("Running inputObjects for child4",
+                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx <- matrix",
+                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx2 <- matrix",
+                    "child4: module code: Init: local variable.*result1.*assigned but may not be used",
+                    "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
   )
   test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
-  test2 <- all(unlist(lapply(fullMessage2, function(x) any(grepl(mm, pattern = x)))))
+  test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
   expect_true(test1 || test2)
 
 })
