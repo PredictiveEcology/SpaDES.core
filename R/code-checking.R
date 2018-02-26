@@ -544,16 +544,28 @@ allCleanMessage <- "module code appears clean"
 #' @inheritParams .findElements
 #' @rdname findElements
 .parsingSim <- function(x, type) {
-  if (as.character(x)[1] %in% c("$") &&
-      grepl(deparse(x[[2]]), "sim|sim@.envir") && is.name(x[[3]])) {
-    out <- as.character(x[[3]])
-  } else if (as.character(x)[1] %in% "[[" &&
-             grepl(deparse(x[[2]]), "sim|sim@.envir") && is.character(x[[3]])) {
-    out <- x[[3]]
-  } else if (as.character(x)[1] %in% "[[" &&
-             grepl(deparse(x[[2]]), "sim|sim@.envir") && is.call(x[[3]])) {
-    out <- deparse(x[[3]])
-  } else {
+  if (length(x) > 1) {
+    if (!is.pairlist(x[[2]])) {
+      grepForSim <- grepl("^sim|^sim@.envir", deparse(x[[2]], backtick = TRUE))
+      if (as.character(x)[1] %in% c("$", "[[") &&
+          grepForSim &&
+          is.name(x[[3]])) {
+        out <- as.character(x[[3]])
+      } else if (as.character(x)[1] %in% "[[" &&
+                 grepForSim &&
+                   is.character(x[[3]])) {
+        out <- x[[3]]
+      } else if (as.character(x)[1] %in% "[[" &&
+                 grepForSim &&
+                 is.call(x[[3]])) {
+        out <- deparse(x[[3]])
+      }
+    } else {
+      out <- character()
+    }
+  }
+
+  if (!exists("out")) {
     if (type == "assign") {
       if (is.name(x)) {
         out <- character()
