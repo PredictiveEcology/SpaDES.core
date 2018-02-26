@@ -54,7 +54,6 @@ allCleanMessage <- "module code appears clean"
 #'
 #' @author Eliot McIntire
 #' @keywords internal
-#' @importFrom pryr fun_body
 #' @rdname findElements
 .findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(),
                                type) {
@@ -64,7 +63,7 @@ allCleanMessage <- "module code appears clean"
       #xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
       xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
 
-      if (identical(type, "returnSim")) {
+      if (identical(type, "returnSim")) { # returnSim case doesn't need to parse whole function, only last line
         xAsCall <- .isLastLineSim(x = x, xAsString = xAsString)
         y <- .findElement(xAsCall, type = type)
       } else {
@@ -74,7 +73,7 @@ allCleanMessage <- "module code appears clean"
         # In some cases, e.g., Jean Marchal's
         if (is.null(parsedXAsString)>0) {
 
-          aa <- fun_body(moduleEnv[[x]])
+          aa <- deparse(body(moduleEnv[[x]]))
           bb <- aa[-c(1, length(aa))]
           funStarts <- grep("^    [[:alpha:]]", bb)
           bb[funStarts] <- gsub("^    ", "", bb[funStarts])
@@ -85,7 +84,6 @@ allCleanMessage <- "module code appears clean"
             if (!is.null(parsedXAsString)) {
               xAsCall <- as.call(parsedXAsString)
               if (identical(type, "returnSim")) {
-                browser()
                 xAsCall <- .isLastLineSim(x = x, xAsString = bb[seq(funStarts[yy], funEnds[yy + 1])])
               }
               y <- .findElement(xAsCall, type = type)

@@ -830,10 +830,11 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
                     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
                     "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
   )
-  if (interactive()) {
-    test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
-    test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
-    tmpFilename = tempfile()
+  test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
+  test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
+  if (grepl( "W-VIC-A128863", Sys.info()["nodename"])) {
+    tmpFilename = "c:/Eliot/tmp/test1.txt"
+
     cat("################### test1\n", file = tmpFilename, append = FALSE)
     cat(paste(collapse = " ", lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
     cat("\n################### test2\n", file = tmpFilename, append = TRUE)
