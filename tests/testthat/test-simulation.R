@@ -830,8 +830,21 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
                     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
                     "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
   )
-  test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
-  test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
+  if (interactive()) {
+    test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
+    test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
+    tmpFilename = tempfile()
+    cat("################### test1\n", file = tmpFilename, append = FALSE)
+    cat(paste(collapse = " ", lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+    cat("\n################### test2\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = " ", lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+    cat("\n################### fullMessage1\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = "\n", fullMessage1), file = tmpFilename, append = TRUE)
+    cat("\n################### fullMessageNonInteractive\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = "\n", fullMessageNonInteractive), file = tmpFilename, append = TRUE)
+    cat("\n###################  mm\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
+  }
   expect_true(test1 || test2)
 
 })
