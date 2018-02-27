@@ -60,8 +60,7 @@ allCleanMessage <- "module code appears clean"
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
 
-      #xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
-      xAsString <- deparse(moduleEnv[[x]], backtick = TRUE, control = "all")
+      xAsString <- deparse(body(moduleEnv[[x]]))#, backtick = TRUE, control = "all")
 
       if (identical(type, "returnSim")) { # returnSim case doesn't need to parse whole function, only last line
         xAsCall <- .isLastLineSim(x = x, xAsString = xAsString)
