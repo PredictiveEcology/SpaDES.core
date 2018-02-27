@@ -19,7 +19,7 @@
 #'
 #' @example inst/examples/example_moduleMetadata.R
 #'
-setGeneric("moduleMetadata", function(module, path, sim) {
+setGeneric("moduleMetadata", function(sim, module, path) {
   standardGeneric("moduleMetadata")
 })
 
@@ -27,7 +27,7 @@ setGeneric("moduleMetadata", function(module, path, sim) {
 #' @rdname moduleMetadata
 setMethod(
   "moduleMetadata",
-  signature = c(module = "character", path = "character", sim = "missing"),
+  signature = c(sim = "missing", module = "character", path = "character"),
   definition = function(module, path) {
     filename <- paste(path, "/", module, "/", module, ".R", sep = "")
     if (!file.exists(filename)) {
@@ -78,7 +78,7 @@ setMethod(
 #' @rdname moduleMetadata
 setMethod(
   "moduleMetadata",
-  signature = c(module = "character", path = "missing", sim = "missing"),
+  signature = c(sim = "missing", module = "character", path = "missing"),
   definition = function(module) {
     moduleMetadata(module, getOption("spades.modulePath"))
 })
@@ -87,18 +87,37 @@ setMethod(
 #' @rdname moduleMetadata
 setMethod(
   "moduleMetadata",
-  signature = c(module = "ANY", path = "missing", sim = "simList"),
-  definition = function(module, sim) {
-    if (missing(module)) module <- modules(sim)
+  signature = c(sim = "ANY", module = "ANY", path = "ANY"),
+  definition = function(sim, module, path) {
+    browser()
+    if (is.character(sim)) {
+      message("Assuming sim is a module name")
+      if (missing(path)) {
+        metadatList <- moduleMetadata(module = sim)
+      } else {
+        metadatList <- moduleMetadata(module = sim, path = path)
+      }
 
-    metadata <- lapply(module, function(mod)
-      moduleMetadata(mod, path = modulePath(sim)))
-    if (length(module) == 1) {
-      metadata <- unlist(metadata, recursive = FALSE)
     } else {
-      names(metadata) <- module
+      if (!missing(path)) message("path not used with sim provided")
+      if (missing(module)) {
+        module <- unlist(modules(sim))
+      }
+      numModules <- length(module)
+
+      metadata <- sim@depends@dependencies[module]
+      sn <- slotNames(".moduleDeps")
+      names(sn) <- sn
+      metadataList <- lapply(metadata, function(mod) {
+        lapply(sn, function(element) {
+          slot(mod, name = element)
+        })
+      })
+      if (numModules == 1)
+        metadataList <- metadataList[[module]]
     }
-    return(metadata)
+
+    return(metadataList)
 })
 
 ################################################################################
