@@ -408,6 +408,7 @@ setMethod(
         } # End of code checking
 
         lockBinding(m, sim@.envir)
+        names(sim@depends@dependencies)[[k]] <- m
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% m
         if (any(alreadyIn)) {
@@ -426,8 +427,6 @@ setMethod(
       # update parse status of the module
       attributes(modules[[j]]) <- list(parsed = TRUE)
     }
-
-    names(sim@depends@dependencies) <- unique(unlist(modules))
 
     modules(sim) <- if (length(parent_ids)) {
       append_attr(modules, all_children)[-parent_ids]
