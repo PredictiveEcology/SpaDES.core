@@ -5,7 +5,7 @@
 \alias{moduleMetadata}
 \alias{moduleMetadata,missing,character,character-method}
 \alias{moduleMetadata,missing,character,missing-method}
-\alias{moduleMetadata,simList,ANY,ANY-method}
+\alias{moduleMetadata,ANY,ANY,ANY-method}
 \title{Parse and extract module metadata}
 \usage{
 moduleMetadata(sim, module, path)
@@ -14,7 +14,7 @@ moduleMetadata(sim, module, path)
 
 \S4method{moduleMetadata}{missing,character,missing}(module)
 
-\S4method{moduleMetadata}{simList,ANY,ANY}(sim, module, path)
+\S4method{moduleMetadata}{ANY,ANY,ANY}(sim, module, path)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}
