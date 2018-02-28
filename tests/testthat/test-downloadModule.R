@@ -46,7 +46,7 @@ test_that("downloadModule downloads and unzips a parent module", {
   f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
   d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
-  d_expected <- moduleMetadata("LCC2005", tmpdir)$childModules %>%
+  d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
     c(m, "data", "testthat") %>% sort()
 
   expect_equal(length(f), 43)
@@ -153,7 +153,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   f <- downloadModule(m, tmpdir, quiet = TRUE, data = TRUE)[[1]] %>% unlist() %>% as.character()
   d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
-  d_expected <- moduleMetadata("LCC2005", tmpdir)$childModules %>%
+  d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
     c(m, "data", "testthat") %>%
     sort()
 

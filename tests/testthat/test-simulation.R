@@ -554,7 +554,7 @@ test_that("conflicting function types", {
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
                    "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
                    "child4: module code: inputObjects: local variable.*a.*assigned but may not be used",
                    "child4: module code: inputObjects: local variable.*fff.*assigned but may not be used",
@@ -727,7 +727,7 @@ test_that("messaging with multiple modules", {
   fullMessage <- c("defineParameter: 'plotInitialTime' is not of specified type 'character'",
                    "defineParameter: 'saveInitialTime' is not of specified type 'character'",
                    "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
                    "test: module code: ei3 is declared in inputObjects, but is not used in the module",
                    "test: module code: inputObjects: local variable.*a.*assigned but may not be used",
                    "test: module code: inputObjects: local variable.*fff.*assigned but may not be used",
@@ -739,7 +739,7 @@ test_that("messaging with multiple modules", {
                    "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
                    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
                    "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
-                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
                    "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
                    "test2: module code: inputObjects: local variable.*a.*assigned but may not be used",
                    "test2: module code: Init: local variable.*a.*assigned but may not be used",
@@ -752,7 +752,6 @@ test_that("messaging with multiple modules", {
                    "Running inputObjects for test4", "test4: module code appears clean"
   )
 
-  xxx1[[1]][20:25]
   for(y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
@@ -825,8 +824,8 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
                    "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
                    "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
   fullMessageNonInteractive <- c("Running inputObjects for child4",
-                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx <- matrix",
-                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx2 <- matrix",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx <- matrix.*possibly at .*147",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx2 <- matrix.*possibly at .*148",
                     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
                     "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
   )

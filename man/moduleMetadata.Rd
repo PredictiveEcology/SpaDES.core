@@ -3,26 +3,26 @@
 \docType{methods}
 \name{moduleMetadata}
 \alias{moduleMetadata}
-\alias{moduleMetadata,character,character,missing-method}
-\alias{moduleMetadata,character,missing,missing-method}
-\alias{moduleMetadata,ANY,missing,simList-method}
+\alias{moduleMetadata,missing,character,character-method}
+\alias{moduleMetadata,missing,character,missing-method}
+\alias{moduleMetadata,ANY,ANY,ANY-method}
 \title{Parse and extract module metadata}
 \usage{
-moduleMetadata(module, path, sim)
+moduleMetadata(sim, module, path)
 
-\S4method{moduleMetadata}{character,character,missing}(module, path)
+\S4method{moduleMetadata}{missing,character,character}(module, path)
 
-\S4method{moduleMetadata}{character,missing,missing}(module)
+\S4method{moduleMetadata}{missing,character,missing}(module)
 
-\S4method{moduleMetadata}{ANY,missing,simList}(module, sim)
+\S4method{moduleMetadata}{ANY,ANY,ANY}(sim, module, path)
 }
 \arguments{
+\item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}
+
 \item{module}{Character string. Your module's name.}
 
 \item{path}{Character string specifying the file path to modules directory.
 Default is to use the \code{spades.modulePath} option.}
-
-\item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}
 }
 \value{
 A list of module metadata, matching the structure in
@@ -34,7 +34,7 @@ Parse and extract module metadata
 \examples{
 path <- system.file("sampleModules", package = "SpaDES.core")
 sampleModules <- dir(path)
-x <- moduleMetadata(sampleModules[3], path)
+x <- moduleMetadata(sampleModules[3], path = path)
 
 # using simList
 mySim <- simInit(
