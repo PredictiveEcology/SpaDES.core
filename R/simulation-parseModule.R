@@ -472,6 +472,7 @@ setMethod(
     return(sim)
 })
 
+#' @importFrom utils getParseData
 parseConditional <- function(envir = NULL, filename = character()) {
   if (!is.null(envir)) {
     if (is.null(envir[[filename]])) {

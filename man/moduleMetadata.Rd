@@ -34,7 +34,7 @@ Parse and extract module metadata
 \examples{
 path <- system.file("sampleModules", package = "SpaDES.core")
 sampleModules <- dir(path)
-x <- moduleMetadata(sampleModules[3], path)
+x <- moduleMetadata(sampleModules[3], path = path)
 
 # using simList
 mySim <- simInit(

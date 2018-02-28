@@ -80,7 +80,7 @@ setMethod(
   "moduleMetadata",
   signature = c(sim = "missing", module = "character", path = "missing"),
   definition = function(module) {
-    moduleMetadata(module, getOption("spades.modulePath"))
+    moduleMetadata(module = module, path = getOption("spades.modulePath"))
 })
 
 #' @export
@@ -89,13 +89,12 @@ setMethod(
   "moduleMetadata",
   signature = c(sim = "ANY", module = "ANY", path = "ANY"),
   definition = function(sim, module, path) {
-    browser()
     if (is.character(sim)) {
       message("Assuming sim is a module name")
       if (missing(path)) {
-        metadatList <- moduleMetadata(module = sim)
+        metadataList <- moduleMetadata(module = sim)
       } else {
-        metadatList <- moduleMetadata(module = sim, path = path)
+        metadataList <- moduleMetadata(module = sim, path = path)
       }
 
     } else {
