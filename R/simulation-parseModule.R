@@ -463,7 +463,7 @@ setMethod(
         } else {
           paste(unique(unlist(codeCheckMsgs)), collapse = "\n")
         }
-        message("###### Module Code Checking ########")
+        message("###### Module Code Checking - Still experimental - please report problems ######## ")
         message(mess)
         message("###### Module Code Checking ########")
       }
