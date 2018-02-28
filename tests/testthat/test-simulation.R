@@ -752,7 +752,6 @@ test_that("messaging with multiple modules", {
                    "Running inputObjects for test4", "test4: module code appears clean"
   )
 
-  xxx1[[1]][20:25]
   for(y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
@@ -825,8 +824,8 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
                    "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
                    "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
   fullMessageNonInteractive <- c("Running inputObjects for child4",
-                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx <- matrix",
-                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx2 <- matrix",
+                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx <- matrix.*possibly at .*147",
+                    "child4: module code: Init could not be code checked for call starting with 'sim\\$bvcx2 <- matrix.*possibly at .*148",
                     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
                     "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
   )
