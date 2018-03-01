@@ -265,11 +265,11 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     # The download step
     if (!is.null(fileToDownload))
       downloadData(moduleName, modulePath, files = fileToDownload,
-                 checked = checkSums, quickCheck = quickCheck)
+                   checked = checkSums, quickCheck = quickCheck)
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
-                       needed = c(targetFile, alsoExtract))
+                         needed = c(targetFile, alsoExtract))
     }
   }
 
