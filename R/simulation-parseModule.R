@@ -205,6 +205,10 @@ setMethod(
         if (doesntUseNamespacing)
           eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir)
 
+        # attach source code to simList in a hidden spot
+        list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.envir[[m]])
+        sim@.envir[[m]][["._sourceFilename"]] <- grep(paste0(m,".R"), ls(sim@.envir[[".parsedFiles"]]), value = TRUE)
+
         # parse any scripts in R subfolder
         RSubFolder <- file.path(dirname(filename), "R")
         RScript <- dir(RSubFolder)
@@ -246,12 +250,17 @@ setMethod(
         # Capture messages which will be about defineParameter at the moment
         mess <- capture.output(type = "message",
                                out <- suppressWarnings(eval(pf, envir = env)))
-        if (length(mess))
-          codeCheckMsgs <- append(
+        if (length(mess)) {
+          messFile <- capture.output(type = "message",
+                                               message(grep(paste0(m, ".R"),
+                                                            ls(sim@.envir$.parsedFiles), value = TRUE)))
+          codeCheckMsgs <- c(
             codeCheckMsgs,
+            messFile,
             capture.output(type = "message",
                            hasMessage <- unique(unlist(lapply(mess, function(x)
                              .parseMessage(m, "", x))))))
+        }
 
         for (dep in out@depends@dependencies) {
           sim <- .addDepends(sim, dep)
@@ -403,11 +412,17 @@ setMethod(
           # the code will always have magenta colour, which has an m
           codeCheckMsgsThisMod <- any(grepl(paste0("m", m, ":"), codeCheckMsgs))
           mess <- capture.output(type = "message", .runCodeChecks(sim, m, k, codeCheckMsgsThisMod))
-          codeCheckMsgs <- append(codeCheckMsgs, mess)
+          if (length(mess) | length(codeCheckMsgsThisMod)==0)
+            mess <- c(capture.output(type = "message",
+                                     message(grep(paste0(m, ".R"),
+                                                  ls(sim@.envir$.parsedFiles), value = TRUE))),
+                      mess)
+          codeCheckMsgs <- c(codeCheckMsgs, mess)
 
         } # End of code checking
 
         lockBinding(m, sim@.envir)
+        names(sim@depends@dependencies)[[k]] <- m
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% m
         if (any(alreadyIn)) {
@@ -427,8 +442,6 @@ setMethod(
       attributes(modules[[j]]) <- list(parsed = TRUE)
     }
 
-    names(sim@depends@dependencies) <- unique(unlist(modules))
-
     modules(sim) <- if (length(parent_ids)) {
       append_attr(modules, all_children)[-parent_ids]
     } else {
@@ -441,30 +454,7 @@ setMethod(
     #  Also, collapse if all are clean
     if (length(codeCheckMsgs)) {
       if (length(parent_ids) < length(modules)) {
-        modCodeClean <- allCleanMessage
-        # Trying to put the sections in order by module --
-        #   this is very experimental and may need to be deleted
-        if (FALSE) {
-          codeCheckMsgs <- gsub(".{1}\\[.{2}m", "", codeCheckMsgs)
-          # HasSpacePrefix <- grep("^  ", codeCheckMsgsNoColr)
-          # getModNameIndex <- HasSpacePrefix[c(0, which(diff(HasSpacePrefix)>1))+1]-1
-          # HasSpacePrefix[which(diff(HasSpacePrefix)==1)]
-          # copyForward <- unlist(lapply(strsplit(codeCheckMsgsNoColr[getModNameIndex], split = " -- "),
-          #                              function (x) x[[1]]))
-          # codeCheckMsgsNoColr[HasSpacePrefix] <-
-          #   paste0(copyForward[c(0, cumsum(diff(HasSpacePrefix)>1))+1],
-          #          " --", codeCheckMsgsNoColr[HasSpacePrefix])
-          # justModuleNames <-
-          #   unlist(lapply(strsplit(codeCheckMsgsNoColr, split = " |:|--"),
-          #                 function (x) x[[1]]))
-          # justModuleNamesFac <- factor(justModuleNames)
-          # justModuleNamesFac <- factor(justModuleNames, levels = unique(justModuleNames))
-          # eventualOrder <- order(justModuleNamesFac)
-          # codeCheckMsgs <- codeCheckMsgs[eventualOrder]
-        }
-        ###  END OF ORDERING SECTION
-
-        mess <- if (all(grepl(codeCheckMsgs, pattern = modCodeClean))) {
+        mess <- if (all(grepl(codeCheckMsgs, pattern = allCleanMessage))) {
           mess <- gsub(codeCheckMsgs,
                        pattern = paste(paste0(unlist(modules), ": "), collapse = "|"),
                        replacement = "")
@@ -473,7 +463,7 @@ setMethod(
         } else {
           paste(unique(unlist(codeCheckMsgs)), collapse = "\n")
         }
-        message("###### Module Code Checking ########")
+        message("###### Module Code Checking - Still experimental - please report problems ######## ")
         message(mess)
         message("###### Module Code Checking ########")
       }
@@ -482,6 +472,7 @@ setMethod(
     return(sim)
 })
 
+#' @importFrom utils getParseData
 parseConditional <- function(envir = NULL, filename = character()) {
   if (!is.null(envir)) {
     if (is.null(envir[[filename]])) {
@@ -497,7 +488,8 @@ parseConditional <- function(envir = NULL, filename = character()) {
   }
 
   if (needParse) {
-    tmp[["parsedFile"]] <- parse(filename)
+    tmp[["parsedFile"]] <- parse(filename, keep.source = TRUE)
+    tmp[["._parsedData"]] <- getParseData(tmp[["parsedFile"]], TRUE)
     tmp[["defineModuleItem"]] <- grepl(pattern = "defineModule", tmp[["parsedFile"]])
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }

@@ -3,20 +3,25 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.1.1.9000
 ==================
 
-* add package dependency `webDatabases`
+* add package dependency `webDatabases`, `pryr`
 * new function `prepInputs` to handle download, extract, crop/mask/reproject etc.
 * fix bug where `start` and `end` were not properly exported
-* use `codetools` to check for various code problems including:
-
-    - conflicts with known common functions (`raster::level`, `raster::scale`, `quickPlot::Plot`)
+* introduction of code checking for modules, currently turned on or off by an option `spades.moduleCodeChecks`, which is `TRUE` by default. Code checking includes various types:
+    
+    - use `codetools` to check for various code problems
+    - detects conflicts with known common functions (`raster::level`, `raster::scale`, `quickPlot::Plot`)
     - use `checkCodeEnv` on every function inside a module
-
-* checking for `sim$xxx` occurrences in modules, comparing to outputs in metadata
-* new option `spades.moduleCodeChecks`, which is `TRUE` by default. This turns on or off the new code checking.
+    - checking for `sim$xxx` occurrences in modules, comparing to `outputObjects` in metadata if used in assignment (i.e., left hand side of assign operator), or comparing to `inputObjects` if used on the right hand side
+    - check that all objects declared in `inputObjects` have default values assigned in the `.inputObjects` function
+    - messages colour coded, and separated by file with absolute path explicit
+    
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
 * `newModule` template modified slightly based on workshop feedback
 * `setPaths` now only sets the directories that are passed into it
 * `downloadData` gets a logical `overwrite` argument.
+* minor bug fixes
+* `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
+* module metadata now in *named* lists inside `depends(sim)`
 
 version 0.1.1
 =============

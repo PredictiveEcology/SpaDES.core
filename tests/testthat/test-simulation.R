@@ -554,7 +554,7 @@ test_that("conflicting function types", {
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
                    "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
                    "child4: module code: inputObjects: local variable.*a.*assigned but may not be used",
                    "child4: module code: inputObjects: local variable.*fff.*assigned but may not be used",
@@ -727,7 +727,7 @@ test_that("messaging with multiple modules", {
   fullMessage <- c("defineParameter: 'plotInitialTime' is not of specified type 'character'",
                    "defineParameter: 'saveInitialTime' is not of specified type 'character'",
                    "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
                    "test: module code: ei3 is declared in inputObjects, but is not used in the module",
                    "test: module code: inputObjects: local variable.*a.*assigned but may not be used",
                    "test: module code: inputObjects: local variable.*fff.*assigned but may not be used",
@@ -739,7 +739,7 @@ test_that("messaging with multiple modules", {
                    "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
                    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
                    "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
-                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default are provided in inputObjects",
+                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
                    "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
                    "test2: module code: inputObjects: local variable.*a.*assigned but may not be used",
                    "test2: module code: Init: local variable.*a.*assigned but may not be used",
@@ -752,7 +752,6 @@ test_that("messaging with multiple modules", {
                    "Running inputObjects for test4", "test4: module code appears clean"
   )
 
-  xxx1[[1]][20:25]
   for(y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
@@ -763,15 +762,89 @@ test_that("messaging with multiple modules", {
                                 function(x) any(grepl(mm1, pattern = x))))))
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
   mm <- cleanMessage(mm)
-  # for (x in seq(fullMessage)) {
-  #   lineNum <- "757"
-  #   theGrepEach <- grepl(mm, pattern = fullMessage[x])
-  #   theGrep <- any(theGrepEach)
-  #   if (!theGrep) {
-  #     cat(paste("\nline ", lineNum, theGrep, fullMessage[x], "\n              ", paste(mm, collapse = "\n               "), collapse = ""), file = tempfile(), append = TRUE)
-  #   }
-  #   expect_true(theGrep)
-  # }
-
 })
 
+
+test_that("Module code checking -- pipe with matrix product with backtick & data.table", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m <- "child4"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  xxx <- readLines(fileName)
+  lineWithInit <- grep(xxx, pattern = "^Init")
+  xxx1 <- xxx
+  cat(xxx[1:lineWithInit], "
+    checksums1 <- structure(list(result = c('OK', 'OK'),
+                                           expectedFile = c('Land_Cover_2010_TIFF.zip','NA_LandCover_2010_25haMMU.tif'),
+                                           actualFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif'),
+                                           checksum.x = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+                                           checksum.y = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+                                           algorithm.x = c('xxhash64', 'xxhash64'),
+                                           algorithm.y = c('xxhash64', 'xxhash64'),
+                                           renamed = c(NA, NA),
+                                           module = c('simplifyLCCVeg',  'simplifyLCCVeg')),
+                                      .Names = c('result', 'expectedFile', 'actualFile',
+                                                 'checksum.x', 'checksum.y', 'algorithm.x', 'algorithm.y', 'renamed',
+                                                 'module'),
+                                      row.names = c(NA, -2L),
+                                      class = c('grouped_df', 'tbl_df', 'tbl', 'data.frame'),
+                                      vars = 'expectedFile',
+                                      indices = list(0L, 1L),
+                                      group_sizes = c(1L, 1L),
+                                      biggest_group_size = 1L,
+                                      labels = structure(list(expectedFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif')),
+                                                         .Names = 'expectedFile',
+                                                         row.names = c(NA, -2L),
+                                                         class = 'data.frame', vars = 'expectedFile'))
+
+    result1 <- checksums1[checksums1$expectedFile == 'NA_LandCover_2010_25haMMU.tif',]$result
+
+    sim$bvcx <- matrix(1:2) %>% `%*%` (2:3)
+    sim$bvcx2 <- matrix(1:2) %>% \"%*%\" (2:3)
+    sim$b <- matrix(1:2) %>% t()
+
+    sim$a <- 1
+    ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- cleanMessage(mm)
+
+  fullMessage1 <- c("Running inputObjects for child4",
+                   "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
+                   "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
+  fullMessageNonInteractive <- c("Running inputObjects for child4",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx <- matrix.*possibly at .*147",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx2 <- matrix.*possibly at .*148",
+                    "child4: module code: Init: local variable.*result1.*assigned but may not be used",
+                    "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
+  )
+  test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
+  test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
+  if (grepl( "W-VIC-A128863", Sys.info()["nodename"])) {
+    tmpFilename = "c:/Eliot/tmp/test1.txt"
+
+    cat("################### test1\n", file = tmpFilename, append = FALSE)
+    cat(paste(collapse = " ", lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+    cat("\n################### test2\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = " ", lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+    cat("\n################### fullMessage1\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = "\n", fullMessage1), file = tmpFilename, append = TRUE)
+    cat("\n################### fullMessageNonInteractive\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = "\n", fullMessageNonInteractive), file = tmpFilename, append = TRUE)
+    cat("\n###################  mm\n", file = tmpFilename, append = TRUE)
+    cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
+  }
+  expect_true(test1 || test2)
+
+})
