@@ -1,10 +1,10 @@
-if (!isGeneric(".robustDigest")) {
-  setGeneric(
-    ".robustDigest",
-    function(object, objects, compareRasterFileLength = 1e6, algo = "xxhash64") {
-      standardGeneric(".robustDigest")
-  })
-}
+# if (!isGeneric(".robustDigest")) {
+#   setGeneric(
+#     ".robustDigest",
+#     function(object, objects, compareRasterFileLength = 1e6, algo = "xxhash64") {
+#       standardGeneric(".robustDigest")
+#   })
+# }
 
 #' \code{.robustDigest} for \code{simList} class objects
 #'
@@ -21,20 +21,16 @@ if (!isGeneric(".robustDigest")) {
 #' @inheritParams reproducible::.robustDigest
 #'
 #' @author Eliot Mcintire
-#' @exportMethod .robustDigest
+#' @export
 #' @importFrom fastdigest fastdigest
 #' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst .orderDotsUnderscoreFirst
-#' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
 #' @aliases Cache
 #' @rdname robustDigest
 #' @seealso \code{\link[reproducible]{robustDigest}}
 #'
-setMethod(
-  ".robustDigest",
-  signature = "simList",
-  definition = function(object, objects, compareRasterFileLength, algo,
-                        digestPathContent, classOptions) {
+.robustDigest.simList <- function(object, objects, compareRasterFileLength, algo,
+                        digestPathContent, classOptions = list()) {
     outerObjs <- ls(object@.envir, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.envir)
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
@@ -135,7 +131,7 @@ setMethod(
       if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
 
     obj
-  })
+  }
 
 if (!isGeneric(".tagsByClass")) {
   setGeneric(".tagsByClass", function(object) {
