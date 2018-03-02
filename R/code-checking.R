@@ -599,7 +599,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     }
   }
 
-  if (!exists("out")) {
+  if (!exists("out", inherits = FALSE)) {
     if (type == "assign") {
       if (is.name(x)) {
         out <- character()
@@ -611,7 +611,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     } else {
       out <- character()
     }
-  }
+  } 
   return(out)
 }
 

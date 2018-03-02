@@ -2,6 +2,52 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables("expectedFile")
 }
 
+
+#' Assess whether an object has or will be supplied from elsewhere
+#'
+#' When loading objects into a \code{simList}, especially during the
+#' \code{simInit} call, and inside the \code{.inputObjects} functions of modules,
+#' it is often useful to know if an object in question will or has been
+#' by the user via the \code{inputs} or \code{objects} arguments, or by another
+#' module's \code{.inputObjects} while preparing its expected inputs (via
+#' \code{expectsInputs} in metadata), or if it will be supplied by another
+#' module during its \code{"init"} event. In all these cases, it may not
+#' be necessary for a given module to load any default value for its \code{expectsInputs}.
+#' This function can be used as a check to determine whether the module needs
+#' to proceed in getting and assigning its default value.
+#'
+#'
+suppliedElsewhere <- function(object, sim) {
+  objDeparsed <- substitute(object)
+  if (missing(sim)) {
+    theCall <- as.call(parse(text = deparse(objDeparsed)))
+    objDeparsedIfHasSim <- .parsingSim(theCall[[1]], "assign")
+    if (length(objDeparsedIfHasSim)) 
+      objDeparsed <- objDeparsedIfHasSim
+    env <- parent.frame()
+    isSimList <- unlist(lapply(theCall[[1]], function(x) 
+      isTRUE(try(is(eval(x, envir = env), "simList"), silent = TRUE))))
+    if (!all(isSimList)) {
+      sim <- get("sim", envir = env)
+    } else {
+      sim <- eval(theCall[[1]][isSimList][[1]], envir = env)  
+    }
+    
+  } 
+  objDeparsed <- as.character(objDeparsed)
+  
+  # Equivalent to !is.null(sim$xxx)
+  inPrevDotInputObjects <- hasName(sim@.envir, objDeparsed)
+  # Equivalent to !(names(sim) %in% sim$.userSuppliedObjNames)
+  inUserSupplied <- objDeparsed %in% sim$.userSuppliedObjNames
+  # If one of the modules that has already been loaded has this object as an output,
+  #   then don't create this
+  inFutureInit <- objDeparsed %in% 
+    depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
+  
+  (inUserSupplied | inPrevDotInputObjects | inFutureInit)
+}
+
 #' Download file from web databases
 #'
 #' This function can be used to download a file from a web database listed in
@@ -216,9 +262,18 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
                        writeCropped = TRUE, addTagsByObject = NULL,
-                       quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...) {
+                       quickCheck = getOption("reproducible.quick"), cacheTags = "", notOlderThan = NULL, ...) {
   message("Preparing: ", targetFile)
-  # destinationPath <- file.path(modulePath, moduleName, "data")
+  # dots <- list(...)
+  # cacheArgsInDots <- names(dots) %in% formalArgs(Cache)
+  # cacheDots <- NULL
+  # if (length(cacheArgsInDots)) {
+  #   if (any(cacheArgsInDots)) {
+  #     dots <- dots[!cacheArgsInDots]
+  #     cacheDots <- dots[cacheArgsInDots]
+  #   }
+  # } 
+  # # destinationPath <- file.path(modulePath, moduleName, "data")
 
   targetFile <- basename(targetFile)
   targetFilePath <- file.path(destinationPath, targetFile)
@@ -230,25 +285,15 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     filesToCheck <- targetFilePath
   }
 
-  # Here we assume that if destinationPath has not been updated checksums don't need to
-  # be rerun. This is useful for WEB apps.
-  capturedOutput <- capture.output(
-    tmp <- Cache(file.info, asPath(dir(destinationPath, full.names = TRUE)), userTags = cacheTags),
-    type = "message"
-  )
-
-  notOlderThan <- if (length(capturedOutput) == 0) Sys.time()
-
-  chksumsFilePath <- file.path(destinationPath, "CHECKSUMS.txt")
-  moduleName <- basename(dirname(dirname(chksumsFilePath)))
-  modulePath <- dirname(dirname(dirname(chksumsFilePath)))
-  checkSums <- checksums(files = filesToCheck,
-          module = moduleName,
-          path = modulePath,
-          checksumFile = asPath(chksumsFilePath),
-          write = FALSE,
-          quickCheck = quickCheck
-  )
+  # If quickCheck, then use file.info as part of cache/memoise ... otherwise, 
+  #   pass a random real number to make a new memoise
+  fileinfo <- if (quickCheck) file.info(filesToCheck) else runif(1)
+  out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
+               asPath(file.path(destinationPath, "CHECKSUMS.txt")),
+               digestPathContentInner = !quickCheck, cacheTags, quickCheck)
+  list2env(out, environment()) # move the 3 elements in "out" to the local env
+  
+  #
   result <- checkSums[checkSums$expectedFile == targetFile, ]$result
   mismatch <- !isTRUE(result == "OK")
 
@@ -560,3 +605,22 @@ writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
 .unzipOrUnTar <- function(fun, args, files) {
   do.call(fun, c(args, list(files = files)))
 }
+
+
+.checkSums <- function(filesToCheck, fileinfo, chksumsFilePath, digestPathContentInner, cacheTags, quickCheck) {
+  if (missing(chksumsFilePath)) {
+    chksumsFilePath <- file.path(dirname(filesToCheck), "CHECKSUMS.txt")
+  }
+  moduleName <- basename(dirname(dirname(chksumsFilePath)))
+  modulePath <- dirname(dirname(dirname(chksumsFilePath)))
+  checkSums <- checksums(files = filesToCheck,
+                         module = moduleName,
+                         path = modulePath,
+                         checksumFile = asPath(chksumsFilePath),
+                         write = FALSE,
+                         quickCheck = quickCheck
+  )
+  list(moduleName = moduleName, modulePath = modulePath, checkSums = checkSums)
+}
+
+.checkSumsMem <- memoise::memoise(.checkSums)
