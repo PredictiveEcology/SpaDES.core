@@ -488,7 +488,7 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 #'
 #' @param x          A \code{Raster*} object
 #'
-#' @param studyArea  A \cohe{SpatialPolygons*} object
+#' @param studyArea  A \code{SpatialPolygons*} object
 #'
 #' @author Eliot McIntire
 #' @author Jean Marchal
