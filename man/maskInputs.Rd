@@ -7,9 +7,9 @@
 maskInputs(x, studyArea)
 }
 \arguments{
-\item{x}{a Raster* object}
+\item{x}{A \code{Raster*} object}
 
-\item{studyArea}{SpatialPolygons* object}
+\item{studyArea}{A \code{SpatialPolygons*} object}
 }
 \description{
 This function can be used to mask module inputs from raw data.

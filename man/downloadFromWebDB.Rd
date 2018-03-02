@@ -9,8 +9,7 @@ downloadFromWebDB(filename, filepath, dataset = NULL, quickCheck = FALSE)
 \arguments{
 \item{filename}{Character string naming the file to be downloaded.}
 
-\item{filepath}{Character string giving the path where the file will be
-written.}
+\item{filepath}{Character string giving the path where the file will be written.}
 
 \item{dataset}{Optional character string representing the dataset of interest
 for download. Allows for restricting the lookup for the url to a dataset,

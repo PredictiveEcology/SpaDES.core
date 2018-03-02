@@ -55,8 +55,7 @@ suppliedElsewhere <- function(object, sim) {
 #'
 #' @param filename Character string naming the file to be downloaded.
 #'
-#' @param filepath Character string giving the path where the file will be
-#' written.
+#' @param filepath Character string giving the path where the file will be written.
 #'
 #' @param dataset Optional character string representing the dataset of interest
 #' for download. Allows for restricting the lookup for the url to a dataset,
@@ -84,7 +83,7 @@ downloadFromWebDB <- function(filename, filepath, dataset = NULL, quickCheck = F
     url <- urls$url[wh]
 
     if (httr::http_error(url))
-      stop ("Can not access url", url)
+      stop("Can not access url", url)
 
     message("  Downloading ", filename)
 
@@ -322,11 +321,11 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     # The download step
     if (!is.null(fileToDownload))
       downloadData(moduleName, modulePath, files = fileToDownload,
-                 checked = checkSums, quickCheck = quickCheck)
+                   checked = checkSums, quickCheck = quickCheck)
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
-                       needed = c(targetFile, alsoExtract))
+                         needed = c(targetFile, alsoExtract))
     }
   }
 
@@ -438,15 +437,15 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
-        crs(rasterToMatch)
-      } else if (!is.null(studyArea)) {
-        crs(studyArea)
-      } else {
-        if (is(x, "sf"))
-          CRS(sf::st_crs(x)$proj4string)
-        else
-          crs(x)
-      }
+      crs(rasterToMatch)
+    } else if (!is.null(studyArea)) {
+      crs(studyArea)
+    } else {
+      if (is(x, "sf"))
+        CRS(sf::st_crs(x)$proj4string)
+      else
+        crs(x)
+    }
 
     if (!is.null(studyArea)) {
       if (!identical(targetCRS, crs(studyArea))) {
@@ -532,9 +531,9 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 #'
 #' This function can be used to mask module inputs from raw data.
 #'
-#' @param x a Raster* object
+#' @param x          A \code{Raster*} object
 #'
-#' @param studyArea SpatialPolygons* object
+#' @param studyArea  A \code{SpatialPolygons*} object
 #'
 #' @author Eliot McIntire
 #' @author Jean Marchal
@@ -546,10 +545,7 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 maskInputs <- function(x, studyArea) {
   message("  Masking")
 
-#  if (is(x, "RasterStack"))
     fastMask(x = x, polygon = studyArea)
-#  else
-#    raster::mask(x = x, mask = studyArea)
 }
 
 #' Write module inputs on disk
