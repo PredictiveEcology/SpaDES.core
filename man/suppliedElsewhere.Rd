@@ -4,7 +4,7 @@
 \alias{suppliedElsewhere}
 \title{Assess whether an object has or will be supplied from elsewhere}
 \usage{
-suppliedElsewhere(object, sim)
+suppliedElsewhere(object, sim, where = c("sim", "user", "initEvent"))
 }
 \description{
 When loading objects into a \code{simList}, especially during the

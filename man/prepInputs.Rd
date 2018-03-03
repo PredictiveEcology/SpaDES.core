@@ -8,7 +8,8 @@ prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
   destinationPath = NULL, fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
-  quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...)
+  overwrite = FALSE, quickCheck = getOption("reproducible.quick"),
+  cacheTags = "", notOlderThan = NULL, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
@@ -50,6 +51,9 @@ cropping.}
 
 \item{addTagsByObject}{Pass any object in there for which there is a
 \code{.tagsByClass} function}
+
+\item{overwrite}{Logical. Should downloading and all the other actions occur even if they
+pass the checksums or the files are all there.}
 
 \item{quickCheck}{Logical. If \code{TRUE}, then all Caching that occurs will
 be based on the much faster but less robust file.info. \code{FALSE},
