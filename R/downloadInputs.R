@@ -261,6 +261,9 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @param cacheTags Character vector with Tags. These Tags will be added to the
 #' repository along with the artifact.
 #'
+#' @param overwrite Logical. Should downloading and all the other actions occur even if they
+#'                  pass the checksums or the files are all there.
+#'
 #' @param ... Passed to pkg::fun
 #'
 #' @author Eliot McIntire
@@ -277,19 +280,9 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
                        dataset = NULL, destinationPath = NULL, fun = "raster",
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
-                       writeCropped = TRUE, addTagsByObject = NULL,
+                       writeCropped = TRUE, addTagsByObject = NULL, overwrite = FALSE,
                        quickCheck = getOption("reproducible.quick"), cacheTags = "", notOlderThan = NULL, ...) {
   message("Preparing: ", targetFile)
-  # dots <- list(...)
-  # cacheArgsInDots <- names(dots) %in% formalArgs(Cache)
-  # cacheDots <- NULL
-  # if (length(cacheArgsInDots)) {
-  #   if (any(cacheArgsInDots)) {
-  #     dots <- dots[!cacheArgsInDots]
-  #     cacheDots <- dots[cacheArgsInDots]
-  #   }
-  # } 
-  # # destinationPath <- file.path(modulePath, moduleName, "data")
 
   targetFile <- basename(targetFile)
   targetFilePath <- file.path(destinationPath, targetFile)
@@ -338,7 +331,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     # The download step
     if (!is.null(fileToDownload))
       downloadData(moduleName, modulePath, files = fileToDownload,
-                   checked = checkSums, quickCheck = quickCheck)
+                   checked = checkSums, quickCheck = quickCheck, overwrite = TRUE)
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
