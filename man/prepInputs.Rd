@@ -8,8 +8,7 @@ prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
   destinationPath = NULL, fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
-  quickCheck = getOption("reproducible.quick"), cacheTags = "",
-  notOlderThan = NULL, ...)
+  quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
