@@ -22,24 +22,24 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
     objDeparsedIfHasSim <- .parsingSim(theCall[[1]], "assign")
-    if (length(objDeparsedIfHasSim)) 
+    if (length(objDeparsedIfHasSim))
       objDeparsed <- objDeparsedIfHasSim
     env <- parent.frame()
-    isSimList <- unlist(lapply(theCall[[1]], function(x) 
+    isSimList <- unlist(lapply(theCall[[1]], function(x)
       isTRUE(try(is(eval(x, envir = env), "simList"), silent = TRUE))))
     if (!all(isSimList)) {
       sim <- get("sim", envir = env)
     } else {
-      sim <- eval(theCall[[1]][isSimList][[1]], envir = env)  
+      sim <- eval(theCall[[1]][isSimList][[1]], envir = env)
     }
-    
-  } 
+
+  }
 
   # if object was actually a variable of character names of objects inside sim
   objDeparsed <- tryCatch(eval(objDeparsed, parent.frame()), error = function(y) objDeparsed)
 
   objDeparsed <- as.character(objDeparsed)
-  
+
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("sim" %in% where) {
     hasName(sim@.envir, objDeparsed)
@@ -57,11 +57,11 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   #   then don't create this
   inFutureInit <- if ("initEvents" %in% where) {
     objDeparsed %in%
-    depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
+      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
   } else {
     FALSE
   }
-  
+
   (inUserSupplied | inPrevDotInputObjects | inFutureInit)
 }
 
@@ -294,14 +294,14 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     filesToCheck <- targetFilePath
   }
 
-  # If quickCheck, then use file.info as part of cache/memoise ... otherwise, 
+  # If quickCheck, then use file.info as part of cache/memoise ... otherwise,
   #   pass a random real number to make a new memoise
   fileinfo <- if (quickCheck) file.info(filesToCheck) else runif(1)
   out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
                asPath(file.path(destinationPath, "CHECKSUMS.txt")),
                digestPathContentInner = !quickCheck, cacheTags, quickCheck)
   list2env(out, environment()) # move the 3 elements in "out" to the local env
-  
+
   #
   result <- checkSums[checkSums$expectedFile == targetFile, ]$result
   mismatch <- !isTRUE(result == "OK")
@@ -335,7 +335,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
-                         needed = c(targetFile, alsoExtract))
+                         needed = c(targetFile, basename(alsoExtract)))
     }
   }
 
