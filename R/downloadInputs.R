@@ -72,7 +72,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- if ("initEvents" %in% where) {
+  inFutureInit <- if (pmatch("initEve", where)) {
     objDeparsed %in%
       depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
   } else {
