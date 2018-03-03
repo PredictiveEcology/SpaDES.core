@@ -30,14 +30,14 @@ test_that("test cache", {
   )
 
   set.seed(1123)
-  sims <- experiment(mySim, replicates = 2, cache = TRUE)
+  sims <- experiment(Copy(mySim), replicates = 2, cache = TRUE, debug = FALSE)
   out <- showCache(sims[[1]])
   expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies
   expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
   expect_true(NROW(out[tagKey != "otherFunctions"]) == 16) #
-  expect_message(sims <- Cache(experiment, mySim, replicates = 2, cache = TRUE),
+  expect_message(sims <- Cache(experiment, mySim, replicates = 2, cache = TRUE, debug = FALSE),
                  "loading cached result from previous spades call")
 
   out2 <- showCache(sims[[1]])
@@ -86,12 +86,12 @@ test_that("test event-level cache", {
 
   set.seed(1123)
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time())))
+                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
 
-  mess1 <- capture_output(sims <- spades(Copy(mySim)))
+  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
@@ -142,7 +142,7 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time()))))
+                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE))))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time())
   dev.off()
 
@@ -155,7 +155,7 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile)
-  mess1 <- capture_output(sims <- spades(Copy(mySim)))
+  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   dev.off()
 
   expect_true(file.info(tmpfile)$size < 10000)
@@ -212,8 +212,8 @@ test_that("test .prepareOutput", {
     objects = c("landscape")
   )
 
-  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
-  simCached2 <- spades(Copy(mySim), cache = TRUE)
+  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(), debug = FALSE)
+  simCached2 <- spades(Copy(mySim), cache = TRUE, debug = FALSE)
 
   if (interactive()) {
     cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
@@ -224,7 +224,7 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(isTRUE(all.equal(simCached1, simCached2)))
+  expect_true(isTRUE(all.equalWONewCache(simCached1, simCached2)))
 
   clearCache(tmpdir)
 })
