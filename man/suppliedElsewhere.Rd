@@ -39,3 +39,19 @@ does not explicitly test that the object will be created in the "init" event, on
 it is in the outputs of that module, and that it is a module that is loaded prior to
 this one.
 }
+\examples{
+mySim <- simInit()
+suppliedElsewhere("test", mySim) # FALSE
+
+# supplied in the simList
+mySim$test <- 1
+suppliedElsewhere("test", mySim) # TRUE
+test <- 1
+
+# supplied from user at simInit time -- note, this object would eventually get into the simList
+#   but the user supplied values come *after* the module's .inputObjects, so
+#   a basic is.null(sim$test) would return TRUE even though the user supplied test
+mySim <- simInit(objects = list("test" = test))
+suppliedElsewhere("test", mySim) # TRUE
+
+}

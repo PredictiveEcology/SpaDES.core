@@ -20,6 +20,7 @@ if (getRversion() >= "3.1.0") {
 #' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
 #'        Default is all three. See details
+#' @export
 #'
 #' @details
 #'
@@ -34,6 +35,21 @@ if (getRversion() >= "3.1.0") {
 #' does not explicitly test that the object will be created in the "init" event, only that
 #' it is in the outputs of that module, and that it is a module that is loaded prior to
 #' this one.
+#' @examples
+#' mySim <- simInit()
+#' suppliedElsewhere("test", mySim) # FALSE
+#'
+#' # supplied in the simList
+#' mySim$test <- 1
+#' suppliedElsewhere("test", mySim) # TRUE
+#' test <- 1
+#'
+#' # supplied from user at simInit time -- note, this object would eventually get into the simList
+#' #   but the user supplied values come *after* the module's .inputObjects, so
+#' #   a basic is.null(sim$test) would return TRUE even though the user supplied test
+#' mySim <- simInit(objects = list("test" = test))
+#' suppliedElsewhere("test", mySim) # TRUE
+#'
 suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
   objDeparsed <- substitute(object)
   if (missing(sim)) {
@@ -294,6 +310,16 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @importFrom reproducible Cache compareNA asPath
 #' @importFrom sf st_buffer st_crs st_intersection st_is st_is_valid st_transform st_write
 #' @rdname prepInputs
+#' @examples
+#' # Currently this function only works within a module, where "sourceURL" is supplied
+#' #   in the metadata in the "expectsInputs(..., sourceURL = "")
+#' \dontrun{
+#' # Put chunks like this in your .inputObjects
+#' if (!suppliedElsewhere("test", sim))
+#'   sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
+#'                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
+#'                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+#' }
 #'
 prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
                        dataset = NULL, destinationPath = ".", fun = "raster",

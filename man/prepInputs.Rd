@@ -73,6 +73,18 @@ runs several other functions, conditionally and sequentially:
 \code{extractFromArchive}.  NOTE: This function is still experimental: use
 with caution.
 }
+\examples{
+# Currently this function only works within a module, where "sourceURL" is supplied
+#   in the metadata in the "expectsInputs(..., sourceURL = "")
+\dontrun{
+# Put chunks like this in your .inputObjects
+if (!suppliedElsewhere("test", sim))
+  sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
+                    destinationPath = dataPath(sim), studyArea = sim$studyArea,
+                    rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+}
+
+}
 \author{
 Eliot McIntire
 
