@@ -1,5 +1,5 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables("expectedFile")
+  utils::globalVariables(c("expectedFile", "objName"))
 }
 
 
@@ -16,7 +16,24 @@ if (getRversion() >= "3.1.0") {
 #' This function can be used as a check to determine whether the module needs
 #' to proceed in getting and assigning its default value.
 #'
+#' @param object Character vector or sim object in the form sim$objName
+#' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
+#' @param where Character vector with one to three of "sim", "user", or "initEvent".
+#'        Default is all three. See details
 #'
+#' @details
+#'
+#' \code{where} indicates which of three places to search, either \code{"sim"} i.e.,
+#' the \code{simList}, which would be equivalent to \code{is.null(sim\$objName)}, or
+#' \code{"user"} which would be supplied by the user in the \code{simInit} function
+#' call via \code{outputs} or \code{inputs} (equivalent to
+#' \code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
+#' or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
+#' the present one \bold{will} create it as part of its outputs (i.e., as indicated by
+#' \code{createsOutputs} in that module's metadata). This final one (\code{"initEvent"})
+#' does not explicitly test that the object will be created in the "init" event, only that
+#' it is in the outputs of that module, and that it is a module that is loaded prior to
+#' this one.
 suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
   objDeparsed <- substitute(object)
   if (missing(sim)) {
@@ -83,6 +100,8 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 #' @author Jean Marchal
 #' @importFrom httr authenticate GET http_error progress write_disk
 #' @importFrom webDatabases webDatabases
+#' @importFrom stats runif
+#' @importFrom utils hasName
 #' @rdname downloadFromWebDB
 #'
 downloadFromWebDB <- function(filename, filepath, dataset = NULL, quickCheck = FALSE) {
@@ -277,7 +296,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @rdname prepInputs
 #'
 prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
-                       dataset = NULL, destinationPath = NULL, fun = "raster",
+                       dataset = NULL, destinationPath = ".", fun = "raster",
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
                        writeCropped = TRUE, addTagsByObject = NULL, overwrite = FALSE,
@@ -300,9 +319,11 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
   out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
                asPath(file.path(destinationPath, "CHECKSUMS.txt")),
                digestPathContentInner = !quickCheck, cacheTags, quickCheck)
-  list2env(out, environment()) # move the 3 elements in "out" to the local env
+  moduleName <- out$moduleName
+  modulePath <- out$modulePath
+  checkSums <- out$checkSums
+  rm(out)
 
-  #
   result <- checkSums[checkSums$expectedFile == targetFile, ]$result
   mismatch <- !isTRUE(result == "OK")
 
@@ -444,7 +465,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 #' @author Jean Marchal
 #' @export
 #' @importFrom methods is
-#' @importFrom raster buffer crop crs extent projectRaster res
+#' @importFrom raster buffer crop crs extent projectRaster res crs<-
 #' @importFrom rgeos gIsValid
 #' @importFrom reproducible Cache
 #' @importFrom sp SpatialPolygonsDataFrame spTransform CRS

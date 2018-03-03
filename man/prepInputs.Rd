@@ -5,7 +5,7 @@
 \title{Download and optionally reproject, crop, mask raw data and output module inputs}
 \usage{
 prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
-  destinationPath = NULL, fun = "raster", pkg = "raster",
+  destinationPath = ".", fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
   overwrite = FALSE, quickCheck = getOption("reproducible.quick"),

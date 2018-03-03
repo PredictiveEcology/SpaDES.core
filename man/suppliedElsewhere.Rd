@@ -6,6 +6,14 @@
 \usage{
 suppliedElsewhere(object, sim, where = c("sim", "user", "initEvent"))
 }
+\arguments{
+\item{object}{Character vector or sim object in the form sim$objName}
+
+\item{sim}{A \code{simList} in which to evaluated whether the object is supplied elsewhere}
+
+\item{where}{Character vector with one to three of "sim", "user", or "initEvent".
+Default is all three. See details}
+}
 \description{
 When loading objects into a \code{simList}, especially during the
 \code{simInit} call, and inside the \code{.inputObjects} functions of modules,
@@ -17,4 +25,17 @@ module during its \code{"init"} event. In all these cases, it may not
 be necessary for a given module to load any default value for its \code{expectsInputs}.
 This function can be used as a check to determine whether the module needs
 to proceed in getting and assigning its default value.
+}
+\details{
+\code{where} indicates which of three places to search, either \code{"sim"} i.e.,
+the \code{simList}, which would be equivalent to \code{is.null(sim\$objName)}, or
+\code{"user"} which would be supplied by the user in the \code{simInit} function
+call via \code{outputs} or \code{inputs} (equivalent to
+\code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
+or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
+the present one \bold{will} create it as part of its outputs (i.e., as indicated by
+\code{createsOutputs} in that module's metadata). This final one (\code{"initEvent"})
+does not explicitly test that the object will be created in the "init" event, only that
+it is in the outputs of that module, and that it is a module that is loaded prior to
+this one.
 }
