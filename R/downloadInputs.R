@@ -394,15 +394,26 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     if (writeCropped) {
       smallFN <- .prefix(targetFilePath, "Small")
 
-      Cache(
+      xTmp <- Cache(
         writeInputsOnDisk,
         x = x,
         filename = smallFN,
         rasterDatatype = rasterDatatype,
         quick = quickCheck,
         userTags = cacheTags,
-        notOlderThan = if (!file.exists(asPath(smallFN))) Sys.time()
+        notOlderThan = Sys.time() # Too many reasons why this doesn't work properly
       )
+
+      if (is(xTmp, "Raster")) { # Rasters need to have their disk-backed value assigned, but not shapefiles
+        # This is a bug in writeRaster was spotted with crs of xTmp became
+        # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+        # should have stayed at
+        # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0
+        if (!identical(crs(xTmp), crs(x)))
+          crs(xTmp) <- crs(x)
+
+        x <- xTmp
+      }
     }
   }
   x
