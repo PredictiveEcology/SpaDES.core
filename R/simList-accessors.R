@@ -1391,6 +1391,7 @@ setGeneric("outputs<-",
 #' @name outputs<-
 #' @aliases outputs<-,.simList-method
 #' @rdname simList-accessors-inout
+#' @importFrom data.table setDT
 #' @export
 setReplaceMethod(
   "outputs",
