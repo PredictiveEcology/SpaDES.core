@@ -351,7 +351,7 @@ setMethod(
 
     # Make a temporary place to store parsed module files
     sim@.envir[[".parsedFiles"]] <- new.env(parent = sim@.envir)
-    #on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )
+    on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )
 
     paths(sim) <- paths #paths accessor does important stuff
     sim@modules <- modules  ## will be updated below
