@@ -17,7 +17,7 @@ if (getRversion() >= "3.1.0") {
 #' to proceed in getting and assigning its default value.
 #'
 #'
-suppliedElsewhere <- function(object, sim) {
+suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
   objDeparsed <- substitute(object)
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
@@ -34,16 +34,33 @@ suppliedElsewhere <- function(object, sim) {
     }
     
   } 
+
+  # if object was actually a variable of character names of objects inside sim
+  objDeparsed <- tryCatch(eval(objDeparsed, parent.frame()), error = function(y) objDeparsed)
+
   objDeparsed <- as.character(objDeparsed)
   
   # Equivalent to !is.null(sim$xxx)
-  inPrevDotInputObjects <- hasName(sim@.envir, objDeparsed)
+  inPrevDotInputObjects <- if ("sim" %in% where) {
+    hasName(sim@.envir, objDeparsed)
+  } else {
+    FALSE
+  }
   # Equivalent to !(names(sim) %in% sim$.userSuppliedObjNames)
-  inUserSupplied <- objDeparsed %in% sim$.userSuppliedObjNames
+  inUserSupplied <- if ("user" %in% where) {
+    objDeparsed %in% sim$.userSuppliedObjNames
+  } else {
+    FALSE
+  }
+
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- objDeparsed %in% 
+  inFutureInit <- if ("initEvents" %in% where) {
+    objDeparsed %in%
     depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
+  } else {
+    FALSE
+  }
   
   (inUserSupplied | inPrevDotInputObjects | inFutureInit)
 }
