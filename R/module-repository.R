@@ -489,6 +489,7 @@ setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
 
 #' @rdname downloadData
 #' @importFrom reproducible checkPath
+#' @importFrom googledrive drive_download as_id
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "logical",
