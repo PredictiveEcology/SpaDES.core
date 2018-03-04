@@ -500,7 +500,6 @@ setMethod(
     inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                   defineModuleElement = "inputObjects")
     urls <- inputs$sourceURL
-    browser()
 
     if (is.call(urls)) {
       # This is the case where it can't evaluate the .parseModulePartial because of a reference
@@ -545,7 +544,6 @@ setMethod(
 
     allInChecksums <- TRUE
     doDownload <- TRUE
-    browser()
     if (!((any(chksums$result == "FAIL") | any(is.na(chksums$result))) )) {
       if (length(to.dl) == 0) {
         message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
