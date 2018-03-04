@@ -500,7 +500,7 @@ setMethod(
     inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                   defineModuleElement = "inputObjects")
     urls <- inputs$sourceURL
-    names(urls) <- inputs$objectName
+    browser()
 
     if (is.call(urls)) {
       # This is the case where it can't evaluate the .parseModulePartial because of a reference
@@ -509,6 +509,12 @@ setMethod(
       urls <- eval(urls)
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
+    objNames <- if (is.call(inputs$objectName)) {
+      unlist(lapply(tail(parse(text = inputs$objectName), length(urls)), function(x) deparse(x)))
+    } else {
+      inputs$objectName
+    }
+    names(urls) <- objNames
 
     ids <- which(urls == "" | is.na(urls))
     to.dl <- if (length(ids)) urls[-ids] else urls
@@ -539,19 +545,26 @@ setMethod(
 
     allInChecksums <- TRUE
     doDownload <- TRUE
+    browser()
     if (!((any(chksums$result == "FAIL") | any(is.na(chksums$result))) )) {
-      message(crayon::magenta("  There is no checksums value for file(s): ", paste(to.dl, collapse = ", "),
-                              ". Perhaps you need to run\n", "checksums(\"", module, "\", path = \"",path, "\", write = TRUE)", sep = ""))
-      if (interactive())  {
-        out <- readline(prompt = "Would you like to download it now anyway? (Y)es or (N)o: ")
-      } else {
-        out = "No"
-      }
-      if (!isTRUE(any(pmatch("Y", toupper(out) )))) {
+      if (length(to.dl) == 0) {
         message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
         doDownload <- FALSE
+        allInChecksums <- FALSE
+      } else {
+        message(crayon::magenta("  There is no checksums value for file(s): ", paste(to.dl, collapse = ", "),
+                                ". Perhaps you need to run\n", "checksums(\"", module, "\", path = \"",path, "\", write = TRUE)", sep = ""))
+        if (interactive())  {
+          out <- readline(prompt = "Would you like to download it now anyway? (Y)es or (N)o: ")
+        } else {
+          out = "No"
+        }
+        if (!isTRUE(any(pmatch("Y", toupper(out) )))) {
+          message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
+          doDownload <- FALSE
+        }
+        allInChecksums <- FALSE
       }
-      allInChecksums <- FALSE
     }
 
     if (doDownload) {
