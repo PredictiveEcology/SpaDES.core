@@ -824,14 +824,14 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
                    "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
                    "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
   fullMessageNonInteractive <- c("Running inputObjects for child4",
-                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx <- matrix.*possibly at .*147",
-                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx2 <- matrix.*possibly at .*148",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx <- matrix.*",#possibly at .*147",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx2 <- matrix.*",#possibly at .*148",
                     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
                     "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
   )
   test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
   test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
-  if (grepl( "W-VIC-A128863", Sys.info()["nodename"])) {
+  if (grepl( "emcintir", Sys.info()["user"])) {
     tmpFilename = "c:/Eliot/tmp/test1.txt"
 
     cat("################### test1\n", file = tmpFilename, append = FALSE)

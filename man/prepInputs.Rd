@@ -5,10 +5,11 @@
 \title{Download and optionally reproject, crop, mask raw data and output module inputs}
 \usage{
 prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
-  destinationPath = NULL, fun = "raster", pkg = "raster",
+  destinationPath = ".", fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
-  quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...)
+  overwrite = FALSE, quickCheck = getOption("reproducible.quick"),
+  cacheTags = "", notOlderThan = NULL, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
@@ -51,6 +52,9 @@ cropping.}
 \item{addTagsByObject}{Pass any object in there for which there is a
 \code{.tagsByClass} function}
 
+\item{overwrite}{Logical. Should downloading and all the other actions occur even if they
+pass the checksums or the files are all there.}
+
 \item{quickCheck}{Logical. If \code{TRUE}, then all Caching that occurs will
 be based on the much faster but less robust file.info. \code{FALSE},
 the default, uses \code{\link[digest]{digest}}}
@@ -68,6 +72,18 @@ runs several other functions, conditionally and sequentially:
 \code{downloadFromWebDB} or \code{downloadData},
 \code{extractFromArchive}.  NOTE: This function is still experimental: use
 with caution.
+}
+\examples{
+# Currently this function only works within a module, where "sourceURL" is supplied
+#   in the metadata in the "expectsInputs(..., sourceURL = "")
+\dontrun{
+# Put chunks like this in your .inputObjects
+if (!suppliedElsewhere("test", sim))
+  sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
+                    destinationPath = dataPath(sim), studyArea = sim$studyArea,
+                    rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+}
+
 }
 \author{
 Eliot McIntire

@@ -429,6 +429,16 @@ setMethod(
 #'  have manually downloaded all the necessary data and ran \code{checksums} to
 #'  build a checksums file.
 #'
+#' There is an experimental attempt to use the googledrive package to download
+#' data from a shared (publically or with individual users) file. To try this,
+#' put the google drive URL in \code{sourceURL} argument of \code{expectsInputs} in the
+#' module metadata, and put the filename once downloaded
+#' in the \code{objectName} argument.
+#'
+#' There is also an experimental option for the user to make a new checksums file
+#' if there is a sourceURL but no entry for that file. This should be used with
+#' caution still.
+#'
 #' @param module  Character string giving the name of the module.
 #'
 #' @param path    Character string giving the path to the module directory.
@@ -454,12 +464,23 @@ setMethod(
 #' @seealso \code{\link{checksums}} for building a checksums file.
 #'
 #' @author Alex Chubaty
+#' @author Eliot McIntire
 #' @export
 #' @importFrom dplyr mutate
 #' @importFrom RCurl url.exists
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
+#' @examples
+#' \dontrun{
+#' # For a google drive example
+#' # In metadata:
+#' expectsInputs("theFilename.zip", "NA", "NA",
+#'   sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
+#' # create the checksums file
+#' checksums("thisModule", "there", write = TRUE)
+#' downloadData("thisModule", "there", files = "theFilename.zip")
+#' }
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
                                     overwrite = FALSE, files = NULL, checked = NULL) {
@@ -468,6 +489,7 @@ setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
 
 #' @rdname downloadData
 #' @importFrom reproducible checkPath
+#' @importFrom googledrive drive_download as_id
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "logical",
@@ -475,8 +497,10 @@ setMethod(
   definition = function(module, path, quiet, quickCheck, overwrite, files, checked) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
-    urls <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                                defineModuleElement = "inputObjects")$sourceURL
+    inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                  defineModuleElement = "inputObjects")
+    urls <- inputs$sourceURL
+
     if (is.call(urls)) {
       # This is the case where it can't evaluate the .parseModulePartial because of a reference
       #  to the sim object that isn't available. Because sourceURL is unlikely to use
@@ -484,6 +508,12 @@ setMethod(
       urls <- eval(urls)
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
+    objNames <- if (is.call(inputs$objectName)) {
+      unlist(lapply(tail(parse(text = inputs$objectName), length(urls)), function(x) deparse(x)))
+    } else {
+      inputs$objectName
+    }
+    names(urls) <- objNames
 
     ids <- which(urls == "" | is.na(urls))
     to.dl <- if (length(ids)) urls[-ids] else urls
@@ -500,21 +530,61 @@ setMethod(
       chksums <- chksums[chksums$expectedFile %in% basename(files), ]
       fileMatching <- agrepl(basename(files), basename(to.dl))
       if (!any(fileMatching)) {
-        stop("Could not match the SourceURLs for ", to.dl[fileMatching],
-             " to particular files in the CHECKSUMS.txt.",
+        fileMatching <- agrepl(basename(files), names(to.dl))
+        chksums <- chksums[chksums$expectedFile %in% names(to.dl)[fileMatching], ]
+        if (!any(fileMatching)) {
+          stop("Could not match the SourceURLs for ", to.dl[fileMatching],
+               " to particular files in the CHECKSUMS.txt.",
              "\nPerhaps add an entry in .inputObjects whose downloaded filename is closer",
              " to the online dataset name.")
+        }
       }
       to.dl <- to.dl[fileMatching]
     }
 
-    if ((any(chksums$result == "FAIL") | any(is.na(chksums$result))) | overwrite) {
+    allInChecksums <- TRUE
+    doDownload <- TRUE
+    if (!((any(chksums$result == "FAIL") | any(is.na(chksums$result))) )) {
+      if (length(to.dl) == 0) {
+        message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
+        doDownload <- FALSE
+        allInChecksums <- FALSE
+      } else {
+        message(crayon::magenta("  There is no checksums value for file(s): ", paste(to.dl, collapse = ", "),
+                                ". Perhaps you need to run\n", "checksums(\"", module, "\", path = \"",path, "\", write = TRUE)", sep = ""))
+        if (interactive())  {
+          out <- readline(prompt = "Would you like to download it now anyway? (Y)es or (N)o: ")
+        } else {
+          out = "No"
+        }
+        if (!isTRUE(any(pmatch("Y", toupper(out) )))) {
+          message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
+          doDownload <- FALSE
+        }
+        allInChecksums <- FALSE
+      }
+    }
+
+    if (doDownload) {
       setwd(path); on.exit(setwd(cwd), add = TRUE)
 
-      files1 <- sapply(to.dl, function(x) {
-        xFile <- gsub("[?!]", "_", basename(x))
+      files1 <- sapply(seq(to.dl), function(xInd) {
+
+        googleDrive <- FALSE
+        if (grepl("drive.google.com", to.dl[xInd])) {
+          message("Using googledrive package, expecting the filename to be provided as the objectName in 'expectsInputs'")
+          xFile <- names(to.dl[xInd])
+          googleDrive <- TRUE
+        } else {
+          xFile <- gsub("[?!]", "_", basename(to.dl[xInd]))
+        }
         destfile <- file.path(dataDir, xFile)
-        id <- which(chksums$expectedFile == xFile)
+
+        if (allInChecksums) {
+          id <- which(chksums$expectedFile == xFile)
+        } else {
+          id <- NA_integer_
+        }
         if (length(id) == 0) {
           fuzzy <- integer()
           md <- 1
@@ -542,10 +612,10 @@ setMethod(
             checkPath(create = TRUE) %>%
             file.path(., xFile)
 
-          if (!RCurl::url.exists(x)) {
+          if (!RCurl::url.exists(to.dl[xInd])) {
             ## if the URL doesn't work allow the user to retrieve it manually
             message(crayon::magenta("Cannot download ", xFile, " for module ", module, ":\n",
-                    "\u2937 cannot open URL '", x, "'.", sep = ""))
+                    "\u2937 cannot open URL '", to.dl[xInd], "'.", sep = ""))
 
             if (interactive()) {
               readline(prompt = paste0("Try downloading this file manually and put it in ",
@@ -557,38 +627,58 @@ setMethod(
             chksums <- checksums(module, path, files = files, quickCheck = quickCheck) %>%
               dplyr::mutate(renamed = NA, module = module)
           } else {
-            ## check whether file needs to be downloaded
-            remoteFileSize <- remoteFileSize(x)
             needNewDownload <- TRUE
-            if (file.exists(destfile)) {
-              if (remoteFileSize > 0)
-                if (round(file.size(destfile)) == remoteFileSize)
-                  needNewDownload <- FALSE
-            }
+            if (googleDrive) {
+              message(crayon::magenta("Downloading from Google Drive"))
+              googledrive::drive_download(googledrive::as_id(to.dl[xInd]), path = tmpFile,
+                                          overwrite = overwrite, verbose = TRUE)
+            } else {
+              ## check whether file needs to be downloaded
+              remoteFileSize <- remoteFileSize(to.dl[xInd])
+              if (file.exists(destfile)) {
+                if (remoteFileSize > 0)
+                  if (round(file.size(destfile)) == remoteFileSize)
+                    needNewDownload <- FALSE
+              }
 
-            ## download if needed, using Cache in case multiple objects use same url
-            ## (e.g., in a .tar file)
+              ## download if needed, using Cache in case multiple objects use same url
+              ## (e.g., in a .tar file)
+              if (needNewDownload) {
+                message(crayon::magenta("Downloading ", basename(to.dl[xInd]), " for module ",
+                                        module, ":", sep = ""))
+                download.file(to.dl[xInd], destfile = tmpFile, mode = "wb", quiet = quiet)
+              }
+            }
             if (needNewDownload) {
-              message(crayon::magenta("Downloading ", basename(x), " for module ",
-                                      module, ":", sep = ""))
-              download.file(x, destfile = tmpFile, mode = "wb", quiet = quiet)
-              copied <- file.copy(from = tmpFile, to = destfile, overwrite = TRUE)
+              copied <- file.copy(from = tmpFile, to = destfile, overwrite = overwrite)
+
             }
             destfile
           }
         } else {
-          message(crayon::magenta("  Download data step skipped for ", basename(x),
+          message(crayon::magenta("  Download data step skipped for ", basename(to.dl[xInd]),
                   " in module ", module, ". Local copy exists.", sep = ""))
         }
       })
+
+      if (!allInChecksums) {
+        if (interactive()) {
+          readline("If download was successful, would you like to run a new checksums? (Y)es or (N)o: ")
+        } else {
+          out = "No"
+        }
+        if (isTRUE(any(pmatch("Y", toupper(out) )))) {
+          message("Making new checksums file")
+          checksums(module = module, path = path, write = TRUE)
+        }
+
+      }
 
       chksums <- checksums(module, path, quickCheck = quickCheck, files = files) %>%
         dplyr::mutate(renamed = NA, module = module)
     } else if (NROW(chksums) > 0) {
       message(crayon::magenta("  Download data step skipped for module ", module,
                               ". Local copy exists.", sep = ""))
-    } else {
-      message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
     }
 
     # There are at least 2 options if the expected doesn't match actual

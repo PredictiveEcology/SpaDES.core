@@ -599,7 +599,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     }
   }
 
-  if (!exists("out")) {
+  if (!exists("out", inherits = FALSE)) {
     if (type == "assign") {
       if (is.name(x)) {
         out <- character()
@@ -648,7 +648,8 @@ cantCodeCheckMessage <- ": line could not be checked "
       whInner <- any((pd[outerWh,"line1"] < lwf) & (pd[outerWh,"line2"] > lwf) )
       if (isTRUE(whInner)) lwf else numeric()
     })
-    names(linesWithFail) <- namedTxt[patternIndex]
+    if (length(linesWithFail) == length(namedTxt[patternIndex]))
+      names(linesWithFail) <- namedTxt[patternIndex]
     unlist(linesWithFail)
 
   })

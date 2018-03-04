@@ -206,7 +206,9 @@ setMethod(
           eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir)
 
         # attach source code to simList in a hidden spot
-        list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.envir[[m]])
+        opt <- getOption("spades.moduleCodeChecks")
+        if (isTRUE(opt) || length(names(opt)) > 1)
+          list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.envir[[m]])
         sim@.envir[[m]][["._sourceFilename"]] <- grep(paste0(m,".R"), ls(sim@.envir[[".parsedFiles"]]), value = TRUE)
 
         # parse any scripts in R subfolder
@@ -381,14 +383,20 @@ setMethod(
                 all(nzchar(x))))], eval, envir = env)
               args[["sim"]] <- sim
 
+              # This next line is not used because we don't actually know what the
+              #  dependencies are for .inputObjects
+              #  aa <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "user"))
+
               sim <- Cache(FUN = do.call, .inputObjects, args = args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
                            outputObjects = moduleSpecificInputObjects,
-                           digestPathContent = TRUE,
+                           digestPathContent = !getOption("reproducible.quick"),
+                           quick = getOption("reproducible.quick"),
+                           debugCache = "complete",
                            userTags = c(paste0("module:", m),
-                                        paste0("eventType:.inputObjects",
-                                               "function:.inputObjects")))
+                                        "eventType:.inputObjects",
+                                        "function:.inputObjects"))
 
             } else {
               message(crayon::green("Running .inputObjects for ", m, sep = ""))
@@ -488,8 +496,11 @@ parseConditional <- function(envir = NULL, filename = character()) {
   }
 
   if (needParse) {
-    tmp[["parsedFile"]] <- parse(filename, keep.source = TRUE)
-    tmp[["._parsedData"]] <- getParseData(tmp[["parsedFile"]], TRUE)
+    tmp[["parsedFile"]] <- parse(filename)#, keep.source = getOption("spades.moduleCodeChecks"))
+    opt <- getOption("spades.moduleCodeChecks")
+    if (isTRUE(opt) || length(names(opt)) > 1) {
+      tmp[["._parsedData"]] <- getParseData(tmp[["parsedFile"]], TRUE)
+    }
     tmp[["defineModuleItem"]] <- grepl(pattern = "defineModule", tmp[["parsedFile"]])
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }

@@ -69,12 +69,13 @@ setMethod(
     } else {
       objects <- allObjsInSimList
     }
-
     envirHash <- lapply(seq(allObjsInSimList), function(objs) {
       objectsToDigest <- sort(allObjsInSimList[[objs]], method = "radix")
       objectsToDigest <- objectsToDigest[objectsToDigest %in%
                                            objects[[names(allObjsInSimList)[objs]]]]
-      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]))
+      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]),
+                    digestPathContent = digestPathContent,
+                    compareRasterFileLength = compareRasterFileLength)
     })
     names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
@@ -95,7 +96,9 @@ setMethod(
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
-    object@inputs$file <- unlist(.robustDigest(object@inputs$file))
+    object@inputs$file <- unlist(.robustDigest(object@inputs$file,
+                                               digestPathContent = digestPathContent,
+                                               compareRasterFileLength = compareRasterFileLength))
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {

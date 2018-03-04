@@ -1,5 +1,101 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables("expectedFile")
+  utils::globalVariables(c("expectedFile", "objName"))
+}
+
+
+#' Assess whether an object has or will be supplied from elsewhere
+#'
+#' When loading objects into a \code{simList}, especially during the
+#' \code{simInit} call, and inside the \code{.inputObjects} functions of modules,
+#' it is often useful to know if an object in question will or has been
+#' by the user via the \code{inputs} or \code{objects} arguments, or by another
+#' module's \code{.inputObjects} while preparing its expected inputs (via
+#' \code{expectsInputs} in metadata), or if it will be supplied by another
+#' module during its \code{"init"} event. In all these cases, it may not
+#' be necessary for a given module to load any default value for its \code{expectsInputs}.
+#' This function can be used as a check to determine whether the module needs
+#' to proceed in getting and assigning its default value.
+#'
+#' @param object Character vector or sim object in the form sim$objName
+#' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
+#' @param where Character vector with one to three of "sim", "user", or "initEvent".
+#'        Default is all three. See details
+#' @export
+#'
+#' @details
+#'
+#' \code{where} indicates which of three places to search, either \code{"sim"} i.e.,
+#' the \code{simList}, which would be equivalent to \code{is.null(sim\$objName)}, or
+#' \code{"user"} which would be supplied by the user in the \code{simInit} function
+#' call via \code{outputs} or \code{inputs} (equivalent to
+#' \code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
+#' or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
+#' the present one \bold{will} create it as part of its outputs (i.e., as indicated by
+#' \code{createsOutputs} in that module's metadata). This final one (\code{"initEvent"})
+#' does not explicitly test that the object will be created in the "init" event, only that
+#' it is in the outputs of that module, and that it is a module that is loaded prior to
+#' this one.
+#' @examples
+#' mySim <- simInit()
+#' suppliedElsewhere("test", mySim) # FALSE
+#'
+#' # supplied in the simList
+#' mySim$test <- 1
+#' suppliedElsewhere("test", mySim) # TRUE
+#' test <- 1
+#'
+#' # supplied from user at simInit time -- note, this object would eventually get into the simList
+#' #   but the user supplied values come *after* the module's .inputObjects, so
+#' #   a basic is.null(sim$test) would return TRUE even though the user supplied test
+#' mySim <- simInit(objects = list("test" = test))
+#' suppliedElsewhere("test", mySim) # TRUE
+#'
+suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
+  objDeparsed <- substitute(object)
+  if (missing(sim)) {
+    theCall <- as.call(parse(text = deparse(objDeparsed)))
+    objDeparsedIfHasSim <- .parsingSim(theCall[[1]], "assign")
+    if (length(objDeparsedIfHasSim))
+      objDeparsed <- objDeparsedIfHasSim
+    env <- parent.frame()
+    isSimList <- unlist(lapply(theCall[[1]], function(x)
+      isTRUE(try(is(eval(x, envir = env), "simList"), silent = TRUE))))
+    if (!all(isSimList)) {
+      sim <- get("sim", envir = env)
+    } else {
+      sim <- eval(theCall[[1]][isSimList][[1]], envir = env)
+    }
+
+  }
+
+  # if object was actually a variable of character names of objects inside sim
+  objDeparsed <- tryCatch(eval(objDeparsed, parent.frame()), error = function(y) objDeparsed)
+
+  objDeparsed <- as.character(objDeparsed)
+
+  # Equivalent to !is.null(sim$xxx)
+  inPrevDotInputObjects <- if ("sim" %in% where) {
+    match(objDeparsed, names(sim@.envir), nomatch = 0L) > 0L
+  } else {
+    FALSE
+  }
+  # Equivalent to !(names(sim) %in% sim$.userSuppliedObjNames)
+  inUserSupplied <- if ("user" %in% where) {
+    objDeparsed %in% sim$.userSuppliedObjNames
+  } else {
+    FALSE
+  }
+
+  # If one of the modules that has already been loaded has this object as an output,
+  #   then don't create this
+  inFutureInit <- if (pmatch("initEve", where)) {
+    objDeparsed %in%
+      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
+  } else {
+    FALSE
+  }
+
+  (inUserSupplied | inPrevDotInputObjects | inFutureInit)
 }
 
 #' Download file from web databases
@@ -20,6 +116,7 @@ if (getRversion() >= "3.1.0") {
 #' @author Jean Marchal
 #' @importFrom httr authenticate GET http_error progress write_disk
 #' @importFrom webDatabases webDatabases
+#' @importFrom stats runif
 #' @rdname downloadFromWebDB
 #'
 downloadFromWebDB <- function(filename, filepath, dataset = NULL, quickCheck = FALSE) {
@@ -198,6 +295,9 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @param cacheTags Character vector with Tags. These Tags will be added to the
 #' repository along with the artifact.
 #'
+#' @param overwrite Logical. Should downloading and all the other actions occur even if they
+#'                  pass the checksums or the files are all there.
+#'
 #' @param ... Passed to pkg::fun
 #'
 #' @author Eliot McIntire
@@ -209,15 +309,24 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @importFrom reproducible Cache compareNA asPath
 #' @importFrom sf st_buffer st_crs st_intersection st_is st_is_valid st_transform st_write
 #' @rdname prepInputs
+#' @examples
+#' # Currently this function only works within a module, where "sourceURL" is supplied
+#' #   in the metadata in the "expectsInputs(..., sourceURL = "")
+#' \dontrun{
+#' # Put chunks like this in your .inputObjects
+#' if (!suppliedElsewhere("test", sim))
+#'   sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
+#'                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
+#'                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+#' }
 #'
 prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
-                       dataset = NULL, destinationPath = NULL, fun = "raster",
+                       dataset = NULL, destinationPath = ".", fun = "raster",
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
-                       writeCropped = TRUE, addTagsByObject = NULL,
-                       quickCheck = FALSE, cacheTags = "", notOlderThan = NULL, ...) {
+                       writeCropped = TRUE, addTagsByObject = NULL, overwrite = FALSE,
+                       quickCheck = getOption("reproducible.quick"), cacheTags = "", notOlderThan = NULL, ...) {
   message("Preparing: ", targetFile)
-  # destinationPath <- file.path(modulePath, moduleName, "data")
 
   targetFile <- basename(targetFile)
   targetFilePath <- file.path(destinationPath, targetFile)
@@ -229,25 +338,17 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     filesToCheck <- targetFilePath
   }
 
-  # Here we assume that if destinationPath has not been updated checksums don't need to
-  # be rerun. This is useful for WEB apps.
-  capturedOutput <- capture.output(
-    tmp <- Cache(file.info, asPath(dir(destinationPath, full.names = TRUE)), userTags = cacheTags),
-    type = "message"
-  )
+  # If quickCheck, then use file.info as part of cache/memoise ... otherwise,
+  #   pass a random real number to make a new memoise
+  fileinfo <- if (quickCheck) file.info(filesToCheck) else runif(1)
+  out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
+               asPath(file.path(destinationPath, "CHECKSUMS.txt")),
+               digestPathContentInner = !quickCheck, cacheTags, quickCheck)
+  moduleName <- out$moduleName
+  modulePath <- out$modulePath
+  checkSums <- out$checkSums
+  rm(out)
 
-  notOlderThan <- if (length(capturedOutput) == 0) Sys.time()
-
-  chksumsFilePath <- file.path(destinationPath, "CHECKSUMS.txt")
-  moduleName <- basename(dirname(dirname(chksumsFilePath)))
-  modulePath <- dirname(dirname(dirname(chksumsFilePath)))
-  checkSums <- checksums(files = filesToCheck,
-          module = moduleName,
-          path = modulePath,
-          checksumFile = asPath(chksumsFilePath),
-          write = FALSE,
-          quickCheck = quickCheck
-  )
   result <- checkSums[checkSums$expectedFile == targetFile, ]$result
   mismatch <- !isTRUE(result == "OK")
 
@@ -276,11 +377,11 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     # The download step
     if (!is.null(fileToDownload))
       downloadData(moduleName, modulePath, files = fileToDownload,
-                   checked = checkSums, quickCheck = quickCheck)
+                   checked = checkSums, quickCheck = quickCheck, overwrite = TRUE)
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
-                         needed = c(targetFile, alsoExtract))
+                         needed = c(targetFile, basename(alsoExtract)))
     }
   }
 
@@ -339,15 +440,26 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
     if (writeCropped) {
       smallFN <- .prefix(targetFilePath, "Small")
 
-      Cache(
+      xTmp <- Cache(
         writeInputsOnDisk,
         x = x,
         filename = smallFN,
         rasterDatatype = rasterDatatype,
         quick = quickCheck,
         userTags = cacheTags,
-        notOlderThan = if (!file.exists(asPath(smallFN))) Sys.time()
+        notOlderThan = Sys.time() # Too many reasons why this doesn't work properly
       )
+
+      if (is(xTmp, "Raster")) { # Rasters need to have their disk-backed value assigned, but not shapefiles
+        # This is a bug in writeRaster was spotted with crs of xTmp became
+        # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+        # should have stayed at
+        # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0
+        if (!identical(crs(xTmp), crs(x)))
+          crs(xTmp) <- crs(x)
+
+        x <- xTmp
+      }
     }
   }
   x
@@ -378,7 +490,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 #' @author Jean Marchal
 #' @export
 #' @importFrom methods is
-#' @importFrom raster buffer crop crs extent projectRaster res
+#' @importFrom raster buffer crop crs extent projectRaster res crs<-
 #' @importFrom rgeos gIsValid
 #' @importFrom reproducible Cache
 #' @importFrom sp SpatialPolygonsDataFrame spTransform CRS
@@ -556,3 +668,22 @@ writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
 .unzipOrUnTar <- function(fun, args, files) {
   do.call(fun, c(args, list(files = files)))
 }
+
+
+.checkSums <- function(filesToCheck, fileinfo, chksumsFilePath, digestPathContentInner, cacheTags, quickCheck) {
+  if (missing(chksumsFilePath)) {
+    chksumsFilePath <- file.path(dirname(filesToCheck), "CHECKSUMS.txt")
+  }
+  moduleName <- basename(dirname(dirname(chksumsFilePath)))
+  modulePath <- dirname(dirname(dirname(chksumsFilePath)))
+  checkSums <- checksums(files = filesToCheck,
+                         module = moduleName,
+                         path = modulePath,
+                         checksumFile = asPath(chksumsFilePath),
+                         write = FALSE,
+                         quickCheck = quickCheck
+  )
+  list(moduleName = moduleName, modulePath = modulePath, checkSums = checkSums)
+}
+
+.checkSumsMem <- memoise::memoise(.checkSums)
