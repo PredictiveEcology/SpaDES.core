@@ -58,10 +58,34 @@ the correct one.
  the files specified therein. Hence, module developers should make sure they
  have manually downloaded all the necessary data and ran \code{checksums} to
  build a checksums file.
+
+There is an experimental attempt to use the googledrive package to download
+data from a shared (publically or with individual users) file. To try this,
+put the google drive URL in \code{sourceURL} argument of \code{expectsInputs} in the
+module metadata, and put the filename once downloaded
+in the \code{objectName} argument.
+
+There is also an experimental option for the user to make a new checksums file
+if there is a sourceURL but no entry for that file. This should be used with
+caution still.
+}
+\examples{
+\dontrun{
+# For a google drive example
+# In metadata:
+expectsInputs("theFilename.zip", "NA", "NA",
+  sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
+# create the checksums file
+checksums("thisModule", "there", write = TRUE)
+downloadData("thisModule", "there", files = "theFilename.zip")
+}
+
 }
 \seealso{
 \code{\link{checksums}} for building a checksums file.
 }
 \author{
 Alex Chubaty
+
+Eliot McIntire
 }

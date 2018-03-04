@@ -117,7 +117,6 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 #' @importFrom httr authenticate GET http_error progress write_disk
 #' @importFrom webDatabases webDatabases
 #' @importFrom stats runif
-#' @importFrom utils hasName
 #' @rdname downloadFromWebDB
 #'
 downloadFromWebDB <- function(filename, filepath, dataset = NULL, quickCheck = FALSE) {
