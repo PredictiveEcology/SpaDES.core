@@ -9,13 +9,17 @@
     spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
+    spades.moduleCodeChecks = list(
+      skipWith = TRUE
+      suppressNoLocalFun = TRUE,
+      suppressParamUnused = FALSE,
+      suppressPartialMatchArgs = FALSE,
+      suppressUndefined = TRUE,
+    ),
     spades.modulePath = file.path(.spadesTempDir, "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
-    spades.moduleCodeChecks = list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
-                                suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-                                skipWith = TRUE),
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "http://github.com/PredictiveEcology/SpaDES"
