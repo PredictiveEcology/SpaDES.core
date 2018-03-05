@@ -429,15 +429,18 @@ setMethod(
 #'  have manually downloaded all the necessary data and ran \code{checksums} to
 #'  build a checksums file.
 #'
-#' There is an experimental attempt to use the googledrive package to download
-#' data from a shared (publically or with individual users) file. To try this,
-#' put the google drive URL in \code{sourceURL} argument of \code{expectsInputs} in the
-#' module metadata, and put the filename once downloaded
+#' There is an experimental attempt to use the \pkg{googledrive} package to download
+#' data from a shared (publically or with individual users) file.
+#' To try this, put the Google Drive URL in \code{sourceURL} argument of
+#' \code{expectsInputs} in the module metadata, and put the filename once downloaded
 #' in the \code{objectName} argument.
+#' If using Rstudio Server, you may need to use "out of band" authentication by
+#' setting \code{options(httr_oob_default = TRUE)}.
+#' To avoid caching of Oauth credentials, set \code{options(httr_oauth_cache = TRUE)}.
 #'
-#' There is also an experimental option for the user to make a new checksums file
-#' if there is a sourceURL but no entry for that file. This should be used with
-#' caution still.
+#' There is also an experimental option for the user to make a new \file{CHECKSUMS.txt}
+#' file if there is a \code{sourceURL} but no entry for that file.
+#' This is experimental and should be used with caution.
 #'
 #' @param module  Character string giving the name of the module.
 #'
@@ -467,13 +470,15 @@ setMethod(
 #' @author Eliot McIntire
 #' @export
 #' @importFrom dplyr mutate
+#' @importFrom googledrive as_id drive_auth drive_download
+#' @importFrom reproducible checkPath
 #' @importFrom RCurl url.exists
 #' @importFrom utils download.file
 #' @include moduleMetadata.R
 #' @rdname downloadData
 #' @examples
 #' \dontrun{
-#' # For a google drive example
+#' # For a Google Drive example
 #' # In metadata:
 #' expectsInputs("theFilename.zip", "NA", "NA",
 #'   sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
@@ -488,8 +493,6 @@ setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
 })
 
 #' @rdname downloadData
-#' @importFrom reproducible checkPath
-#' @importFrom googledrive drive_download as_id
 setMethod(
   "downloadData",
   signature = c(module = "character", path = "character", quiet = "logical",
@@ -550,8 +553,11 @@ setMethod(
         doDownload <- FALSE
         allInChecksums <- FALSE
       } else {
-        message(crayon::magenta("  There is no checksums value for file(s): ", paste(to.dl, collapse = ", "),
-                                ". Perhaps you need to run\n", "checksums(\"", module, "\", path = \"",path, "\", write = TRUE)", sep = ""))
+        message(crayon::magenta("  There is no checksums value for file(s): ",
+                                paste(to.dl, collapse = ", "),
+                                ". Perhaps you need to run\n",
+                                "checksums(\"", module, "\", path = \"", path,
+                                "\", write = TRUE)", sep = ""))
         if (interactive())  {
           out <- readline(prompt = "Would you like to download it now anyway? (Y)es or (N)o: ")
         } else {
@@ -569,10 +575,10 @@ setMethod(
       setwd(path); on.exit(setwd(cwd), add = TRUE)
 
       files1 <- sapply(seq(to.dl), function(xInd) {
-
         googleDrive <- FALSE
         if (grepl("drive.google.com", to.dl[xInd])) {
-          message("Using googledrive package, expecting the filename to be provided as the objectName in 'expectsInputs'")
+          message("Using 'googledrive' package, expecting the filename to be provided",
+                  " as the objectName in 'expectsInputs'")
           xFile <- names(to.dl[xInd])
           googleDrive <- TRUE
         } else {
@@ -629,7 +635,11 @@ setMethod(
           } else {
             needNewDownload <- TRUE
             if (googleDrive) {
-              message(crayon::magenta("Downloading from Google Drive"))
+              message(crayon::magenta("Downloading from Google Drive:"))
+
+              ## allow options `httr_oob_default` and `httr_oauth_cache` to be used:
+              googledrive::drive_auth() ## needed for use on e.g., rstudio-server
+
               googledrive::drive_download(googledrive::as_id(to.dl[xInd]), path = tmpFile,
                                           overwrite = overwrite, verbose = TRUE)
             } else {

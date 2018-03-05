@@ -59,19 +59,22 @@ the correct one.
  have manually downloaded all the necessary data and ran \code{checksums} to
  build a checksums file.
 
-There is an experimental attempt to use the googledrive package to download
-data from a shared (publically or with individual users) file. To try this,
-put the google drive URL in \code{sourceURL} argument of \code{expectsInputs} in the
-module metadata, and put the filename once downloaded
+There is an experimental attempt to use the \pkg{googledrive} package to download
+data from a shared (publically or with individual users) file.
+To try this, put the Google Drive URL in \code{sourceURL} argument of
+\code{expectsInputs} in the module metadata, and put the filename once downloaded
 in the \code{objectName} argument.
+If using Rstudio Server, you may need to use "out of band" authentication by
+setting \code{options(httr_oob_default = TRUE)}.
+To avoid caching of Oauth credentials, set \code{options(httr_oauth_cache = TRUE)}.
 
-There is also an experimental option for the user to make a new checksums file
-if there is a sourceURL but no entry for that file. This should be used with
-caution still.
+There is also an experimental option for the user to make a new \file{CHECKSUMS.txt}
+file if there is a \code{sourceURL} but no entry for that file.
+This is experimental and should be used with caution.
 }
 \examples{
 \dontrun{
-# For a google drive example
+# For a Google Drive example
 # In metadata:
 expectsInputs("theFilename.zip", "NA", "NA",
   sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
