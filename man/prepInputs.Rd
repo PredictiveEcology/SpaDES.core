@@ -8,7 +8,7 @@ prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
   destinationPath = ".", fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
-  overwrite = FALSE, quickCheck = getOption("reproducible.quick"),
+  overwrite = FALSE, quickCheck = getOption("reproducible.quick", FALSE),
   cacheTags = "", notOlderThan = NULL, ...)
 }
 \arguments{

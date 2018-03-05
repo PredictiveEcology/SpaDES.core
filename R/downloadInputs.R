@@ -325,7 +325,8 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
                        writeCropped = TRUE, addTagsByObject = NULL, overwrite = FALSE,
-                       quickCheck = getOption("reproducible.quick"), cacheTags = "", notOlderThan = NULL, ...) {
+                       quickCheck = getOption("reproducible.quick", FALSE),
+                       cacheTags = "", notOlderThan = NULL, ...) {
   message("Preparing: ", targetFile)
 
   targetFile <- basename(targetFile)
