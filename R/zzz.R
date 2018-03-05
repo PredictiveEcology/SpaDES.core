@@ -10,11 +10,11 @@
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
     spades.moduleCodeChecks = list(
-      skipWith = TRUE
+      skipWith = TRUE,
       suppressNoLocalFun = TRUE,
       suppressParamUnused = FALSE,
       suppressPartialMatchArgs = FALSE,
-      suppressUndefined = TRUE,
+      suppressUndefined = TRUE
     ),
     spades.modulePath = file.path(.spadesTempDir, "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
