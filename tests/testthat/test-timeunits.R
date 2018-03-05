@@ -190,7 +190,6 @@ test_that("timeunits with child and parent modules work correctly", {
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = "timeunit = NA") # nolint
   cat(xxx1, file = fileName, sep = "\n")
 
-
   ## child6 is used for further module testing
   suppressMessages(newModule("child6", tmpdir, open = FALSE))
   fileName <- file.path(tmpdir, "child6/child6.R")
@@ -208,7 +207,7 @@ test_that("timeunits with child and parent modules work correctly", {
   modName <- basename(dirname(fileName))
   initLine <- grep(xxx, pattern = "Init\\(sim\\)")
   xxx1 <- c(xxx[seq(initLine)], "  sim$dp <- dataPath(sim)",
-            "  sim$cm <- currentModule(sim)", xxx[seq(length(xxx)-initLine)+initLine],
+            "  sim$cm <- currentModule(sim)", xxx[seq(length(xxx) - initLine) + initLine],
             "  cm1 <- currentModule(sim)", "  dp1 <- dataPath(sim)")
   cat(xxx1, file = fileName, sep = "\n")
   mySim <- simInit(modules = list(modName), paths = list(modulePath = tmpdir))
@@ -219,37 +218,38 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_true(mySimOut$dp == file.path(dirname(fileName), "data"))
   expect_true(mySimOut$cm == file.path(modName))
 
-
   ######
   theFile <- file.path(tmpdir, "test")
   write.table(x = data.frame(1), file = theFile)
 
   xxx <- readLines(fileName)
   modName <- basename(dirname(fileName))
-  lineOfInterest1 <- tail(grep(xxx, pattern = "expectsInput"),1)
-  xxx1 <- c(xxx[seq(lineOfInterest1-1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
-            xxx[seq(length(xxx)-lineOfInterest1)+lineOfInterest1])
+  lineOfInterest1 <- tail(grep(xxx, pattern = "expectsInput"), 1)
+  xxx1 <- c(xxx[seq(lineOfInterest1 - 1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
+            xxx[seq(length(xxx) - lineOfInterest1) + lineOfInterest1])
   cat(xxx1, file = fileName, sep = "\n")
 
   lineOfInterest <- grep(xxx1, pattern = ".inputObjects <- ")
-  xxx1 <- c(xxx1[seq(lineOfInterest - 1)], "  .inputObjects <- function(sim, a = asPath(file.path(inputPath(sim), \"test\"))) {",
+  xxx1 <- c(xxx1[seq(lineOfInterest - 1)],
+            "  .inputObjects <- function(sim, a = asPath(file.path(inputPath(sim), \"test\"))) {",
             "  sim$b <- a",
-            xxx1[seq(length(xxx1)-lineOfInterest)+lineOfInterest])
+            xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
   cat(xxx1, file = fileName, sep = "\n")
 
   cacheDir <- file.path(tmpdir, "cache")
   try(clearCache(cacheDir), silent = TRUE)
-  expect_silent(expect_message(mySim <- simInit(modules = list(modName),
-                                  paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                  params = list("child6"= list(.useCache = ".inputObjects"))),
-                               "Using or creating cached|child6 -- outputObjects: b, dp, cm are assigned")
+  expect_silent(expect_message(
+    mySim <- simInit(modules = list(modName),
+                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                     params = list("child6" = list(.useCache = ".inputObjects"))),
+    "Using or creating cached|child6 -- outputObjects: b, dp, cm are assigned")
   )
 
   # pulls cached value
   mm1 <- capture_messages(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                     params = list("child6"= list(.useCache = ".inputObjects")))
+                     params = list("child6" = list(.useCache = ".inputObjects")))
   )
   mm1 <- cleanMessage(mm1)
   fullMessage <- c("Using or creating cached copy of inputObjects for child6",
@@ -259,14 +259,15 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_true(all(unlist(lapply(fullMessage,
                                 function(x) any(grepl(mm1, pattern = x))))))
 
-  expect_true(identical(mySim$b, asPath(theFile)))
+  expect_identical(mySim$b, asPath(theFile))
 
   # Change the file that is in the arguments to .inputObjects
-  write.table(x = data.frame(sample(1e6,1)), file = theFile)
+  write.table(x = data.frame(sample(1e6, 1)), file = theFile)
   # Cache should force a rerun -- i.e., not cached value
-  mm1 <- capture_messages(mySim <- simInit(modules = list(modName),
-                                           paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                           params = list("child6"= list(.useCache = ".inputObjects"))))
+  mm1 <- capture_messages(
+    mySim <- simInit(modules = list(modName),
+                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                     params = list("child6" = list(.useCache = ".inputObjects"))))
 
   mm1 <- cleanMessage(mm1)
   fullMessage <- c("Using or creating cached copy of inputObjects for child6",
@@ -277,9 +278,10 @@ test_that("timeunits with child and parent modules work correctly", {
                                 function(x) any(grepl(mm1, pattern = x))))))
 
   # pulls cached value
-  mm1 <- capture_messages(mm2 <- capture_output(mySim <- simInit(modules = list(modName),
-                                           paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                                           params = list("child6"= list(.useCache = ".inputObjects")))
+  mm1 <- capture_messages(mm2 <- capture_output(
+    mySim <- simInit(modules = list(modName),
+                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                     params = list("child6" = list(.useCache = ".inputObjects")))
   ))
   mm1 <- cleanMessage(mm1)
   fullMessage <- c("Using or creating cached copy of inputObjects for child6",
@@ -289,6 +291,4 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_true(all(unlist(lapply(fullMessage,
                                 function(x) any(grepl(mm1, pattern = x))))))
   expect_true(grepl("Using cached", mm2))
-
-
 })
