@@ -472,8 +472,9 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 #'
 #' @param x A \code{Spatial*}, \code{sf}, or \code{Raster*} object.
 #'
-#' @param studyArea Template \code{SpatialPolygons*} object used for reprojecting
-#' and cropping.
+#' @param studyArea Template \code{SpatialPolygons*} object used for masking, after cropping.
+#'                  If not in same CRS, then it will be \code{spTransform}ed to
+#'                  CRS of \code{x} before masking.
 #'
 #' @param rasterToMatch Template \code{Raster*} object used for reprojecting and
 #' cropping.
@@ -506,8 +507,8 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
       crs(rasterToMatch)
-    } else if (!is.null(studyArea)) {
-      crs(studyArea)
+    # } else if (!is.null(studyArea)) {
+    #   crs(studyArea)
     } else {
       if (is(x, "sf"))
         CRS(sf::st_crs(x)$proj4string)
@@ -548,7 +549,7 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         }
       } else {
         if (!identical(crs(x), targetCRS)) {
-          x <- Cache(projectRaster, from = x, crs = targetCRS,
+          x <- Cache(projectRaster, from = x, crs = targetCRS, res = res(x),
                      method = rasterInterpMethod, userTags = cacheTags)
         }
       }
