@@ -19,7 +19,7 @@ if (getRversion() >= "3.1.0") {
 #' @param object Character vector or sim object in the form sim$objName
 #' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
-#'        Default is all three. See details
+#'        Default is all three. Partial matching is used. See details.
 #' @export
 #'
 #' @details
@@ -31,7 +31,10 @@ if (getRversion() >= "3.1.0") {
 #' \code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
 #' or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
 #' the present one \bold{will} create it as part of its outputs (i.e., as indicated by
-#' \code{createsOutputs} in that module's metadata). This final one (\code{"initEvent"})
+#' \code{createsOutputs} in that module's metadata). There is a caveat to this test,
+#' however; if that other event also has the object as an \code{expectsInput}, then
+#' it would fail this test, as it \emph{also} needs it as an input.
+#' This final one (\code{"initEvent"})
 #' does not explicitly test that the object will be created in the "init" event, only that
 #' it is in the outputs of that module, and that it is a module that is loaded prior to
 #' this one.
@@ -51,6 +54,9 @@ if (getRversion() >= "3.1.0") {
 #' suppliedElsewhere("test", mySim) # TRUE
 #'
 suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
+  partialMatching <- c("s", "i", "u")
+  where <- partialMatching[which(!is.na(pmatch(partialMatching, where)))]
+  if (length(where) == 0) stop("where must be either sim, user or initEvent")
   objDeparsed <- substitute(object)
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
@@ -74,13 +80,13 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   objDeparsed <- as.character(objDeparsed)
 
   # Equivalent to !is.null(sim$xxx)
-  inPrevDotInputObjects <- if ("sim" %in% where) {
+  inPrevDotInputObjects <- if ("s" %in% where) {
     match(objDeparsed, names(sim@.envir), nomatch = 0L) > 0L
   } else {
     FALSE
   }
   # Equivalent to !(names(sim) %in% sim$.userSuppliedObjNames)
-  inUserSupplied <- if ("user" %in% where) {
+  inUserSupplied <- if ("u" %in% where) {
     objDeparsed %in% sim$.userSuppliedObjNames
   } else {
     FALSE
@@ -88,9 +94,14 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- if (pmatch("initEve", where)) {
+  inFutureInit <- if ("i" %in% where) {
     objDeparsed %in%
-      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
+      # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
+      #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
+      #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
+      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), ][
+        objName == objDeparsed][
+          all(from != to), .SD, by = objName]
   } else {
     FALSE
   }
