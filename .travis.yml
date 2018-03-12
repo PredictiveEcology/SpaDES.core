@@ -16,6 +16,7 @@ matrix:
         packages:
         - libgdal1-dev
         - libgeos-dev
+        - libglpk-dev
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
@@ -32,6 +33,7 @@ matrix:
         packages:
         - libgdal1-dev
         - libgeos-dev
+        - libglpk-dev
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
@@ -48,6 +50,7 @@ matrix:
         packages:
         - libgdal1-dev
         - libgeos-dev
+        - libglpk-dev
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
@@ -72,6 +75,7 @@ matrix:
         packages:
         - libgdal1-dev
         - libgeos-dev
+        - libglpk-dev
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
