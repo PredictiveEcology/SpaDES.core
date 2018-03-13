@@ -36,7 +36,7 @@
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     packageStartupMessage("Default paths for SpaDES directories set to:\n",
-                          "  cachePath:  ", getOption("spades.cachePath"), "\n",
+                          "  cachePath:  ", .getOption("spades.cachePath"), "\n",
                           "  inputPath:  ", getOption("spades.inputPath"), "\n",
                           "  modulePath: ", getOption("spades.modulePath"), "\n",
                           "  outputPath: ", getOption("spades.outputPath"), "\n",
@@ -46,7 +46,7 @@
 
 .onUnload <- function(libpath) {
   ## if temp session dir is being used, ensure it gets reset each session
-  if (getOption("spades.cachePath") == file.path(.spadesTempDir, "cache")) {
+  if (.getOption("spades.cachePath") == file.path(.spadesTempDir, "cache")) {
     options(spades.cachePath = NULL)
   }
   if (getOption("spades.inputPath") == file.path(.spadesTempDir, "inputs")) {

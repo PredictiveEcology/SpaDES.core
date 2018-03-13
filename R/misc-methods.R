@@ -2,6 +2,22 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 }
 
+#' A slightly modified version of getOption
+#'
+#' This can take x as a character string or as a function that returns a character string.
+#'
+#' @inheritParams base::getOption
+.getOption <- function(x) {
+
+  spadesCacheDefault <- getOption(x)
+  cacheRepo <-
+    if (is.function(spadesCacheDefault)) {
+      spadesCacheDefault()
+    } else {
+      spadesCacheDefault
+    }
+}
+
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
@@ -581,7 +597,7 @@ setMethod(
 #'
 .paths <- function() {
   list(
-    cachePath = getOption("spades.cachePath"),
+    cachePath = .getOption("spades.cachePath"),
     inputPath = getOption("spades.inputPath"),
     modulePath = getOption("spades.modulePath"),
     outputPath = getOption("spades.outputPath")
@@ -600,7 +616,7 @@ getPaths <- function() {
 #' @importFrom reproducible checkPath
 #' @importFrom R.utils getOption
 setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
-  if (missing(cachePath)) cachePath <- getOption("spades.cachePath")     # nolint
+  if (missing(cachePath)) cachePath <- .getOption("spades.cachePath")     # nolint
   if (missing(inputPath)) inputPath <- getOption("spades.inputPath")    # nolint
   if (missing(modulePath)) modulePath <- getOption("spades.modulePath") # nolint
   if (missing(outputPath)) outputPath <- getOption("spades.outputPath") # nolint

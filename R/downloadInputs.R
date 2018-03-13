@@ -19,7 +19,7 @@ if (getRversion() >= "3.1.0") {
 #' @param object Character vector or sim object in the form sim$objName
 #' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
-#'        Default is all three. See details
+#'        Default is all three. Partial matching is used. See details.
 #' @export
 #'
 #' @details
@@ -31,7 +31,10 @@ if (getRversion() >= "3.1.0") {
 #' \code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
 #' or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
 #' the present one \bold{will} create it as part of its outputs (i.e., as indicated by
-#' \code{createsOutputs} in that module's metadata). This final one (\code{"initEvent"})
+#' \code{createsOutputs} in that module's metadata). There is a caveat to this test,
+#' however; if that other event also has the object as an \code{expectsInput}, then
+#' it would fail this test, as it \emph{also} needs it as an input.
+#' This final one (\code{"initEvent"})
 #' does not explicitly test that the object will be created in the "init" event, only that
 #' it is in the outputs of that module, and that it is a module that is loaded prior to
 #' this one.
@@ -51,6 +54,9 @@ if (getRversion() >= "3.1.0") {
 #' suppliedElsewhere("test", mySim) # TRUE
 #'
 suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
+  partialMatching <- c("s", "i", "u")
+  where <- partialMatching[which(!is.na(pmatch(partialMatching, where)))]
+  if (length(where) == 0) stop("where must be either sim, user or initEvent")
   objDeparsed <- substitute(object)
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
@@ -74,13 +80,13 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   objDeparsed <- as.character(objDeparsed)
 
   # Equivalent to !is.null(sim$xxx)
-  inPrevDotInputObjects <- if ("sim" %in% where) {
+  inPrevDotInputObjects <- if ("s" %in% where) {
     match(objDeparsed, names(sim@.envir), nomatch = 0L) > 0L
   } else {
     FALSE
   }
   # Equivalent to !(names(sim) %in% sim$.userSuppliedObjNames)
-  inUserSupplied <- if ("user" %in% where) {
+  inUserSupplied <- if ("u" %in% where) {
     objDeparsed %in% sim$.userSuppliedObjNames
   } else {
     FALSE
@@ -88,9 +94,14 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- if (pmatch("initEve", where)) {
+  inFutureInit <- if ("i" %in% where) {
     objDeparsed %in%
-      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), objName]
+      # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
+      #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
+      #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
+      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), ][
+        objName == objDeparsed][
+          all(from != to), .SD, by = objName]
   } else {
     FALSE
   }
@@ -307,7 +318,6 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @importFrom digest digest
 #' @importFrom methods is
 #' @importFrom reproducible Cache compareNA asPath
-#' @importFrom sf st_buffer st_crs st_intersection st_is st_is_valid st_transform st_write
 #' @rdname prepInputs
 #' @examples
 #' # Currently this function only works within a module, where "sourceURL" is supplied
@@ -401,9 +411,14 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
         crs(studyArea)
       } else {
         if (is(x, "sf"))
-          CRS(sf::st_crs(x)$proj4string)
+          if (requireNamespace("sf")) {
+            CRS(sf::st_crs(x)$proj4string)
+          } else {
+            stop("Please install sf package: https://github.com/r-spatial/sf")
+          }
         else
           crs(x)
+
       }
 
     if (!is.null(studyArea)) {
@@ -472,8 +487,9 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 #'
 #' @param x A \code{Spatial*}, \code{sf}, or \code{Raster*} object.
 #'
-#' @param studyArea Template \code{SpatialPolygons*} object used for reprojecting
-#' and cropping.
+#' @param studyArea Template \code{SpatialPolygons*} object used for masking, after cropping.
+#'                  If not in same CRS, then it will be \code{spTransform}ed to
+#'                  CRS of \code{x} before masking.
 #'
 #' @param rasterToMatch Template \code{Raster*} object used for reprojecting and
 #' cropping.
@@ -495,7 +511,6 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 #' @importFrom rgeos gIsValid
 #' @importFrom reproducible Cache
 #' @importFrom sp SpatialPolygonsDataFrame spTransform CRS
-#' @importFrom sf st_as_sf st_crs st_is_valid st_buffer st_transform
 #' @rdname cropReprojInputs
 #'
 cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
@@ -506,11 +521,17 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
       crs(rasterToMatch)
-    } else if (!is.null(studyArea)) {
-      crs(studyArea)
+    # } else if (!is.null(studyArea)) {
+    #   crs(studyArea)
     } else {
-      if (is(x, "sf"))
-        CRS(sf::st_crs(x)$proj4string)
+      if (is(x, "sf")) {
+        if (requireNamespace("sf")) {
+          CRS(sf::st_crs(x)$proj4string)
+        } else {
+          stop("Please install sf package: https://github.com/r-spatial/sf")
+        }
+      }
+
       else
         crs(x)
     }
@@ -548,7 +569,7 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         }
       } else {
         if (!identical(crs(x), targetCRS)) {
-          x <- Cache(projectRaster, from = x, crs = targetCRS,
+          x <- Cache(projectRaster, from = x, crs = targetCRS, res = res(x),
                      method = rasterInterpMethod, userTags = cacheTags)
         }
       }
@@ -573,20 +594,24 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         x <- Cache(crop, x, rasterToMatch, userTags = cacheTags)
       }
     } else if (is(x, "sf")) {
-      if (any(st_is(x, c("POLYGON", "MULTIPOLYGON"))) && !any(isValid <- st_is_valid(x))) {
-        x[!isValid] <- Cache(st_buffer, x[!isValid], dist = 0, userTags = cacheTags)
-      }
+      if (requireNamespace("sf")) {
+        if (any(sf::st_is(x, c("POLYGON", "MULTIPOLYGON"))) && !any(isValid <- sf::st_is_valid(x))) {
+          x[!isValid] <- Cache(sf::st_buffer, x[!isValid], dist = 0, userTags = cacheTags)
+        }
 
-      if (!identical(st_crs(targetCRS@projargs), st_crs(x)))
-        x <- Cache(st_transform, x = x, crs = st_crs(targetCRS@projargs), userTags = cacheTags)
+        if (!identical(sf::st_crs(targetCRS@projargs), sf::st_crs(x)))
+          x <- Cache(sf::st_transform, x = x, crs = sf::st_crs(targetCRS@projargs), userTags = cacheTags)
 
-      if (!is.null(studyArea)) {
-        x <- Cache(st_intersection, x, st_as_sf(studyArea), userTags = cacheTags)
-      }
+        if (!is.null(studyArea)) {
+          x <- Cache(sf::st_intersection, x, sf::st_as_sf(studyArea), userTags = cacheTags)
+        }
 
-      if (!is.null(rasterToMatch)) {
-        x <- Cache(st_intersection, x, st_as_sf(as(extent(rasterToMatch), "SpatialPolygons")),
-                   userTags = cacheTags)
+        if (!is.null(rasterToMatch)) {
+          x <- Cache(sf::st_intersection, x, sf::st_as_sf(as(extent(rasterToMatch), "SpatialPolygons")),
+                     userTags = cacheTags)
+        }
+      } else {
+        stop("Please install sf package: https://github.com/r-spatial/sf")
       }
     } else {
       stop("Class '", class(x), "' is not supported.")
@@ -632,7 +657,6 @@ maskInputs <- function(x, studyArea) {
 #' @importFrom methods is
 #' @importFrom raster shapefile writeRaster
 #' @importFrom reproducible Cache
-#' @importFrom sf st_write
 #' @rdname writeInputsOnDisk
 #'
 writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
@@ -646,9 +670,13 @@ writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
              inherits(x, "SpatialLines") ||
              inherits(x, "SpatialPolygons")) {
     shapefile(x = x, overwrite = TRUE, filename = filename)
-  } else if (is(x, "sf"))
-  {
-    st_write(obj = x, delete_dsn = TRUE, dsn = filename)
+  } else if (is(x, "sf")) {
+    if (requireNamespace("sf")) {
+      sf::st_write(obj = x, delete_dsn = TRUE, dsn = filename)
+    } else {
+      stop("Please install sf package: https://github.com/r-spatial/sf")
+    }
+
   } else {
     stop("Don't know how to write object of class ", class(x), " on disk.")
   }

@@ -396,11 +396,11 @@ Event2 <- function(sim) {
   # downloadData(\"LCC2005\", modulePath(sim)).
   # Nothing should be created here that does not create an named object in inputObjects.
   # Any other initiation procedures should be put in \"init\" eventType of the doEvent function.
-  # Note: the module developer can use 'sim$.userSuppliedObjNames' in their function below to
+  # Note: the module developer can check if an object is 'suppliedElsewhere' to
   # selectively skip unnecessary steps because the user has provided those inputObjects in the
-  # simInit call. e.g.,
-  # if (!('defaultColor' %in% sim$.userSuppliedObjNames)) {
-  #  sim$defaultColor <- 'red'
+  # simInit call, or another module will supply or has supplied it. e.g.,
+  # if (!suppliedElsewhere('defaultColor', sim)) {
+  #   sim$defaultColor <- 'red'
   # }
   # ! ----- EDIT BELOW ----- ! #
 

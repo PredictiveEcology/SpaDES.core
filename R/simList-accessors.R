@@ -81,17 +81,17 @@ setMethod(
 
     ### completed events
     out[[20]] <- capture.output(cat(">> Completed Events:\n"))
-    out[[21]] <- capture.output(print(completed(object)))
+    out[[21]] <- capture.output(completed(object))
     out[[22]] <- capture.output(cat("\n"))
 
     ### Current events
     out[[23]] <- capture.output(cat(">> Current Event:\n"))
-    out[[24]] <- capture.output(print(current(object)))
+    out[[24]] <- capture.output(current(object))
     out[[25]] <- capture.output(cat("\n"))
 
     ### scheduled events
     out[[26]] <- capture.output(cat(">> Scheduled Events:\n"))
-    out[[27]] <- capture.output(print(events(object)))
+    out[[27]] <- capture.output(events(object))
     out[[28]] <- capture.output(cat("\n"))
 
     ### print result

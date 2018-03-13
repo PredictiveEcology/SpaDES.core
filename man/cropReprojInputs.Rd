@@ -11,8 +11,9 @@ cropReprojInputs(x, studyArea = NULL, rasterToMatch = NULL,
 \arguments{
 \item{x}{A \code{Spatial*}, \code{sf}, or \code{Raster*} object.}
 
-\item{studyArea}{Template \code{SpatialPolygons*} object used for reprojecting
-and cropping.}
+\item{studyArea}{Template \code{SpatialPolygons*} object used for masking, after cropping.
+If not in same CRS, then it will be \code{spTransform}ed to
+CRS of \code{x} before masking.}
 
 \item{rasterToMatch}{Template \code{Raster*} object used for reprojecting and
 cropping.}

@@ -36,8 +36,9 @@ all writing of files in.}
 
 \item{pkg}{Character string indicating the package in which to find \code{fun}.}
 
-\item{studyArea}{Template \code{SpatialPolygons*} object used for reprojecting
-and cropping.}
+\item{studyArea}{Template \code{SpatialPolygons*} object used for masking, after cropping.
+If not in same CRS, then it will be \code{spTransform}ed to
+CRS of \code{x} before masking.}
 
 \item{rasterToMatch}{Template \code{Raster*} object used for reprojecting and
 cropping.}

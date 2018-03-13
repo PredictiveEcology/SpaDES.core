@@ -321,3 +321,57 @@ test_that("test .robustDigest for simLists", {
 
 
 })
+
+
+test_that("test .checkCacheRepo with function as spades.cachePath", {
+  library(igraph)
+  library(reproducible)
+
+  tmpdir <- tempdir()
+  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    setwd(cwd)
+
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+
+  awesomeCacheFun <- function() tmpCache ;
+  options("spades.cachePath" = awesomeCacheFun)
+
+  # uses .getOptions
+  aa <- .checkCacheRepo(list(1), create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # accepts character string
+  aa <- .checkCacheRepo(tmpCache, create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # uses .getPaths during simInit
+  mySim <- simInit()
+  aa <- .checkCacheRepo(list(mySim))
+  expect_equal(aa, tmpCache)
+
+
+  justAPath <- tmpCache ;
+  options("spades.cachePath" = justAPath)
+
+  # uses .getOptions
+  aa <- .checkCacheRepo(list(1), create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # accepts character string
+  aa <- .checkCacheRepo(tmpCache, create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # uses .getPaths during simInit
+  mySim <- simInit()
+  aa <- .checkCacheRepo(list(mySim))
+  expect_equal(aa, tmpCache)
+
+
+})
