@@ -176,7 +176,7 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
     rm(sim2)
 
     # test without package specified
-    dt <- data.table::data.table(a = 1, b = 2)
+    dt <- data.table::data.table(a = 3, b = 2)
     tmpFile <- tempfile()
     write.table(dt, file = tmpFile, sep = "\t", col.names = TRUE, row.names = FALSE)
     inputs <- data.frame(

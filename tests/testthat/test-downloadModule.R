@@ -146,14 +146,14 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  m <- "LCC2005"
+  m <- "forestAge"
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   f <- downloadModule(m, tmpdir, quiet = TRUE, data = TRUE)[[1]] %>% unlist() %>% as.character()
   d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
-  d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
+  d_expected <- moduleMetadata(module = m, path = tmpdir)$childModules %>%
     c(m, "data", "testthat") %>%
     sort()
 

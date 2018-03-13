@@ -831,20 +831,20 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   )
   test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
   test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
-  if (grepl( "emcintir", Sys.info()["user"])) {
-    tmpFilename = "c:/Eliot/tmp/test1.txt"
-
-    cat("################### test1\n", file = tmpFilename, append = FALSE)
-    cat(paste(collapse = " ", lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
-    cat("\n################### test2\n", file = tmpFilename, append = TRUE)
-    cat(paste(collapse = " ", lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
-    cat("\n################### fullMessage1\n", file = tmpFilename, append = TRUE)
-    cat(paste(collapse = "\n", fullMessage1), file = tmpFilename, append = TRUE)
-    cat("\n################### fullMessageNonInteractive\n", file = tmpFilename, append = TRUE)
-    cat(paste(collapse = "\n", fullMessageNonInteractive), file = tmpFilename, append = TRUE)
-    cat("\n###################  mm\n", file = tmpFilename, append = TRUE)
-    cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
-  }
+  # if (grepl( "emcintir", Sys.info()["user"])) {
+  #   tmpFilename = "c:/Eliot/tmp/test1.txt"
+  #
+  #   cat("################### test1\n", file = tmpFilename, append = FALSE)
+  #   cat(paste(collapse = " ", lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+  #   cat("\n################### test2\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = " ", lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+  #   cat("\n################### fullMessage1\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = "\n", fullMessage1), file = tmpFilename, append = TRUE)
+  #   cat("\n################### fullMessageNonInteractive\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = "\n", fullMessageNonInteractive), file = tmpFilename, append = TRUE)
+  #   cat("\n###################  mm\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
+  # }
   expect_true(test1 || test2)
 
 })
