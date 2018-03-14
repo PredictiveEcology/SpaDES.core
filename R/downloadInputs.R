@@ -95,13 +95,12 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
   inFutureInit <- if ("i" %in% where) {
-    objDeparsed %in%
       # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
       #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
       #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
-      depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), ][
-        objName == objDeparsed][
-          all(from != to), .SD, by = objName]
+      isTRUE(depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), ][
+        objName == objDeparsed][, all(from != to), by = from][V1==TRUE]$V1)
+
   } else {
     FALSE
   }
