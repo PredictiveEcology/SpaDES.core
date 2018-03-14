@@ -393,7 +393,6 @@ setMethod(
                            outputObjects = moduleSpecificInputObjects,
                            digestPathContent = !getOption("reproducible.quick", FALSE),
                            quick = getOption("reproducible.quick", FALSE),
-                           debugCache = "complete",
                            userTags = c(paste0("module:", m),
                                         "eventType:.inputObjects",
                                         "function:.inputObjects"))
