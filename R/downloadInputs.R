@@ -1,5 +1,5 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("expectedFile", "objName"))
+  utils::globalVariables(c("expectedFile", "objName", "V1"))
 }
 
 
