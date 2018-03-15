@@ -7,6 +7,8 @@ if (getRversion() >= "3.1.0") {
 #' This can take x as a character string or as a function that returns a character string.
 #'
 #' @inheritParams base::getOption
+#' @rdname spadesOptions
+#' @keywords internal
 .getOption <- function(x) {
 
   spadesCacheDefault <- getOption(x)
