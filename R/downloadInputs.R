@@ -391,7 +391,7 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
-                         needed = c(targetFile, basename(alsoExtract)))
+                         needed = c(targetFile, if (!is.null(alsoExtract)) basename(alsoExtract)))
     }
   }
 
