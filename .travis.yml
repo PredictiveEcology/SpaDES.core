@@ -94,7 +94,7 @@ matrix:
     before_install:
     - brew update
     - brew install glpk
-    - Rscript -e 'install.packages(c("digest", "Rglpk"), type = "source")'
+    - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true
