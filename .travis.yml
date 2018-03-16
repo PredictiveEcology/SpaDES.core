@@ -93,7 +93,7 @@ matrix:
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     before_install:
     - brew update
-    - brew outdated glpk || brew upgrade glpk
+    - brew install glpk
     - Rscript -e 'install.packages(c("digest", "Rgplk"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
