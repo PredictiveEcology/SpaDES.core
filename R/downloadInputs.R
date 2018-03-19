@@ -546,8 +546,8 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         is(x, "RasterBrick")) {
 
       if (!is.null(studyArea)) {
-        x <- Cache(
-          crop,
+        x <-
+          crop( # don't Cache because slow to write
           x = x,
           y = if (identical(raster::crs(studyArea), raster::crs(x))) {
             studyArea
@@ -563,12 +563,12 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         if (!identical(crs(x), targetCRS) |
             !identical(res(x), res(rasterToMatch)) |
             !identical(extent(x), extent(rasterToMatch))) {
-          x <- Cache(projectRaster, from = x, to = rasterToMatch,
+          x <- projectRaster(from = x, to = rasterToMatch,
                      method = rasterInterpMethod, userTags = cacheTags)
         }
       } else {
         if (!identical(crs(x), targetCRS)) {
-          x <- Cache(projectRaster, from = x, crs = targetCRS, res = res(x),
+          x <- projectRaster(from = x, crs = targetCRS, res = res(x),
                      method = rasterInterpMethod, userTags = cacheTags)
         }
       }
@@ -586,11 +586,11 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         x <- Cache(spTransform, x = x, CRSobj = targetCRS, userTags = cacheTags)
 
       if (!is.null(studyArea)) {
-        x <- Cache(crop, x, studyArea, userTags = cacheTags)
+        x <- crop(x, studyArea, userTags = cacheTags) # don't Cache because slow to write
       }
 
       if (!is.null(rasterToMatch)) {
-        x <- Cache(crop, x, rasterToMatch, userTags = cacheTags)
+        x <- crop(x, rasterToMatch, userTags = cacheTags) # don't Cache because slow to write
       }
     } else if (is(x, "sf")) {
       if (requireNamespace("sf")) {
