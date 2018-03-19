@@ -330,6 +330,8 @@ setMethod(
         # If user supplies the needed objects, then test whether all are supplied.
         # If they are all supplied, then skip the .inputObjects code
         cacheIt <- FALSE
+        browser()
+
         allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
           userSuppliedObjNames
         if (!all(allObjsProvided)) {
@@ -383,10 +385,12 @@ setMethod(
                 all(nzchar(x))))], eval, envir = env)
               args[["sim"]] <- sim
 
-              # This next line is not used because we don't actually know what the
-              #  dependencies are for .inputObjects
-              #  aa <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "user"))
-
+              # This next line will make the Caching sensitive to userSuppliedObjs (which are already
+              #   in the simList) or objects supplied by another module
+              inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
+              if (any(inSimList))
+                objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
+                                               moduleSpecificInputObjects[inSimList])
               sim <- Cache(FUN = do.call, .inputObjects, args = args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
