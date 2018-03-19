@@ -330,7 +330,6 @@ setMethod(
         # If user supplies the needed objects, then test whether all are supplied.
         # If they are all supplied, then skip the .inputObjects code
         cacheIt <- FALSE
-        browser()
 
         allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
           userSuppliedObjNames
