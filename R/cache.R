@@ -492,13 +492,13 @@ setMethod(
 }
 
 
-#' @importFrom reproducible .recursiveObjectSize
-#' @inheritParams reproducible::.recursiveObjectSize
+#' @importFrom reproducible objectSize
+#' @inheritParams reproducible::objectSize
 #' @export
-.recursiveObjectSize <- function(x) UseMethod(".recursiveObjectSize")
+objectSize <- function(x) UseMethod("objectSize")
 
-#' @importFrom reproducible .recursiveObjectSize
+#' @importFrom reproducible objectSize
 #' @export
-.recursiveObjectSize.simList <- function(x) {
-  lapply(x@.envir, function(y) .recursiveObjectSize(y))
+objectSize.simList <- function(x) {
+  lapply(x@.envir, function(y) objectSize(y))
 }
