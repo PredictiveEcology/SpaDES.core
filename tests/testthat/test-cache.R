@@ -375,3 +375,25 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
 
 
 })
+
+
+test_that("test objectSize", {
+  library(igraph)
+  library(reproducible)
+
+  tmpdir <- tempdir()
+  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    setwd(cwd)
+
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  a <- simInit(objects = list(d = 1:10, b = 2:20))
+  os <- objectSize(a)
+  expect_true(length(os)==4) # 2 objects, the environment, the rest
+})

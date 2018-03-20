@@ -491,14 +491,29 @@ setMethod(
   return(out)
 }
 
+if (!exists("objectSize")) {
+  objectSize <- function(x) UseMethod("objectSize")
+}
 
+
+#' Object size for simLists
+#'
+#' Recursively, runs \code{object\.size} on the simList environment.
+#' Currently, this will not assess object.size of the other elements
+#'
 #' @importFrom reproducible objectSize
 #' @inheritParams reproducible::objectSize
-#' @export
-objectSize <- function(x) UseMethod("objectSize")
-
 #' @importFrom reproducible objectSize
 #' @export
+#' @examples
+#' a <- simInit(objects = list(d = 1:10, b = 2:20))
+#' objectSize(a)
+#' object.size(a)
 objectSize.simList <- function(x) {
-  lapply(x@.envir, function(y) objectSize(y))
+  aa <- objectSize(x@.envir)
+  bb <- as(x, "simList_")
+  bb@.list <- list()
+  bbOs <- list(simList = object.size(bb))
+  aa <- append(aa, bbOs)
+  return(aa)
 }
