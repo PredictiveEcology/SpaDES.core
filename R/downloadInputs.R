@@ -384,7 +384,6 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
   # If quickCheck, then use file.info as part of cache/memoise ... otherwise,
   #   pass a random real number to make a new memoise
   if (is.null(url)) {
-    browser()
     fileinfo <- if (quickCheck) file.info(filesToCheck) else runif(1)
     if (file.exists(checkSumFilePath)) {
       out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
