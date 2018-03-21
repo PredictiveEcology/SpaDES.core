@@ -884,7 +884,12 @@ setMethod(
     defaultHashAlgo <- "xxhash64"
     defaultWriteHashAlgo <- "xxhash64"
     dots <- list(...)
-    path <- checkPath(path, create = FALSE) %>% file.path(., module, "data")
+    checkPath(path, create = write)
+    path <- if (length(module)) {
+      file.path(path, module, "data")
+    } else {
+      file.path(path)
+    }
 
     if (!write) {
       stopifnot(file.exists(checksumFile))
@@ -1001,3 +1006,13 @@ setMethod(
   definition = function(module, path, quickCheck, files, ...) {
     checksums(module, path, write = FALSE, quickCheck = quickCheck, files = files, ...)
 })
+
+#' @rdname checksums
+setMethod(
+  "checksums",
+  signature = c(module = "missing", path = "character", write = "logical",
+                quickCheck = "ANY", files = "ANY"),
+  definition = function(module, path, write, quickCheck, files, ...) {
+    checksums(module = character(), path = path, write = write,
+              quickCheck = quickCheck, files = files, ...)
+  })

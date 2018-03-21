@@ -106,4 +106,3 @@ branches:
   only:
   - master
   - development
-  - prepInputsGoogleDownload

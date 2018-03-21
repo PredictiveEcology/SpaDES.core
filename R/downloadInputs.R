@@ -185,7 +185,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 
   funWArgs <- .whichExtractFn(archive[1], args)
 
-  filesInArchive <- Cache(funWArgs$fun, archive[1], list = TRUE)
+  filesInArchive <- funWArgs$fun(archive[1], list = TRUE)
   if ("Name" %in% names(filesInArchive)) filesInArchive <- filesInArchive$Name # for zips
 
   if (length(archive) > 1) {
@@ -193,7 +193,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
     # recursion, removing one archive
     extractFromArchive(archive[-1], destinationPath = destinationPath,
                        needed = needed, extractedArchives = extractedArchives)
-  } else if (any(needed %in% basename(filesInArchive))) {
+  } else if (any(needed %in% basename(filesInArchive)) || is.null(needed)) {
     message(paste("  Extracting from archive:", basename(archive[1])))
     .unzipOrUnTar(funWArgs$fun, funWArgs$args, files = filesInArchive[basename(filesInArchive) %in% needed])
   } else {
@@ -262,8 +262,15 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #'
 #' This function can be used to prepare module inputs from raw data. It
 #' runs several other functions, conditionally and sequentially:
-#' \code{downloadFromWebDB} or \code{downloadData},
-#' \code{extractFromArchive}.  NOTE: This function is still experimental: use
+#' \code{downloadFromWebDB} or \code{downloadData} if used within a module. If used
+#' outside of a SpaDES module, then it will use \code{file.download} or
+#' \code{googledrive::drive_download} if the \code{url} has \code{https://drive.google.com}.
+#' If the download is a .zip or .tar file (i.e., an archive), then the function will
+#' run \code{extractFromArchive}. Then it will sequentially try to load the extracted file (if
+#' passed as \code{targetFile}). If the default fun and pkg are not left as is,
+#' the function will try to use those. If the file is not a raster file, it will try
+#' using raster::shapefile. NOTE: This function is still experimental: use
+#' with caution.
 #' with caution.
 #'
 #' @param targetFile Character string giving the path to the eventual
@@ -275,6 +282,14 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' (e.g., \code{c("xxx.tar", "inner.zip")}). If there is/are (an) inner archive(s),
 #' but they are unknown, the function will try all until it finds the
 #' \code{targetFile}
+#'
+#' @param url Optional character string indicating the URL to download from. Normally,
+#' if used within a module, this url should be explicitly given as sourceURL for an
+#' \code{expectsInput}. In that case, it will use the module's checksums file to
+#' confirm that the download occurred correctly. If URL is used here, an ad hoc
+#' checksums will be created in the \code{destinationPath}. This will be used in
+#' subsequent calls to \code{prepInputs}, comparing the file on hand with the ad hoc
+#' \code{checksums.txt}.
 #'
 #' @param alsoExtract Optional character string naming files other than
 #' \code{targetFile} that must be extracted from the \code{archive}.
@@ -305,6 +320,9 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @param cacheTags Character vector with Tags. These Tags will be added to the
 #' repository along with the artifact.
 #'
+#' @param purge When prepInputs is called from outside a module, it will write a \code{CHECKSUMS.txt}
+#'              file. If there is an incorrect \code{CHECKSUMS.txt}, this will purge it.
+#'
 #' @param overwrite Logical. Should downloading and all the other actions occur even if they
 #'                  pass the checksums or the files are all there.
 #'
@@ -319,47 +337,132 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @importFrom reproducible Cache compareNA asPath
 #' @rdname prepInputs
 #' @examples
-#' # Currently this function only works within a module, where "sourceURL" is supplied
-#' #   in the metadata in the "expectsInputs(..., sourceURL = "")
+#' # This function works within a module, when "sourceURL" is supplied
+#' #   in the metadata in the "expectsInputs(..., sourceURL = ""), but can
+#' # also run outside a module, e.g., with url argument.
 #' \dontrun{
 #' # Put chunks like this in your .inputObjects
 #' if (!suppliedElsewhere("test", sim))
 #'   sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
 #'                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
 #'                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+#'
+#' # download a zip file from internet, unzip all files, load as shapefile, Cache the call
+#' # First time: don't know all files - prepInputs will guess, if download file is an archive,
+#' #   then extract all files, then if there is a .shp, it will load with raster::shapefile
+#' dPath <- file.path(tempdir(), "ecozones")
+#' shpEcozone <- prepInputs(destinationPath = dPath,
+#'                      url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
+#'
+#' # Once this is done, can be more precise in operational code:
+#' #  specify targetFile, alsoExtract, and fun, wrap with Cache
+#' ecozoneFilename <- file.path(dPath, "ecozones.shp")
+#' ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
+#' shpEcozone <- Cache(prepInputs, url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+#'                             targetFile = asPath(ecozoneFilename),
+#'                             alsoExtract = asPath(ecozoneFiles),
+#'                             fun = "shapefile", destinationPath = dPath)
+#'
+#' #' # Add a study area to Crop and Mask to
+#' # Create a "study area"
+#' StudyArea <- SpaDES.tools::randomPolygon(x = sp::SpatialPoints(matrix(c(-110, 60), ncol=2)), 1e8)
+#' #  specify targetFile, alsoExtract, and fun, wrap with Cache
+#' ecozoneFilename <- file.path(dPath, "ecozones.shp")
+#' ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
+#' shpEcozoneSmall <- Cache(prepInputs, url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+#'                             targetFile = asPath(ecozoneFilename),
+#'                             alsoExtract = asPath(ecozoneFiles),
+#'                             studyArea = StudyArea,
+#'                             fun = "shapefile", destinationPath = dPath)
+#'
+#' dev();
+#' Plot(shpEcozone)
+#' Plot(shpEcozoneSmall, addTo = "shpEcozone", col = "red")
+#'
+#' # Big Raster, with crop and mask to Study Area - no reprojecting (lossy) of raster,
+#' #   but the StudyArea does get reprojected, need to use rasterToMatch
+#' lcc2005Filename <- file.path(dPath, "LCC2005_V1_4a.tif")
+#' url <- file.path("ftp://ftp.ccrs.nrcan.gc.ca/ad/NLCCLandCover",
+#'                  "LandcoverCanada2005_250m/LandCoverOfCanada2005_V1_4.zip")
+#' dPath <- file.path(tempdir(), "LCC")
+#' LCC2005 <- Cache(prepInputs, url = url,
+#'                      #targetFile = lcc2005Filename,
+#'                      #archive = asPath("LandCoverOfCanada2005_V1_4.zip"),
+#'                      destinationPath = asPath(dPath),
+#'                      studyArea = StudyArea)
+#' Plot(LCC2005)
+#'
+#' # Specifying more args
+#' LCC2005 <- Cache(prepInputs, url = url,
+#'                      targetFile = lcc2005Filename,
+#'                      archive = asPath("LandCoverOfCanada2005_V1_4.zip"),
+#'                      destinationPath = asPath(dPath),
+#'                      studyArea = StudyArea)
 #' }
 #'
-prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
+prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NULL,
                        dataset = NULL, destinationPath = ".", fun = "raster",
                        pkg = "raster", studyArea = NULL, rasterToMatch = NULL,
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
                        writeCropped = TRUE, addTagsByObject = NULL, overwrite = FALSE,
                        quickCheck = getOption("reproducible.quick", FALSE),
-                       cacheTags = "", notOlderThan = NULL, ...) {
+                       cacheTags = "", purge = FALSE, ...) {
+  if (!missing(targetFile)) {
+    targetFile <- basename(targetFile)
+    targetFilePath <- file.path(destinationPath, targetFile)
+  } else {
+    targetFile <- NULL
+    targetFilePath <- NULL
+  }
+
+  if (purge) unlink(file.path(destinationPath, "CHECKSUMS.txt"))
+
+  if (!dir.exists(destinationPath)) checkPath(destinationPath, create = TRUE)
   message("Preparing: ", targetFile)
 
-  targetFile <- basename(targetFile)
-  targetFilePath <- file.path(destinationPath, targetFile)
+  checkSumFilePath <- file.path(destinationPath, "CHECKSUMS.txt")
+  emptyChecksums <- data.table(expectedFile = character(), result = character())
 
   if (!is.null(archive)) {
     archive <- file.path(destinationPath, basename(archive))
     filesToCheck <- c(targetFilePath, archive)
   } else {
+    if (!is.null(url)) {
+      possibleArchiveName <- file.path(destinationPath, basename(url))
+      archive <- .isArchive(possibleArchiveName)
+    }
     filesToCheck <- targetFilePath
   }
 
   # If quickCheck, then use file.info as part of cache/memoise ... otherwise,
   #   pass a random real number to make a new memoise
-  fileinfo <- if (quickCheck) file.info(filesToCheck) else runif(1)
-  out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
-               asPath(file.path(destinationPath, "CHECKSUMS.txt")),
-               digestPathContentInner = !quickCheck, cacheTags, quickCheck)
-  moduleName <- out$moduleName
-  modulePath <- out$modulePath
-  checkSums <- out$checkSums
+  if (is.null(url)) {
+    fileinfo <- if (quickCheck) file.info(filesToCheck) else runif(1)
+    if (file.exists(checkSumFilePath)) {
+      out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
+                   asPath(checkSumFilePath),
+                   digestPathContentInner = !quickCheck, cacheTags, quickCheck)
+      moduleName <- out$moduleName
+      modulePath <- out$modulePath
+      checkSums <- out$checkSums
+    } else {
+      checkSums <- out <- emptyChecksums
+    }
+
+  } else {
+    out <- tryCatch(checksums(path = destinationPath, write = FALSE), error = function(p) {
+      emptyChecksums
+      on.exit({checksums(path = destinationPath, write = TRUE)})
+    })
+    checkSums <- out
+  }
   rm(out)
 
-  result <- checkSums[checkSums$expectedFile == targetFile, ]$result
+  if (!is.null(targetFile)) {
+    result <- checkSums[checkSums$expectedFile == targetFile, ]$result
+  } else {
+    result <- unique(checkSums$result)
+  }
   mismatch <- !isTRUE(result == "OK")
 
   if (mismatch) {
@@ -381,26 +484,103 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
           downloadFromWebDB(basename(archive), archive, quickCheck = quickCheck)
           NULL
         }
+      } else {
+        NULL
       }
     }
 
     # The download step
-    if (!is.null(fileToDownload))
-      downloadData(moduleName, modulePath, files = fileToDownload,
-                   checked = checkSums, quickCheck = quickCheck, overwrite = TRUE)
+      if (exists("moduleName")) { # means it is inside a SpaDES module
+        if (!is.null(fileToDownload)) {
+          downloadData(moduleName, modulePath, files = fileToDownload,
+                     checked = checkSums, quickCheck = quickCheck, overwrite = TRUE)
+        }
+      } else {
+        # The ad hoc case
+        if (!is.null(fileToDownload)) {
+          if (!is.null(url)) {
+            if (grepl("drive.google.com", url)) {
+              googledrive::drive_auth() ## needed for use on e.g., rstudio-server
+              if (is.null(archive)) {
+                fileAttr <- drive_get(as_id(url))
+                archive <- .isArchive(fileAttr$name)
+                archive <- file.path(destinationPath, basename(archive))
+                downloadFilename <- archive
+                if (is.null(archive)) {
+                  if (is.null(targetFile)) {
+                    # make the guess
+                    targetFile <- fileAttr$name
+                    downloadFilename <- targetFile # override if the targetFile is not an archive
+                  }
+                }
+              }
+              destFile <- file.path(tempdir(), basename(downloadFilename))
+
+              googledrive::drive_download(googledrive::as_id(url), path = destFile,
+                                          overwrite = TRUE, verbose = TRUE)
+            } else {
+              destFile <- file.path(tempdir(), basename(url))
+              download.file(url, destfile = destFile)
+            }
+            file.copy(destFile, destinationPath)
+            file.remove(destFile)
+            on.exit({checksums(path = destinationPath, write = TRUE)})
+          }
+        }
+      }
 
     if (!is.null(archive)) {
       extractFromArchive(archive = archive, destinationPath = destinationPath,
                          needed = c(targetFile, if (!is.null(alsoExtract)) basename(alsoExtract)))
+      if (is.null(targetFile)) {
+        on.exit({checksums(path = destinationPath, write = TRUE)})
+      }
     }
   }
+
+  # Now that all files are downloaded and extracted from archive, deal with missing targetFilePath
+  if (is.null(targetFilePath)) {
+    filesInDestPath <- dir(destinationPath)
+    isShapefile <- grepl("shp", fileExt(filesInDestPath))
+    isRaster <- fileExt(filesInDestPath) %in% c("tif", "grd")
+    message("targetFile was not specified. ", if (any(isShapefile)) {
+              c(" Trying raster::shapefile on ", filesInDestPath[isShapefile],
+                ". If that is not correct, please specify different targetFile",
+                " and/or pkg & fun")
+            } else {
+              c(" Trying ", pkg, "::", fun,
+                ". If that is not correct, please specify a targetFile",
+                " and/or different pkg & fun. The current files in the destinationPath are: \n",
+                paste(filesInDestPath, collapse = "\n"))
+            })
+    if (fun == "raster") { #i.e., the default
+      if (any(isShapefile)) {
+        fun <- "shapefile"
+      }
+    }
+
+    guessAtFileToLoad <- if ("shapefile" %in% fun ) {
+      filesInDestPath[isShapefile]
+    } else {
+      if (any(isRaster)) {
+        filesInDestPath[isRaster]
+      } else {
+        message("Don't know which file to load. Please specify targetFile")
+      }
+
+    }
+    message("Trying ", guessAtFileToLoad, " with ", pkg, "::", fun)
+    targetFile <- guessAtFileToLoad
+    targetFilePath <- file.path(destinationPath, targetFile)
+  }
+
 
   f <- getFromNamespace(fun, pkg)
 
   if (fun == "raster" && pkg == "raster") {
     x <- f(targetFilePath, ...)
   } else {
-    x <- Cache(f, targetFilePath, userTags = cacheTags, ...)
+    x <- Cache(f, asPath(targetFilePath), userTags = cacheTags, ...)
   }
 
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
@@ -427,28 +607,27 @@ prepInputs <- function(targetFile, archive = NULL, alsoExtract = NULL,
       }
     }
 
-    x <- Cache(
-      cropReprojInputs,
+    x <-
+      cropReprojInputs(
       x = x,
       studyArea = studyArea,
       rasterToMatch = rasterToMatch,
-      rasterInterpMethod = rasterInterpMethod,
-      quick = quickCheck,
-      cacheTags = cacheTags,
-      userTags = cacheTags
-    )
+      rasterInterpMethod = rasterInterpMethod)
 
     if (!is.null(studyArea)) {
       if (is(x, "RasterLayer") ||
           is(x, "RasterStack") ||
           is(x, "RasterBrick")) {
-        x <- Cache(
-          maskInputs,
-          x = x,
-          studyArea = studyArea,
-          userTags = cacheTags,
-          quick = quickCheck
-        )
+        x <-
+          maskInputs( # don't Cache because slow to write
+            x = x,
+            studyArea = if (identical(raster::crs(studyArea), raster::crs(x))) {
+              studyArea
+            } else {
+              sp::spTransform(x = studyArea, CRSobj = raster::crs(x),
+                              userTags = cacheTags)
+            }
+          )
       }
     }
 
@@ -537,7 +716,7 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 
     if (!is.null(studyArea)) {
       if (!identical(targetCRS, crs(studyArea))) {
-        studyArea <- Cache(spTransform, x = studyArea, CRSobj = targetCRS, userTags = cacheTags)
+        studyArea <- spTransform(x = studyArea, CRSobj = targetCRS, userTags = cacheTags)
       }
     }
 
@@ -546,16 +725,15 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         is(x, "RasterBrick")) {
 
       if (!is.null(studyArea)) {
-        x <- Cache(
-          crop,
+        x <-
+          crop( # don't Cache because slow to write
           x = x,
           y = if (identical(raster::crs(studyArea), raster::crs(x))) {
             studyArea
           } else {
-            Cache(sp::spTransform, x = studyArea, CRSobj = raster::crs(x),
+            sp::spTransform(x = studyArea, CRSobj = raster::crs(x),
                   userTags = cacheTags)
-          },
-          userTags = cacheTags
+          }
         )
       }
 
@@ -563,12 +741,12 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
         if (!identical(crs(x), targetCRS) |
             !identical(res(x), res(rasterToMatch)) |
             !identical(extent(x), extent(rasterToMatch))) {
-          x <- Cache(projectRaster, from = x, to = rasterToMatch,
+          x <- projectRaster(from = x, to = rasterToMatch,
                      method = rasterInterpMethod, userTags = cacheTags)
         }
       } else {
         if (!identical(crs(x), targetCRS)) {
-          x <- Cache(projectRaster, from = x, crs = targetCRS, res = res(x),
+          x <- projectRaster(from = x, crs = targetCRS, res = res(x),
                      method = rasterInterpMethod, userTags = cacheTags)
         }
       }
@@ -576,21 +754,21 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
                inherits(x, "SpatialLines") ||
                inherits(x, "SpatialPolygons")) {
       if (inherits(x, "SpatialPolygons") && !suppressWarnings(gIsValid(x))) {
-        xValid <- Cache(buffer, x, dissolve = FALSE, width = 0, userTags = cacheTags)
+        xValid <- buffer(x, dissolve = FALSE, width = 0)#, userTags = cacheTags)
         x <- if (.hasSlot(x, "data")) xValid
-             else Cache(SpatialPolygonsDataFrame, Sr = xValid,
-                        data = as.data.frame(x), userTags = cacheTags)
+             else SpatialPolygonsDataFrame(Sr = xValid,
+                        data = as.data.frame(x))#, userTags = cacheTags)
       }
 
       if (!identical(targetCRS, crs(x)))
-        x <- Cache(spTransform, x = x, CRSobj = targetCRS, userTags = cacheTags)
+        x <- spTransform(x = x, CRSobj = targetCRS)#, userTags = cacheTags)
 
       if (!is.null(studyArea)) {
-        x <- Cache(crop, x, studyArea, userTags = cacheTags)
+        x <- crop(x, studyArea, userTags = cacheTags) # don't Cache because slow to write
       }
 
       if (!is.null(rasterToMatch)) {
-        x <- Cache(crop, x, rasterToMatch, userTags = cacheTags)
+        x <- crop(x, rasterToMatch, userTags = cacheTags) # don't Cache because slow to write
       }
     } else if (is(x, "sf")) {
       if (requireNamespace("sf")) {
@@ -637,7 +815,11 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL,
 maskInputs <- function(x, studyArea) {
   message("  Masking")
 
-    fastMask(x = x, polygon = studyArea)
+  if (!is(studyArea, "SpatialPolygonsDataFrame")) {
+    studyArea <- SpatialPolygonsDataFrame(Sr = studyArea, data = data.frame(ID = seq(length(studyArea))),
+                                  match.ID = FALSE)
+  }
+  fastMask(x = x, polygon = studyArea)
 }
 
 #' Write module inputs on disk
@@ -715,3 +897,12 @@ writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
 }
 
 .checkSumsMem <- memoise::memoise(.checkSums)
+
+.isArchive <- function(filename) {
+  archive = if (fileExt(filename) %in% c("zip", "tar")) {
+    filename
+  } else {
+    NULL
+  }
+
+}
