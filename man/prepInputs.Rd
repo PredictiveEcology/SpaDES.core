@@ -88,6 +88,7 @@ passed as \code{targetFile}). If the default fun and pkg are not left as is,
 the function will try to use those. If the file is not a raster file, it will try
 using raster::shapefile. NOTE: This function is still experimental: use
 with caution.
+with caution.
 }
 \examples{
 # Currently this function only works within a module, where "sourceURL" is supplied
