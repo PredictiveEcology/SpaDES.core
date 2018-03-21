@@ -5,6 +5,7 @@
 \alias{checksums}
 \alias{checksums,character,character,logical-method}
 \alias{checksums,character,character,missing-method}
+\alias{checksums,missing,character,logical-method}
 \title{Calculate checksums for a module's data files}
 \usage{
 checksums(module, path, write, quickCheck = FALSE,
@@ -15,6 +16,10 @@ checksums(module, path, write, quickCheck = FALSE,
   files = NULL, ...)
 
 \S4method{checksums}{character,character,missing}(module, path, write,
+  quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"),
+  files = NULL, ...)
+
+\S4method{checksums}{missing,character,logical}(module, path, write,
   quickCheck = FALSE, checksumFile = file.path(path, "CHECKSUMS.txt"),
   files = NULL, ...)
 }

@@ -161,6 +161,7 @@ doEvent <- function(sim, debug, notOlderThan) {
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
                                  modules = cur[["moduleName"]])
+            browser()
             sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],

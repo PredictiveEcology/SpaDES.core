@@ -4,17 +4,25 @@
 \alias{prepInputs}
 \title{Download and optionally reproject, crop, mask raw data and output module inputs}
 \usage{
-prepInputs(targetFile, archive = NULL, alsoExtract = NULL, dataset = NULL,
-  destinationPath = ".", fun = "raster", pkg = "raster",
+prepInputs(targetFile, url = NULL, archive = NULL, alsoExtract = NULL,
+  dataset = NULL, destinationPath = ".", fun = "raster", pkg = "raster",
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
   overwrite = FALSE, quickCheck = getOption("reproducible.quick", FALSE),
-  cacheTags = "", notOlderThan = NULL, ...)
+  cacheTags = "", purge = FALSE, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
 file (raster, shapefile, csv, etc.) that will be
 downloaded, extracted.}
+
+\item{url}{Optional character string indicating the URL to download from. Normally,
+if used within a module, this url should be explicitly given as sourceURL for an
+\code{expectsInput}. In that case, it will use the module's checksums file to
+confirm that the download occurred correctly. If URL is used here, an ad hoc
+checksums will be created in the \code{destinationPath}. This will be used in
+subsequent calls to \code{prepInputs}, comparing the file on hand with the ad hoc
+\code{checksums.txt}.}
 
 \item{archive}{Optional character string giving the path of an archive
 containing \code{targetFile}, or a vector giving a set of nested archives
@@ -63,15 +71,22 @@ the default, uses \code{\link[digest]{digest}}}
 \item{cacheTags}{Character vector with Tags. These Tags will be added to the
 repository along with the artifact.}
 
-\item{notOlderThan}{load an artifact from the database only if it was created after notOlderThan.}
+\item{purge}{When prepInputs is called from outside a module, it will write a \code{CHECKSUMS.txt}
+file. If there is an incorrect \code{CHECKSUMS.txt}, this will purge it.}
 
 \item{...}{Passed to pkg::fun}
 }
 \description{
 This function can be used to prepare module inputs from raw data. It
 runs several other functions, conditionally and sequentially:
-\code{downloadFromWebDB} or \code{downloadData},
-\code{extractFromArchive}.  NOTE: This function is still experimental: use
+\code{downloadFromWebDB} or \code{downloadData} if used within a module. If used
+outside of a SpaDES module, then it will use \code{file.download} or
+\code{googledrive::drive_download} if the \code{url} has \code{https://drive.google.com}.
+If the download is a .zip or .tar file (i.e., an archive), then the function will
+run \code{extractFromArchive}. Then it will sequentially try to load the extracted file (if
+passed as \code{targetFile}). If the default fun and pkg are not left as is,
+the function will try to use those. If the file is not a raster file, it will try
+using raster::shapefile. NOTE: This function is still experimental: use
 with caution.
 }
 \examples{
