@@ -112,26 +112,29 @@ shpEcozone <- prepInputs(destinationPath = dPath,
 #  specify targetFile, alsoExtract, and fun, wrap with Cache
 ecozoneFilename <- file.path(dPath, "ecozones.shp")
 ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
-shpEcozone <- Cache(prepInputs, url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
-                            targetFile = asPath(ecozoneFilename),
-                            alsoExtract = asPath(ecozoneFiles),
-                            fun = "shapefile", destinationPath = dPath)
+shpEcozone <- Cache(prepInputs,
+                    url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+                    targetFile = asPath(ecozoneFilename),
+                    alsoExtract = asPath(ecozoneFiles),
+                    fun = "shapefile", destinationPath = dPath)
 
 #' # Add a study area to Crop and Mask to
 # Create a "study area"
-StudyArea <- SpaDES.tools::randomPolygon(x = sp::SpatialPoints(matrix(c(-110, 60), ncol=2)), 1e8)
+library(SpaDES.tools)
+StudyArea <- randomPolygon(x = sp::SpatialPoints(matrix(c(-110, 60), ncol=2)), 1e8)
 #  specify targetFile, alsoExtract, and fun, wrap with Cache
 ecozoneFilename <- file.path(dPath, "ecozones.shp")
 ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
-shpEcozoneSmall <- Cache(prepInputs, url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
-                            targetFile = asPath(ecozoneFilename),
-                            alsoExtract = asPath(ecozoneFiles),
-                            studyArea = StudyArea,
-                            fun = "shapefile", destinationPath = dPath)
+shpEcozoneSm <- Cache(prepInputs,
+                         url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+                         targetFile = asPath(ecozoneFilename),
+                         alsoExtract = asPath(ecozoneFiles),
+                         studyArea = StudyArea,
+                         fun = "shapefile", destinationPath = dPath)
 
 dev();
 Plot(shpEcozone)
-Plot(shpEcozoneSmall, addTo = "shpEcozone", col = "red")
+Plot(shpEcozoneSm, addTo = "shpEcozone", col = "red")
 
 # Big Raster, with crop and mask to Study Area - no reprojecting (lossy) of raster,
 #   but the StudyArea does get reprojected, need to use rasterToMatch
