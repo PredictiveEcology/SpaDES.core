@@ -91,14 +91,67 @@ with caution.
 with caution.
 }
 \examples{
-# Currently this function only works within a module, where "sourceURL" is supplied
-#   in the metadata in the "expectsInputs(..., sourceURL = "")
+# This function works within a module, when "sourceURL" is supplied
+#   in the metadata in the "expectsInputs(..., sourceURL = ""), but can
+# also run outside a module, e.g., with url argument.
 \dontrun{
 # Put chunks like this in your .inputObjects
 if (!suppliedElsewhere("test", sim))
   sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+
+# download a zip file from internet, unzip all files, load as shapefile, Cache the call
+# First time: don't know all files - prepInputs will guess, if download file is an archive,
+#   then extract all files, then if there is a .shp, it will load with raster::shapefile
+dPath <- file.path(tempdir(), "ecozones")
+shpEcozone <- prepInputs(destinationPath = dPath,
+                     url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
+
+# Once this is done, can be more precise in operational code:
+#  specify targetFile, alsoExtract, and fun, wrap with Cache
+ecozoneFilename <- file.path(dPath, "ecozones.shp")
+ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
+shpEcozone <- Cache(prepInputs, url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+                            targetFile = asPath(ecozoneFilename),
+                            alsoExtract = asPath(ecozoneFiles),
+                            fun = "shapefile", destinationPath = dPath)
+
+#' # Add a study area to Crop and Mask to
+# Create a "study area"
+StudyArea <- SpaDES.tools::randomPolygon(x = sp::SpatialPoints(matrix(c(-110, 60), ncol=2)), 1e8)
+#  specify targetFile, alsoExtract, and fun, wrap with Cache
+ecozoneFilename <- file.path(dPath, "ecozones.shp")
+ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
+shpEcozoneSmall <- Cache(prepInputs, url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+                            targetFile = asPath(ecozoneFilename),
+                            alsoExtract = asPath(ecozoneFiles),
+                            studyArea = StudyArea,
+                            fun = "shapefile", destinationPath = dPath)
+
+dev();
+Plot(shpEcozone)
+Plot(shpEcozoneSmall, addTo = "shpEcozone", col = "red")
+
+# Big Raster, with crop and mask to Study Area - no reprojecting (lossy) of raster,
+#   but the StudyArea does get reprojected, need to use rasterToMatch
+lcc2005Filename <- file.path(dPath, "LCC2005_V1_4a.tif")
+url <- file.path("ftp://ftp.ccrs.nrcan.gc.ca/ad/NLCCLandCover",
+                 "LandcoverCanada2005_250m/LandCoverOfCanada2005_V1_4.zip")
+dPath <- file.path(tempdir(), "LCC")
+LCC2005 <- Cache(prepInputs, url = url,
+                     #targetFile = lcc2005Filename,
+                     #archive = asPath("LandCoverOfCanada2005_V1_4.zip"),
+                     destinationPath = asPath(dPath),
+                     studyArea = StudyArea)
+Plot(LCC2005)
+
+# Specifying more args
+LCC2005 <- Cache(prepInputs, url = url,
+                     targetFile = lcc2005Filename,
+                     archive = asPath("LandCoverOfCanada2005_V1_4.zip"),
+                     destinationPath = asPath(dPath),
+                     studyArea = StudyArea)
 }
 
 }
