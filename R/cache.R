@@ -1,7 +1,7 @@
 if (!isGeneric(".robustDigest")) {
   setGeneric(
     ".robustDigest",
-    function(object, objects, compareRasterFileLength = 1e6, algo = "xxhash64") {
+    function(object, objects, length = 1e6, algo = "xxhash64") {
       standardGeneric(".robustDigest")
   })
 }
@@ -33,8 +33,8 @@ if (!isGeneric(".robustDigest")) {
 setMethod(
   ".robustDigest",
   signature = "simList",
-  definition = function(object, objects, compareRasterFileLength, algo,
-                        digestPathContent, classOptions) {
+  definition = function(object, objects, length, algo,
+                        quick, classOptions) {
     outerObjs <- ls(object@.envir, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.envir)
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
@@ -74,8 +74,8 @@ setMethod(
       objectsToDigest <- objectsToDigest[objectsToDigest %in%
                                            objects[[names(allObjsInSimList)[objs]]]]
       .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]),
-                    digestPathContent = digestPathContent,
-                    compareRasterFileLength = compareRasterFileLength)
+                    quick = quick,
+                    length = length)
     })
     names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
@@ -91,14 +91,12 @@ setMethod(
     # Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
     #  i.e., if the same file is located in a different place, that is ok
     object@paths <- list()
-    #object@paths <- .robustDigest(lapply(object@paths, asPath),
-    #                              digestPathContent = digestPathContent)
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
     object@inputs$file <- unlist(.robustDigest(object@inputs$file,
-                                               digestPathContent = digestPathContent,
-                                               compareRasterFileLength = compareRasterFileLength))
+                                               quick = quick,
+                                               length = length))
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {

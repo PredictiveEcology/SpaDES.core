@@ -441,7 +441,7 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
     if (file.exists(checkSumFilePath)) {
       out <- .checkSumsMem(asPath(filesToCheck), fileinfo,
                    asPath(checkSumFilePath),
-                   digestPathContentInner = !quickCheck, cacheTags, quickCheck)
+                   quick = quickCheck, cacheTags, quickCheck)
       moduleName <- out$moduleName
       modulePath <- out$modulePath
       checkSums <- out$checkSums
@@ -880,7 +880,7 @@ writeInputsOnDisk <- function(x, filename, rasterDatatype = NULL) {
 }
 
 
-.checkSums <- function(filesToCheck, fileinfo, chksumsFilePath, digestPathContentInner, cacheTags, quickCheck) {
+.checkSums <- function(filesToCheck, fileinfo, chksumsFilePath, quick, cacheTags, quickCheck) {
   if (missing(chksumsFilePath)) {
     chksumsFilePath <- file.path(dirname(filesToCheck), "CHECKSUMS.txt")
   }

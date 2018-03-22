@@ -394,7 +394,6 @@ setMethod(
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
                            outputObjects = moduleSpecificInputObjects,
-                           digestPathContent = !getOption("reproducible.quick", FALSE),
                            quick = getOption("reproducible.quick", FALSE),
                            userTags = c(paste0("module:", m),
                                         "eventType:.inputObjects",
