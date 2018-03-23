@@ -213,10 +213,10 @@ doEvent <- function(sim, debug, notOlderThan) {
                 if (isTRUE(is(out, "try-error"))) {
                   numTries <- numTries + 1
                   if (numTries > 1) {
+                    numTries <- 0 # after editing, treat it as a new attempt
                     tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
                     eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                          envir = sim@.envir[[cur[["moduleName"]]]])
-                    numTries <- 0
                   } else {
                     message("There was an error in the code in the ", moduleCall,
                             ". Entering browser. You can correct it and press c to continue",
