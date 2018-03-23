@@ -823,7 +823,7 @@ maskInputs <- function(x, studyArea) {
     studyArea <- SpatialPolygonsDataFrame(Sr = studyArea, data = data.frame(ID = seq(length(studyArea))),
                                   match.ID = FALSE)
   }
-  fastMask(x = x, polygon = studyArea)
+  fastMask(x = x, y = studyArea)
 }
 
 #' Write module inputs on disk
