@@ -95,8 +95,14 @@ See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details
 \section{\code{debug}}{
 
 
-If \code{debug} is specified, it can be a logical or character vector.
-If not specified, the package option \code{spades.debug} is used. The following
+If \code{debug} is specified and is not \cod{FALSE}, 2 things will happen:
+1) there can be messages sent to console, such as events as they pass by, and
+2) (experimental still) if there is an error, it will attempt to open a browser
+in the event where the error occurred. You can edit, and then press c to continue
+or Q to quit. \code{debug} can be a logical or character vector.
+
+If not specified in the function call, the package
+option \code{spades.debug} is used. The following
 options for debug are available:
 
 \tabular{ll}{
