@@ -515,7 +515,7 @@ scheduleEvent <- function(sim,
 #'
 #' @section \code{debug}:
 #'
-#' If \code{debug} is specified and is not \cod{FALSE}, 2 things will happen:
+#' If \code{debug} is specified and is not \code{FALSE}, 2 things will happen:
 #' 1) there can be messages sent to console, such as events as they pass by, and
 #' 2) (experimental still) if there is an error, it will attempt to open a browser
 #' in the event where the error occurred. You can edit, and then press c to continue
