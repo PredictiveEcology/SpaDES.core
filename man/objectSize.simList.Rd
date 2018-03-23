@@ -4,10 +4,15 @@
 \alias{objectSize.simList}
 \title{Object size for simLists}
 \usage{
-\method{objectSize}{simList}(x)
+\method{objectSize}{simList}(x, quick = getOption("reproducible.quick",
+  FALSE))
 }
 \arguments{
 \item{x}{An object}
+
+\item{quick}{Logical. Only some methods use this. e.g.,
+\code{Path} class objects. In which case, \code{file.size} will be
+used instead of \code{object.size}.}
 }
 \description{
 Recursively, runs \code{object\.size} on the simList environment.
