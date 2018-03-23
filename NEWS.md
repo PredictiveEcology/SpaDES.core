@@ -3,6 +3,7 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.1.1.9000
 ==================
 
+* new debugging -- if debug is not FALSE, then any error will trigger a browser call inside the event function. User can continue (c) or quit (Q) as per normal. c will trigger a reparse and events will continue as scheduled.
 * add package dependency `webDatabases`, `pryr`
 * new function `prepInputs` to handle download, extract, crop/mask/reproject etc.
 * fix bug where `start` and `end` were not properly exported
