@@ -501,7 +501,7 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
         }
       } else {
         # The ad hoc case
-        if (!is.null(fileToDownload)) {
+        if (!is.null(fileToDownload) || is.null(targetFile)) {
           if (!is.null(url)) {
             if (grepl("drive.google.com", url)) {
               googledrive::drive_auth() ## needed for use on e.g., rstudio-server
@@ -519,7 +519,7 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
                 }
               }
               destFile <- file.path(tempdir(), basename(downloadFilename))
-
+              message("Downloading from google drive")
               googledrive::drive_download(googledrive::as_id(url), path = destFile,
                                           overwrite = TRUE, verbose = TRUE)
             } else {

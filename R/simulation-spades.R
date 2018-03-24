@@ -161,7 +161,11 @@ doEvent <- function(sim, debug, notOlderThan) {
             classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                                  params = sim@params[[cur[["moduleName"]]]],
                                  modules = cur[["moduleName"]])
-            sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
+            if (interactive() & !identical(debug, FALSE)) {
+              canContinue <- TRUE
+              numTries <- 0
+              while(canContinue) {
+                out <- try(Cache(FUN = get(moduleCall, envir = fnEnv),
                          sim = sim,
                          eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                          objects = moduleSpecificObjects,
@@ -169,10 +173,65 @@ doEvent <- function(sim, debug, notOlderThan) {
                          outputObjects = moduleSpecificOutputObjects,
                          classOptions = classOptions,
                          cacheRepo = sim@paths[["cachePath"]],
-                         userTags = c("function:doEvent"))
+                         userTags = c("function:doEvent")))
+                if (isTRUE(is(out, "try-error"))) {
+                  numTries <- numTries + 1
+                  if (numTries > 1) {
+                    tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
+                    eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                         envir = sim@.envir[[cur[["moduleName"]]]])
+                    numTries <- 0
+                  } else {
+                    message("There was an error in the code in the ", moduleCall,
+                            ". Entering browser. You can correct it and press c to continue",
+                            " or Q to quit")
+                    debugonce(get(moduleCall, envir = fnEnv))
+                  }
+                } else {
+                  canContinue <- FALSE
+                }
+              }
+              sim <- out
+            } else {
+              sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
+                                      sim = sim,
+                                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+                                      objects = moduleSpecificObjects,
+                                      notOlderThan = notOlderThan,
+                                      outputObjects = moduleSpecificOutputObjects,
+                                      classOptions = classOptions,
+                                      cacheRepo = sim@paths[["cachePath"]],
+                                      userTags = c("function:doEvent"))
+            }
           } else {
-            sim <- get(moduleCall,
-                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]])
+            if (interactive() & !identical(debug, FALSE)) {
+              canContinue <- TRUE
+              numTries <- 0
+              while(canContinue) {
+                out <- try(get(moduleCall,
+                           envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
+                if (isTRUE(is(out, "try-error"))) {
+                  numTries <- numTries + 1
+                  if (numTries > 1) {
+                    numTries <- 0 # after editing, treat it as a new attempt
+                    tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
+                    eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                         envir = sim@.envir[[cur[["moduleName"]]]])
+                  } else {
+                    message("There was an error in the code in the ", moduleCall,
+                            ". Entering browser. You can correct it and press c to continue",
+                            " or Q to quit")
+                    debugonce(get(moduleCall, envir = fnEnv))
+                  }
+                } else {
+                  canContinue <- FALSE
+                }
+              }
+              sim <- out
+            } else {
+              sim <- get(moduleCall,
+                         envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]])
+            }
           }
         }
       } else {
@@ -456,8 +515,18 @@ scheduleEvent <- function(sim,
 #'
 #' @section \code{debug}:
 #'
-#' If \code{debug} is specified, it can be a logical or character vector.
-#' If not specified, the package option \code{spades.debug} is used. The following
+#' If \code{debug} is specified and is not \code{FALSE}, 2 things will happen:
+#' 1) there can be messages sent to console, such as events as they pass by, and
+#' 2) (experimental still) if there is an error, it will attempt to open a browser
+#' in the event where the error occurred. You can edit, and then press \code{c} to continue
+#' or \code{Q} to quit, plus all other normal interactive browser tools.
+#' \code{c} will trigger a reparse and events will continue as scheduled, starting
+#' with the one just edited. There may be some unexpected consequences if the
+#' \code{simList} objects had already been changed before the error occurred.
+#' \code{debug} can be a logical or character vector.
+#'
+#' If not specified in the function call, the package
+#' option \code{spades.debug} is used. The following
 #' options for debug are available:
 #'
 #' \tabular{ll}{
