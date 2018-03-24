@@ -490,7 +490,7 @@ setMethod(
 }
 
 if (!exists("objectSize")) {
-  objectSize <- function(x) UseMethod("objectSize")
+  objectSize <- function(x, quick) UseMethod("objectSize")
 }
 
 
