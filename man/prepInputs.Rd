@@ -9,7 +9,7 @@ prepInputs(targetFile, url = NULL, archive = NULL, alsoExtract = NULL,
   studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
   rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
   overwrite = FALSE, quickCheck = getOption("reproducible.quick", FALSE),
-  cacheTags = "", purge = FALSE, ...)
+  cacheTags = "", purge = FALSE, attemptErrorFixes = TRUE, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
@@ -73,6 +73,10 @@ repository along with the artifact.}
 
 \item{purge}{When prepInputs is called from outside a module, it will write a \code{CHECKSUMS.txt}
 file. If there is an incorrect \code{CHECKSUMS.txt}, this will purge it.}
+
+\item{attemptErrorFixes}{Will attempt to fix known errors. Currently only some failures
+for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
+Default \code{TRUE}, though this may not be the right action for all cases.}
 
 \item{...}{Passed to pkg::fun}
 }

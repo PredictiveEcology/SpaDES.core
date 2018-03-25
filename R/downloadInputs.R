@@ -325,6 +325,10 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #'
 #' @param overwrite Logical. Should downloading and all the other actions occur even if they
 #'                  pass the checksums or the files are all there.
+#'                  
+#' @param attemptErrorFixes Will attempt to fix known errors. Currently only some failures
+#'        for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
+#'        Default \code{TRUE}, though this may not be the right action for all cases.
 #'
 #' @param ... Passed to pkg::fun
 #'
@@ -410,7 +414,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
                        rasterInterpMethod = "bilinear", rasterDatatype = "INT2U",
                        writeCropped = TRUE, addTagsByObject = NULL, overwrite = FALSE,
                        quickCheck = getOption("reproducible.quick", FALSE),
-                       cacheTags = "", purge = FALSE, ...) {
+                       cacheTags = "", purge = FALSE, attemptErrorFixes = TRUE, 
+                       ...) {
   if (!missing(targetFile)) {
     targetFile <- basename(targetFile)
     targetFilePath <- file.path(destinationPath, targetFile)
@@ -586,7 +591,25 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
   } else {
     x <- Cache(f, asPath(targetFilePath), userTags = cacheTags, ...)
   }
-
+  
+  if (attemptErrorFixes) {
+    if (is(x, "SpatialPolygons")) {
+      message("Checking for errors in ", targetFile)
+      if (suppressWarnings(any(!rgeos::gIsValid(x, byid = TRUE)))) {
+        message("Found errors in ", targetFile, ". Attempting to correct.")
+        x1 <- try(raster::buffer(x, width = 0, dissolve = FALSE))
+        if (is(x1, "try-error")) {
+                          message("There are errors with ", targetFile, 
+                                  ". Couldn't fix them with raster::buffer(..., width = 0)")
+        } else {
+          x <- x1
+          message("  Some or all of the errors fixed")
+        }
+        
+      }
+    }
+    
+  }
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
         crs(rasterToMatch)
