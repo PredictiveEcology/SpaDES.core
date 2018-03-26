@@ -377,7 +377,7 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
 })
 
 
-test_that("test objectSize", {
+test_that("test objSize", {
   library(igraph)
   library(reproducible)
 
@@ -394,6 +394,6 @@ test_that("test objectSize", {
   }, add = TRUE)
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
-  os <- objectSize(a)
+  os <- objSize(a)
   expect_true(length(os)==4) # 2 objects, the environment, the rest
 })
