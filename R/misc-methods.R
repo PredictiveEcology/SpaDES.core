@@ -9,15 +9,14 @@ if (getRversion() >= "3.1.0") {
 #' @inheritParams base::getOption
 #' @rdname spadesOptions
 #' @keywords internal
-.getOption <- function(x) {
-
-  spadesCacheDefault <- getOption(x)
-  cacheRepo <-
-    if (is.function(spadesCacheDefault)) {
-      spadesCacheDefault()
-    } else {
-      spadesCacheDefault
-    }
+.getOption <- function(x, default = NULL) {
+  optionDefault <- options(x)[[1]]
+  if (is.null(optionDefault)) optionDefault <- default
+  if (is.function(optionDefault)) {
+    optionDefault()
+  } else {
+    optionDefault
+  }
 }
 
 ################################################################################
