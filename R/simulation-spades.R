@@ -151,88 +151,23 @@ doEvent <- function(sim, debug, notOlderThan) {
           .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
                             removeOthers = FALSE)
 
-          if (cacheIt) { # means that a module or event is to be cached
-            objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
-            moduleSpecificObjects <-
-              c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
-                ls(fnEnv, all.names = TRUE), # functions in the namespaced location
-                na.omit(objNam)) # objects outputted by module
-            moduleSpecificOutputObjects <- objNam
-            classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
-                                 params = sim@params[[cur[["moduleName"]]]],
-                                 modules = cur[["moduleName"]])
-            if (interactive() & !identical(debug, FALSE)) {
-              canContinue <- TRUE
-              numTries <- 0
-              while(canContinue) {
-                out <- try(Cache(FUN = get(moduleCall, envir = fnEnv),
-                         sim = sim,
-                         eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                         objects = moduleSpecificObjects,
-                         notOlderThan = notOlderThan,
-                         outputObjects = moduleSpecificOutputObjects,
-                         classOptions = classOptions,
-                         cacheRepo = sim@paths[["cachePath"]],
-                         userTags = c("function:doEvent")))
-                if (isTRUE(is(out, "try-error"))) {
-                  numTries <- numTries + 1
-                  if (numTries > 1) {
-                    tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
-                    eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                         envir = sim@.envir[[cur[["moduleName"]]]])
-                    numTries <- 0
-                  } else {
-                    message("There was an error in the code in the ", moduleCall,
-                            ". Entering browser. You can correct it and press c to continue",
-                            " or Q to quit")
-                    debugonce(get(moduleCall, envir = fnEnv))
-                  }
-                } else {
-                  canContinue <- FALSE
-                }
-              }
-              sim <- out
-            } else {
-              sim <- Cache(FUN = get(moduleCall, envir = fnEnv),
-                                      sim = sim,
-                                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                                      objects = moduleSpecificObjects,
-                                      notOlderThan = notOlderThan,
-                                      outputObjects = moduleSpecificOutputObjects,
-                                      classOptions = classOptions,
-                                      cacheRepo = sim@paths[["cachePath"]],
-                                      userTags = c("function:doEvent"))
-            }
+          quotedFnCall <- if (cacheIt) { # means that a module or event is to be cached
+            quote(Cache(FUN = get(moduleCall, envir = fnEnv),
+                                       sim = sim,
+                                       eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+                                       objects = moduleSpecificObjects,
+                                       notOlderThan = notOlderThan,
+                                       outputObjects = moduleSpecificOutputObjects,
+                                       classOptions = classOptions,
+                                       cacheRepo = sim@paths[["cachePath"]],
+                                       userTags = c("function:doEvent")))
           } else {
-            if (interactive() & !identical(debug, FALSE)) {
-              canContinue <- TRUE
-              numTries <- 0
-              while(canContinue) {
-                out <- try(get(moduleCall,
-                           envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
-                if (isTRUE(is(out, "try-error"))) {
-                  numTries <- numTries + 1
-                  if (numTries > 1) {
-                    numTries <- 0 # after editing, treat it as a new attempt
-                    tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
-                    eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                         envir = sim@.envir[[cur[["moduleName"]]]])
-                  } else {
-                    message("There was an error in the code in the ", moduleCall,
-                            ". Entering browser. You can correct it and press c to continue",
-                            " or Q to quit")
-                    debugonce(get(moduleCall, envir = fnEnv))
-                  }
-                } else {
-                  canContinue <- FALSE
-                }
-              }
-              sim <- out
-            } else {
-              sim <- get(moduleCall,
-                         envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]])
-            }
+            quote(get(moduleCall,
+                      envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
           }
+          sim <- .runEvent(sim, cacheIt, debug,
+                           quotedFnCall = quotedFnCall,
+                           moduleCall, fnEnv, cur, notOlderThan)
         }
       } else {
         stop(
@@ -622,6 +557,8 @@ setMethod(
                         notOlderThan,
                         ...) {
     .pkgEnv$searchPath <- search()
+    .pkgEnv[["spades.browserOnError"]] <-
+      (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))
 
     # timeunits gets accessed every event -- this should only be needed once per simList
     sim@.envir$.timeunits <- timeunits(sim)
@@ -732,3 +669,49 @@ setMethod(
       )
     }
   })
+
+
+.runEvent <- function(sim, cacheIt, debug, quotedFnCall, moduleCall, fnEnv, cur, notOlderThan) {
+  if (cacheIt) { # means that a module or event is to be cached
+    objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    moduleSpecificObjects <-
+      c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
+        ls(fnEnv, all.names = TRUE), # functions in the namespaced location
+        na.omit(objNam)) # objects outputted by module
+    moduleSpecificOutputObjects <- objNam
+    classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
+                         params = sim@params[[cur[["moduleName"]]]],
+                         modules = cur[["moduleName"]])
+  }
+  if (.pkgEnv[["spades.browserOnError"]]) {
+    sim <- .runEventWithBrowser(sim, quotedFnCall, moduleCall, fnEnv, cur)
+  } else {
+    sim <- eval(quotedFnCall)
+  }
+  sim
+}
+
+.runEventWithBrowser <- function(sim, quotedFnCall, moduleCall, fnEnv, cur) {
+  canContinue <- TRUE
+  numTries <- 0
+  while(canContinue) {
+    out <- try(eval(quotedFnCall))
+    if (isTRUE(is(out, "try-error"))) {
+      numTries <- numTries + 1
+      if (numTries > 1) {
+        tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
+        eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+             envir = sim@.envir[[cur[["moduleName"]]]])
+        numTries <- 0
+      } else {
+        message("There was an error in the code in the ", moduleCall,
+                ". Entering browser. You can correct it and press c to continue",
+                " or Q to quit")
+        debugonce(get(moduleCall, envir = fnEnv))
+      }
+    } else {
+      canContinue <- FALSE
+    }
+  }
+  sim <- out
+}
