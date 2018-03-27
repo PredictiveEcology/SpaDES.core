@@ -209,7 +209,7 @@ if (!isGeneric(".cacheMessage")) {
 setMethod(
   ".cacheMessage",
   signature = "simList",
-  definition = function(object, functionName) {
+  definition = function(object, functionName, fromMemoise) {
     cur <- current(object)
     if (NROW(cur)) {
       whichCached <- grep(".useCache", object@params)
@@ -218,10 +218,11 @@ setMethod(
       })
 
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
+      fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
-        cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n"))
+        cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
       } else {
-        cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
+        cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
                          cur$moduleName, "module\n"))
       }
     } else {
