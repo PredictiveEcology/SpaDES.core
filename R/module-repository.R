@@ -937,7 +937,8 @@ setMethod(
     } else {
       files
     }
-    filesToCheck <- filesToCheck[file.exists(filesToCheck)]
+    filesToCheck <- filesToCheck[file.exists(filesToCheck)] # remove non existing files
+    filesToCheck <- filesToCheck[!dir.exists(filesToCheck)] # remove directories
 
     if (is.null(txt$filesize)) {
       quickCheck <- FALSE
