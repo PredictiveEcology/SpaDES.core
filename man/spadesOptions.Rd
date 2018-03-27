@@ -4,10 +4,14 @@
 \alias{.getOption}
 \title{A slightly modified version of getOption}
 \usage{
-.getOption(x)
+.getOption(x, default = NULL)
 }
 \arguments{
 \item{x}{a character string holding an option name.}
+
+\item{default}{if the specified option is not set in the options list,
+    this value is returned.  This facilitates retrieving an option and
+    checking whether it is set and setting it separately if not.}
 }
 \description{
 This can take x as a character string or as a function that returns a character string.
