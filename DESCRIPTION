@@ -27,7 +27,7 @@ Authors@R: c(
 Depends:
     R (>= 3.3.0),
     quickPlot (>= 0.1.3.9001),
-    reproducible (>= 0.1.4.9009)
+    reproducible (>= 0.1.4.9011)
 Imports:
     codetools,
     crayon,

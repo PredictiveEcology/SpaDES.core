@@ -489,8 +489,8 @@ setMethod(
   return(out)
 }
 
-if (!exists("objectSize")) {
-  objectSize <- function(x, quick) UseMethod("objectSize")
+if (!exists("objSize")) {
+  objSize <- function(..., quick) UseMethod("objSize")
 }
 
 
@@ -499,16 +499,16 @@ if (!exists("objectSize")) {
 #' Recursively, runs \code{object\.size} on the simList environment.
 #' Currently, this will not assess object.size of the other elements
 #'
-#' @importFrom reproducible objectSize
-#' @inheritParams reproducible::objectSize
-#' @importFrom reproducible objectSize
+#' @inheritParams reproducible::objSize
+#' @importFrom reproducible objSize
 #' @export
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
-#' objectSize(a)
+#' objSize(a)
 #' object.size(a)
-objectSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
-  aa <- objectSize(x@.envir, quick = quick)
+objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
+  xObjName <- deparse(substitute(x))
+  aa <- objSize(x@.envir, quick = quick)
   bb <- as(x, "simList_")
   bb@.list <- list()
   bbOs <- list(simList = object.size(bb))
