@@ -210,7 +210,7 @@ setMethod(
   ".cacheMessage",
   signature = "simList",
   definition = function(object, functionName,
-                        fromMemoise = getOption("reproducible.useMemoise")) {
+                        fromMemoise = getOption("reproducible.useMemoise", TRUE)) {
     cur <- current(object)
     if (NROW(cur)) {
       whichCached <- grep(".useCache", object@params)
@@ -221,13 +221,30 @@ setMethod(
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
-        cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
+        if (isTRUE(fromMemoise)) {
+          cat(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
+        } else if (!is.na(fromMemoise)){
+          cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
+                           "adding to memoised copy"))
+        } else {
+          cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
+        }
       } else {
-        cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
-                         cur$moduleName, "module\n"))
+        if (isTRUE(fromMemoise)) {
+          cat(crayon::blue("  Using memoised copy of", cur$eventType, "event in",
+                           cur$moduleName, "module\n"))
+
+        } else if (!is.na(fromMemoise)){
+          cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
+                           cur$moduleName, "module. Adding to memoised copy.\n"))
+        } else {
+          cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
+                           cur$moduleName, "module\n"))
+        }
+
       }
     } else {
-      .cacheMessage(NULL, functionName)
+      .cacheMessage(NULL, functionName, fromMemoise = fromMemoise)
     }
   })
 
