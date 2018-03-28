@@ -5,12 +5,16 @@
 \alias{.cacheMessage,simList-method}
 \title{cacheMessage for simList class objects}
 \usage{
-\S4method{.cacheMessage}{simList}(object, functionName)
+\S4method{.cacheMessage}{simList}(object, functionName,
+  fromMemoise = getOption("reproducible.useMemoise"))
 }
 \arguments{
 \item{object}{Any R object.}
 
 \item{functionName}{A character string indicating the function name}
+
+\item{fromMemoise}{Logical. If \code{TRUE}, the message will be about
+recovery from memoised copy}
 }
 \description{
 See \code{\link[reproducible]{.cacheMessage}}.

@@ -190,7 +190,7 @@ setMethod(
   })
 
 if (!isGeneric(".cacheMessage")) {
-  setGeneric(".cacheMessage", function(object, functionName) {
+  setGeneric(".cacheMessage", function(object, functionName, fromMemoise) {
     standardGeneric(".cacheMessage")
   })
 }
@@ -209,7 +209,8 @@ if (!isGeneric(".cacheMessage")) {
 setMethod(
   ".cacheMessage",
   signature = "simList",
-  definition = function(object, functionName, fromMemoise) {
+  definition = function(object, functionName,
+                        fromMemoise = getOption("reproducible.useMemoise")) {
     cur <- current(object)
     if (NROW(cur)) {
       whichCached <- grep(".useCache", object@params)
