@@ -6,7 +6,7 @@
 \title{cacheMessage for simList class objects}
 \usage{
 \S4method{.cacheMessage}{simList}(object, functionName,
-  fromMemoise = getOption("reproducible.useMemoise"))
+  fromMemoise = getOption("reproducible.useMemoise", TRUE))
 }
 \arguments{
 \item{object}{Any R object.}
