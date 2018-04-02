@@ -98,7 +98,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
       # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
       #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
       #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
-      isTRUE(depsEdgeList(sim)[!(from %in% c("_INPUT_", currentModule(sim))), ][
+      isTRUE(depsEdgeList(sim, plot = FALSE)[!(from %in% c("_INPUT_", currentModule(sim))), ][
         objName == objDeparsed][, all(from != to), by = from][V1==TRUE]$V1)
 
   } else {
