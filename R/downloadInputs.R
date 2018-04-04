@@ -309,7 +309,14 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #'
 #' @inheritParams writeInputsOnDisk
 #'
-#' @param writeCropped Logical. Should the output be written to disk?
+#' @param writeCropped Logical or character string (a file path). If logical,
+#'                     then the cropped/masked raster will
+#'                     be written to disk with the original targetFile name,
+#'                     with "Small" prefixed to the basename(targetFilename).
+#'                     If a character string, it will be the path of the saved raster.
+#'                     It will be tested whether it is an absolute or relative path and used
+#'                     as is if absolute or prepended with \code{destinationPath} if
+#'                     relative.
 #'
 #' @inheritParams reproducible::Cache
 #'
@@ -339,6 +346,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @importFrom digest digest
 #' @importFrom methods is
 #' @importFrom reproducible Cache compareNA asPath
+#' @importFrom R.utils isAbsolutePath
 #' @importFrom googledrive drive_get drive_auth drive_download as_id
 #' @rdname prepInputs
 #' @examples
@@ -416,6 +424,12 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
                        quickCheck = getOption("reproducible.quick", FALSE),
                        cacheTags = "", purge = FALSE, attemptErrorFixes = TRUE,
                        ...) {
+  # Some assertions
+  if (!(is.logical(writeCropped) || is.character(writeCropped))) {
+    stop("writeCropped must be logical or character string")
+  }
+
+
   if (!missing(targetFile)) {
     targetFile <- basename(targetFile)
     targetFilePath <- file.path(destinationPath, targetFile)
@@ -660,8 +674,17 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
       }
     }
 
-    if (writeCropped) {
-      smallFN <- .prefix(targetFilePath, "Small")
+    if (!identical(writeCropped, FALSE)) { # allow TRUE or path
+      smallFN <- if (isTRUE(writeCropped) ) {
+        .prefix(targetFilePath, "Small")
+      } else {
+        if (isAbsolutePath(writeCropped)) {
+          writeCropped
+        } else {
+          file.path(destinationPath, basename(writeCropped))
+        }
+
+      }
 
       xTmp <- Cache(
         writeInputsOnDisk,

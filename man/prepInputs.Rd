@@ -56,7 +56,14 @@ cropping.}
 
 \item{rasterDatatype}{Output data type. Passed to \code{\link[raster]{writeRaster}}}
 
-\item{writeCropped}{Logical. Should the output be written to disk?}
+\item{writeCropped}{Logical or character string (a file path). If logical,
+then the cropped/masked raster will
+be written to disk with the original targetFile name,
+with "Small" prefixed to the basename(targetFilename).
+If a character string, it will be the path of the saved raster.
+It will be tested whether it is an absolute or relative path and used
+as is if absolute or prepended with \code{destinationPath} if
+relative.}
 
 \item{addTagsByObject}{Pass any object in there for which there is a
 \code{.tagsByClass} function}
