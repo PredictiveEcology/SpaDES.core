@@ -1004,8 +1004,9 @@ setMethod(
   "checksums",
   signature = c(module = "character", path = "character", quickCheck = "ANY",
                 write = "missing", files = "ANY"),
-  definition = function(module, path, quickCheck, files, ...) {
-    checksums(module, path, write = FALSE, quickCheck = quickCheck, files = files, ...)
+  definition = function(module, path, quickCheck, checksumFile, files, ...) {
+    checksums(module, path, write = FALSE, quickCheck = quickCheck, checksumFile = checksumFile,
+              files = files, ...)
 })
 
 #' @rdname checksums
@@ -1013,7 +1014,7 @@ setMethod(
   "checksums",
   signature = c(module = "missing", path = "character", write = "logical",
                 quickCheck = "ANY", files = "ANY"),
-  definition = function(module, path, write, quickCheck, files, ...) {
+  definition = function(module, path, write, quickCheck, checksumFile, files, ...) {
     checksums(module = character(), path = path, write = write,
-              quickCheck = quickCheck, files = files, ...)
+              quickCheck = quickCheck, checksumFile = checksumFile, files = files, ...)
   })
