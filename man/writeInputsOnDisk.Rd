@@ -4,14 +4,16 @@
 \alias{writeInputsOnDisk}
 \title{Write module inputs on disk}
 \usage{
-writeInputsOnDisk(x, filename, rasterDatatype = NULL)
+writeInputsOnDisk(x, filename, ...)
 }
 \arguments{
-\item{x}{A \code{Spatial*}, \code{sf} or \code{Raster*} object.}
+\item{x}{An object of postProcessing. See individual methods.}
 
-\item{filename}{Output filename}
+\item{filename}{The filename to save the output object to disk (a \code{Raster*} or
+\code{Spatial*} object)}
 
-\item{rasterDatatype}{Output data type. Passed to \code{\link[raster]{writeRaster}}}
+\item{...}{Passed to \code{\link[raster]{writeRaster}}, such as \code{datatype},
+and \code{\link[raster]{shapefile}}}
 }
 \description{
 Can be used to write prepared inputs on disk.
