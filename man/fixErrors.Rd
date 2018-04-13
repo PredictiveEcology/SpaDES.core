@@ -7,6 +7,9 @@
 fixErrors(x, targetFile, attemptErrorFixes = TRUE, ...)
 }
 \arguments{
+\item{x}{Any object that could be fixed for errors.
+See \code{\link{fixErrors.SpatialPolygons}}}
+
 \item{targetFile}{Character string giving the path to the eventual
 file (raster, shapefile, csv, etc.) after downloading and extracting from
 a zip or tar archive. This is the file \emph{before}

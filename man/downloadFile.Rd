@@ -23,6 +23,8 @@ checksumming does not checksum the file after it is
 Using \code{Cache} around \code{prepInputs} will do a
 sufficient job in these cases.}
 
+\item{neededFiles}{Character string giving the name of the file(s) to be extracted.}
+
 \item{destinationPath}{Character string of where to download to, and do
 all writing of files in.}
 

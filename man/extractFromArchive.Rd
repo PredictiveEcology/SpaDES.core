@@ -11,8 +11,10 @@ extractFromArchive(archive, destinationPath = dirname(archive), neededFiles,
 \item{archive}{Character string giving the path of the archive
 containing the \code{file} to be extracted.}
 
-\item{destinationPath}{Character string giving the path where \code{needed} will be
+\item{destinationPath}{Character string giving the path where \code{neededFiles} will be
 extracted. Defaults to the archive directory.}
+
+\item{neededFiles}{Character string giving the name of the file(s) to be extracted.}
 
 \item{extractedArchives}{Used internally.}
 
@@ -23,8 +25,6 @@ extracted. Defaults to the archive directory.}
 \code{2} append new information to existing one.}
 
 \item{...}{Passed to \code{unzip} or \code{untar}, e.g., \code{overwrite}}
-
-\item{needed}{Character string giving the name of the file(s) to be extracted.}
 }
 \value{
 A character vector listing the paths of the extracted archives.

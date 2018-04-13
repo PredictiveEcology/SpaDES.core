@@ -93,6 +93,7 @@ if (getRversion() >= "3.1.0") {
 #' @importFrom methods is
 #' @importFrom reproducible Cache compareNA asPath
 #' @importFrom R.utils isAbsolutePath
+#' @importFrom utils methods
 #' @importFrom googledrive drive_get drive_auth drive_download as_id
 #' @rdname prepInputs
 #' @seealso \code{\link{downloadFile}}, \code{\link{extractFromArchive}},
@@ -309,9 +310,11 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
 
   # dots will contain too many things for some functions -- need to remove those that are known going
   #   into prepInputs
-  argsToRemove <- unique(c(formalArgs(prepInputs),
-                           formalArgs(fixErrors), formalArgs(writeRaster), formalArgs(projectRaster),
-                           unlist(lapply(methods("postProcess"), formalArgs))))
+  argsToRemove <- unique(c(names(formals(prepInputs)),
+                           names(formals(fixErrors)),
+                           names(formals(writeRaster)),
+                           names(formals(projectRaster)),
+                           unlist(lapply(methods("postProcess"), function(x) names(formals(x))))))
   args <- dots[!(names(dots) %in% argsToRemove)]
   if (length(args) == 0) args <- NULL
 
@@ -339,6 +342,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
 #' meaningful method is on SpatialPolygons, and it runs \code{rgeos::gIsValid}. If
 #' \code{FALSE}, then it runs a buffer of width 0.
 #' @inheritParams prepInputs
+#' @param x Any object that could be fixed for errors.
+#'          See \code{\link{fixErrors.SpatialPolygons}}
 #' @param ... None used currently
 #' @param attemptErrorFixes Will attempt to fix known errors. Currently only some failures
 #'        for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
@@ -434,10 +439,10 @@ downloadFromWebDB <- function(filename, filepath, dataset = NULL, quick = FALSE,
 #' @param archive Character string giving the path of the archive
 #' containing the \code{file} to be extracted.
 #'
-#' @param destinationPath Character string giving the path where \code{needed} will be
+#' @param destinationPath Character string giving the path where \code{neededFiles} will be
 #' extracted. Defaults to the archive directory.
 #'
-#' @param needed Character string giving the name of the file(s) to be extracted.
+#' @param neededFiles Character string giving the name of the file(s) to be extracted.
 #'
 #' @param extractedArchives Used internally.
 #' @param checkSums A checksums file, e.g., created by checksums(..., write = TRUE)
@@ -635,6 +640,8 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #'
 #' There may be many methods developed. See e.g.,
 #' \code{\link{postProcess.spatialObjects}}
+#' @export
+#' @keywords internal
 #' @param x  An object of postProcessing. See individual methods.
 #' @importClassesFrom quickPlot spatialObjects
 #' @seealso \code{prepInputs}, \code{\link{postProcess.spatialObjects}}
@@ -646,6 +653,8 @@ postProcess <- function(x, ...) {
   UseMethod("postProcess")
 }
 
+#' @export
+#' @keywords internal
 postProcess.default <- function(x, ...) {
   x
 }
@@ -1052,7 +1061,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
       if (!is.null(fileToDownload) ) {#|| is.null(targetFile)) {
         if (!is.null(url)) {
           if (grepl("drive.google.com", url)) {
-            googledrive::drive_auth() ## needed for use on e.g., rstudio-server
+            googledrive::drive_auth() ## neededFiles for use on e.g., rstudio-server
             if (is.null(archive)) {
               fileAttr <- googledrive::drive_get(googledrive::as_id(url))
               archive <- .isArchive(fileAttr$name)
