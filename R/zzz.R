@@ -5,7 +5,7 @@
   ## set options using the approach used by devtools
   opts <- options()
   opts.spades <- list( # nolint
-    spades.browserOnError = TRUE,
+    spades.browserOnError = FALSE,
     spades.cachePath = file.path(.spadesTempDir, "cache"),
     spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
