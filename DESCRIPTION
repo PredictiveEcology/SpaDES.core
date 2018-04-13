@@ -110,5 +110,6 @@ Collate:
     'spades-classes.R'
     'spades-core-package.R'
     'spades-tools-deprecated.R'
+    'suppliedElsewhere.R'
     'zzz.R'
 RoxygenNote: 6.0.1
