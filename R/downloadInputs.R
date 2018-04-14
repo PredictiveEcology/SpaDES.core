@@ -262,7 +262,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
   neededFiles <- c(targetFile, if (!is.null(alsoExtract)) basename(alsoExtract))
   # Download
   needChecksums <- downloadFile(archive, targetFile, neededFiles = neededFiles,
-               destinationPath, quick, checkSums, url, needChecksums = needChecksums)
+               destinationPath, quick, checkSums, url, needChecksums = needChecksums,
+               overwrite = overwrite)
 
   filesToChecksum <- if (is.null(archive)) character() else basename(archive)
   on.exit({
@@ -1033,7 +1034,7 @@ writeInputsOnDisk <- function(x, filename, ...) {
 #' @inheritParams extractFromArchive
 #' @author Eliot McIntire
 downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quick,
-                         checkSums, url, needChecksums, overwrite, ...) {
+                         checkSums, url, needChecksums, overwrite = TRUE, ...) {
 
   if (!is.null(neededFiles)) {
     result <- checkSums[checkSums$expectedFile %in% neededFiles, ]$result
