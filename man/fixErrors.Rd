@@ -20,8 +20,9 @@ Using \code{Cache} around \code{prepInputs} will do a
 sufficient job in these cases.}
 
 \item{attemptErrorFixes}{Will attempt to fix known errors. Currently only some failures
-for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
-Default \code{TRUE}, though this may not be the right action for all cases.}
+      for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
+      Default \code{TRUE}, though this may not be the right action for all cases.
+@examples}
 
 \item{...}{None used currently}
 }

@@ -351,6 +351,7 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
 #' @param attemptErrorFixes Will attempt to fix known errors. Currently only some failures
 #'        for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
 #'        Default \code{TRUE}, though this may not be the right action for all cases.
+#'  @examples
 fixErrors <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
   UseMethod("fixErrors")
 }
@@ -367,6 +368,8 @@ fixErrors.default <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
 #' failures to \code{rgeos::gIsValid}
 #'
 #' @export
+#' @param x A \code{SpatialPolygons} object
+#' @inheritParams fixErrors
 fixErrors.SpatialPolygons <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
   if (attemptErrorFixes) {
     if (is(x, "SpatialPolygons")) {
