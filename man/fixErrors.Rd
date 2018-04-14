@@ -30,3 +30,4 @@ These must be very common for this function to be useful. Currently, the only
 meaningful method is on SpatialPolygons, and it runs \code{rgeos::gIsValid}. If
 \code{FALSE}, then it runs a buffer of width 0.
 }
+\keyword{internal}

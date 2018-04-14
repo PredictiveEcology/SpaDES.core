@@ -344,6 +344,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
 #' @inheritParams prepInputs
 #' @param x Any object that could be fixed for errors.
 #'          See \code{\link{fixErrors.SpatialPolygons}}
+#' @export
+#' @keywords internal
 #' @param ... None used currently
 #' @param attemptErrorFixes Will attempt to fix known errors. Currently only some failures
 #'        for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
@@ -352,6 +354,8 @@ fixErrors <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
   UseMethod("fixErrors")
 }
 
+#' @export
+#' @keywords internal
 fixErrors.default <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
   x
 }
