@@ -360,6 +360,11 @@ fixErrors.default <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
   x
 }
 
+#' Fix \code{rgeos::gIsValid} failures in \code{SpatialPolygons}
+#'
+#' This uses \code{raster::buffer(..., width = 0)} internally, which fixes some
+#' failures to \code{rgeos::gIsValid}
+#'
 #' @export
 fixErrors.SpatialPolygons <- function(x, targetFile, attemptErrorFixes = TRUE, ...) {
   if (attemptErrorFixes) {
