@@ -776,6 +776,8 @@ setMethod(
 #' to \code{spades}
 #'
 #' @param ... Passed to simInit
+#' @export
+#' @rdname simInit
 simInitAndSpades <- function(...) {
   simIn <- simInit(...)
   spades(simIn)
