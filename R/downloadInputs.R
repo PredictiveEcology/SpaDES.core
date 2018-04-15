@@ -1040,10 +1040,10 @@ writeInputsOnDisk <- function(x, filename, ...) {
 #' @export
 #' @inheritParams prepInputs
 #' @inheritParams extractFromArchive
-#' @params moduleName Character string indicating SpaDES module name from which prepInputs is
+#' @param moduleName Character string indicating SpaDES module name from which prepInputs is
 #'                    being called
 #'                    being called
-#' @params modulePath Character string of the path where the \code{moduleName} is located.
+#' @param modulePath Character string of the path where the \code{moduleName} is located.
 #' @author Eliot McIntire
 downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quick,
                          checkSums, url, needChecksums, overwrite = TRUE, moduleName, modulePath, ...) {

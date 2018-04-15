@@ -52,6 +52,12 @@ subsequent calls to \code{prepInputs}, comparing the file on hand with the ad ho
 \item{overwrite}{Logical. Should downloading and all the other actions occur even if they
 pass the checksums or the files are all there.}
 
+\item{moduleName}{Character string indicating SpaDES module name from which prepInputs is
+being called
+being called}
+
+\item{modulePath}{Character string of the path where the \code{moduleName} is located.}
+
 \item{...}{Additional arguments that can be passed to
 \code{fun}, \code{\link{fixErrors}} and \code{\link{postProcess}} and
 also \code{\link[reproducible]{Cache}}
