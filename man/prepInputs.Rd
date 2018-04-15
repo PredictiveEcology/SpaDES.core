@@ -2,19 +2,22 @@
 % Please edit documentation in R/downloadInputs.R
 \name{prepInputs}
 \alias{prepInputs}
-\title{Download and optionally reproject, crop, mask raw data and output module inputs}
+\title{Download and optionally post process files}
 \usage{
 prepInputs(targetFile, url = NULL, archive = NULL, alsoExtract = NULL,
-  dataset = NULL, destinationPath = ".", fun = "raster", pkg = "raster",
-  studyArea = NULL, rasterToMatch = NULL, rasterInterpMethod = "bilinear",
-  rasterDatatype = "INT2U", writeCropped = TRUE, addTagsByObject = NULL,
-  overwrite = FALSE, quickCheck = getOption("reproducible.quick", FALSE),
-  cacheTags = "", purge = FALSE, attemptErrorFixes = TRUE, ...)
+  destinationPath = ".", fun = "raster::raster",
+  quick = getOption("reproducible.quick"), overwrite = FALSE,
+  purge = FALSE, ...)
 }
 \arguments{
 \item{targetFile}{Character string giving the path to the eventual
-file (raster, shapefile, csv, etc.) that will be
-downloaded, extracted.}
+file (raster, shapefile, csv, etc.) after downloading and extracting from
+a zip or tar archive. This is the file \emph{before}
+it is passed to \code{postProcess}. Currently, the internal
+checksumming does not checksum the file after it is
+\code{postProcess}ed (e.g., cropped/reprojected/masked).
+Using \code{Cache} around \code{prepInputs} will do a
+sufficient job in these cases.}
 
 \item{url}{Optional character string indicating the URL to download from. Normally,
 if used within a module, this url should be explicitly given as sourceURL for an
@@ -33,74 +36,62 @@ but they are unknown, the function will try all until it finds the
 \item{alsoExtract}{Optional character string naming files other than
 \code{targetFile} that must be extracted from the \code{archive}.}
 
-\item{dataset}{Optional character string representing the dataset of interest
-for download. Allows for restricting the lookup for the url to a dataset,
-thus avoiding filename collision.}
-
 \item{destinationPath}{Character string of where to download to, and do
 all writing of files in.}
 
-\item{fun}{Character string indicating the function to use to load #' \code{targetFile}.}
+\item{fun}{Character string indicating the function to use to load \code{targetFile} into
+an \code{R} object.}
 
-\item{pkg}{Character string indicating the package in which to find \code{fun}.}
-
-\item{studyArea}{Template \code{SpatialPolygons*} object used for masking, after cropping.
-If not in same CRS, then it will be \code{spTransform}ed to
-CRS of \code{x} before masking.}
-
-\item{rasterToMatch}{Template \code{Raster*} object used for reprojecting and
-cropping.}
-
-\item{rasterInterpMethod}{Method used to compute values for the new
-\code{RasterLayer}. See \code{\link[raster]{projectRaster}}. Defaults to bilinear.}
-
-\item{rasterDatatype}{Output data type. Passed to \code{\link[raster]{writeRaster}}}
-
-\item{writeCropped}{Logical or character string (a file path). If logical,
-then the cropped/masked raster will
-be written to disk with the original targetFile name,
-with "Small" prefixed to the basename(targetFilename).
-If a character string, it will be the path of the saved raster.
-It will be tested whether it is an absolute or relative path and used
-as is if absolute or prepended with \code{destinationPath} if
-relative.}
-
-\item{addTagsByObject}{Pass any object in there for which there is a
-\code{.tagsByClass} function}
+\item{quick}{Logical. This is passed internally to \code{\link{checksums}} and
+\code{\link{downloadData}} (the quickCheck argument for both),
+and to \code{\link{Cache}} (the quick argument). This results in
+faster, though less robust checking of inputs. See the respective
+functions.}
 
 \item{overwrite}{Logical. Should downloading and all the other actions occur even if they
 pass the checksums or the files are all there.}
 
-\item{quickCheck}{Logical. If \code{TRUE}, then all Caching that occurs will
-be based on the much faster but less robust file.info. \code{FALSE},
-the default, uses \code{\link[digest]{digest}}}
-
-\item{cacheTags}{Character vector with Tags. These Tags will be added to the
-repository along with the artifact.}
-
 \item{purge}{When prepInputs is called from outside a module, it will write a \code{CHECKSUMS.txt}
 file. If there is an incorrect \code{CHECKSUMS.txt}, this will purge it.}
 
-\item{attemptErrorFixes}{Will attempt to fix known errors. Currently only some failures
-for SpatialPolygons* are attempted. Notably with \code{raster::buffer(..., width = 0)}.
-Default \code{TRUE}, though this may not be the right action for all cases.}
-
-\item{...}{Passed to pkg::fun}
+\item{...}{Additional arguments that can be passed to
+\code{fun}, \code{\link{fixErrors}} and \code{\link{postProcess}} and
+also \code{\link[reproducible]{Cache}}
+(if \code{useCache = TRUE}, which is the default unless
+\code{options(reproducible.useCache = FALSE)}). Since \code{...} is passed to
+\code{\link{postProcess}}, these may be passed into other functions.
+See details and examples.}
 }
 \description{
-This function can be used to prepare module inputs from raw data. It
+This function can be used to prepare R objects from remote or local data sources.
+The object of this function is to provide a reproducible version of a series of
+commonly used steps for getting, loading, and processing data. In the case of
+\code{Spatial*} and \code{Raster*} objects, then the postprocessing may include
+cropping, reprojecting, masking, if the appropriate arguments are used. See examples.
+}
+\details{
+\code{prepInputs} has some functionality of its own; however, its primary purpose
+is to run in sequence: \code{downloadFile}, \code{extractFromArchive}, \code{fun},
+\code{postProcess}.
 runs several other functions, conditionally and sequentially:
 \code{downloadFromWebDB} or \code{downloadData} if used within a module. If used
 outside of a SpaDES module, then it will use \code{file.download} or
 \code{googledrive::drive_download} if the \code{url} has \code{https://drive.google.com}.
 If the download is a .zip or .tar file (i.e., an archive), then the function will
 run \code{extractFromArchive}. Then it will sequentially try to load the extracted file (if
-passed as \code{targetFile}). If the default fun and pkg are not left as is,
+passed as \code{targetFile}). If the default \code{fun} is not left as is,
 the function will try to use those. If the file is not a raster file, it will try
 using raster::shapefile. NOTE: This function is still experimental: use
 with caution.
-with caution.
 }
+\section{3. postProcessing of \code{Raster*} and \code{Spatial*} objects}{
+
+
+If \code{rasterToMatch} or \code{studyArea} are used, then this will trigger several
+subsequent functions, specifically the sequence, \emph{Crop, reproject, mask}, which appears
+to be a common sequence in spatial simulation. See \code{\link{postProcess.spatialObjects}}.
+}
+
 \examples{
 # This function works within a module, when "sourceURL" is supplied
 #   in the metadata in the "expectsInputs(..., sourceURL = ""), but can
@@ -119,23 +110,34 @@ dPath <- file.path(tempdir(), "ecozones")
 shpEcozone <- prepInputs(destinationPath = dPath,
                      url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
 
+# Robust to partial file deletions:
+unlink(dir(dPath, full.names = TRUE)[1:3])
+shpEcozone <- prepInputs(destinationPath = dPath,
+                     url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
+unlink(dPath, recursive = TRUE)
+
 # Once this is done, can be more precise in operational code:
 #  specify targetFile, alsoExtract, and fun, wrap with Cache
 ecozoneFilename <- file.path(dPath, "ecozones.shp")
-ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
-shpEcozone <- Cache(prepInputs,
+ecozoneFiles <- c("ecozones.dbf", "ecozones.prj",
+                  "ecozones.sbn", "ecozones.sbx", "ecozones.shp", "ecozones.shx")
+shpEcozone <- prepInputs(targetFile = asPath(ecozoneFilename),
                     url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
-                    targetFile = asPath(ecozoneFilename),
                     alsoExtract = asPath(ecozoneFiles),
                     fun = "shapefile", destinationPath = dPath)
+unlink(dPath, recursive = TRUE)
 
 #' # Add a study area to Crop and Mask to
 # Create a "study area"
 library(SpaDES.tools)
 StudyArea <- randomPolygon(x = sp::SpatialPoints(matrix(c(-110, 60), ncol=2)), 1e8)
+
 #  specify targetFile, alsoExtract, and fun, wrap with Cache
 ecozoneFilename <- file.path(dPath, "ecozones.shp")
-ecozoneFiles <- dir(dPath, pattern = "ecozones.") # not CHECKSUMS.txt or .zip file
+# Note, you don't need to "alsoExtract" the archive... if the archive is not there, but the
+#   targetFile is there, it will not redownload the archive.
+ecozoneFiles <- c("ecozones.dbf", "ecozones.prj",
+                  "ecozones.sbn", "ecozones.sbx", "ecozones.shp", "ecozones.shx")
 shpEcozoneSm <- Cache(prepInputs,
                          url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
                          targetFile = asPath(ecozoneFilename),
@@ -145,7 +147,8 @@ shpEcozoneSm <- Cache(prepInputs,
 
 dev();
 Plot(shpEcozone)
-Plot(shpEcozoneSm, addTo = "shpEcozone", col = "red")
+Plot(shpEcozoneSm, addTo = "shpEcozone", gp = gpar(col = "red"))
+unlink(dPath)
 
 # Big Raster, with crop and mask to Study Area - no reprojecting (lossy) of raster,
 #   but the StudyArea does get reprojected, need to use rasterToMatch
@@ -153,11 +156,12 @@ lcc2005Filename <- file.path(dPath, "LCC2005_V1_4a.tif")
 url <- file.path("ftp://ftp.ccrs.nrcan.gc.ca/ad/NLCCLandCover",
                  "LandcoverCanada2005_250m/LandCoverOfCanada2005_V1_4.zip")
 dPath <- file.path(tempdir(), "LCC")
+
+# messages received below may help for filling in more arguments in the subsequent call
 LCC2005 <- Cache(prepInputs, url = url,
-                     #targetFile = lcc2005Filename,
-                     #archive = asPath("LandCoverOfCanada2005_V1_4.zip"),
                      destinationPath = asPath(dPath),
                      studyArea = StudyArea)
+
 Plot(LCC2005)
 
 # Specifying more args
@@ -168,6 +172,10 @@ LCC2005 <- Cache(prepInputs, url = url,
                      studyArea = StudyArea)
 }
 
+}
+\seealso{
+\code{\link{downloadFile}}, \code{\link{extractFromArchive}},
+         \code{\link{downloadFile}},  \code{\link{postProcess}}.
 }
 \author{
 Eliot McIntire

@@ -2,11 +2,9 @@
 % Please edit documentation in R/downloadInputs.R
 \name{cropReprojInputs}
 \alias{cropReprojInputs}
-\title{Reproject, crop module inputs}
+\title{Reproject, crop a \code{Spatial*} or \code{Raster*} object}
 \usage{
-cropReprojInputs(x, studyArea = NULL, rasterToMatch = NULL,
-  rasterInterpMethod = "bilinear", addTagsByObject = NULL,
-  cacheTags = NULL)
+cropReprojInputs(x, studyArea = NULL, rasterToMatch = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{Spatial*}, \code{sf}, or \code{Raster*} object.}
@@ -15,17 +13,10 @@ cropReprojInputs(x, studyArea = NULL, rasterToMatch = NULL,
 If not in same CRS, then it will be \code{spTransform}ed to
 CRS of \code{x} before masking.}
 
-\item{rasterToMatch}{Template \code{Raster*} object used for reprojecting and
+\item{rasterToMatch}{Template \code{Raster*} object used for reprojecting and}
+
+\item{...}{Passed to \code{projectRaster} and \code{Cache}
 cropping.}
-
-\item{rasterInterpMethod}{Method used to compute values for the new
-\code{RasterLayer}. See \code{\link[raster]{projectRaster}}. Defaults to bilinear.}
-
-\item{addTagsByObject}{Pass any object in there for which there is a
-\code{.tagsByClass} function}
-
-\item{cacheTags}{Character vector with Tags. These Tags will be added to the
-repository along with the artifact.}
 }
 \description{
 This function can be used to crop or reproject module inputs from raw data.

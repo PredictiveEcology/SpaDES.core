@@ -47,8 +47,9 @@ evaluate if the \code{checksumFile} has changed.}
 \item{files}{A character vector of length 1 or more if only a subset of files should be
 checked in the CHECKSUMS.txt file}
 
-\item{...}{Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
-the digest algorithm can be specified.}
+\item{...}{Passed to \code{\link[digest]{digest}} and \code{\link[utils]{write.table}}.
+For \code{digest}, the notable argument is \code{algo}. For \code{write.table},
+the notable argument is \code{append}.}
 }
 \value{
 A \code{data.frame} with columns: \code{result}, \code{expectedFile},

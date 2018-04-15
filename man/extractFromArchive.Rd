@@ -4,19 +4,27 @@
 \alias{extractFromArchive}
 \title{Extract files from archive.}
 \usage{
-extractFromArchive(archive, destinationPath = dirname(archive), needed,
-  extractedArchives = NULL)
+extractFromArchive(archive, destinationPath = dirname(archive), neededFiles,
+  extractedArchives = NULL, checkSums, needChecksums, ...)
 }
 \arguments{
 \item{archive}{Character string giving the path of the archive
 containing the \code{file} to be extracted.}
 
-\item{destinationPath}{Character string giving the path where \code{needed} will be
+\item{destinationPath}{Character string giving the path where \code{neededFiles} will be
 extracted. Defaults to the archive directory.}
 
-\item{needed}{Character string giving the name of the file(s) to be extracted.}
+\item{neededFiles}{Character string giving the name of the file(s) to be extracted.}
 
 \item{extractedArchives}{Used internally.}
+
+\item{checkSums}{A checksums file, e.g., created by checksums(..., write = TRUE)}
+
+\item{needChecksums}{A numeric, with \code{0} indicating do not write a new checksums,
+\code{1} write a new one,
+\code{2} append new information to existing one.}
+
+\item{...}{Passed to \code{unzip} or \code{untar}, e.g., \code{overwrite}}
 }
 \value{
 A character vector listing the paths of the extracted archives.
@@ -27,4 +35,6 @@ archives.
 }
 \author{
 Jean Marchal
+
+Eliot McIntire
 }
