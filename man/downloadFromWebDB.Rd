@@ -4,7 +4,8 @@
 \alias{downloadFromWebDB}
 \title{Download file from web databases}
 \usage{
-downloadFromWebDB(filename, filepath, dataset = NULL, quickCheck = FALSE)
+downloadFromWebDB(filename, filepath, dataset = NULL, quick = FALSE,
+  overwrite = TRUE)
 }
 \arguments{
 \item{filename}{Character string naming the file to be downloaded.}
@@ -15,9 +16,14 @@ downloadFromWebDB(filename, filepath, dataset = NULL, quickCheck = FALSE)
 for download. Allows for restricting the lookup for the url to a dataset,
 thus avoiding filename collision.}
 
-\item{quickCheck}{Logical. If \code{TRUE}, then all Caching that occurs will
-be based on the much faster but less robust file.info. \code{FALSE},
-the default, uses \code{\link[digest]{digest}}}
+\item{quick}{Logical. This is passed internally to \code{\link{checksums}} and
+\code{\link{downloadData}} (the quickCheck argument for both),
+and to \code{\link{Cache}} (the quick argument). This results in
+faster, though less robust checking of inputs. See the respective
+functions.}
+
+\item{overwrite}{Logical. Should downloading and all the other actions occur even if they
+pass the checksums or the files are all there.}
 }
 \description{
 This function can be used to download a file from a web database listed in

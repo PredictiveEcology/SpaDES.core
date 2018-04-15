@@ -837,8 +837,9 @@ setMethod(
 #'
 #' @inheritParams downloadData
 #'
-#' @param ...     Passed to \code{\link[digest]{digest}}, notably \code{algo}, so
-#'                the digest algorithm can be specified.
+#' @param ...     Passed to \code{\link[digest]{digest}} and \code{\link[utils]{write.table}}.
+#'                For \code{digest}, the notable argument is \code{algo}. For \code{write.table},
+#'                the notable argument is \code{append}.
 #'
 #' @return A \code{data.frame} with columns: \code{result}, \code{expectedFile},
 #'         \code{actualFile}, and \code{checksum}.
@@ -884,12 +885,17 @@ setMethod(
     defaultHashAlgo <- "xxhash64"
     defaultWriteHashAlgo <- "xxhash64"
     dots <- list(...)
+    dotsWriteTable <- dots[names(dots) %in% formalArgs(write.table)]
+    dots <- dots[names(dots) %in% formalArgs(digest::digest)]
     checkPath(path, create = write)
     path <- if (length(module)) {
       file.path(path, module, "data")
     } else {
       file.path(path)
     }
+
+    # If it is a SpaDES module, then CHECKSUM.txt must be in the data folder
+    checksumFile <- file.path(path, basename(checksumFile))
 
     if (!write) {
       stopifnot(file.exists(checksumFile))
@@ -968,7 +974,8 @@ setMethod(
     }
 
     if (write) {
-      write.table(out, checksumFile, eol = "\n", col.names = TRUE, row.names = FALSE)
+      writeChecksumsTable(out, checksumFile, dotsWriteTable)
+
       return(out)
     } else {
       results.df <- out %>%
@@ -1018,3 +1025,11 @@ setMethod(
     checksums(module = character(), path = path, write = write,
               quickCheck = quickCheck, checksumFile = checksumFile, files = files, ...)
   })
+
+writeChecksumsTable <- function(out, checksumFile, dots) {
+  do.call(write.table,
+          args = append(list(x = out, file = checksumFile, eol = "\n",
+                             col.names = !isTRUE(dots$append),
+                             row.names = FALSE),
+                        dots))
+}
