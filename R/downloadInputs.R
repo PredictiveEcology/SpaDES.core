@@ -237,6 +237,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
 
   # If quick, then use file.info as part of cache/memoise ... otherwise,
   #   pass a random real number to make a new memoise
+  moduleName <- NULL
+  modulePath <- NULL
   if (is.null(url)) { # the only way for this to be useful is if there is a SpaDES module
                       # and url can be gotten during downloadData from module metadata
     fileinfo <- if (quick) file.info(filesToCheck) else runif(1)
@@ -248,8 +250,6 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
       checkSums <- out$checkSums
     } else {
       checkSums <- out <- emptyChecksums
-      moduleName <- NULL
-      modulePath <- NULL
     }
 
   } else {
@@ -265,15 +265,19 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
   # Download
   needChecksums <- downloadFile(archive, targetFile, neededFiles = neededFiles,
                destinationPath, quick, checkSums, url, needChecksums = needChecksums,
-               overwrite = overwrite, moduleName, modulePath)
+               overwrite = overwrite, moduleName = moduleName, modulePath = modulePath)
 
   filesToChecksum <- if (is.null(archive)) character() else basename(archive)
   on.exit({
     if (needChecksums > 0) {
       if (needChecksums == 2) { # a checksums file already existed, need to keep some of it
-        cs <- read.table(checkSumFilePath, header = TRUE)
-        nonCurrentFiles <- cs %>%
-          filter(!file %in% filesToChecksum)
+        cs <- try(read.table(checkSumFilePath, header = TRUE), silent = TRUE)
+        if (is(cs, "try-error")) { # meant that it was an empty CHECKSUMS.txt file -- rebuild it
+          needChecksums <- 1
+        } else {
+          nonCurrentFiles <- cs %>%
+            filter(!file %in% filesToChecksum)
+        }
       }
       currentFiles <- checksums(path = destinationPath, write = TRUE, #checksumFile = checkSumFilePath,
                                 files = file.path(destinationPath, filesToChecksum))
@@ -503,7 +507,6 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
       if (!(all(compareNA(result, "OK")) && all(neededFiles %in% checkSums$expectedFile)) ||
           NROW(result) == 0) { # don't extract if we already have all files and they are fine
         if (needChecksums == 0) needChecksums <- 2 # use binary addition -- 1 is new file, 2 is append
-
 
         if (length(archive) > 1) {
           filesExtracted <- c(filesExtracted,
