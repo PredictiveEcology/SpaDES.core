@@ -767,3 +767,16 @@ setMethod(
 
     return(invisible(sim))
 })
+
+
+#' Put simInit and spades together
+#'
+#' This may allow for more efficient Caching. This passes all
+#' arguments to simInit, then the created \code{simList} is passed
+#' to \code{spades}
+#'
+#' @param ... Passed to simInit
+simInitAndSpades <- function(...) {
+  simIn <- simInit(...)
+  spades(simIn)
+}
