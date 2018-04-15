@@ -248,6 +248,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
       checkSums <- out$checkSums
     } else {
       checkSums <- out <- emptyChecksums
+      moduleName <- NULL
+      modulePath <- NULL
     }
 
   } else {
@@ -263,7 +265,7 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
   # Download
   needChecksums <- downloadFile(archive, targetFile, neededFiles = neededFiles,
                destinationPath, quick, checkSums, url, needChecksums = needChecksums,
-               overwrite = overwrite)
+               overwrite = overwrite, moduleName, modulePath)
 
   filesToChecksum <- if (is.null(archive)) character() else basename(archive)
   on.exit({
@@ -1035,9 +1037,13 @@ writeInputsOnDisk <- function(x, filename, ...) {
 #' @export
 #' @inheritParams prepInputs
 #' @inheritParams extractFromArchive
+#' @params moduleName Character string indicating SpaDES module name from which prepInputs is
+#'                    being called
+#'                    being called
+#' @params modulePath Character string of the path where the \code{moduleName} is located.
 #' @author Eliot McIntire
 downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quick,
-                         checkSums, url, needChecksums, overwrite = TRUE, ...) {
+                         checkSums, url, needChecksums, overwrite = TRUE, moduleName, modulePath, ...) {
 
   if (!is.null(neededFiles)) {
     result <- checkSums[checkSums$expectedFile %in% neededFiles, ]$result
@@ -1064,7 +1070,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
     }
 
     # The download step
-    if (exists("moduleName")) { # means it is inside a SpaDES module
+    if (!is.null(moduleName)) { # means it is inside a SpaDES module
       if (!is.null(fileToDownload)) {
         downloadData(moduleName, modulePath, files = fileToDownload,
                      checked = checkSums, quickCheck = quick, overwrite = overwrite)

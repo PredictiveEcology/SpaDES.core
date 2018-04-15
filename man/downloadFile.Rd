@@ -5,7 +5,8 @@
 \title{A wrapper around a set of downloading functions}
 \usage{
 downloadFile(archive, targetFile, neededFiles, destinationPath, quick,
-  checkSums, url, needChecksums, overwrite = TRUE, ...)
+  checkSums, url, needChecksums, overwrite = TRUE, moduleName, modulePath,
+  ...)
 }
 \arguments{
 \item{archive}{Optional character string giving the path of an archive
