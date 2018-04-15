@@ -5,7 +5,7 @@ if (getRversion() >= "3.1.0") {
 
 # These are known functions that will definitely cause conflicts unless they are
 # prefixed by their packages.
-conflictingFns <- c("\\<raster::levels\\>", "\\<raster::scale\\>")
+conflictingFns <- c("\\<raster::levels\\>", "\\<raster::scale\\>", "\\<raster::which.max\\>")
 clashingFns <- c("\\<quickPlot::Plot\\>")
 mustBeReturnSim <- c("doEvent\\..*") # module functions that must end with return(sim) or the like
 mustAssignToSim <- c("scheduleEvent", "saveFiles") # module functions that must assign to sim <-
