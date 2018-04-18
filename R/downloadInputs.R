@@ -1104,7 +1104,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
               downloadFilename <- archive
             }
             destFile <- file.path(tempdir(), basename(downloadFilename))
-            if (checkSums[ checkSums$expectedFile ==  basename(destFile), ]$result != "OK") {
+            if (!isTRUE(checkSums[ checkSums$expectedFile ==  basename(destFile), ]$result == "OK")) {
               message("Downloading from google drive")
               googledrive::drive_download(googledrive::as_id(url), path = destFile,
                                           overwrite = overwrite, verbose = TRUE)
@@ -1118,8 +1118,8 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
           }
           if (!(identical(dirname(destFile),
                           normalizePath(destinationPath, winslash = "/", mustWork = FALSE)))) {
-            file.copy(destFile, destinationPath)
-            file.remove(destFile)
+            suppressWarnings(file.copy(destFile, destinationPath))
+            suppressWarnings(file.remove(destFile))
           }
 
         }
