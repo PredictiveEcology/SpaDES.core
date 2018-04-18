@@ -206,6 +206,8 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
     fun <- paste0(dots$pkg, "::", fun)
     dots$pkg <- NULL
   }
+  # remove trailing slash -- causes unzip fail if it is there
+  destinationPath <- gsub("\\\\$|/$", "", destinationPath)
 
   if (!missing(targetFile)) {
     targetFile <- basename(targetFile)
