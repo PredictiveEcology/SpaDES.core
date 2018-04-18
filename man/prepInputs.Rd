@@ -108,7 +108,7 @@ if (!suppliedElsewhere("test", sim))
 #   then extract all files, then if there is a .shp, it will load with raster::shapefile
 dPath <- file.path(tempdir(), "ecozones")
 shpEcozone <- prepInputs(destinationPath = dPath,
-                     url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
+                         url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
 
 # Robust to partial file deletions:
 unlink(dir(dPath, full.names = TRUE)[1:3])
@@ -158,13 +158,13 @@ url <- file.path("ftp://ftp.ccrs.nrcan.gc.ca/ad/NLCCLandCover",
 dPath <- file.path(tempdir(), "LCC")
 
 # messages received below may help for filling in more arguments in the subsequent call
-LCC2005 <- Cache(prepInputs, url = url,
+LCC2005 <- prepInputs(url = url,
                      destinationPath = asPath(dPath),
                      studyArea = StudyArea)
 
 Plot(LCC2005)
 
-# Specifying more args
+# Specifying more args -- can wrap with Cache
 LCC2005 <- Cache(prepInputs, url = url,
                      targetFile = lcc2005Filename,
                      archive = asPath("LandCoverOfCanada2005_V1_4.zip"),

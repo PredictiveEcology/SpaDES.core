@@ -114,7 +114,7 @@ if (getRversion() >= "3.1.0") {
 #' #   then extract all files, then if there is a .shp, it will load with raster::shapefile
 #' dPath <- file.path(tempdir(), "ecozones")
 #' shpEcozone <- prepInputs(destinationPath = dPath,
-#'                      url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
+#'                          url = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip")
 #'
 #' # Robust to partial file deletions:
 #' unlink(dir(dPath, full.names = TRUE)[1:3])
@@ -164,13 +164,13 @@ if (getRversion() >= "3.1.0") {
 #' dPath <- file.path(tempdir(), "LCC")
 #'
 #' # messages received below may help for filling in more arguments in the subsequent call
-#' LCC2005 <- Cache(prepInputs, url = url,
+#' LCC2005 <- prepInputs(url = url,
 #'                      destinationPath = asPath(dPath),
 #'                      studyArea = StudyArea)
 #'
 #' Plot(LCC2005)
 #'
-#' # Specifying more args
+#' # Specifying more args -- can wrap with Cache
 #' LCC2005 <- Cache(prepInputs, url = url,
 #'                      targetFile = lcc2005Filename,
 #'                      archive = asPath("LandCoverOfCanada2005_V1_4.zip"),
@@ -263,9 +263,11 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
 
   neededFiles <- c(targetFile, if (!is.null(alsoExtract)) basename(alsoExtract))
   # Download
-  needChecksums <- downloadFile(archive, targetFile, neededFiles = neededFiles,
+  downloadFileResult <- downloadFile(archive, targetFile, neededFiles = neededFiles,
                destinationPath, quick, checkSums, url, needChecksums = needChecksums,
                overwrite = overwrite, moduleName = moduleName, modulePath = modulePath)
+  needChecksums <- downloadFileResult$needChecksums
+  if (is.null(archive)) archive <- downloadFileResult$archive
 
   filesToChecksum <- if (is.null(archive)) character() else basename(archive)
   on.exit({
@@ -1061,7 +1063,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
 
   if (missingNeededFiles) {
     fileToDownload <- if (is.null(archive[1])) {
-      targetFile
+      "All"
     } else {
       result <- checkSums[checkSums$expectedFile == basename(archive), ]$result
       missingArchive <- !isTRUE(result == "OK")
@@ -1071,6 +1073,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
         NULL # means nothing to download because the archive is already in hand
       }
     }
+    skipDownloadMsg <- "Skipping download of url; local copy already exists and passes checksums"
 
     # The download step
     if (!is.null(moduleName)) { # means it is inside a SpaDES module
@@ -1100,17 +1103,28 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
               downloadFilename <- archive
             }
             destFile <- file.path(tempdir(), basename(downloadFilename))
-            message("Downloading from google drive")
-            googledrive::drive_download(googledrive::as_id(url), path = destFile,
-                                        overwrite = overwrite, verbose = TRUE)
+            if (checkSums[ checkSums$expectedFile ==  basename(destFile), ]$result != "OK") {
+              message("Downloading from google drive")
+              googledrive::drive_download(googledrive::as_id(url), path = destFile,
+                                          overwrite = overwrite, verbose = TRUE)
+            } else {
+              message(skipDownloadMsg)
+              needChecksums <- 0
+            }
           } else {
             destFile <- file.path(tempdir(), basename(url))
             download.file(url, destfile = destFile)
           }
-          file.copy(destFile, destinationPath)
-          file.remove(destFile)
+          if (!(identical(dirname(destFile),
+                          normalizePath(destinationPath, winslash = "/", mustWork = FALSE)))) {
+            file.copy(destFile, destinationPath)
+            file.remove(destFile)
+          }
 
         }
+      } else {
+        message(skipDownloadMsg)
+        needChecksums <- 0
       }
     }
   } else {
@@ -1122,5 +1136,5 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
     }
 
   }
-  needChecksums
+  list(needChecksums = needChecksums, archive = file.path(destinationPath, basename(archive)))
 }
