@@ -93,9 +93,8 @@ to be a common sequence in spatial simulation. See \code{\link{postProcess.spati
 }
 
 \examples{
-# This function works within a module, when "sourceURL" is supplied
-#   in the metadata in the "expectsInputs(..., sourceURL = ""), but can
-# also run outside a module, e.g., with url argument.
+# This function works within a module, however, currently,
+#   "sourceURL" is not yet working as desired. Use url.
 \dontrun{
 # Put chunks like this in your .inputObjects
 if (!suppliedElsewhere("test", sim))
