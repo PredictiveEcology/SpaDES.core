@@ -178,7 +178,7 @@ if (getRversion() >= "3.1.0") {
 #' }
 #'
 prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NULL,
-                       destinationPath = ".", fun = "raster::raster",
+                       destinationPath = ".", fun = NULL,
                        quick = getOption("reproducible.quick"),
                        overwrite = FALSE, purge = FALSE,
                        ...) {
@@ -617,6 +617,13 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
     filesInDestPath <- dir(destinationPath)
     isShapefile <- grepl("shp", fileExt(filesInDestPath))
     isRaster <- fileExt(filesInDestPath) %in% c("tif", "grd")
+    if (is.null(fun)) { #i.e., the default
+      fun <-if (any(isShapefile)) {
+        "raster::shapefile"
+      } else {
+        "raster::raster"
+      }
+    }
     message("targetFile was not specified. ", if (any(isShapefile)) {
       c(" Trying raster::shapefile on ", filesInDestPath[isShapefile],
         ". If that is not correct, please specify different targetFile",
@@ -628,11 +635,6 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
         "directory are: \n",
         paste(filesInDestPath, collapse = "\n"))
     })
-    if (endsWith(fun, "raster")) { #i.e., the default
-      if (any(isShapefile)) {
-        fun <- "shapefile"
-      }
-    }
 
     guessAtFileToLoad <- if ("shapefile" %in% fun ) {
       filesInDestPath[isShapefile]

@@ -5,7 +5,7 @@
 \title{Download and optionally post process files}
 \usage{
 prepInputs(targetFile, url = NULL, archive = NULL, alsoExtract = NULL,
-  destinationPath = ".", fun = "raster::raster",
+  destinationPath = ".", fun = NULL,
   quick = getOption("reproducible.quick"), overwrite = FALSE,
   purge = FALSE, ...)
 }
