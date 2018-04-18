@@ -493,7 +493,6 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
     "NotOK"
   }
   filesExtracted <- character()
-
   # needs to pass checkSums & have all neededFiles files
   if (!(all(compareNA(result, "OK")) && all(neededFiles %in% checkSums$expectedFile))) {
     if (!is.null(archive)) {
@@ -558,6 +557,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
         }
       } else {
         message("Skipping extractFromArchive because all files already extracted")
+        filesExtracted <- checkSums[checkSums$expectedFile %in% basename(filesInArchive), ]$expectedFile
       }
     }
   } else {
@@ -1062,10 +1062,12 @@ writeInputsOnDisk <- function(x, filename, ...) {
 downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quick,
                          checkSums, url, needChecksums, overwrite = TRUE, moduleName, modulePath, ...) {
 
-  if ("shp" %in% fileExt(neededFiles)) { # if user wants .shp file, needs other anciliary files
-    shpfileBase <- gsub(".shp$", "", neededFiles[fileExt(neededFiles) %in% "shp"])
-    otherShpfiles <- paste0(shpfileBase, ".", c("shx", "dbf", "prj", "sbx", "cpg", "shp.xml", "sbn"))
-    neededFiles <- unique(c(neededFiles, otherShpfiles))
+  if (!is.null(neededFiles)) {
+    if ("shp" %in% fileExt(neededFiles)) { # if user wants .shp file, needs other anciliary files
+      shpfileBase <- gsub(".shp$", "", neededFiles[fileExt(neededFiles) %in% "shp"])
+      otherShpfiles <- paste0(shpfileBase, ".", c("shx", "dbf", "prj", "sbx", "cpg", "shp.xml", "sbn"))
+      neededFiles <- unique(c(neededFiles, otherShpfiles))
+    }
   }
 
 
