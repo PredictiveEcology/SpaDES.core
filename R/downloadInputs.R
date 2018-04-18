@@ -268,6 +268,7 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
                destinationPath, quick, checkSums, url, needChecksums = needChecksums,
                overwrite = overwrite, moduleName = moduleName, modulePath = modulePath)
   needChecksums <- downloadFileResult$needChecksums
+  neededFiles <- downloadFileResult$neededFiles
   if (is.null(archive)) archive <- downloadFileResult$archive
 
   filesToChecksum <- if (is.null(archive)) character() else basename(archive)
@@ -298,14 +299,17 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
                               basename(filesExtracted$filesExtracted)))
   needChecksums <- filesExtracted$needChecksums
 
-  # Now that all files are downloaded and extracted from archive, deal with missing targetFilePath
-  tryRasterFn <- if (endsWith(suffix = "raster", fun)) TRUE else FALSE
 
   #targetFilePath might still be NULL, need destinationPath too
-  targetParams <- .guessAtTarget(targetFilePath, destinationPath, fun) # passes through if all known
+  targetParams <- .guessAtTargetAndFun(targetFilePath, destinationPath,
+                                 filesExtracted$filesExtracted,
+                                 fun) # passes through if all known
   targetFile <- basename(targetParams$targetFilePath)
   targetFilePath <- targetParams$targetFilePath
   fun <- targetParams$fun
+
+  # Now that all files are downloaded and extracted from archive, deal with missing targetFilePath
+  tryRasterFn <- if (endsWith(suffix = "raster", fun)) TRUE else FALSE
 
   # fun is a charcter string, convert to function
   if (grepl("::", fun)) {
@@ -611,12 +615,15 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
 #' @rdname guessAtTarget
 #' @name guessAtTarget
 #' @inheritParams postProcess
+#' @param filesExtracted A character vector of all files that have been extracted (e.g.,
+#'                       from an archive)
 #' @param destinationPath Full path of the directory where the target file should be
-.guessAtTarget <- function(targetFilePath, destinationPath, fun) {
-  if (is.null(targetFilePath)) {
-    filesInDestPath <- dir(destinationPath)
-    isShapefile <- grepl("shp", fileExt(filesInDestPath))
-    isRaster <- fileExt(filesInDestPath) %in% c("tif", "grd")
+.guessAtTargetAndFun <- function(targetFilePath, destinationPath, filesExtracted, fun) {
+  #if (is.null(targetFilePath)) {
+    #filesExtracted <- dir(destinationPath)
+    possibleFiles <- basename(unique(c(targetFilePath, filesExtracted)))
+    isShapefile <- grepl("shp", fileExt(possibleFiles))
+    isRaster <- fileExt(possibleFiles) %in% c("tif", "grd")
     if (is.null(fun)) { #i.e., the default
       fun <-if (any(isShapefile)) {
         "raster::shapefile"
@@ -624,8 +631,9 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
         "raster::raster"
       }
     }
+
     message("targetFile was not specified. ", if (any(isShapefile)) {
-      c(" Trying raster::shapefile on ", filesInDestPath[isShapefile],
+      c(" Trying raster::shapefile on ", possibleFiles[isShapefile],
         ". If that is not correct, please specify different targetFile",
         " and/or fun")
     } else {
@@ -633,14 +641,14 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
         ". If that is not correct, please specify a targetFile",
         " and/or different fun. The current files in the targetFilePath's ",
         "directory are: \n",
-        paste(filesInDestPath, collapse = "\n"))
+        paste(possibleFiles, collapse = "\n"))
     })
 
-    guessAtFileToLoad <- if ("shapefile" %in% fun ) {
-      filesInDestPath[isShapefile]
+    guessAtFileToLoad <- if (endsWith(suffix = "shapefile", fun )) {
+      possibleFiles[isShapefile]
     } else {
       if (any(isRaster)) {
-        filesInDestPath[isRaster]
+        possibleFiles[isRaster]
       } else {
         message("Don't know which file to load. Please specify targetFile")
       }
@@ -655,8 +663,9 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
     }
     targetFile <- guessAtFileToLoad
     targetFilePath <- file.path(destinationPath, targetFile)
-  }
-  list(targetFilePath = targetFilePath, fun = fun)
+  #}
+
+    list(targetFilePath = targetFilePath, fun = fun)
 }
 
 #' Generic function to post process objects
@@ -1053,6 +1062,13 @@ writeInputsOnDisk <- function(x, filename, ...) {
 downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quick,
                          checkSums, url, needChecksums, overwrite = TRUE, moduleName, modulePath, ...) {
 
+  if ("shp" %in% fileExt(neededFiles)) { # if user wants .shp file, needs other anciliary files
+    shpfileBase <- gsub(".shp$", "", neededFiles[fileExt(neededFiles) %in% "shp"])
+    otherShpfiles <- paste0(shpfileBase, ".", c("shx", "dbf", "prj", "sbx", "cpg", "shp.xml", "sbn"))
+    neededFiles <- unique(c(neededFiles, otherShpfiles))
+  }
+
+
   if (!is.null(neededFiles)) {
     result <- checkSums[checkSums$expectedFile %in% neededFiles, ]$result
   } else {
@@ -1118,6 +1134,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
             destFile <- file.path(tempdir(), basename(url))
             download.file(url, destfile = destFile)
           }
+          # if destinationPath is tempdir, then don't copy and remove
           if (!(identical(dirname(destFile),
                           normalizePath(destinationPath, winslash = "/", mustWork = FALSE)))) {
             suppressWarnings(file.copy(destFile, destinationPath))
@@ -1139,5 +1156,6 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
     }
 
   }
-  list(needChecksums = needChecksums, archive = file.path(destinationPath, basename(archive)))
+  archiveReturn <- if (is.null(archive)) archive else file.path(destinationPath, basename(archive))
+  list(needChecksums = needChecksums, archive = archiveReturn, neededFiles = neededFiles)
 }

@@ -2,15 +2,18 @@
 % Please edit documentation in R/downloadInputs.R
 \name{guessAtTarget}
 \alias{guessAtTarget}
-\alias{.guessAtTarget}
+\alias{.guessAtTargetAndFun}
 \title{Try to pick a file to load}
 \usage{
-.guessAtTarget(targetFilePath, destinationPath, fun)
+.guessAtTargetAndFun(targetFilePath, destinationPath, filesExtracted, fun)
 }
 \arguments{
 \item{targetFilePath}{Full path of the target file}
 
 \item{destinationPath}{Full path of the directory where the target file should be}
+
+\item{filesExtracted}{A character vector of all files that have been extracted (e.g.,
+from an archive)}
 }
 \description{
 Try to pick a file to load

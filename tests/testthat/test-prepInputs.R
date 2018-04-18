@@ -10,7 +10,12 @@ test_that("prepInputs doesn't work", {
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 
-  prepInputs()
+
+  setwd(tempdir())
+  test <- prepInputs(targetFile = "FMA_Boundary_Updated.shp",
+                     url = "https://drive.google.com/file/d/1nTFOcrdMf1hIsxd_yNCSTr8RrYNHHwuc/view?usp=sharing",
+                     destinationPath = "data/FMA")
+
   # m <- "child4"
   # newModule(m, tmpdir, open = FALSE)
   # fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
