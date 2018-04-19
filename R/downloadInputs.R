@@ -729,8 +729,10 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     message("  Starting postProcessing")
     targetCRS <- if (!is.null(rasterToMatch)) {
+      message("Using rasterToMatch crs")
       crs(rasterToMatch)
     } else if (!is.null(studyArea)) {
+      message("Using studyArea crs")
       crs(studyArea)
     } else {
       if (is(x, "sf"))
