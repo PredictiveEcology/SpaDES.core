@@ -84,6 +84,10 @@ if (getRversion() >= "3.1.0") {
 #'            \code{\link{postProcess}}, these may be passed into other functions.
 #'            See details and examples.
 #'
+#' @section Passing \code{rasterToMatch} and/or \code{studyArea}:
+#'
+#' Please see \code{\link{postProcess.SpatialPolygon}}
+#'
 #'
 #' @author Eliot McIntire
 #' @author Jean Marchal
@@ -723,6 +727,18 @@ postProcess.default <- function(x, ...) {
 #'            \code{sf::st_write}. This might include potentially important
 #'            arguments like \code{datatype}, \code{format}. Also passed to \code{projectRaster},
 #'            with likely important arguments such as \code{method = "bilinear"}
+#'
+#' @section Passing \code{rasterToMatch} and/or \code{studyArea}:
+#'
+#' Depending on which of these were passed, different things will happen to the \code{targetFile}
+#' located at \code{targetFilePath}.
+#' \tabular{ll}{
+#'                     \tab \code{rasterToMatch} \tab \code{studyArea} \tab              Both \cr
+#'   \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch}  \cr
+#'   \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
+#'   \code{projection} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
+#'   \code{mask}       \tab No                   \tab   Yes        \tab \code{studyArea}      \cr
+#' }
 postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rasterToMatch = NULL, quick,
                                        writeCropped = TRUE, overwrite = TRUE,
                                        destinationPath = tempdir(), ...) {

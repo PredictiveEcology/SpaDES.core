@@ -92,6 +92,12 @@ subsequent functions, specifically the sequence, \emph{Crop, reproject, mask}, w
 to be a common sequence in spatial simulation. See \code{\link{postProcess.spatialObjects}}.
 }
 
+\section{Passing \code{rasterToMatch} and/or \code{studyArea}}{
+
+
+Please see \code{\link{postProcess.SpatialPolygon}}
+}
+
 \examples{
 # This function works within a module, however, currently,
 #   "sourceURL" is not yet working as desired. Use url.

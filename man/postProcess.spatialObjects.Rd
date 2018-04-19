@@ -40,8 +40,10 @@ relative.}
 \item{overwrite}{Logical. Should downloading and all the other actions occur even if they
 pass the checksums or the files are all there.}
 
-\item{destinationPath}{Character string of where to download to, and do
-all writing of files in.}
+\item{destinationPath}{Character string of a directory in which to download and
+save the file that comes from \code{url} and is also
+where the function will look for \code{archive} or
+\code{targetFile}.}
 
 \item{...}{\code{\link{cropReprojInputs}}, \code{\link{writeInputsOnDisk}} and
 \code{\link{Cache}}. These each may then pass \code{...} into
@@ -57,3 +59,17 @@ crop, reproject, and mask, in that order.  This function is a wrapper for
 \code{\link{writeInputsOnDisk}}, with a decent amount of data manipulating
 between these calls so that the crs match.
 }
+\section{Passing \code{rasterToMatch} and/or \code{studyArea}}{
+
+
+Depending on which of these were passed, different things will happen to the \code{targetFile}
+located at \code{targetFilePath}.
+\tabular{llll}{
+                    \tab \code{rasterToMatch} \tab \code{studyArea} \tab              Both \cr
+  \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch}  \cr
+  \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
+  \code{projection} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
+  \code{mask}       \tab No                   \tab   Yes        \tab \code{studyArea}      \cr
+}
+}
+
