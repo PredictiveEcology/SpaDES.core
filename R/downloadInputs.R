@@ -644,7 +644,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
           "directory are: \n",
           paste(possibleFiles, collapse = "\n"))
       })
-    
+
       targetFilePath <- if (endsWith(suffix = "shapefile", fun )) {
         possibleFiles[isShapefile]
       } else {
@@ -653,7 +653,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
         } else {
           message("  Don't know which file to load. Please specify targetFile")
         }
-  
+
       }
       if (length(targetFilePath) > 1)  {
         message("  More than one possible files to load, ", paste(targetFilePath, collapse = ", "),
@@ -756,6 +756,7 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
         studyArea = studyArea,
         rasterToMatch = rasterToMatch, ...)
 
+
     if (!is.null(studyArea)) {
       if (is(x, "RasterLayer") ||
           is(x, "RasterStack") ||
@@ -843,8 +844,8 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
       crs(rasterToMatch)
-      # } else if (!is.null(studyArea)) {
-      #   crs(studyArea)
+      } else if (!is.null(studyArea)) {
+        crs(studyArea)
     } else {
       if (is(x, "sf")) {
         if (requireNamespace("sf")) {
