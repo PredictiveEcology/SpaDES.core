@@ -191,12 +191,12 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
     dots$cacheTags <- NULL
   }
   if (!is.null(dots$rasterInterpMethod))  {
-    message("cacheTags is deprecated; use userTags which will pass directly to Cache")
+    message("rasterInterpMethod is deprecated; use method which will pass directly to projectRaster")
     dots$method <- dots$rasterInterpMethod
     dots$rasterInterpMethod <- NULL
   }
   if (!is.null(dots$rasterDatatype))  {
-    message("cacheTags is deprecated; use userTags which will pass directly to Cache")
+    message("rasterDatatype is deprecated; use datatype which will pass directly to writeRaster")
     dots$datatype <- dots$rasterDatatype
     dots$rasterDatatype <- NULL
   }
@@ -727,7 +727,7 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
                                        writeCropped = TRUE, overwrite = TRUE,
                                        destinationPath = tempdir(), ...) {
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
-    message("Starting postProcessing")
+    message("  Starting postProcessing")
     targetCRS <- if (!is.null(rasterToMatch)) {
       crs(rasterToMatch)
     } else if (!is.null(studyArea)) {
@@ -838,7 +838,7 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
 #' @rdname cropReprojInputs
 #'
 cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
-  message("  Cropping, reprojecting")
+  message("    Cropping, reprojecting")
 
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
@@ -953,7 +953,7 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
 #' @rdname maskInputs
 #'
 maskInputs <- function(x, studyArea) {
-  message("  Masking")
+  message("    Masking")
 
   if (!is(studyArea, "SpatialPolygonsDataFrame")) {
     studyArea <- SpatialPolygonsDataFrame(Sr = studyArea, data = data.frame(ID = seq(length(studyArea))),
@@ -1126,7 +1126,7 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
             }
             destFile <- file.path(tempdir(), basename(downloadFilename))
             if (!isTRUE(checkSums[ checkSums$expectedFile ==  basename(destFile), ]$result == "OK")) {
-              message("Downloading from google drive")
+              message("  Downloading from google drive")
               googledrive::drive_download(googledrive::as_id(url), path = destFile,
                                           overwrite = overwrite, verbose = TRUE)
             } else {
@@ -1152,10 +1152,10 @@ downloadFile <- function(archive, targetFile, neededFiles, destinationPath, quic
     }
   } else {
     if (is.null(targetFile)) {
-      message("Skipping download because all files listed in CHECKSUMS.txt file are present.",
+      message("   Skipping download because all files listed in CHECKSUMS.txt file are present.",
               " If this is not correct, rerun prepInputs with purge = TRUE")
     } else {
-      message("Skipping download because targetFile already present")
+      message("  Skipping download because targetFile already present")
     }
 
   }
