@@ -632,38 +632,39 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
       }
     }
 
-    message("targetFile was not specified. ", if (any(isShapefile)) {
-      c(" Trying raster::shapefile on ", possibleFiles[isShapefile],
-        ". If that is not correct, please specify different targetFile",
-        " and/or fun")
-    } else {
-      c(" Trying ", fun,
-        ". If that is not correct, please specify a targetFile",
-        " and/or different fun. The current files in the targetFilePath's ",
-        "directory are: \n",
-        paste(possibleFiles, collapse = "\n"))
-    })
-
-    guessAtFileToLoad <- if (endsWith(suffix = "shapefile", fun )) {
-      possibleFiles[isShapefile]
-    } else {
-      if (any(isRaster)) {
-        possibleFiles[isRaster]
+    if (is.null(targetFilePath)) {
+      message("  targetFile was not specified. ", if (any(isShapefile)) {
+        c(" Trying raster::shapefile on ", possibleFiles[isShapefile],
+          ". If that is not correct, please specify different targetFile",
+          " and/or fun")
       } else {
-        message("Don't know which file to load. Please specify targetFile")
+        c(" Trying ", fun,
+          ". If that is not correct, please specify a targetFile",
+          " and/or different fun. The current files in the targetFilePath's ",
+          "directory are: \n",
+          paste(possibleFiles, collapse = "\n"))
+      })
+    
+      targetFilePath <- if (endsWith(suffix = "shapefile", fun )) {
+        possibleFiles[isShapefile]
+      } else {
+        if (any(isRaster)) {
+          possibleFiles[isRaster]
+        } else {
+          message("  Don't know which file to load. Please specify targetFile")
+        }
+  
       }
-
+      if (length(targetFilePath) > 1)  {
+        message("  More than one possible files to load, ", paste(targetFilePath, collapse = ", "),
+                " Picking the first one. If not correct, specify a targetFile")
+        targetFilePath <- targetFilePath[1]
+      } else {
+        message("  Trying ", targetFilePath, " with ", fun)
+      }
+      targetFile <- targetFilePath
+      targetFilePath <- file.path(destinationPath, targetFile)
     }
-    if (length(guessAtFileToLoad) > 1)  {
-      message("More than one possible files to load, ", paste(guessAtFileToLoad, collapse = ", "),
-              " Picking the first one. If not correct, specify a targetFile")
-      guessAtFileToLoad <- guessAtFileToLoad[1]
-    } else {
-      message("Trying ", guessAtFileToLoad, " with ", fun)
-    }
-    targetFile <- guessAtFileToLoad
-    targetFilePath <- file.path(destinationPath, targetFile)
-  #}
 
     list(targetFilePath = targetFilePath, fun = fun)
 }
