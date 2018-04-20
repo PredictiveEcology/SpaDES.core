@@ -17,9 +17,13 @@ is \code{TRUE}. The resulting cropped filename will be
 
 \item{studyArea}{Template \code{SpatialPolygons*} object used for masking, after cropping.
 If not in same CRS, then it will be \code{spTransform}ed to
-CRS of \code{x} before masking.}
+CRS of \code{x} before masking. Currently, this function will not reproject the
+\code{x}. \code{\link{postProcess.spatialObjects}}}
 
-\item{rasterToMatch}{Template \code{Raster*} object used for reprojecting and}
+\item{rasterToMatch}{Template \code{Raster*} object used for cropping (so extent should be
+the extent of desired outcome), reprojecting (including changing the
+resolution and projection). See details in
+\code{\link{postProcess.spatialObjects}}.}
 
 \item{quick}{Logical. This is passed internally to \code{\link{checksums}} and
 \code{\link{downloadData}} (the quickCheck argument for both),

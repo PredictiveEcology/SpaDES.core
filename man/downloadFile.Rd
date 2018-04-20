@@ -26,8 +26,10 @@ sufficient job in these cases.}
 
 \item{neededFiles}{Character string giving the name of the file(s) to be extracted.}
 
-\item{destinationPath}{Character string of where to download to, and do
-all writing of files in.}
+\item{destinationPath}{Character string of a directory in which to download and
+save the file that comes from \code{url} and is also
+where the function will look for \code{archive} or
+\code{targetFile}.}
 
 \item{quick}{Logical. This is passed internally to \code{\link{checksums}} and
 \code{\link{downloadData}} (the quickCheck argument for both),

@@ -25,11 +25,15 @@ if (getRversion() >= "3.1.0") {
 #' with caution.
 #'
 #'
-#' @section 3. postProcessing of \code{Raster*} and \code{Spatial*} objects:
+#' @section postProcessing of \code{Raster*} and \code{Spatial*} objects:
 #'
 #' If \code{rasterToMatch} or \code{studyArea} are used, then this will trigger several
 #' subsequent functions, specifically the sequence, \emph{Crop, reproject, mask}, which appears
 #' to be a common sequence in spatial simulation. See \code{\link{postProcess.spatialObjects}}.
+#'
+#' \subsection{Understanding various combinations of \code{rasterToMatch} and/or \code{studyArea}}{
+#'   Please see \code{\link{postProcess.spatialObjects}}
+#' }
 #'
 #'
 #' @param targetFile Character string giving the path to the eventual
@@ -58,8 +62,10 @@ if (getRversion() >= "3.1.0") {
 #' @param alsoExtract Optional character string naming files other than
 #' \code{targetFile} that must be extracted from the \code{archive}.
 #'
-#' @param destinationPath Character string of where to download to, and do
-#'                        all writing of files in.
+#' @param destinationPath Character string of a directory in which to download and
+#'                        save the file that comes from \code{url} and is also
+#'                        where the function will look for \code{archive} or
+#'                        \code{targetFile}.
 #'
 #' @param fun Character string indicating the function to use to load \code{targetFile} into
 #'            an \code{R} object.
@@ -84,10 +90,6 @@ if (getRversion() >= "3.1.0") {
 #'            \code{\link{postProcess}}, these may be passed into other functions.
 #'            See details and examples.
 #'
-#' @section Passing \code{rasterToMatch} and/or \code{studyArea}:
-#'
-#' Please see \code{\link{postProcess.SpatialPolygon}}
-#'
 #'
 #' @author Eliot McIntire
 #' @author Jean Marchal
@@ -96,7 +98,7 @@ if (getRversion() >= "3.1.0") {
 #' @importFrom digest digest
 #' @importFrom methods is
 #' @importFrom reproducible Cache compareNA asPath
-#' @importFrom R.utils isAbsolutePath
+#' @importFrom R.utils isAbsolutePath isFile
 #' @importFrom utils methods
 #' @importFrom googledrive drive_get drive_auth drive_download as_id
 #' @rdname prepInputs
@@ -224,7 +226,12 @@ prepInputs <- function(targetFile, url = NULL, archive = NULL, alsoExtract = NUL
   checkSumFilePath <- file.path(destinationPath, "CHECKSUMS.txt")
   if (purge) unlink(checkSumFilePath)
 
-  if (!dir.exists(destinationPath)) checkPath(destinationPath, create = TRUE)
+  if (!dir.exists(destinationPath)) {
+    if (isFile(destinationPath)) {
+      stop("destinationPath must be a directory")
+    }
+    checkPath(destinationPath, create = TRUE)
+  }
   message("Preparing: ", targetFile)
 
   emptyChecksums <- data.table(expectedFile = character(), result = character())
@@ -648,7 +655,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
           "directory are: \n",
           paste(possibleFiles, collapse = "\n"))
       })
-    
+
       targetFilePath <- if (endsWith(suffix = "shapefile", fun )) {
         possibleFiles[isShapefile]
       } else {
@@ -657,7 +664,7 @@ extractFromArchive <- function(archive, destinationPath = dirname(archive),
         } else {
           message("  Don't know which file to load. Please specify targetFile")
         }
-  
+
       }
       if (length(targetFilePath) > 1)  {
         message("  More than one possible files to load, ", paste(targetFilePath, collapse = ", "),
@@ -732,7 +739,7 @@ postProcess.default <- function(x, ...) {
 #'
 #' Depending on which of these were passed, different things will happen to the \code{targetFile}
 #' located at \code{targetFilePath}.
-#' \tabular{ll}{
+#' \tabular{llll}{
 #'                     \tab \code{rasterToMatch} \tab \code{studyArea} \tab              Both \cr
 #'   \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch}  \cr
 #'   \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
@@ -837,9 +844,13 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
 #'
 #' @param studyArea Template \code{SpatialPolygons*} object used for masking, after cropping.
 #'                  If not in same CRS, then it will be \code{spTransform}ed to
-#'                  CRS of \code{x} before masking.
+#'                  CRS of \code{x} before masking. Currently, this function will not reproject the
+#'                  \code{x}. \code{\link{postProcess.spatialObjects}}
 #'
-#' @param rasterToMatch Template \code{Raster*} object used for reprojecting and
+#' @param rasterToMatch Template \code{Raster*} object used for cropping (so extent should be
+#'                      the extent of desired outcome), reprojecting (including changing the
+#'                      resolution and projection). See details in
+#'                      \code{\link{postProcess.spatialObjects}}.
 #' @param ... Passed to \code{projectRaster} and \code{Cache}
 #' cropping.
 #'

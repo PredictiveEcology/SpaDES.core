@@ -36,8 +36,10 @@ but they are unknown, the function will try all until it finds the
 \item{alsoExtract}{Optional character string naming files other than
 \code{targetFile} that must be extracted from the \code{archive}.}
 
-\item{destinationPath}{Character string of where to download to, and do
-all writing of files in.}
+\item{destinationPath}{Character string of a directory in which to download and
+save the file that comes from \code{url} and is also
+where the function will look for \code{archive} or
+\code{targetFile}.}
 
 \item{fun}{Character string indicating the function to use to load \code{targetFile} into
 an \code{R} object.}
@@ -84,18 +86,16 @@ the function will try to use those. If the file is not a raster file, it will tr
 using raster::shapefile. NOTE: This function is still experimental: use
 with caution.
 }
-\section{3. postProcessing of \code{Raster*} and \code{Spatial*} objects}{
+\section{postProcessing of \code{Raster*} and \code{Spatial*} objects}{
 
 
 If \code{rasterToMatch} or \code{studyArea} are used, then this will trigger several
 subsequent functions, specifically the sequence, \emph{Crop, reproject, mask}, which appears
 to be a common sequence in spatial simulation. See \code{\link{postProcess.spatialObjects}}.
+
+\subsection{Understanding various combinations of \code{rasterToMatch} and/or \code{studyArea}}{
+  Please see \code{\link{postProcess.spatialObjects}}
 }
-
-\section{Passing \code{rasterToMatch} and/or \code{studyArea}}{
-
-
-Please see \code{\link{postProcess.SpatialPolygon}}
 }
 
 \examples{
