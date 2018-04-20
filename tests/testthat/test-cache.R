@@ -30,23 +30,27 @@ test_that("test cache", {
   )
 
   set.seed(1123)
-  sims <- experiment(Copy(mySim), replicates = 2, cache = TRUE, debug = FALSE)
+  expr <- quote(experiment(Copy(mySim), replicates = 2, cache = TRUE, debug = FALSE,
+                           omitArgs = c("progress", "debug", ".plotInitialTime", ".saveInitialTime")))
+  sims <- eval(expr)
   out <- showCache(sims[[1]])
   expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies
   expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
-  expect_true(NROW(out[tagKey != "otherFunctions"]) == 16) #
-  expect_message(sims <- Cache(experiment, mySim, replicates = 2, cache = TRUE, debug = FALSE),
+  expect_true(NROW(out[!tagKey %in% c("preDigest", "otherFunctions")]) == 16) #
+  expect_true(NROW(out[tagKey %in% "preDigest"]) ==
+                     (length(slotNames(sims[[1]]))*2 + 2 * length(modules(mySim)) + 2 * 2)) # 2 args for Cache -- FUN & replicate
+  expect_message(sims <- eval(expr),
                  "loading cached result from previous spades call")
 
   out2 <- showCache(sims[[1]])
 
-  # 2 original times, 2 cached times per spades, 1 experiment time
-  expect_true(NROW(out2[tagKey == "accessed"]) == 5)
+  # 2 original times, 2 cached times per spades
+  expect_true(NROW(out2[tagKey == "accessed"]) == 4)
 
-  # 2 cached copies of spades, 1 experiment
-  expect_true(NROW(unique(out2$artifact)) == 3)
+  # 2 cached copies of spades
+  expect_true(NROW(unique(out2$artifact)) == 2)
 
   clearCache(sims[[1]])
   out <- showCache(sims[[1]])
