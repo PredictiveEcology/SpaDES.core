@@ -752,8 +752,10 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     message("  Starting postProcessing")
     targetCRS <- if (!is.null(rasterToMatch)) {
+      message("Using rasterToMatch crs")
       crs(rasterToMatch)
     } else if (!is.null(studyArea)) {
+      message("Using studyArea crs")
       crs(studyArea)
     } else {
       if (is(x, "sf"))
@@ -778,6 +780,7 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
         x = x,
         studyArea = studyArea,
         rasterToMatch = rasterToMatch, ...)
+
 
     if (!is.null(studyArea)) {
       if (is(x, "RasterLayer") ||
@@ -870,8 +873,8 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
     targetCRS <- if (!is.null(rasterToMatch)) {
       crs(rasterToMatch)
-      # } else if (!is.null(studyArea)) {
-      #   crs(studyArea)
+      } else if (!is.null(studyArea)) {
+        crs(studyArea)
     } else {
       if (is(x, "sf")) {
         if (requireNamespace("sf")) {
