@@ -16,7 +16,13 @@ test_that("downloadModule downloads and unzips a single module", {
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% basename()
+    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
+    if (!is.null(f$error)) {
+      if (grepl("Forbidden", f$error)) {
+        skip("Forbidden HTTP 403 on GitHub during downloadModule")
+      }
+    }
+    f <- f$value[[1]] %>% unlist() %>% as.character()
 
     f_expected <- c("LICENSE", "README.txt", "citation.bib", "CHECKSUMS.txt",
                     "test.R", "test.Rmd")
@@ -46,7 +52,15 @@ test_that("downloadModule downloads and unzips a parent module", {
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
+    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
+    if (!is.null(f$error)) {
+      if (grepl("Forbidden", f$error)) {
+        skip("Forbidden HTTP 403 on GitHub during downloadModule")
+      }
+    }
+    f <- f$value[[1]] %>% unlist() %>% as.character()
+
+    #f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
     d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
     d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
@@ -73,7 +87,12 @@ test_that("downloadModule can overwrite existing modules", {
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE)
+  f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
+  if (!is.null(f$error)) {
+    if (grepl("Forbidden", f$error)) {
+      skip("Forbidden HTTP 403 on GitHub during downloadModule")
+    }
+  }
 
   original_f <- file.path(tmpdir, m) %>%
     list.files(., full.names = TRUE, pattern = "[.]R$") %>%
@@ -81,7 +100,13 @@ test_that("downloadModule can overwrite existing modules", {
 
   expect_error(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
 
-  downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = TRUE)
+
+  f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = TRUE))
+  if (!is.null(f$error)) {
+    if (grepl("Forbidden", f$error)) {
+      skip("Forbidden HTTP 403 on GitHub during downloadModule")
+    }
+  }
 
   new_f <- file.path(tmpdir, m) %>%
     list.files(., full.names = TRUE, pattern = "[.]R$") %>%
@@ -106,7 +131,13 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    f <- downloadModule(m, tmpdir, quiet = TRUE, data = TRUE)[[1]] %>% unlist() %>% as.character()
+    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = TRUE))
+    if (!is.null(f$error)) {
+      if (grepl("Forbidden", f$error)) {
+        skip("Forbidden HTTP 403 on GitHub during downloadModule")
+      }
+    }
+    f <- f$value[[1]] %>% unlist() %>% as.character()
     d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
     d_expected <- moduleMetadata(module = m, path = tmpdir)$childModules %>%

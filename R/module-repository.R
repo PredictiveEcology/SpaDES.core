@@ -342,7 +342,7 @@ setMethod(
     }
 
     if (data) {
-      moduleFilename <- file.path(path, module, paste0(module, ".R"))
+      moduleFilename <- file.path(path, name, paste0(name, ".R"))
       inputs <- .parseModulePartial(filename = moduleFilename,
                                     defineModuleElement = "inputObjects")
       urls <- inputs$sourceURL
