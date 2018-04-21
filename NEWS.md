@@ -23,6 +23,7 @@ version 0.1.1.9000
 * minor bug fixes
 * `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
 * module metadata now in *named* lists inside `depends(sim)`
+* remove `fileExt` -- use `tools::file_ext` instead
 
 version 0.1.1
 =============
