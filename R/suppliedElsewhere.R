@@ -1,3 +1,9 @@
+### deal with spurious httr warnings
+if (getRversion() >= "3.1.0") {
+  utils::globalVariables(c("objName", "V1"))
+}
+
+
 #' Assess whether an object has or will be supplied from elsewhere
 #'
 #' When loading objects into a \code{simList}, especially during the
