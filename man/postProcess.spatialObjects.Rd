@@ -4,9 +4,8 @@
 \alias{postProcess.spatialObjects}
 \title{Post processing for \code{spatialObjects}}
 \usage{
-\method{postProcess}{spatialObjects}(x, targetFilePath, studyArea = NULL,
-  rasterToMatch = NULL, quick, writeCropped = TRUE, overwrite = TRUE,
-  destinationPath = tempdir(), ...)
+\method{postProcess}{spatialObjects}(x, targetFilePath, writeCropped = TRUE,
+  overwrite = TRUE, destinationPath = tempdir(), ...)
 }
 \arguments{
 \item{x}{A \code{Spatial*}, \code{sf} or \code{Raster*} object.}
@@ -14,22 +13,6 @@
 \item{targetFilePath}{Character string. This is used if \code{writeCropped}
 is \code{TRUE}. The resulting cropped filename will be
 \code{.prefix(basename(targetFilePath), "Small")}.}
-
-\item{studyArea}{Template \code{SpatialPolygons*} object used for masking, after cropping.
-If not in same CRS, then it will be \code{spTransform}ed to
-CRS of \code{x} before masking. Currently, this function will not reproject the
-\code{x}. \code{\link{postProcess.spatialObjects}}}
-
-\item{rasterToMatch}{Template \code{Raster*} object used for cropping (so extent should be
-the extent of desired outcome), reprojecting (including changing the
-resolution and projection). See details in
-\code{\link{postProcess.spatialObjects}}.}
-
-\item{quick}{Logical. This is passed internally to \code{\link{checksums}} and
-\code{\link{downloadData}} (the quickCheck argument for both),
-and to \code{\link{Cache}} (the quick argument). This results in
-faster, though less robust checking of inputs. See the respective
-functions.}
 
 \item{writeCropped}{Logical or character string (a file path). If logical,
 then the cropped/masked raster will
@@ -68,12 +51,30 @@ between these calls so that the crs match.
 
 Depending on which of these were passed, different things will happen to the \code{targetFile}
 located at \code{targetFilePath}.
-\tabular{llll}{
-                    \tab \code{rasterToMatch} \tab \code{studyArea} \tab              Both \cr
-  \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch}  \cr
-  \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
-  \code{projection} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
-  \code{mask}       \tab No                   \tab   Yes        \tab \code{studyArea}      \cr
+
+\subsection{Raster* objects:}{
+  \tabular{lccc}{
+                      \tab \code{rasterToMatch} \tab \code{studyArea} \tab             Both \cr
+    \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch} \cr
+    \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch} \cr
+    \code{projection} \tab Yes                  \tab   No*        \tab \code{rasterToMatch}*\cr
+    \code{alignment}  \tab Yes                  \tab   No         \tab \code{rasterToMatch} \cr
+    \code{mask}       \tab No**                 \tab   Yes        \tab \code{studyArea}**   \cr
+  }
+  * Can be overridden with \code{useSAcrs}
+  ** Will mask with \code{NA}s from \code{rasterToMatch} if \code{maskWithRTM}
+}
+
+\subsection{Spatial* objects:}{
+  \tabular{lccc}{
+                      \tab \code{rasterToMatch} \tab \code{studyArea} \tab             Both \cr
+    \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch} \cr
+    \code{resolution} \tab NA                   \tab   NA         \tab NA                   \cr
+    \code{projection} \tab Yes                  \tab   No*        \tab \code{rasterToMatch}*\cr
+    \code{alignment}  \tab NA                   \tab   NA         \tab NA                   \cr
+    \code{mask}       \tab No                   \tab   Yes        \tab \code{studyArea}     \cr
+  }
+  * Can be overridden with \code{useSAcrs}
 }
 }
 

@@ -4,7 +4,7 @@
 \alias{maskInputs}
 \title{Mask module inputs}
 \usage{
-maskInputs(x, studyArea)
+maskInputs(x, studyArea, ...)
 }
 \arguments{
 \item{x}{A \code{Raster*} object}

@@ -739,99 +739,42 @@ postProcess.default <- function(x, ...) {
 #'
 #' Depending on which of these were passed, different things will happen to the \code{targetFile}
 #' located at \code{targetFilePath}.
-#' \tabular{llll}{
-#'                     \tab \code{rasterToMatch} \tab \code{studyArea} \tab              Both \cr
-#'   \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch}  \cr
-#'   \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
-#'   \code{projection} \tab Yes                  \tab   No         \tab \code{rasterToMatch}  \cr
-#'   \code{mask}       \tab No                   \tab   Yes        \tab \code{studyArea}      \cr
+#'
+#' \subsection{Raster* objects:}{
+#'   \tabular{lccc}{
+#'                       \tab \code{rasterToMatch} \tab \code{studyArea} \tab             Both \cr
+#'     \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch} \cr
+#'     \code{resolution} \tab Yes                  \tab   No         \tab \code{rasterToMatch} \cr
+#'     \code{projection} \tab Yes                  \tab   No*        \tab \code{rasterToMatch}*\cr
+#'     \code{alignment}  \tab Yes                  \tab   No         \tab \code{rasterToMatch} \cr
+#'     \code{mask}       \tab No**                 \tab   Yes        \tab \code{studyArea}**   \cr
+#'   }
+#'   * Can be overridden with \code{useSAcrs}
+#'   ** Will mask with \code{NA}s from \code{rasterToMatch} if \code{maskWithRTM}
 #' }
-postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rasterToMatch = NULL, quick,
+#'
+#' \subsection{Spatial* objects:}{
+#'   \tabular{lccc}{
+#'                       \tab \code{rasterToMatch} \tab \code{studyArea} \tab             Both \cr
+#'     \code{extent}     \tab Yes                  \tab   Yes        \tab \code{rasterToMatch} \cr
+#'     \code{resolution} \tab NA                   \tab   NA         \tab NA                   \cr
+#'     \code{projection} \tab Yes                  \tab   No*        \tab \code{rasterToMatch}*\cr
+#'     \code{alignment}  \tab NA                   \tab   NA         \tab NA                   \cr
+#'     \code{mask}       \tab No                   \tab   Yes        \tab \code{studyArea}     \cr
+#'   }
+#'   * Can be overridden with \code{useSAcrs}
+#' }
+postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rasterToMatch = NULL,
                                        writeCropped = TRUE, overwrite = TRUE,
                                        destinationPath = tempdir(), ...) {
   if (!is.null(studyArea) || !is.null(rasterToMatch)) {
-    message("  Starting postProcessing")
-    targetCRS <- if (!is.null(rasterToMatch)) {
-      crs(rasterToMatch)
-    } else if (!is.null(studyArea)) {
-      crs(studyArea)
-    } else {
-      if (is(x, "sf"))
-        if (requireNamespace("sf")) {
-          CRS(sf::st_crs(x)$proj4string)
-        } else {
-          stop("Please install sf package: https://github.com/r-spatial/sf")
-        }
-      else
-        crs(x)
 
-    }
+    x <- cropInputs(x, studyArea = studyArea, rasterToMatch = rasterToMatch, ...)
+    x <- projectInputs(x, studyArea = studyArea, rasterToMatch = rasterToMatch, ...)
+    x <- maskInputs(x, studyArea = studyArea, rasterToMatch = rasterToMatch, ...)
 
-    if (!is.null(studyArea)) {
-      if (!identical(targetCRS, crs(studyArea))) {
-        studyArea <- Cache(spTransform, x = studyArea, CRSobj = targetCRS, ...)
-      }
-    }
+    x <- writeCropped(x, targetFilePath = targetFilePath, ...)
 
-    x <-
-      cropReprojInputs(
-        x = x,
-        studyArea = studyArea,
-        rasterToMatch = rasterToMatch, ...)
-
-    if (!is.null(studyArea)) {
-      if (is(x, "RasterLayer") ||
-          is(x, "RasterStack") ||
-          is(x, "RasterBrick")) {
-        x <-
-          maskInputs( # don't Cache because slow to write
-            x = x,
-            studyArea = if (identical(raster::crs(studyArea), raster::crs(x))) {
-              studyArea
-            } else {
-              sp::spTransform(x = studyArea, CRSobj = raster::crs(x))
-            }
-          )
-      }
-    }
-
-    # Some assertions
-    if (!(is.logical(writeCropped) || is.character(writeCropped))) {
-      stop("writeCropped must be logical or character string")
-    }
-
-    if (!identical(writeCropped, FALSE)) { # allow TRUE or path
-      smallFN <- if (isTRUE(writeCropped) ) {
-        .prefix(targetFilePath, "Small")
-      } else {
-        if (isAbsolutePath(writeCropped)) {
-          writeCropped
-        } else {
-          file.path(destinationPath, basename(writeCropped))
-        }
-
-      }
-
-      xTmp <- writeInputsOnDisk(
-        x = x,
-        filename = smallFN,
-        overwrite = overwrite,
-        #rasterDatatype = rasterDatatype,
-        #notOlderThan = Sys.time(), # Too many reasons why this doesn't work properly
-        ...
-      )
-
-      if (is(xTmp, "Raster")) { # Rasters need to have their disk-backed value assigned, but not shapefiles
-        # This is a bug in writeRaster was spotted with crs of xTmp became
-        # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
-        # should have stayed at
-        # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0
-        if (!identical(crs(xTmp), crs(x)))
-          crs(xTmp) <- crs(x)
-
-        x <- xTmp
-      }
-    }
   }
   x
 }
@@ -864,103 +807,125 @@ postProcess.spatialObjects <- function(x, targetFilePath, studyArea = NULL, rast
 #' @importFrom sp SpatialPolygonsDataFrame spTransform CRS
 #' @rdname cropReprojInputs
 #'
+#'
 cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
-  message("    Cropping, reprojecting")
+  UseMethod("cropReprojInputs")
+}
 
-  if (!is.null(studyArea) || !is.null(rasterToMatch)) {
-    targetCRS <- if (!is.null(rasterToMatch)) {
-      crs(rasterToMatch)
-      # } else if (!is.null(studyArea)) {
-      #   crs(studyArea)
-    } else {
-      if (is(x, "sf")) {
-        if (requireNamespace("sf")) {
-          CRS(sf::st_crs(x)$proj4string)
-        } else {
-          stop("Please install sf package: https://github.com/r-spatial/sf")
-        }
-      }
+cropReprojInputs.Spatial <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
+  browser()
+  cropInputs(x, studyArea = studyArea, rasterToMatch = rasterToMatch, ...)
+}
 
-      else
-        crs(x)
+cropInputs <- function(x, studyArea, rasterToMatch, ...) {
+  UseMethod("cropInputs")
+}
+
+projectInputs <- function(x, studyArea, rasterToMatch, useSAcrs, ...) {
+  UseMethod("projectInputs")
+}
+
+getTargetCRS <- function(useSAcrs, studyArea, rasterToMatch) {
+  targetCRS <- if (useSAcrs) {
+    crs(studyArea)
+  } else if (!is.null(rasterToMatch)) {
+    crs(rasterToMatch)
+  } else {
+    NULL # don't reproject a Raster if only has studyArea -- too lossy
+  }
+  targetCRS
+}
+
+projectInputs.Raster <- function(x, studyArea, rasterToMatch, useSAcrs = FALSE, ...) {
+  browser()
+  targetCRS <- getTargetCRS(useSAcrs, studyArea, rasterToMatch)
+
+  if (!is.null(targetCRS)) {
+    message("    reprojecting")
+    if (!identical(crs(x), targetCRS) |
+        !identical(res(x), res(rasterToMatch)) |
+        !identical(extent(x), extent(rasterToMatch))) {
+      x <- projectRaster(from = x, to = rasterToMatch, ...)
     }
+      #if (!identical(crs(x), targetCRS)) {
+      #  x <- projectRaster(from = x, crs = targetCRS, res = res(x), ...)
+      #}
+  } else {
+    message("    no reprojecting because no rasterToMatch & useSAcrs is FALSE")
+  }
+  x
+}
+
+projectInputs.sf <- function(x, studyArea, rasterToMatch, useSAcrs, ...) {
+  if (requireNamespace("sf")) {
+    if (any(sf::st_is(x, c("POLYGON", "MULTIPOLYGON"))) && !any(isValid <- sf::st_is_valid(x))) {
+      x[!isValid] <- Cache(sf::st_buffer, x[!isValid], dist = 0, ...)
+    }
+
+    if (!identical(sf::st_crs(targetCRS@projargs), sf::st_crs(x)))
+      x <- Cache(sf::st_transform, x = x, crs = sf::st_crs(targetCRS@projargs), ...)
 
     if (!is.null(studyArea)) {
-      if (!identical(targetCRS, crs(studyArea))) {
-        studyArea <- spTransform(x = studyArea, CRSobj = targetCRS)
+      x <- Cache(sf::st_intersection, x, sf::st_as_sf(studyArea), ...)
+    }
+
+    if (!is.null(rasterToMatch)) {
+      x <- Cache(sf::st_intersection, x, sf::st_as_sf(as(extent(rasterToMatch), "SpatialPolygons")), ...)
+    }
+  } else {
+    stop("Please install sf package: https://github.com/r-spatial/sf")
+  }
+}
+
+projectInputs.Spatial <- function(x, studyArea, rasterToMatch, useSAcrs = FALSE, ...) {
+  targetCRS <- getTargetCRS(useSAcrs, studyArea, rasterToMatch)
+
+  if (!is.null(targetCRS)) {
+    x <- spTransform(x = x, CRSobj = targetCRS)
+  }
+  x
+}
+
+
+cropInputs.spatialObjects <- function(x, studyArea, rasterToMatch, ...) {
+  if (!is.null(studyArea) || !is.null(rasterToMatch)) {
+
+    cropTo <- if (!is.null(rasterToMatch)) {
+      rasterToMatch
+    } else {
+      studyArea
+    }
+
+    # have to project the extent to the x projection so crop will work -- this is temporary
+    #   once cropped, then cropExtent should be rm
+    cropExtent <- if (identical(crs(x), crs(cropTo))) {
+      extent(cropTo)
+    } else {
+      if (!is.null(rasterToMatch)) {
+        projectExtent(cropTo, crs(x))
+      } else {
+        spTransform(x = cropTo, CRSobj = crs(x))
       }
     }
 
-    if (is(x, "RasterLayer") ||
-        is(x, "RasterStack") ||
-        is(x, "RasterBrick")) {
-
-      if (!is.null(studyArea)) {
-        x <-
-          crop( # don't Cache because slow to write
-            x = x,
-            y = if (identical(raster::crs(studyArea), raster::crs(x))) {
-              studyArea
-            } else {
-              sp::spTransform(x = studyArea, CRSobj = raster::crs(x))
-            }
-          )
-      }
-
-      if (!is.null(rasterToMatch)) {
-        if (!identical(crs(x), targetCRS) |
-            !identical(res(x), res(rasterToMatch)) |
-            !identical(extent(x), extent(rasterToMatch))) {
-          x <- projectRaster(from = x, to = rasterToMatch, ...)
-        }
-      } else {
-        if (!identical(crs(x), targetCRS)) {
-          x <- projectRaster(from = x, crs = targetCRS, res = res(x), ...)
-        }
-      }
-    } else if (inherits(x, "SpatialPoints") ||
-               inherits(x, "SpatialLines") ||
-               inherits(x, "SpatialPolygons")) {
-      if (inherits(x, "SpatialPolygons") && !suppressWarnings(gIsValid(x))) {
-        xValid <- buffer(x, dissolve = FALSE, width = 0)
-        x <- if (.hasSlot(x, "data")) xValid
-        else SpatialPolygonsDataFrame(Sr = xValid,
-                                      data = as.data.frame(x))
-      }
-
-      if (!identical(targetCRS, crs(x)))
-        x <- spTransform(x = x, CRSobj = targetCRS)
-
-      if (!is.null(studyArea)) {
-        x <- crop(x, studyArea) # don't Cache because slow to write
-      }
-
-      if (!is.null(rasterToMatch)) {
-        x <- crop(x, rasterToMatch) # don't Cache because slow to write
-      }
-    } else if (is(x, "sf")) {
-      if (requireNamespace("sf")) {
-        if (any(sf::st_is(x, c("POLYGON", "MULTIPOLYGON"))) && !any(isValid <- sf::st_is_valid(x))) {
-          x[!isValid] <- Cache(sf::st_buffer, x[!isValid], dist = 0, ...)
-        }
-
-        if (!identical(sf::st_crs(targetCRS@projargs), sf::st_crs(x)))
-          x <- Cache(sf::st_transform, x = x, crs = sf::st_crs(targetCRS@projargs), ...)
-
-        if (!is.null(studyArea)) {
-          x <- Cache(sf::st_intersection, x, sf::st_as_sf(studyArea), ...)
-        }
-
-        if (!is.null(rasterToMatch)) {
-          x <- Cache(sf::st_intersection, x, sf::st_as_sf(as(extent(rasterToMatch), "SpatialPolygons")), ...)
-        }
-      } else {
-        stop("Please install sf package: https://github.com/r-spatial/sf")
-      }
-    } else {
-      stop("Class '", class(x), "' is not supported.")
+    # crop it
+    if (!identical(cropExtent, extent(x))) {
+      message("    cropping")
+      x <- crop(x = x, y = cropExtent)
     }
   }
+  x
+}
+
+cropReprojInputs.default <- function(x, ...) {
+  stop("Class '", class(x), "' is not supported.")
+}
+
+cropReprojInputs.Raster <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
+  browser()
+
+  x <- cropInputs(x, studyArea = studyArea, rasterToMatch = rasterToMatch, ...)
+  x <- projectInputs(x, studyArea = studyArea, rasterToMatch = rasterToMatch, ...)
   x
 }
 
@@ -979,14 +944,67 @@ cropReprojInputs <- function(x, studyArea = NULL, rasterToMatch = NULL, ...) {
 #' @importFrom SpaDES.tools fastMask
 #' @rdname maskInputs
 #'
-maskInputs <- function(x, studyArea) {
-  message("    Masking")
+maskInputs <- function(x, studyArea, ...) {
+  UseMethod("maskInputs")
+}
 
-  if (!is(studyArea, "SpatialPolygonsDataFrame")) {
-    studyArea <- SpatialPolygonsDataFrame(Sr = studyArea, data = data.frame(ID = seq(length(studyArea))),
-                                          match.ID = FALSE)
+maskInputs.Raster <- function(x, studyArea, rasterToMatch, maskWithRTM = FALSE, ...) {
+  message("    Masking")
+  browser()
+  if (isTRUE(maskWithRTM)) {
+    x[is.na(rasterToMatch)] <- NA
+  } else {
+    msg <- capture.output(type = "message",
+                          x <- fastMask(x = x, y = studyArea))
+    message(paste0("      ", msg))
+
   }
-  fastMask(x = x, y = studyArea)
+  x
+}
+
+maskInputs.Spatial <- function(x, studyArea, ...) {
+  message("    Intersecting")
+  studyArea <- raster::aggregate(studyArea, dissolve = TRUE)
+  x <- raster::intersect(x, spTransform(studyArea, CRSobj = crs(x)))
+  x
+}
+
+writeCropped <- function(x, targetFilePath, ...) {
+  # Some assertions
+  if (!(is.logical(writeCropped) || is.character(writeCropped))) {
+    stop("writeCropped must be logical or character string")
+  }
+
+  if (!identical(writeCropped, FALSE)) { # allow TRUE or path
+    smallFN <- if (isTRUE(writeCropped) ) {
+      .prefix(targetFilePath, "Small")
+    } else {
+      if (isAbsolutePath(writeCropped)) {
+        writeCropped
+      } else {
+        file.path(destinationPath, basename(writeCropped))
+      }
+
+    }
+
+    xTmp <- writeInputsOnDisk(
+      x = x,
+      filename = smallFN,
+      overwrite = overwrite,
+      ...
+    )
+
+    if (is(xTmp, "Raster")) { # Rasters need to have their disk-backed value assigned, but not shapefiles
+      # This is a bug in writeRaster was spotted with crs of xTmp became
+      # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+      # should have stayed at
+      # +proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0
+      if (!identical(crs(xTmp), crs(x)))
+        crs(xTmp) <- crs(x)
+
+      x <- xTmp
+    }
+  }
 }
 
 #' Write module inputs on disk
