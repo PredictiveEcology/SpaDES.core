@@ -20,7 +20,7 @@ if (!isGeneric(".robustDigest")) {
 #'
 #' @inheritParams reproducible::.robustDigest
 #'
-#' @author Eliot Mcintire
+#' @author Eliot McIntire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
 #' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst .orderDotsUnderscoreFirst

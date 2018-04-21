@@ -402,38 +402,3 @@ setMethod(
 })
 
 
-################################################################################
-#' Calculate the hashes of multiple files
-#'
-#' Internal function. Wrapper for \code{\link[digest]{digest}} using \code{xxhash64}.
-#'
-#' @param file  Character vector of file paths.
-#' @inheritParams SpaDES.tools::downloadData
-#' @param ...   Additional arguments to \code{digest::digest}.
-#'
-#' @return A character vector of hashes.
-#'
-#' @importFrom digest digest
-#' @keywords internal
-#' @rdname digest
-#'
-#' @author Alex Chubaty
-#'
-setGeneric(".digest", function(file, quickCheck, ...) {
-  standardGeneric(".digest")
-})
-
-#' @rdname digest
-setMethod(
-  ".digest",
-  signature = c(file = "character"),
-  definition = function(file, quickCheck, algo = "xxhash64", ...) {
-    if (quickCheck) {
-      file.size(file) %>% as.character() # need as.character for empty case
-    } else {
-      lapply(file, function(f) {
-        digest::digest(object = f, file = TRUE, algo = algo, ...)
-      }) %>% unlist() %>% unname() %>% as.character() # need as.character for empty case # nolint
-    }
-})
-
