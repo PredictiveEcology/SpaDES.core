@@ -73,7 +73,7 @@ setMethod(
   definition = function(filename, defineModuleElement, envir) {
 
     if (file.exists(filename)) {
-      tmp <- parseConditional(envir = envir, filename = filename) # parse file, conditioned on it
+      tmp <- .parseConditional(envir = envir, filename = filename) # parse file, conditioned on it
                                                                   #  not already been done
       namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
 
@@ -180,7 +180,7 @@ setMethod(
       }
       if (!(m %in% prevNamedModules)) { # This is about duplicate named modules
         filename <- paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
-        tmp <- parseConditional(envir = envir, filename = filename)
+        tmp <- .parseConditional(envir = envir, filename = filename)
 
         # duplicate -- put in namespaces location
         # If caching is being used, it is possible that exists
@@ -482,7 +482,7 @@ setMethod(
 })
 
 #' @importFrom utils getParseData
-parseConditional <- function(envir = NULL, filename = character()) {
+.parseConditional <- function(envir = NULL, filename = character()) {
   if (!is.null(envir)) {
     if (is.null(envir[[filename]])) {
       envir[[filename]] <- new.env(parent = envir)

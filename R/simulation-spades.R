@@ -699,7 +699,7 @@ setMethod(
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
-        tmp <- parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
+        tmp <- .parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
         eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
              envir = sim@.envir[[cur[["moduleName"]]]])
         numTries <- 0
