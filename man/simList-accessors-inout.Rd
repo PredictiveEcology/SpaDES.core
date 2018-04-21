@@ -146,7 +146,7 @@ any objects required by this module, i.e., objects  identified in the \code{inpu
 element of \code{defineModule}.
 This is useful if there is something required before simulation to produce the module
 object dependencies, including such things as downloading default datasets, e.g.,
-\code{downloadData('LCC2005', modulePath(sim))}.
+\code{SpaDES.tools::downloadData('LCC2005', modulePath(sim))}.
 Nothing should be created here that does not create an named object in inputObjects.
 Any other initiation procedures should be put in the "init" eventType of the doEvent function.
 Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to

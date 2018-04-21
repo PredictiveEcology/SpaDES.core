@@ -4,8 +4,8 @@ version 0.1.1.9000
 ==================
 
 * new debugging -- if debug is not FALSE, then any error will trigger a browser call inside the event function. User can continue (c) or quit (Q) as per normal. c will trigger a reparse and events will continue as scheduled.
-* add package dependency `webDatabases`, `pryr`
-* new function `prepInputs` to handle download, extract, crop/mask/reproject etc.
+* add package imports `tools`, `pryr`
+* removed package imports `rgeos`, `RCurl` and `googledrive` 
 * fix bug where `start` and `end` were not properly exported
 * introduction of code checking for modules, currently turned on or off by an option `spades.moduleCodeChecks`, which is `TRUE` by default. Code checking includes various types:
     
@@ -19,7 +19,7 @@ version 0.1.1.9000
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
 * `newModule` template modified slightly based on workshop feedback
 * `setPaths` now only sets the directories that are passed into it
-* `downloadData` gets a logical `overwrite` argument.
+* `downloadData` moved to SpaDES.tools
 * minor bug fixes
 * `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
 * module metadata now in *named* lists inside `depends(sim)`
