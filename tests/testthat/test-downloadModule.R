@@ -22,7 +22,7 @@ test_that("downloadModule downloads and unzips a single module", {
         skip("Forbidden HTTP 403 on GitHub during downloadModule")
       }
     }
-    f <- f$value[[1]] %>% unlist() %>% as.character()
+    f <- f$value[[1]] %>% unlist() %>% as.character() %>% basename()
 
     f_expected <- c("LICENSE", "README.txt", "citation.bib", "CHECKSUMS.txt",
                     "test.R", "test.Rmd")
