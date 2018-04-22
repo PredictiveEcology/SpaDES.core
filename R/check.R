@@ -167,7 +167,7 @@ setMethod(
           # a little faster to use already parsed objects --
           #   might have happened earlier during simInit,
           #   if this checkParams was run from simInit
-          tmp <- parseConditional(envir = sim@.envir[[".parsedFiles"]],
+          tmp <- .parseConditional(envir = sim@.envir[[".parsedFiles"]],
                                   filename = filename)
           deparse(tmp$parsedFile)
         } else {

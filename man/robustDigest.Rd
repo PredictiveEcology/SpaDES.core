@@ -59,5 +59,5 @@ results across R versions.
 \code{\link[reproducible]{robustDigest}}
 }
 \author{
-Eliot Mcintire
+Eliot McIntire
 }

@@ -8,8 +8,8 @@ Description: Provide the core discrete event simulation (DES) framework for
 URL:
     http://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2018-04-18
-Version: 0.1.1.9010
+Date: 2018-04-20
+Version: 0.1.1.9011
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre")),
@@ -34,11 +34,9 @@ Imports:
     data.table (>= 1.10.4),
     DEoptim (>= 2.2-4),
     DiagrammeR (>= 0.8.2),
-    digest (>= 0.6.12),
     dplyr (>= 0.5.0),
     fastdigest,
     fpCompare (>= 0.2.1),
-    googledrive (>= 0.1.1),
     httr (>= 1.2.1),
     igraph (>= 1.0.1),
     lubridate (>= 1.3.3),
@@ -46,15 +44,13 @@ Imports:
     parallel,
     R.utils (>= 2.5.0),
     raster (>= 2.5-8),
-    RCurl (>= 1.95-4.8),
-    rgeos,
     stats,
     sp (>= 1.2-4),
-    SpaDES.tools (>= 0.1.1),
+    SpaDES.tools (>= 0.1.1.9008),
     stringi (>= 1.1.3),
     tcltk,
-    utils,
-    webDatabases
+    tools,
+    utils
 Suggests:
     covr,
     hunspell,
@@ -70,8 +66,7 @@ Suggests:
 Remotes:
     PredictiveEcology/quickPlot@development,
     PredictiveEcology/reproducible@development,
-    PredictiveEcology/SpaDES.tools@development,
-    PredictiveEcology/webDatabases
+    PredictiveEcology/SpaDES.tools@development
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
@@ -89,17 +84,16 @@ Collate:
     'checkpoint.R'
     'code-checking.R'
     'copy.R'
-    'downloadInputs.R'
     'experiment.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'
     'module-define.R'
     'module-dependencies-methods.R'
-    'moduleMetadata.R'
     'module-repository.R'
     'module-template.R'
     'moduleCoverage.R'
+    'moduleMetadata.R'
     'times.R'
     'simList-accessors.R'
     'plotting-diagrams.R'

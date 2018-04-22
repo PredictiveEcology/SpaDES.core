@@ -186,7 +186,7 @@ of a \code{\link{simList}} object are summarized further below.
   repository on GitHub.
 
   \tabular{ll}{
-    \code{\link{checksums}} \tab Verify (and optionally write) checksums for a module's data files.\cr
+    \code{\link[SpaDES.tools]{checksums}} \tab Verify (and optionally write) checksums for a module's data files.\cr
     \code{\link{downloadModule}} \tab Open all modules nested within a base directory.\cr
     \code{\link{getModuleVersion}} \tab Get the latest module version # from module repository.\cr
     \code{\link{newModule}} \tab Create new module from template.\cr

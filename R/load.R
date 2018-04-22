@@ -37,29 +37,6 @@ fileName <- function(x) {
   return(unlist(strsplit(basename(unlist(x)), "\\..*$")))
 }
 
-#' Extract the file extension of a file
-#'
-#' @param x  List or character vector of file names.
-#'
-#' @return A character vector of file extensions.
-#'
-#' @author Eliot McIntire and Alex Chubaty
-fileExt <- function(x) {
-  NAs <- is.na(x) # nolint
-  out <- rep(NA, length(x))
-  if (!any(NAs)) {
-    filenames <- basename(unlist(x[!NAs]))
-
-    out[!NAs] <- strsplit(filenames, "^.*\\.") %>%
-      sapply(., function(y) {
-        if (length(y) > 1) {
-          y[[length(y)]]
-        } else {
-          ""
-        }})
-  }
-  out
-}
 
 # The load doEvent
 doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
