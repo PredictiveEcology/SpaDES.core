@@ -67,6 +67,8 @@ matrix:
     after_success:
     - travis_wait 20 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
     - Rscript -e 'lintr::lint_package()'
+    r_packages:
+    - devtools
   - os: linux
     dist: trusty
     r: devel
