@@ -316,20 +316,91 @@ setMethod(
   definition = function(sim, ...) {
     modDia <- depsGraph(sim, TRUE)
     dots <- list(...)
+    nDots <- names(dots)
     if (missing(showParents)) showParents <- FALSE
     if (showParents) {
       moduleGraph(sim = sim, ...)
     } else {
-      if (!("vertex.color" %in% names(dots))) {
-        vcol <- sapply(names(V(modDia)), function(v) {
-          ifelse(v == "_INPUT_", "orange", "lightblue")
-        })
+      # need to remove dots ... not as easy as hoped -- define new function which removes
+      PlotRemovingDots <- function(modDia, plotFn, axes, ..., 
+                                  vertex.color,
+                                  vertex.size, 
+                                  vertex.size2, 
+                                  vertex.shape, 
+                                  vertex.label.cex, 
+                                  vertex.label.family, 
+                                  layout, 
+                                  rescale,
+                                  xlim, ylim, asp) {
+        namesModDia <- names(V(modDia))
+        vcol <- if (!("vertex.color" %in% nDots)) {
+          sapply(namesModDia, function(v) {
+            ifelse(v == "_INPUT_", "orange", "lightblue")
+          })
+        } else {
+          "lightblue"
+        }
+        
+        vertexSize <- if (!("vertex.size" %in% nDots)) {
+          c(nchar(namesModDia)^0.8*10) # use exponential to stretch out, and multiplication to make all bigger
+        } else {
+          dots$vertex.size
+        }
+        
+        vertexSize2 <- if (!("vertex.size2" %in% nDots)) {
+          25
+        } else {
+          dots$vertex.size2
+        }
+        
+        vertexLabelCex <- if (!("vertex.label.cex" %in% nDots)) {
+          1.7
+        } else {
+          dots$vertex.label.cex
+        }
+        
+        vertexLabelFamily <- if (!("vertex.label.family" %in% nDots)) {
+          "sans"
+        } else {
+          dots$vertex.label.family
+        }
+        
+        vertexShape <- if (!("vertex.shape" %in% nDots)) {
+          "rectangle"
+        } else {
+          dots$vertex.shape
+        }
+        
+        layout2 <- if (!("layout" %in% nDots)) {
+          layout_as_star(modDia, center = "_INPUT_")
+        } else {
+          dots$layout
+        }
+        
+        rescale2 <- if (!("rescale" %in% nDots)) {FALSE} else {dots$rescale}
+        xlim2 <- if (!("xlim" %in% nDots)) {c(-1.7, 1.7)} else {dots$xlim}
+        ylim2 <- if (!("ylim" %in% nDots)) {c(-1.1, 1.1)} else {dots$ylim}
+        asp2 <-  if (!("asp" %in% nDots)) {0} else {dots$asp}
+        
+        #browser()
+        Plot(modDia, plotFn = "plot", axes = FALSE,
+             vertex.color = vcol,
+             vertex.size = vertexSize, 
+             vertex.size2 = vertexSize2, 
+             vertex.shape = vertexShape, 
+             vertex.label.cex = vertexLabelCex, 
+             vertex.label.family = vertexLabelFamily, 
+             layout = layout2, 
+             rescale = rescale2,
+             xlim = xlim2, ylim = ylim2, asp = asp2, ...)
+        
       }
-      if ("title" %in% names(dots)) {
-        Plot(modDia, plotFn = "plot", axes = FALSE, vertex.color = vcol, ...)
+      if ("title" %in% nDots) {
+        PlotRemovingDots(modDia = modDia, plotFn = "plot", axes = FALSE, ...)
       } else {
-        Plot(modDia, plotFn = "plot", axes = FALSE, vertex.color = vcol,
-             title = "Module Diagram", ...)
+        PlotRemovingDots(modDia = modDia, plotFn = "plot", axes = FALSE, 
+                         title = "Module Diagram", ...)
+        
       }
     }
 })
@@ -392,7 +463,7 @@ setMethod(
     if (plot) {
       vs <- c(15, 0)[(names(V(grph)) %in% parents) + 1]
       dots <- list(...)
-      if ("title" %in% names(dots)) {
+      if ("title" %in% nDots) {
         Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE, ...)
       } else {
         Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE,
