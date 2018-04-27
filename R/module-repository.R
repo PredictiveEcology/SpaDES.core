@@ -328,11 +328,11 @@ setMethod(
     if (!is.null(children)) {
       if (all(nzchar(children) & !is.na(children))) {
         tmp <- lapply(children, function(x) {
-          f <- if (is.null(childVersions[[x]])) {
-            downloadModule(x, path = path, data = data, version = childVersions[[x]],
+          f <- if (!is.null(childVersions[[x]])) {
+            downloadModule(x, path = path, repo = repo, data = data, version = childVersions[[x]],
                            quickCheck = quickCheck, overwrite = overwrite)
           } else {
-            downloadModule(x, path = path, data = data, quickCheck = quickCheck,
+            downloadModule(x, path = path,  repo = repo, data = data, quickCheck = quickCheck,
                            overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
