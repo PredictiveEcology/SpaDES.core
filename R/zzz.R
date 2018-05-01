@@ -37,10 +37,10 @@
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     packageStartupMessage("Default paths for SpaDES directories set to:\n",
-                          "  cachePath:  ", .getOption("spades.cachePath"), "\n",
-                          "  inputPath:  ", getOption("spades.inputPath"), "\n",
-                          "  modulePath: ", getOption("spades.modulePath"), "\n",
-                          "  outputPath: ", getOption("spades.outputPath"), "\n",
+                          "  cachePath:  ", normPath(.getOption("spades.cachePath")), "\n",
+                          "  inputPath:  ", normPath(getOption("spades.inputPath")), "\n",
+                          "  modulePath: ", normPath(getOption("spades.modulePath")), "\n",
+                          "  outputPath: ", normPath(getOption("spades.outputPath")), "\n",
                           "These can be changed using 'setPaths()'. See '?setPaths'.")
   }
 }
