@@ -318,65 +318,71 @@ setMethod(
     tmpl <- .findSimList(tmpl)
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
-    origEnv <- tmpl[[whSimList[1]]]@.envir
-    isListOfSimLists <- if (is.list(object)) {
-      if (is(object[[1]], "simList")) TRUE else FALSE
-    } else {
-      FALSE
-    }
-
-    if (isListOfSimLists) {
-      object2 <- list()
-      for (i in seq_along(object)) {
-        # need to keep the list(...) slots ...
-        # i.e., Caching of simLists is mostly about objects in .envir
-        object2[[i]] <- Copy(tmpl[[whSimList]], objects = FALSE)
-        object2[[i]]@.envir <- object[[i]]@.envir
-        object2[[i]]@completed <- object[[i]]@completed
-        object2[[i]]@simtimes <- object[[i]]@simtimes
-        object2[[i]]@current <- object[[i]]@current
-        object2[[i]]@events <- object[[i]]@events
-
-        lsOrigEnv <- ls(origEnv, all.names = TRUE)
-        keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
-        # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
-        #          envir = object2[[i]]@.envir)
-        list2env(mget(lsOrigEnv[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
-                 envir = object2[[i]]@.envir)
-      }
-    } else {
-      # need to keep the tmpl slots ...
-      # i.e., Caching of simLists is mostly about objects in .envir
-      object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
-      object2@.envir <- object@.envir
-      object2@completed <- object@completed
-      if (NROW(current(object2)) == 0) {
-        # this is usually a spades call, i.e., not an event or module doEvent call
-        object2@events <- object@events
-        object2@simtimes <- object@simtimes
+    simListInput <- !isTRUE(is.na(whSimList))
+    if (simListInput) {
+      origEnv <- tmpl[[whSimList[1]]]@.envir
+      
+      isListOfSimLists <- if (is.list(object)) {
+        if (is(object[[1]], "simList")) TRUE else FALSE
       } else {
-        # if this is FALSE, it means that events were added by the event
-        if (!isTRUE(all.equal(object@events, object2@events)))
-          object2@events <- do.call(unique, args = list(append(object@events, object2@events)))
-          #object2@events <- unique(rbindlist(list(object@events, object2@events)))
+        FALSE
       }
-      object2@current <- object@current
-
-      lsOrigEnv <- ls(origEnv, all.names = TRUE)
-      keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
-      list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
-    }
-    if (!is.null(attr(object, "removedObjs"))) {
-      if (length(attr(object, "removedObjs"))) {
-        rm(list = attr(object, "removedObjs"), envir = object2@.envir)
+  
+      if (isListOfSimLists) {
+        object2 <- list()
+        for (i in seq_along(object)) {
+          # need to keep the list(...) slots ...
+          # i.e., Caching of simLists is mostly about objects in .envir
+          object2[[i]] <- Copy(tmpl[[whSimList]], objects = FALSE)
+          object2[[i]]@.envir <- object[[i]]@.envir
+          object2[[i]]@completed <- object[[i]]@completed
+          object2[[i]]@simtimes <- object[[i]]@simtimes
+          object2[[i]]@current <- object[[i]]@current
+          object2[[i]]@events <- object[[i]]@events
+  
+          lsOrigEnv <- ls(origEnv, all.names = TRUE)
+          keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
+          # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
+          #          envir = object2[[i]]@.envir)
+          list2env(mget(lsOrigEnv[keepFromOrig], envir = tmpl[[whSimList]]@.envir),
+                   envir = object2[[i]]@.envir)
+        }
+      } else {
+        # need to keep the tmpl slots ...
+        # i.e., Caching of simLists is mostly about objects in .envir
+        object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
+        object2@.envir <- object@.envir
+        object2@completed <- object@completed
+        if (NROW(current(object2)) == 0) {
+          # this is usually a spades call, i.e., not an event or module doEvent call
+          object2@events <- object@events
+          object2@simtimes <- object@simtimes
+        } else {
+          # if this is FALSE, it means that events were added by the event
+          if (!isTRUE(all.equal(object@events, object2@events)))
+            object2@events <- do.call(unique, args = list(append(object@events, object2@events)))
+            #object2@events <- unique(rbindlist(list(object@events, object2@events)))
+        }
+        object2@current <- object@current
+  
+        lsOrigEnv <- ls(origEnv, all.names = TRUE)
+        keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
+        list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
       }
+      if (!is.null(attr(object, "removedObjs"))) {
+        if (length(attr(object, "removedObjs"))) {
+          rm(list = attr(object, "removedObjs"), envir = object2@.envir)
+        }
+      }
+  
+      attr(object2, "tags") <- attr(object, "tags")
+      attr(object2, "call") <- attr(object, "call")
+      attr(object2, "function") <- attr(object, "function")
+  
+      return(object2)
+    } else {
+      return(object)
     }
-
-    attr(object2, "tags") <- attr(object, "tags")
-    attr(object2, "call") <- attr(object, "call")
-    attr(object2, "function") <- attr(object, "function")
-
-    return(object2)
 })
 
 if (!isGeneric(".preDigestByClass")) {
