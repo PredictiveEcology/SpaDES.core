@@ -40,40 +40,7 @@ setMethod(
   signature(sim = "simList", plot = "logical"),
   definition = function(sim, plot) {
     deps <- depends(sim)
-    sim.in <- sim.out <- data.table(objectName = character(0),
-                                    objectClass = character(0),
-                                    module = character(0))
-
-    lapply(deps@dependencies, function(x) {
-      if (!is.null(x)) {
-        z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
-        z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
-        z.in$module <- z.out$module <- x@name
-        if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
-          sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
-        }
-        if (!all(is.na(z.out[, 1:2]), is.na(z.out[, objectClass]))) {
-          sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
-        }
-      }
-      return(invisible(NULL)) # return from the lapply
-    })
-
-    setkey(sim.in, "objectName")
-    setkey(sim.out, "objectName")
-
-    if ((nrow(sim.in)) && (nrow(sim.out))) {
-      dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]
-      dx[is.na(module), module := "_INPUT_"]
-      DT <- dx[, list(from = module, to = i.module,
-                      objName = objectName, objClass = i.objectClass)]
-
-      if (plot) DT <- DT[!duplicated(DT[, 1:2, with = FALSE]), ]
-    } else {
-      DT <- data.table(from = character(0), to = character(0),
-                       objName = character(0), objClass = character(0))
-    }
-    setorder(DT, "from", "to", "objName")
+    DT <- .depsEdgeListMem(deps, plot)
     return(DT)
 })
 
@@ -83,6 +50,46 @@ setMethod("depsEdgeList",
           definition = function(sim, plot) {
             depsEdgeList(sim, plot = FALSE)
 })
+
+
+.depsEdgeList <- function(deps, plot) {
+  sim.in <- sim.out <- data.table(objectName = character(0),
+                                  objectClass = character(0),
+                                  module = character(0))
+  lapply(deps@dependencies, function(x) {
+    if (!is.null(x)) {
+      z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
+      z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
+      z.in$module <- z.out$module <- x@name
+      if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
+        sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
+      }
+      if (!all(is.na(z.out[, 1:2]), is.na(z.out[, objectClass]))) {
+        sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+      }
+    }
+    return(invisible(NULL)) # return from the lapply
+  })
+
+  setkey(sim.in, "objectName")
+  setkey(sim.out, "objectName")
+
+  if ((nrow(sim.in)) && (nrow(sim.out))) {
+    dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]
+    dx[is.na(module), module := "_INPUT_"]
+    DT <- dx[, list(from = module, to = i.module,
+                    objName = objectName, objClass = i.objectClass)]
+
+    if (plot) DT <- DT[!duplicated(DT[, 1:2, with = FALSE]), ]
+  } else {
+    DT <- data.table(from = character(0), to = character(0),
+                     objName = character(0), objClass = character(0))
+  }
+  setorder(DT, "from", "to", "objName")
+
+}
+
+.depsEdgeListMem <- memoise::memoise(.depsEdgeList)
 
 ################################################################################
 #' Build a module dependency graph

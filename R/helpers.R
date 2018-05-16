@@ -183,7 +183,7 @@ setMethod(
   if (!skipNamespacing) {
     pkgs <- c("SpaDES.core", pkgs)
     pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
-    pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
+    pkgPositions <- pmatch(paste0("package:", unlist(pkgs)), search())
 
     # Find all packages that are not in the first sequence after .GlobalEnv
     whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
@@ -198,7 +198,8 @@ setMethod(
         whAdd <- which(is.na(pkgPositions))
       }
 
-      if (length(whRm) > 0) { # i.e,. ones that need reordering
+      if (length(whRm) > 0) {
+        # i.e,. ones that need reordering
         suppressWarnings(
           lapply(unique(gsub(pkgs, pattern = "package:", replacement = "")[whRm]), function(pack) {
             try(detach(paste0("package:", pack), character.only = TRUE), silent = TRUE)
@@ -220,7 +221,27 @@ setMethod(
 }
 
 
-.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats"
+.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats" # nolint
 
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
-.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)], paste0("package:",.pkgEnv$corePackagesVec[-(1:2)]))
+.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
+                             paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
+
+
+#' tryCatch that keeps warnings, errors and value (result)
+#'
+#' This is from https://stackoverflow.com/a/24569739/3890027
+#'
+#' @keywords internal
+.tryCatch <- function(expr) {
+  warn <- err <- NULL
+  value <- withCallingHandlers(
+    tryCatch(expr, error=function(e) {
+      err <<- e
+      NULL
+    }), warning=function(w) {
+      warn <<- w
+      invokeRestart("muffleWarning")
+    })
+  list(value=value, warning=warn, error=err)
+}

@@ -164,9 +164,10 @@ setMethod(
       for (uM in userModules) {
         filename <- paste(path, "/", uM, "/", uM, ".R", sep = "")
         readFile[[uM]] <- if (!is.null(sim@.envir[[".parsedFiles"]][[filename]])) {
-          # a little faster to use already parsed objects -- might have happened earlier during simInit,
+          # a little faster to use already parsed objects --
+          #   might have happened earlier during simInit,
           #   if this checkParams was run from simInit
-          tmp <- parseConditional(envir = sim@.envir[[".parsedFiles"]],
+          tmp <- .parseConditional(envir = sim@.envir[[".parsedFiles"]],
                                   filename = filename)
           deparse(tmp$parsedFile)
         } else {
@@ -214,7 +215,7 @@ setMethod(
         # read in and cleanup/isolate the global params in the module's .R file
         moduleParams <- grep("globals\\(sim\\)\\$", readFile[[uM]], value = TRUE) %>%
           strsplit(., " ") %>%
-          unlist(lapply(., function(x) x[nzchar(x, keepNA=TRUE)] )) %>%
+          unlist(lapply(., function(x) x[nzchar(x, keepNA = TRUE)])) %>%
           grep("globals\\(sim\\)\\$", ., value = TRUE) %>%
           gsub(",", "", .) %>%
           gsub("\\)\\)", "", .) %>%
@@ -276,4 +277,3 @@ setMethod(
     }
     return(invisible(allFound))
 })
-

@@ -2,21 +2,29 @@
 ##   in R/spades-core-package.R
 ##
 .onLoad <- function(libname, pkgname) {
-  tmpdir <- file.path(tempdir(), "SpaDES")
   ## set options using the approach used by devtools
   opts <- options()
   opts.spades <- list( # nolint
-    spades.cachePath = file.path(tmpdir, "cache"),
-    spades.debug = FALSE, # TODO: is this the best default? see discussion in #5
-    spades.inputPath = file.path(tmpdir, "inputs"),
+    spades.browserOnError = FALSE,
+    spades.cachePath = file.path(.spadesTempDir, "cache"),
+    spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
+    spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
-    spades.modulePath = file.path(tmpdir, "modules"),
+    spades.moduleCodeChecks = list(
+      skipWith = TRUE,
+      suppressNoLocalFun = TRUE,
+      suppressParamUnused = FALSE,
+      suppressPartialMatchArgs = FALSE,
+      suppressUndefined = TRUE
+    ),
+    spades.modulePath = file.path(.spadesTempDir, "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.nCompleted = 10000L,
-    spades.outputPath = file.path(tmpdir, "outputs"),
+    spades.outputPath = file.path(.spadesTempDir, "outputs"),
+    spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
-    spades.switchPkgNamespaces = TRUE
+    spades.useragent = "http://github.com/PredictiveEcology/SpaDES"
+
   )
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
@@ -29,28 +37,29 @@
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     packageStartupMessage("Default paths for SpaDES directories set to:\n",
-                          "  cachePath:  ", getOption("spades.cachePath"), "\n",
-                          "  inputPath:  ", getOption("spades.inputPath"), "\n",
-                          "  modulePath: ", getOption("spades.modulePath"), "\n",
-                          "  outputPath: ", getOption("spades.outputPath"), "\n",
+                          "  cachePath:  ", normPath(.getOption("spades.cachePath")), "\n",
+                          "  inputPath:  ", normPath(getOption("spades.inputPath")), "\n",
+                          "  modulePath: ", normPath(getOption("spades.modulePath")), "\n",
+                          "  outputPath: ", normPath(getOption("spades.outputPath")), "\n",
                           "These can be changed using 'setPaths()'. See '?setPaths'.")
   }
 }
 
 .onUnload <- function(libpath) {
   ## if temp session dir is being used, ensure it gets reset each session
-  tmpdir <- file.path(tempdir(), "SpaDES")
-  if (getOption("spades.cachePath") == file.path(tmpdir, "cache")) {
+  if (.getOption("spades.cachePath") == file.path(.spadesTempDir, "cache")) {
     options(spades.cachePath = NULL)
   }
-  if (getOption("spades.inputPath") == file.path(tmpdir, "inputs")) {
+  if (getOption("spades.inputPath") == file.path(.spadesTempDir, "inputs")) {
     options(spades.inputPath = NULL)
   }
-  if (getOption("spades.modulePath") == file.path(tmpdir, "modules")) {
+  if (getOption("spades.modulePath") == file.path(.spadesTempDir, "modules")) {
     options(spades.modulePath = NULL)
   }
-  if (getOption("spades.outputPath") == file.path(tmpdir, "outputs")) {
+  if (getOption("spades.outputPath") == file.path(.spadesTempDir, "outputs")) {
     options(spades.outputPath = NULL)
   }
 }
+
+.spadesTempDir <- file.path(tempdir(), "SpaDES")
 

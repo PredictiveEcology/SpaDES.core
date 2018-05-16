@@ -12,10 +12,12 @@
 \alias{time<-}
 \alias{time<-}
 \alias{time<-,.simList-method}
+\alias{end}
 \alias{end..simList}
 \alias{end<-}
 \alias{end<-}
 \alias{end<-,.simList-method}
+\alias{start}
 \alias{start..simList}
 \alias{start<-}
 \alias{start<-}
@@ -43,11 +45,15 @@ time(x) <- value
 
 \S4method{time}{.simList}(x) <- value
 
+end(x, ...)
+
 \method{end}{.simList}(x, unit, ...)
 
 end(x) <- value
 
 \S4method{end}{.simList}(x) <- value
+
+start(x, ...)
 
 \method{start}{.simList}(x, unit = NULL, ...)
 

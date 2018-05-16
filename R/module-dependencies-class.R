@@ -34,12 +34,11 @@ setGeneric(".inputObjects", function(x) {
 setMethod(".inputObjects",
           signature(x = "missing"),
           definition = function() {
-            in.df <- data.frame(
+            data.frame(
               objectName = character(0), objectClass = character(0),
               desc = character(0), sourceURL = character(0),
               stringsAsFactors = FALSE
             )
-            return(in.df)
 })
 
 #' @rdname inputObjects
@@ -161,16 +160,20 @@ setClass(
     }
 
     # data.frame checking
-    if (length(object@inputObjects) < 1L) stop("input object name and class must be specified, or NA.")
-    if (length(object@outputObjects) < 1L) stop("output object name and class must be specified, or NA.")
-    if ( !all(names(.inputObjects()) %in% colnames(object@inputObjects)) ) {
-      stop(paste("input object data.frame must use colnames", paste(collapse = ", ", colnames(.inputObjects()) )))
-    }
+    if (length(object@inputObjects) < 1L)
+      stop("input object name and class must be specified, or NA.")
+    if (length(object@outputObjects) < 1L)
+      stop("output object name and class must be specified, or NA.")
+    if (!all(names(.inputObjects()) %in% colnames(object@inputObjects)))
+      stop(paste("input object data.frame must use colnames",
+                 paste(collapse = ", ", colnames(.inputObjects()))))
+
     # if ( !("sourceURL" %in% colnames(object@inputObjects)) ) {
     #   warning("input object data.frame should use colnames sourceURL.")
     # }
     if ( !all(colnames(.outputObjects()) %in% colnames(object@outputObjects)) ) {
-     stop(paste("output object data.frame must use colnames", paste(collapse = ", ", colnames(.outputObjects()))))
+     stop(paste("output object data.frame must use colnames",
+                paste(collapse = ", ", colnames(.outputObjects()))))
     }
     # try coercing to character because if data.frame was created without specifying
     # `stringsAsFactors=FALSE`, or used `NA` (logical) there will be problems...

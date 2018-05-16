@@ -16,8 +16,8 @@ framework that facilitates modularity, and easily enables the user to
 include additional functionality by running user-built simulation modules.
 Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
-of the DES, with current benchmarking as low as 700 microseconds overhead for each
-event (including queuing, sorting, spawning event etc.).
+of the DES, with current benchmarking as low as 700 microseconds overhead for
+each event (including queuing, sorting, spawning event etc.).
 
 Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 
@@ -186,7 +186,7 @@ of a \code{\link{simList}} object are summarized further below.
   repository on GitHub.
 
   \tabular{ll}{
-    \code{\link{checksums}} \tab Verify (and optionally write) checksums for a module's data files.\cr
+    \code{\link[SpaDES.tools]{checksums}} \tab Verify (and optionally write) checksums for a module's data files.\cr
     \code{\link{downloadModule}} \tab Open all modules nested within a base directory.\cr
     \code{\link{getModuleVersion}} \tab Get the latest module version # from module repository.\cr
     \code{\link{newModule}} \tab Create new module from template.\cr
@@ -440,26 +440,44 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 \code{SpaDES} packages use the following \code{\link{options}} to configure behaviour:
 
 \itemize{
+  \item \code{spades.browserOnError}: If \code{TRUE}, the default, then any
+  error rerun the same event with \code{debugonce} called on it to allow editing
+  to be done. When that browser is continued (e.g., with 'c'), then it will save it
+  reparse it into the simList and rerun the edited version. This may allow a spades
+  call to be recovered on error, though in many cases that may not be the correct
+  behaviour. For example, if the simList gets updated inside that event in an iterative
+  manner, then each run through the event will cause that iteration to occur.
+  When this option is \code{TRUE}, then the event will be run at least 3 times: the
+  first time makes the error, the second time has \code{debugonce} and the third time
+  is after the error is addressed. \code{TRUE} is likely somewhat slower.
+
   \item \code{spades.cachePath}: The default local directory in which to
   cache simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
 
-  \item \code{spades.cachePath}: The default local directory in which to
+  \item \code{spades.inputPath}: The default local directory in which to
   look for simulation inputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs}).
 
-  \item \code{spades.debug}: The default debugging value for \code{spades()}.
-  Default is \code{FALSE}.
+  \item \code{spades.debug}: The default debugging value \code{debug}
+  argument in \code{spades()}. Default is \code{TRUE}.
 
   \item \code{spades.lowMemory}: If true, some functions will use more memory
     efficient (but slower) algorithms. Default \code{FALSE}.
+
+  \item \code{spades.moduleCodeChecks}: Should the various code checks be run
+  during \code{simInit}. These are passed to codetools::checkUsage.
+  Default is given by the function, plus these :\code{list(suppressParamUnused = FALSE,
+  suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
+  skipWith = TRUE)}.
 
   \item \code{spades.modulePath}: The default local directory where modules
     and data will be downloaded and stored.
     Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/modules}).
 
   \item \code{spades.moduleRepo}: The default GitHub repository to use when
-    downloading modules. Default \code{"PredictiveEcology/SpaDES-modules"}.
+    downloading modules via \code{downloadModule}.
+    Default \code{"PredictiveEcology/SpaDES-modules"}.
 
   \item \code{spades.nCompleted}: The maximum number of completed events to
     retain in the \code{completed} event queue. Default \code{1000L}.
@@ -470,8 +488,9 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 
   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
     to ensure a module's required packages are listed first?
-    Default \code{TRUE}, which reduces name conflicts among package objects,
-    but is not without overhead (\emph{i.e.}, can be slow).
+    Default \code{FALSE} to keep computational overhead down. If \code{TRUE},
+    there should be no name conflicts among package objects,
+    but it is much slower, especially if the events are themselves fast.
 
   \item \code{spades.tolerance}: The default tolerance value used for floating
     point number comparisons. Default \code{.Machine$double.eps^0.5}.
@@ -491,17 +510,18 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Eliot J B McIntire \email{eliotmcintire@gmail}
+\strong{Maintainer}: Alex M Chubaty \email{alex.chubaty@gmail.com}
 
 Authors:
 \itemize{
-  \item Alex M Chubaty \email{alexander.chubaty@canada.ca}
+  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca}
 }
 
 Other contributors:
 \itemize{
   \item Yong Luo \email{yluo1@lakeheadu.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
+  \item Ceres Barros \email{cbarros@mail.ubc.ca} [contributor]
   \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
 

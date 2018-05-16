@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Use Pattern Oriented Modeling to fit unknown parameters � POM • SpaDES.core</title>
+<title>Use Pattern Oriented Modeling to fit unknown parameters — POM • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -333,7 +333,7 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
     <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
     <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(
       <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>, <span class='kw'>burnStats</span> <span class='kw'>=</span> <span class='st'>"nPixelsBurned"</span>),
-      <span class='kw'>fireSpread</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>nFires</span> <span class='kw'>=</span> <span class='fl'>5</span>),
+      <span class='kw'>fireSpread</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>nfires</span> <span class='kw'>=</span> <span class='fl'>5</span>),
       <span class='kw'>randomLandscapes</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>nx</span> <span class='kw'>=</span> <span class='fl'>300</span>, <span class='kw'>ny</span> <span class='kw'>=</span> <span class='fl'>300</span>)
     ),
     <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
@@ -349,18 +349,18 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
   <span class='no'>outData</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw pkg'>reproducible</span><span class='kw ns'>::</span><span class='fu'><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></span>(<span class='no'>mySim</span>), <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
   <span class='co'># Extract the "true" data, in this case, the "proportion of cells burned"</span>
-  <span class='co'># Function defined that will use landscape$Fires map from simList,</span>
-  <span class='co'>#  i.e., sim$landscape$Fires</span>
+  <span class='co'># Function defined that will use landscape$fires map from simList,</span>
+  <span class='co'>#  i.e., sim$landscape$fires</span>
   <span class='co'>#  the return value being compared via MAD with propCellBurnedData</span>
   <span class='no'>propCellBurnedFn</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>landscape</span>) {
-    <span class='fu'>sum</span>(<span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/getValues'>getValues</a></span>(<span class='no'>landscape</span>$<span class='no'>Fires</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) / <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/ncell'>ncell</a></span>(<span class='no'>landscape</span>$<span class='no'>Fires</span>)
+    <span class='fu'>sum</span>(<span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/getValues'>getValues</a></span>(<span class='no'>landscape</span>$<span class='no'>fires</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) / <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/ncell'>ncell</a></span>(<span class='no'>landscape</span>$<span class='no'>fires</span>)
   }
   <span class='co'># visualize the burned maps of true "data"</span>
   <span class='no'>propCellBurnedData</span> <span class='kw'>&lt;-</span> <span class='fu'>propCellBurnedFn</span>(<span class='no'>outData</span>$<span class='no'>landscape</span>)
   <span class='fu'>clearPlot</span>()
   <span class='kw'>if</span> (<span class='fu'>interactive</span>()) {
-    <span class='no'>Fires</span> <span class='kw'>&lt;-</span> <span class='no'>outData</span>$<span class='no'>landscape</span>$<span class='no'>Fires</span> <span class='co'># Plot doesn't do well with many nested layers</span>
-    <span class='fu'>Plot</span>(<span class='no'>Fires</span>)
+    <span class='no'>fires</span> <span class='kw'>&lt;-</span> <span class='no'>outData</span>$<span class='no'>landscape</span>$<span class='no'>fires</span> <span class='co'># Plot doesn't do well with many nested layers</span>
+    <span class='fu'>Plot</span>(<span class='no'>fires</span>)
   }
 
   <span class='co'># Example 1 - 1 parameter</span>
@@ -385,18 +385,18 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
 
   <span class='co'># Example 2 - 2 parameters</span>
   <span class='co'># Function defined that will use caribou from sim$caribou, with</span>
-  <span class='co'>#  the return value being compared via MAD with NPattern</span>
+  <span class='co'>#  the return value being compared via MAD with nPattern</span>
   <span class='co'>#  module, parameter N, is from 10 to 1000)</span>
   <span class='no'>caribouFn</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>caribou</span>) <span class='fu'>length</span>(<span class='no'>caribou</span>)
 
   <span class='co'># Extract "data" from simList object (normally, this would be actual data)</span>
-  <span class='no'>NPattern</span> <span class='kw'>&lt;-</span> <span class='fu'>caribouFn</span>(<span class='no'>outData</span>$<span class='no'>caribou</span>)
+  <span class='no'>nPattern</span> <span class='kw'>&lt;-</span> <span class='fu'>caribouFn</span>(<span class='no'>outData</span>$<span class='no'>caribou</span>)
 
   <span class='no'>aTime</span> <span class='kw'>&lt;-</span> <span class='fu'>Sys.time</span>()
   <span class='no'>parsToVary</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='st'>"spreadprob"</span>, <span class='st'>"N"</span>)
   <span class='no'>out2</span> <span class='kw'>&lt;-</span> <span class='fu'>POM</span>(<span class='no'>mySim</span>, <span class='no'>parsToVary</span>,
               <span class='fu'>list</span>(<span class='kw'>propCellBurnedData</span> <span class='kw'>=</span> <span class='no'>propCellBurnedFn</span>,
-                   <span class='kw'>NPattern</span> <span class='kw'>=</span> <span class='no'>caribouFn</span>), <span class='kw'>logObjFnVals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+                   <span class='kw'>nPattern</span> <span class='kw'>=</span> <span class='no'>caribouFn</span>), <span class='kw'>logObjFnVals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
                    <span class='co'>#optimControl = list(parallelType = 1))</span>
                    <span class='co'>#cl = cl) # not yet implemented, waiting for DEoptim</span>
   <span class='no'>bTime</span> <span class='kw'>&lt;-</span> <span class='fu'>Sys.time</span>()
@@ -423,7 +423,7 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
   <span class='co'>#   - pass data that will be used internally for objective function</span>
   <span class='no'>objFnEx</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>pars</span>, <span class='co'># param values</span>
                       <span class='no'>sim</span>, <span class='co'># simList object</span>
-                      <span class='no'>NPattern</span>, <span class='no'>propCellBurnedData</span>, <span class='no'>caribouFn</span>, <span class='no'>propCellBurnedFn</span>) {
+                      <span class='no'>nPattern</span>, <span class='no'>propCellBurnedData</span>, <span class='no'>caribouFn</span>, <span class='no'>propCellBurnedFn</span>) {
     <span class='co'>### data</span>
 
     <span class='co'># make a copy of simList because it will possibly be altered by spades call</span>
@@ -438,9 +438,9 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
 
     <span class='co'># calculate outputs</span>
     <span class='no'>propCellBurnedOut</span> <span class='kw'>&lt;-</span> <span class='fu'>propCellBurnedFn</span>(<span class='no'>out</span>$<span class='no'>landscape</span>)
-    <span class='no'>NPattern_Out</span> <span class='kw'>&lt;-</span> <span class='fu'>caribouFn</span>(<span class='no'>out</span>$<span class='no'>caribou</span>)
+    <span class='no'>nPattern_Out</span> <span class='kw'>&lt;-</span> <span class='fu'>caribouFn</span>(<span class='no'>out</span>$<span class='no'>caribou</span>)
 
-    <span class='no'>minimizeFn</span> <span class='kw'>&lt;-</span> <span class='fu'>abs</span>(<span class='no'>NPattern_Out</span> - <span class='no'>NPattern</span>) +
+    <span class='no'>minimizeFn</span> <span class='kw'>&lt;-</span> <span class='fu'>abs</span>(<span class='no'>nPattern_Out</span> - <span class='no'>nPattern</span>) +
                   <span class='fu'>abs</span>(<span class='no'>propCellBurnedOut</span> - <span class='no'>propCellBurnedData</span>)
 
     <span class='co'># have more info reported to console, if desired</span>
@@ -460,7 +460,7 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
   <span class='co'># Change optimization parameters to alter how convergence is achieved</span>
   <span class='no'>out5</span> <span class='kw'>&lt;-</span> <span class='fu'>POM</span>(<span class='no'>mySim</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"spreadprob"</span>, <span class='st'>"N"</span>),
               <span class='kw'>objFn</span> <span class='kw'>=</span> <span class='no'>objFnEx</span>,
-              <span class='kw'>NPattern</span> <span class='kw'>=</span> <span class='no'>NPattern</span>,
+              <span class='kw'>nPattern</span> <span class='kw'>=</span> <span class='no'>nPattern</span>,
               <span class='kw'>propCellBurnedData</span> <span class='kw'>=</span> <span class='no'>propCellBurnedData</span>,
               <span class='kw'>caribouFn</span> <span class='kw'>=</span> <span class='no'>caribouFn</span>,
               <span class='kw'>propCellBurnedFn</span> <span class='kw'>=</span> <span class='no'>propCellBurnedFn</span>,
@@ -478,7 +478,7 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
   <span class='fu'>library</span>(<span class='no'>DEoptim</span>)
   <span class='no'>out7</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/DEoptim/topics/DEoptim'>DEoptim</a></span>(<span class='kw'>fn</span> <span class='kw'>=</span> <span class='no'>objFnEx</span>,
                  <span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>,
-                 <span class='kw'>NPattern</span> <span class='kw'>=</span> <span class='no'>NPattern</span>,
+                 <span class='kw'>nPattern</span> <span class='kw'>=</span> <span class='no'>nPattern</span>,
                  <span class='kw'>propCellBurnedData</span> <span class='kw'>=</span> <span class='no'>propCellBurnedData</span>,
                  <span class='kw'>caribouFn</span> <span class='kw'>=</span> <span class='no'>caribouFn</span>,
                  <span class='kw'>propCellBurnedFn</span> <span class='kw'>=</span> <span class='no'>propCellBurnedFn</span>,

@@ -19,7 +19,7 @@
 #'
 #' @example inst/examples/example_moduleMetadata.R
 #'
-setGeneric("moduleMetadata", function(module, path, sim) {
+setGeneric("moduleMetadata", function(sim, module, path) {
   standardGeneric("moduleMetadata")
 })
 
@@ -27,7 +27,7 @@ setGeneric("moduleMetadata", function(module, path, sim) {
 #' @rdname moduleMetadata
 setMethod(
   "moduleMetadata",
-  signature = c(module = "character", path = "character", sim = "missing"),
+  signature = c(sim = "missing", module = "character", path = "character"),
   definition = function(module, path) {
     filename <- paste(path, "/", module, "/", module, ".R", sep = "")
     if (!file.exists(filename)) {
@@ -45,7 +45,7 @@ setMethod(
            function(xx) {
              pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                         defineModuleElement = xx)
-             out2 <- try(eval(pmp), silent = TRUE)
+             out2 <- suppressMessages(try(eval(pmp), silent = TRUE))
              if (is(out2, "try-error")) {
                inner2 <- lapply(pmp, function(yyy) {
                  # pmp is whole rbind statement
@@ -63,7 +63,8 @@ setMethod(
                })
                out2 <- as.call(inner2)
              }
-             return(eval(out2))
+             aa <- capture.output(type = "message", bb <- eval(out2))
+             return(bb)
           })
 
     names(metadata) <- defineModuleListItems
@@ -77,27 +78,45 @@ setMethod(
 #' @rdname moduleMetadata
 setMethod(
   "moduleMetadata",
-  signature = c(module = "character", path = "missing", sim = "missing"),
+  signature = c(sim = "missing", module = "character", path = "missing"),
   definition = function(module) {
-    moduleMetadata(module, getOption("spades.modulePath"))
+    moduleMetadata(module = module, path = getOption("spades.modulePath"))
 })
 
 #' @export
 #' @rdname moduleMetadata
 setMethod(
   "moduleMetadata",
-  signature = c(module = "ANY", path = "missing", sim = "simList"),
-  definition = function(module, sim) {
-    if (missing(module)) module <- modules(sim)
+  signature = c(sim = "ANY", module = "ANY", path = "ANY"),
+  definition = function(sim, module, path) {
+    if (is.character(sim)) {
+      message("Assuming sim is a module name")
+      if (missing(path)) {
+        metadataList <- moduleMetadata(module = sim)
+      } else {
+        metadataList <- moduleMetadata(module = sim, path = path)
+      }
 
-    metadata <- lapply(module, function(mod)
-      moduleMetadata(mod, path = modulePath(sim)))
-    if (length(module) == 1) {
-      metadata <- unlist(metadata, recursive = FALSE)
     } else {
-      names(metadata) <- module
+      if (!missing(path)) message("path not used with sim provided")
+      if (missing(module)) {
+        module <- unlist(modules(sim))
+      }
+      numModules <- length(module)
+
+      metadata <- sim@depends@dependencies[module]
+      sn <- slotNames(".moduleDeps")
+      names(sn) <- sn
+      metadataList <- lapply(metadata, function(mod) {
+        lapply(sn, function(element) {
+          slot(mod, name = element)
+        })
+      })
+      if (numModules == 1)
+        metadataList <- metadataList[[module]]
     }
-    return(metadata)
+
+    return(metadataList)
 })
 
 ################################################################################

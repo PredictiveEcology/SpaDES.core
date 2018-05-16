@@ -13,7 +13,8 @@ test_that("simulation runs with simInit and spades", {
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
-  mySim <- simInit(times, params, modules, objects = list(), paths) %>% spades()
+  mySim <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE)
 
   # simtime
   expect_equivalent(time(mySim), 10.0)
@@ -22,61 +23,61 @@ test_that("simulation runs with simInit and spades", {
 
   # sim results ## NOTE upcoming version of RandomFields completely changes the values!!!
   #if (utils::packageVersion("RandomFields") >= "3.1.20") {
-    burnedLast <- c(1435, 1044, 1531, 844, 1093, 1379, 2026, 1181, 469, 1381)
+    burnedLast <- c(1725, 126, 816, 2136, 1836, 825, 1381, 1507, 1509, 1624)
 
-    pos_x <- c(33.2872398995189, -17.3422621469692, 8.75313234185035,
-               24.0077471712237, -40.9511657271224, 4.67136848352605, 1.63754197323153,
-               47.0523572578574, -33.249115084004, 48.0873109754402, -7.77153078573273,
-               -48.9946323868193, 17.9728675881409, 37.6335473250708, 5.39323021033027,
-               -47.4864772203972, 11.6040269926992, -0.865950034505744, -36.9293704235718,
-               -21.531106341633, 40.9938873771294, -42.5429308603906, -25.9181746115019,
-               -26.2432233488535, 14.0087500069471, 25.8855766724122, 46.9359618222115,
-               -19.8016223717072, -49.8222051620967, 30.2757492095112, -7.28689325262428,
-               -4.50039315271449, -10.547261947459, -11.5071818522213, 4.48358610873886,
-               25.6944051540438, -41.1416895584928, 9.48882488424441, -18.4614444331997,
-               34.9689888922441, 0.840919977329037, -41.0611183006543, 0.795379844279644,
-               -24.1159885913404, 1.42940853742768, 5.07830438400629, -7.7835339336879,
-               -49.9176129132604, 38.0547415109303, -23.617696164462, 27.598907121919,
-               4.52221827777863, 6.58707710429276, 48.534921591503, -11.7141259923688,
-               47.7952502894699, -40.0630795353281, -20.6192855655735, 3.87439431752425,
-               -14.3781330735223, -15.2560485462677, -31.5638425447865, 48.8032870922823,
-               5.81793650533037, 41.8727853065613, -30.0912034365545, 46.5808437960944,
-               15.7969872175151, 43.2982483637298, 0.722432416500425, -21.2889097741673,
-               -24.092352778194, 42.8997225069988, 38.2804348365648, -40.6515240164646,
-               25.4967712722791, 31.9804489132599, -40.6608411861367, 10.4166482355862,
-               -15.1510045022174, 20.0076631157052, 43.0570386794077, -24.9791258717695,
-               -29.8709993334512, 45.3060116671438, 28.3291482755146, -43.5158165322117,
-               39.4175768516032, 20.3064395385905, -37.3700933983955, 32.7448779315204,
-               33.6911235142027, -25.8218432960084, -6.64749387632853, -37.2734122354639,
-               -24.701424556876, -45.1535543851411, 5.4222549212579, -21.262059193088,
-               7.08587571124283)
+    pos_x <- c(1.05944046146596, 44.4530163547364, 45.8793618542196,
+               -1.31587161139159, 17.8640418602947, 48.4840937544703, 10.7535089382283,
+               -24.6253107925863, -48.5108426726095, -7.76764412474417, 34.7851382149642,
+               9.83572522829692, 41.9505922251921, -9.07555369460079, -39.676662136738,
+               21.6185984474158, 46.4701522375152, -0.883315154385187, 28.0911201823354,
+               -13.847369533562, -49.7727146829549, -16.2936810258016, -33.9335427084662,
+               -8.47926857699624, -17.5993028014645, -33.0461085829127, 24.8750808532409,
+               -43.5077879392023, -16.9752324398488, 16.7694485345211, -8.91563038316473,
+               -48.3650161814635, 27.0749755681643, 34.0994637648402, -49.1648592745971,
+               -29.9712621173336, 49.5667313041262, 21.3612681252904, -21.3445953954488,
+               24.8211683871312, 23.4173005016891, -29.9699855919438, -49.958594066106,
+               -17.825402853539, 30.0307948992073, 29.6380142083718, 49.6506417101735,
+               -44.1750870723644, -32.8472885698896, 12.7607439556149, -15.7741569225653,
+               -41.5405111886502, -34.8179542704289, -38.3885023832212, 4.60137973293355,
+               -22.6440580206797, -0.213427106250919, -2.29987838737896, -21.081170253662,
+               38.454598692853, 15.1416694346051, -43.728082307768, -13.0723350036922,
+               28.0846481560228, -27.3096141757915, 45.7054711281168, 9.16013996497286,
+               9.62565605939507, -16.0461041502597, -35.5546251289444, -24.9716699563686,
+               49.8465322556856, 10.8257847829093, -34.2753709391232, -10.4856247161767,
+               48.8397137324941, 16.7101178052949, -35.4992391966538, -49.0238384344422,
+               47.597755712123, -20.1128595601079, 44.2571096499243, -34.507735468028,
+               35.4557823272802, 49.5489237085567, 31.1401253978472, 25.3007340967458,
+               6.45953149953921, -46.7962501020211, 1.03386467153074, -24.1707710493782,
+               35.2616940703965, -1.12871674368546, 46.1499998989781, 30.4491021819093,
+               -26.5440703974598, -39.6645892713107, -28.1460804729089, -41.6606455063026,
+               -7.39377404125834)
 
-    pos_y <- c(-36.7915302068531, 19.4049257142821, 8.99246407697373,
-               11.1972141131503, -28.9042034294489, 21.6276219077891, -31.0277712593001,
-               -41.7658238188155, -25.3298671454348, -11.8963315269705, -41.3248994981119,
-               -17.5279823276148, -7.52501323292238, -29.5785339759454, 2.02411986858414,
-               -26.9279490346496, 37.0220847585067, 33.01216290486, -36.7155731663296,
-               -20.3595762313143, 20.2377052688342, -48.731190870263, -34.0058211864778,
-               -12.7019908770908, 2.85640042972667, -6.81740166205414, -22.8625105848804,
-               -20.8366231499668, 35.7474349085467, 11.8197161345573, -2.9113717513449,
-               -17.5537959621871, 5.53538898703373, 24.2233244841148, -3.38930417352202,
-               -45.6155550309963, 6.48087493076159, -46.1985693927484, -2.96529308770018,
-               21.1228741105041, -31.5132944934996, -11.9282793587603, -14.3123527346389,
-               -9.27831516836018, -38.7022504195187, -5.89356892562855, 42.92261409509,
-               -34.626156901399, -0.830322963815291, 22.4308200079755, -32.8706273407653,
-               -36.3802314149427, 4.50055526477191, -42.26773250131, -14.6343299094686,
-               -45.7342538278528, -4.9852604991062, 18.2115594208981, -27.2099645387977,
-               -29.9166461890478, 8.1878785078301, -20.2503321669608, -47.3353166806515,
-               -22.4684753660724, -4.28818807965439, -29.6287278762122, -35.8334444728408,
-               -5.38698453074952, 32.3835464252082, -7.82200530744319, 2.52995097890168,
-               -45.3450571270551, 45.5202912871924, 29.8891155371416, -46.7513360594827,
-               34.8309029291136, -23.3302083002779, 29.2185922344093, 26.6638390625404,
-               -11.0415248404228, 22.8039989094315, 36.0049451333158, 7.31257801889006,
-               -48.8194164055657, -36.9492164182348, -10.6970705800586, -48.1786489911048,
-               -19.3699919165668, 11.3725621864949, -18.7864877048488, -42.1370407807376,
-               23.5682143369233, -30.4867970470337, -30.7283217366377, -11.6149434287642,
-               22.6263984629265, 9.66250955670057, -22.3417192277185, -6.44269250619922,
-               -14.501302544863)
+    pos_y <- c(-15.8993972461616, -8.96685346602316, 25.2653183350009,
+               -39.0714808439679, -32.9641113081288, 19.5922174069934, 14.8674025804159,
+               38.2616003081126, -8.16583605869974, 17.8252525894824, 8.21593603120944,
+               -36.3379915713033, 29.7329787318616, 42.0827238488804, -20.2386772454794,
+               35.7556518838588, 5.55152952583172, 27.7482179433487, 37.4124616940735,
+               -42.4068608457502, -22.1109081515469, 10.2089709119964, -3.45245440515526,
+               -12.0062733527654, 5.19230996990487, -27.1646572653389, -26.8632992341179,
+               12.4455696770408, 39.5029725546056, -40.8904798063864, 13.4903138848752,
+               -9.33150580154056, 12.266246498016, 27.8095419155339, 8.94181503604101,
+               24.4028888129788, -44.3392208269988, 36.7910379389471, -45.1228359607758,
+               -35.9317653139032, 6.31296435991845, 20.9073748145245, -16.3575394819696,
+               22.4740052505691, 36.7314942719821, -3.77070330422793, -30.2931909279016,
+               16.583785813993, 38.7946206773652, -12.6087368305901, -3.99514927265182,
+               15.0189478879167, 27.1011443151554, -19.4368853267691, -6.71379469116036,
+               18.2862630593746, -40.2802146105095, -15.6248800198687, 32.2775346771305,
+               31.4803155819967, 45.0553762113152, 25.7675846881672, -49.8075671509248,
+               -6.86962262435439, 14.4530466734969, -5.96936453527461, 3.86969432620594,
+               -35.3152672431326, -15.5041801097397, -36.2079856152726, -10.8110700378683,
+               -48.6952585997799, -30.7297095345783, -42.2974065446223, 7.53790808198442,
+               -9.89011549737592, 30.0073720455366, 48.1503933132591, -32.8646234493861,
+               -46.9746807507946, -21.8590265307828, -2.9748266389963, 2.86405420190562,
+               -43.7889401248308, 10.0365696344108, 44.4795579080847, -48.3616605982961,
+               1.2228017579147, 4.04249242242624, 33.1075803768298, 4.64441718295845,
+               -47.8216259071557, 33.265393363792, 40.0764181461184, 42.4561064648432,
+               20.6604237095649, -41.4412266891093, 9.96154914243285, 33.2776014337331,
+               12.9988550096717)
   # } else {
   #   burnedLast <- c(1680, 1485, 607, 1079, 1041, 605, 871, 1097, 495, 1253)
   #
@@ -106,8 +107,8 @@ test_that("simulation runs with simInit and spades", {
   #     25.6514918771879, -25.7249927901813, 46.5803504144238, -46.9702484362805,
   #     30.3177776221904, 11.1446124689632, 46.5656200410542, 42.6072217133873,
   #     -26.5944387764709, 30.3706355061775, -39.2953280003378, -6.61414387806415
-  #   )
-  #
+#   )
+#
   #   pos_y <- c(
   #     11.2259177001642, -48.2749285467045, -19.2693150119305, -30.1955629122566,
   #     -5.16274098908813, 19.7263653977621, -18.3682115225133, 11.738367415035,
@@ -134,8 +135,8 @@ test_that("simulation runs with simInit and spades", {
   #     15.4977777956788, 20.7609180017956, 31.0985715416653, -34.7622261504206,
   #     18.6274139594293, 43.0727309557879, -18.0134694585456, 39.5790564364162,
   #     12.5097325118235, -31.4932896470479, 37.7529892755605, -30.960625150814
-  #   )
-  # }
+#   )
+#   }
 
   expect_equal(mySim$npixelsburned, burnedLast)
   expect_equivalent(mySim$caribou$x, pos_x)
@@ -151,7 +152,6 @@ test_that("spades calls with different signatures don't work", {
   setwd(tmpdir)
 
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     setwd(cwd)
     unlink(tmpdir, recursive = TRUE)
@@ -159,10 +159,10 @@ test_that("spades calls with different signatures don't work", {
 
   a <- simInit()
   a1 <- Copy(a)
-  expect_silent(spades(a))
   expect_output(spades(a, debug = TRUE), "eventTime")
-  expect_silent(spades(a, .plotInitialTime = NA))
-  expect_silent(spades(a, .saveInitialTime = NA))
+  expect_silent(spades(a, debug = FALSE))
+  expect_silent(spades(a, debug = FALSE, .plotInitialTime = NA))
+  expect_silent(spades(a, debug = FALSE, .saveInitialTime = NA))
   expect_output(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
   expect_output(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
@@ -180,8 +180,8 @@ test_that("spades calls with different signatures don't work", {
     expect_output(spades(a, progress = "text", debug = TRUE), "20%")
     expect_output(spades(a, progress = "text"), "..........| 100%")
   }
-  expect_silent(spades(a, progress = FALSE))
-  expect_silent(spades(a, progress = "rr"))
+  expect_silent(spades(a, debug = FALSE, progress = FALSE))
+  expect_silent(spades(a, debug = FALSE, progress = "rr"))
 
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
   a <- Copy(a1)
@@ -221,7 +221,6 @@ test_that("simInit with R subfolder scripts", {
   setwd(tmpdir)
 
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     setwd(cwd)
     unlink(tmpdir, recursive = TRUE)
@@ -229,8 +228,8 @@ test_that("simInit with R subfolder scripts", {
 
   newModule("child1", ".", open = FALSE)
   cat(file = file.path("child1", "R", "script.R"),
-      "a <- function(r) {
-          r + 1
+      "a <- function(poiuoiu) {
+          poiuoiu + 1
       }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
   expect_true(sum(grepl(unlist(lapply(ls(mySim@.envir, all.names = TRUE), function(x) {
@@ -333,4 +332,519 @@ test_that("simulation runs with simInit with duplicate modules named", {
   #system.time({spades(mySim, debug = FALSE)})
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
+})
+
+
+test_that("conflicting function types", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m <- "child4"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  xxx <- readLines(fileName)
+  lineWithInit <- grep(xxx, pattern = "^Init")
+
+
+  xxx1 <- gsub(xxx, pattern = 'plotFun', replacement = 'Plot') # nolint
+  cat(xxx1, file = fileName, sep = "\n")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 "Plot is defined")
+
+  # do functions like raster::levels
+  cat(xxx[1:lineWithInit], "
+      library(raster)
+      poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      poiuoiu <- poiuoiu
+      poiuoiu <- scale(poiuoiu)
+      poiuoiu <- ratify(poiuoiu)
+      rat <- raster::levels(poiuoiu)[[1]]
+
+      levels(poiuoiu) <- rat
+      ",
+              xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+
+  fullMessage <- c("the following function\\(s\\) is used that",
+                   "raster::scale", "scale")
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
+  nonMessage <- c("raster::levels", "levels")
+  expect_false(all(unlist(lapply(nonMessage, function(x) any(grepl(mm, pattern = x))))))
+
+  cat(xxx[1:lineWithInit], "
+      library(raster)
+      poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      poiuoiu <- scale(poiuoiu)
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 "raster::scale")
+
+  ###
+  cat(xxx[1:lineWithInit], "
+      library(raster)
+      poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
+      poiuoiu <- raster::scale(poiuoiu)
+      sim$poiuoiu <- poiuoiu
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 "poiuoiu is assigned")
+
+  cat(xxx[1:(lineWithInit - 1)], "
+      a <- function(x) {
+         b <- b + 1
+      }
+      ",
+      xxx[(lineWithInit):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 "a: parameter")
+
+  xxx1 <- gsub(xxx, pattern = "\\.plotInitialTime", replacement = "value")
+  xxx1 <- gsub(xxx1, pattern = "NA, NA, NA", replacement = "'hi', NA, NA")
+
+  cat(xxx1[1:lineWithInit], "
+      a <- sim$b
+      d <- sim$d
+      f <- sim[['f']]
+      f <- sim[[P(sim)$value]]
+      poiuoiu <- sim@.envir$d1
+      qwerqwer <- sim@.envir[['test']]
+      sim$g <- f
+      sim@.envir$g1 <- f
+      return(list(a, d, f, sim))
+      ",
+      xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+
+  fullMessage <- c("defineParameter: 'value' is not of specified type 'numeric'",
+                   "defineParameter: 'plotInterval' is not of specified type 'numeric'",
+                   "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
+                   "defineParameter: 'saveInterval' is not of specified type 'numeric'",
+                   "child4: module code: Init: local variable.*qwerqwer.*assigned but may not be used",
+                   "Running inputObjects for child4", "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used",
+                   "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in outputObjects",
+                   "child4: inputObjects: b, d, f, hi, d1, test are used from sim inside Init, but are not declared in inputObjects"
+  )
+
+  mm <- cleanMessage(mm)
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
+  # cat(paste("################################################"), file = tempfile(), append = FALSE)
+  # for (x in seq(fullMessage)) {
+  #   lineNum <- "444"
+  #   theGrepEach <- grepl(mm, pattern = fullMessage[x])
+  #   theGrep <- any(theGrepEach)
+  #   if (!theGrep) {
+  #     cat(paste("\nline ", lineNum, theGrep, fullMessage[x], "\n              ", paste(mm, collapse = "\n               "), collapse = ""), file = tempfile(), append = TRUE)
+  #   }
+  #   expect_true(theGrep)
+  # }
+
+  cat(xxx[1:lineWithInit], "
+      sim$child4 <- 1
+      ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_error(simInit(paths = list(modulePath = tmpdir), modules = m),
+               c(paste0(m, ": You have created an object")))
+
+  # declared in inputObjects
+  lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
+  cat(xxx[1:(lineWithInputObjects-1)], "
+      expectsInput('a', 'numeric', '', '')
+      ",
+      xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+               c(paste0(m, ": module code: a is declared in inputObjects")))
+
+  # declared in outputObjects
+  lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
+  cat(xxx[1:(lineWithOutputObjects-1)], "
+      createsOutput('b', 'numeric', '')
+      ",
+      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+               c(paste0(m, ": module code: b is declared in outputObjects")))
+
+  cat(xxx[1:(lineWithInputObjects-1)], "
+      expectsInput('a', 'numeric', '', '')
+      ",
+      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)],
+      "
+      createsOutput('b', 'numeric', '')
+      ",
+      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  expect_true(all(grepl(mm,
+    pattern = c(paste0(m, ": module code: b is declared in outputObjects|child4: module code: a is declared in inputObjects|Running .input")))))
+
+  # assign to sim for functions like scheduleEvent
+  lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
+  xxx1 <- xxx
+  xxx1[lineWithScheduleEvent] <- sub(xxx[lineWithScheduleEvent], pattern = "sim <- scheduleEvent", replacement = "scheduleEvent")
+  cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 c(paste0(m, ": module code: scheduleEvent inside doEvent.child4 must")))
+
+  # Return sim in doEvent
+  patt <- "return\\(invisible\\(sim\\)\\)"
+  lineWithReturnSim <- grep(xxx, pattern = patt)[1]
+  xxx1 <- xxx
+  xxx1[lineWithReturnSim] <- sub(xxx[lineWithReturnSim], pattern = patt,
+                                     replacement = "return(invisible())")
+  cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
+
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
+                 c(paste0(m, ": module code: doEvent.",m," must return")))
+
+
+  lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
+  lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
+  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")
+  cat(xxx[1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei2', 'numeric', '', ''),
+      expectsInput('ei3', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co2', 'numeric', ''),
+      createsOutput('co3', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx[(lineWithOutputObjects+1):lineWithInit], "
+      a <- sim$b
+      sim$g <- f
+      holy(sim$co4) <- f
+      moly(sim$aaa) <- f
+      fff <- sim$ei2
+      fff <- sim$co3
+      sim$co1 <- 123
+      xx <- c(1,2)
+      xx[sim$ei4] <- NA
+      ",
+      xxx[(lineWithInit+1):lineWithDotInputObjects], "
+      a <- sim$b
+      sim$g <- 1
+      sim$ei1 <- 4
+      fff <- sim$ei1
+      fff <- sim$co3
+      sim$co1 <- 123
+      aaa <- sim$.userSuppliedObjNames # in the ignoreObjects
+      ",
+      xxx[(lineWithDotInputObjects+1):length(xxx)],
+      sep = "\n", fill = FALSE, file = fileName)
+
+  fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
+                   "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
+                   "child4: module code: inputObjects: local variable.*a.*assigned but may not be used",
+                   "child4: module code: inputObjects: local variable.*fff.*assigned but may not be used",
+                   "child4: module code: Init: local variable.*a.*assigned but may not be used",
+                   "child4: module code: Init: local variable.*fff.*assigned but may not be used",
+                   "child4: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
+                   "child4: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
+                   "child4: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
+                   "child4: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects"
+  )
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- cleanMessage(mm)
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
+  # for (x in seq(fullMessage)) {
+  #   lineNum <- "566"
+  #   theGrepEach <- grepl(mm, pattern = fullMessage[x])
+  #   theGrep <- any(theGrepEach)
+  #   if (!theGrep) {
+  #     cat(paste("\nline ", lineNum, theGrep, fullMessage[x], "\n              ", paste(mm, collapse = "\n               "), collapse = ""), file = tempfile(), append = TRUE)
+  #   }
+  #   expect_true(theGrep)
+  # }
+
+
+})
+
+
+test_that("scheduleEvent with NA logical in a non-standard parameter", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m <- "test"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  xxx <- readLines(fileName)
+  #lineWithInit <- grep(xxx, pattern = "^Init")
+
+  xxx1 <- gsub(xxx, pattern = '.plotInitialTime', replacement = '.plotInitialTim') # nolint
+  xxx2 <- gsub(",$", grep(".plotInitialTim\\>", xxx1, value = TRUE)[1], replacement = "")
+  xxx3 <- parse(text = xxx2)
+  # show that it is logical
+  expect_true(is.logical(eval(xxx3)$default[[1]]))
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  expect_true(all(unlist(lapply(c("Running .inputObjects", "module code appears clean"),
+                                function(x) any(grepl(mm, pattern = x))))))
+
+})
+
+test_that("messaging with multiple modules", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m1 <- "test"
+  m2 <- "test2"
+  m3 <- "test3"
+  m4 <- "test4"
+  m <- c(m1, m2, m3, m4)
+  newModule(m1, tmpdir, open = FALSE)
+  newModule(m2, tmpdir, open = FALSE)
+  newModule(m3, tmpdir, open = FALSE)
+  newModule(m4, tmpdir, open = FALSE)
+  #lapply(m, newModule, tmpdir, open = FALSE)
+  fileNames <- file.path(dir(tmpdir), paste0(dir(tmpdir),".R"))
+  xxx <- lapply(fileNames, readLines)
+  set.seed(113)
+
+
+  lineWithInit <- grep(xxx[[1]], pattern = "^Init")
+  lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
+  lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+
+  xxx1 <- list()
+  #lapply(seq(m), function(yy) sample(c("character", "numeric", "logical"), size = 3, replace = TRUE))
+  xxx1[[1]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
+                   "\\.plotInitialTime\", \"character\", 1", xxx[[1]])
+  xxx1[[1]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
+                   "\\.saveInitialTime\", \"character\", FALSE", xxx1[[1]])
+  xxx1[[1]] <- gsub("\\.saveInterval\", \"numeric\", NA",
+                   "\\testtime\", \"logical\", NA_real_", xxx1[[1]])
+
+  xxx1[[2]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
+                   "\\.plotInitialTime\", \"character\", TRUE", xxx[[2]])
+  xxx1[[2]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
+                   "\\.saveInitialTime\", \"character\", 'c'", xxx1[[2]])
+  xxx1[[2]] <- gsub("\\.saveInterval\", \"numeric\", NA",
+                   "\\testtime\", \"character\", NA_real_", xxx1[[2]])
+
+  xxx1[[3]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
+                   "\\.plotInitialTime\", \"character\", 1", xxx[[3]])
+  xxx1[[3]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
+                   "\\hello\", \"character\", 1", xxx1[[3]])
+  xxx1[[3]] <- gsub("\\.saveInterval\", \"numeric\", NA",
+                   "\\testtime\", \"logical\", NA_real_", xxx1[[3]])
+  xxx1[[4]] <- xxx[[4]] # clean one
+
+  cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei2', 'numeric', '', ''),
+      expectsInput('ei3', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx1[[1]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co2', 'numeric', ''),
+      createsOutput('co3', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx1[[1]][(lineWithOutputObjects+1):lineWithInit], "
+      a <- sim$b
+      sim$g <- f
+      holy(sim$co4) <- f
+      moly(sim$aaa) <- f
+      fff <- sim$ei2
+      fff <- sim$co3
+      sim$co1 <- 123
+      xx <- c(1,2)
+      xx[sim$ei4] <- NA
+      ",
+      xxx1[[1]][(lineWithInit+1):lineWithDotInputObjects], "
+      a <- sim$b
+      sim$g <- 1
+      sim$ei1 <- 4
+      fff <- sim$ei1
+      fff <- sim$co3
+      sim$co1 <- 123
+      ",
+      xxx1[[1]][(lineWithDotInputObjects+1):length(xxx1[[1]])],
+      sep = "\n", fill = FALSE, file = fileNames[1])
+
+
+  cat(xxx1[[2]][1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx1[[2]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx1[[2]][(lineWithOutputObjects+1):lineWithInit], "
+      a <- sim$b
+      xx <- c(1,2)
+      xx[sim$ei4] <- NA
+      ",
+      xxx1[[2]][(lineWithInit+1):lineWithDotInputObjects], "
+      a <- sim$b
+      sim$co1 <- 123
+      ",
+      xxx1[[2]][(lineWithDotInputObjects+1):length(xxx1[[2]])],
+      sep = "\n", fill = FALSE, file = fileNames[2])
+
+  fullMessage <- c("defineParameter: 'plotInitialTime' is not of specified type 'character'",
+                   "defineParameter: 'saveInitialTime' is not of specified type 'character'",
+                   "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
+                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
+                   "test: module code: ei3 is declared in inputObjects, but is not used in the module",
+                   "test: module code: inputObjects: local variable.*a.*assigned but may not be used",
+                   "test: module code: inputObjects: local variable.*fff.*assigned but may not be used",
+                   "test: module code: Init: local variable.*a.*assigned but may not be used",
+                   "test: module code: Init: local variable.*fff.*assigned but may not be used",
+                   "test: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
+                   "test: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
+                   "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
+                   "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
+                   "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+                   "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
+                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
+                   "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
+                   "test2: module code: inputObjects: local variable.*a.*assigned but may not be used",
+                   "test2: module code: Init: local variable.*a.*assigned but may not be used",
+                   "test2: inputObjects: co1 is assigned to sim inside inputObjects, but is not declared in inputObjects",
+                   "test2: inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
+                   "test2: inputObjects: b is used from sim inside inputObjects, but is not declared in inputObjects",
+                   "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+                   "defineParameter: 'hello' is not of specified type 'character'",
+                   "Running inputObjects for test3", "test3: module code appears clean",
+                   "Running inputObjects for test4", "test4: module code appears clean"
+  )
+
+  for(y in 3:4) {
+    cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
+  }
+
+  mm1 <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
+  mm1 <- cleanMessage(mm1)
+  expect_true(all(unlist(lapply(fullMessage,
+                                function(x) any(grepl(mm1, pattern = x))))))
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
+  mm <- cleanMessage(mm)
+})
+
+
+test_that("Module code checking -- pipe with matrix product with backtick & data.table", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    detach("package:igraph")
+    setwd(cwd)
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  m <- "child4"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  xxx <- readLines(fileName)
+  lineWithInit <- grep(xxx, pattern = "^Init")
+  xxx1 <- xxx
+  cat(xxx[1:lineWithInit], "
+    checksums1 <- structure(list(result = c('OK', 'OK'),
+                                           expectedFile = c('Land_Cover_2010_TIFF.zip','NA_LandCover_2010_25haMMU.tif'),
+                                           actualFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif'),
+                                           checksum.x = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+                                           checksum.y = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+                                           algorithm.x = c('xxhash64', 'xxhash64'),
+                                           algorithm.y = c('xxhash64', 'xxhash64'),
+                                           renamed = c(NA, NA),
+                                           module = c('simplifyLCCVeg',  'simplifyLCCVeg')),
+                                      .Names = c('result', 'expectedFile', 'actualFile',
+                                                 'checksum.x', 'checksum.y', 'algorithm.x', 'algorithm.y', 'renamed',
+                                                 'module'),
+                                      row.names = c(NA, -2L),
+                                      class = c('grouped_df', 'tbl_df', 'tbl', 'data.frame'),
+                                      vars = 'expectedFile',
+                                      indices = list(0L, 1L),
+                                      group_sizes = c(1L, 1L),
+                                      biggest_group_size = 1L,
+                                      labels = structure(list(expectedFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif')),
+                                                         .Names = 'expectedFile',
+                                                         row.names = c(NA, -2L),
+                                                         class = 'data.frame', vars = 'expectedFile'))
+
+    result1 <- checksums1[checksums1$expectedFile == 'NA_LandCover_2010_25haMMU.tif',]$result
+
+    sim$bvcx <- matrix(1:2) %>% `%*%` (2:3)
+    sim$bvcx2 <- matrix(1:2) %>% \"%*%\" (2:3)
+    sim$b <- matrix(1:2) %>% t()
+
+    sim$a <- 1
+    ",
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- cleanMessage(mm)
+
+  fullMessage1 <- c("Running inputObjects for child4",
+                   "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
+                   "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
+  fullMessageNonInteractive <- c("Running inputObjects for child4",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx <- matrix.*",#possibly at .*147",
+                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx2 <- matrix.*",#possibly at .*148",
+                    "child4: module code: Init: local variable.*result1.*assigned but may not be used",
+                    "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
+  )
+  test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
+  test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
+  # if (grepl( "emcintir", Sys.info()["user"])) {
+  #   tmpFilename = "c:/Eliot/tmp/test1.txt"
+  #
+  #   cat("################### test1\n", file = tmpFilename, append = FALSE)
+  #   cat(paste(collapse = " ", lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+  #   cat("\n################### test2\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = " ", lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))), file = tmpFilename, append = TRUE)
+  #   cat("\n################### fullMessage1\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = "\n", fullMessage1), file = tmpFilename, append = TRUE)
+  #   cat("\n################### fullMessageNonInteractive\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = "\n", fullMessageNonInteractive), file = tmpFilename, append = TRUE)
+  #   cat("\n###################  mm\n", file = tmpFilename, append = TRUE)
+  #   cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
+  # }
+  expect_true(test1 || test2)
+
 })

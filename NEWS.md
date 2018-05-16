@@ -1,9 +1,34 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.1.1
+version 0.1.1.9000
 ==================
 
-* uses reproducible::Require instead of SpaDES.core::loadPackages to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`
+* new debugging -- if debug is not FALSE, then any error will trigger a browser call inside the event function. User can continue (c) or quit (Q) as per normal. c will trigger a reparse and events will continue as scheduled.
+* add package imports `tools`, `pryr`
+* removed package imports `rgeos`, `RCurl` and `googledrive` 
+* fix bug where `start` and `end` were not properly exported
+* introduction of code checking for modules, currently turned on or off by an option `spades.moduleCodeChecks`, which is `TRUE` by default. Code checking includes various types:
+    
+    - use `codetools` to check for various code problems
+    - detects conflicts with known common functions (`raster::level`, `raster::scale`, `quickPlot::Plot`)
+    - use `checkCodeEnv` on every function inside a module
+    - checking for `sim$xxx` occurrences in modules, comparing to `outputObjects` in metadata if used in assignment (i.e., left hand side of assign operator), or comparing to `inputObjects` if used on the right hand side
+    - check that all objects declared in `inputObjects` have default values assigned in the `.inputObjects` function
+    - messages colour coded, and separated by file with absolute path explicit
+    
+* option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
+* `newModule` template modified slightly based on workshop feedback
+* `setPaths` now only sets the directories that are passed into it
+* `downloadData` moved to SpaDES.tools
+* minor bug fixes
+* `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
+* module metadata now in *named* lists inside `depends(sim)`
+* remove `fileExt` -- use `tools::file_ext` instead
+
+version 0.1.1
+=============
+
+* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`
 * environments in modules are now as follows: 
     
     - Functions defined in a module are sourced into an environment located here: `sim@.envir$<moduleName>`, and it is a is a child of `sim@.envir`. Functions can be found in this environment, but prefixing functions is not necessary, because modules functions are within this environment already. 
@@ -15,7 +40,7 @@ version 0.1.1
 
 * speed improvements:
 
-    - the core DES is now built around lists, rather than data.table. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
+    - the core DES is now built around lists, rather than `data.table` objects. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
     - `.parseModule` and `.parseModuePartial` now put their parsed content into a temporary environment (`sim@.envir$.parsedFiles$<Full Filename>)` during the `simInit`, which gets re-used. Previously, files were parsed multiple times in a given `simInit` call. Several functions now have `envir` argument to pass this through (including `moduleVersion`, `packages`, `checkParams`)
 
 * parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the sim object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., `startSimPlus1 <- start(sim) + 1` can be defined in the module and used in `defineModule`

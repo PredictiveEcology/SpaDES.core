@@ -5,7 +5,6 @@ test_that("test checkpointing", {
   tmpdir <- file.path(tempdir(), "test_checkpoint") %>% checkPath(create = TRUE)
   file <- file.path("chkpnt.RData")
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)

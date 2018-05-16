@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run an experiment using <code><a href='spades.html'>spades</a></code> � experiment • SpaDES.core</title>
+<title>Run an experiment using <code><a href='spades.html'>spades</a></code> — experiment • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -360,7 +360,7 @@ database can only be written to one at a time, so there may be collisions.</p>
   <span class='co'>#   numerics here -- e.g., list(0.2, 0.23) for spreadprob in fireSpread module,</span>
   <span class='co'>#   but they can be anything, as long as it is a list.</span>
   <span class='no'>experimentParams</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>fireSpread</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>spreadprob</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='fl'>0.2</span>, <span class='fl'>0.23</span>),
-                                             <span class='kw'>nFires</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='fl'>20</span>, <span class='fl'>10</span>)),
+                                             <span class='kw'>nfires</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='fl'>20</span>, <span class='fl'>10</span>)),
                            <span class='kw'>caribouMovement</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>N</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='fl'>100</span>, <span class='fl'>1000</span>)))
 
   <span class='no'>sims</span> <span class='kw'>&lt;-</span> <span class='fu'>experiment</span>(<span class='no'>mySim</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='no'>experimentParams</span>)
@@ -369,9 +369,9 @@ database can only be written to one at a time, so there may be collisions.</p>
   <span class='fu'>attr</span>(<span class='no'>sims</span>, <span class='st'>"experiment"</span>)
 
   <span class='co'># Read in outputs from sims object</span>
-  <span class='no'>FireMaps</span> <span class='kw'>&lt;-</span> <span class='fu'>do.call</span>(<span class='no'>stack</span>, <span class='fu'>lapply</span>(<span class='fl'>1</span>:<span class='fu'>NROW</span>(<span class='fu'>attr</span>(<span class='no'>sims</span>, <span class='st'>"experiment"</span>)$<span class='no'>expDesign</span>),
-                                    <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>sims</span><span class='kw'>[[</span><span class='no'>x</span>]]$<span class='no'>landscape</span>$<span class='no'>Fires</span>))
-  <span class='kw'>if</span> (<span class='fu'>interactive</span>()) <span class='fu'>Plot</span>(<span class='no'>FireMaps</span>, <span class='kw'>new</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+  <span class='no'>fireMaps</span> <span class='kw'>&lt;-</span> <span class='fu'>do.call</span>(<span class='no'>stack</span>, <span class='fu'>lapply</span>(<span class='fl'>1</span>:<span class='fu'>NROW</span>(<span class='fu'>attr</span>(<span class='no'>sims</span>, <span class='st'>"experiment"</span>)$<span class='no'>expDesign</span>),
+                                    <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>sims</span><span class='kw'>[[</span><span class='no'>x</span>]]$<span class='no'>landscape</span>$<span class='no'>fires</span>))
+  <span class='kw'>if</span> (<span class='fu'>interactive</span>()) <span class='fu'>Plot</span>(<span class='no'>fireMaps</span>, <span class='kw'>new</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
   <span class='co'># Or reload objects from files, useful if sim objects too large to store in RAM</span>
   <span class='no'>caribouMaps</span> <span class='kw'>&lt;-</span> <span class='fu'>lapply</span>(<span class='no'>sims</span>, <span class='kw'>function</span>(<span class='no'>sim</span>) {
@@ -478,12 +478,12 @@ database can only be written to one at a time, so there may be collisions.</p>
   <span class='no'>landscapeFiles</span> <span class='kw'>&lt;-</span> <span class='fu'>dir</span>(<span class='fu'><a href='simList-accessors-paths.html'>outputPath</a></span>(<span class='no'>mySimNoRL</span>), <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>,
                         <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-  <span class='co'># Can read in Fires layers from disk since they were saved, or from the sims</span>
+  <span class='co'># Can read in fires layers from disk since they were saved, or from the sims</span>
   <span class='co'>#  object</span>
-  <span class='co'># Fires &lt;- lapply(sims, function(x) x$landscape$Fires) %&gt;% stack</span>
-  <span class='no'>Fires</span> <span class='kw'>&lt;-</span> <span class='fu'>lapply</span>(<span class='no'>landscapeFiles</span>, <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fu'>readRDS</span>(<span class='no'>x</span>)$<span class='no'>Fires</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/stack'>stack</a></span>()
-  <span class='no'>Fires</span>[<span class='no'>Fires</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>] <span class='kw'>&lt;-</span> <span class='fl'>1</span> <span class='co'># convert to 1s and 0s</span>
-  <span class='no'>fireProb</span> <span class='kw'>&lt;-</span> <span class='fu'>sum</span>(<span class='no'>Fires</span>) / <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/nlayers'>nlayers</a></span>(<span class='no'>Fires</span>) <span class='co'># sum them and convert to probability</span>
+  <span class='co'># fires &lt;- lapply(sims, function(x) x$landscape$fires) %&gt;% stack</span>
+  <span class='no'>fires</span> <span class='kw'>&lt;-</span> <span class='fu'>lapply</span>(<span class='no'>landscapeFiles</span>, <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fu'>readRDS</span>(<span class='no'>x</span>)$<span class='no'>fires</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/stack'>stack</a></span>()
+  <span class='no'>fires</span>[<span class='no'>fires</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>] <span class='kw'>&lt;-</span> <span class='fl'>1</span> <span class='co'># convert to 1s and 0s</span>
+  <span class='no'>fireProb</span> <span class='kw'>&lt;-</span> <span class='fu'>sum</span>(<span class='no'>fires</span>) / <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/nlayers'>nlayers</a></span>(<span class='no'>fires</span>) <span class='co'># sum them and convert to probability</span>
   <span class='kw'>if</span> (<span class='fu'>interactive</span>()) <span class='fu'>Plot</span>(<span class='no'>fireProb</span>, <span class='kw'>new</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
   <span class='co'># Example 9 - Pass in inputs, i.e., input data objects taken from disk</span>

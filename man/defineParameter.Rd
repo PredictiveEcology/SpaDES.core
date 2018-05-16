@@ -41,6 +41,11 @@ data.frame
 \description{
 Used to specify a parameter's name, value, and set a default.
 }
+\note{
+Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
+      real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
+      See \code{\link{NA}}.
+}
 \examples{
 parameters = rbind(
   defineParameter("lambda", "numeric", 1.23, desc = "intrinsic rate of increase"),

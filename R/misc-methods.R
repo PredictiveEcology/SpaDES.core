@@ -2,6 +2,23 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 }
 
+#' A slightly modified version of getOption
+#'
+#' This can take x as a character string or as a function that returns a character string.
+#'
+#' @inheritParams base::getOption
+#' @rdname spadesOptions
+#' @keywords internal
+.getOption <- function(x, default = NULL) {
+  optionDefault <- options(x)[[1]]
+  if (is.null(optionDefault)) optionDefault <- default
+  if (is.function(optionDefault)) {
+    optionDefault()
+  } else {
+    optionDefault
+  }
+}
+
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
@@ -168,7 +185,7 @@ setMethod(
     if (length(packageList)) {
       if (install) {
         repos <- getOption("repos")
-        if ( is.null(repos) | any(repos == "") ) {
+        if (is.null(repos) | any(repos == "")) {
           repos <- "https://cran.rstudio.com"
         }
         installed <- unname(installed.packages()[, "Package"])
@@ -180,11 +197,12 @@ setMethod(
                                         quiet = TRUE, warn.conflicts = FALSE))
       if (any(!loaded)) {
         alreadyLoaded <- unlist(lapply(packageList[!loaded], isNamespaceLoaded))
-        if(!all(alreadyLoaded)) {
+        if (!all(alreadyLoaded)) {
           stop("Some packages required for the simulation are not installed:\n",
              "    ", paste(names(loaded[-which(loaded)]), collapse = "\n    "))
         } else {
-          message("Older version(s) of ", paste(collapse = ", ", packageList[!loaded]), " already loaded")
+          message("Older version(s) of ",
+                  paste(collapse = ", ", packageList[!loaded]), " already loaded")
         }
       }
 
@@ -445,9 +463,9 @@ setMethod(
       # -------------------- #
       # using `inherits` doesn't work as expected in some cases,
       #  so we tweak the 'include' to work with those cases:
-      if ( ("numeric" %in% include) &
-           (inherits(get(w, envir = envir), "integer")) ) {
-             include <- c(include, "integer")
+      if (("numeric" %in% include) &
+          (inherits(get(w, envir = envir), "integer")) ) {
+        include <- c(include, "integer")
       }
       # --- end tweaking --- #
 
@@ -549,16 +567,17 @@ setMethod(
 #' Wrapper functions to access the packages options for default working directories.
 #'
 #' @param cachePath   The default local directory in which to cache simulation outputs.
-#'                    If not specified, defaults to \code{~/SpaDES/cache}.
+#'                    If not specified, defaults to \code{getOption("spades.cachePath")}.
 #'
 #' @param inputPath   The default local directory in which to look for simulation inputs
-#'                    If not specified, defaults to \code{~/SpaDES/inputs}.
+#'                    If not specified, defaults to \code{getOption("spades.inputPath")}.
 #'
-#' @param modulePath  The default local directory where modules and data will be downloaded and stored.
-#'                    If not specified, defaults to \code{~/SpaDES/modules}.
+#' @param modulePath  The default local directory where modules and data will be
+#'                    downloaded and stored.
+#'                    If not specified, defaults to \code{getOption("spades.modulePath")}.
 #'
 #' @param outputPath  The default local directory in which to save simulation outputs.
-#'                    If not specified, defaults to \code{~/SpaDES/outputs}.
+#'                    If not specified, defaults to \code{getOption("spades.outputPath")}.
 #'
 #' @return Returns a named list of the user's default working directories.
 #' \code{setPaths} is invoked for the side effect of setting these directories.
@@ -579,7 +598,7 @@ setMethod(
 #'
 .paths <- function() {
   list(
-    cachePath = getOption("spades.cachePath"),
+    cachePath = .getOption("spades.cachePath"),
     inputPath = getOption("spades.inputPath"),
     modulePath = getOption("spades.modulePath"),
     outputPath = getOption("spades.outputPath")
@@ -596,11 +615,12 @@ getPaths <- function() {
 #' @export
 #' @rdname setPaths
 #' @importFrom reproducible checkPath
+#' @importFrom R.utils getOption
 setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
-  if (missing(cachePath)) cachePath <- "~/SpaDES/cache"     # nolint
-  if (missing(inputPath)) inputPath <- "~/SpaDES/inputs"    # nolint
-  if (missing(modulePath)) modulePath <- "~/SpaDES/modules" # nolint
-  if (missing(outputPath)) outputPath <- "~/SpaDES/outputs" # nolint
+  if (missing(cachePath)) cachePath <- .getOption("spades.cachePath")     # nolint
+  if (missing(inputPath)) inputPath <- getOption("spades.inputPath")    # nolint
+  if (missing(modulePath)) modulePath <- getOption("spades.modulePath") # nolint
+  if (missing(outputPath)) outputPath <- getOption("spades.outputPath") # nolint
 
   options(spades.cachePath = cachePath, spades.inputPath = inputPath,
           spades.modulePath = modulePath, spades.outputPath = outputPath)

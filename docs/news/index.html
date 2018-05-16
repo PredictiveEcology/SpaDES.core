@@ -115,80 +115,6 @@
     </div>
 
     <div class="contents">
-    <div id="version-0-1-1" class="section level1">
-<h1 class="hasAnchor">
-<a href="#version-0-1-1" class="anchor"></a>version 0.1.1</h1>
-<ul>
-<li>uses reproducible::Require instead of SpaDES.core::loadPackages to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. <code>achubaty/amc@development</code>
-</li>
-<li>
-<p>environments in modules are now as follows:</p>
-<ul>
-<li>Functions defined in a module are sourced into an environment located here: <code>sim@.envir$&lt;moduleName&gt;</code>, and it is a is a child of <code>sim@.envir</code>. Functions can be found in this environment, but prefixing functions is not necessary, because modules functions are within this environment already.</li>
-<li>
-<code>sim@.envir</code> is a child of <code>SpaDES.core</code>
-</li>
-</ul>
-</li>
-<li>
-<p>scoping from within a function that is defined in a module is thus:</p>
-<ul>
-<li>
-<code>sim@.envir$&lt;moduleName&gt;</code> –&gt; <code>sim@.envir</code> –&gt; <code>SpaDES.core</code> –&gt; all imported packages including <code>base</code> –&gt; <code>.GlobalEnv</code> –&gt; <code>search()</code>
-</li>
-</ul>
-</li>
-<li>
-<p>speed improvements:</p>
-<ul>
-<li>the core DES is now built around lists, rather than data.table. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., <code><a href="../reference/simList-accessors-events.html">events(sim)</a></code>, <code><a href="../reference/simList-accessors-events.html">completed(sim)</a></code>) of the event queues still show <code>data.table</code> objects, but these are made on the fly.</li>
-<li>
-<code>.parseModule</code> and <code>.parseModuePartial</code> now put their parsed content into a temporary environment (<code>sim@.envir$.parsedFiles$&lt;Full Filename&gt;)</code> during the <code>simInit</code>, which gets re-used. Previously, files were parsed multiple times in a given <code>simInit</code> call. Several functions now have <code>envir</code> argument to pass this through (including <code>moduleVersion</code>, <code>packages</code>, <code>checkParams</code>)</li>
-</ul>
-</li>
-<li>parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the sim object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., <code>startSimPlus1 &lt;- start(sim) + 1</code> can be defined in the module and used in <code>defineModule</code>
-</li>
-<li>remove <code>grDevices</code> from Imports as it was not used (#1)</li>
-<li>remove <code>chron</code> and <code>CircStats</code> dependencies</li>
-<li>remove functions <code>dwrpnorm2</code> and move to package <code>SpaDES.tools</code>
-</li>
-<li>remove unused function <code>F()</code> due to conflicts with <code>F</code>/<code>FALSE</code>.</li>
-<li>improved download of module data: added new <code>quickCheck</code> argument</li>
-<li>improved download of modules: use fuzzy matching</li>
-<li>new option: <code>spades.switchPkgNamespaces</code> which allows the user to turn off the <code>SpaDES</code> feature that loads and unloads libraries specific to each module. While useful, it slows down computations, in some cases, by a lot.</li>
-<li>
-<p>bug fixes:</p>
-<ul>
-<li>in <code>zipModule</code> that omitted the checksum file from being included when <code>data = FALSE</code> (#3)</li>
-<li>caching of <code>.inputObjects</code> functions was evaluating outputObjects instead of inputObjects. Now corrected.</li>
-</ul>
-</li>
-<li>If <code>.inputObjects</code> contains arguments other than just sim, these will be evaluated as function inputs by the Cache mechanism (via .useCache), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in <code>asPath</code>, then any change to the underlying file will cause a re-cache. e.g., <code>.inputObjects &lt;- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }</code>
-</li>
-<li>default <code>debug</code> option in <code><a href="../reference/spades.html">spades()</a></code> now uses the package option <code>spades.debug</code> and default is set to <code>FALSE</code> (#5)</li>
-<li>various other speed improvements and bug fixes</li>
-<li>convert <code>P</code> to a function, rather than S4 generic and method, for speed.</li>
-<li>importFrom only used functions from <code>utils</code> due to name conflicts with <code><a href="http://www.rdocumentation.org/packages/raster/topics/stack">raster::stack</a></code> and <code><a href="http://www.rdocumentation.org/packages/utils/topics/stack">utils::stack</a></code>
-</li>
-<li>new function <code>remoteFileSize</code> to check the size of remote files</li>
-<li>new namespaced function <code>dataPath</code> will return <code>file.path(modulePath(sim), currentModule(sim), "data")</code>, which will return a different path, depending on which module it is placed inside.</li>
-<li>add crayon to imports – now messages are more colour coded</li>
-<li><p>bug fix in ‘inputs’ for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object</p></li>
-</ul>
-</div>
-    <div id="version-0-1-0" class="section level1">
-<h1 class="hasAnchor">
-<a href="#version-0-1-0" class="anchor"></a>version 0.1.0</h1>
-<ul>
-<li>
-<p>A new package, which takes all core DES functionality out of the <code>SpaDES</code> package:</p>
-<ul>
-<li>see <code><a href="../reference/SpaDES.core-package.html">?SpaDES.core</a></code> for an overview</li>
-</ul>
-</li>
-<li><p>various speed improvements and bug fixes</p></li>
-</ul>
-</div>
     </div>
   </div>
 
@@ -196,8 +122,6 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#version-0-1-1">0.1.1</a></li>
-        <li><a href="#version-0-1-0">0.1.0</a></li>
       </ul>
     </div>
   </div>

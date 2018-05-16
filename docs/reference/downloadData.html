@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Download module data � downloadData • SpaDES.core</title>
+<title>Download module data — downloadData • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -115,24 +115,27 @@
 
     
     <p>Download external data for a module if not already present in the module
-directory or if there is a checksum mismatch indicating that the file is not
+directory, or if there is a checksum mismatch indicating that the file is not
 the correct one.</p>
     
 
-    <pre class="usage"><span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for character,character,logical</span>
 <span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for character,missing,missing</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quickCheck</span>)
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quickCheck</span>,
+  <span class='no'>overwrite</span>)
 
 <span class='co'># S4 method for character,missing,logical</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quiet</span>, <span class='no'>quickCheck</span>)
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quiet</span>, <span class='no'>quickCheck</span>,
+  <span class='no'>overwrite</span>)
 
 <span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quickCheck</span>)</pre>
+<span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quickCheck</span>,
+  <span class='no'>overwrite</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -155,11 +158,27 @@ the correct one.</p>
 use <code>file.size</code> instead of <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>.
 This is faster, but potentially much less robust.</p></td>
     </tr>
+    <tr>
+      <th>overwrite</th>
+      <td><p>Logical. Should local data files be overwritten in case they exist?
+Default is FALSE</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Invisibly, a list of downloaded files.</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>downloadData</code> requires a checksums file to work, as it will only download
+ the files specified therein. Hence, module developers should make sure they
+ have manually downloaded all the necessary data and ran <code>checksums</code> to
+ build a checksums file.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <p><code><a href='checksums.html'>checksums</a></code> for building a checksums file.</p>
     
 
   </div>
@@ -169,6 +188,10 @@ This is faster, but potentially much less robust.</p></td>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
     <h2>Author</h2>
