@@ -9,11 +9,13 @@ output:
     self_contained: yes
     toc: yes
 vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{02 Building SpaDES modules}
   %\VignetteDepends{data.table, DiagrammeR, igraph, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Introduction
