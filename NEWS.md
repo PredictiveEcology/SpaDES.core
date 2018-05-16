@@ -3,10 +3,10 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.1.1.9000
 ==================
 
-* new debugging -- if debug is not FALSE, then any error will trigger a browser call inside the event function. User can continue (c) or quit (Q) as per normal. c will trigger a reparse and events will continue as scheduled.
-* add package imports `tools`, `pryr`
-* removed package imports `rgeos`, `RCurl` and `googledrive` 
-* fix bug where `start` and `end` were not properly exported
+## new features
+
+* module metadata now in *named* lists inside `depends(sim)`
+* new debugging -- if debug is not `FALSE`, then any error will trigger a `browser()` call inside the event function. User can continue (`c`) or quit (`Q`) as per normal. `c` will trigger a reparse and events will continue as scheduled.
 * introduction of code checking for modules, currently turned on or off by an option `spades.moduleCodeChecks`, which is `TRUE` by default. Code checking includes various types:
     
     - use `codetools` to check for various code problems
@@ -17,13 +17,25 @@ version 0.1.1.9000
     - messages colour coded, and separated by file with absolute path explicit
     
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
-* `newModule` template modified slightly based on workshop feedback
-* `setPaths` now only sets the directories that are passed into it
-* `downloadData` moved to SpaDES.tools
-* minor bug fixes
 * `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
-* module metadata now in *named* lists inside `depends(sim)`
+
+## deprecated, defunct, and removed features
+
 * remove `fileExt` -- use `tools::file_ext` instead
+* `downloadData` moved to SpaDES.tools
+
+## bug fixes
+
+* fix tests based on `data.table` changes (@mattdowle, #64).
+* re-export `start` and `end`.
+* `newModule` template modified slightly based on workshop feedback.
+* `setPaths` now only sets the directories that are passed into it
+* other minor bug fixes.
+
+## package dependency changes
+
+* add package imports `tools`, `pryr`.
+* removed package imports `rgeos`, `RCurl` and `googledrive`.
 
 version 0.1.1
 =============
