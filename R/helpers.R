@@ -227,21 +227,21 @@ setMethod(
 .pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
                              paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
 
-
 #' tryCatch that keeps warnings, errors and value (result)
 #'
 #' This is from https://stackoverflow.com/a/24569739/3890027
 #'
 #' @keywords internal
+#' @rdname tryCatch
 .tryCatch <- function(expr) {
   warn <- err <- NULL
   value <- withCallingHandlers(
-    tryCatch(expr, error=function(e) {
+    tryCatch(expr, error = function(e) {
       err <<- e
       NULL
-    }), warning=function(w) {
+    }), warning = function(w) {
       warn <<- w
       invokeRestart("muffleWarning")
     })
-  list(value=value, warning=warn, error=err)
+  list(value = value, warning = warn, error = err)
 }

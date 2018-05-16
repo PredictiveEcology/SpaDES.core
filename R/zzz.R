@@ -32,16 +32,19 @@
   invisible()
 }
 
+#' @importFrom reproducible normPath
 #' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
-    packageStartupMessage("Default paths for SpaDES directories set to:\n",
-                          "  cachePath:  ", normPath(.getOption("spades.cachePath")), "\n",
-                          "  inputPath:  ", normPath(getOption("spades.inputPath")), "\n",
-                          "  modulePath: ", normPath(getOption("spades.modulePath")), "\n",
-                          "  outputPath: ", normPath(getOption("spades.outputPath")), "\n",
-                          "These can be changed using 'setPaths()'. See '?setPaths'.")
+    packageStartupMessage(
+      "Default paths for SpaDES directories set to:\n",
+      "  cachePath:  ", reproducible::normPath(.getOption("spades.cachePath")), "\n",
+      "  inputPath:  ", reproducible::normPath(getOption("spades.inputPath")), "\n",
+      "  modulePath: ", reproducible::normPath(getOption("spades.modulePath")), "\n",
+      "  outputPath: ", reproducible::normPath(getOption("spades.outputPath")), "\n",
+      "These can be changed using 'setPaths()'. See '?setPaths'."
+    )
   }
 }
 
