@@ -14,7 +14,12 @@ test_that("simList object initializes correctly", {
   w <- getOption("width")
   options(width = 100L)
   out <- utils::capture.output(show(mySim))
-  expect_equal(length(out), 73)
+  
+  # data.table v1.11.0 no longer prints "NULL" data.table.
+  # See bug fix 8 in https://github.com/Rdatatable/data.table/blob/master/NEWS.md
+  nline <- if (out[60] == "NULL") 75 else 73
+
+  expect_equal(length(out), nline)
   options(width = w); rm(w)
 
   ### SLOT .envir
