@@ -93,7 +93,7 @@
 #'
 #' \subsection{3.4 Simulation paths}{
 #'   Accessor functions for the \code{paths} slot and its elements.
-#'   \tabular{lll}{
+#'   \tabular{ll}{
 #'      \code{\link{cachePath}} \tab Global simulation cache path.\cr
 #'      \code{\link{modulePath}} \tab Global simulation module path.\cr
 #'      \code{\link{inputPath}} \tab Global simulation input path.\cr
@@ -305,7 +305,7 @@
 #'   They are intended to make translations from \href{http://www.gowlland.ca/}{SELES}.
 #'   You must know how to use SELES for these to be useful:
 #'
-#'   \tabular{ll}{1
+#'   \tabular{ll}{
 #'     \code{\link[SpaDES.tools]{agentLocation}} \tab Agent location\cr
 #'     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a SpatialPointsDataFrame\cr
 #'     \code{\link[SpaDES.tools]{numAgents}} \tab Number of agents\cr

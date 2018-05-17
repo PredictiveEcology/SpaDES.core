@@ -53,5 +53,4 @@ Each event is represented by a \code{\link{data.table}} row consisting of:
 \author{
 Alex Chubaty
 }
-\keyword{datasets}
 \keyword{internal}

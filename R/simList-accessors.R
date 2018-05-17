@@ -1635,7 +1635,6 @@ setReplaceMethod(
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
 
-
     # keep named elements, use unnamed in remaining order:
     #  cache, input, module, output
     # if (length(na.omit(wh)) < length(value)) {

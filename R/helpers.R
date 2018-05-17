@@ -46,16 +46,19 @@
 .emptyEventListDT <- data.table(eventTime = integer(0L), moduleName = character(0L),
                                 eventType = character(0L), eventPriority = numeric(0L))
 
+#' @keywords internal
 #' @rdname emptyEventList
 #' @importFrom data.table data.table
 .singleEventListDT <- data.table(eventTime = integer(1L), moduleName = character(1L),
-                          eventType = character(1L), eventPriority = numeric(1L))
+                                 eventType = character(1L), eventPriority = numeric(1L))
 
+#' @keywords internal
 #' @rdname emptyEventList
 setGeneric(".emptyEventList", function(eventTime, moduleName, eventType, eventPriority) {
   standardGeneric(".emptyEventList")
 })
 
+#' @keywords internal
 #' @rdname emptyEventList
 #' @importFrom data.table set copy
 setMethod(
@@ -69,10 +72,10 @@ setMethod(
     set(eeldt, , "moduleName", moduleName)
     set(eeldt, , "eventType", eventType)
     set(eeldt, , "eventPriority", eventPriority)
-    eeldt
-    # don't set key because it is set later when used
+    eeldt # don't set key because it is set later when used
 })
 
+#' @keywords internal
 #' @rdname emptyEventList
 setMethod(
   ".emptyEventList",
@@ -82,6 +85,7 @@ setMethod(
     copy(.emptyEventListDT)
 })
 
+#' @keywords internal
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
 

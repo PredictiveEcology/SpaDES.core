@@ -2,7 +2,6 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables(".")
 }
 
-
 # These are known functions that will definitely cause conflicts unless they are
 # prefixed by their packages.
 conflictingFns <- c("\\<raster::levels\\>", "\\<raster::scale\\>", "\\<raster::which.max\\>")
@@ -24,9 +23,9 @@ clashingFnsSimple <- gsub(clashingFns, pattern = "^.*::", replacement = "\\\\<")
 clashingFnsSimple <- gsub(pattern = "\\\\<", clashingFnsSimple, replacement = "")
 clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = "")
 
-
 allCleanMessage <- "module code appears clean"
 cantCodeCheckMessage <- ": line could not be checked "
+
 #' Find all references to sim$
 #'
 #' @param envToFindSim An environment where sim is defined. This is used when
@@ -63,16 +62,15 @@ cantCodeCheckMessage <- ": line could not be checked "
 
       xAsString <- deparse(body(moduleEnv[[x]]))#, backtick = TRUE, control = "all")
 
-      if (identical(type, "returnSim")) { # returnSim case doesn't need to parse whole function, only last Number
+      if (identical(type, "returnSim")) {
+        # returnSim case doesn't need to parse whole function, only last Number
         xAsCall <- .isLastLineSim(x = x, xAsString = xAsString)
         y <- .findElement(xAsCall, type = type)
       } else {
-
         parsedXAsString <- tryCatch(parse(text = xAsString), error = function(yy) NULL)
 
         # In some cases, e.g., Jean Marchal's
-        if (is.null(parsedXAsString)>0) {
-
+        if (is.null(parsedXAsString) > 0) {
           deparseBody <- deparse(body(moduleEnv[[x]]))
           bb <- deparseBody[-c(1, length(deparseBody))]
           funStarts <- grep("^    [[:alpha:]]", bb)
@@ -80,7 +78,8 @@ cantCodeCheckMessage <- ": line could not be checked "
           funEnds <- funStarts - 1
 
           y <- lapply(seq(funStarts)[-length(funStarts)], function(yy) {
-            parsedXAsString <- tryCatch(parse(text = bb[seq(funStarts[yy], funEnds[yy + 1])]), error = function(yy) NULL)
+            parsedXAsString <- tryCatch(parse(text = bb[seq(funStarts[yy], funEnds[yy + 1])]),
+                                        error = function(yy) NULL)
             if (!is.null(parsedXAsString)) {
               xAsCall <- as.call(parsedXAsString)
               if (identical(type, "returnSim")) {
@@ -123,7 +122,6 @@ cantCodeCheckMessage <- ": line could not be checked "
       }
       y
     }
-
   })))
   if (is.null(out)) out <- character()
   return(out)
@@ -160,14 +158,16 @@ cantCodeCheckMessage <- ": line could not be checked "
 
       unique(c(out, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "assignToSim")) {
-      if (identical(x[[1]], quote(`<-`)) && (any(grepl(x, pattern = paste(mustAssignToSim, collapse="|"))))) {
+      if (identical(x[[1]], quote(`<-`)) &&
+          (any(grepl(x, pattern = paste(mustAssignToSim, collapse = "|"))))) {
         if (identical(x[[2]], quote(sim))) {
           out <- character()
           x <- "" # clear x so it doesn't go any further in these cases
         } else {
           out <- character()
         }
-      } else if (is.name(x[[1]]) & (any(grepl(x[[1]], pattern = paste(mustAssignToSim, collapse="|"))))) {
+      } else if (is.name(x[[1]]) &
+                 (any(grepl(x[[1]], pattern = paste(mustAssignToSim, collapse = "|"))))) {
         out <- as.character(x[[1]])
         x <- "" # clear x so it doesn't go any further in these cases
       } else {
@@ -188,7 +188,8 @@ cantCodeCheckMessage <- ": line could not be checked "
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
             }
           } else {
-            if (identical(as.character(x[[2]])[1], "[") | identical(as.character(x[[2]])[1], "[[")) {
+            if (identical(as.character(x[[2]])[1], "[") |
+                identical(as.character(x[[2]])[1], "[[")) {
               assigner <- TRUE
             } else {
               assigner <- FALSE
@@ -208,7 +209,8 @@ cantCodeCheckMessage <- ": line could not be checked "
       }
       unique(c(out, unlist(lapply(x, .findElement, type = type))))
     } else if (identical(type, "globals")) {
-      if (identical(x[[1]], quote(`<-`)) && is.call(x[[2]])) { # left side function assign
+      if (identical(x[[1]], quote(`<-`)) && is.call(x[[2]])) {
+        # left side function assign
 
         # This labels it with an assignment arrow -- e.g., levels<-
         out <- paste0(as.character(x[[2]][[1]]), as.character(x)[[1]])
@@ -231,7 +233,8 @@ cantCodeCheckMessage <- ": line could not be checked "
         out <- character()
       }
       unique(c(out, unlist(lapply(x, .findElement, type = type))))
-    } else { # all other cases, just return empty
+    } else {
+      # all other cases, just return empty
       out <- character()
       unique(c(out, unlist(lapply(x, .findElement, type = type))))
     }
@@ -242,8 +245,6 @@ cantCodeCheckMessage <- ": line could not be checked "
          call. = FALSE)
   }
 }
-
-
 
 #' Runs a series of code checks during simInit
 #'
@@ -262,12 +263,13 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @keywords internal
 #' @rdname runCodeChecks
 .runCodeChecks <- function(sim, m, k, hadPrevMessage = FALSE) {
-
   inputObjNames <- na.omit(sim@depends@dependencies[[k]]@inputObjects$objectName)
   outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
+
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
   simAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
   simAssigns <- simAssigns[!(simAssigns %in% ignoreObjectsAssign)]
+
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
   simGets <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "get")
   simGets <- simGets[!(simGets %in% ignoreObjectsGet)]
@@ -312,8 +314,6 @@ cantCodeCheckMessage <- ": line could not be checked "
                             collapse = "\n")
                       )
       })
-
-
     }
 
     allChecks[anyCantCodeCheck] <- lapply(names(cantCodeCheck[anyCantCodeCheck]), function(objName) {
@@ -323,20 +323,21 @@ cantCodeCheckMessage <- ": line could not be checked "
     list2env(allChecks, envir = environment())
   }
 
-  simAssignsInDotInputObjects <- simAssigns[names(simAssigns)==".inputObjects"]
-  simAssignsNotInDotInputObjects <- simAssigns[names(simAssigns)!=".inputObjects"]
-  simGetsInDotInputObjects <- simGets[names(simGets)==".inputObjects"]
-  simGetsNotInDotInputObjects <- simGets[names(simGets)!=".inputObjects"]
+  simAssignsInDotInputObjects <- simAssigns[names(simAssigns) == ".inputObjects"]
+  simAssignsNotInDotInputObjects <- simAssigns[names(simAssigns) != ".inputObjects"]
+  simGetsInDotInputObjects <- simGets[names(simGets) == ".inputObjects"]
+  simGetsNotInDotInputObjects <- simGets[names(simGets) != ".inputObjects"]
 
   #############################################################
   ###### Key fns return sim ###################################
   #############################################################
   if (!all(returnsSim)) {
     verb <- .verb(returnsSim)
-    hadPrevMessage <- .parseMessage(m, "module code",
-                                     paste0(paste(names(returnsSim), collapse = ", "),
-                                            " must return the sim, e.g., return(invisible(sim))"
-                                     ))
+    hadPrevMessage <- .parseMessage(
+      m, "module code",
+      paste0(paste(names(returnsSim), collapse = ", "),
+             " must return the sim, e.g., return(invisible(sim))")
+    )
 
   }
 
@@ -345,19 +346,19 @@ cantCodeCheckMessage <- ": line could not be checked "
   #############################################################
   if (length(assignToSim)) {
     verb <- .verb(assignToSim)
-    hadPrevMessage <- .parseMessage(m, "module code",
-                                     paste0(paste(assignToSim, collapse = ", "),
-                                            " inside ", paste(names(assignToSim), collapse = ", "),
-                                            " must assign to the sim, e.g., sim <- scheduleEvent(sim, ...)"
-                                     ))
-
+    hadPrevMessage <- .parseMessage(
+      m, "module code",
+      paste0(paste(assignToSim, collapse = ", "),
+             " inside ", paste(names(assignToSim), collapse = ", "),
+             " must assign to the sim, e.g., sim <- scheduleEvent(sim, ...)")
+    )
   }
 
   #############################################################
   ###### Sim Assignments ######################################
   #############################################################
   # 1
-  if (length(outputObjNames)) { #
+  if (length(outputObjNames)) {
     missingFrmMod <- outputObjNames[!(outputObjNames) %in% simAssignsNotInDotInputObjects]
     missingFrmMod <- unique(missingFrmMod)
     if (length(missingFrmMod)) {
@@ -377,11 +378,12 @@ cantCodeCheckMessage <- ": line could not be checked "
     missingFrmMod <- unique(missingFrmMod)
     if (length(missingFrmMod)) {
       verb <- .verb(missingFrmMod)
-      hadPrevMessage <- .parseMessage(m, "module code",
-                                       paste0(paste(missingFrmMod, collapse = ", "),
-                                              " ",verb," declared in inputObjects, ",
-                                              "but no default(s) ", verb, " provided in .inputObjects"
-                                       ))
+      hadPrevMessage <- .parseMessage(
+        m, "module code",
+        paste0(paste(missingFrmMod, collapse = ", "),
+               " ",verb," declared in inputObjects, ",
+               "but no default(s) ", verb, " provided in .inputObjects")
+      )
     }
 
     # inputObjects -- Gets
@@ -429,14 +431,15 @@ cantCodeCheckMessage <- ": line could not be checked "
     names(theFns) <- theFns
     whichFnsWithPackage <- conflictingFnsClean[conflictingFnsSimple %in% hasConflicts]
     verb <- .verb(length(whichFnsWithPackage))
-    hadPrevMessage <-
-      .parseMessage(m, "module code", paste0("the following function(s) ", verb,
-                                             " used that conflict(s)",
-                                             "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
-                                             "\n  It is a good idea to be explicit about the package sources",
-                                             ", e.g., ", paste(whichFnsWithPackage, collapse = ", "),
-                                             " but only for the 'get' functions, not the 'set' function ","
-                                             (e.g., don't change when on the left hand side of an assignement operator)"))
+    hadPrevMessage <- .parseMessage(
+      m, "module code",
+      paste0("the following function(s) ", verb, " used that conflict(s)",
+             "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
+             "\n  It is a good idea to be explicit about the package sources",
+             ", e.g., ", paste(whichFnsWithPackage, collapse = ", "),
+             " but only for the 'get' functions, not the 'set' function ","
+             (e.g., don't change when on the left hand side of an assignement operator)")
+    )
   }
 
   if (length(simAssigns)) {
@@ -454,10 +457,14 @@ cantCodeCheckMessage <- ": line could not be checked "
       verbs <- lapply(missingInMetadataByFn, .verb)
       hadPrevMessage <- any(unlist(
         lapply(names(missingInMetadataByFn), function(fn)
-          .parseMessage(m, "outputObjects", paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
-                                                  " ",verbs[[fn]]," assigned to sim inside ",
-                                                  fn, ", but ",verbs[[fn]]," not declared in outputObjects"
-          )))))
+          .parseMessage(
+            m, "outputObjects",
+            paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
+                   " ",verbs[[fn]]," assigned to sim inside ",
+                   fn, ", but ",verbs[[fn]]," not declared in outputObjects")
+          )
+        )
+      ))
     }
 
     # Now do .inputObjects, i.e., inputObjects
@@ -467,10 +474,14 @@ cantCodeCheckMessage <- ": line could not be checked "
       verbs <- lapply(missingInMetadataByFn, .verb)
       hadPrevMessage <- any(unlist(
         lapply(names(missingInMetadataByFn), function(fn)
-          .parseMessage(m, "inputObjects", paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
-                                                  " ",verbs[[fn]]," assigned to sim inside ",
-                                                  fn, ", but ",verbs[[fn]]," not declared in inputObjects"
-          )))))
+          .parseMessage(
+            m, "inputObjects",
+            paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
+                   " ",verbs[[fn]]," assigned to sim inside ",
+                   fn, ", but ",verbs[[fn]]," not declared in inputObjects")
+          )
+        )
+      ))
     }
   }
 
@@ -480,17 +491,20 @@ cantCodeCheckMessage <- ": line could not be checked "
   # compare to inputObjNames -- this is about inputs
   if (length(simGets)) {
     missingInMetadata <- simGetsNotInDotInputObjects[!(simGetsNotInDotInputObjects %in%
-                                            c(inputObjNames, outputObjNames))]
+                                                         c(inputObjNames, outputObjNames))]
     if (length(missingInMetadata)) {
-
       missingInMetadataByFn <- tapply(missingInMetadata, names(missingInMetadata), unique)
       verbs <- lapply(missingInMetadataByFn, .verb)
       hadPrevMessage <- any(unlist(
         lapply(names(missingInMetadataByFn), function(fn)
-          .parseMessage(m, "inputObjects", paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
-                                                   " ",verbs[[fn]]," used from sim inside ",
-                                                   fn, ", but ",verbs[[fn]]," not declared in inputObjects"
-          )))))
+          .parseMessage(
+            m, "inputObjects",
+            paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
+                   " ",verbs[[fn]]," used from sim inside ",
+                   fn, ", but ",verbs[[fn]]," not declared in inputObjects")
+          )
+        )
+      ))
     }
 
     # Now do .inputObjects, i.e., inputObjects
@@ -569,7 +583,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @keywords internal
 #' @rdname verb
 .verb <- function(item) {
-  c("is", "are")[1 + as.numeric(length(item)>1)]
+  c("is", "are")[1 + as.numeric(length(item) > 1)]
 }
 
 #' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
@@ -603,7 +617,8 @@ cantCodeCheckMessage <- ": line could not be checked "
     if (type == "assign") {
       if (is.name(x)) {
         out <- character()
-      } else if (identical(as.character(x)[1], "[") | identical(as.character(x)[1], "[[")) {
+      } else if (identical(as.character(x)[1], "[") |
+                 identical(as.character(x)[1], "[[")) {
         out <- character()
       } else {
         out <- .findElement(x, type = "get")
@@ -619,7 +634,7 @@ cantCodeCheckMessage <- ": line could not be checked "
   if (grepl(x, pattern = mustBeReturnSim)) {
     # only pull out last line
     # must end with sim or return(sim) or return(invisible(sim))
-    xAsString <- xAsString[length(xAsString)-1]
+    xAsString <- xAsString[length(xAsString) - 1]
     xAsCall <- as.call(parse(text = xAsString))
   } else {
     xAsCall <- ""
@@ -633,13 +648,15 @@ cantCodeCheckMessage <- ": line could not be checked "
     pd <- sim@.envir[[module]][["._parsedData"]]
   }
   lineNumbers <- lapply(seq(namedTxt), function(patternIndex) {
-
-    wh <- which(grepl(pattern = paste0("\\b", namedTxt[patternIndex], "\\b"), pd$text) & (pd$line1 == pd$line2) & (pd$token == "expr"))
+    wh <- which(grepl(pattern = paste0("\\b", namedTxt[patternIndex], "\\b"), pd$text) &
+                  (pd$line1 == pd$line2) & (pd$token == "expr"))
     if (length(wh) == 0) {
-      wh <- which(agrepl(pattern = paste0(namedTxt[patternIndex]), pd$text) & (pd$line1 == pd$line2) & (pd$token == "expr"))
+      wh <- which(agrepl(pattern = paste0(namedTxt[patternIndex]), pd$text) &
+                    (pd$line1 == pd$line2) & (pd$token == "expr"))
     }
 
-    outerWh <- which(grepl(paste0("\\b", names(namedTxt)[patternIndex], "\\b"), pd$text) & (pd$token == "expr"))
+    outerWh <- which(grepl(paste0("\\b", names(namedTxt)[patternIndex], "\\b"), pd$text) &
+                       (pd$token == "expr"))
     linesWithFail <- unique(pd[wh, "line1"])
     #unique(pd[outerWh, "line1"])
 
@@ -651,8 +668,6 @@ cantCodeCheckMessage <- ": line could not be checked "
     if (length(linesWithFail) == length(namedTxt[patternIndex]))
       names(linesWithFail) <- namedTxt[patternIndex]
     unlist(linesWithFail)
-
   })
   unlist(lineNumbers)
-
 }

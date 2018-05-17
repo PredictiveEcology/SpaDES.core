@@ -41,7 +41,7 @@ if (getRversion() >= "3.1.0") {
 #'   determines time unit \tab takes time units of modules
 #'       and how they fit together \tab \code{times} or automatic \cr
 #'   runs \code{.inputObjects} functions \tab from every module
-#'     \emph{in the module order as determined above} \tab automatic
+#'     \emph{in the module order as determined above} \tab automatic \cr
 #'   }
 #' }
 #'
