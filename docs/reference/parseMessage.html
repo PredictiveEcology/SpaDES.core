@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Copy for simList class objects — Copy,simList-method • SpaDES.core</title>
+<title>Prepend module name to a message — .parseMessage • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -28,15 +28,9 @@
 
 
 
-<meta property="og:title" content="Copy for simList class objects — Copy,simList-method" />
+<meta property="og:title" content="Prepend module name to a message — .parseMessage" />
 
-<meta property="og:description" content="Because a simList works with an environment to hold all objects,
-all objects within that slot are pass-by-reference. That means
-it is not possible to simply copy an object with an assignment operator:
-the two objects will share the same objects. As one simList object changes
-so will the other. when this is not the desired behaviour, use this function.
-NOTE: use capital C, to limit confusion with data.table::copy()
-See Copy." />
+<meta property="og:description" content="Also makes it blue." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -128,49 +122,35 @@ See Copy." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Copy for simList class objects</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/copy.R'><code>R/copy.R</code></a></small>
-    <div class="hidden name"><code>Copy.Rd</code></div>
+    <h1>Prepend module name to a message</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/code-checking.R'><code>R/code-checking.R</code></a></small>
+    <div class="hidden name"><code>parseMessage.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Because a simList works with an environment to hold all objects,
-all objects within that slot are pass-by-reference. That means
-it is not possible to simply copy an object with an assignment operator:
-the two objects will share the same objects. As one simList object changes
-so will the other. when this is not the desired behaviour, use this function.
-NOTE: use capital C, to limit confusion with <code><a href='http://www.rdocumentation.org/packages/data.table/topics/copy'>data.table::copy()</a></code>
-See <code><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></code>.</p>
+    <p>Also makes it blue.</p>
     
     </div>
 
-    <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>Copy</span>(<span class='no'>object</span>, <span class='no'>objects</span>, <span class='no'>queues</span>)</pre>
+    <pre class="usage"><span class='fu'>.parseMessage</span>(<span class='no'>m</span>, <span class='no'>problem</span>, <span class='no'>message</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>An R object (likely containing environments) or an environment.</p></td>
+      <th>m</th>
+      <td><p>module name</p></td>
     </tr>
     <tr>
-      <th>objects</th>
-      <td><p>Whether the objects contained within the simList environment
-should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
-    </tr>
-    <tr>
-      <th>queues</th>
-      <td><p>Logical. Should the events queues (<code>events</code>,
-<code>current</code>, <code>completed</code>) be deep copied via
-<code><a href='http://www.rdocumentation.org/packages/data.table/topics/copy'>data.table::copy</a></code></p></td>
+      <th>message</th>
+      <td><p>rest of message</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <div class='dont-index'><p><code><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></code></p></div>
+    <p>A message with that starts with paste0(m, ":", message)</p>
     
 
   </div>
@@ -179,12 +159,8 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#value">Value</a></li>
           </ul>
-
-    <h2>Author</h2>
-    
-Eliot McIntire
 
   </div>
 </div>

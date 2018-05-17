@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Copy for simList class objects — Copy,simList-method • SpaDES.core</title>
+<title>Find all references to sim$ — .findElementsInEnv • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -28,15 +28,11 @@
 
 
 
-<meta property="og:title" content="Copy for simList class objects — Copy,simList-method" />
+<meta property="og:title" content="Find all references to sim$ — .findElementsInEnv" />
 
-<meta property="og:description" content="Because a simList works with an environment to hold all objects,
-all objects within that slot are pass-by-reference. That means
-it is not possible to simply copy an object with an assignment operator:
-the two objects will share the same objects. As one simList object changes
-so will the other. when this is not the desired behaviour, use this function.
-NOTE: use capital C, to limit confusion with data.table::copy()
-See Copy." />
+<meta property="og:description" content="Find all references to sim$
+.parsingSim will pull out the various ways to use sim, e.g.,
+sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -128,49 +124,70 @@ See Copy." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Copy for simList class objects</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/copy.R'><code>R/copy.R</code></a></small>
-    <div class="hidden name"><code>Copy.Rd</code></div>
+    <h1>Find all references to sim$</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/code-checking.R'><code>R/code-checking.R</code></a></small>
+    <div class="hidden name"><code>findElements.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Because a simList works with an environment to hold all objects,
-all objects within that slot are pass-by-reference. That means
-it is not possible to simply copy an object with an assignment operator:
-the two objects will share the same objects. As one simList object changes
-so will the other. when this is not the desired behaviour, use this function.
-NOTE: use capital C, to limit confusion with <code><a href='http://www.rdocumentation.org/packages/data.table/topics/copy'>data.table::copy()</a></code>
-See <code><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></code>.</p>
+    <p>Find all references to sim$</p>
+<p><code>.parsingSim</code> will pull out the various ways to use sim, e.g.,
+<code><a href='objects.html'>sim$xxx</a></code>, <code><a href='objects.html'>sim[['xxx']]</a></code>, <code><a href='objects.html'>sim[[P(sim)$xxx]]</a></code></p>
     
     </div>
 
-    <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>Copy</span>(<span class='no'>object</span>, <span class='no'>objects</span>, <span class='no'>queues</span>)</pre>
+    <pre class="usage"><span class='fu'>.findElementsInEnv</span>(<span class='kw'>envToFindSim</span> <span class='kw'>=</span> <span class='fu'>parent.frame</span>(),
+  <span class='kw'>moduleEnv</span> <span class='kw'>=</span> <span class='fu'>parent.frame</span>(), <span class='no'>type</span>)
+
+<span class='fu'>.findElement</span>(<span class='no'>x</span>, <span class='no'>type</span>)
+
+<span class='fu'>.parsingSim</span>(<span class='no'>x</span>, <span class='no'>type</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>An R object (likely containing environments) or an environment.</p></td>
+      <th>envToFindSim</th>
+      <td><p>An environment where sim is defined. This is used when
+the element accessing the simList is actually a call, e.g.,
+<code><a href='objects.html'>sim[[P(sim)$stackName]]</a></code></p></td>
     </tr>
     <tr>
-      <th>objects</th>
-      <td><p>Whether the objects contained within the simList environment
-should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
+      <th>moduleEnv</th>
+      <td><p>The environment where the module functions are</p></td>
     </tr>
     <tr>
-      <th>queues</th>
-      <td><p>Logical. Should the events queues (<code>events</code>,
-<code>current</code>, <code>completed</code>) be deep copied via
-<code><a href='http://www.rdocumentation.org/packages/data.table/topics/copy'>data.table::copy</a></code></p></td>
+      <th>type</th>
+      <td><p>Either "get", "assign", or "globals". See details.</p></td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td><p>A call in which to search for sim</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <div class='dont-index'><p><code><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></code></p></div>
+    <p>A character string with all sim objects found</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>.findElementsInEnv</code> is a wrapper around <code>.findElements</code>. It will convert
+function code to a call, and then pass it to <code>.findElements</code>. It also does
+some cleaning for duplications, <code>NA</code> values, and cases where the element
+inside a <code><a href='objects.html'>sim[["xxx"]]</a></code> is a variable that should be evaluated, rather than
+simply taken verbatim (e.g., <code>sim[[P(sim)$stackName]])</code>.</p>
+<p>When <b><code>type = "get"</code></b>, the function scans for sim$xxx or sim[["xxx"]]] on
+the RHS of an assignment operator or when there is no assignment. When
+<b><code>type = "assign"</code></b>, the function scans for sim$xxx or sim[['xxx']] on the
+LHS of an assignment operator. When <b><code>type = "globals"</code></b>, the function
+scans for all functions (i.e., "globals") being used. This is similar to
+<code><a href='http://www.rdocumentation.org/packages/codetools/topics/findGlobals'>findGlobals</a></code>, but faster.</p>
+<p><code>.findElement</code> will omit whatever it finds inside a <code>is.null</code>, when
+<code>type = "assign"</code>. Usually this is a test of existence of that object, in
+order to assign to that object. It is only reading it to determine whether or
+not it should write to it.</p>
     
 
   </div>
@@ -179,7 +196,9 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
           </ul>
 
     <h2>Author</h2>

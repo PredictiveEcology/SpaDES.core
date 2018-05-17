@@ -18,13 +18,29 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Use Pattern Oriented Modeling to fit unknown parameters — POM" />
+
+<meta property="og:description" content="This is very much in alpha condition. It has been tested on simple problems,
+as shown in the examples, with up to 2 parameters.
+It appears that DEoptim is the superior package for the stochastic problems.
+This should be used with caution as with all optimization routines. This function
+can nevertheless take optim or genoud as optimizers, using
+stats::optim or rgenoud::genoud, respectively.
+However, these latter approaches do not seem appropriate for stochastic problems,
+and have not been widely tested and are not supported within POM." />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +50,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +73,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1.9012</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +106,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +118,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,12 +126,15 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Use Pattern Oriented Modeling to fit unknown parameters</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/POM.R'><code>R/POM.R</code></a></small>
+    <div class="hidden name"><code>POM.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>This is very much in alpha condition. It has been tested on simple problems,
 as shown in the examples, with up to 2 parameters.
@@ -123,6 +145,7 @@ can nevertheless take <code>optim</code> or <code>genoud</code> as optimizers, u
 However, these latter approaches do not seem appropriate for stochastic problems,
 and have not been widely tested and are not supported within <code>POM</code>.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>POM</span>(<span class='no'>sim</span>, <span class='no'>params</span>, <span class='kw'>objects</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>objFn</span>, <span class='no'>cl</span>, <span class='kw'>optimizer</span> <span class='kw'>=</span> <span class='st'>"DEoptim"</span>,
   <span class='kw'>sterr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>, <span class='kw'>objFnCompare</span> <span class='kw'>=</span> <span class='st'>"MAD"</span>, <span class='kw'>optimControl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -134,7 +157,7 @@ and have not been widely tested and are not supported within <code>POM</code>.</
   <span class='kw'>optimControl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>NaNRetries</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>logObjFnVals</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>weights</span>,
   <span class='kw'>useLog</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -249,7 +272,8 @@ into the control of the optimizer.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>There are two ways to use this function, via 1) <code>objFn</code> or 2) <code>objects</code>.</p><ol>
+    <p>There are two ways to use this function, via 1) <code>objFn</code> or 2) <code>objects</code>.</p>
+<ol>
 <li><p>The user can pass the entire objective function to the <code>objFn</code>
   argument that will be passed directly to the <code>optimizer</code>.
   For this, the user will likely need to pass named objects as part of the <code>...</code>.</p></li>
@@ -269,8 +293,8 @@ metadata in the module. Thus, if the module metadata does not define the
 upper and lower limits, or these are very wide, then the optimization
 may have troubles. Currently, there is no way to override these upper
 and lower limits; the module metadata should be changed if there needs
-to be different parameter limits for optimization.
-    <code>objects</code> is a named list of data--pattern pairs.
+to be different parameter limits for optimization.</p>
+<p><code>objects</code> is a named list of data--pattern pairs.
 Each of these pairs will be assessed against one another using
 the <code>objFnCompare</code>, after standardizing each independently. The
 standardization, which only occurs if the abs(data value &lt; 1),
@@ -319,8 +343,8 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='spades.html'>spades</a></code>, <code><a href='http://www.rdocumentation.org/packages/parallel/topics/makeCluster'>makeCluster</a></code>,
-<code><a href='simInit.html'>simInit</a></code></p>
+    <div class='dont-index'><p><code><a href='spades.html'>spades</a></code>, <code><a href='http://www.rdocumentation.org/packages/parallel/topics/makeCluster'>makeCluster</a></code>,
+<code><a href='simInit.html'>simInit</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -528,5 +552,8 @@ Eliot McIntire
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

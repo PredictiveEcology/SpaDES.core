@@ -18,13 +18,35 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Categorized overview of the <code>SpaDES.core</code> package — SpaDES.core-package" />
+
+<meta property="og:description" content="
+This package allows implementation a variety of simulation-type models,
+with a focus on spatially explicit models.
+The core simulation components are built upon a discrete event simulation
+framework that facilitates modularity, and easily enables the user to
+include additional functionality by running user-built simulation modules.
+Included are numerous tools to visualize various spatial data formats,
+as well as non-spatial data. Much work has been done to speed up the core
+of the DES, with current benchmarking as low as 700 microseconds overhead for
+each event (including queuing, sorting, spawning event etc.).
+Bug reports: https://github.com/PredictiveEcology/SpaDES.core/issues
+Module repository: https://github.com/PredictiveEcology/SpaDES-modules
+Wiki: https://github.com/PredictiveEcology/SpaDES/wiki
+------------------------------------------------------------------------------------------" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +56,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +79,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1.9012</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +112,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +124,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,12 +132,15 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Categorized overview of the <code>SpaDES.core</code> package</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/spades-core-package.R'><code>R/spades-core-package.R</code></a></small>
+    <div class="hidden name"><code>SpaDES.core-package.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p><img src='figures/SpaDES.png' width=100 alt="SpaDES logo" align="right" /></p>
 <p>This package allows implementation a variety of simulation-type models,
@@ -129,142 +157,95 @@ each event (including queuing, sorting, spawning event etc.).</p>
 <p>Wiki: <a href='https://github.com/PredictiveEcology/SpaDES/wiki'>https://github.com/PredictiveEcology/SpaDES/wiki</a></p>
 <p>------------------------------------------------------------------------------------------</p>
     
+    </div>
 
         
-    <h2 class="hasAnchor" id="-spatial-discrete-event-simulation-code-spades-code-"><a class="anchor" href="#-spatial-discrete-event-simulation-code-spades-code-"></a>1 Spatial discrete event simulation (&lt;code&gt;SpaDES&lt;/code&gt;)</h2>
+    <h2 class="hasAnchor" id="-spatial-discrete-event-simulation-spades-"><a class="anchor" href="#-spatial-discrete-event-simulation-spades-"></a>1 Spatial discrete event simulation (<code>SpaDES</code>)</h2>
 
     
-    <p>A collection of top-level functions for doing spatial discrete event simulation.</p><h3>1.1 Simulations</h3>
+    <p>A collection of top-level functions for doing spatial discrete event simulation.</p>
+<h3>1.1 Simulations</h3>
     There are two workhorse functions that initialize and run a simulation, and
   third function for doing multiple spades runs:
-    <table><tr><td>
-    <code><a href='simInit.html'>simInit</a></code> </td>
-<td> Initialize a new simulation</td>
-</tr><tr><td>
-    <code><a href='spades.html'>spades</a></code> </td>
-<td> Run a discrete event simulation</td>
-</tr><tr><td>
-    <code><a href='experiment.html'>experiment</a></code> </td>
-<td> Run multiple <code><a href='spades.html'>spades</a></code> calls</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='simInit.html'>simInit</a></code></td><td>Initialize a new simulation</td></tr>
+<tr><td><code><a href='spades.html'>spades</a></code></td><td>Run a discrete event simulation</td></tr>
+<tr><td><code><a href='experiment.html'>experiment</a></code></td><td>Run multiple <code><a href='spades.html'>spades</a></code> calls</td></tr>
+</table>
     <h3>1.2 Events</h3>
     Within a module, important simulation functions include:
-    <table><tr><td>
-    <code><a href='scheduleEvent.html'>scheduleEvent</a></code> </td>
-<td> Schedule a simulation event</td>
-</tr><tr><td>
-    <code>removeEvent</code> </td>
-<td> Remove an event from the simulation queue (not yet implemented)</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='scheduleEvent.html'>scheduleEvent</a></code></td><td>Schedule a simulation event</td></tr>
+<tr><td><code>removeEvent</code></td><td>Remove an event from the simulation queue (not yet implemented)</td></tr>
+</table>
     
-    <h2 class="hasAnchor" id="-the-code-simlist-code-object-class"><a class="anchor" href="#-the-code-simlist-code-object-class"></a>2 The &lt;code&gt;simList&lt;/code&gt; object class</h2>
+    <h2 class="hasAnchor" id="-the-simlist-object-class"><a class="anchor" href="#-the-simlist-object-class"></a>2 The <code>simList</code> object class</h2>
 
     
     <p>The principle exported object class is the <code>simList</code>.
-All <code>SpaDES</code> simulations operate on this object class.</p><table><tr><td>
-  <code><a href='simList-class.html'>simList</a></code> </td>
-<td> The 'simList' class</td>
-</tr></table>
+All <code>SpaDES</code> simulations operate on this object class.</p>
+<table class='table'>
+<tr><td><code><a href='simList-class.html'>simList</a></code></td><td>The 'simList' class</td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
-    <h2 class="hasAnchor" id="-code-simlist-code-methods"><a class="anchor" href="#-code-simlist-code-methods"></a>3 &lt;code&gt;simList&lt;/code&gt; methods</h2>
+    <h2 class="hasAnchor" id="-simlist-methods"><a class="anchor" href="#-simlist-methods"></a>3 <code>simList</code> methods</h2>
 
     
     <p>Collections of commonly used functions to retrieve or set slots (and their elements)
-of a <code><a href='simList-class.html'>simList</a></code> object are summarized further below.</p><h3>3.1 Simulation parameters</h3>
-    <table><tr><td>
-     <code><a href='globals.html'>globals</a></code> </td>
-<td> List of global simulation parameters.</td>
-</tr><tr><td>
-     <code><a href='params.html'>params</a></code> </td>
-<td> Nested list of all simulation parameter.</td>
-</tr><tr><td>
-     <code><a href='params.html'>P</a></code> </td>
-<td> Namespaced version of <code><a href='params.html'>params</a></code>
-                        (i.e., do not have to specify module name).</td>
-</tr></table>
+of a <code><a href='simList-class.html'>simList</a></code> object are summarized further below.</p>
+<h3>3.1 Simulation parameters</h3>
+    <table class='table'>
+<tr><td><code><a href='globals.html'>globals</a></code></td><td>List of global simulation parameters.</td></tr>
+<tr><td><code><a href='params.html'>params</a></code></td><td>Nested list of all simulation parameter.</td></tr>
+<tr><td><code><a href='params.html'>P</a></code></td><td>Namespaced version of <code><a href='params.html'>params</a></code>
+                        (i.e., do not have to specify module name).</td></tr>
+</table>
     <h3>3.2 loading from disk, saving to disk</h3>
-    <table><tr><td>
-     <code><a href='simList-accessors-inout.html'>inputs</a></code> </td>
-<td> List of loaded objects used in simulation. (advanced)</td>
-</tr><tr><td>
-     <code><a href='simList-accessors-inout.html'>outputs</a></code> </td>
-<td> List of objects to save during simulation. (advanced)</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='simList-accessors-inout.html'>inputs</a></code></td><td>List of loaded objects used in simulation. (advanced)</td></tr>
+<tr><td><code><a href='simList-accessors-inout.html'>outputs</a></code></td><td>List of objects to save during simulation. (advanced)</td></tr>
+</table>
     <h3>3.3 objects in the <code>simList</code></h3>
-    <table><tr><td>
-     <code>ls</code>, <code>objects</code> </td>
-<td> Names of objects referenced by the simulation environment.</td>
-</tr><tr><td>
-     <code>ls.str</code> </td>
-<td> List the structure of the simList objects.</td>
-</tr><tr><td>
-     <code><a href='objects.html'>objs</a></code> </td>
-<td> List of objects referenced by the simulation environment.</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code>ls</code>, <code>objects</code></td><td>Names of objects referenced by the simulation environment.</td></tr>
+<tr><td><code>ls.str</code></td><td>List the structure of the simList objects.</td></tr>
+<tr><td><code><a href='objects.html'>objs</a></code></td><td>List of objects referenced by the simulation environment.</td></tr>
+</table>
     <h3>3.4 Simulation paths</h3>
     Accessor functions for the <code>paths</code> slot and its elements.
-  <table><tr><td>
-     <code><a href='simList-accessors-paths.html'>cachePath</a></code> </td>
-<td> Global simulation cache path.</td>
-<td>
-     <code><a href='simList-accessors-paths.html'>modulePath</a></code> </td>
-</tr><tr><td> Global simulation module path.</td>
-<td>
-     <code><a href='simList-accessors-paths.html'>inputPath</a></code> </td>
-<td> Global simulation input path.</td>
-</tr><tr><td>
-     <code><a href='simList-accessors-paths.html'>outputPath</a></code> </td>
-<td> Global simulation output path.</td>
-<td>
-     <code><a href='simList-accessors-paths.html'>paths</a></code> </td>
-</tr><tr><td> Global simulation paths (cache, modules, inputs, outputs).</td>
-<td>
-     <code><a href='simList-accessors-paths.html'>cachePath</a></code> </td>
-<td> Global simulation cache path.</td>
-</tr></table>
+  <table class='table'>
+<tr><td><code><a href='simList-accessors-paths.html'>cachePath</a></code></td><td>Global simulation cache path.</td></tr>
+<tr><td><code><a href='simList-accessors-paths.html'>modulePath</a></code></td><td>Global simulation module path.</td></tr>
+<tr><td><code><a href='simList-accessors-paths.html'>inputPath</a></code></td><td>Global simulation input path.</td></tr>
+<tr><td><code><a href='simList-accessors-paths.html'>outputPath</a></code></td><td>Global simulation output path.</td></tr>
+<tr><td><code><a href='simList-accessors-paths.html'>paths</a></code></td><td>Global simulation paths (cache, modules, inputs, outputs).</td></tr>
+</table>
     <h3>3.5 Simulation times</h3>
     Accessor functions for the <code>simtimes</code> slot and its elements.
-    <table><tr><td>
-     <code>time</code> </td>
-<td> Current simulation time, in units of longest module.</td>
-</tr><tr><td>
-     <code>start</code> </td>
-<td> Simulation start time, in units of longest module.</td>
-</tr><tr><td>
-     <code>end</code> </td>
-<td> Simulation end time, in units of longest module.</td>
-</tr><tr><td>
-     <code><a href='simList-accessors-times.html'>times</a></code> </td>
-<td> List of all simulation times (current, start, end), in units of longest module..</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code>time</code></td><td>Current simulation time, in units of longest module.</td></tr>
+<tr><td><code><a href='simList-accessors-times.html'>start</a></code></td><td>Simulation start time, in units of longest module.</td></tr>
+<tr><td><code><a href='simList-accessors-times.html'>end</a></code></td><td>Simulation end time, in units of longest module.</td></tr>
+<tr><td><code><a href='simList-accessors-times.html'>times</a></code></td><td>List of all simulation times (current, start, end), in units of longest module..</td></tr>
+</table>
     <h3>3.6 Simulation event queues</h3>
     Accessor functions for the <code>events</code> and <code>completed</code> slots.
   By default, the event lists are shown when the <code>simList</code> object is printed,
   thus most users will not require direct use of these methods.
-    <table><tr><td>
-     <code><a href='simList-accessors-events.html'>events</a></code> </td>
-<td> Scheduled simulation events (the event queue). (advanced)</td>
-</tr><tr><td>
-     <code><a href='simList-accessors-events.html'>current</a></code> </td>
-<td> Currently executing event. (advanced)</td>
-</tr><tr><td>
-     <code><a href='simList-accessors-events.html'>completed</a></code> </td>
-<td> Completed simulation events. (advanced)</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='simList-accessors-events.html'>events</a></code></td><td>Scheduled simulation events (the event queue). (advanced)</td></tr>
+<tr><td><code><a href='simList-accessors-events.html'>current</a></code></td><td>Currently executing event. (advanced)</td></tr>
+<tr><td><code><a href='simList-accessors-events.html'>completed</a></code></td><td>Completed simulation events. (advanced)</td></tr>
+</table>
     <h3>3.7 Modules, dependencies, packages</h3>
     Accessor functions for the <code>depends</code>, <code>modules</code>, and <code>.loadOrder</code> slots.
   These are included for advanced users.
-    <table><tr><td>
-     <code><a href='simList-accessors-modules.html'>depends</a></code> </td>
-<td> List of simulation module dependencies. (advanced)</td>
-</tr><tr><td>
-     <code><a href='simList-accessors-modules.html'>modules</a></code> </td>
-<td> List of simulation modules to be loaded. (advanced)</td>
-</tr><tr><td>
-     <code><a href='packages.html'>packages</a></code> </td>
-<td> Vector of required R libraries of all modules. (advanced)</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='simList-accessors-modules.html'>depends</a></code></td><td>List of simulation module dependencies. (advanced)</td></tr>
+<tr><td><code><a href='simList-accessors-modules.html'>modules</a></code></td><td>List of simulation modules to be loaded. (advanced)</td></tr>
+<tr><td><code><a href='packages.html'>packages</a></code></td><td>Vector of required R libraries of all modules. (advanced)</td></tr>
+</table>
     <h3>3.8 <code>simList</code> environment</h3>
     The <code><a href='simList-class.html'>simList</a></code> has a slot called <code>.envir</code> which is an environment.
   All objects in the <code>simList</code> are actually in this environment,
@@ -274,37 +255,21 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
   will not copy the objects contained within the <code>.envir</code> slot.
   The two objects (<code>sim1</code> and <code>sim2</code>) will share identical objects
   within that slot. Sometimes, this not desired, and a true copy is required.
-    <table><tr><td>
-     <code><a href='simList-accessors-envir.html'>envir</a></code> </td>
-<td> Access the environment of the simList directly (advanced)</td>
-</tr><tr><td>
-     <code>copy</code> </td>
-<td> Deep copy of a simList. (advanced)</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='simList-accessors-envir.html'>envir</a></code></td><td>Access the environment of the simList directly (advanced)</td></tr>
+<tr><td><code>copy</code></td><td>Deep copy of a simList. (advanced)</td></tr>
+</table>
     <h3>3.9 Checkpointing</h3>
-    <table><tr><td>
-     Accessor method </td>
-<td> Module </td>
-<td> Description</td>
-</tr><tr><td>
-     <code><a href='checkpoint.html'>checkpointFile</a></code> </td>
-<td> <code>.checkpoint</code> </td>
-<td> Name of the checkpoint file. (advanced)</td>
-</tr><tr><td>
-     <code><a href='checkpoint.html'>checkpointInterval</a></code> </td>
-<td> <code>.checkpoint</code> </td>
-<td> The simulation checkpoint interval. (advanced)</td>
-</tr></table>
+    <table class='table'>
+<tr><td>Accessor method</td><td>Module</td><td>Description</td></tr>
+<tr><td><code><a href='checkpoint.html'>checkpointFile</a></code></td><td><code>.checkpoint</code></td><td>Name of the checkpoint file. (advanced)</td></tr>
+<tr><td><code><a href='checkpoint.html'>checkpointInterval</a></code></td><td><code>.checkpoint</code></td><td>The simulation checkpoint interval. (advanced)</td></tr>
+</table>
     <h3>3.10 Progress Bar</h3>
-    <table><tr><td>
-     <code><a href='progress.html'>progressType</a></code> </td>
-<td> <code>.progress</code> </td>
-<td> Type of graphical progress bar used. (advanced)</td>
-</tr><tr><td>
-     <code><a href='progress.html'>progressInterval</a></code> </td>
-<td> <code>.progress</code> </td>
-<td> Interval for the progress bar. (advanced)</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='progress.html'>progressType</a></code></td><td><code>.progress</code></td><td>Type of graphical progress bar used. (advanced)</td></tr>
+<tr><td><code><a href='progress.html'>progressInterval</a></code></td><td><code>.progress</code></td><td>Interval for the progress bar. (advanced)</td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
     <h2 class="hasAnchor" id="-module-operations"><a class="anchor" href="#-module-operations"></a>4 Module operations</h2>
@@ -316,203 +281,122 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
   repositories, including our
   <a href='https://github.com/PredictiveEcology/SpaDES-modules'>SpaDES-modules</a>
   repository on GitHub.
-    <table><tr><td>
-    <code><a href='checksums.html'>checksums</a></code> </td>
-<td> Verify (and optionally write) checksums for a module's data files.</td>
-</tr><tr><td>
-    <code><a href='downloadModule.html'>downloadModule</a></code> </td>
-<td> Open all modules nested within a base directory.</td>
-</tr><tr><td>
-    <code><a href='getModuleVersion.html'>getModuleVersion</a></code> </td>
-<td> Get the latest module version # from module repository.</td>
-</tr><tr><td>
-    <code><a href='newModule.html'>newModule</a></code> </td>
-<td> Create new module from template.</td>
-</tr><tr><td>
-    <code><a href='newModuleDocumentation.html'>newModuleDocumentation</a></code> </td>
-<td> Create empty documentation for a new module.</td>
-</tr><tr><td>
-    <code><a href='openModules.html'>openModules</a></code> </td>
-<td> Open all modules nested within a base directory.</td>
-</tr><tr><td>
-    <code><a href='moduleMetadata.html'>moduleMetadata</a></code> </td>
-<td> Shows the module metadata.</td>
-</tr><tr><td>
-    <code><a href='zipModule.html'>zipModule</a></code> </td>
-<td> Zip a module and its associated files.</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/checksums.html'>checksums</a></code></td><td>Verify (and optionally write) checksums for a module's data files.</td></tr>
+<tr><td><code><a href='downloadModule.html'>downloadModule</a></code></td><td>Open all modules nested within a base directory.</td></tr>
+<tr><td><code><a href='getModuleVersion.html'>getModuleVersion</a></code></td><td>Get the latest module version # from module repository.</td></tr>
+<tr><td><code><a href='newModule.html'>newModule</a></code></td><td>Create new module from template.</td></tr>
+<tr><td><code><a href='newModuleDocumentation.html'>newModuleDocumentation</a></code></td><td>Create empty documentation for a new module.</td></tr>
+<tr><td><code><a href='openModules.html'>openModules</a></code></td><td>Open all modules nested within a base directory.</td></tr>
+<tr><td><code><a href='moduleMetadata.html'>moduleMetadata</a></code></td><td>Shows the module metadata.</td></tr>
+<tr><td><code><a href='zipModule.html'>zipModule</a></code></td><td>Zip a module and its associated files.</td></tr>
+</table>
     <h3>4.2 Module metadata</h3>
     Each module requires several items to be defined.
   These comprise the metadata for that module (including default parameter
   specifications, inputs and outputs), and are currently written at the top of
   the module's <code>.R</code> file.
-    <table><tr><td>
-    <code><a href='defineModule.html'>defineModule</a></code> </td>
-<td> Define the module metadata</td>
-</tr><tr><td>
-    <code><a href='defineParameter.html'>defineParameter</a></code> </td>
-<td> Specify a parameter's name, value and set a default</td>
-</tr><tr><td>
-    <code><a href='expectsInput.html'>expectsInput</a></code> </td>
-<td> Specify an input object's name, class, description, sourceURL and other specifications</td>
-</tr><tr><td>
-    <code><a href='createsOutput.html'>createsOutput</a></code> </td>
-<td> Specify an output object's name, class, description and other specifications</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='defineModule.html'>defineModule</a></code></td><td>Define the module metadata</td></tr>
+<tr><td><code><a href='defineParameter.html'>defineParameter</a></code></td><td>Specify a parameter's name, value and set a default</td></tr>
+<tr><td><code><a href='expectsInput.html'>expectsInput</a></code></td><td>Specify an input object's name, class, description, sourceURL and other specifications</td></tr>
+<tr><td><code><a href='createsOutput.html'>createsOutput</a></code></td><td>Specify an output object's name, class, description and other specifications</td></tr>
+</table>
     <h3>4.3 Module dependencies</h3>
     Once a set of modules have been chosen, the dependency information is automatically
   calculated once simInit is run. There are several functions to assist with dependency
   information:
-    <table><tr><td>
-    <code><a href='depsEdgeList.html'>depsEdgeList</a></code> </td>
-<td> Build edge list for module dependency graph</td>
-</tr><tr><td>
-    <code><a href='depsGraph.html'>depsGraph</a></code> </td>
-<td> Build a module dependency graph using <code>igraph</code></td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='depsEdgeList.html'>depsEdgeList</a></code></td><td>Build edge list for module dependency graph</td></tr>
+<tr><td><code><a href='depsGraph.html'>depsGraph</a></code></td><td>Build a module dependency graph using <code>igraph</code></td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
     <h2 class="hasAnchor" id="-module-functions"><a class="anchor" href="#-module-functions"></a>5 Module functions</h2>
 
     
     <p><em>A collection of functions that help with making modules can be found in
-the suggested <code>SpaDES.tools</code> package, and are summarized below.</em></p><h3>5.1 Spatial spreading/distances methods</h3>
+the suggested <code>SpaDES.tools</code> package, and are summarized below.</em></p>
+<h3>5.1 Spatial spreading/distances methods</h3>
     Spatial contagion is a key phenomenon for spatially explicit simulation models.
   Contagion can be modelled using discrete approaches or continuous approaches.
   Several <code>SpaDES.tools</code> functions assist with these:
-    <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/adj.html'>adj</a></code> </td>
-<td> An optimized (i.e., faster) version of <code><a href='http://www.rdocumentation.org/packages/raster/topics/adjacent'>adjacent</a></code></td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/cir.html'>cir</a></code> </td>
-<td> Identify pixels in a circle around a <code><a href='http://www.rdocumentation.org/packages/sp/topics/SpatialPoints-class'>SpatialPoints*</a></code> object</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/directions.html'>directionFromEachPoint</a></code> </td>
-<td> Fast calculation of direction and distance surfaces</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/distances.html'>distanceFromEachPoint</a></code> </td>
-<td> Fast calculation of distance surfaces</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/rings.html'>rings</a></code> </td>
-<td> Identify rings around focal cells (e.g., buffers and donuts)</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/spokes.html'>spokes</a></code> </td>
-<td> Identify outward radiating spokes from initial points</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/spread.html'>spread</a></code> </td>
-<td> Contagious cellular automata</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/wrap.html'>wrap</a></code> </td>
-<td> Create a torus from a grid</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/adj.html'>adj</a></code></td><td>An optimized (i.e., faster) version of <code><a href='http://www.rdocumentation.org/packages/raster/topics/adjacent'>adjacent</a></code></td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/cir.html'>cir</a></code></td><td>Identify pixels in a circle around a <code><a href='http://www.rdocumentation.org/packages/sp/topics/SpatialPoints-class'>SpatialPoints*</a></code> object</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/directions.html'>directionFromEachPoint</a></code></td><td>Fast calculation of direction and distance surfaces</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/distances.html'>distanceFromEachPoint</a></code></td><td>Fast calculation of distance surfaces</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/rings.html'>rings</a></code></td><td>Identify rings around focal cells (e.g., buffers and donuts)</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/spokes.html'>spokes</a></code></td><td>Identify outward radiating spokes from initial points</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/spread.html'>spread</a></code></td><td>Contagious cellular automata</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/wrap.html'>wrap</a></code></td><td>Create a torus from a grid</td></tr>
+</table>
     <h3>5.2 Spatial agent methods</h3>
     Agents have several methods and functions specific to them:
-    <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/crw.html'>crw</a></code> </td>
-<td> Simple correlated random walk function</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/heading.html'>heading</a></code> </td>
-<td> Determines the heading between SpatialPoints*</td>
-</tr><tr><td>
-    <code><a href='http://quickplot.predictiveecology.org//reference/makeLines.html'>makeLines</a></code> </td>
-<td> Makes <code>SpatialLines</code> object for, e.g., drawing arrows</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/crw.html'>move</a></code> </td>
-<td> A meta function that can currently only take "crw"</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/specnumperpatch-probs.html'>specificNumPerPatch</a></code> </td>
-<td> Initiate a specific number of agents per patch</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/crw.html'>crw</a></code></td><td>Simple correlated random walk function</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/heading.html'>heading</a></code></td><td>Determines the heading between SpatialPoints*</td></tr>
+<tr><td><code><a href='http://quickplot.predictiveecology.org//reference/makeLines.html'>makeLines</a></code></td><td>Makes <code>SpatialLines</code> object for, e.g., drawing arrows</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/crw.html'>move</a></code></td><td>A meta function that can currently only take "crw"</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/specnumperpatch-probs.html'>specificNumPerPatch</a></code></td><td>Initiate a specific number of agents per patch</td></tr>
+</table>
     <h3>5.3 GIS operations</h3>
     In addition to the vast amount of GIS operations available in R (mostly from
   contributed packages such as <code>sp</code>, <code>raster</code>, <code>maps</code>, <code>maptools</code>
   and many others), we provide the following GIS-related functions:
-    <table><tr><td>
-    <code>equalExtent</code> </td>
-<td> Assess whether a list of extents are all equal</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code>equalExtent</code></td><td>Assess whether a list of extents are all equal</td></tr>
+</table>
     <h3>5.4 'Map-reduce'--type operations</h3>
     These functions convert between reduced and mapped representations of the same data.
   This allows compact representation of, e.g., rasters that have many individual pixels
   that share identical information.
-    <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/rasterizeReduce.html'>rasterizeReduced</a></code> </td>
-<td> Convert reduced representation to full raster.</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/rasterizeReduce.html'>rasterizeReduced</a></code></td><td>Convert reduced representation to full raster.</td></tr>
+</table>
     <h3>5.5 Colors in <code>Raster*</code> objects</h3>
     We likely will not want the default colours for every map.
   Here are several helper functions to add to, set and get colors of <code>Raster*</code> objects:
-    <table><tr><td>
-    <code><a href='http://quickplot.predictiveecology.org//reference/getSetColors.html'>setColors</a></code> </td>
-<td> Set colours for plotting <code>Raster*</code> objects</td>
-</tr><tr><td>
-    <code>getColors</code> </td>
-<td> Get colours in a <code>Raster*</code> objects</td>
-</tr><tr><td>
-    <code>divergentColors</code> </td>
-<td> Create a color palette with diverging colors around a middle</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://quickplot.predictiveecology.org//reference/getSetColors.html'>setColors</a></code></td><td>Set colours for plotting <code>Raster*</code> objects</td></tr>
+<tr><td><code>getColors</code></td><td>Get colours in a <code>Raster*</code> objects</td></tr>
+<tr><td><code>divergentColors</code></td><td>Create a color palette with diverging colors around a middle</td></tr>
+</table>
     <h3>5.6 Random Map Generation</h3>
     It is often useful to build dummy maps with which to build simulation models before all data are available.
   These dummy maps can later be replaced with actual data maps.
-    <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/gaussmap.html'>gaussMap</a></code> </td>
-<td> Creates a random map using Gaussian random fields</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/randomPolygons.html'>randomPolygons</a></code> </td>
-<td> Creates a random polygon with specified number of classes</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/gaussmap.html'>gaussMap</a></code></td><td>Creates a random map using Gaussian random fields</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/randomPolygons.html'>randomPolygons</a></code></td><td>Creates a random polygon with specified number of classes</td></tr>
+</table>
     <h3>5.7 Checking for the existence of objects</h3>
     <code>SpaDES</code> modules will often require the existence of objects in the <code>simList</code>.
   These are helpers for assessing this:
-    <table><tr><td>
-    <code><a href='checkObject.html'>checkObject</a></code> </td>
-<td> Check for a existence of an object within a <code>simList</code> </td>
-</tr><tr><td>
-    <code><a href='http://reproducible.predictiveecology.org/reference/checkPath.html'>checkPath</a></code> </td>
-<td> Checks the specified filepath for formatting consistencies</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='checkObject.html'>checkObject</a></code></td><td>Check for a existence of an object within a <code>simList</code></td></tr>
+<tr><td><code><a href='http://www.rdocumentation.org/packages/reproducible/topics/checkPath'>checkPath</a></code></td><td>Checks the specified filepath for formatting consistencies</td></tr>
+</table>
     <h3>5.8 SELES-type approach to simulation</h3>
     These functions are essentially skeletons and are not fully implemented.
   They are intended to make translations from <a href='http://www.gowlland.ca/'>SELES</a>.
   You must know how to use SELES for these to be useful:
-    <table><tr><td>1
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELESagentLocation.html'>agentLocation</a></code> </td>
-<td> Agent location</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/initiateAgents.html'>initiateAgents</a></code> </td>
-<td> Initiate agents into a SpatialPointsDataFrame</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELESnumAgents.html'>numAgents</a></code> </td>
-<td> Number of agents</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELESprobInit.html'>probInit</a></code> </td>
-<td> Probability of initiating an agent or event</td>
-</tr><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/SELEStransitions.html'>transitions</a></code> </td>
-<td> Transition probability</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/SELESagentLocation.html'>agentLocation</a></code></td><td>Agent location</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/initiateAgents.html'>initiateAgents</a></code></td><td>Initiate agents into a SpatialPointsDataFrame</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/SELESnumAgents.html'>numAgents</a></code></td><td>Number of agents</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/SELESprobInit.html'>probInit</a></code></td><td>Probability of initiating an agent or event</td></tr>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/SELEStransitions.html'>transitions</a></code></td><td>Transition probability</td></tr>
+</table>
     <h3>5.9 Miscellaneous</h3>
     Functions that may be useful within a <code>SpaDES</code> context:
-    <table><tr><td>
-    <code><a href='http://spades-tools.predictiveecology.org/reference/inRange.html'>inRange</a></code> </td>
-<td> Test whether a number lies within range [a,b]</td>
-</tr><tr><td>
-    <code>layerNames</code> </td>
-<td> Get layer names for numerous object classes</td>
-</tr><tr><td>
-    <code><a href='loadPackages.html'>loadPackages</a></code> </td>
-<td> Simple wrapper for loading packages</td>
-</tr><tr><td>
-    <code>numLayers</code> </td>
-<td> Return number of layers</td>
-</tr><tr><td>
-    <code><a href='paddedFloatToChar.html'>paddedFloatToChar</a></code> </td>
-<td> Wrapper for padding (e.g., zeros) floating numbers to character</td>
-</tr><tr><td>
-    <code><a href='updateList.html'>updateList</a></code> </td>
-<td> Update values in a named list</td>
-</tr></table>
+    <table class='table'>
+<tr><td><code><a href='http://spades-tools.predictiveecology.org/reference/inRange.html'>inRange</a></code></td><td>Test whether a number lies within range [a,b]</td></tr>
+<tr><td><code>layerNames</code></td><td>Get layer names for numerous object classes</td></tr>
+<tr><td><code><a href='loadPackages.html'>loadPackages</a></code></td><td>Simple wrapper for loading packages</td></tr>
+<tr><td><code>numLayers</code></td><td>Return number of layers</td></tr>
+<tr><td><code><a href='paddedFloatToChar.html'>paddedFloatToChar</a></code></td><td>Wrapper for padding (e.g., zeros) floating numbers to character</td></tr>
+<tr><td><code><a href='updateList.html'>updateList</a></code></td><td>Update values in a named list</td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
     <h2 class="hasAnchor" id="-caching-simulations-and-simulation-components"><a class="anchor" href="#-caching-simulations-and-simulation-components"></a>6 Caching simulations and simulation components</h2>
@@ -524,25 +408,15 @@ However, the one most common usage would be to cache a simulation run.
 This might be useful if a simulation is very long, has been run once, and the
 goal is just to retrieve final results.
 This would be an alternative to manually saving the outputs.</p>
-<p>See example in <code><a href='spades.html'>spades</a></code>, achieved by using <code>cache = TRUE</code> argument.</p><table><tr><td>
-  <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code> </td>
-<td> Caches a function, but often accessed as arg in <code><a href='spades.html'>spades</a></code></td>
-</tr><tr><td>
-  <code><a href='http://reproducible.predictiveecology.org/reference/reproducible-deprecated.html'>cache</a></code> </td>
-<td> deprecated. Please use <code>Cache</code></td>
-</tr><tr><td>
-  <code><a href='http://reproducible.predictiveecology.org/reference/viewCache.html'>showCache</a></code> </td>
-<td> Shows information about the objects in the cache</td>
-</tr><tr><td>
-  <code><a href='http://reproducible.predictiveecology.org/reference/viewCache.html'>clearCache</a></code> </td>
-<td> Removes objects from the cache</td>
-</tr><tr><td>
-  <code><a href='http://reproducible.predictiveecology.org/reference/viewCache.html'>keepCache</a></code> </td>
-<td> Keeps only the objects described</td>
-</tr><tr><td>
-  <code><a href='http://reproducible.predictiveecology.org/reference/clearStubArtifacts.html'>clearStubArtifacts</a></code> </td>
-<td> Removes any erroneous items in a cache repository</td>
-</tr></table>
+<p>See example in <code><a href='spades.html'>spades</a></code>, achieved by using <code>cache = TRUE</code> argument.</p>
+<table class='table'>
+<tr><td><code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code></td><td>Caches a function, but often accessed as arg in <code><a href='spades.html'>spades</a></code></td></tr>
+<tr><td><code><a href='http://reproducible.predictiveecology.org/reference/reproducible-deprecated.html'>cache</a></code></td><td>deprecated. Please use <code>Cache</code></td></tr>
+<tr><td><code><a href='http://reproducible.predictiveecology.org/reference/viewCache.html'>showCache</a></code></td><td>Shows information about the objects in the cache</td></tr>
+<tr><td><code><a href='http://reproducible.predictiveecology.org/reference/viewCache.html'>clearCache</a></code></td><td>Removes objects from the cache</td></tr>
+<tr><td><code><a href='http://reproducible.predictiveecology.org/reference/viewCache.html'>keepCache</a></code></td><td>Keeps only the objects described</td></tr>
+<tr><td><code><a href='http://reproducible.predictiveecology.org/reference/clearStubArtifacts.html'>clearStubArtifacts</a></code></td><td>Removes any erroneous items in a cache repository</td></tr>
+</table>
     <p>A module developer can build caching into their module by creating cached versions of their
 functions.</p>
 <p>------------------------------------------------------------------------------------------</p>
@@ -554,95 +428,85 @@ functions.</p>
 package.</em></p>
 <p>There are several user-accessible plotting functions that are optimized for modularity
 and speed of plotting:</p>
-<p>Commonly used:</p><table><tr><td>
-  <code>Plot</code> </td>
-<td> The workhorse plotting function</td>
-</tr></table>
-    <p>Simulation diagrams:</p><table><tr><td>
-  <code><a href='eventDiagram.html'>eventDiagram</a></code> </td>
-<td> Gantt chart representing the events in a completed simulation.</td>
-</tr><tr><td>
-  <code><a href='moduleDiagram.html'>moduleDiagram</a></code> </td>
-<td> Network diagram of simplified module (object) dependencies.</td>
-</tr><tr><td>
-  <code><a href='objectDiagram.html'>objectDiagram</a></code> </td>
-<td> Sequence diagram of detailed object dependencies.</td>
-</tr></table>
-    <p>Other useful plotting functions:</p><table><tr><td>
-  <code>clearPlot</code> </td>
-<td> Helpful for resolving many errors</td>
-</tr><tr><td>
-  <code>clickValues</code> </td>
-<td> Extract values from a raster object at the mouse click location(s)</td>
-</tr><tr><td>
-  <code>clickExtent</code> </td>
-<td> Zoom into a raster or polygon map that was plotted with <code>Plot</code></td>
-</tr><tr><td>
-  <code>clickCoordinates</code> </td>
-<td> Get the coordinates, in map units, under mouse click</td>
-</tr><tr><td>
-  <code>dev</code> </td>
-<td> Specify which device to plot on, making a non-RStudio one as default</td>
-</tr><tr><td>
-  <code>newPlot</code> </td>
-<td> Open a new default plotting device</td>
-</tr><tr><td>
-  <code>rePlot</code> </td>
-<td> Replots all elements of device for refreshing or moving plot</td>
-</tr></table>
+<p>Commonly used:</p><table class='table'>
+<tr><td><code>Plot</code></td><td>The workhorse plotting function</td></tr>
+</table>
+    <p>Simulation diagrams:</p><table class='table'>
+<tr><td><code><a href='eventDiagram.html'>eventDiagram</a></code></td><td>Gantt chart representing the events in a completed simulation.</td></tr>
+<tr><td><code><a href='moduleDiagram.html'>moduleDiagram</a></code></td><td>Network diagram of simplified module (object) dependencies.</td></tr>
+<tr><td><code><a href='objectDiagram.html'>objectDiagram</a></code></td><td>Sequence diagram of detailed object dependencies.</td></tr>
+</table>
+    <p>Other useful plotting functions:</p><table class='table'>
+<tr><td><code>clearPlot</code></td><td>Helpful for resolving many errors</td></tr>
+<tr><td><code>clickValues</code></td><td>Extract values from a raster object at the mouse click location(s)</td></tr>
+<tr><td><code>clickExtent</code></td><td>Zoom into a raster or polygon map that was plotted with <code>Plot</code></td></tr>
+<tr><td><code>clickCoordinates</code></td><td>Get the coordinates, in map units, under mouse click</td></tr>
+<tr><td><code>dev</code></td><td>Specify which device to plot on, making a non-RStudio one as default</td></tr>
+<tr><td><code>newPlot</code></td><td>Open a new default plotting device</td></tr>
+<tr><td><code>rePlot</code></td><td>Replots all elements of device for refreshing or moving plot</td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
     <h2 class="hasAnchor" id="-file-operations"><a class="anchor" href="#-file-operations"></a>8 File operations</h2>
 
     
     <p>In addition to R's file operations, we have added several here to aid in bulk
-loading and saving of files for simulation purposes:</p><table><tr><td>
-  <code><a href='loadFiles.html'>loadFiles</a></code> </td>
-<td> Load simulation objects according to a filelist</td>
-</tr><tr><td>
-  <code><a href='rasterToMemory.html'>rasterToMemory</a></code> </td>
-<td> Read a raster from file to RAM</td>
-</tr><tr><td>
-  <code><a href='saveFiles.html'>saveFiles</a></code> </td>
-<td> Save simulation objects according to outputs and params</td>
-</tr></table>
+loading and saving of files for simulation purposes:</p>
+<table class='table'>
+<tr><td><code><a href='loadFiles.html'>loadFiles</a></code></td><td>Load simulation objects according to a filelist</td></tr>
+<tr><td><code><a href='rasterToMemory.html'>rasterToMemory</a></code></td><td>Read a raster from file to RAM</td></tr>
+<tr><td><code><a href='saveFiles.html'>saveFiles</a></code></td><td>Save simulation objects according to outputs and params</td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
     <h2 class="hasAnchor" id="-sample-modules-included-in-package"><a class="anchor" href="#-sample-modules-included-in-package"></a>9 Sample modules included in package</h2>
 
     
     <p>Several dummy modules are included for testing of functionality.
-These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModules")</code>.</p><table><tr><td>
-  <code>randomLandscapes</code> </td>
-<td> Imports, updates, and plots several raster map layers</td>
-</tr><tr><td>
-  <code>caribouMovement</code> </td>
-<td> A simple agent-based (a.k.a., individual-based) model</td>
-</tr><tr><td>
-  <code>fireSpread</code> </td>
-<td> A simple model of a spatial spread process</td>
-</tr></table>
+These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModules")</code>.</p>
+<table class='table'>
+<tr><td><code>randomLandscapes</code></td><td>Imports, updates, and plots several raster map layers</td></tr>
+<tr><td><code>caribouMovement</code></td><td>A simple agent-based (a.k.a., individual-based) model</td></tr>
+<tr><td><code>fireSpread</code></td><td>A simple model of a spatial spread process</td></tr>
+</table>
     <p>------------------------------------------------------------------------------------------</p>
     
     <h2 class="hasAnchor" id="-package-options"><a class="anchor" href="#-package-options"></a>10 Package options</h2>
 
     
-    <p><code>SpaDES</code> packages use the following <code>options</code> to configure behaviour:</p><ul>
+    <p><code>SpaDES</code> packages use the following <code>options</code> to configure behaviour:</p>
+<ul>
+<li><p><code>spades.browserOnError</code>: If <code>TRUE</code>, the default, then any
+  error rerun the same event with <code>debugonce</code> called on it to allow editing
+  to be done. When that browser is continued (e.g., with 'c'), then it will save it
+  reparse it into the simList and rerun the edited version. This may allow a spades
+  call to be recovered on error, though in many cases that may not be the correct
+  behaviour. For example, if the simList gets updated inside that event in an iterative
+  manner, then each run through the event will cause that iteration to occur.
+  When this option is <code>TRUE</code>, then the event will be run at least 3 times: the
+  first time makes the error, the second time has <code>debugonce</code> and the third time
+  is after the error is addressed. <code>TRUE</code> is likely somewhat slower.</p></li>
 <li><p><code>spades.cachePath</code>: The default local directory in which to
   cache simulation outputs.
   Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/cache</code>).</p></li>
-<li><p><code>spades.cachePath</code>: The default local directory in which to
+<li><p><code>spades.inputPath</code>: The default local directory in which to
   look for simulation inputs.
   Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/inputs</code>).</p></li>
-<li><p><code>spades.debug</code>: The default debugging value for <code><a href='spades.html'>spades()</a></code>.
-  Default is <code>FALSE</code>.</p></li>
+<li><p><code>spades.debug</code>: The default debugging value <code>debug</code>
+  argument in <code><a href='spades.html'>spades()</a></code>. Default is <code>TRUE</code>.</p></li>
 <li><p><code>spades.lowMemory</code>: If true, some functions will use more memory
     efficient (but slower) algorithms. Default <code>FALSE</code>.</p></li>
+<li><p><code>spades.moduleCodeChecks</code>: Should the various code checks be run
+  during <code>simInit</code>. These are passed to codetools::checkUsage.
+  Default is given by the function, plus these :<code>list(suppressParamUnused = FALSE,
+  suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
+  skipWith = TRUE)</code>.</p></li>
 <li><p><code>spades.modulePath</code>: The default local directory where modules
     and data will be downloaded and stored.
     Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/modules</code>).</p></li>
 <li><p><code>spades.moduleRepo</code>: The default GitHub repository to use when
-    downloading modules. Default <code>"PredictiveEcology/SpaDES-modules"</code>.</p></li>
+    downloading modules via <code>downloadModule</code>.
+    Default <code>"PredictiveEcology/SpaDES-modules"</code>.</p></li>
 <li><p><code>spades.nCompleted</code>: The maximum number of completed events to
     retain in the <code>completed</code> event queue. Default <code>1000L</code>.</p></li>
 <li><p><code>spades.outputPath</code>: The default local directory in which to
@@ -650,8 +514,9 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
   Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/outputs</code>).</p></li>
 <li><p><code>spades.switchPkgNamespaces</code>: Should the search path be modified
     to ensure a module's required packages are listed first?
-    Default <code>TRUE</code>, which reduces name conflicts among package objects,
-    but is not without overhead (<em>i.e.</em>, can be slow).</p></li>
+    Default <code>FALSE</code> to keep computational overhead down. If <code>TRUE</code>,
+    there should be no name conflicts among package objects,
+    but it is much slower, especially if the events are themselves fast.</p></li>
 <li><p><code>spades.tolerance</code>: The default tolerance value used for floating
     point number comparisons. Default <code>.Machine$double.eps^0.5</code>.</p></li>
 <li><p><code>spades.useragent</code>: The default user agent to use for downloading
@@ -660,11 +525,11 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>Useful links:</p><ul>
+    <div class='dont-index'><p>Useful links:</p><ul>
 <li><p><a href='http://spades-core.predictiveecology.org/'>http://spades-core.predictiveecology.org/</a></p></li>
 <li><p><a href='https://github.com/PredictiveEcology/SpaDES.core'>https://github.com/PredictiveEcology/SpaDES.core</a></p></li>
 <li><p>Report bugs at <a href='https://github.com/PredictiveEcology/SpaDES.core/issues'>https://github.com/PredictiveEcology/SpaDES.core/issues</a></p></li>
-</ul>
+</ul></div>
     
 
   </div>
@@ -672,11 +537,11 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       
-      <li><a href="#-spatial-discrete-event-simulation-code-spades-code-">1 Spatial discrete event simulation (&lt;code&gt;SpaDES&lt;/code&gt;)</a></li>
+      <li><a href="#-spatial-discrete-event-simulation-spades-">1 Spatial discrete event simulation (<code>SpaDES</code>)</a></li>
 
-      <li><a href="#-the-code-simlist-code-object-class">2 The &lt;code&gt;simList&lt;/code&gt; object class</a></li>
+      <li><a href="#-the-simlist-object-class">2 The <code>simList</code> object class</a></li>
 
-      <li><a href="#-code-simlist-code-methods">3 &lt;code&gt;simList&lt;/code&gt; methods</a></li>
+      <li><a href="#-simlist-methods">3 <code>simList</code> methods</a></li>
 
       <li><a href="#-module-operations">4 Module operations</a></li>
 
@@ -697,7 +562,7 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
 
     <h2>Author</h2>
     
-<strong>Maintainer</strong>: Alex M Chubaty <a href='mailto:alexander.chubaty@canada.ca'>alexander.chubaty@canada.ca</a>
+<strong>Maintainer</strong>: Alex M Chubaty <a href='mailto:alex.chubaty@gmail.com'>alex.chubaty@gmail.com</a>
 
 Authors:
 <ul>
@@ -708,6 +573,7 @@ Other contributors:
 <ul>
 <li><p>Yong Luo <a href='mailto:yluo1@lakeheadu.ca'>yluo1@lakeheadu.ca</a> [contributor]</p></li>
 <li><p>Steve Cumming <a href='mailto:Steve.Cumming@sbf.ulaval.ca'>Steve.Cumming@sbf.ulaval.ca</a> [contributor]</p></li>
+<li><p>Ceres Barros <a href='mailto:cbarros@mail.ubc.ca'>cbarros@mail.ubc.ca</a> [contributor]</p></li>
 <li><p>Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]</p></li>
 </ul>
 
@@ -727,5 +593,8 @@ Other contributors:
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+
