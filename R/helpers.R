@@ -46,9 +46,9 @@
 .emptyEventListDT <- data.table(eventTime = integer(0L), moduleName = character(0L),
                                 eventType = character(0L), eventPriority = numeric(0L))
 
+#' @importFrom data.table data.table
 #' @keywords internal
 #' @rdname emptyEventList
-#' @importFrom data.table data.table
 .singleEventListDT <- data.table(eventTime = integer(1L), moduleName = character(1L),
                                  eventType = character(1L), eventPriority = numeric(1L))
 
@@ -68,10 +68,10 @@ setMethod(
   definition = function(eventTime, moduleName, eventType, eventPriority) {
     # This is faster than direct call to new data.table
     eeldt <- copy(.singleEventListDT)
-    set(eeldt, , "eventTime", eventTime)
-    set(eeldt, , "moduleName", moduleName)
-    set(eeldt, , "eventType", eventType)
-    set(eeldt, , "eventPriority", eventPriority)
+    set(eeldt, NULL, "eventTime", eventTime)
+    set(eeldt, NULL, "moduleName", moduleName)
+    set(eeldt, NULL, "eventType", eventType)
+    set(eeldt, NULL, "eventPriority", eventPriority)
     eeldt # don't set key because it is set later when used
 })
 
@@ -90,7 +90,7 @@ setMethod(
 .emptyEventListCols <- colnames(.emptyEventList())
 
 
-################################################################################
+
 #' Default (empty) metadata
 #'
 #' Internal use only.
@@ -221,9 +221,7 @@ setMethod(
       }
     }
   }
-
 }
-
 
 .pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats" # nolint
 

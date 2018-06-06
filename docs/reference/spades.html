@@ -18,13 +18,27 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Run a spatial discrete event simulation — spades" />
+
+<meta property="og:description" content="Here, we implement a simulation in a more modular fashion so it's easier to add
+submodules to the simulation. We use S4 classes and methods, and use `data.table`
+instead of `data.frame` to implement the event queue (because it is much faster)." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +48,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +71,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +104,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +116,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,17 +124,21 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Run a spatial discrete event simulation</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/simulation-spades.R'><code>R/simulation-spades.R</code></a></small>
+    <div class="hidden name"><code>spades.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Here, we implement a simulation in a more modular fashion so it's easier to add
 submodules to the simulation. We use S4 classes and methods, and use `data.table`
 instead of `data.frame` to implement the event queue (because it is much faster).</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
   <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -134,7 +155,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
   <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -213,18 +234,6 @@ a previous run, even if there is stochasticity internally.
 Caching is only based on the input simList. See also <code>experiment</code> for
 the same mechanism, but it can be used with replication.
 See also the vignette on caching for examples.</p>
-<p>If <code>debug</code> is specified, it can be a logical or character vector.
-If not specified, the package option <code>spades.debug</code> is used.
-In all cases, something will be printed to the console immediately before each
-event is being executed.
-If <code>TRUE</code>, then the event immediately following will be printed as it
-runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</a></code>).
-If a character string, then it can be one of the many <code>simList</code> accessors,
-such as <code>events</code>, <code>params</code>, <code>"simList"</code> (print the entire simList),
-or any R expression.
-If an R expression it will be evaluated with access to the <code>sim</code> object.
-If this is more than one character string, then all will be printed to the
-screen in their sequence.</p>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
@@ -234,6 +243,39 @@ Will print additional outputs informing the user of updates to the values of
 various <code>simList</code> slot components.
 See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https://github.com/PredictiveEcology/SpaDES/wiki/Debugging</a> for details.</p>
     
+    <h2 class="hasAnchor" id="debug"><a class="anchor" href="#debug"></a><code>debug</code></h2>
+
+    
+    <p>If <code>debug</code> is specified and is not <code>FALSE</code>, 2 things will happen:
+1) there can be messages sent to console, such as events as they pass by, and
+2) (experimental still) if there is an error, it will attempt to open a browser
+in the event where the error occurred. You can edit, and then press <code>c</code> to continue
+or <code>Q</code> to quit, plus all other normal interactive browser tools.
+<code>c</code> will trigger a reparse and events will continue as scheduled, starting
+with the one just edited. There may be some unexpected consequences if the
+<code>simList</code> objects had already been changed before the error occurred.
+<code>debug</code> can be a logical or character vector.</p>
+<p>If not specified in the function call, the package
+option <code>spades.debug</code> is used. The following
+options for debug are available:</p>
+<table class='table'>
+<tr><td><code>TRUE</code></td><td>the event immediately following will be printed as it
+runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</a></code>).</td></tr>
+<tr><td>function name (as character string)</td><td>If a function, then it will be run on the
+                                           simList, e.g., "time" will run
+                                           <code>time(sim)</code> at each event.</td></tr>
+<tr><td>moduleName (as character string)</td><td>All calls to that module will be entered
+                                        interactively</td></tr>
+<tr><td>eventName (as character string)</td><td>All calls that have that event name (in any module)
+                                       will be entered interactively</td></tr>
+<tr><td><code>c(&lt;moduleName&gt;, &lt;eventName&gt;)</code></td><td>Only the event in that specified module
+                                            will be entered into.</td></tr>
+<tr><td>Any other R expression</td><td>Will be evaluated with access to the simList as 'sim'.
+                               If this is more than one character string, then all will
+                               be printed to the screen in their sequence.</td></tr>
+<tr><td></td><td><code>TRUE</code></td></tr>
+</table>
+    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -242,11 +284,11 @@ See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https:/
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>,
+    <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>,
 <code><a href='experiment.html'>experiment</a></code> for using replication with <code>spades</code>,
 <code><a href='simInit.html'>simInit</a></code>, and the caching vignette (very important for reproducibility):
 <a href='https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html</a> which
-uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code>.</p>
+uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code>.</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -302,6 +344,8 @@ uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.ht
 
       <li><a href="#note">Note</a></li>
 
+      <li><a href="#debug"><code>debug</code></a></li>
+
       <li><a href="#references">References</a></li>
 
       <li><a href="#see-also">See also</a></li>
@@ -328,5 +372,8 @@ Alex Chubaty and Eliot McIntire
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+
