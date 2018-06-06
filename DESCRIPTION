@@ -57,6 +57,7 @@ Suggests:
     knitr,
     Matrix,
     magrittr,
+    microbenchmark,
     png,
     RColorBrewer (>= 1.1-2),
     rgdal,
