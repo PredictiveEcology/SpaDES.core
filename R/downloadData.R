@@ -438,7 +438,7 @@ setMethod(
 
     allInChecksums <- TRUE
     doDownload <- TRUE
-    if (! ( NROW(chksums) > 0 && all(compareNA(chksums$result, "OK")))) {
+    if (!(NROW(chksums) > 0 && all(compareNA(chksums$result, "OK")))) {
     #if (!((any(chksums$result == "FAIL") | any(is.na(chksums$result))) )) {
       if (length(to.dl) == 0) {
         message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
