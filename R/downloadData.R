@@ -187,11 +187,11 @@ setMethod(
 
     ##
 
-    browser()
-    reproducible::prepInputs(url = urls, quick = quickCheck, overwrite = overwrite,
-                             destinationPath = file.path(path, module, "data")
-                              )
+    res <- Map(url = urls, reproducible::prepInputs, MoreArgs = list(quick = quickCheck, overwrite = overwrite,
+                             destinationPath = file.path(path, module, "data")))
+    browser() # stopped here
 
+    # TODO -- probably MOST of following code can be removed. Only "children" might be relevant
     ##
 
     ids <- which(urls == "" | is.na(urls))
