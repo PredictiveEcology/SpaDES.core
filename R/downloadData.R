@@ -174,7 +174,7 @@ setMethod(
                                   defineModuleElement = "inputObjects")
     urls <- inputs$sourceURL
 
-    # parsedModule <- parse(file = file.path(modulePath, moduleName, paste0(moduleName, '.R')))
+    # parsedModule <- parse(file = file.path(path, module, paste0(module, '.R')))
     # urls <- .getSourceURL(pattern = fileToDownload, x = parsedModule)
 
     if (is.call(urls)) {
@@ -187,7 +187,10 @@ setMethod(
 
     ##
 
-    reproducible::prepInputs(url = urls, path = path)
+    browser()
+    reproducible::prepInputs(url = urls, quick = quickCheck, overwrite = overwrite,
+                             destinationPath = file.path(path, module, "data")
+                              )
 
     ##
 
