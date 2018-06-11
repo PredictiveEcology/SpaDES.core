@@ -2,7 +2,7 @@
 % Please edit documentation in R/downloadData.R
 \name{checksums}
 \alias{checksums}
-\title{Calculate checksum  or a module's data files}
+\title{Calculate checksum for a module's data files}
 \usage{
 checksums(module, path, ...)
 }
@@ -16,7 +16,7 @@ checksums(module, path, ...)
 }
 \description{
 Verify (and optionally write) checksums for data files in a module's
-\code{data/} subdirectory. The file \code{data/CHECKSUMS.txt} contains the
+\file{data/} subdirectory. The file \file{data/CHECKSUMS.txt} contains the
 expected checksums for each data file.
 Checksums are computed using \code{SpaDES.tools:::.digest}, which is simply a
 wrapper around \code{digest::digest}.

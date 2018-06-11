@@ -98,7 +98,5 @@ downloadData("thisModule", "there", files = "theFilename.zip")
       \code{SpaDES.core} package for downloading modules and building a checksums file.
 }
 \author{
-Alex Chubaty
-
-Eliot McIntire
+Alex Chubaty & Eliot McIntire
 }

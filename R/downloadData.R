@@ -1,18 +1,57 @@
-### deal with spurious httr warnings
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(#"actualFile",
-                           "checksum.x", "checksum.y", #"content",
-                           "expectedFile", "filesize.x", "filesize.y", "result"))
+  utils::globalVariables(c(
+    "checksum.x", "checksum.y", "expectedFile", "filesize.x", "filesize.y", "result"
+  ))
 }
 
+if (!isGeneric("extractURL")) {
+  setGeneric(
+    "extractURL",
+    function(x) {
+      standardGeneric("extractURL")
+    })
+}
 
+#' Extract a URL
+#'
+#' @inheritParams reproducible::extractURL
+#'
+#' @author Eliot McIntire
+#' @export
+#' @exportMethod extractURL
+#' @importFrom fastdigest fastdigest
+#' @importFrom reproducible extractURL
+#' @importMethodsFrom reproducible extractURL
+#' @rdname extractURL
+setMethod(
+  "extractURL",
+  signature = "missing",
+  definition = function(x) {
+  browser()
+})
 
+#' @export
+#' @rdname extractURL
+setMethod(
+  "extractURL",
+  signature = "simList",
+  definition = function(x) {
+    browser()
+})
 
-################################################################################
-#' Calculate checksum  or a module's data files
+#' @export
+#' @rdname extractURL
+setMethod(
+  "extractURL",
+  signature = "NULL",
+  definition = function(x) {
+    browser()
+})
+
+#' Calculate checksum for a module's data files
 #'
 #' Verify (and optionally write) checksums for data files in a module's
-#' \code{data/} subdirectory. The file \code{data/CHECKSUMS.txt} contains the
+#' \file{data/} subdirectory. The file \file{data/CHECKSUMS.txt} contains the
 #' expected checksums for each data file.
 #' Checksums are computed using \code{SpaDES.tools:::.digest}, which is simply a
 #' wrapper around \code{digest::digest}.
@@ -135,8 +174,7 @@ remoteFileSize <- function(url) {
 #' @seealso \code{\link{prepInputs}}, \code{checksums} and \code{downloadModule} in
 #'       \code{SpaDES.core} package for downloading modules and building a checksums file.
 #'
-#' @author Alex Chubaty
-#' @author Eliot McIntire
+#' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @importFrom dplyr mutate bind_rows
 #' @importFrom googledrive as_id drive_auth drive_download

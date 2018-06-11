@@ -24,7 +24,6 @@
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "http://github.com/PredictiveEcology/SpaDES"
-
   )
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
