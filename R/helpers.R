@@ -73,7 +73,7 @@ setMethod(
     set(eeldt, NULL, "eventType", eventType)
     set(eeldt, NULL, "eventPriority", eventPriority)
     eeldt # don't set key because it is set later when used
-})
+  })
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -83,7 +83,7 @@ setMethod(
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
     copy(.emptyEventListDT)
-})
+  })
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -131,7 +131,7 @@ setMethod(
       outputObjects = .outputObjects()
     )
     return(out)
-})
+  })
 
 #' Find objects if passed as character strings
 #'
@@ -247,3 +247,46 @@ setMethod(
     })
   list(value = value, warning = warn, error = err)
 }
+
+
+if (!isGeneric("getURL")) {
+  setGeneric(
+    "getURL",
+    function(url) {
+      standardGeneric("getURL")
+    })
+}
+
+#' @inheritParams reproducible::getURL
+#'
+#' @author Eliot McIntire
+#' @exportMethod getURL
+#' @importFrom fastdigest fastdigest
+#' @importFrom reproducible getURL
+#' @importMethodsFrom reproducible getURL
+#' @export
+#' @rdname getURL
+setMethod(
+  "getURL",
+  signature = "missing",
+  definition = function(url) {
+    browser()
+  })
+
+#' @export
+#' @rdname getURL
+setMethod(
+  "getURL",
+  signature = "simList",
+  definition = function(url) {
+    browser()
+  })
+
+#' @export
+#' @rdname getURL
+setMethod(
+  "getURL",
+  signature = "NULL",
+  definition = function(url) {
+    browser()
+  })
