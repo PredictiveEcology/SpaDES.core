@@ -21,7 +21,7 @@ test_that("downloadData downloads and unzips module data", {
     chksums <- structure(
       list(
         file = structure(1:2, .Label = c("DEM.tif", "habitatQuality.tif"), class = "factor"),
-        checksum = structure(1:2, .Label = c("77c56d42fecac5b1", "f21251dcdf23dde0"), class = "factor")
+        checksum = structure(1:2, .Label = c("181f66ffb4580194", "f21251dcdf23dde0"), class = "factor")
       ),
       .Names = c("file", "checksum"),
       class = "data.frame", row.names = c(NA, -2L)

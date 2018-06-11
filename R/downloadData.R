@@ -5,7 +5,45 @@ if (getRversion() >= "3.1.0") {
                            "expectedFile", "filesize.x", "filesize.y", "result"))
 }
 
-checksums <- function(module, path, TODO)
+
+
+
+################################################################################
+#' Calculate checksum  or a module's data files
+#'
+#' Verify (and optionally write) checksums for data files in a module's
+#' \code{data/} subdirectory. The file \code{data/CHECKSUMS.txt} contains the
+#' expected checksums for each data file.
+#' Checksums are computed using \code{SpaDES.tools:::.digest}, which is simply a
+#' wrapper around \code{digest::digest}.
+#'
+#' Modules may require data that for various reasons cannot be distributed with
+#' the module source code. In these cases, the module developer should ensure
+#' that the module downloads and extracts the data required. It is useful to not
+#' only check that the data files exist locally but that their checksums match
+#' those expected.
+#'
+#' @note In version 1.2.0 and earlier, two checksums per file were required
+#' because of differences in the checksum hash values on Windows and Unix-like
+#' platforms. Recent versions use a different (faster) algorithm and only require
+#' one checksum value per file.
+#' To update your \file{CHECKSUMS.txt} files using the new algorithm, see
+#' \url{https://github.com/PredictiveEcology/SpaDES/issues/295#issuecomment-246513405}.
+#'
+#' @param module  Character string giving the name of the module.
+#'
+#' @param path    Character string giving the path to the module directory.
+#' @param ... Passed to \code{\link[reproducible]{Checksums}}, notably, \code{write},
+#'            \code{quickCheck},  \code{checksumFile} and \code{files}.
+#' @importFrom reproducible Checksums
+checksums <- function(module, path, ...) {
+  path <- if (length(module)) {
+    file.path(path, module, "data")
+  } else {
+    file.path(path)
+  }
+  result <- Checksums(path, ...)
+}
 
 #' Determine the size of a remotely hosted file
 #'
@@ -136,7 +174,7 @@ setMethod(
                                   defineModuleElement = "inputObjects")
     urls <- inputs$sourceURL
 
-    # parsedModule <- parse(file = file.path(modulePath, moduleName, paste0(moduleName, '.R')))
+    # parsedModule <- parse(file = file.path(path, module, paste0(module, '.R')))
     # urls <- .getSourceURL(pattern = fileToDownload, x = parsedModule)
 
     if (is.call(urls)) {
@@ -149,8 +187,11 @@ setMethod(
 
     ##
 
-    reproducible::prepInputs(url = urls, path = path)
+    res <- Map(url = urls, reproducible::prepInputs, MoreArgs = list(quick = quickCheck, overwrite = overwrite,
+                             destinationPath = file.path(path, module, "data")))
+    browser() # stopped here
 
+    # TODO -- probably MOST of following code can be removed. Only "children" might be relevant
     ##
 
     ids <- which(urls == "" | is.na(urls))
