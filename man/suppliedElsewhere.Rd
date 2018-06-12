@@ -57,4 +57,11 @@ test <- 1
 mySim <- simInit(objects = list("test" = test))
 suppliedElsewhere("test", mySim) # TRUE
 
+# Example with prepInputs
+# Put chunks like this in your .inputObjects
+if (!suppliedElsewhere("test", sim))
+  sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
+                    destinationPath = dataPath(sim), studyArea = sim$studyArea,
+                    rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
+
 }
