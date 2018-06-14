@@ -10,11 +10,11 @@
 \title{Download module data}
 \usage{
 downloadData(module, path, quiet, quickCheck = FALSE, overwrite = FALSE,
-  files = NULL, checked = NULL, urls = NULL, children = NULL)
+  files = NULL, checked = NULL, urls = NULL, children = NULL, ...)
 
 \S4method{downloadData}{character,character,logical}(module, path, quiet,
   quickCheck = FALSE, overwrite = FALSE, files = NULL, checked = NULL,
-  urls = NULL, children = NULL)
+  urls = NULL, children = NULL, ...)
 
 \S4method{downloadData}{character,missing,missing}(module, quickCheck,
   overwrite, files, checked, urls, children)
@@ -53,6 +53,8 @@ called from inside another function}
 
 \item{children}{The character vector of child modules (without path) to also
 run \code{downloadData} on}
+
+\item{...}{Passed to \code{\link[reproducible]{preProcess}}, e.g., \code{purge}}
 }
 \value{
 Invisibly, a list of downloaded files.

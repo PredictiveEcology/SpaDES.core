@@ -18,6 +18,8 @@ test_that("downloadData downloads and unzips module data", {
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- numeric_version(paste0(R.version$major, ".", R.version$minor))
   if (Rversion > "3.4.2") { ## TODO: need o test on earlier versions too!
+
+    # write checksums
     chksums <- structure(
       list(
         file = structure(1:2, .Label = c("DEM.tif", "habitatQuality.tif"), class = "factor"),
@@ -29,6 +31,8 @@ test_that("downloadData downloads and unzips module data", {
     moduleDir <- file.path(tmpdir, "test")
     dataDir <- file.path(moduleDir, "data")
     write.table(chksums, file = file.path(dataDir, "CHECKSUMS.txt") )
+
+
     expectsInputs <- data.frame(
       objectName = c("DEM", "habitatQuality"),
       objectClass = "RasterLayer",
@@ -38,8 +42,6 @@ test_that("downloadData downloads and unzips module data", {
     )
 
     reproducible::checkPath(dataDir, create = TRUE)
-
-    browser()
 
     #f <- downloadModule(m, tmpdir, quiet = TRUE)
     t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL))
@@ -69,7 +71,10 @@ test_that("downloadData downloads and unzips module data", {
       ras <- raster(file.path(datadir, filenames[2]))
       ras[4] <- maxValue(ras) + 1
       writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
-      downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL)
+      expect_error(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
+      expect_false(exists("dwnload", inherits = FALSE))
+      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, purge = 7)
+      expect_true(all(dwnload$result %in% "OK"))
       expect_true(all(file.exists(file.path(datadir, filenames))))
     }
   }

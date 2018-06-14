@@ -4,50 +4,6 @@ if (getRversion() >= "3.1.0") {
   ))
 }
 
-if (!isGeneric("extractURL")) {
-  setGeneric(
-    "extractURL",
-    function(x) {
-      standardGeneric("extractURL")
-    })
-}
-
-#' Extract a URL
-#'
-#' @inheritParams reproducible::extractURL
-#'
-#' @author Eliot McIntire
-#' @export
-#' @exportMethod extractURL
-#' @importFrom fastdigest fastdigest
-#' @importFrom reproducible extractURL
-#' @importMethodsFrom reproducible extractURL
-#' @rdname extractURL
-setMethod(
-  "extractURL",
-  signature = "missing",
-  definition = function(x) {
-  browser()
-})
-
-#' @export
-#' @rdname extractURL
-setMethod(
-  "extractURL",
-  signature = "simList",
-  definition = function(x) {
-    browser()
-})
-
-#' @export
-#' @rdname extractURL
-setMethod(
-  "extractURL",
-  signature = "NULL",
-  definition = function(x) {
-    browser()
-})
-
 #' Calculate checksum for a module's data files
 #'
 #' Verify (and optionally write) checksums for data files in a module's
@@ -169,6 +125,8 @@ remoteFileSize <- function(url) {
 #' @param children The character vector of child modules (without path) to also
 #'                 run \code{downloadData} on
 #'
+#' @param ... Passed to \code{\link[reproducible]{preProcess}}, e.g., \code{purge}
+#'
 #' @return Invisibly, a list of downloaded files.
 #'
 #' @seealso \code{\link{prepInputs}}, \code{checksums} and \code{downloadModule} in
@@ -195,7 +153,7 @@ remoteFileSize <- function(url) {
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
                                     overwrite = FALSE, files = NULL, checked = NULL,
-                                    urls = NULL, children = NULL) {
+                                    urls = NULL, children = NULL, ...) {
   standardGeneric("downloadData")
 })
 
@@ -205,7 +163,8 @@ setMethod(
   signature = c(module = "character", path = "character", quiet = "logical",
                 quickCheck = "ANY", overwrite = "ANY", files = "ANY", checked = "ANY",
                 urls = "ANY", children = "ANY"),
-  definition = function(module, path, quiet, quickCheck, overwrite, files, checked, urls, children) {
+  definition = function(module, path, quiet, quickCheck, overwrite, files, checked,
+                        urls, children, ...) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
 
@@ -226,9 +185,10 @@ setMethod(
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
 
-    res <- Map(url = urls, reproducible::preProcess, MoreArgs = list(quick = quickCheck, overwrite = overwrite,
-                             destinationPath = file.path(path, module, "data")))
-
+    res <- Map(url = urls, reproducible::preProcess,
+               MoreArgs = append(list(quick = quickCheck, overwrite = overwrite,
+                               destinationPath = file.path(path, module, "data")), list(...))
+               )
     chksums <- rbindlist(lapply(res, function(x) x$checkSums))
     chksums <- chksums[order(-result)]
     chksums <- unique(chksums, by = "expectedFile")

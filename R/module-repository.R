@@ -234,7 +234,6 @@ setMethod(
 #' @seealso \code{\link{zipModule}} for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
-#' @inheritParams SpaDES.tools::downloadData
 #'
 #' @param path    Character string giving the location in which to save the
 #'                downloaded module.
