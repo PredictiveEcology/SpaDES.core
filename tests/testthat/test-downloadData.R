@@ -39,6 +39,8 @@ test_that("downloadData downloads and unzips module data", {
 
     reproducible::checkPath(dataDir, create = TRUE)
 
+    browser()
+
     #f <- downloadModule(m, tmpdir, quiet = TRUE)
     t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL))
     result <- checksums(m, tmpdir)$result

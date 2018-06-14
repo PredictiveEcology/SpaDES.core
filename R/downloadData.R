@@ -208,9 +208,11 @@ setMethod(
   definition = function(module, path, quiet, quickCheck, overwrite, files, checked, urls, children) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
-    inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                                  defineModuleElement = "inputObjects")
-    urls <- inputs$sourceURL
+    if (is.null(urls)) {
+      inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                    defineModuleElement = "inputObjects")
+      urls <- inputs$sourceURL
+    }
 
     # parsedModule <- parse(file = file.path(path, module, paste0(module, '.R')))
     # urls <- .getSourceURL(pattern = fileToDownload, x = parsedModule)
@@ -223,8 +225,7 @@ setMethod(
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
 
-    ##
-
+    browser()
     res <- Map(url = urls, reproducible::prepInputs, MoreArgs = list(quick = quickCheck, overwrite = overwrite,
                              destinationPath = file.path(path, module, "data")))
     browser() # stopped here

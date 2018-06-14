@@ -18,11 +18,11 @@ version 0.2.0
     
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
 * `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
+* `downloadData` has changed dramatically, now it is a wrapper around `reproducible::prepInputs` which does more checking
 
 ## deprecated, defunct, and removed features
 
 * remove `fileExt` -- use `tools::file_ext` instead
-* `downloadData` moved to SpaDES.tools
 
 ## bug fixes
 
