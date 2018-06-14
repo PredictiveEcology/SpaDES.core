@@ -13,6 +13,9 @@
 
 \S4method{extractURL}{`NULL`}(x)
 }
+\arguments{
+\item{x}{A character string or other object containing a url.}
+}
 \description{
 Extract a URL
 }

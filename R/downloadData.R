@@ -208,9 +208,12 @@ setMethod(
   definition = function(module, path, quiet, quickCheck, overwrite, files, checked, urls, children) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
-    inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                                  defineModuleElement = "inputObjects")
-    urls <- inputs$sourceURL
+
+    if (is.null(urls)) {
+      inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                    defineModuleElement = "inputObjects")
+      urls <- inputs$sourceURL
+    }
 
     # parsedModule <- parse(file = file.path(path, module, paste0(module, '.R')))
     # urls <- .getSourceURL(pattern = fileToDownload, x = parsedModule)
@@ -223,216 +226,12 @@ setMethod(
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
 
-    ##
-
-    res <- Map(url = urls, reproducible::prepInputs, MoreArgs = list(quick = quickCheck, overwrite = overwrite,
+    res <- Map(url = urls, reproducible::preProcess, MoreArgs = list(quick = quickCheck, overwrite = overwrite,
                              destinationPath = file.path(path, module, "data")))
-    browser() # stopped here
 
-    # TODO -- probably MOST of following code can be removed. Only "children" might be relevant
-    ##
-
-    ids <- which(urls == "" | is.na(urls))
-    to.dl <- if (length(ids)) urls[-ids] else urls
-    if (is.null(checked)) {
-      chksums <- checksums(module, path, quickCheck = quickCheck, files = files)
-    } else {
-      chksums <- checked
-    }
-    chksums <- chksums %>%
-      dplyr::mutate(renamed = NA, module = module)
-    dataDir <- file.path(path, module, "data" )
-
-    if (!is.null(files)) {
-      chksums <- chksums[chksums$expectedFile %in% basename(files), ]
-      fileMatching <- agrepl(basename(files), basename(to.dl))
-      if (!any(fileMatching)) {
-        fileMatching <- agrepl(basename(files), names(to.dl))
-        chksums <- chksums[chksums$expectedFile %in% names(to.dl)[fileMatching], ]
-        if (!any(fileMatching)) {
-          stop("Could not match the SourceURLs for ", to.dl[fileMatching],
-               " to particular files in the CHECKSUMS.txt.",
-               "\nPerhaps add an entry in .inputObjects whose downloaded filename is closer",
-               " to the online dataset name.")
-        }
-      }
-      to.dl <- to.dl[fileMatching]
-    }
-
-    allInChecksums <- TRUE
-    doDownload <- TRUE
-    if (!(NROW(chksums) > 0 && all(compareNA(chksums$result, "OK")))) {
-    #if (!((any(chksums$result == "FAIL") | any(is.na(chksums$result))) )) {
-      if (length(to.dl) == 0) {
-        message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
-        doDownload <- FALSE
-        allInChecksums <- FALSE
-      } else {
-        message(crayon::magenta("  There is no checksums value for file(s): ",
-                                paste(to.dl, collapse = ", "),
-                                ". Perhaps you need to run\n",
-                                "checksums(\"", module, "\", path = \"", path,
-                                "\", write = TRUE). Downloading it anyway.", sep = ""))
-        out <- "Yes"
-        # if (interactive())  {
-        #   out <- readline(prompt = "Would you like to download it now anyway? (Y)es or (N)o: ")
-        # } else {
-        #   out = "No"
-        # }
-        if (!isTRUE(any(pmatch("Y", toupper(out) )))) {
-          message(crayon::magenta("  No data to download for module ", module, ".", sep = ""))
-          doDownload <- FALSE
-        }
-        allInChecksums <- FALSE
-      }
-    }
-
-    if (doDownload) {
-      setwd(path); on.exit(setwd(cwd), add = TRUE)
-
-      files1 <- sapply(seq(to.dl), function(xInd) {
-        googleDrive <- FALSE
-        if (grepl("drive.google.com", to.dl[xInd])) {
-          message("Using 'googledrive' package, expecting the filename to be provided",
-                  " as the objectName in 'expectsInputs'")
-          xFile <- names(to.dl[xInd])
-          googleDrive <- TRUE
-        } else {
-          xFile <- gsub("[?!]", "_", basename(to.dl[xInd]))
-        }
-        destfile <- file.path(dataDir, xFile)
-
-        if (allInChecksums) {
-          id <- which(chksums$expectedFile == xFile)
-        } else {
-          id <- NA_integer_
-        }
-        if (length(id) == 0) {
-          fuzzy <- integer()
-          md <- 1
-          while (length(fuzzy) == 0) {
-            md <- md + 1
-            fuzzy <- agrep(xFile, chksums$expectedFile, max.distance = md, ignore.case = TRUE)
-            if (md >= nchar(xFile)) fuzzy <- 0
-          }
-          if (all(fuzzy == 0)) {
-            stop("  downloadData() requires that basename(sourceURL) name",
-                 " and local filename be at least somewhat similar.")
-          } else {
-            id <- fuzzy
-            message(crayon::magenta("  Used fuzzy matching of filenames. Assuming\n    ",
-                                    xFile, " is the source for\n      ",
-                                    paste(chksums$expectedFile[id], collapse = ",\n      "), sep = ""))
-          }
-        }
-        # Only do files that were requested, but allow fuzzy matching
-        if (!is.null(files)) {
-          xFile <- xFile[xFile %in% basename(files)]
-        }
-        if ((any(chksums$result[id] == "FAIL") | any(is.na(chksums$actualFile[id]))) | overwrite) {
-          tmpFile <- file.path(tempdir(), "SpaDES_module_data") %>%
-            checkPath(create = TRUE) %>%
-            file.path(., xFile)
-
-          if (!RCurl::url.exists(to.dl[xInd])) {
-            ## if the URL doesn't work allow the user to retrieve it manually
-            message(crayon::magenta("Cannot download ", xFile, " for module ", module, ":\n",
-                                    "\u2937 cannot open URL '", to.dl[xInd], "'.", sep = ""))
-
-            if (interactive()) {
-              readline(prompt = paste0("Try downloading this file manually and put it in ",
-                                       file.path(path, module, "data"),
-                                       "/\nPress [enter] to continue"))
-            }
-
-            ## re-checksums
-            chksums <- checksums(module, path, files = files, quickCheck = quickCheck) %>%
-              dplyr::mutate(renamed = NA, module = module)
-          } else {
-            needNewDownload <- TRUE
-            if (googleDrive) {
-              message(crayon::magenta("Downloading from Google Drive:"))
-
-              ## allow options `httr_oob_default` and `httr_oauth_cache` to be used:
-              googledrive::drive_auth() ## needed for use on e.g., rstudio-server
-
-              googledrive::drive_download(googledrive::as_id(to.dl[xInd]), path = tmpFile,
-                                          overwrite = overwrite, verbose = TRUE)
-            } else {
-              ## check whether file needs to be downloaded
-              remoteFileSize <- remoteFileSize(to.dl[xInd])
-              if (file.exists(destfile)) {
-                if (remoteFileSize > 0)
-                  if (round(file.size(destfile)) == remoteFileSize)
-                    needNewDownload <- FALSE
-              }
-
-              ## download if needed, using Cache in case multiple objects use same url
-              ## (e.g., in a .tar file)
-              if (needNewDownload) {
-                message(crayon::magenta("Downloading ", basename(to.dl[xInd]), " for module ",
-                                        module, ":", sep = ""))
-                download.file(to.dl[xInd], destfile = tmpFile, mode = "wb", quiet = quiet)
-              }
-            }
-            if (needNewDownload) {
-              copied <- file.copy(from = tmpFile, to = destfile, overwrite = overwrite)
-            }
-            destfile
-          }
-        } else {
-          message(crayon::magenta("  Download data step skipped for ", basename(to.dl[xInd]),
-                                  " in module ", module, ". Local copy exists.", sep = ""))
-        }
-      })
-
-      if (!allInChecksums) {
-        # if (interactive()) {
-        #   readline("If download was successful, would you like to run a new checksums? (Y)es or (N)o: ")
-        # } else {
-        #   out = "No"
-        # }
-        # if (isTRUE(any(pmatch("Y", toupper(out) )))) {
-          message("Updating new checksums file. If this is not desired, ",
-                  "manually run checksums(..., write = TRUE)")
-          checkSumFolder <- file.path(path, module, "data")
-          appendChecksumsTable(destinationPath = checkSumFolder, filesToChecksum = basename(to.dl),
-                               append = TRUE,
-                               checkSumFilePath = file.path(checkSumFolder, "CHECKSUMS.txt"))
-
-          # path = destinationPath, write = TRUE, #checksumFile = checkSumFilePath,
-          # files = file.path(destinationPath, filesToChecksum)
-          # checksums(module = module, path = path, write = TRUE)
-        #}
-
-      }
-
-      chksums <- checksums(module, path, quickCheck = quickCheck, files = files) %>%
-        dplyr::mutate(renamed = NA, module = module)
-    } else if (NROW(chksums) > 0) {
-      message(crayon::magenta("  Download data step skipped for module ", module,
-                              ". Local copy exists.", sep = ""))
-    }
-
-    # There are at least 2 options if the expected doesn't match actual
-    # Next line: left logical: if there is no expectation, then doesn't matter,
-    #            right logical: if there is no actualFile, then don't change its name
-    wh <- ((match(chksums$actualFile, chksums$expectedFile) %>% is.na()) &
-             !(chksums$actualFile %>% is.na() )) %>%
-      which()
-    if (length(wh)) {
-      chksums[wh, "renamed"] <- sapply(wh, function(id) {
-        if (!is.na(chksums$expectedFile[id])  ) {
-          renamed <- file.rename(
-            from = file.path(dataDir, chksums$actualFile[id]),
-            to = file.path(dataDir, chksums$expectedFile[id])
-          )
-        } else {
-          message("  downloadData(", module, "): file ",
-                  chksums$expectedFile[id], " wasn't downloaded directly during download.")
-        }
-      })
-    }
+    chksums <- rbindlist(lapply(res, function(x) x$checkSums))
+    chksums <- chksums[order(-result)]
+    chksums <- unique(chksums, by = "expectedFile")
 
     # after download, check for childModules that also require downloading
     chksums2 <- chksums[0,]

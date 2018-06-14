@@ -275,7 +275,6 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 #' @rdname downloadModule
 #' @importFrom reproducible checkPath
 #' @importFrom utils unzip zip
-#' @importFrom SpaDES.tools checksums downloadData
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
