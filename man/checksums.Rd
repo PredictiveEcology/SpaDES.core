@@ -18,7 +18,7 @@ checksums(module, path, ...)
 Verify (and optionally write) checksums for data files in a module's
 \file{data/} subdirectory. The file \file{data/CHECKSUMS.txt} contains the
 expected checksums for each data file.
-Checksums are computed using \code{SpaDES.tools:::.digest}, which is simply a
+Checksums are computed using \code{reproducible:::.digest}, which is simply a
 wrapper around \code{digest::digest}.
 }
 \details{

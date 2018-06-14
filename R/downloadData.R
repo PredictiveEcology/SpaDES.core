@@ -9,7 +9,7 @@ if (getRversion() >= "3.1.0") {
 #' Verify (and optionally write) checksums for data files in a module's
 #' \file{data/} subdirectory. The file \file{data/CHECKSUMS.txt} contains the
 #' expected checksums for each data file.
-#' Checksums are computed using \code{SpaDES.tools:::.digest}, which is simply a
+#' Checksums are computed using \code{reproducible:::.digest}, which is simply a
 #' wrapper around \code{digest::digest}.
 #'
 #' Modules may require data that for various reasons cannot be distributed with
