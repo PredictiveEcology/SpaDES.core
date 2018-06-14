@@ -54,13 +54,14 @@ if (getRversion() >= "3.1.0") {
 #' mySim <- simInit(objects = list("test" = test))
 #' suppliedElsewhere("test", mySim) # TRUE
 #'
+#' \dontrun{
 #' # Example with prepInputs
 #' # Put chunks like this in your .inputObjects
-#' if (!suppliedElsewhere("test", sim))
+#' if (!suppliedElsewhere("test", mySim))
 #'   sim$test <- Cache(prepInputs, "raster.tif", "downloadedArchive.zip",
 #'                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
 #'                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
-#'
+#' }
 suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
   partialMatching <- c("s", "i", "u")
   where <- partialMatching[which(!is.na(pmatch(partialMatching, where)))]
@@ -90,6 +91,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("s" %in% where) {
     match(objDeparsed, names(sim@.envir), nomatch = 0L) > 0L
+
   } else {
     FALSE
   }
