@@ -393,7 +393,7 @@ Event2 <- function(sim) {
   # any objects required by this module and identified in the inputObjects element of defineModule.
   # This is useful if there is something required before simulation to produce the module
   # object dependencies, including such things as downloading default datasets, e.g.,
-  # SpaDES.tools::downloadData(\"LCC2005\", modulePath(sim)).
+  # downloadData(\"LCC2005\", modulePath(sim)).
   # Nothing should be created here that does not create an named object in inputObjects.
   # Any other initiation procedures should be put in \"init\" eventType of the doEvent function.
   # Note: the module developer can check if an object is 'suppliedElsewhere' to

@@ -73,7 +73,7 @@ setMethod(
     set(eeldt, NULL, "eventType", eventType)
     set(eeldt, NULL, "eventPriority", eventPriority)
     eeldt # don't set key because it is set later when used
-})
+  })
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -83,7 +83,7 @@ setMethod(
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
     copy(.emptyEventListDT)
-})
+  })
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -131,7 +131,7 @@ setMethod(
       outputObjects = .outputObjects()
     )
     return(out)
-})
+  })
 
 #' Find objects if passed as character strings
 #'

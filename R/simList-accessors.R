@@ -680,14 +680,14 @@ setMethod("G",
           signature = ".simList",
           definition = function(sim) {
             return(sim@params$.globals)
-          })
+})
 
 #' @export
 #' @rdname globals
 setGeneric("G<-",
            function(sim, value) {
              standardGeneric("G<-")
-           })
+})
 
 #' @name G<-
 #' @aliases G<-,.simList-method
@@ -699,7 +699,7 @@ setReplaceMethod("G",
                    sim@params$.globals <- value
                    validObject(sim)
                    return(sim)
-                 })
+})
 
 ################################################################################
 #' @inheritParams params
@@ -1002,7 +1002,7 @@ setReplaceMethod("progressType",
 #' element of \code{defineModule}.
 #' This is useful if there is something required before simulation to produce the module
 #' object dependencies, including such things as downloading default datasets, e.g.,
-#' \code{SpaDES.tools::downloadData('LCC2005', modulePath(sim))}.
+#' \code{downloadData('LCC2005', modulePath(sim))}.
 #' Nothing should be created here that does not create an named object in inputObjects.
 #' Any other initiation procedures should be put in the "init" eventType of the doEvent function.
 #' Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
@@ -1132,7 +1132,7 @@ setMethod("inputs",
               if (any(!is.na(sim@inputs$loadTime))) {
                 if (!is.null(sim@inputs$loadTime)) {
                   obj <- copy(sim@inputs) # don't change original sim
-                  set(obj, , j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
+                  set(obj, NULL, j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
                   #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.envir)]
                   obj[]
                 }
@@ -1441,7 +1441,7 @@ setReplaceMethod(
        fe <- setDT(fileExts)[setDT(sim@outputs[,c("fun", "package")]), on = c("fun","package")]$exts
        #fe <- suppressMessages(inner_join(sim@outputs, fileExts)$exts)
        wh <- !stri_detect_fixed(str = sim@outputs$file, pattern = ".") &
-         (nzchar(fe, keepNA=TRUE))
+         (nzchar(fe, keepNA = TRUE))
        sim@outputs[wh, "file"] <- paste0(sim@outputs[wh, "file"], ".", fe[wh])
 
        # If the file name already has a time unit on it,
@@ -1456,8 +1456,8 @@ setReplaceMethod(
        sim@outputs[wh, "file"] <- paste0(
          file_path_sans_ext(sim@outputs[wh, "file"]),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA=TRUE) , ".", ""),
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA=TRUE) ,
+         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) ,
                 file_ext(sim@outputs[wh, "file"]),
                 "")
        )
@@ -1831,7 +1831,6 @@ setReplaceMethod(
 })
 
 
-#################
 #' @description
 #' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
 #' \code{dataPath}, like \code{currentModule},is namespaced. This means that when
@@ -1983,7 +1982,7 @@ time..simList <- function(x, unit, ...) {
         unit <- NA_character_
       }
     }
-    if(isTRUE(!startsWith(unit, "second"))) {
+    if (isTRUE(!startsWith(unit, "second"))) {
 
       t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
                            skipChecks = TRUE)
@@ -2516,7 +2515,7 @@ setReplaceMethod(
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
     if (NROW(value)) {
-      sim@completed <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x, ]))
+      sim@completed <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x, ]))
     } else {
       sim@completed <- list()
     }

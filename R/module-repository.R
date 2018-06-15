@@ -234,7 +234,6 @@ setMethod(
 #' @seealso \code{\link{zipModule}} for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
-#' @inheritParams SpaDES.tools::downloadData
 #'
 #' @param path    Character string giving the location in which to save the
 #'                downloaded module.
@@ -275,7 +274,6 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 #' @rdname downloadModule
 #' @importFrom reproducible checkPath
 #' @importFrom utils unzip zip
-#' @importFrom SpaDES.tools checksums downloadData
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
