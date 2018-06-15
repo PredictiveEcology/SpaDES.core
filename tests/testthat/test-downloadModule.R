@@ -126,7 +126,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  m <- "forestAge"
+  m <- "test"
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
