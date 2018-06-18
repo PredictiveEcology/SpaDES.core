@@ -37,19 +37,19 @@ use \code{file.size} instead of \code{digest::digest}.
 This is faster, but potentially much less robust.}
 
 \item{overwrite}{Logical. Should local data files be overwritten in case they exist?
-Default is FALSE}
+Default is \code{FALSE}.}
 
 \item{files}{A character vector of length 1 or more if only a subset of files should be
-checked in the CHECKSUMS.txt file}
+checked in the \file{CHECKSUMS.txt} file.}
 
-\item{checked}{The result of a previous checksums(...) call. This should only be used when
+\item{checked}{The result of a previous \code{checksums} call. This should only be used when
 there is no possibility that the file has changed, i.e., if \code{downloadData} is
-called from inside another function}
+called from inside another function.}
 
 \item{urls}{Character vector of urls from which to get the data. This is automatically
  found from module metadata when this function invoked with
 \code{SpaDES.core::downloadModule(..., data = TRUE)}. See also
-\code{\link{prepInputs}}}
+\code{\link{prepInputs}}.}
 
 \item{children}{The character vector of child modules (without path) to also
 run \code{downloadData} on}

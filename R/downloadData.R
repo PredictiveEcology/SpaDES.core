@@ -22,8 +22,22 @@ if (getRversion() >= "3.1.0") {
 #' because of differences in the checksum hash values on Windows and Unix-like
 #' platforms. Recent versions use a different (faster) algorithm and only require
 #' one checksum value per file.
-#' To update your \file{CHECKSUMS.txt} files using the new algorithm, see
-#' \url{https://github.com/PredictiveEcology/SpaDES/issues/295#issuecomment-246513405}.
+#' To update your \file{CHECKSUMS.txt} files using the new algorithm:
+#' \enumerate{
+#'   \item specify your module (\code{moduleName <- "my_module"});
+#'   \item use a temp dir to ensure all modules get fresh copies of the data
+#'         (\code{tmpdir <- file.path(tempdir(), "SpaDES_modules")});
+#'   \item download your module's data to the temp dir (\code{downloadData(moduleName, tmpdir)});
+#'   \item initialize a dummy simulation to ensure any 'data prep' steps in the
+#'         \code{.inputObjects} section are run (\code{simInit(modules = moduleName)});
+#'   \item recalculate your checksums and overwrite the file
+#'         (\code{checksums(moduleName, tmpdir, write = TRUE)});
+#'   \item copy the new checksums file to your working module directory
+#'         (the one not in the temp dir)
+#'         (\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+#'                to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
+#'                overwrite = TRUE)}).
+#' }
 #'
 #' @param module  Character string giving the name of the module.
 #'
@@ -108,19 +122,19 @@ remoteFileSize <- function(url) {
 #'                   This is faster, but potentially much less robust.
 #'
 #' @param overwrite Logical. Should local data files be overwritten in case they exist?
-#'                  Default is FALSE
+#'                  Default is \code{FALSE}.
 #'
 #' @param files A character vector of length 1 or more if only a subset of files should be
-#'              checked in the CHECKSUMS.txt file
+#'              checked in the \file{CHECKSUMS.txt} file.
 #'
-#' @param checked The result of a previous checksums(...) call. This should only be used when
+#' @param checked The result of a previous \code{checksums} call. This should only be used when
 #'         there is no possibility that the file has changed, i.e., if \code{downloadData} is
-#'         called from inside another function
+#'         called from inside another function.
 #'
 #' @param urls Character vector of urls from which to get the data. This is automatically
 #'             found from module metadata when this function invoked with
 #'            \code{SpaDES.core::downloadModule(..., data = TRUE)}. See also
-#'            \code{\link{prepInputs}}
+#'            \code{\link{prepInputs}}.
 #'
 #' @param children The character vector of child modules (without path) to also
 #'                 run \code{downloadData} on

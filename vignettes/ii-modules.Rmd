@@ -387,6 +387,28 @@ All module data are located in the module's `data/` subdirectory.
 Also included in this folder is a `CHECKSUMS.txt` file that contains the expected checksums for each data file.
 Checksums can be verified (and optionally written) using `checksums()`.
 
+```{r checksums, eval=FALSE}
+## 1. specify your module here
+moduleName <- "my_module"
+
+## 2. use a temp dir to ensure all modules get fresh copies of the data
+tmpdir <- file.path(tempdir(), "SpaDES_modules")
+
+## 3. download your module's data to the temp dir
+downloadData(moduleName, tmpdir)
+
+## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run
+simInit(modules = moduleName)
+
+## 5. recalculate your checksums and overwrite the file
+checksums(moduleName, tmpdir, write = TRUE)
+
+## 6. copy the new checksums file to your working module directory (the one not in the temp dir)
+file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+          to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
+          overwrite = TRUE)
+```
+
 Modules may require data that for various reasons cannot be distributed with the module source code.
 In these cases, the module developer should ensure that the module downloads and extracts the data required.
 It is useful to not only check that the data files exist locally but that their checksums match those expected (see `checksums()`).
