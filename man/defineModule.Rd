@@ -81,18 +81,16 @@ values set to defaults
                         to load if available, and install if not available.
                         Because \code{\link[reproducible]{Require}} can also download from
                         GitHub.com, these packages can specify package names stored
-                        on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}.
-                        \cr
+                        on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
    \code{parameters} \tab A data.frame specifying the parameters used in the module.
                           Usually produced by \code{rbind}-ing the outputs of multiple
                           \code{\link{defineParameter}} calls. These parameters indicate
                           the default values that will be used unless a module user
                           overrides them with the \code{params} argument in the
                           \code{\link{simInit}} call. The minimum and maximum are
-                          currently used
-                          by the \code{shine} function and the \code{POM} function, and they
-                          should indicate the range of values that are reasonable
-                          scientifically.\cr
+                          currently used by the \code{shine} function and the
+                          \code{POM} function, and they should indicate the range
+                          of values that are reasonable scientifically.\cr
    \code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as
                             inputs to the module,
                             with columns \code{objectName} (class \code{character}),
@@ -100,9 +98,8 @@ values set to defaults
                             \code{sourceURL} (class \code{character}), and \code{other}
                              (currently spades does nothing with this column).
                             This data.frame identifies the objects that are expected,
-                            but does not do any loading of
-                            that object into the simList. The \code{sourceURL} gives
-                            the developer the opportunity
+                            but does not do any loading of that object into the simList.
+                            The \code{sourceURL} gives the developer the opportunity
                             to identify the source of a data file that can be used
                             with the model. This URL will be
                             used if the user calls \code{downloadData} (or

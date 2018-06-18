@@ -46,16 +46,19 @@
 .emptyEventListDT <- data.table(eventTime = integer(0L), moduleName = character(0L),
                                 eventType = character(0L), eventPriority = numeric(0L))
 
-#' @rdname emptyEventList
 #' @importFrom data.table data.table
+#' @keywords internal
+#' @rdname emptyEventList
 .singleEventListDT <- data.table(eventTime = integer(1L), moduleName = character(1L),
-                          eventType = character(1L), eventPriority = numeric(1L))
+                                 eventType = character(1L), eventPriority = numeric(1L))
 
+#' @keywords internal
 #' @rdname emptyEventList
 setGeneric(".emptyEventList", function(eventTime, moduleName, eventType, eventPriority) {
   standardGeneric(".emptyEventList")
 })
 
+#' @keywords internal
 #' @rdname emptyEventList
 #' @importFrom data.table set copy
 setMethod(
@@ -65,14 +68,14 @@ setMethod(
   definition = function(eventTime, moduleName, eventType, eventPriority) {
     # This is faster than direct call to new data.table
     eeldt <- copy(.singleEventListDT)
-    set(eeldt, , "eventTime", eventTime)
-    set(eeldt, , "moduleName", moduleName)
-    set(eeldt, , "eventType", eventType)
-    set(eeldt, , "eventPriority", eventPriority)
-    eeldt
-    # don't set key because it is set later when used
-})
+    set(eeldt, NULL, "eventTime", eventTime)
+    set(eeldt, NULL, "moduleName", moduleName)
+    set(eeldt, NULL, "eventType", eventType)
+    set(eeldt, NULL, "eventPriority", eventPriority)
+    eeldt # don't set key because it is set later when used
+  })
 
+#' @keywords internal
 #' @rdname emptyEventList
 setMethod(
   ".emptyEventList",
@@ -80,13 +83,14 @@ setMethod(
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
     copy(.emptyEventListDT)
-})
+  })
 
+#' @keywords internal
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
 
 
-################################################################################
+
 #' Default (empty) metadata
 #'
 #' Internal use only.
@@ -127,7 +131,7 @@ setMethod(
       outputObjects = .outputObjects()
     )
     return(out)
-})
+  })
 
 #' Find objects if passed as character strings
 #'
@@ -183,7 +187,7 @@ setMethod(
   if (!skipNamespacing) {
     pkgs <- c("SpaDES.core", pkgs)
     pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
-    pkgPositions <- pmatch(paste0("package:",unlist(pkgs)), search())
+    pkgPositions <- pmatch(paste0("package:", unlist(pkgs)), search())
 
     # Find all packages that are not in the first sequence after .GlobalEnv
     whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
@@ -198,7 +202,8 @@ setMethod(
         whAdd <- which(is.na(pkgPositions))
       }
 
-      if (length(whRm) > 0) { # i.e,. ones that need reordering
+      if (length(whRm) > 0) {
+        # i.e,. ones that need reordering
         suppressWarnings(
           lapply(unique(gsub(pkgs, pattern = "package:", replacement = "")[whRm]), function(pack) {
             try(detach(paste0("package:", pack), character.only = TRUE), silent = TRUE)
@@ -216,11 +221,29 @@ setMethod(
       }
     }
   }
-
 }
 
-
-.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats"
+.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats" # nolint
 
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
-.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)], paste0("package:",.pkgEnv$corePackagesVec[-(1:2)]))
+.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
+                             paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
+
+#' tryCatch that keeps warnings, errors and value (result)
+#'
+#' This is from https://stackoverflow.com/a/24569739/3890027
+#'
+#' @keywords internal
+#' @rdname tryCatch
+.tryCatch <- function(expr) {
+  warn <- err <- NULL
+  value <- withCallingHandlers(
+    tryCatch(expr, error = function(e) {
+      err <<- e
+      NULL
+    }), warning = function(w) {
+      warn <<- w
+      invokeRestart("muffleWarning")
+    })
+  list(value = value, warning = warn, error = err)
+}

@@ -238,7 +238,7 @@ defineModule(sim, list(
     defineParameter(\".plotInterval\", \"numeric\", NA, NA, NA, \"This describes the simulation time interval between plot events\"),
     defineParameter(\".saveInitialTime\", \"numeric\", NA, NA, NA, \"This describes the simulation time at which the first save event should occur\"),
     defineParameter(\".saveInterval\", \"numeric\", NA, NA, NA, \"This describes the simulation time interval between save events\"),
-    defineParameter(\".useCache\", \"numeric\", FALSE, NA, NA, \"Should this entire module be run with caching activated? This is generally intended for data-type modules, where stochasticity and time are not relevant\")
+    defineParameter(\".useCache\", \"logical\", FALSE, NA, NA, \"Should this entire module be run with caching activated? This is generally intended for data-type modules, where stochasticity and time are not relevant\")
   ),
   inputObjects = bind_rows(
     #expectsInput(\"objectName\", \"objectClass\", \"input object description\", sourceURL, ...),
@@ -256,7 +256,7 @@ defineModule(sim, list(
 ## event types
 #   - type `init` is required for initialiazation
 
-doEvent.", name, " = function(sim, eventTime, eventType, debug = FALSE) {
+doEvent.", name, " = function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {
@@ -274,7 +274,7 @@ doEvent.", name, " = function(sim, eventTime, eventType, debug = FALSE) {
       # ! ----- EDIT BELOW ----- ! #
       # do stuff for this event
 
-      #Plot(objectFromModule) # uncomment this, replace with object to plot
+      #plotFun(sim) # uncomment this, replace with object to plot
       # schedule future event(s)
 
       # e.g.,
@@ -355,10 +355,10 @@ Save <- function(sim) {
 }
 
 ### template for plot events
-Plot <- function(sim) {
+plotFun <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # do stuff for this event
-  #Plot(\"object\")
+  #Plot(sim$object)
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
@@ -368,8 +368,8 @@ Plot <- function(sim) {
 Event1 <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  sim$event1Test1 <- \" this is test for event 1. \" # for dummy unit test
-  sim$event1Test2 <- 999 # for dummy unit test
+  # sim$event1Test1 <- \" this is test for event 1. \" # for dummy unit test
+  # sim$event1Test2 <- 999 # for dummy unit test
 
 
   # ! ----- STOP EDITING ----- ! #
@@ -380,8 +380,8 @@ Event1 <- function(sim) {
 Event2 <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  sim$event2Test1 <- \" this is test for event 2. \" # for dummy unit test
-  sim$event2Test2 <- 777  # for dummy unit test
+  # sim$event2Test1 <- \" this is test for event 2. \" # for dummy unit test
+  # sim$event2Test2 <- 777  # for dummy unit test
 
 
   # ! ----- STOP EDITING ----- ! #
@@ -396,11 +396,11 @@ Event2 <- function(sim) {
   # downloadData(\"LCC2005\", modulePath(sim)).
   # Nothing should be created here that does not create an named object in inputObjects.
   # Any other initiation procedures should be put in \"init\" eventType of the doEvent function.
-  # Note: the module developer can use 'sim$.userSuppliedObjNames' in their function below to
+  # Note: the module developer can check if an object is 'suppliedElsewhere' to
   # selectively skip unnecessary steps because the user has provided those inputObjects in the
-  # simInit call. e.g.,
-  # if (!('defaultColor' %in% sim$.userSuppliedObjNames)) {
-  #  sim$defaultColor <- 'red'
+  # simInit call, or another module will supply or has supplied it. e.g.,
+  # if (!suppliedElsewhere('defaultColor', sim)) {
+  #   sim$defaultColor <- 'red'
   # }
   # ! ----- EDIT BELOW ----- ! #
 
@@ -468,14 +468,13 @@ For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
 # Usage
 
 ```{r module_usage}
-library(igraph)
-library(SpaDES.core)
+library(SpaDES)
 
-moduleDir <- file.path(\"", path, "\")
-inputDir <- file.path(moduleDir, \"inputs\") %>% reproducible::checkPath(create = TRUE)
-outputDir <- file.path(moduleDir, \"outputs\")
-cacheDir <- file.path(outputDir, \"cache\")
+setPaths(modulePath = file.path(\"", path, "\"))
+getPaths() # shows where the 4 relevant paths are
+
 times <- list(start = 0, end = 10)
+
 parameters <- list(
   #.progress = list(type = \"text\", interval = 1), # for a progress bar
   ## If there are further modules, each can have its own set of parameters:
@@ -484,17 +483,13 @@ parameters <- list(
 )
 modules <- list(\"", name, "\")
 objects <- list()
-paths <- list(
-  cachePath = cacheDir,
-  modulePath = moduleDir,
-  inputPath = inputDir,
-  outputPath = outputDir
-)
+inputs <- list()
+outputs <- list()
 
 mySim <- simInit(times = times, params = parameters, modules = modules,
-                 objects = objects, paths = paths)
+                 objects = objects)
 
-spades(mySim)
+mySimOut <- spades(mySim)
 ```
 
 # Events

@@ -187,6 +187,27 @@ mySim <- spades(mySim) # runs the simulation
 # overview of the events in the simulation
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
+## ----checksums, eval=FALSE-----------------------------------------------
+#  ## 1. specify your module here
+#  moduleName <- "my_module"
+#  
+#  ## 2. use a temp dir to ensure all modules get fresh copies of the data
+#  tmpdir <- file.path(tempdir(), "SpaDES_modules")
+#  
+#  ## 3. download your module's data to the temp dir
+#  downloadData(moduleName, tmpdir)
+#  
+#  ## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run
+#  simInit(modules = moduleName)
+#  
+#  ## 5. recalculate your checksums and overwrite the file
+#  checksums(moduleName, tmpdir, write = TRUE)
+#  
+#  ## 6. copy the new checksums file to your working module directory (the one not in the temp dir)
+#  file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+#            to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
+#            overwrite = TRUE)
+
 ## ----module-object-diagrams, eval=TRUE, echo=TRUE, message=FALSE, fig.width=7----
 library(SpaDES.core)
 

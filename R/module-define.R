@@ -82,18 +82,16 @@ moduleDefaults <- list(
 #'                         to load if available, and install if not available.
 #'                         Because \code{\link[reproducible]{Require}} can also download from
 #'                         GitHub.com, these packages can specify package names stored
-#'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}.
-#'                         \cr
+#'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
 #'    \code{parameters} \tab A data.frame specifying the parameters used in the module.
 #'                           Usually produced by \code{rbind}-ing the outputs of multiple
 #'                           \code{\link{defineParameter}} calls. These parameters indicate
 #'                           the default values that will be used unless a module user
 #'                           overrides them with the \code{params} argument in the
 #'                           \code{\link{simInit}} call. The minimum and maximum are
-#'                           currently used
-#'                           by the \code{shine} function and the \code{POM} function, and they
-#'                           should indicate the range of values that are reasonable
-#'                           scientifically.\cr
+#'                           currently used by the \code{shine} function and the
+#'                           \code{POM} function, and they should indicate the range
+#'                           of values that are reasonable scientifically.\cr
 #'    \code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as
 #'                             inputs to the module,
 #'                             with columns \code{objectName} (class \code{character}),
@@ -101,9 +99,8 @@ moduleDefaults <- list(
 #'                             \code{sourceURL} (class \code{character}), and \code{other}
 #'                              (currently spades does nothing with this column).
 #'                             This data.frame identifies the objects that are expected,
-#'                             but does not do any loading of
-#'                             that object into the simList. The \code{sourceURL} gives
-#'                             the developer the opportunity
+#'                             but does not do any loading of that object into the simList.
+#'                             The \code{sourceURL} gives the developer the opportunity
 #'                             to identify the source of a data file that can be used
 #'                             with the model. This URL will be
 #'                             used if the user calls \code{downloadData} (or
@@ -211,25 +208,25 @@ setMethod(
 
     ## enforce/coerce types for the user-supplied param list
     lapply(c("name", "description", "keywords"), function(z) {
-      x[[z]] <<- if ( is.null(x[[z]]) || (length(x[[z]]) == 0) ) {
+      x[[z]] <<- if (is.null(x[[z]]) || (length(x[[z]]) == 0)) {
         moduleDefaults[[z]]
       } else {
         as.character(x[[z]])
       }
     })
 
-    x$childModules <- if ( is.null(x$childModules) ) {
+    x$childModules <- if (is.null(x$childModules)) {
       moduleDefaults$childModules
     } else {
-      if( isTRUE(is.na(x$childModules)) ) {
+      if (isTRUE(is.na(x$childModules))) {
         moduleDefaults$childModules
       } else {
-        x$childModules %>% as.character() %>% na.omit() %>% as.character()
+        x$childModules %>% as.character() %>% na.omit() %>% as.character() # nolint
       }
     }
 
 
-    x$authors <- if ( is.null(x$authors) || is.na(x$authors) ) {
+    x$authors <- if (is.null(x$authors) || is.na(x$authors)) {
       moduleDefaults$authors
     } else {
       as.person(x$authors)
@@ -255,13 +252,13 @@ setMethod(
       }
     }
 
-    x$timeframe <- if ( is.null(x$timeframe) || is.na(x$timeframe) ) {
+    x$timeframe <- if (is.null(x$timeframe) || is.na(x$timeframe)) {
       eval(moduleDefaults$timeframe)
     } else if (!is.numeric.POSIXt(x$timeframe)) {
       as.POSIXlt(x$timeframe)
-    } %>% `[`(1:2)
+    } %>% `[`(1:2) # nolint
 
-    if ( is.null(x$timeunit) || is.na(x$timeunit) ) {
+    if (is.null(x$timeunit) || is.na(x$timeunit)) {
       x$timeunit <- moduleDefaults$timeunit
     }
 
@@ -272,12 +269,12 @@ setMethod(
         as.list(x[[z]])
       }
     })
-    if ( is.null(x$parameters) ) {
+    if (is.null(x$parameters)) {
       x$parameters <- defineParameter()
     } else {
-      if ( is(x$parameters, "data.frame") ) {
-        if ( !all(colnames(x$parameters) %in% colnames(defineParameter())) ||
-             !all(colnames(defineParameter()) %in% colnames(x$parameters)) ) {
+      if (is(x$parameters, "data.frame")) {
+        if (!all(colnames(x$parameters) %in% colnames(defineParameter())) ||
+            !all(colnames(defineParameter()) %in% colnames(x$parameters))) {
           stop("invalid data.frame `parameters` in module `", x$name, "`")
         }
       } else {
@@ -289,8 +286,8 @@ setMethod(
       x$inputObjects <- .inputObjects()
     } else {
       if (is(x$inputObjects, "data.frame")) {
-        if ( !all(colnames(x$inputObjects) %in% colnames(.inputObjects())) ||
-             !all(colnames(.inputObjects()) %in% colnames(x$inputObjects)) ) {
+        if (!all(colnames(x$inputObjects) %in% colnames(.inputObjects())) ||
+            !all(colnames(.inputObjects()) %in% colnames(x$inputObjects))) {
           stop("invalid data.frame `inputObjects` in module `", x$name, "`:\n",
                "provided: ", paste(colnames(x$inputObjects), collapse = ", "),
                "expected: ", paste(colnames(.inputObjects()), collapse = ", "))
@@ -313,8 +310,8 @@ setMethod(
       x$outputObjects <- .outputObjects()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        if ( !all(colnames(x$outputObjects) %in% colnames(.outputObjects())) ||
-             !all(colnames(.outputObjects()) %in% colnames(x$outputObjects)) ) {
+        if (!all(colnames(x$outputObjects) %in% colnames(.outputObjects())) ||
+            !all(colnames(.outputObjects()) %in% colnames(x$outputObjects))) {
           stop("invalid data.frame `outputObjects` in module `", x$name, "`:",
                "provided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
                "expected: ", paste(colnames(.outputObjects()), collapse = ", "))
@@ -357,6 +354,10 @@ setMethod(
 #'
 #' Used to specify a parameter's name, value, and set a default.
 #'
+#' @note Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
+#'       real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
+#'       See \code{\link{NA}}.
+#'
 #' @param name      Character string giving the parameter name.
 #' @param class     Character string giving the parameter class.
 #' @param default   The default value to use when none is specified by the user.
@@ -388,13 +389,20 @@ setMethod("defineParameter",
           signature(name = "character", class = "character", default = "ANY",
                     min = "ANY", max = "ANY", desc = "character"),
           definition = function(name, class, default, min, max, desc) {
-
-            # coerce `default`, `min`, and `max` to same specified type
-            # These next lines commented out because it doesn't allow for character e.g.,
-            #   start(sim)
-            #default <- as(default, class)
-            #min <- as(min, class)
-            #max <- as(max, class)
+            # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
+            # we can't just coerece these because it wouldn't allow for character,
+            #  e.g., start(sim)
+            anyNAs <- c(is.na(default), is.na(min), is.na(max))
+            if (!all(anyNAs)) {
+              # if some or all are NA -- need to check
+              if (!all(is(c(default, min, max)[!anyNAs], class))) {
+                #if (!all(is(default, class), is(min, class), is(max, class))) {
+                # any messages here are captured if this is run from .parseModule
+                #   It will append module name
+                message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
+                                        class, "'.", sep = ""))
+              }
+            }
 
             # previously used `substitute()` instead of `I()`,
             # but it did not allow for a vector to be passed with `c()`
@@ -411,7 +419,7 @@ setMethod("defineParameter",
                     default = "ANY", min = "missing", max = "missing",
                     desc = "character"),
           definition = function(name, class, default, desc) {
-            NAtypes <- c("character", "complex", "integer", "logical", "numeric")
+            NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
             if (class %in% NAtypes) {
               # coerce `min` and `max` to same type as `default`
               min <- as(NA, class)
@@ -594,6 +602,7 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
+#' @importFrom tools file_ext
 #' @rdname fillInputRows
 .fillInputRows <- function(inputDF, startTime) {
   factorCols <- sapply(inputDF, is.factor)
@@ -604,7 +613,7 @@ setMethod(
   if (any(needRenameArgs)) {
     colnames(inputDF)[needRenameArgs] <- .fileTableInCols[pmatch("arg", .fileTableInCols)]
   }
-  columns <- pmatch(substr(.fileTableInCols,1,c(3,5,1,3,5,5,3,5)), names(inputDF))
+  columns <- pmatch(substr(.fileTableInCols, 1, c(3, 5, 1, 3, 5, 5, 3, 5)), names(inputDF))
   setnames(inputDF, old = colnames(inputDF)[na.omit(columns)],
            new = .fileTableInCols[!is.na(columns)])
   if (any(is.na(columns))) {
@@ -616,7 +625,7 @@ setMethod(
   }
 
   if (any(is.na(inputDF[, "objectName"]))) {
-    inputDF[is.na(inputDF$objectName), "objectName"] <- fileName(inputDF[is.na(inputDF$objectName), "file"])
+    inputDF[is.na(inputDF$objectName), "objectName"] <- fileName(inputDF[is.na(inputDF$objectName), "file"]) # nolint
   }
 
   # correct those for which a specific function is supplied in filelistDT$fun
@@ -635,14 +644,14 @@ setMethod(
     if (any(is.na(inputDF2[, "fun"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]) )
+      exts <- na.omit(match(file_ext(fl), .fileExts[, "exts"]))
       inputDF2$fun[is.na(inputDF2$fun)] <- .fileExts[exts, "fun"]
     }
 
     if (any(is.na(inputDF2[, "package"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- match(fileExt(fl), .fileExts[, "exts"])
+      exts <- match(file_ext(fl), .fileExts[, "exts"])
       inputDF2$package[is.na(inputDF2$package)]  <- .fileExts[exts, "package"]
     }
     inputDF[!objectsOnly, ] <- inputDF2
@@ -657,6 +666,7 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
+#' @importFrom tools file_ext
 #' @rdname fillOutputRows
 .fillOutputRows <- function(outputDF, endTime) {
   needRenameArgs <- grepl(names(outputDF), pattern = "arg[s]?$")
@@ -664,7 +674,7 @@ setMethod(
     colnames(outputDF)[needRenameArgs] <-
       .fileTableOutCols[pmatch("arg", .fileTableOutCols)]
   }
-  columns <- pmatch(substr(.fileTableOutCols,1,c(3,5,1,3,5,5,3)), names(outputDF))
+  columns <- pmatch(substr(.fileTableOutCols, 1, c(3, 5, 1, 3, 5, 5, 3)), names(outputDF))
   setnames(outputDF, old = colnames(outputDF)[na.omit(columns)],
            new = .fileTableOutCols[!is.na(columns)])
 
@@ -688,12 +698,12 @@ setMethod(
   if (any(is.na(outputDF[, "fun"]))) {
     .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
-    exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA=TRUE))) {
-      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA=TRUE))] <- .fileExts$fun[1]
+    exts <- file_ext(fl)
+    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
     }
     if (any(is.na(outputDF[, "fun"]))) {
-      exts <- na.omit(match(exts, .fileExts[, "exts"]) )
+      exts <- na.omit(match(exts, .fileExts[, "exts"]))
       outputDF$fun[is.na(outputDF$fun)] <- .fileExts[exts, "fun"]
     }
   }
@@ -701,15 +711,14 @@ setMethod(
   if (any(is.na(outputDF[, "package"]))) {
     .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
-    exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA=TRUE))) {
-      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA=TRUE))] <- .fileExts$package[1]
+    exts <- file_ext(fl)
+    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
     }
     if (any(is.na(outputDF[, "package"]))) {
-      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]) )
+      exts <- na.omit(match(file_ext(fl), .fileExts[, "exts"]) )
       outputDF$package[is.na(outputDF$package)] <- .fileExts[exts, "package"]
     }
   }
   return(outputDF)
 }
-

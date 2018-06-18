@@ -1,7 +1,10 @@
-urls:
-  reference: http://spades-core.predictiveecology.org//reference
-  article: http://spades-core.predictiveecology.org//articles
+pandoc: 1.19.2.4
+pkgdown: 1.1.0
+pkgdown_sha: ~
 articles:
   i-introduction: i-introduction.html
   ii-modules: ii-modules.html
+urls:
+  reference: http://spades-core.predictiveecology.org//reference
+  article: http://spades-core.predictiveecology.org//articles
 

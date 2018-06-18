@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Download a module from a SpaDES module GitHub repository � downloadModule • SpaDES.core</title>
+<title>Download a module from a SpaDES module GitHub repository — downloadModule • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,25 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Download a module from a SpaDES module GitHub repository — downloadModule" />
+
+<meta property="og:description" content="Download a .zip file of the module and extract (unzip) it to a user-specified location." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +46,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +69,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +102,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +114,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,33 +122,38 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Download a module from a SpaDES module GitHub repository</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/module-repository.R'><code>R/module-repository.R</code></a></small>
+    <div class="hidden name"><code>downloadModule.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Download a .zip file of the module and extract (unzip) it to a user-specified location.</p>
     
+    </div>
 
-    <pre class="usage"><span class='fu'>downloadModule</span>(<span class='no'>name</span>, <span class='no'>path</span>, <span class='no'>version</span>, <span class='no'>repo</span>, <span class='no'>data</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>downloadModule</span>(<span class='no'>name</span>, <span class='no'>path</span>, <span class='no'>version</span>, <span class='no'>repo</span>, <span class='no'>data</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 
-  <span class='co'># S4 method for character,character,character,character,logical,logical</span>
+  <span class='co'># S4 method for character,character,character,character,logical,logical,ANY,logical</span>
 <span class='fu'>downloadModule</span>(<span class='no'>name</span>,
-  <span class='no'>path</span>, <span class='no'>version</span>, <span class='no'>repo</span>, <span class='no'>data</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='no'>path</span>, <span class='no'>version</span>, <span class='no'>repo</span>, <span class='no'>data</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 
-  <span class='co'># S4 method for character,missing,missing,missing,missing,missing</span>
+  <span class='co'># S4 method for character,missing,missing,missing,missing,missing,ANY,ANY</span>
 <span class='fu'>downloadModule</span>(<span class='no'>name</span>,
-  <span class='no'>quickCheck</span>)
+  <span class='no'>quickCheck</span>, <span class='no'>overwrite</span>)
 
-<span class='co'># S4 method for character,ANY,ANY,ANY,ANY,ANY</span>
-<span class='fu'>downloadModule</span>(<span class='no'>name</span>, <span class='no'>path</span>, <span class='no'>version</span>,
-  <span class='no'>repo</span>, <span class='no'>data</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+<span class='co'># S4 method for character,ANY,ANY,ANY,ANY,ANY,ANY,ANY</span>
+<span class='fu'>downloadModule</span>(<span class='no'>name</span>, <span class='no'>path</span>,
+  <span class='no'>version</span>, <span class='no'>repo</span>, <span class='no'>data</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -152,14 +172,15 @@ the most recent version will be retrieved.)</p></td>
     </tr>
     <tr>
       <th>repo</th>
-      <td><p>GitHub repository name.
+      <td><p>GitHub repository name, specified as <code>"username/repo"</code>.
 Default is <code>"PredictiveEcology/SpaDES-modules"</code>, which is
-specified by the global option <code>spades.moduleRepo</code>.</p></td>
+specified by the global option <code>spades.moduleRepo</code>.
+Only <code>master</code> branches can be used at this point.</p></td>
     </tr>
     <tr>
       <th>data</th>
-      <td><p>Logical. If TRUE, then the data that is identified in the module
-metadata will be downloaded, if possible. Default if FALSE.</p></td>
+      <td><p>Logical. If <code>TRUE</code>, then the data that is identified in the
+module metadata will be downloaded, if possible. Default <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>quiet</th>
@@ -170,6 +191,11 @@ metadata will be downloaded, if possible. Default if FALSE.</p></td>
       <td><p>Logical. If <code>TRUE</code>, then the check with local data will only
 use <code>file.size</code> instead of <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>.
 This is faster, but potentially much less robust.</p></td>
+    </tr>
+    <tr>
+      <th>overwrite</th>
+      <td><p>Logical. Should local module files be overwritten in case they exist?
+Default <code>FALSE</code>.</p></td>
     </tr>
     </table>
     
@@ -184,7 +210,9 @@ This is faster, but potentially much less robust.</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Currently only works with a public GitHub repository, where modules are in
-a <code>modules</code> directory in the root tree on the <code>master</code> branch.</p>
+a <code>modules</code> directory in the root tree on the <code>master</code> branch.
+Module .zip files' names should contain the version number and be inside their
+respective module folders (see <code><a href='zipModule.html'>zipModule</a></code> for zip compression of modules).</p>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
@@ -192,6 +220,10 @@ a <code>modules</code> directory in the root tree on the <code>master</code> bra
 if a value is set. This alleviates 403 errors caused by too-frequent downloads.
 Generate a GitHub personal access token at <a href='https://github.com/settings/tokens'>https://github.com/settings/tokens</a>.</p>
 <p>The default is to overwrite any existing files in the case of a conflict.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='zipModule.html'>zipModule</a></code> for creating module .zip folders.</p></div>
     
 
   </div>
@@ -205,6 +237,8 @@ Generate a GitHub personal access token at <a href='https://github.com/settings/
       <li><a href="#details">Details</a></li>
 
       <li><a href="#note">Note</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
     <h2>Author</h2>
@@ -226,5 +260,8 @@ Alex Chubaty
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

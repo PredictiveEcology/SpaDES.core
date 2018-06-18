@@ -81,17 +81,17 @@ setMethod(
 
     ### completed events
     out[[20]] <- capture.output(cat(">> Completed Events:\n"))
-    out[[21]] <- capture.output(print(completed(object)))
+    out[[21]] <- capture.output(completed(object))
     out[[22]] <- capture.output(cat("\n"))
 
     ### Current events
     out[[23]] <- capture.output(cat(">> Current Event:\n"))
-    out[[24]] <- capture.output(print(current(object)))
+    out[[24]] <- capture.output(current(object))
     out[[25]] <- capture.output(cat("\n"))
 
     ### scheduled events
     out[[26]] <- capture.output(cat(">> Scheduled Events:\n"))
-    out[[27]] <- capture.output(print(events(object)))
+    out[[27]] <- capture.output(events(object))
     out[[28]] <- capture.output(cat("\n"))
 
     ### print result
@@ -680,14 +680,14 @@ setMethod("G",
           signature = ".simList",
           definition = function(sim) {
             return(sim@params$.globals)
-          })
+})
 
 #' @export
 #' @rdname globals
 setGeneric("G<-",
            function(sim, value) {
              standardGeneric("G<-")
-           })
+})
 
 #' @name G<-
 #' @aliases G<-,.simList-method
@@ -699,7 +699,7 @@ setReplaceMethod("G",
                    sim@params$.globals <- value
                    validObject(sim)
                    return(sim)
-                 })
+})
 
 ################################################################################
 #' @inheritParams params
@@ -1132,7 +1132,7 @@ setMethod("inputs",
               if (any(!is.na(sim@inputs$loadTime))) {
                 if (!is.null(sim@inputs$loadTime)) {
                   obj <- copy(sim@inputs) # don't change original sim
-                  set(obj, , j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
+                  set(obj, NULL, j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
                   #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.envir)]
                   obj[]
                 }
@@ -1391,6 +1391,7 @@ setGeneric("outputs<-",
 #' @name outputs<-
 #' @aliases outputs<-,.simList-method
 #' @rdname simList-accessors-inout
+#' @importFrom data.table setDT
 #' @export
 setReplaceMethod(
   "outputs",
@@ -1437,9 +1438,10 @@ setReplaceMethod(
 
        # file extension stuff
        fileExts <- .saveFileExtensions()
-       fe <- suppressMessages(inner_join(sim@outputs, fileExts)$exts)
+       fe <- setDT(fileExts)[setDT(sim@outputs[,c("fun", "package")]), on = c("fun","package")]$exts
+       #fe <- suppressMessages(inner_join(sim@outputs, fileExts)$exts)
        wh <- !stri_detect_fixed(str = sim@outputs$file, pattern = ".") &
-         (nzchar(fe, keepNA=TRUE))
+         (nzchar(fe, keepNA = TRUE))
        sim@outputs[wh, "file"] <- paste0(sim@outputs[wh, "file"], ".", fe[wh])
 
        # If the file name already has a time unit on it,
@@ -1454,8 +1456,8 @@ setReplaceMethod(
        sim@outputs[wh, "file"] <- paste0(
          file_path_sans_ext(sim@outputs[wh, "file"]),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA=TRUE) , ".", ""),
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA=TRUE) ,
+         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) ,
                 file_ext(sim@outputs[wh, "file"]),
                 "")
        )
@@ -1632,7 +1634,6 @@ setReplaceMethod(
     whValueNamed <- which(!is.na(pmatch(names(value), names(sim@paths)))) # length of names of value
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
-
 
     # keep named elements, use unnamed in remaining order:
     #  cache, input, module, output
@@ -1830,7 +1831,6 @@ setReplaceMethod(
 })
 
 
-#################
 #' @description
 #' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
 #' \code{dataPath}, like \code{currentModule},is namespaced. This means that when
@@ -1982,16 +1982,11 @@ time..simList <- function(x, unit, ...) {
         unit <- NA_character_
       }
     }
-    if(isTRUE(!startsWith(unit, "second"))) {
+    if (isTRUE(!startsWith(unit, "second"))) {
 
-    #if (!is.na(unit)) {
-      #browser()
-      #if (is.na(pmatch("second", unit))) {
-        # i.e., if not in same units as simulation
-        t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
-                             skipChecks = TRUE)
-        return(t)
-      #}
+      t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
+                           skipChecks = TRUE)
+      return(t)
     }
     t <- x@simtimes[["current"]]
     return(t)
@@ -2028,6 +2023,10 @@ setReplaceMethod(
 #' @include times.R
 #' @importFrom stats end
 #' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-times
+end <- function(x, ...) UseMethod("end")
+
 #' @export
 #' @rdname simList-accessors-times
 end..simList <- function(x, unit, ...) {
@@ -2075,6 +2074,10 @@ setReplaceMethod(
 #' @importFrom stats start
 #' @include simList-class.R
 #' @include times.R
+#' @export
+#' @rdname simList-accessors-times
+start <- function(x, ...) UseMethod("start")
+
 #' @export
 #' @rdname simList-accessors-times
 start..simList <- function(x, unit = NULL, ...) {
@@ -2512,7 +2515,7 @@ setReplaceMethod(
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
     if (NROW(value)) {
-      sim@completed <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x, ]))
+      sim@completed <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x, ]))
     } else {
       sim@completed <- list()
     }

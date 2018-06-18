@@ -41,7 +41,7 @@ if (getRversion() >= "3.1.0") {
 #'   determines time unit \tab takes time units of modules
 #'       and how they fit together \tab \code{times} or automatic \cr
 #'   runs \code{.inputObjects} functions \tab from every module
-#'     \emph{in the module order as determined above} \tab automatic
+#'     \emph{in the module order as determined above} \tab automatic \cr
 #'   }
 #' }
 #'
@@ -57,8 +57,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' We implement a discrete event simulation in a more modular fashion so it is
 #' easier to add modules to the simulation. We use S4 classes and methods,
-#' and use \code{data.table} instead of \code{data.frame} to implement the event
-#' queue (because it is much faster).
+#' and fast lists to manage the event queue.
 #'
 #' \code{paths} specifies the location of the module source files,
 #' the data input files, and the saving output files. If no paths are specified
@@ -73,6 +72,27 @@ if (getRversion() >= "3.1.0") {
 #'
 #'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
 #' }
+#'
+#' @section Parsing and Checking Code:
+#'
+#' The \code{simInit} function will attempt to find usage of sim$xxx
+#' or sim[['xxx']] on either side of the assignement "<-" operator.
+#' It will compare these to the module metadata, specifically
+#' \code{inputObjects} for cases where objects or "gotten" from the
+#' simList and \code{outputObjects} for cases where objects are
+#' assigned to the simList.
+#'
+#' It will also attempt to find potential, common function name conflicts
+#' with things like scale and stack (both in base and raster), and
+#' Plot (in quickPlot and some modules).
+#'
+#' \emph{This code checking is young and may get false positives and
+#' false negatives -- i.e., miss things}. It also takes computational
+#' time, which may be undesireable in operational code.
+#' To turn off checking (i.e.,
+#' if there are too many false positives and negatives), set
+#' the option \code{spades.moduleCodeChecks} to \code{FALSE},
+#' e.g., \code{options(spades.moduleCodeChecks = FALSE)}
 #'
 #' @section Caching:
 #'
@@ -463,7 +483,7 @@ setMethod(
     # Force SpaDES.core to front of search path
     #.modifySearchPath("SpaDES.core", skipNamespacing = FALSE)
 
-    rm(".userSuppliedObjNames", envir=envir(sim))
+    #rm(".userSuppliedObjNames", envir=envir(sim))
     ## add name to depends
     if (!is.null(names(sim@depends@dependencies))) {
       names(sim@depends@dependencies) <- sim@depends@dependencies %>%
@@ -747,3 +767,18 @@ setMethod(
 
     return(invisible(sim))
 })
+
+
+#' Put simInit and spades together
+#'
+#' This may allow for more efficient Caching. This passes all
+#' arguments to simInit, then the created \code{simList} is passed
+#' to \code{spades}
+#'
+#' @param ... Passed to simInit
+#' @export
+#' @rdname simInit
+simInitAndSpades <- function(...) {
+  simIn <- simInit(...)
+  spades(simIn)
+}

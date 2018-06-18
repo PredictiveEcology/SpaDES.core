@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>The <code>simList</code> class � .simList-class • SpaDES.core</title>
+<title>The <code>simList</code> class — .simList-class • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,27 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="The <code>simList</code> class — .simList-class" />
+
+<meta property="og:description" content="Contains the minimum components of a SpaDES simulation.
+Various slot accessor methods (i.e., get and set functions) are provided
+(see 'Accessor Methods' below)." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +48,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +71,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +104,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +116,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,17 +124,21 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>The <code>simList</code> class</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/simList-class.R'><code>R/simList-class.R</code></a></small>
+    <div class="hidden name"><code>simList-class.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Contains the minimum components of a <code>SpaDES</code> simulation.
 Various slot accessor methods (i.e., get and set functions) are provided
 (see 'Accessor Methods' below).</p>
     
+    </div>
 
         
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -181,31 +202,17 @@ The class <code>simList_</code> is only used internally.</p>
 
     
     <p>Several slot (and sub-slot) accessor methods are provided for use, and
-categorized into separate help pages:</p><table><tr><td>
-  <code><a href='simList-accessors-envir.html'>simList-accessors-envir</a></code> </td>
-<td> Simulation enviroment. </td>
-</tr><tr><td>
-  <code><a href='simList-accessors-events.html'>simList-accessors-events</a></code> </td>
-<td> Scheduled and completed events. </td>
-</tr><tr><td>
-  <code><a href='simList-accessors-inout.html'>simList-accessors-inout</a></code> </td>
-<td> Passing data in to / out of simulations. </td>
-</tr><tr><td>
-  <code><a href='simList-accessors-modules.html'>simList-accessors-modules</a></code> </td>
-<td> Modules loaded and used; module dependencies. </td>
-</tr><tr><td>
-  <code><a href='objects.html'>simList-accessors-objects</a></code> </td>
-<td> Accessing objects used in the simulation. </td>
-</tr><tr><td>
-  <code>simList-accessors-params</code> </td>
-<td> Global and module-specific parameters. </td>
-</tr><tr><td>
-  <code><a href='simList-accessors-paths.html'>simList-accessors-paths</a></code> </td>
-<td> File paths for modules, inputs, and outputs. </td>
-</tr><tr><td>
-  <code><a href='simList-accessors-times.html'>simList-accessors-times</a></code> </td>
-<td> Simulation times. </td>
-</tr></table>
+categorized into separate help pages:</p><table class='table'>
+<tr><td><code><a href='simList-accessors-envir.html'>simList-accessors-envir</a></code></td><td>Simulation enviroment.</td></tr>
+<tr><td><code><a href='simList-accessors-events.html'>simList-accessors-events</a></code></td><td>Scheduled and completed events.</td></tr>
+<tr><td><code><a href='simList-accessors-inout.html'>simList-accessors-inout</a></code></td><td>Passing data in to / out of simulations.</td></tr>
+<tr><td><code><a href='simList-accessors-modules.html'>simList-accessors-modules</a></code></td><td>Modules loaded and used; module dependencies.</td></tr>
+<tr><td><code><a href='objects.html'>simList-accessors-objects</a></code></td><td>Accessing objects used in the simulation.</td></tr>
+<tr><td><code>simList-accessors-params</code></td><td>Global and module-specific parameters.</td></tr>
+<tr><td><code><a href='simList-accessors-paths.html'>simList-accessors-paths</a></code></td><td>File paths for modules, inputs, and outputs.</td></tr>
+<tr><td><code><a href='simList-accessors-times.html'>simList-accessors-times</a></code></td><td>Simulation times.</td></tr>
+<tr><td></td><td><code><a href='simList-accessors-envir.html'>simList-accessors-envir</a></code></td></tr>
+</table>
     
     <h2 class="hasAnchor" id="event-lists"><a class="anchor" href="#event-lists"></a>Event Lists</h2>
 
@@ -213,19 +220,13 @@ categorized into separate help pages:</p><table><tr><td>
     <p>The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
 The completed event list is an ordered list in the exact order that the events
 were executed.
-Each event is represented by a <code>data.table</code> row consisting of:</p><table><tr><td>
-  <code>eventTime</code> </td>
-<td> The time the event is to occur.</td>
-</tr><tr><td>
-  <code>moduleName</code> </td>
-<td> The module from which the event is taken.</td>
-</tr><tr><td>
-  <code>eventType</code> </td>
-<td> A character string for the programmer-defined event type.</td>
-</tr><tr><td>
-  <code>eventPriority</code> </td>
-<td> The priority given to the event. </td>
-</tr></table>
+Each event is represented by a <code>data.table</code> row consisting of:</p><table class='table'>
+<tr><td><code>eventTime</code></td><td>The time the event is to occur.</td></tr>
+<tr><td><code>moduleName</code></td><td>The module from which the event is taken.</td></tr>
+<tr><td><code>eventType</code></td><td>A character string for the programmer-defined event type.</td></tr>
+<tr><td><code>eventPriority</code></td><td>The priority given to the event.</td></tr>
+<tr><td></td><td><code>eventTime</code></td></tr>
+</table>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -271,5 +272,8 @@ Alex Chubaty and Eliot McIntire
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

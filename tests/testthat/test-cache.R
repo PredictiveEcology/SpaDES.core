@@ -4,7 +4,6 @@ test_that("test cache", {
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
-    detach("package:reproducible")
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -31,23 +30,27 @@ test_that("test cache", {
   )
 
   set.seed(1123)
-  sims <- experiment(mySim, replicates = 2, cache = TRUE)
+  expr <- quote(experiment(Copy(mySim), replicates = 2, cache = TRUE, debug = FALSE,
+                           omitArgs = c("progress", "debug", ".plotInitialTime", ".saveInitialTime")))
+  sims <- eval(expr)
   out <- showCache(sims[[1]])
   expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies
   expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
-  expect_true(NROW(out[tagKey != "otherFunctions"]) == 16) #
-  expect_message(sims <- Cache(experiment, mySim, replicates = 2, cache = TRUE),
+  expect_true(NROW(out[!tagKey %in% c("preDigest", "otherFunctions")]) == 16) #
+  expect_true(NROW(out[tagKey %in% "preDigest"]) ==
+                     (length(slotNames(sims[[1]]))*2 + 2 * length(modules(mySim)) + 2 * 2)) # 2 args for Cache -- FUN & replicate
+  expect_message(sims <- eval(expr),
                  "loading cached result from previous spades call")
 
   out2 <- showCache(sims[[1]])
 
-  # 2 original times, 2 cached times per spades, 1 experiment time
-  expect_true(NROW(out2[tagKey == "accessed"]) == 5)
+  # 2 original times, 2 cached times per spades
+  expect_true(NROW(out2[tagKey == "accessed"]) == 4)
 
-  # 2 cached copies of spades, 1 experiment
-  expect_true(NROW(unique(out2$artifact)) == 3)
+  # 2 cached copies of spades
+  expect_true(NROW(unique(out2$artifact)) == 2)
 
   clearCache(sims[[1]])
   out <- showCache(sims[[1]])
@@ -60,7 +63,7 @@ test_that("test event-level cache", {
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
 
   on.exit({
-    detach("package:reproducible")
+
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -87,12 +90,12 @@ test_that("test event-level cache", {
 
   set.seed(1123)
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time())))
+                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
 
-  mess1 <- capture_output(sims <- spades(Copy(mySim)))
+  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
@@ -111,7 +114,7 @@ test_that("test module-level cache", {
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
-    detach("package:reproducible")
+
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -143,7 +146,7 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time()))))
+                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE))))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time())
   dev.off()
 
@@ -156,7 +159,7 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile)
-  mess1 <- capture_output(sims <- spades(Copy(mySim)))
+  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   dev.off()
 
   expect_true(file.info(tmpfile)$size < 10000)
@@ -182,7 +185,7 @@ test_that("test .prepareOutput", {
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
   on.exit({
-    detach("package:reproducible")
+
     detach("package:igraph")
     detach("package:raster")
     unlink(tmpdir, recursive = TRUE)
@@ -213,8 +216,8 @@ test_that("test .prepareOutput", {
     objects = c("landscape")
   )
 
-  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
-  simCached2 <- spades(Copy(mySim), cache = TRUE)
+  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(), debug = FALSE)
+  simCached2 <- spades(Copy(mySim), cache = TRUE, debug = FALSE)
 
   if (interactive()) {
     cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
@@ -225,7 +228,7 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(isTRUE(all.equal(simCached1, simCached2)))
+  expect_true(isTRUE(all.equalWONewCache(simCached1, simCached2)))
 
   clearCache(tmpdir)
 })
@@ -241,7 +244,7 @@ test_that("test .robustDigest for simLists", {
 
   on.exit({
     setwd(cwd)
-    detach("package:reproducible")
+
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
@@ -258,10 +261,10 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache), silent = TRUE)
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy",
+                 regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result",
+                 regexp = "Using or creating cached copy|Using cached copy|module code",
                  all = TRUE)
 
 
@@ -274,10 +277,10 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy",
+                 regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result",
+                 regexp = "Using or creating cached copy|loading cached result|module code",
                  all = TRUE)
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -289,7 +292,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result",
+                 regexp = "Using or creating cached copy|loading cached result|module code",
                  all = TRUE)
 
 
@@ -298,7 +301,7 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
-  expect_silent(spades(bbb))
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb),
                  regexp = "Using cached copy of init",
                  all = TRUE)
@@ -315,10 +318,86 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
-  expect_silent(spades(bbb))
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb),
                 regexp = "Using cached copy of init",
                 all = TRUE)
 
 
+})
+
+
+test_that("test .checkCacheRepo with function as spades.cachePath", {
+  library(igraph)
+  library(reproducible)
+
+  tmpdir <- tempdir()
+  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    setwd(cwd)
+
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+
+  awesomeCacheFun <- function() tmpCache ;
+  options("spades.cachePath" = awesomeCacheFun)
+
+  # uses .getOptions
+  aa <- .checkCacheRepo(list(1), create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # accepts character string
+  aa <- .checkCacheRepo(tmpCache, create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # uses .getPaths during simInit
+  mySim <- simInit()
+  aa <- .checkCacheRepo(list(mySim))
+  expect_equal(aa, tmpCache)
+
+
+  justAPath <- tmpCache ;
+  options("spades.cachePath" = justAPath)
+
+  # uses .getOptions
+  aa <- .checkCacheRepo(list(1), create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # accepts character string
+  aa <- .checkCacheRepo(tmpCache, create = TRUE)
+  expect_equal(aa, tmpCache)
+
+  # uses .getPaths during simInit
+  mySim <- simInit()
+  aa <- .checkCacheRepo(list(mySim))
+  expect_equal(aa, tmpCache)
+
+
+})
+
+
+test_that("test objSize", {
+  library(igraph)
+  library(reproducible)
+
+  tmpdir <- tempdir()
+  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  cwd <- getwd()
+  setwd(tmpdir)
+
+  on.exit({
+    setwd(cwd)
+
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+  }, add = TRUE)
+
+  a <- simInit(objects = list(d = 1:10, b = 2:20))
+  os <- objSize(a)
+  expect_true(length(os)==4) # 2 objects, the environment, the rest
 })

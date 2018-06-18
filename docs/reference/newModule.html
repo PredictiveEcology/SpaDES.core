@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create new module from template � newModule • SpaDES.core</title>
+<title>Create new module from template — newModule • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,29 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Create new module from template — newModule" />
+
+<meta property="og:description" content="Autogenerate a skeleton for a new SpaDES module, a template for a
+documentation file, a citation file, a license file, a README.txt file,
+and a folder that contains unit tests information.
+The newModuleDocumentation will not generate the module file, but will
+create the other files." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +50,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +73,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +106,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +118,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,12 +126,15 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create new module from template</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/module-template.R'><code>R/module-template.R</code></a></small>
+    <div class="hidden name"><code>newModule.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Autogenerate a skeleton for a new SpaDES module, a template for a
 documentation file, a citation file, a license file, a <code class="file">README.txt</code> file,
@@ -120,6 +142,7 @@ and a folder that contains unit tests information.
 The <code>newModuleDocumentation</code> will not generate the module file, but will
 create the other files.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>newModule</span>(<span class='no'>name</span>, <span class='no'>path</span>, <span class='no'>...</span>)
 
@@ -129,7 +152,7 @@ create the other files.</p>
 <span class='co'># S4 method for character,missing</span>
 <span class='fu'>newModule</span>(<span class='no'>name</span>, <span class='no'>path</span>, <span class='no'>...</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -143,13 +166,13 @@ The default is the current working directory.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments. Currently, only the following are supported:</p>
+      <td><p>Additional arguments. Currently, only the following are supported:<br /><br /></p>
 <p><code>open</code>. Logical. Should the new module file be opened after creation?
-             Default <code>TRUE</code>.</p>
+             Default <code>TRUE</code>.<br /><br /></p>
 <p><code>unitTests</code>. Logical. Should the new module include unit test files?
-             Default <code>TRUE</code>. Unit testing relies on the <code>testthat</code> package.</p>
+             Default <code>TRUE</code>. Unit testing relies on the <code>testthat</code> package.<br /><br /></p>
 <p><code>type</code>. Character string specifying one of <code>"child"</code> (default),
-             or <code>"parent"</code>.</p>
+             or <code>"parent"</code>.<br /><br /></p>
 <p><code>children</code>. Required when <code>type = "parent"</code>. A character vector
              specifying the names of child modules.</p></td>
     </tr>
@@ -164,7 +187,8 @@ The default is the current working directory.</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>All files will be created within a subdirectory named <code>name</code> within the
-<code>path</code>:</p><ul>
+<code>path</code>:</p>
+<ul>
 <li><p><code>path/</code></p><ul>
 <li><p><code>name/</code></p></li>
 <li><p><code>R/               # contains additional module R scripts</code></p></li>
@@ -191,9 +215,9 @@ A message with the correct lines to copy and paste is provided.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>Other module creation helpers: <code><a href='newModuleCode.html'>newModuleCode</a></code>,
+    <div class='dont-index'><p>Other module creation helpers: <code><a href='newModuleCode.html'>newModuleCode</a></code>,
   <code><a href='newModuleDocumentation.html'>newModuleDocumentation</a></code>,
-  <code><a href='newModuleTests.html'>newModuleTests</a></code></p>
+  <code><a href='newModuleTests.html'>newModuleTests</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -242,5 +266,8 @@ Alex Chubaty and Eliot McIntire
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

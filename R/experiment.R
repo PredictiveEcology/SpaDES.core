@@ -221,7 +221,7 @@ setMethod(
       factorsTmp <- if (NROW(paramsTmp) > 0) {
         # unlist(params[paramsTmp], recursive = FALSE)
         lapply(params[paramsTmp], function(z) {
-          lapply(z, function(y) seq_along(y) )
+          lapply(z, function(y) seq_along(y))
         }) %>% unlist(recursive = FALSE)
       } else {
         params
@@ -239,7 +239,7 @@ setMethod(
       factorialExpInner <- expand.grid(factorsTmp, stringsAsFactors = FALSE)
 
       modulesShort <- paste(modules[[x]], collapse = ",")
-      if (NROW(factorialExpInner) > 0 ) {
+      if (NROW(factorialExpInner) > 0) {
         if (any(!(names(factorialExpInner) %in% c("object", "input")))) {
           factorialExpInner[["modules"]] <- x
         }
@@ -263,7 +263,7 @@ setMethod(
       factorialExp$replicate <- rep(replicates, each = numExpLevels)
     }
 
-    FunDef <- function(ind, ...) {
+    FunDef <- function(ind, ...) { # nolint
       mod <- strsplit(names(factorialExp), split = "\\.") %>%
         sapply(function(x) x[1])
       param <- strsplit(names(factorialExp), split = "\\.") %>%
@@ -295,7 +295,7 @@ setMethod(
         paramValues <- paramValues[notNA]
       }
 
-      sim_ <- Copy(sim)
+      sim_ <- Copy(sim) # nolint
       experimentDF <- data.frame(module = character(0),
                                  param = character(0),
                                  val = I(list()),
@@ -321,7 +321,7 @@ setMethod(
                   val = if (!(mod[x] %in% c("input", "object"))) I(list(val)) else list(NA),
                   modules = paste0(unlist(modules[factorialExp[ind, "modules"]]), collapse = ","),
                   input = if (mod[x] %in% c("input")) inputs[[factorialExp[ind, "input"]]] else NA,
-                  object = if (mod[x] %in% c("object")) names(objects)[[factorialExp[ind, "object"]]] else NA,
+                  object = if (mod[x] %in% c("object")) names(objects)[[factorialExp[ind, "object"]]] else NA, # nolint
                   expLevel = factorialExp[ind, "expLevel"],
                   stringsAsFactors = FALSE
                 )),
@@ -332,7 +332,8 @@ setMethod(
           experimentDF <- rbindlist(
             l = list(
               experimentDF,
-              data.frame(modules = paste0(unlist(modules[factorialExp[ind, "modules"]]), collapse = ","),
+              data.frame(modules = paste0(unlist(modules[factorialExp[ind, "modules"]]),
+                                          collapse = ","),
                          expLevel = factorialExp[ind, "expLevel"],
                          stringsAsFactors = FALSE
               )),
@@ -344,7 +345,7 @@ setMethod(
           if (!identical(sort(unlist(modules[factorialExp[ind, "modules"]])),
                          sort(unlist(SpaDES.core::modules(sim))))) {
             # test if modules are different from sim; if yes, rerun simInit
-            sim_ <- simInit(params = params(sim_),
+            sim_ <- simInit(params = params(sim_), # nolint
                             modules = as.list(unlist(modules[factorialExp[ind, "modules"]])),
                             times = append(lapply(times(sim_)[2:3], as.numeric), times(sim_)[4]),
                             paths = paths(sim_),

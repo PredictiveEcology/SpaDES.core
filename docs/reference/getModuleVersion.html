@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find the latest module version from a SpaDES module repository � getModuleVersion • SpaDES.core</title>
+<title>Find the latest module version from a SpaDES module repository — getModuleVersion • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,25 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Find the latest module version from a SpaDES module repository — getModuleVersion" />
+
+<meta property="og:description" content="Modified from http://stackoverflow.com/a/25485782/1380598." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +46,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +69,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +102,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +114,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,15 +122,19 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Find the latest module version from a SpaDES module repository</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/module-repository.R'><code>R/module-repository.R</code></a></small>
+    <div class="hidden name"><code>getModuleVersion.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Modified from <a href='http://stackoverflow.com/a/25485782/1380598'>http://stackoverflow.com/a/25485782/1380598</a>.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>getModuleVersion</span>(<span class='no'>name</span>, <span class='no'>repo</span>)
 
@@ -125,7 +144,7 @@
 <span class='co'># S4 method for character,missing</span>
 <span class='fu'>getModuleVersion</span>(<span class='no'>name</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -134,11 +153,26 @@
     </tr>
     <tr>
       <th>repo</th>
-      <td><p>GitHub repository name.
+      <td><p>GitHub repository name, specified as <code>"username/repo"</code>.
 Default is <code>"PredictiveEcology/SpaDES-modules"</code>, which is
-specified by the global option <code>spades.moduleRepo</code>.</p></td>
+specified by the global option <code>spades.moduleRepo</code>.
+Only <code>master</code> branches can be used at this point.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>getModuleVersion</code> extracts a module's most recent version by
+         looking at the module <code class="file">.zip</code> files contained in the module directory.
+         It takes the most recent version, based on the name of the zip file.</p>
+<p>See the modules vignette for details of module directory structure
+         (<a href='http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename'>http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename</a>),
+         and see our SpaDES-modules repo for details of module repository structure
+         (<a href='https://github.com/PredictiveEcology/SpaDES-modules'>https://github.com/PredictiveEcology/SpaDES-modules</a>).</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='zipModule.html'>zipModule</a></code> for creating module <code class="file">.zip</code> folders.</p></div>
     
 
   </div>
@@ -146,7 +180,11 @@ specified by the global option <code>spades.moduleRepo</code>.</p></td>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#details">Details</a></li>
+
+      <li><a href="#see-also">See also</a></li>
+          </ul>
 
     <h2>Author</h2>
     
@@ -167,5 +205,8 @@ Alex Chubaty
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

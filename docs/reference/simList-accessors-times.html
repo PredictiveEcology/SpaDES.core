@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Time usage in <code>SpaDES</code> � times • SpaDES.core</title>
+<title>Time usage in <code>SpaDES</code> — times • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,29 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Time usage in <code>SpaDES</code> — times" />
+
+<meta property="og:description" content="Functions for the simtimes slot of a simList object
+and its elements. To maintain modularity, the behavior of these functions depends
+on where they are used. In other words, different modules can have their own
+timeunit. SpaDES converts these to seconds when running a simulation, but
+shows the user time in the units of the model as shown with timeunit(sim)" />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +50,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +73,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +106,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +118,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,12 +126,15 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Time usage in <code>SpaDES</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/simList-accessors.R'><code>R/simList-accessors.R</code></a></small>
+    <div class="hidden name"><code>simList-accessors-times.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Functions for the <code>simtimes</code> slot of a <code>simList</code> object
 and its elements. To maintain modularity, the behavior of these functions depends
@@ -120,6 +142,7 @@ on where they are used. In other words, different modules can have their own
 timeunit. <code>SpaDES</code> converts these to seconds when running a simulation, but
 shows the user time in the units of the model as shown with <code>timeunit(sim)</code></p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>times</span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
@@ -139,6 +162,8 @@ shows the user time in the units of the model as shown with <code>timeunit(sim)<
 <span class='co'># S4 method for .simList</span>
 <span class='fu'>time</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
+<span class='fu'>end</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
 <span class='co'># S3 method for .simList</span>
 <span class='fu'>end</span>(<span class='no'>x</span>, <span class='no'>unit</span>, <span class='no'>...</span>)
 
@@ -146,6 +171,8 @@ shows the user time in the units of the model as shown with <code>timeunit(sim)<
 
 <span class='co'># S4 method for .simList</span>
 <span class='fu'>end</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+
+<span class='fu'>start</span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for .simList</span>
 <span class='fu'>start</span>(<span class='no'>x</span>, <span class='kw'>unit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
@@ -170,7 +197,7 @@ shows the user time in the units of the model as shown with <code>timeunit(sim)<
 <span class='co'># S4 method for .simList</span>
 <span class='fu'>timeunits</span>(<span class='no'>x</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -219,8 +246,8 @@ or <code>dfortnight</code>.
 The unit name is the part without the <code>d</code> and the function name definition
 includes the <code>d</code>. This new function, e.g.,
 <code>dfortnight &lt;- function(x) lubridate::duration(dday(14))</code>
-can be placed anywhere in the search path or in a module.
-    <code>timeunits</code> will extract the current units of the time of all
+can be placed anywhere in the search path or in a module.</p>
+<p><code>timeunits</code> will extract the current units of the time of all
 modules used in a simulation.
 This is different from <code>timeunit</code> because it is not necessarily
 associated with a <code>spades</code> call.</p>
@@ -236,29 +263,20 @@ When used inside a module, then the time is in the units of the module.
 If used in an interactive mode, then the time will be in the units of the
 simulation.</p>
 <p>Additional methods are provided to access the current, start, and end times
-of the simulation:</p><table><tr><td>
-   <code>time</code> </td>
-<td> Current simulation time.</td>
-</tr><tr><td>
-   <code>start</code> </td>
-<td> Simulation start time.</td>
-</tr><tr><td>
-   <code>end</code> </td>
-<td> Simulation end time.</td>
-</tr><tr><td>
-   <code>timeunit</code> </td>
-<td> Simulation timeunit.</td>
-</tr><tr><td>
-   <code>timeunits</code> </td>
-<td> Module timeunits.</td>
-</tr><tr><td>
-   <code>times</code> </td>
-<td> List of all simulation times (current, start, end, timeunit).</td>
-</tr></table>
+of the simulation:</p>
+<table class='table'>
+<tr><td><code>time</code></td><td>Current simulation time.</td></tr>
+<tr><td><code>start</code></td><td>Simulation start time.</td></tr>
+<tr><td><code>end</code></td><td>Simulation end time.</td></tr>
+<tr><td><code>timeunit</code></td><td>Simulation timeunit.</td></tr>
+<tr><td><code>timeunits</code></td><td>Module timeunits.</td></tr>
+<tr><td><code>times</code></td><td>List of all simulation times (current, start, end, timeunit).</td></tr>
+<tr><td></td><td><code>time</code></td></tr>
+</table>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.5 on Simulation times.</p>
+    <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.5 on Simulation times.</p>
 <p>Other functions to access elements of a <code>simList</code> object: <code><a href='addDepends.html'>.addDepends</a></code>,
   <code><a href='checkpoint.html'>doEvent.checkpoint</a></code>, <code><a href='simList-accessors-envir.html'>envir</a></code>,
   <code><a href='simList-accessors-events.html'>events</a></code>, <code><a href='globals.html'>globals</a></code>,
@@ -266,7 +284,7 @@ of the simulation:</p><table><tr><td>
   <code><a href='ls_str-method.html'>ls.str.simList</a></code>, <code><a href='simList-accessors-modules.html'>modules</a></code>,
   <code><a href='objects.html'>objs</a></code>, <code><a href='packages.html'>packages</a></code>,
   <code><a href='params.html'>params</a></code>, <code><a href='simList-accessors-paths.html'>paths</a></code>,
-  <code><a href='progress.html'>progressInterval</a></code></p>
+  <code><a href='progress.html'>progressInterval</a></code></p></div>
     
 
   </div>
@@ -303,5 +321,8 @@ Alex Chubaty and Eliot McIntire
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

@@ -2,7 +2,7 @@ test_that("experiment does not work correctly", {
   library(raster); on.exit(detach("package:raster"), add = TRUE)
   library(igraph); on.exit(detach("package:igraph"), add = TRUE)
   library(dplyr); on.exit(detach("package:dplyr"), add = TRUE)
-  library(reproducible); on.exit(detach("package:reproducible"), add = TRUE)
+  library(reproducible)
 
   tmpdir <- file.path(tempdir(), "testParallel") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
@@ -40,9 +40,9 @@ test_that("experiment does not work correctly", {
 
   expect_equal(NROW(exptDesign), 4)
   expect_equal(exptVals[exptVals$module == "caribouMovement", "val"] %>% unlist(),
-               c(rep(caribouNums, 2)))
+               c(rep(caribouNums, each = 2)))
   expect_equal(exptVals$modules %>% unique(),
-               "randomLandscapes,caribouMovement,fireSpread")
+               "randomLandscapes,fireSpread,caribouMovement")
   expect_equal(NROW(attr(sims, "experiment")$expDesign), NROW(exptDesign))
 
   # test that experimental design object is indeed what is in the sims object

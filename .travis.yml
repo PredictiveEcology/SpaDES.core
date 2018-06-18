@@ -1,5 +1,6 @@
 sudo: required
 language: r
+cache: packages
 cran: https://cran.rstudio.com/
 env:
   global:
@@ -8,12 +9,52 @@ matrix:
   include:
   - os: linux
     dist: trusty
+    r: 3.3.0
+    addons:
+      apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
+        packages:
+        - libgdal1-dev
+        - libgeos-dev
+        - libglpk-dev
+        - libnlopt-dev
+        - libproj-dev
+        - libudunits2-dev
+    before_install:
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
+  - os: linux
+    dist: trusty
+    r: 3.4.0
+    addons:
+      apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
+        packages:
+        - libgdal1-dev
+        - libgeos-dev
+        - libglpk-dev
+        - libnlopt-dev
+        - libproj-dev
+        - libudunits2-dev
+    before_install:
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
+  - os: linux
+    dist: trusty
     r: oldrel
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libglpk-dev
+        - libnlopt-dev
         - libproj-dev
+        - libudunits2-dev
     before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
@@ -22,9 +63,15 @@ matrix:
     r: release
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libglpk-dev
+        - libnlopt-dev
         - libproj-dev
+        - libudunits2-dev
     r_github_packages:
       - jimhester/lintr
       - r-lib/covr
@@ -33,29 +80,41 @@ matrix:
     - sh -e /etc/init.d/xvfb start
     before_script:
     - Rscript -e 'install.packages("devtools", type = "source")'
+    after_failure:
+    - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
     - travis_wait 20 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
     - Rscript -e 'lintr::lint_package()'
+    r_packages:
+    - devtools
   - os: linux
     dist: trusty
     r: devel
     addons:
       apt:
+        sources:
+        - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
         - libgdal1-dev
+        - libgeos-dev
+        - libglpk-dev
+        - libnlopt-dev
         - libproj-dev
+        - libudunits2-dev
     before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
     r_packages:
     - devtools
   - os: osx
-    osx_image: xcode9.2
+    osx_image: xcode8.3
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
-    before_script:
-    - Rscript -e 'install.packages("rgdal", type = "source")'
+    before_install:
+    - brew update
+    - brew install glpk
+    - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true
@@ -63,8 +122,3 @@ notifications:
   email:
     on_success: change
     on_failure: change
-branches:
-  only:
-  - master
-  - development
-  - testing

@@ -8,10 +8,10 @@ Description: Provide the core discrete event simulation (DES) framework for
 URL:
     http://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2018-01-25
-Version: 0.1.1
+Date: 2018-06-18
+Version: 0.2.0
 Authors@R: c(
-    person("Alex M", "Chubaty", email = "alexander.chubaty@canada.ca",
+    person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre")),
     person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
     role = c("aut")),
@@ -19,47 +19,58 @@ Authors@R: c(
     role = c("ctb")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
     role = c("ctb")),
+    person("Ceres", "Barros", email = "cbarros@mail.ubc.ca",
+    role = c("ctb")),
     person("Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada",
     role = "cph")
     )
 Depends:
     R (>= 3.3.0),
-    quickPlot (>= 0.1.3),
-    reproducible (>= 0.1.4)
+    quickPlot (>= 0.1.3.9001),
+    reproducible (>= 0.2.0)
 Imports:
+    codetools,
     crayon,
     data.table (>= 1.10.4),
     DEoptim (>= 2.2-4),
     DiagrammeR (>= 0.8.2),
-    digest (>= 0.6.12),
     dplyr (>= 0.5.0),
     fastdigest,
     fpCompare (>= 0.2.1),
+    googledrive,
     httr (>= 1.2.1),
     igraph (>= 1.0.1),
     lubridate (>= 1.3.3),
     methods,
     parallel,
+    RCurl,
     R.utils (>= 2.5.0),
     raster (>= 2.5-8),
-    RCurl (>= 1.95-4.8),
-    stats,
     sp (>= 1.2-4),
+    SpaDES.tools (>= 0.2.0),
+    stats,
     stringi (>= 1.1.3),
     tcltk,
+    tools,
     utils
 Suggests:
     covr,
     hunspell,
     knitr,
     Matrix,
+    magrittr,
+    microbenchmark,
     png,
     RColorBrewer (>= 1.1-2),
     rgdal,
     rgenoud,
+    sf, 
     rmarkdown,
-    SpaDES.tools,
     testthat (>= 1.0.2)
+Remotes:
+    PredictiveEcology/quickPlot@development,
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.tools@development
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
@@ -75,17 +86,19 @@ Collate:
     'cache.R'
     'check.R'
     'checkpoint.R'
+    'code-checking.R'
     'copy.R'
+    'downloadData.R'
     'experiment.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'
     'module-define.R'
     'module-dependencies-methods.R'
-    'moduleMetadata.R'
     'module-repository.R'
     'module-template.R'
     'moduleCoverage.R'
+    'moduleMetadata.R'
     'times.R'
     'simList-accessors.R'
     'plotting-diagrams.R'
@@ -94,6 +107,8 @@ Collate:
     'save.R'
     'simulation-spades.R'
     'spades-classes.R'
+    'spades-core-deprecated.R'
     'spades-core-package.R'
+    'suppliedElsewhere.R'
     'zzz.R'
 RoxygenNote: 6.0.1

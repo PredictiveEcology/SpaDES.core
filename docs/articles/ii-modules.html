@@ -8,23 +8,23 @@
 <title>02 Building modules in <code>SpaDES</code> • SpaDES.core</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-<!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script><script src="../pkgdown.js"></script><!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script><meta property="og:title" content="02 Building modules in &lt;code&gt;SpaDES&lt;/code&gt;">
+<meta property="og:description" content="">
+<meta name="twitter:card" content="summary">
+<!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]--><!-- Google analytics --><script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+<![endif]--><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 </head>
 <body>
-    <div class="container template-vignette">
+    <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -33,8 +33,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
@@ -62,7 +66,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -81,21 +85,24 @@
 <!--/.navbar -->
 
       
-      </header><script src="ii-modules_files/htmlwidgets-0.9/htmlwidgets.js"></script><script src="ii-modules_files/d3-3.3.8/d3.min.js"></script><script src="ii-modules_files/dagre-0.4.0/dagre-d3.min.js"></script><link href="ii-modules_files/mermaid-0.3.0/dist/mermaid.css" rel="stylesheet">
+      </header><script src="ii-modules_files/htmlwidgets-1.2/htmlwidgets.js"></script><script src="ii-modules_files/d3-3.3.8/d3.min.js"></script><script src="ii-modules_files/dagre-0.4.0/dagre-d3.min.js"></script><link href="ii-modules_files/mermaid-0.3.0/dist/mermaid.css" rel="stylesheet">
 <script src="ii-modules_files/mermaid-0.3.0/dist/mermaid.slim.min.js"></script><link href="ii-modules_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-<script src="ii-modules_files/chromatography-0.1/chromatography.js"></script><script src="ii-modules_files/DiagrammeR-binding-0.9.2/DiagrammeR.js"></script><div class="row">
-  <div class="col-md-9">
+<script src="ii-modules_files/chromatography-0.1/chromatography.js"></script><script src="ii-modules_files/DiagrammeR-binding-1.0.0/DiagrammeR.js"></script><div class="row">
+  <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>02 Building modules in <code>SpaDES</code>
 </h1>
                         <h4 class="author">Alex M. Chubaty</h4>
             
-            <h4 class="date">January 26 2018</h4>
-          </div>
+            <h4 class="date">June 18 2018</h4>
+      
+      <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/ii-modules.Rmd"><code>vignettes/ii-modules.Rmd</code></a></small>
+      <div class="hidden name"><code>ii-modules.Rmd</code></div>
+
+    </div>
 
     
     
-<div class="contents">
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
@@ -406,31 +413,31 @@ randomLandscapesInit &lt;-<span class="st"> </span><span class="cf">function</sp
   <span class="co"># Give dimensions of dummy raster</span>
   nx &lt;-<span class="st"> </span><span class="kw"><a href="../reference/params.html">params</a></span>(sim)<span class="op">$</span>randomLandscapes<span class="op">$</span>nx
   ny &lt;-<span class="st"> </span><span class="kw"><a href="../reference/params.html">params</a></span>(sim)<span class="op">$</span>randomLandscapes<span class="op">$</span>ny
-  r &lt;-<span class="st"> </span><span class="kw">raster</span>(<span class="dt">nrows =</span> ny, <span class="dt">ncols =</span> nx, <span class="dt">xmn =</span> <span class="op">-</span>nx<span class="op">/</span><span class="dv">2</span>, <span class="dt">xmx =</span> nx<span class="op">/</span><span class="dv">2</span>,
+  r &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/raster">raster</a></span>(<span class="dt">nrows =</span> ny, <span class="dt">ncols =</span> nx, <span class="dt">xmn =</span> <span class="op">-</span>nx<span class="op">/</span><span class="dv">2</span>, <span class="dt">xmx =</span> nx<span class="op">/</span><span class="dv">2</span>,
               <span class="dt">ymn =</span> <span class="op">-</span>ny<span class="op">/</span><span class="dv">2</span>, <span class="dt">ymx =</span> ny<span class="op">/</span><span class="dv">2</span>)
   speedup &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="dv">1</span>, nx<span class="op">/</span><span class="fl">5e2</span>)
   <span class="co"># Make dummy maps for testing of models</span>
-  DEM &lt;-<span class="st"> </span><span class="kw">gaussMap</span>(template, <span class="dt">scale =</span> <span class="dv">300</span>, <span class="dt">var =</span> <span class="fl">0.03</span>,
+  DEM &lt;-<span class="st"> </span><span class="kw"><a href="http://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">300</span>, <span class="dt">var =</span> <span class="fl">0.03</span>,
                   <span class="dt">speedup =</span> speedup, <span class="dt">inMemory =</span> inMemory)
-  DEM[] &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">getValues</span>(DEM), <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>
-  forestAge &lt;-<span class="st"> </span><span class="kw">gaussMap</span>(template, <span class="dt">scale =</span> <span class="dv">10</span>, <span class="dt">var =</span> <span class="fl">0.1</span>,
+  DEM[] &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/getValues">getValues</a></span>(DEM), <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>
+  forestAge &lt;-<span class="st"> </span><span class="kw"><a href="http://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">10</span>, <span class="dt">var =</span> <span class="fl">0.1</span>,
                         <span class="dt">speedup =</span> speedup, <span class="dt">inMemory =</span> inMemory)
-  forestAge[] &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">getValues</span>(forestAge), <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="dv">20</span>
-  percentPine &lt;-<span class="st"> </span><span class="kw">gaussMap</span>(template, <span class="dt">scale =</span> <span class="dv">50</span>, <span class="dt">var =</span> <span class="dv">1</span>,
+  forestAge[] &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/getValues">getValues</a></span>(forestAge), <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="dv">20</span>
+  percentPine &lt;-<span class="st"> </span><span class="kw"><a href="http://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">50</span>, <span class="dt">var =</span> <span class="dv">1</span>,
                           <span class="dt">speedup =</span> speedup, <span class="dt">inMemory =</span> inMemory)
-  percentPine[] &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">getValues</span>(percentPine), <span class="dv">1</span>)
+  percentPine[] &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/getValues">getValues</a></span>(percentPine), <span class="dv">1</span>)
 
   <span class="co"># Scale them as needed</span>
-  forestAge &lt;-<span class="st"> </span>forestAge <span class="op">/</span><span class="st"> </span><span class="kw">maxValue</span>(forestAge) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>
-  percentPine &lt;-<span class="st"> </span>percentPine <span class="op">/</span><span class="st"> </span><span class="kw">maxValue</span>(percentPine) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>
+  forestAge &lt;-<span class="st"> </span>forestAge <span class="op">/</span><span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/extremeValues">maxValue</a></span>(forestAge) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>
+  percentPine &lt;-<span class="st"> </span>percentPine <span class="op">/</span><span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/extremeValues">maxValue</a></span>(percentPine) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>
 
   <span class="co"># Make layers that are derived from other layers</span>
   habitatQuality &lt;-<span class="st"> </span>(DEM <span class="op">+</span><span class="st"> </span><span class="dv">10</span> <span class="op">+</span><span class="st"> </span>(forestAge <span class="op">+</span><span class="st"> </span><span class="fl">2.5</span>) <span class="op">*</span><span class="st"> </span><span class="dv">10</span>) <span class="op">/</span><span class="st"> </span><span class="dv">100</span>
-  habitatQuality &lt;-<span class="st"> </span>habitatQuality <span class="op">/</span><span class="st"> </span><span class="kw">maxValue</span>(habitatQuality)
+  habitatQuality &lt;-<span class="st"> </span>habitatQuality <span class="op">/</span><span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/extremeValues">maxValue</a></span>(habitatQuality)
 
   <span class="co"># Stack them into a single stack and assign to sim envir</span>
-  mapStack &lt;-<span class="st"> </span><span class="kw">stack</span>(DEM, forestAge, habitatQuality, percentPine)
-  <span class="kw">names</span>(mapStack) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>)
+  mapStack &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>(DEM, forestAge, habitatQuality, percentPine)
+  <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(mapStack) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>)
   <span class="kw">setColors</span>(mapStack) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">DEM =</span> <span class="kw">brewer.pal</span>(<span class="dv">9</span>, <span class="st">"YlOrBr"</span>),
                               <span class="dt">forestAge =</span> <span class="kw">brewer.pal</span>(<span class="dv">9</span>, <span class="st">"BuGn"</span>),
                               <span class="dt">habitatQuality =</span> <span class="kw">brewer.pal</span>(<span class="dv">8</span>, <span class="st">"Spectral"</span>),
@@ -444,14 +451,68 @@ randomLandscapesInit &lt;-<span class="st"> </span><span class="cf">function</sp
 <a href="#event-diagram" class="anchor"></a>Event diagram</h3>
 <p>To better understand how events are scheduled within a simulation, a visual representation called an <code>eventDiagram</code> illustrates the sequences of events within a simulation.</p>
 <p>Simulation time is presented on the x-axis, starting at date <code>startDate</code>. Each module appears in a color-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module. Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module’s event corresponds to the module’s timestep unit, not the event’s “duration”.</p>
+<pre><code>## This is the current event, printed as it is happening:
+## eventTime moduleName eventType eventPriority
+## 0         checkpoint init      5            
+## 0         save       init      5            
+## 0         progress   init      5            
+## 0         load       init      5            
+## 0         randomLandscapes init      5            
+## 0         fireSpread       init      5            
+## 0         caribouMovement  init      5            
+## 0         fireSpread       burn      5            
+## 0         fireSpread       stats     5            
+## 0         randomLandscapes plot      10           
+## 0         fireSpread       plot.init 10</code></pre>
+<pre><code>## 0.08333333 caribouMovement  plot.init 10           
+## 0.1666667  caribouMovement  plot      10           
+## 0.25       caribouMovement  plot      10           
+## 0.3333333  caribouMovement  plot      10           
+## 0.4166667  caribouMovement  plot      10           
+## 0.5        caribouMovement  plot      10           
+## 0.5833333  caribouMovement  plot      10           
+## 0.6666667  caribouMovement  plot      10           
+## 0.75       caribouMovement  plot      10           
+## 0.8333333  caribouMovement  plot      10           
+## 0.9166667  caribouMovement  plot      10           
+## 1          caribouMovement  move      5            
+## 1          fireSpread       burn      5            
+## 1          fireSpread       stats     5            
+## 1          caribouMovement  plot      10           
+## 1.083333   caribouMovement  move      5            
+## 1.083333   caribouMovement  plot      10           
+## 1.166667   caribouMovement  move      5            
+## 1.166667   caribouMovement  plot      10           
+## 1.25       caribouMovement  move      5            
+## 1.25       caribouMovement  plot      10           
+## 1.333333   caribouMovement  move      5            
+## 1.333333   caribouMovement  plot      10           
+## 1.416667   caribouMovement  move      5            
+## 1.416667   caribouMovement  plot      10           
+## 1.5        caribouMovement  move      5            
+## 1.5        caribouMovement  plot      10           
+## 1.583333   caribouMovement  move      5            
+## 1.583333   caribouMovement  plot      10           
+## 1.666667   caribouMovement  move      5            
+## 1.666667   caribouMovement  plot      10           
+## 1.75       caribouMovement  move      5            
+## 1.75       caribouMovement  plot      10           
+## 1.833333   caribouMovement  move      5            
+## 1.833333   caribouMovement  plot      10           
+## 1.916667   caribouMovement  move      5            
+## 1.916667   caribouMovement  plot      10           
+## 2          fireSpread       burn      5            
+## 2          caribouMovement  move      5            
+## 2          fireSpread       stats     5            
+## 2          caribouMovement  plot      10</code></pre>
 <pre><code>## png 
 ##   2</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim) <span class="co"># runs the simulation</span>
 
 <span class="co"># overview of the events in the simulation</span>
 <span class="kw"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(mySim, <span class="st">"0000-06-01"</span>, <span class="dt">n =</span> <span class="dv">200</span>, <span class="dt">width =</span> <span class="dv">720</span>)</code></pre></div>
-<div id="htmlwidget-9c63ae5c62543f33a8d9" style="width:720px;height:1326px;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9c63ae5c62543f33a8d9">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0000-06-01,0000-06-07\nsection  save \n init:done,save1,0000-06-01,0000-06-07\nsection  load \n init:done,load1,0000-06-01,0000-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0000-06-01,0000-06-07\nplot:crit,randomLandscapes2,0000-06-01,0000-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0000-06-01,0000-06-07\nplot.init:active,caribouMovement2,0000-07-01,0000-07-07\nplot:crit,caribouMovement3,0000-07-31,0000-08-07\nplot:crit,caribouMovement4,0000-08-31,0000-09-06\nplot:crit,caribouMovement5,0000-09-30,0000-10-07\nplot:crit,caribouMovement6,0000-10-31,0000-11-06\nplot:crit,caribouMovement7,0000-11-30,0000-12-06\nplot:crit,caribouMovement8,0000-12-31,0001-01-06\nplot:crit,caribouMovement9,0001-01-30,0001-02-05\nplot:crit,caribouMovement10,0001-03-01,0001-03-08\nplot:crit,caribouMovement11,0001-04-01,0001-04-07\nplot:crit,caribouMovement12,0001-05-01,0001-05-08\nmove:active,caribouMovement13,0001-06-01,0001-06-07\nplot:crit,caribouMovement14,0001-06-01,0001-06-07\nmove:active,caribouMovement15,0001-07-01,0001-07-07\nplot:crit,caribouMovement16,0001-07-01,0001-07-07\nmove:active,caribouMovement17,0001-08-01,0001-08-07\nplot:crit,caribouMovement18,0001-08-01,0001-08-07\nmove:active,caribouMovement19,0001-08-31,0001-09-06\nplot:crit,caribouMovement20,0001-08-31,0001-09-06\nmove:active,caribouMovement21,0001-10-01,0001-10-07\nplot:crit,caribouMovement22,0001-10-01,0001-10-07\nmove:active,caribouMovement23,0001-10-31,0001-11-06\nplot:crit,caribouMovement24,0001-10-31,0001-11-06\nmove:active,caribouMovement25,0001-11-30,0001-12-07\nplot:crit,caribouMovement26,0001-11-30,0001-12-07\nmove:active,caribouMovement27,0001-12-31,0002-01-06\nplot:crit,caribouMovement28,0001-12-31,0002-01-06\nmove:active,caribouMovement29,0002-01-30,0002-02-06\nplot:crit,caribouMovement30,0002-01-30,0002-02-06\nmove:active,caribouMovement31,0002-03-02,0002-03-08\nplot:crit,caribouMovement32,0002-03-02,0002-03-08\nmove:active,caribouMovement33,0002-04-01,0002-04-07\nplot:crit,caribouMovement34,0002-04-01,0002-04-07\nmove:active,caribouMovement35,0002-05-02,0002-05-08\nplot:crit,caribouMovement36,0002-05-02,0002-05-08\nmove:active,caribouMovement37,0002-06-01,0002-06-07\nplot:crit,caribouMovement38,0002-06-01,0002-06-07\nsection  fireSpread \n init:done,fireSpread1,0000-06-01,0000-06-07\nburn:active,fireSpread2,0000-06-01,0000-06-07\nstats:active,fireSpread3,0000-06-01,0000-06-07\nplot.init:active,fireSpread4,0000-06-01,0000-06-07\nburn:active,fireSpread5,0001-06-01,0001-06-07\nstats:active,fireSpread6,0001-06-01,0001-06-07\nburn:active,fireSpread7,0002-06-01,0002-06-07\nstats:active,fireSpread8,0002-06-01,0002-06-07\n"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4e1951d9a3b7fa1a054a" style="width:720px;height:1326px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4e1951d9a3b7fa1a054a">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nburn:active,fireSpread7,2-06-01,2-06-07\nstats:active,fireSpread8,2-06-01,2-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\nmove:active,caribouMovement15,1-07-01,1-07-07\nplot:crit,caribouMovement16,1-07-01,1-07-07\nmove:active,caribouMovement17,1-08-01,1-08-07\nplot:crit,caribouMovement18,1-08-01,1-08-07\nmove:active,caribouMovement19,1-08-31,1-09-06\nplot:crit,caribouMovement20,1-08-31,1-09-06\nmove:active,caribouMovement21,1-10-01,1-10-07\nplot:crit,caribouMovement22,1-10-01,1-10-07\nmove:active,caribouMovement23,1-10-31,1-11-06\nplot:crit,caribouMovement24,1-10-31,1-11-06\nmove:active,caribouMovement25,1-11-30,1-12-07\nplot:crit,caribouMovement26,1-11-30,1-12-07\nmove:active,caribouMovement27,1-12-31,2-01-06\nplot:crit,caribouMovement28,1-12-31,2-01-06\nmove:active,caribouMovement29,2-01-30,2-02-06\nplot:crit,caribouMovement30,2-01-30,2-02-06\nmove:active,caribouMovement31,2-03-02,2-03-08\nplot:crit,caribouMovement32,2-03-02,2-03-08\nmove:active,caribouMovement33,2-04-01,2-04-07\nplot:crit,caribouMovement34,2-04-01,2-04-07\nmove:active,caribouMovement35,2-05-02,2-05-08\nplot:crit,caribouMovement36,2-05-02,2-05-08\nmove:active,caribouMovement37,2-06-01,2-06-07\nplot:crit,caribouMovement38,2-06-01,2-06-07\n"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="module-documentation-modulename-rmd" class="section level2">
@@ -473,6 +534,25 @@ randomLandscapesInit &lt;-<span class="st"> </span><span class="cf">function</sp
 <h2 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h2>
 <p>All module data are located in the module’s <code>data/</code> subdirectory. Also included in this folder is a <code>CHECKSUMS.txt</code> file that contains the expected checksums for each data file. Checksums can be verified (and optionally written) using <code><a href="../reference/checksums.html">checksums()</a></code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1. specify your module here
+moduleName &lt;-<span class="st"> "my_module"</span>
+
+## 2. use a temp dir to ensure all modules get fresh copies of the data
+tmpdir &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">"SpaDES_modules"</span>)
+
+## 3. download your module's data to the temp dir
+<span class="kw"><a href="../reference/downloadData.html">downloadData</a></span>(moduleName, tmpdir)
+
+## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run
+<span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">modules =</span> moduleName)
+
+## 5. recalculate your checksums and overwrite the file
+<span class="kw"><a href="../reference/checksums.html">checksums</a></span>(moduleName, tmpdir, <span class="dt">write =</span> <span class="ot">TRUE</span>)
+
+## 6. copy the new checksums file to your working module directory (the one not in the temp dir)
+<span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="kw">file.path</span>(tmpdir, moduleName, <span class="st">'data'</span>, <span class="st">'CHECKSUMS.txt'</span>),
+          <span class="dt">to =</span> <span class="kw">file.path</span>(<span class="st">'path/to/my/moduleDir'</span>, moduleName, <span class="st">'data'</span>, <span class="st">'CHECKSUMS.txt'</span>),
+          <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>Modules may require data that for various reasons cannot be distributed with the module source code. In these cases, the module developer should ensure that the module downloads and extracts the data required. It is useful to not only check that the data files exist locally but that their checksums match those expected (see <code><a href="../reference/checksums.html">checksums()</a></code>).</p>
 </div>
 <div id="versioned-zip-archives-modulename_x-y-z-zip" class="section level2">
@@ -524,13 +604,11 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## examine simulation module (object) dependencies
 <span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)      <span class="co"># all object dependency relationships</span></code></pre></div>
 <pre><code>##                from              to       objName    objClass
-## 1:  caribouMovement caribouMovement     landscape RasterStack
-## 2:  caribouMovement      fireSpread     landscape RasterStack
-## 3:       fireSpread caribouMovement     landscape RasterStack
-## 4:       fireSpread      fireSpread     landscape RasterStack
-## 5:       fireSpread      fireSpread nPixelsBurned     numeric
-## 6: randomLandscapes caribouMovement     landscape RasterStack
-## 7: randomLandscapes      fireSpread     landscape RasterStack</code></pre>
+## 1:       fireSpread caribouMovement     landscape RasterStack
+## 2:       fireSpread      fireSpread     landscape RasterStack
+## 3:       fireSpread      fireSpread nPixelsBurned     numeric
+## 4: randomLandscapes caribouMovement     landscape RasterStack
+## 5: randomLandscapes      fireSpread     landscape RasterStack</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clearPlot</span>()
 <span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)            <span class="co"># simplified visual representation of modules</span></code></pre></div>
 <p><img src="ii-modules_files/figure-html/module-object-diagrams-1.png" width="672"></p>
@@ -539,8 +617,8 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 <p><img src="ii-modules_files/figure-html/module-object-diagrams-2.png" width="672"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># detailed visual representation of objects</span>
 <span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim, <span class="dt">width =</span> <span class="dv">720</span>)</code></pre></div>
-<div id="htmlwidget-af97e5f76cc361c8054e" style="width:720px;height:480px;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-af97e5f76cc361c8054e">{"x":{"diagram":"sequenceDiagram\ncaribouMovement ->> caribouMovement : landscape\ncaribouMovement ->> fireSpread : landscape\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing the relationships between each module. In the example above, line 2 of the output indicates that the <code>fireSpread</code> module relies on an object <code>landscape</code> provided by the <code>caribouMovement</code> module. This edgelist is used inside the <code>depsGraph</code> function to produce a dependency graph (network), where each module corresponds to a vertex (node), and object dependencies are denoted by the arrows. When plotting the dependency graph, it’s often useful to use the <code>plot=TRUE</code> argument to simplify the network by showing no more than one object dependency between modules.</p>
+<div id="htmlwidget-4312e1e9e1049d3566b2" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4312e1e9e1049d3566b2">{"x":{"diagram":"sequenceDiagram\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing the relationships between each module. In the example above, line 2 of the output indicates that the <code>fireSpread</code> module relies on an object <code>landscape</code> provided by the <code>caribouMovement</code> module. This edgelist is used inside the <code>depsGraph</code> function to produce a dependency graph (network), where each module corresponds to a vertex (node), and object dependencies are denoted by the arrows. When plotting the dependency graph, it’s often useful to use the <code>plot=TRUE</code> argument to simplify the network by showing no more than one object dependency between modules.</p>
 </div>
 </div>
 <div id="core-modules" class="section level1">
@@ -720,7 +798,7 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 <tbody>
 <tr class="odd">
 <td><strong><code>.saveInitialTime</code></strong></td>
-<td>Numeric specifying the time at which the first save is scheduled (between <code>start(sim)</code> and <code>end(sim)</code>).</td>
+<td>Numeric specifying the time at which the first save is scheduled (between <code><a href="../reference/simList-accessors-times.html">start(sim)</a></code> and <code><a href="../reference/simList-accessors-times.html">end(sim)</a></code>).</td>
 </tr>
 <tr class="even">
 <td><strong><code>.saveInterval</code></strong></td>
@@ -842,7 +920,7 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 </tr>
 <tr class="odd">
 <td><strong><code>saveTime</code></strong></td>
-<td>Numeric indicating when the file should be saved. Defaults to <code>end(simList)</code>, but this can be any time. For multiple saves of the same object, use unique lines, e.g., via <code>data.table(expand.grid(objectName = c("caribou", "veg"), saveTime = 1:10))</code>
+<td>Numeric indicating when the file should be saved. Defaults to <code><a href="../reference/simList-accessors-times.html">end(simList)</a></code>, but this can be any time. For multiple saves of the same object, use unique lines, e.g., via <code><a href="http://www.rdocumentation.org/packages/data.table/topics/data.table">data.table(expand.grid(objectName = c("caribou", "veg"), saveTime = 1:10))</a></code>
 </td>
 </tr>
 </tbody>
@@ -874,8 +952,8 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## [7] arguments  intervals 
 ## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim)   <span class="co"># shows all files and objects that are "outputs"</span></code></pre></div>
-<pre><code>##   objectName                                               file     fun
-## 1  landscape C:/Temp/RtmpeGRuph/simOutputs/landscape_year10.rds saveRDS
+<pre><code>##   objectName                                            file     fun
+## 1  landscape /tmp/RtmpHOnQJv/simOutputs/landscape_year10.rds saveRDS
 ##   package saveTime saved arguments
 ## 1    base       10    NA        NA</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInitialTime</code></pre></div>
@@ -885,20 +963,45 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveObjects</code></pre></div>
 <pre><code>## [1] "landscape"</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.savePath</code></pre></div>
-<pre><code>## [1] "C:\\Temp\\RtmpeGRuph/simOutputs/randomLandscapes"</code></pre>
+<pre><code>## [1] "/tmp/RtmpHOnQJv/simOutputs/randomLandscapes"</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftmp &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">"spades_vignetteOutputs"</span>)
 <span class="kw">pdf</span>(ftmp)
 <span class="kw">clearPlot</span>()
-mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)
-
-<span class="co"># More sophisticated, passing arguments to outputs()</span>
+mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</code></pre></div>
+<pre><code>## This is the current event, printed as it is happening:
+## eventTime moduleName eventType eventPriority
+## 0         checkpoint init      5            
+## 0         save       init      5            
+## 0         progress   init      5            
+## 0         load       init      5            
+## 0         randomLandscapes init      5            
+## 0         randomLandscapes plot      10           
+## 0         randomLandscapes save      11           
+## 10        save             spades    10           
+## 10        save             later     10           
+## 10        randomLandscapes save      11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># More sophisticated, passing arguments to outputs()</span>
 <span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
   <span class="dt">objectName =</span> <span class="st">"landscape"</span>, <span class="dt">fun =</span> <span class="st">"writeRaster"</span>, <span class="dt">package =</span> <span class="st">"raster"</span>,
   <span class="dt">saveTime =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">6</span>), <span class="dt">arguments =</span> <span class="kw">I</span>(<span class="kw">lapply</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">6</span>), <span class="cf">function</span>(x) {
     <span class="kw">list</span>(<span class="dt">dataType =</span> <span class="st">"FLT4S"</span>, <span class="dt">format =</span> <span class="st">"raster"</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
 })))
-mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)
-<span class="kw">dev.off</span>()</code></pre></div>
+mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</code></pre></div>
+<pre><code>## This is the current event, printed as it is happening:
+## eventTime moduleName eventType eventPriority
+## 0         checkpoint init      5            
+## 0         save       init      5            
+## 0         progress   init      5            
+## 0         load       init      5            
+## 0         randomLandscapes init      5            
+## 0         randomLandscapes plot      10           
+## 0         randomLandscapes save      11           
+## 3         save             spades    10           
+## 3         save             later     10           
+## 6         save             later     10           
+## 6         save             later     10           
+## 10        randomLandscapes save      11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dev.off</span>()</code></pre></div>
 <pre><code>## png 
 ##   2</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">unlink</span>(ftmp)</code></pre></div>
@@ -1061,7 +1164,6 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 </div>
 </div>
 </div>
-</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -1131,6 +1233,8 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 
       </footer>
 </div>
+
+  
 
   </body>
 </html>

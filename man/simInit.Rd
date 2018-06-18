@@ -7,6 +7,7 @@
 \alias{simInit,ANY,ANY,ANY,character,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,character,ANY,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
+\alias{simInitAndSpades}
 \title{Initialize a new simulation}
 \usage{
 simInit(times, params, modules, objects, paths, inputs, outputs, loadOrder,
@@ -25,6 +26,8 @@ simInit(times, params, modules, objects, paths, inputs, outputs, loadOrder,
 
 \S4method{simInit}{ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(times, params, modules,
   objects, paths, inputs, outputs, loadOrder, notOlderThan = NULL)
+
+simInitAndSpades(...)
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times
@@ -78,6 +81,8 @@ then the \code{.inputObjects} will be cached.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
+
+\item{...}{Passed to simInit}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
@@ -91,6 +96,10 @@ pass by reference, "putting" objects in the sim object does no actual copy. The
 \code{simList} also stores all parameters,
 and other important simulation information, such
 as times, paths, modules, and module load order. See more details below.
+
+This may allow for more efficient Caching. This passes all
+arguments to simInit, then the created \code{simList} is passed
+to \code{spades}
 }
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
@@ -121,7 +130,7 @@ as times, paths, modules, and module load order. See more details below.
   determines time unit \tab takes time units of modules
       and how they fit together \tab \code{times} or automatic \cr
   runs \code{.inputObjects} functions \tab from every module
-    \emph{in the module order as determined above} \tab automatic
+    \emph{in the module order as determined above} \tab automatic \cr
   }
 }
 
@@ -137,8 +146,7 @@ from multiple modules all at once, with say:
 
 We implement a discrete event simulation in a more modular fashion so it is
 easier to add modules to the simulation. We use S4 classes and methods,
-and use \code{data.table} instead of \code{data.frame} to implement the event
-queue (because it is much faster).
+and fast lists to manage the event queue.
 
 \code{paths} specifies the location of the module source files,
 the data input files, and the saving output files. If no paths are specified
@@ -160,6 +168,29 @@ These can be added later with the accessor methods (See example). These are not 
 simulation via simInit. \code{modules}, \code{paths}, \code{params}, and \code{objects}
 are all needed for successful initialization.
 }
+\section{Parsing and Checking Code}{
+
+
+The \code{simInit} function will attempt to find usage of sim$xxx
+or sim[['xxx']] on either side of the assignement "<-" operator.
+It will compare these to the module metadata, specifically
+\code{inputObjects} for cases where objects or "gotten" from the
+simList and \code{outputObjects} for cases where objects are
+assigned to the simList.
+
+It will also attempt to find potential, common function name conflicts
+with things like scale and stack (both in base and raster), and
+Plot (in quickPlot and some modules).
+
+\emph{This code checking is young and may get false positives and
+false negatives -- i.e., miss things}. It also takes computational
+time, which may be undesireable in operational code.
+To turn off checking (i.e.,
+if there are too many false positives and negatives), set
+the option \code{spades.moduleCodeChecks} to \code{FALSE},
+e.g., \code{options(spades.moduleCodeChecks = FALSE)}
+}
+
 \section{Caching}{
 
 

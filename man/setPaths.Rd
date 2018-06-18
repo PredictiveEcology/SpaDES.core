@@ -15,16 +15,17 @@ setPaths(cachePath, inputPath, modulePath, outputPath)
 }
 \arguments{
 \item{cachePath}{The default local directory in which to cache simulation outputs.
-If not specified, defaults to \code{~/SpaDES/cache}.}
+If not specified, defaults to \code{getOption("spades.cachePath")}.}
 
 \item{inputPath}{The default local directory in which to look for simulation inputs
-If not specified, defaults to \code{~/SpaDES/inputs}.}
+If not specified, defaults to \code{getOption("spades.inputPath")}.}
 
-\item{modulePath}{The default local directory where modules and data will be downloaded and stored.
-If not specified, defaults to \code{~/SpaDES/modules}.}
+\item{modulePath}{The default local directory where modules and data will be
+downloaded and stored.
+If not specified, defaults to \code{getOption("spades.modulePath")}.}
 
 \item{outputPath}{The default local directory in which to save simulation outputs.
-If not specified, defaults to \code{~/SpaDES/outputs}.}
+If not specified, defaults to \code{getOption("spades.outputPath")}.}
 }
 \value{
 Returns a named list of the user's default working directories.
