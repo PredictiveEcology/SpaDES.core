@@ -149,7 +149,9 @@
 </ul>
 </li>
 <li>option <code>spades.debug</code> set to <code>TRUE</code> by default, instead of <code>FALSE</code>. This is better for new users.</li>
-<li><p><code>moduleMetadata</code> argument order changed, so <code>sim</code> is first, more consistent with all other <code>simList</code> accessors</p></li>
+<li>
+<code>moduleMetadata</code> argument order changed, so <code>sim</code> is first, more consistent with all other <code>simList</code> accessors</li>
+<li><p><code>downloadData</code> has changed dramatically, now it is a wrapper around <code><a href="http://reproducible.predictiveecology.org/reference/prepInputs.html">reproducible::prepInputs</a></code> which does more checking</p></li>
 </ul>
 </div>
 <div id="deprecated-defunct-and-removed-features" class="section level2">
@@ -157,8 +159,6 @@
 <a href="#deprecated-defunct-and-removed-features" class="anchor"></a>deprecated, defunct, and removed features</h2>
 <ul>
 <li>remove <code>fileExt</code> – use <code><a href="http://www.rdocumentation.org/packages/tools/topics/fileutils">tools::file_ext</a></code> instead</li>
-<li>
-<code>downloadData</code> moved to SpaDES.tools</li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">

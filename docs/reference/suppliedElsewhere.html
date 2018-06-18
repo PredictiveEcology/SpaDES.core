@@ -208,6 +208,13 @@ this one.</p>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"test"</span> <span class='kw'>=</span> <span class='no'>test</span>))
 <span class='fu'>suppliedElsewhere</span>(<span class='st'>"test"</span>, <span class='no'>mySim</span>) <span class='co'># TRUE</span>
 
+<span class='co'># }</span><span class='co'># NOT RUN {</span>
+<span class='co'># Example with prepInputs</span>
+<span class='co'># Put chunks like this in your .inputObjects</span>
+<span class='kw'>if</span> (!<span class='fu'>suppliedElsewhere</span>(<span class='st'>"test"</span>, <span class='no'>mySim</span>))
+  <span class='no'>sim</span>$<span class='no'>test</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='robustDigest.html'>Cache</a></span>(<span class='no'>prepInputs</span>, <span class='st'>"raster.tif"</span>, <span class='st'>"downloadedArchive.zip"</span>,
+                    <span class='kw'>destinationPath</span> <span class='kw'>=</span> <span class='fu'><a href='simList-accessors-paths.html'>dataPath</a></span>(<span class='no'>sim</span>), <span class='kw'>studyArea</span> <span class='kw'>=</span> <span class='no'>sim</span>$<span class='no'>studyArea</span>,
+                    <span class='kw'>rasterToMatch</span> <span class='kw'>=</span> <span class='no'>sim</span>$<span class='no'>otherRasterTemplate</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

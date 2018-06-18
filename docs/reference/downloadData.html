@@ -18,13 +18,27 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Download module data — downloadData" />
+
+<meta property="og:description" content="Download external data for a module if not already present in the module
+directory, or if there is a checksum mismatch indicating that the file is not
+the correct one." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -34,16 +48,14 @@
 <![endif]-->
 
 
-<!-- Google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-58633549-6"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  ga('create', 'UA-58633549-6', 'auto');
-  ga('send', 'pageview');
-
+  gtag('config', 'UA-58633549-6');
 </script>
 
   </head>
@@ -59,8 +71,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">SpaDES.core</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">SpaDES.core</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -88,7 +104,7 @@
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -100,6 +116,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -107,37 +124,43 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Download module data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/downloadData.R'><code>R/downloadData.R</code></a></small>
+    <div class="hidden name"><code>downloadData.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Download external data for a module if not already present in the module
 directory, or if there is a checksum mismatch indicating that the file is not
 the correct one.</p>
     
+    </div>
 
-    <pre class="usage"><span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>, <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>files</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>checked</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>urls</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>children</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for character,character,logical</span>
 <span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quiet</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>files</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>checked</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>urls</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>children</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for character,missing,missing</span>
 <span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quickCheck</span>,
-  <span class='no'>overwrite</span>)
+  <span class='no'>overwrite</span>, <span class='no'>files</span>, <span class='no'>checked</span>, <span class='no'>urls</span>, <span class='no'>children</span>)
 
 <span class='co'># S4 method for character,missing,logical</span>
 <span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>quiet</span>, <span class='no'>quickCheck</span>,
-  <span class='no'>overwrite</span>)
+  <span class='no'>overwrite</span>, <span class='no'>files</span>, <span class='no'>checked</span>, <span class='no'>urls</span>, <span class='no'>children</span>)
 
 <span class='co'># S4 method for character,character,missing</span>
 <span class='fu'>downloadData</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>quickCheck</span>,
-  <span class='no'>overwrite</span>)</pre>
+  <span class='no'>overwrite</span>, <span class='no'>files</span>, <span class='no'>checked</span>, <span class='no'>urls</span>, <span class='no'>children</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -161,7 +184,34 @@ This is faster, but potentially much less robust.</p></td>
     <tr>
       <th>overwrite</th>
       <td><p>Logical. Should local data files be overwritten in case they exist?
-Default is FALSE</p></td>
+Default is <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>files</th>
+      <td><p>A character vector of length 1 or more if only a subset of files should be
+checked in the <code class="file">CHECKSUMS.txt</code> file.</p></td>
+    </tr>
+    <tr>
+      <th>checked</th>
+      <td><p>The result of a previous <code>checksums</code> call. This should only be used when
+there is no possibility that the file has changed, i.e., if <code>downloadData</code> is
+called from inside another function.</p></td>
+    </tr>
+    <tr>
+      <th>urls</th>
+      <td><p>Character vector of urls from which to get the data. This is automatically
+ found from module metadata when this function invoked with
+<code><a href='downloadModule.html'>SpaDES.core::downloadModule(..., data = TRUE)</a></code>. See also
+<code>prepInputs</code>.</p></td>
+    </tr>
+    <tr>
+      <th>children</th>
+      <td><p>The character vector of child modules (without path) to also
+run <code>downloadData</code> on</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Passed to <code><a href='http://reproducible.predictiveecology.org/reference/preProcess.html'>preProcess</a></code>, e.g., <code>purge</code></p></td>
     </tr>
     </table>
     
@@ -175,12 +225,36 @@ Default is FALSE</p></td>
  the files specified therein. Hence, module developers should make sure they
  have manually downloaded all the necessary data and ran <code>checksums</code> to
  build a checksums file.</p>
+<p>There is an experimental attempt to use the <span class="pkg">googledrive</span> package to download
+data from a shared (publically or with individual users) file.
+To try this, put the Google Drive URL in <code>sourceURL</code> argument of
+<code>expectsInputs</code> in the module metadata, and put the filename once downloaded
+in the <code>objectName</code> argument.
+If using Rstudio Server, you may need to use "out of band" authentication by
+setting <code>options(httr_oob_default = TRUE)</code>.
+To avoid caching of Oauth credentials, set <code>options(httr_oauth_cache = TRUE)</code>.</p>
+<p>There is also an experimental option for the user to make a new <code class="file">CHECKSUMS.txt</code>
+file if there is a <code>sourceURL</code> but no entry for that file.
+This is experimental and should be used with caution.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='checksums.html'>checksums</a></code> for building a checksums file.</p>
+    <div class='dont-index'><p><code>prepInputs</code>, <code>checksums</code> and <code>downloadModule</code> in
+      <code>SpaDES.core</code> package for downloading modules and building a checksums file.</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># For a Google Drive example</span>
+<span class='co'># In metadata:</span>
+<span class='fu'>expectsInputs</span>(<span class='st'>"theFilename.zip"</span>, <span class='st'>"NA"</span>, <span class='st'>"NA"</span>,
+  <span class='kw'>sourceURL</span> <span class='kw'>=</span> <span class='st'>"https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez"</span>)
+<span class='co'># create the checksums file</span>
+<span class='fu'><a href='checksums.html'>checksums</a></span>(<span class='st'>"thisModule"</span>, <span class='st'>"there"</span>, <span class='kw'>write</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>downloadData</span>(<span class='st'>"thisModule"</span>, <span class='st'>"there"</span>, <span class='kw'>files</span> <span class='kw'>=</span> <span class='st'>"theFilename.zip"</span>)
+<span class='co'># }</span># NOT RUN {
+# }
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -192,11 +266,13 @@ Default is FALSE</p></td>
       <li><a href="#details">Details</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     
-Alex Chubaty
+Alex Chubaty &amp; Eliot McIntire
 
   </div>
 </div>
@@ -213,5 +289,8 @@ Alex Chubaty
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

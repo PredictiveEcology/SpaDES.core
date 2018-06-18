@@ -1,6 +1,28 @@
-## Resubmission
+## Updated release
 
-This is a update to our package with several enhancments, bugfixes and internal changes, as described in NEWS.md
+This release fixes CRAN concerns about package declarations for tests and vignettes.
+
+The maintainer email address has changed, about which I notified CRAN on March 28, 2018 and sent followup on June 12, 2018 (in response to `fpCompare` submission) and again on June 15, 2018 (in response to `SpaDES` submission).
+
+> Chubaty, Alexander (NRCan/RNCan)
+> Fri, Jun 15, 8:42 AM (3 days ago)
+> to me, CRAN
+>
+> Hello CRAN maintainers,
+>
+> Please note the change in my maintainer email for the following packages:
+>
+> - fpCompare
+> - SpaDES
+> - SpaDES.core
+> - SpaDES.tools
+>
+> My new email is alex.chubaty@gmail.com.
+>
+> Thank you,
+> Alex
+
+We also introduced several new functions and bug fixes (see NEWS.md).
 
 ## Test environments
 
@@ -24,29 +46,19 @@ This is a update to our package with several enhancments, bugfixes and internal 
 * Windows 7            (local), R 3.5.0
 
 ### Development R version
-* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-06-11 r74885)
-* Ubuntu 18.04         (local), R 3.6.0 (2018-06-11 r74889)
+* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-06-15 r74903)
+* Ubuntu 18.04         (local), R 3.6.0 (2018-06-15 r74903)
 * Windows           (appveyor), R 3.6.0 (2018-06-11 r74889)
-* Windows        (win-builder), R 3.6.0 (2018-06-11 r74889)
+* Windows        (win-builder), R 3.6.0 (2018-06-15 r74904)
 
 ## R CMD check results
 
-There is 1 *intermittent* ERROR related to a missing `tk85.dll` on windows R 3.4.3, 32 bit.
-We have tested it on Windows 32 bit with R 3.4.0 (no error), R 3.4.1  (no error), R 3.4.2 (error) and R 3.4.3 (intermittent error), R 3.5.0 (no error) Windows, and it only occurs on R 3.4.3.
-There is are no other combinations of Windows, Linux, Mac and R-old release, R-release, and R-devel to have the error.
-The error indicates that `tk85.dll` is not present; however, `tk86.dll` *is* present and delivered with R, so there is something in some internals somewhere that is searching for a mismatched dll between the one being requested and the one that is shipped with R.
-This error is occurring because of the package `RandomFields` from which we import one function.
-We feel that this is not something that our package can address. 
-
-There are no WARNINGs.
+There are no ERRORs nor WARNINGs.
 
 There was 1 NOTE:
 
 1. Maintainer's email address has changed (notified CRAN 2018-05-28).
 
-    * checking CRAN incoming feasibility ... NOTE
-    Maintainer: 'Alex M Chubaty <alex.chubaty@gmail.com>'
-        
     New maintainer:
       Alex M Chubaty <alex.chubaty@gmail.com>
     Old maintainer(s):
