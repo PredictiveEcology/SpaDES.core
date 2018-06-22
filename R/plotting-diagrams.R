@@ -403,7 +403,6 @@ setMethod(
       } else {
         PlotRemovingDots(modDia = modDia, plotFn = "plot", axes = FALSE,
                          title = "Module Diagram", ...)
-
       }
     }
 })
