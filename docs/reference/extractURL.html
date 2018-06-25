@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Open all modules nested within a base directory — openModules • SpaDES.core</title>
+<title>Extract a url from module metadata — extractURL • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,11 +30,9 @@
 
 
 
-<meta property="og:title" content="Open all modules nested within a base directory — openModules" />
+<meta property="og:title" content="Extract a url from module metadata — extractURL" />
 
-<meta property="og:description" content="This is just a convenience wrapper for opening several modules at once, recursively.
-A module is defined as any file that ends in .R or .r and has a
-directory name identical to its filename. Thus, this must be case sensitive." />
+<meta property="og:description" content="This will get the sourceURL for the object named." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -127,69 +125,47 @@ directory name identical to its filename. Thus, this must be case sensitive." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Open all modules nested within a base directory</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/module-template.R'><code>R/module-template.R</code></a></small>
-    <div class="hidden name"><code>openModules.Rd</code></div>
+    <h1>Extract a url from module metadata</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/downloadData.R'><code>R/downloadData.R</code></a></small>
+    <div class="hidden name"><code>extractURL.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This is just a convenience wrapper for opening several modules at once, recursively.
-A module is defined as any file that ends in <code>.R</code> or <code>.r</code> and has a
-directory name identical to its filename. Thus, this must be case sensitive.</p>
+    <p>This will get the sourceURL for the object named.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>openModules</span>(<span class='no'>name</span>, <span class='no'>path</span>)
-
-<span class='co'># S4 method for character,character</span>
-<span class='fu'>openModules</span>(<span class='no'>name</span>, <span class='no'>path</span>)
-
-<span class='co'># S4 method for missing,missing</span>
-<span class='fu'>openModules</span>()
-
-<span class='co'># S4 method for missing,character</span>
-<span class='fu'>openModules</span>(<span class='no'>path</span>)
+    <pre class="usage"><span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)
 
 <span class='co'># S4 method for character,missing</span>
-<span class='fu'>openModules</span>(<span class='no'>name</span>)
+<span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)
 
-<span class='co'># S4 method for simList,missing</span>
-<span class='fu'>openModules</span>(<span class='no'>name</span>)</pre>
+<span class='co'># S4 method for character,simList</span>
+<span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>name</th>
-      <td><p>Character vector with names of modules to open. If missing, then
-all modules will be opened within the basedir.</p></td>
+      <th>objectName</th>
+      <td><p>A character string of the object name in the metadata.</p></td>
     </tr>
     <tr>
-      <th>path</th>
-      <td><p>Character string of length 1. The base directory within which
-there are only module subdirectories.</p></td>
+      <th>sim</th>
+      <td><p>A <code>simList</code> object from which to extract the <code>sourceURL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>module</th>
+      <td><p>Character giving the name of the module.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Nothing is returned. All file are open via <code>file.edit</code>.</p>
-    
-    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
-
-    <p>On Windows there is currently a bug in RStudio that prevents the editor
-from opening when <code>file.edit</code> is called. <code>file.edit</code> does work if the
-user types it at the command prompt. A message with the correct lines to copy
-and paste is provided.</p>
+    <p>The url.</p>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"># NOT RUN {
-openModules("~\SpaDESModules")
-# }
-<div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -197,11 +173,7 @@ openModules("~\SpaDESModules")
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#note">Note</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+          </ul>
 
     <h2>Author</h2>
     
