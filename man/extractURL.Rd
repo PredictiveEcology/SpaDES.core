@@ -13,7 +13,9 @@ extractURL(objectName, sim, module)
 \arguments{
 \item{objectName}{A character string of the object name in the metadata.}
 
-\item{sim}{A \code{simList} object from which to extract the \code{sourceURL}}
+\item{sim}{A \code{simList} object from which to extract the \code{sourceURL}.}
+
+\item{module}{Character giving the name of the module.}
 }
 \value{
 The url.
