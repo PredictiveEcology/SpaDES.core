@@ -25,6 +25,7 @@ setGeneric(
 #' @export
 #' @exportMethod extractURL
 #' @importFrom quickPlot whereInStack
+#' @rdname extractURL
 setMethod(
   "extractURL",
   signature = c(objectName = "character", sim = "missing"),

@@ -3,10 +3,13 @@
 \docType{methods}
 \name{extractURL}
 \alias{extractURL}
+\alias{extractURL,character,missing-method}
 \alias{extractURL,character,simList-method}
 \title{Extract a url from module metadata}
 \usage{
 extractURL(objectName, sim, module)
+
+\S4method{extractURL}{character,missing}(objectName, sim, module)
 
 \S4method{extractURL}{character,simList}(objectName, sim, module)
 }
