@@ -48,8 +48,9 @@ setMethod(
     if (missing(module)) {
       module <- currentModule(sim)
     }
+
     io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
-    io$LBMR[io$LBMR$objectName == objectName,"sourceURL"]
+    io[[module]][io[[module]][["objectName"]] == objectName,"sourceURL"]
   })
 
 
