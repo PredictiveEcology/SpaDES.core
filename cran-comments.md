@@ -71,16 +71,14 @@ I have run R CMD check on downstream dependencies and all have passed, except as
 Summary at https://github.com/PredictiveEcology/SpaDES.core/blob/master/revdep/README.md.
 
 
-`SpaDES` and `SpaDES.addins` both show a `Tk` DISPLAY warning due to being run in a headless environment:
+* `SpaDES.addins` shows a `Tk` DISPLAY warning due to being run in a headless environment:
 
+    ```
+    checking whether package ‘SpaDES.addins’ can be installed ... WARNING
+    Found the following significant warnings:
+      Warning: no DISPLAY variable so Tk is not available
+    See ‘/home/achubaty/Documents/GitHub/SpaDES/SpaDES.core/revdep/checks/SpaDES.addins.Rcheck/00install.out’ for details.
 ```
-checking whether package ‘SpaDES’ can be installed ... WARNING
-Found the following significant warnings:
-  Warning: no DISPLAY variable so Tk is not available
-See ‘/home/achubaty/Documents/GitHub/SpaDES/SpaDES.core/revdep/checks/SpaDES.Rcheck/00install.out’ for details.
 
-checking whether package ‘SpaDES.addins’ can be installed ... WARNING
-Found the following significant warnings:
-  Warning: no DISPLAY variable so Tk is not available
-See ‘/home/achubaty/Documents/GitHub/SpaDES/SpaDES.core/revdep/checks/SpaDES.addins.Rcheck/00install.out’ for details.
-```
+* `SpaDES` shows a warning due to `DISPLAY` not being set in the headless session.
+  Three other warnings regarding replaced imports are caused by having depracated and moved these functions from `SpaDES.tools` to `reproducible`.

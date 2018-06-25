@@ -1,5 +1,13 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.1
+=============
+
+## new function
+
+* `extractURL` will extract the sourceURL from metadata, given an object name
+
+
 version 0.2.0
 =============
 

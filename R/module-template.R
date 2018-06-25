@@ -394,13 +394,13 @@ Event2 <- function(sim) {
   # This is useful if there is something required before simulation to produce the module
   # object dependencies, including such things as downloading default datasets, e.g.,
   # downloadData(\"LCC2005\", modulePath(sim)).
-  # Nothing should be created here that does not create an named object in inputObjects.
+  # Nothing should be created here that does not create a named object in inputObjects.
   # Any other initiation procedures should be put in \"init\" eventType of the doEvent function.
   # Note: the module developer can check if an object is 'suppliedElsewhere' to
   # selectively skip unnecessary steps because the user has provided those inputObjects in the
   # simInit call, or another module will supply or has supplied it. e.g.,
   # if (!suppliedElsewhere('defaultColor', sim)) {
-  #   sim$defaultColor <- 'red'
+  #   sim$map <- Cache(prepInputs, extractURL('map')) # download, extract, load file from url in sourceURL
   # }
   # ! ----- EDIT BELOW ----- ! #
 

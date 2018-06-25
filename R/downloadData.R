@@ -1,8 +1,57 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(
-    "checksum.x", "checksum.y", "expectedFile", "filesize.x", "filesize.y", "result"
-  ))
+  utils::globalVariables(c("expectedFile", "result"))
 }
+
+#' Extract a url from module metadata
+#'
+#' This will get the sourceURL for the object named.
+#'
+#' @param objectName A character string of the object name in the metadata.
+#' @param sim A \code{simList} object from which to extract the \code{sourceURL}.
+#' @param module Character giving the name of the module.
+#'
+#' @return The url.
+#'
+#' @author Eliot McIntire
+#' @export
+#' @exportMethod extractURL
+#' @rdname extractURL
+setGeneric(
+  "extractURL",
+  function(objectName, sim, module) {
+    standardGeneric("extractURL")
+})
+
+#' @export
+#' @exportMethod extractURL
+#' @importFrom quickPlot whereInStack
+#' @rdname extractURL
+setMethod(
+  "extractURL",
+  signature = c(objectName = "character", sim = "missing"),
+  definition = function(objectName, sim, module) {
+    i <- 0
+    while (missing(sim) && i < length(sys.calls())) {
+      i <- i + 1
+      simEnv <- whereInStack("sim", -i)
+      sim <- simEnv$sim
+    }
+    extractURL(objectName = objectName, sim = sim)
+})
+
+#' @export
+#' @rdname extractURL
+setMethod(
+  "extractURL",
+  signature = c(objectName = "character", sim = "simList"),
+  definition = function(objectName, sim, module) {
+    if (missing(module)) {
+      module <- currentModule(sim)
+    }
+
+    io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
+    io[[module]][io[[module]][["objectName"]] == objectName, "sourceURL"]
+})
 
 #' Calculate checksum for a module's data files
 #'
@@ -255,4 +304,3 @@ setMethod(
                  quickCheck = quickCheck, overwrite = overwrite, files = files,
                  checked = checked, urls = urls, children = children)
 })
-
