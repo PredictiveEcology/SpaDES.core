@@ -1,3 +1,7 @@
+## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE)
+options(spades.moduleCodeChecks = FALSE)
+
 ## ----module-metadata, eval=FALSE, echo=TRUE------------------------------
 #  ## sample module metadata for the default `randomLandscapes` module
 #  ## NOTE: long lines have been truncated
