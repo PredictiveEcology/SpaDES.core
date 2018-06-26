@@ -14,6 +14,10 @@ extractURL(objectName, sim, module)
 \item{objectName}{A character string of the object name in the metadata.}
 
 \item{sim}{A \code{simList} object from which to extract the \code{sourceURL}}
+
+\item{module}{An optional character string of the module name whose metadata is
+to be used. If omitted, the function will use the \code{currentModule(sim)},
+if defined.}
 }
 \value{
 The url.
