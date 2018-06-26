@@ -14,7 +14,7 @@ test_that("simList object initializes correctly", {
   w <- getOption("width")
   options(width = 100L)
   out <- utils::capture.output(show(mySim))
-  
+
   # data.table v1.11.0 no longer prints "NULL" data.table.
   # See bug fix 8 in https://github.com/Rdatatable/data.table/blob/master/NEWS.md
   nline <- if (out[60] == "NULL") 75 else 73
@@ -231,6 +231,7 @@ test_that("simList test all signatures", {
     N <- 256L
     successes <- logical(N)
     argsTested <- vector("list", length = N)
+    bb <- options("spades.moduleCodeChecks" = FALSE)
     for (i in 1L:N) {
       li <- list(
         {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
@@ -255,7 +256,9 @@ test_that("simList test all signatures", {
     }
 
     # needs paths and params; many defaults are fine
-      expect_equal(sum(successes, na.rm = TRUE), 192)
+    expect_equal(sum(successes, na.rm = TRUE), 192)
+    options("spades.moduleCodeChecks" = bb[[1]])
+
   }
 })
 

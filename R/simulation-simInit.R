@@ -420,7 +420,7 @@ setMethod(
     }
 
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
-    moduleGraph <- buildModuleGraph(sim, modules(sim), childModules = childModules)
+    moduleGraph <- as.data.frame(buildModuleGraph(sim, modules(sim), childModules = childModules))
 
     timeunits <- findSmallestTU(sim, modules(sim), childModules)
 
@@ -801,6 +801,9 @@ simInitAndSpades <- function(...) {
 #'         \code{childModules} a non flat named list of only the childModule names.
 .identifyChildModules <- function(sim, modules) {
   modulesToSearch <- modules
+  if (any(duplicated(modules))) {
+    message("Duplicate module, ", modules[duplicated(modules)], ", specified. Skipping loading it twice.")
+  }
   if (length(modules) > 0) {
     #isParent <- unlist(lapply(modulesToSearch, function(x) length(x)>0))
     modulesToSearch <- lapply(.parseModulePartial(sim, modulesToSearch,
