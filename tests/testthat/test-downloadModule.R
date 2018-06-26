@@ -141,7 +141,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
     d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
     d_expected <- moduleMetadata(module = m, path = tmpdir)$childModules %>%
-      c(m, "data", "testthat") %>%
+      c(m, "data") %>%
       sort()
 
     expect_equal(d, d_expected)
