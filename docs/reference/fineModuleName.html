@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract a url from module metadata — extractURL • SpaDES.core</title>
+<title>Identify module names up to a given recursive level — .findModuleName • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,11 @@
 
 
 
-<meta property="og:title" content="Extract a url from module metadata — extractURL" />
+<meta property="og:title" content="Identify module names up to a given recursive level — .findModuleName" />
 
-<meta property="og:description" content="This will get the sourceURL for the object named." />
+<meta property="og:description" content="With children, parents, grandparents, etc, there can be severl &quot;layers&quot; of recursion.
+Some functions need to evaluate the outer level for a value, if found, they don't need
+to proceed further. If not found, increment one more level of recursion, etc." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -125,47 +127,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract a url from module metadata</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/downloadData.R'><code>R/downloadData.R</code></a></small>
-    <div class="hidden name"><code>extractURL.Rd</code></div>
+    <h1>Identify module names up to a given recursive level</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/simulation-simInit.R'><code>R/simulation-simInit.R</code></a></small>
+    <div class="hidden name"><code>fineModuleName.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This will get the sourceURL for the object named.</p>
+    <p>With children, parents, grandparents, etc, there can be severl "layers" of recursion.
+Some functions need to evaluate the outer level for a value, if found, they don't need
+to proceed further. If not found, increment one more level of recursion, etc.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)
-
-<span class='co'># S4 method for character,missing</span>
-<span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)
-
-<span class='co'># S4 method for character,simList</span>
-<span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)</pre>
+    <pre class="usage"><span class='fu'><a href='findModuleName.html'>.findModuleName</a></span>(<span class='no'>modList</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>objectName</th>
-      <td><p>A character string of the object name in the metadata.</p></td>
+      <th>recursive</th>
+      <td><p>Numeric. The depth of recursion, where 0 is only top level, 1 is 1 level in etc.</p></td>
     </tr>
     <tr>
-      <th>sim</th>
-      <td><p>A <code>simList</code> object from which to extract the <code>sourceURL</code></p></td>
-    </tr>
-    <tr>
-      <th>module</th>
-      <td><p>An optional character string of the module name whose metadata is
-to be used. If omitted, the function will use the <code><a href='namespacing.html'>currentModule(sim)</a></code>,
-if defined.</p></td>
+      <th>modules</th>
+      <td><p>(Nested) Named list of module names</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The url.</p>
+    <p>Character vector of modules names</p>
     
 
   </div>
@@ -176,10 +168,6 @@ if defined.</p></td>
       
       <li><a href="#value">Value</a></li>
           </ul>
-
-    <h2>Author</h2>
-    
-Eliot McIntire
 
   </div>
 </div>

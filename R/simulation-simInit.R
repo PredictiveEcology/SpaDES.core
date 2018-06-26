@@ -826,11 +826,12 @@ simInitAndSpades <- function(...) {
 #' Some functions need to evaluate the outer level for a value, if found, they don't need
 #' to proceed further. If not found, increment one more level of recursion, etc.
 #'
-#' @rdname fineModuleName
 #' @param recursive Numeric. The depth of recursion, where 0 is only top level, 1 is 1 level in etc.
 #' @param modules (Nested) Named list of module names
-#' @keywords internal
 #' @return Character vector of modules names
+#'
+#' @keywords internal
+#' @rdname findModuleName
 .findModuleName <- function(modList, recursive = 0) {
   isParent <- unlist(lapply(modList, function(x) length(x) > 1))
   parentNames <- lapply(modList, function(x) x)

@@ -6,20 +6,20 @@
 |:--------|:----------------------------|
 |version  |R version 3.4.4 (2018-03-15) |
 |system   |x86_64, linux-gnu            |
-|ui       |RStudio (1.1.453)            |
+|ui       |X11                          |
 |language |en_CA:en                     |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-06-19                   |
+|date     |2018-06-25                   |
 
 ## Packages
 
-|package      |*  |version |date       |source                                          |
-|:------------|:--|:-------|:----------|:-----------------------------------------------|
-|quickPlot    |   |0.1.4   |2018-06-19 |Github (PredictiveEcology/quickPlot@ffc2ddb)    |
-|reproducible |   |0.2.0   |2018-06-19 |Github (PredictiveEcology/reproducible@e2bb94f) |
-|SpaDES.core  |   |0.2.0   |2018-06-19 |local (PredictiveEcology/SpaDES.core@NA)        |
-|SpaDES.tools |   |0.2.0   |2018-06-19 |Github (PredictiveEcology/SpaDES.tools@8498d25) |
+|package      |*  |version    |date       |source                                          |
+|:------------|:--|:----------|:----------|:-----------------------------------------------|
+|quickPlot    |   |0.1.4      |2018-06-26 |Github (PredictiveEcology/quickPlot@cba38b4)    |
+|reproducible |   |0.2.0.9002 |2018-06-26 |Github (PredictiveEcology/reproducible@25b7f61) |
+|SpaDES.core  |   |0.2.0      |2018-06-26 |local (PredictiveEcology/SpaDES.core@NA)        |
+|SpaDES.tools |   |0.2.0      |2018-06-26 |Github (PredictiveEcology/SpaDES.tools@8498d25) |
 
 # Check results
 

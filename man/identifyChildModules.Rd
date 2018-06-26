@@ -2,33 +2,20 @@
 % Please edit documentation in R/simulation-simInit.R
 \name{.identifyChildModules}
 \alias{.identifyChildModules}
-\alias{.findModuleName}
 \title{Identify Child Modules from a recursive list}
 \usage{
 .identifyChildModules(sim, modules)
-
-.findModuleName(modList, recursive = 0)
 }
 \arguments{
 \item{sim}{simList}
 
 \item{modules}{List of module names}
-
-\item{recursive}{Numeric. The depth of recursion, where 0 is only top level, 1 is 1 level in etc.}
-
-\item{modules}{(Nested) Named list of module names}
 }
 \value{
 list of \code{modules} will flat named list of all module names (children, parents etc.) and
         \code{childModules} a non flat named list of only the childModule names.
-
-Character vector of modules names
 }
 \description{
 There can be parents, grandparents, etc
-
-With children, parents, grandparents, etc, there can be severl "layers" of recursion.
-Some functions need to evaluate the outer level for a value, if found, they don't need
-to proceed further. If not found, increment one more level of recursion, etc.
 }
 \keyword{internal}
