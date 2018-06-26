@@ -207,6 +207,7 @@ setMethod(
 
         # attach source code to simList in a hidden spot
         opt <- getOption("spades.moduleCodeChecks")
+
         if (isTRUE(opt) || length(names(opt)) > 1)
           list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.envir[[m]])
         sim@.envir[[m]][["._sourceFilename"]] <- grep(paste0(m,".R"), ls(sim@.envir[[".parsedFiles"]]), value = TRUE)
@@ -252,7 +253,8 @@ setMethod(
         # Capture messages which will be about defineParameter at the moment
         mess <- capture.output(type = "message",
                                out <- suppressWarnings(eval(pf, envir = env)))
-        if (length(mess)) {
+        opt <- getOption("spades.moduleCodeChecks")
+        if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {
           messFile <- capture.output(type = "message",
                                                message(grep(paste0(m, ".R"),
                                                             ls(sim@.envir$.parsedFiles), value = TRUE)))

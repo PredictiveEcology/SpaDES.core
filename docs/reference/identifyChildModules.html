@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract a url from module metadata — extractURL • SpaDES.core</title>
+<title>Identify Child Modules from a recursive list — .identifyChildModules • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Extract a url from module metadata — extractURL" />
+<meta property="og:title" content="Identify Child Modules from a recursive list — .identifyChildModules" />
 
-<meta property="og:description" content="This will get the sourceURL for the object named." />
+<meta property="og:description" content="There can be parents, grandparents, etc" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -125,47 +125,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract a url from module metadata</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/downloadData.R'><code>R/downloadData.R</code></a></small>
-    <div class="hidden name"><code>extractURL.Rd</code></div>
+    <h1>Identify Child Modules from a recursive list</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/simulation-simInit.R'><code>R/simulation-simInit.R</code></a></small>
+    <div class="hidden name"><code>identifyChildModules.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This will get the sourceURL for the object named.</p>
+    <p>There can be parents, grandparents, etc</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)
-
-<span class='co'># S4 method for character,missing</span>
-<span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)
-
-<span class='co'># S4 method for character,simList</span>
-<span class='fu'>extractURL</span>(<span class='no'>objectName</span>, <span class='no'>sim</span>, <span class='no'>module</span>)</pre>
+    <pre class="usage"><span class='fu'>.identifyChildModules</span>(<span class='no'>sim</span>, <span class='no'>modules</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>objectName</th>
-      <td><p>A character string of the object name in the metadata.</p></td>
-    </tr>
-    <tr>
       <th>sim</th>
-      <td><p>A <code>simList</code> object from which to extract the <code>sourceURL</code></p></td>
+      <td><p>simList</p></td>
     </tr>
     <tr>
-      <th>module</th>
-      <td><p>An optional character string of the module name whose metadata is
-to be used. If omitted, the function will use the <code><a href='namespacing.html'>currentModule(sim)</a></code>,
-if defined.</p></td>
+      <th>modules</th>
+      <td><p>List of module names</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The url.</p>
+    <p>list of <code>modules</code> will flat named list of all module names (children, parents etc.) and
+        <code>childModules</code> a non flat named list of only the childModule names.</p>
     
 
   </div>
@@ -176,10 +165,6 @@ if defined.</p></td>
       
       <li><a href="#value">Value</a></li>
           </ul>
-
-    <h2>Author</h2>
-    
-Eliot McIntire
 
   </div>
 </div>

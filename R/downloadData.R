@@ -7,8 +7,10 @@ if (getRversion() >= "3.1.0") {
 #' This will get the sourceURL for the object named.
 #'
 #' @param objectName A character string of the object name in the metadata.
-#' @param sim A \code{simList} object from which to extract the \code{sourceURL}.
-#' @param module Character giving the name of the module.
+#' @param sim A \code{simList} object from which to extract the \code{sourceURL}
+#' @param module An optional character string of the module name whose metadata is
+#'               to be used. If omitted, the function will use the \code{currentModule(sim)},
+#'               if defined.
 #'
 #' @return The url.
 #'

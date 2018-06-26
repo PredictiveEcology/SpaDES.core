@@ -130,6 +130,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/findSimList.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/fineModuleName.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/ganttStatus.html</loc>
   </url>
   <url>
@@ -137,6 +140,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/globals.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/identifyChildModules.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/initialize-method.html</loc>
