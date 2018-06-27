@@ -321,13 +321,13 @@ setMethod(
     simListInput <- !isTRUE(is.na(whSimList))
     if (simListInput) {
       origEnv <- tmpl[[whSimList[1]]]@.envir
-      
+
       isListOfSimLists <- if (is.list(object)) {
         if (is(object[[1]], "simList")) TRUE else FALSE
       } else {
         FALSE
       }
-  
+
       if (isListOfSimLists) {
         object2 <- list()
         for (i in seq_along(object)) {
@@ -339,7 +339,7 @@ setMethod(
           object2[[i]]@simtimes <- object[[i]]@simtimes
           object2[[i]]@current <- object[[i]]@current
           object2[[i]]@events <- object[[i]]@events
-  
+
           lsOrigEnv <- ls(origEnv, all.names = TRUE)
           keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
           # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
@@ -364,7 +364,7 @@ setMethod(
             #object2@events <- unique(rbindlist(list(object@events, object2@events)))
         }
         object2@current <- object@current
-  
+
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
@@ -374,11 +374,11 @@ setMethod(
           rm(list = attr(object, "removedObjs"), envir = object2@.envir)
         }
       }
-  
+
       attr(object2, "tags") <- attr(object, "tags")
       attr(object2, "call") <- attr(object, "call")
       attr(object2, "function") <- attr(object, "function")
-  
+
       return(object2)
     } else {
       return(object)
@@ -539,4 +539,33 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
   bbOs <- list(simList = object.size(bb))
   aa <- append(aa, bbOs)
   return(aa)
+}
+
+
+
+#' Make simList correctly work with memoise
+#'
+#' Because of the environment slot, \code{simList} objects don't
+#' correctly memoise a \code{simList}. This method for
+#' \code{simList} converts the object to a \code{simList_} first.
+#'
+#' @return A \code{simList_} object or a \code{simList}, in the case
+#' of \code{unmakeMemoiseable}.
+#'
+#' @importFrom reproducible makeMemoiseable
+#' @inheritParams reproducible::makeMemoiseable
+#' @rdname makeMemoiseable
+#' @include simList-class.R
+#' @seealso \code{\link[reproducible]{makeMemoiseable}}
+#' @export
+makeMemoiseable.simList <- function(x) {
+  as(x, "simList_")
+}
+
+#' @importFrom reproducible unmakeMemoiseable
+#' @inheritParams reproducible::unmakeMemoiseable
+#' @export
+#' @rdname makeMemoiseable
+unmakeMemoiseable.simList_ <- function(x) {
+  as(x, "simList")
 }
