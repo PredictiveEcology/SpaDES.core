@@ -226,7 +226,7 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
+    cat(file = "~/tmp/out.txt", all.equalWONewCache(simCached1, simCached2), append = TRUE)
   }
   expect_true(isTRUE(all.equalWONewCache(simCached1, simCached2)))
 

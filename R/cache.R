@@ -569,3 +569,19 @@ makeMemoiseable.simList <- function(x) {
 unmakeMemoiseable.simList_ <- function(x) {
   as(x, "simList")
 }
+
+#' Attach missing attributes from x to y
+#'
+#' This is an internal helper.
+#'
+#' @keywords internal
+#' @param x an object with attributes
+#' @param y an object with attributes
+#' @rdname keepAttrs
+.keepAttrs <- function(x, y, omitAttrs = c(".envir", ".list")) {
+  keepAttrs <- setdiff(names(attributes(x)), names(attributes(y)))
+  keepAttrs <- setdiff(keepAttrs, omitAttrs)
+  for (att in keepAttrs)
+    attr(y, att) <- attr(x, att)
+  return(y)
+}
