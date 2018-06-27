@@ -43,15 +43,11 @@
 #' @slot simtimes   List of numerical values describing the simulation start
 #'                  and end times; as well as the current simulation time.
 #'
-#' @slot inputs     A list of length 2, containing:
-#'                  1) a \code{data.frame} or \code{data.table} of files and
-#'                  metadata, and 2) a list of optional arguments to pass to an
-#'                  import function.
+#' @slot inputs     a \code{data.frame} or \code{data.table} of files and
+#'                  metadata
 #'
-#' @slot outputs    A list of length 2 containing:
-#'                  1) a \code{data.frame}  or \code{data.table} of files and
-#'                  metadata, and 2) a list of optional arguments to pass to an
-#'                  export function.
+#' @slot outputs    a \code{data.frame}  or \code{data.table} of files and
+#'                  metadata
 #'
 #' @slot paths      Named list of \code{modulePath}, \code{inputPath},
 #'                  and \code{outputPath} paths. Partial matching is performed.
@@ -101,7 +97,7 @@ setClass(
     modules = "list", params = "list", events = "list",#data.table",
     current = "list", #"data.table",
     completed = "list", depends = ".simDeps",
-    simtimes = "list", inputs = "list", outputs = "list", paths = "list"
+    simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list"
   ),
   prototype = list(
     modules = as.list(NULL),

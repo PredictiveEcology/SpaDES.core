@@ -94,9 +94,10 @@ setMethod(
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
-    object@inputs$file <- unlist(.robustDigest(object@inputs$file,
-                                               quick = quick,
-                                               length = length))
+    if (NROW(object@inputs))
+      object@inputs$file <- unlist(.robustDigest(object@inputs$file,
+                                                 quick = quick,
+                                                 length = length))
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
