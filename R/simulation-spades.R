@@ -148,8 +148,9 @@ doEvent <- function(sim, debug, notOlderThan) {
           }
 
           # This is to create a namespaced module call
-          .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
-                            removeOthers = FALSE)
+          if (!.pkgEnv[["skipNamespacing"]])
+            .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
+                              removeOthers = FALSE)
 
           quotedFnCall <- if (cacheIt) { # means that a module or event is to be cached
             quote(Cache(FUN = get(moduleCall, envir = fnEnv),
@@ -271,9 +272,10 @@ scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
                           eventType,
-                          eventPriority) {
+                          eventPriority = .pkgEnv$.normalVal) {
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
+
   if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
 
   if (!is.numeric(eventTime)) {
@@ -289,7 +291,7 @@ scheduleEvent <- function(sim,
   }
   if (!is.character(eventType)) stop("eventType must be a character")
   if (!is.character(moduleName)) stop("moduleName must be a character")
-  if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
+  #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
   if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
   if (length(eventTime)) {
@@ -559,11 +561,14 @@ setMethod(
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))
+    .pkgEnv[["spades.nCompleted"]] <- getOption("spades.nCompleted")
+    .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
 
     # timeunits gets accessed every event -- this should only be needed once per simList
     sim@.envir$.timeunits <- timeunits(sim)
     on.exit({
-      .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
+      if (!.pkgEnv[["skipNamespacing"]])
+        .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
       rm(".timeunits", envir = sim@.envir)
     })
 

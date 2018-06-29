@@ -213,7 +213,7 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #' If the units passed to argument \code{units} are the same as
 #' \code{attr(time, "unit")}, then it simply returns input \code{time}.
 #'
-#' If \code{time} has no \code{units} attribute, then it is assumed to be
+#' If \code{time} has no \code{unit} attribute, then it is assumed to be
 #' seconds.
 #'
 #' @param time   Numeric. With a unit attribute, indicating the time unit of the
@@ -236,7 +236,7 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   timeUnit <- attr(time, "unit")
 
   if (!skipChecks) {
-    # Assume default of seconds if time has no units
+    # Assume default of seconds if time has no unit
     if (!is.character(timeUnit)) {
       attr(time, "unit") <- timeUnit <- "second"
     }
