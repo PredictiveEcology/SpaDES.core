@@ -4,7 +4,8 @@
 \alias{scheduleEvent}
 \title{Schedule a simulation event}
 \usage{
-scheduleEvent(sim, eventTime, moduleName, eventType, eventPriority)
+scheduleEvent(sim, eventTime, moduleName, eventType,
+  eventPriority = .pkgEnv$.normalVal)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object.}

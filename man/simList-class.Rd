@@ -45,15 +45,11 @@ containing module object dependency information.}
 \item{\code{simtimes}}{List of numerical values describing the simulation start
 and end times; as well as the current simulation time.}
 
-\item{\code{inputs}}{A list of length 2, containing:
-1) a \code{data.frame} or \code{data.table} of files and
-metadata, and 2) a list of optional arguments to pass to an
-import function.}
+\item{\code{inputs}}{a \code{data.frame} or \code{data.table} of files and
+metadata}
 
-\item{\code{outputs}}{A list of length 2 containing:
-1) a \code{data.frame}  or \code{data.table} of files and
-metadata, and 2) a list of optional arguments to pass to an
-export function.}
+\item{\code{outputs}}{a \code{data.frame}  or \code{data.table} of files and
+metadata}
 
 \item{\code{paths}}{Named list of \code{modulePath}, \code{inputPath},
 and \code{outputPath} paths. Partial matching is performed.}

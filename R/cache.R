@@ -376,10 +376,15 @@ setMethod(
         }
       }
 
-      attr(object2, "tags") <- attr(object, "tags")
-      attr(object2, "call") <- attr(object, "call")
-      attr(object2, "function") <- attr(object, "function")
+      attrsToGrab <- setdiff(names(attributes(object)), names(attributes(object2)))
+      for(atts in attrsToGrab) {
+        attr(object2, atts) <- attr(object, atts)
+      }
 
+      # attr(object2, "tags") <- attr(object, "tags")
+      # attr(object2, "call") <- attr(object, "call")
+      # attr(object2, "function") <- attr(object, "function")
+      #
       return(object2)
     } else {
       return(object)

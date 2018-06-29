@@ -10,7 +10,7 @@
 \alias{checkTimeunit,character,missing-method}
 \alias{checkTimeunit,character,environment-method}
 \title{Convert time units}
-\format{An object of class \code{character} of length 6.}
+\format{An object of class \code{character} of length 12.}
 \usage{
 inSeconds(unit, envir, skipChecks = FALSE)
 
@@ -65,7 +65,7 @@ Thus, it will find a user defined or module defined unit before a SpaDES unit.
 This means that a user can override the \code{dyear} given in SpaDES, for example,
 which is 365.25 days, with \code{dyear <- function(x) lubridate::duration(dday(365))}.
 
-If \code{time} has no \code{units} attribute, then it is assumed to be
+If \code{time} has no \code{unit} attribute, then it is assumed to be
 seconds.
 }
 \author{

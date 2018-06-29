@@ -256,16 +256,33 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
       # if timeUnit is same as unit, skip calculations
   if (is.null(timeUnit)) timeUnit <- "NA" # for next line
   if (unit != timeUnit) {
-        if (timeUnit == "second") {
-          time <- time / inSeconds(unit, envir, skipChecks = TRUE)
-        } else if (unit == "second") {
-          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE)
-        } else {
-          time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) /
-                          inSeconds(unit, envir, skipChecks = TRUE)
+
+    # For bypassing calculation -- use table of knowns
+    if (timeUnit != "NA") {
+      if (!startsWith(timeUnit, prefix = "second")) {
+        if (isTRUE(time %% 1 == 0)) {
+          if (time[1] < .pkgEnv[["nUnitConversions"]]) {
+            if (unit %in% .spadesTimes) {
+              time <- as.numeric(.pkgEnv[["unitConversions"]][time[1] + 1L, attr(time, "unit")])
+            }
+          }
         }
-        attr(time, "unit") <- unit
       }
+    }
+
+    if (!is.null(attr(time, "unit"))) {
+      if (startsWith(timeUnit, prefix = "second")) {
+        time <- time / inSeconds(unit, envir, skipChecks = TRUE)
+      } else if (startsWith(unit, prefix = "second")) {
+        time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE)
+      } else {
+        time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE) /
+                        inSeconds(unit, envir, skipChecks = TRUE)
+      }
+    }
+    attr(time, "unit") <- unit
+
+  }
   #   } else {
   #     # if timeunit is NA
   #     time <- 0
@@ -377,6 +394,8 @@ setMethod(
 
 #' @rdname timeConversion
 .spadesTimes <- c("year", "month", "week", "day", "hour", "second")
+.spadesTimes <- c(.spadesTimes, paste0(.spadesTimes, "s"))
+
 
 #' @export
 #' @rdname timeConversion

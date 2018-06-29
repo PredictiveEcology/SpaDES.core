@@ -202,6 +202,7 @@ test_that("test .prepareOutput", {
   layers <- lapply(filelist$files, rasterToMemory)
   landscape <- raster::stack(layers)
 
+  opts <- options("spades.moduleCodeChecks" = FALSE)
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
@@ -226,11 +227,13 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", all.equalWONewCache(simCached1, simCached2), append = TRUE)
+    cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(isTRUE(all.equalWONewCache(simCached1, simCached2)))
+  expect_true(isTRUE(all.equal(simCached1, simCached2)))
 
   clearCache(tmpdir)
+  options("spades.moduleCodeChecks" = opts)
+
 })
 
 test_that("test .robustDigest for simLists", {

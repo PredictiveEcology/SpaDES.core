@@ -247,3 +247,22 @@ setMethod(
     })
   list(value = value, warning = warn, error = err)
 }
+
+#' All equal method for simLists
+#'
+#' This function removes a few attributes that are added internally
+#' by SpaDES.core and are not relevant to the \code{all.equal}.
+#'
+#' @inheritParams base all.equal
+#' @return
+all.equal.simList <- function(target, current) {
+  attr(target, "newCache") <- NULL
+  attr(current, "newCache") <- NULL
+  attr(target, "removedObjs") <- NULL
+  attr(current, "removedObjs") <- NULL
+
+  # make a dummy class so it uses the default all.equal
+  class(target) <- "other"
+  class(current) <- "other"
+  all.equal(target, current)
+}

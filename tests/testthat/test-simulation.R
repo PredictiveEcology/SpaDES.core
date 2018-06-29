@@ -330,10 +330,12 @@ test_that("simulation runs with simInit with duplicate modules named", {
                    objects = objects, paths = paths)
 
 
-  # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.25 seconds
+  # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
   #system.time({spades(mySim, debug = FALSE)})
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
+
+  # Turn off completed list -- June 29, 2018 is 0.775 seconds
   options("spades.keepCompleted" = FALSE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})

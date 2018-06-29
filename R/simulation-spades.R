@@ -68,6 +68,7 @@ doEvent <- function(sim, debug, notOlderThan) {
     sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
   } else {
 
+    # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
       fnEnv <- sim@.envir[[cur[["moduleName"]]]]
       # update current simulated time
@@ -224,7 +225,6 @@ doEvent <- function(sim, debug, notOlderThan) {
       }
 
       # current event completed, replace current with empty
-      slot(sim, "current") <- list()
 
     } else {
       # update current simulated time and event
@@ -232,9 +232,9 @@ doEvent <- function(sim, debug, notOlderThan) {
       if (length(sim@events)) {
         # i.e., if no more events
         slot(sim, "events") <- append(list(sim@current), sim@events)
-        slot(sim, "current") <- list()
       }
     }
+    slot(sim, "current") <- list()
   }
   return(invisible(sim))
 }
