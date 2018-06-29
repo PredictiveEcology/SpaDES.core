@@ -53,11 +53,11 @@ doEvent <- function(sim, debug, notOlderThan) {
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
     if (length(sim@events)) {
-      sim@current <- sim@events[[1]]
-      sim@events <- sim@events[-1]
+      slot(sim, "current") <- sim@events[[1]]
+      slot(sim, "events") <- sim@events[-1]
     } else {
       # no more events, return empty event list
-      sim@current <- list()
+      slot(sim, "current") <- list()
     }
   }
 
@@ -76,8 +76,15 @@ doEvent <- function(sim, debug, notOlderThan) {
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
 
-      # check the module call for validity
-      if (!(all(unlist(lapply(debug, identical, FALSE))))) {
+      # if debug is TRUE
+      if (is.null(attr(sim, "needDebug"))) {
+        attr(sim, "needDebug") <- if (length(debug) > 1) {
+          !(all(unlist(lapply(debug, identical, FALSE))))
+        } else {
+          !identical(debug, FALSE)
+        }
+      }
+      if (attr(sim, "needDebug")) {
         for (i in seq_along(debug)) {
           if (isTRUE(debug[[i]]) | debug[[i]] == "current" | debug[[i]] == "step") {
             if (length(cur) > 0) {
@@ -120,6 +127,7 @@ doEvent <- function(sim, debug, notOlderThan) {
         }
       }
 
+      # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
@@ -181,39 +189,50 @@ doEvent <- function(sim, debug, notOlderThan) {
       }
 
       # add to list of completed events
-      lenCompl <- length(sim@completed)
-      if (lenCompl) {
-        # next 4 lines replace sim@completed <- append(sim@completed, list(cur)), which gets slower with size of sim@completed
-        # sim@completed <- append(sim@completed, list(cur))
-        #   following does not: it is more or less O(1). Algorithm from: https://stackoverflow.com/questions/17046336/here-we-go-again-append-an-element-to-a-list-in-r?lq=1
-        #   it basically increases size of list by *2 every time it fills up
-        sim@.envir[["._completedCounter"]] <- sim@.envir[["._completedCounter"]] + 1
-        # This gets slower as it gets larger. So sad.
-        if(sim@.envir[["._completedCounter"]]==sim@.envir[["._completedSize"]]) {
-          sim@.envir[["._completedSize"]] <- sim@.envir[["._completedSize"]] * 2
-          length(sim@completed) <- sim@.envir[["._completedSize"]]
-        }
-        sim@completed[sim@.envir[["._completedCounter"]]] <- list(cur)
+      if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
+        if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
+                            #instead of sim@.envir because collisions with parallel sims from same sim object
 
-        if (lenCompl > getOption("spades.nCompleted")) {
-          sim@completed <- sim@completed[(lenCompl+1) - getOption("spades.nCompleted"):(lenCompl+1)]
+          # next section replaces sim@completed <- append(sim@completed, list(cur)),
+          # which gets slower with size of sim@completed
+          # sim@completed <- append(sim@completed, list(cur))
+          #   following does not: it is more or less O(1). Algorithm from: https://stackoverflow.com/questions/17046336/here-we-go-again-append-an-element-to-a-list-in-r?lq=1
+          #   it basically increases size of list by *2 every time it fills up
+          attr(sim, "completedCounter") <- attr(sim, "completedCounter") + 1
+
+          # increase length of list by doubling as it grows
+          if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
+            lenCompl <- length(sim@completed)
+            if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
+              if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
+                keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
+                sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
+                attr(sim, "completedSize") <- length(sim@completed)
+                attr(sim, "completedCounter") <- attr(sim, "completedSize")
+              }
+            }
+            attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
+            length(sim@completed) <- attr(sim, "completedSize")
+          }
+          sim@completed[attr(sim, "completedCounter")] <- list(cur)
+
+        } else {
+          attr(sim, "completedCounter") <- 1
+          attr(sim, "completedSize") <- 2
+          sim@completed <- list(cur)
         }
-      } else {
-        sim@.envir[["._completedCounter"]] <- 1
-        sim@.envir[["._completedSize"]] <- 2
-        sim@completed <- list(cur)
       }
 
       # current event completed, replace current with empty
-      sim@current <- list()
+      slot(sim, "current") <- list()
 
     } else {
       # update current simulated time and event
       sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
       if (length(sim@events)) {
         # i.e., if no more events
-        sim@events <- append(list(sim@current), sim@events)
-        sim@current <- list()
+        slot(sim, "events") <- append(list(sim@current), sim@events)
+        slot(sim, "current") <- list()
       }
     }
   }
@@ -348,9 +367,9 @@ scheduleEvent <- function(sim,
 
       # put new event into event queue
       if (numEvents == 0L) {
-        sim@events <- newEventList
+        slot(sim, "events") <- newEventList
       } else {
-        sim@events <- append(sim@events, newEventList)
+        slot(sim, "events") <- append(sim@events, newEventList)
         needSort <- TRUE
         if (eventTimeInSeconds>sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
@@ -360,7 +379,7 @@ scheduleEvent <- function(sim,
         if (needSort) {
           ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
                        unlist(lapply(sim@events, function(x) x$eventPriority)))
-          sim@events <- sim@events[ord]
+          slot(sim, "events") <- sim@events[ord]
         }
       }
     }
@@ -563,6 +582,7 @@ setMethod(
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))
     .pkgEnv[["spades.nCompleted"]] <- getOption("spades.nCompleted")
     .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
+    .pkgEnv[["spades.keepCompleted"]] <- getOption("spades.keepCompleted", TRUE)
 
     # timeunits gets accessed every event -- this should only be needed once per simList
     sim@.envir$.timeunits <- timeunits(sim)
