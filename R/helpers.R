@@ -255,14 +255,12 @@ setMethod(
 #'
 #' @inheritParams base all.equal
 #' @return
-all.equal.simList <- function(target, current) {
+all.equal.simList <- function(target, current, ...) {
   attr(target, "newCache") <- NULL
   attr(current, "newCache") <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
 
   # make a dummy class so it uses the default all.equal
-  class(target) <- "other"
-  class(current) <- "other"
-  all.equal(target, current)
+  all.equal.default(target, current)
 }
