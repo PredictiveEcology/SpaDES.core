@@ -4,7 +4,18 @@
 \alias{all.equal.simList}
 \title{All equal method for simLists}
 \usage{
-\method{all}{equal.simList}(target, current)
+\method{all}{equal.simList}(target, current, ...)
+}
+\arguments{
+\item{target}{\R object.}
+
+\item{current}{other \R object, to be compared with \code{target}.}
+
+\item{...}{Further arguments for different methods, notably the
+    following two, for numerical comparison:}
+}
+\value{
+See \code{\link[base]{all.equal}}
 }
 \description{
 This function removes a few attributes that are added internally

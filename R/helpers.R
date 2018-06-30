@@ -253,8 +253,9 @@ setMethod(
 #' This function removes a few attributes that are added internally
 #' by SpaDES.core and are not relevant to the \code{all.equal}.
 #'
-#' @inheritParams base all.equal
+#' @inheritParams base::all.equal
 #' @return
+#' See \code{\link[base]{all.equal}}
 all.equal.simList <- function(target, current, ...) {
   attr(target, "newCache") <- NULL
   attr(current, "newCache") <- NULL
