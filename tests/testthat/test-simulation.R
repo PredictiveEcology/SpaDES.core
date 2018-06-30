@@ -325,17 +325,25 @@ test_that("simulation runs with simInit with duplicate modules named", {
     outputPath = outputDir
   )
 
+  #options("spades.nCompleted" = 500)
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    objects = objects, paths = paths)
 
-  # was 10.2 seconds -- currently 4.2 seconds or so
+
+  # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
   #system.time({spades(mySim, debug = FALSE)})
+  options("spades.keepCompleted" = TRUE)
+  microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
+
+  # Turn off completed list -- June 29, 2018 is 0.775 seconds
+  options("spades.keepCompleted" = FALSE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
 })
 
 
 test_that("conflicting function types", {
+  options("spades.moduleCodeChecks" = TRUE)
   library(igraph)
   tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
   cwd <- getwd()
