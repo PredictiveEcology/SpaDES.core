@@ -97,8 +97,9 @@ test_that("timeunit works correctly", {
   mySim <- simInit()
   expect_equal(maxTimeunit(mySim), NA_character_)
 
-  expect_equal(c("year", "month", "week", "day", "hour", "second"),
-                 spadesTimes())
+  st1 <- c("year", "month", "week", "day", "hour", "second")
+  st2 <- c(st1, paste0(st1, "s"))
+  expect_equal(st2, spadesTimes())
 
   expect_equal(as.numeric(dNA()), 0)
   expect_equal(as.numeric(dhour(1)), 60 * 60)

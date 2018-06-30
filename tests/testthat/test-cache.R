@@ -184,11 +184,13 @@ test_that("test .prepareOutput", {
   library(raster)
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  opts <- options("spades.moduleCodeChecks" = FALSE)
   on.exit({
 
     detach("package:igraph")
     detach("package:raster")
     unlink(tmpdir, recursive = TRUE)
+    options("spades.moduleCodeChecks" = opts)
   }, add = TRUE)
 
   try(clearCache(tmpdir), silent = TRUE)
@@ -202,7 +204,6 @@ test_that("test .prepareOutput", {
   layers <- lapply(filelist$files, rasterToMemory)
   landscape <- raster::stack(layers)
 
-  opts <- options("spades.moduleCodeChecks" = FALSE)
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
@@ -232,7 +233,6 @@ test_that("test .prepareOutput", {
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
 
   clearCache(tmpdir)
-  options("spades.moduleCodeChecks" = opts)
 
 })
 
