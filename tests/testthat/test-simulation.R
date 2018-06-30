@@ -343,6 +343,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
 
 test_that("conflicting function types", {
+  options("spades.moduleCodeChecks" = TRUE)
   library(igraph)
   tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
   cwd <- getwd()
