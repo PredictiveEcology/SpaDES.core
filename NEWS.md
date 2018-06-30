@@ -6,6 +6,10 @@ version 0.2.1
 ## new function
 
 * `extractURL` will extract the sourceURL from metadata, given an object name
+* `all.equal.simList` method strips a small number of attributes that are used internally that create false failures.
+* `makeMemoiseable` and `unmakeMemoisable`, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of `simList`
+* speed enhancements and bugfixes
+* new option, `spades.keepCompleted`, `TRUE` by default, which can be useful for dramatically speeding up the DES when there are many (>10,000) events
 
 
 version 0.2.0

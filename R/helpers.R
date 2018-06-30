@@ -255,6 +255,7 @@ setMethod(
 #'
 #' @inheritParams base::all.equal
 #' @return
+#' @export
 #' See \code{\link[base]{all.equal}}
 all.equal.simList <- function(target, current, ...) {
   attr(target, "newCache") <- NULL
