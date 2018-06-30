@@ -254,8 +254,8 @@ setMethod(
 #' by SpaDES.core and are not relevant to the \code{all.equal}.
 #'
 #' @inheritParams base::all.equal
-#' @return
 #' @export
+#' @return
 #' See \code{\link[base]{all.equal}}
 all.equal.simList <- function(target, current, ...) {
   attr(target, "newCache") <- NULL

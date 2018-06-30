@@ -14,6 +14,9 @@
 \item{...}{Further arguments for different methods, notably the
     following two, for numerical comparison:}
 }
+\value{
+See \code{\link[base]{all.equal}}
+}
 \description{
 This function removes a few attributes that are added internally
 by SpaDES.core and are not relevant to the \code{all.equal}.
