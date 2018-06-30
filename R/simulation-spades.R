@@ -225,16 +225,16 @@ doEvent <- function(sim, debug, notOlderThan) {
       }
 
       # current event completed, replace current with empty
+      slot(sim, "current") <- list()
 
     } else {
       # update current simulated time and event
       sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
-      if (length(sim@events)) {
-        # i.e., if no more events
-        slot(sim, "events") <- append(list(sim@current), sim@events)
-      }
+      # i.e., if no more events
+      slot(sim, "events") <- append(list(sim@current), sim@events)
+      slot(sim, "current") <- list()
     }
-    slot(sim, "current") <- list()
+
   }
   return(invisible(sim))
 }
