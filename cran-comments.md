@@ -39,17 +39,17 @@ We also introduced several new functions and bug fixes (see NEWS.md).
 ### Current R versions
 * macOS High Sierra    (local), R 3.5.0
 * OS X El Capitan  (travis-ci), R 3.5.0
-* Ubuntu 14.04     (travis-ci), R 3.5.0
-* Ubuntu 18.04         (local), R 3.5.0
-* Windows           (appveyor), R 3.5.0
-* Windows        (win-builder), R 3.5.0
-* Windows 7            (local), R 3.5.0
+* Ubuntu 14.04     (travis-ci), R 3.5.1
+* Ubuntu 18.04         (local), R 3.5.1
+* Windows           (appveyor), R 3.5.1
+* Windows        (win-builder), R 3.5.1
+* Windows 7            (local), R 3.5.1
 
 ### Development R version
-* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-06-15 r74903)
-* Ubuntu 18.04         (local), R 3.6.0 (2018-06-15 r74903)
-* Windows           (appveyor), R 3.6.0 (2018-06-11 r74889)
-* Windows        (win-builder), R 3.6.0 (2018-06-15 r74904)
+* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-06-20 r74923)
+* Ubuntu 18.04         (local), R 3.6.0 (2018-06-28 r74935)
+* Windows           (appveyor), R 3.6.0 (2018-06-26 r74934)
+* Windows        (win-builder), R 3.6.0 (2018-07-01 r74950)
 
 ## R CMD check results
 

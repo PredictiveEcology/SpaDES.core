@@ -1,17 +1,5 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.2.1
-=============
-
-## new function
-
-* `extractURL` will extract the sourceURL from metadata, given an object name
-* `all.equal.simList` method strips a small number of attributes that are used internally that create false failures.
-* `makeMemoiseable` and `unmakeMemoisable`, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of `simList`
-* speed enhancements and bugfixes
-* new option, `spades.keepCompleted`, `TRUE` by default, which can be useful for dramatically speeding up the DES when there are many (>10,000) events
-
-
 version 0.2.0
 =============
 
@@ -29,8 +17,11 @@ version 0.2.0
     - messages colour coded, and separated by file with absolute path explicit
     
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
-* `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors
-* `downloadData` has changed dramatically, now it is a wrapper around `reproducible::prepInputs` which does more checking
+* `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors.
+* `downloadData` has changed dramatically, now it is a wrapper around `reproducible::prepInputs` which does more checking.
+* `extractURL` will extract the sourceURL from metadata, given an object name.
+* `makeMemoiseable` and `unmakeMemoisable`, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of `simList`.
+* new option, `spades.keepCompleted`, `TRUE` by default, which can be useful for dramatically speeding up the DES when there are many (>10,000) events.
 
 ## deprecated, defunct, and removed features
 
@@ -41,7 +32,9 @@ version 0.2.0
 * fix tests based on `data.table` changes (@mattdowle, #64).
 * re-export `start` and `end`.
 * `newModule` template modified slightly based on workshop feedback.
-* `setPaths` now only sets the directories that are passed into it
+* `setPaths` now only sets the directories that are passed into it.
+* `all.equal.simList` method strips a small number of attributes that are used internally that create false failures.
+* speed enhancements.
 * other minor bug fixes.
 
 ## package dependency changes

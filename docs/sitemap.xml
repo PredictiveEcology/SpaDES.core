@@ -22,6 +22,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/addTagsToOutput.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/all.equal.simList.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/append_attr.html</loc>
   </url>
   <url>
@@ -124,13 +127,13 @@
     <loc>http://spades-core.predictiveecology.org//reference/findElements.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/findModuleName.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/findObjects.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/findSimList.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/fineModuleName.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/ganttStatus.html</loc>
@@ -151,6 +154,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/inputObjects.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/keepAttrs.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/loadFiles.html</loc>
   </url>
   <url>
@@ -161,6 +167,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/ls_str-method.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/makeMemoiseable.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/maxTimeunit.html</loc>
