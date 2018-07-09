@@ -40,8 +40,12 @@ test_that("test checkpointing", {
   end(simB) <- 2
   simB <- spades(simB)
 
+  rm("._startClockTime", envir = envir(simB))
+  rm("._startClockTime", envir = envir(simA))
+  rm(".timestamp", envir = envir(simB))
+  rm(".timestamp", envir = envir(simA))
   ## both versions above should yield identical results
-  expect_true(all.equal(as(simA, "simList_"), as(simB, "simList_")))
+  expect_true(all.equal(simA, simB))
 
 })
 
@@ -95,5 +99,9 @@ test_that("test checkpointing with disk-backed raster", {
   simB <- spades(simB)
 
   ## both versions above should yield identical results
-  expect_true(all.equal(as(simA, "simList_"), as(simB, "simList_")))
+  rm("._startClockTime", envir = envir(simB))
+  rm("._startClockTime", envir = envir(simA))
+  rm(".timestamp", envir = envir(simB))
+  rm(".timestamp", envir = envir(simA))
+  expect_true(all.equal(simA, simB))
 })

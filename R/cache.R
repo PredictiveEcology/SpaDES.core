@@ -94,9 +94,10 @@ setMethod(
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
-    object@inputs$file <- unlist(.robustDigest(object@inputs$file,
-                                               quick = quick,
-                                               length = length))
+    if (NROW(object@inputs))
+      object@inputs$file <- unlist(.robustDigest(object@inputs$file,
+                                                 quick = quick,
+                                                 length = length))
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
@@ -321,13 +322,13 @@ setMethod(
     simListInput <- !isTRUE(is.na(whSimList))
     if (simListInput) {
       origEnv <- tmpl[[whSimList[1]]]@.envir
-      
+
       isListOfSimLists <- if (is.list(object)) {
         if (is(object[[1]], "simList")) TRUE else FALSE
       } else {
         FALSE
       }
-  
+
       if (isListOfSimLists) {
         object2 <- list()
         for (i in seq_along(object)) {
@@ -339,7 +340,7 @@ setMethod(
           object2[[i]]@simtimes <- object[[i]]@simtimes
           object2[[i]]@current <- object[[i]]@current
           object2[[i]]@events <- object[[i]]@events
-  
+
           lsOrigEnv <- ls(origEnv, all.names = TRUE)
           keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.envir, all.names = TRUE))
           # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
@@ -364,7 +365,7 @@ setMethod(
             #object2@events <- unique(rbindlist(list(object@events, object2@events)))
         }
         object2@current <- object@current
-  
+
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
@@ -374,11 +375,16 @@ setMethod(
           rm(list = attr(object, "removedObjs"), envir = object2@.envir)
         }
       }
-  
-      attr(object2, "tags") <- attr(object, "tags")
-      attr(object2, "call") <- attr(object, "call")
-      attr(object2, "function") <- attr(object, "function")
-  
+
+      attrsToGrab <- setdiff(names(attributes(object)), names(attributes(object2)))
+      for(atts in attrsToGrab) {
+        attr(object2, atts) <- attr(object, atts)
+      }
+
+      # attr(object2, "tags") <- attr(object, "tags")
+      # attr(object2, "call") <- attr(object, "call")
+      # attr(object2, "function") <- attr(object, "function")
+      #
       return(object2)
     } else {
       return(object)
@@ -539,4 +545,49 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
   bbOs <- list(simList = object.size(bb))
   aa <- append(aa, bbOs)
   return(aa)
+}
+
+
+
+#' Make simList correctly work with memoise
+#'
+#' Because of the environment slot, \code{simList} objects don't
+#' correctly memoise a \code{simList}. This method for
+#' \code{simList} converts the object to a \code{simList_} first.
+#'
+#' @return A \code{simList_} object or a \code{simList}, in the case
+#' of \code{unmakeMemoiseable}.
+#'
+#' @importFrom reproducible makeMemoiseable
+#' @inheritParams reproducible::makeMemoiseable
+#' @rdname makeMemoiseable
+#' @include simList-class.R
+#' @seealso \code{\link[reproducible]{makeMemoiseable}}
+#' @export
+makeMemoiseable.simList <- function(x) {
+  as(x, "simList_")
+}
+
+#' @importFrom reproducible unmakeMemoiseable
+#' @inheritParams reproducible::unmakeMemoiseable
+#' @export
+#' @rdname makeMemoiseable
+unmakeMemoiseable.simList_ <- function(x) {
+  as(x, "simList")
+}
+
+#' Attach missing attributes from x to y
+#'
+#' This is an internal helper.
+#'
+#' @keywords internal
+#' @param x an object with attributes
+#' @param y an object with attributes
+#' @rdname keepAttrs
+.keepAttrs <- function(x, y, omitAttrs = c(".envir", ".list")) {
+  keepAttrs <- setdiff(names(attributes(x)), names(attributes(y)))
+  keepAttrs <- setdiff(keepAttrs, omitAttrs)
+  for (att in keepAttrs)
+    attr(y, att) <- attr(x, att)
+  return(y)
 }

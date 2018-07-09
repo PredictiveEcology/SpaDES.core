@@ -25,7 +25,7 @@ test_that("simList object initializes correctly", {
   ### SLOT .envir
   expect_is(envir(mySim), "environment")
   expect_is(objs(mySim), "list")
-  expect_equal(sort(names(objs(mySim))),
+  expect_equal(sort(names(objs(mySim, all.names = TRUE))),
                sort(names(as(mySim, "simList_")@.list)))
   expect_equivalent(mySim, as(as(mySim, "simList_"), "simList"))
   expect_equal(ls(mySim), objects(mySim))

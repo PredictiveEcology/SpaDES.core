@@ -184,11 +184,13 @@ test_that("test .prepareOutput", {
   library(raster)
 
   tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  opts <- options("spades.moduleCodeChecks" = FALSE)
   on.exit({
 
     detach("package:igraph")
     detach("package:raster")
     unlink(tmpdir, recursive = TRUE)
+    options("spades.moduleCodeChecks" = opts)
   }, add = TRUE)
 
   try(clearCache(tmpdir), silent = TRUE)
@@ -228,9 +230,10 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
     cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(isTRUE(all.equalWONewCache(simCached1, simCached2)))
+  expect_true(isTRUE(all.equal(simCached1, simCached2)))
 
   clearCache(tmpdir)
+
 })
 
 test_that("test .robustDigest for simLists", {
