@@ -64,6 +64,13 @@ There was 1 NOTE:
     Old maintainer(s):
       Alex M Chubaty <alexander.chubaty@canada.ca>
 
+2. The package size has increased; we will work to reduce package size on the next update.
+
+    installed size is 12.4Mb
+    sub-directories of 1Mb or more:
+      R    10.1Mb
+      doc   1.4Mb
+
 ## Downstream dependencies
 
 I have run R CMD check on downstream dependencies and all have passed, except as noted below.
