@@ -251,8 +251,13 @@ setMethod(
 
         # Evaluate defineModule into the sim environment
         # Capture messages which will be about defineParameter at the moment
+        on.exit({
+          if (!exists("finishedClean"))
+            try(mess)
+        })
         mess <- capture.output(type = "message",
-                               out <- suppressWarnings(eval(pf, envir = env)))
+                               out <- try(suppressWarnings(eval(pf, envir = env))))
+        if (is(out, "try-error")) stop(out)
         opt <- getOption("spades.moduleCodeChecks")
         if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {
           messFile <- capture.output(type = "message",
@@ -480,6 +485,7 @@ setMethod(
       }
     }
 
+    finishedClean <- TRUE
     return(sim)
 })
 
