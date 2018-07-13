@@ -1,5 +1,5 @@
 test_that("test userSuppliedObj", {
-  tmpdir <- file.path(tempdir(), "test_conflictingFns")
+  tmpdir <- file.path(tempdir(), paste(collapse = "", sample(LETTERS, 6)))
   checkPath(tmpdir, create = TRUE)
   cwd <- getwd()
   setwd(tmpdir)

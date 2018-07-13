@@ -517,7 +517,6 @@ setMethod(
   return(tmp)
 }
 
-#' Evaluate code that has "active" code, i.e., functions like start(sim)
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame()) {
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = envir), error = function(y) "ERROR"))
