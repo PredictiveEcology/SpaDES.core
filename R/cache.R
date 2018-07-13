@@ -354,7 +354,14 @@ setMethod(
         #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
 
-        createOutputs <- tmpl[[whSimList]]@depends@dependencies[[currentModule(tmpl[[whSimList]])]]@outputObjects$objectName
+        hasCurrModule <- currentModule(tmpl[[whSimList]])
+        createOutputs <-if (length(hasCurrModule)) {
+          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
+        } else {
+          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
+            dep@outputObjects$objectName)
+          unique(unlist(aa))
+        }
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.envir, all.names = TRUE)
