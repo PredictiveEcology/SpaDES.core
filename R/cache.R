@@ -358,7 +358,7 @@ if (!isGeneric(".prepareOutput")) {
 }
 
 ##########################################
-#' prepareOutput for simList class objects
+#' \code{.prepareOutput} for simList
 #'
 #' See \code{\link[reproducible]{.prepareOutput}}.
 #'
@@ -414,6 +414,9 @@ setMethod(
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
 
         hasCurrModule <- currentModule(tmpl[[whSimList]])
+        # Convert to numeric index, as some modules don't have names
+        hasCurrModule <- match(hasCurrModule, modules(tmpl[[whSimList]]))
+
         createOutputs <-if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
         } else {
@@ -421,6 +424,9 @@ setMethod(
             dep@outputObjects$objectName)
           unique(unlist(aa))
         }
+        createOutputs <- na.omit(createOutputs)
+        # take only the ones that the file changed, based on attr(object, ".Cache")$changed
+        createOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.envir, all.names = TRUE)
@@ -434,7 +440,7 @@ setMethod(
           # if this is FALSE, it means that events were added by the event
           if (!isTRUE(all.equal(object@events, object2@events)))
             object2@events <- do.call(unique, args = list(append(object@events, object2@events)))
-            #object2@events <- unique(rbindlist(list(object@events, object2@events)))
+          #object2@events <- unique(rbindlist(list(object@events, object2@events)))
         }
         object2@current <- object@current
 
@@ -463,13 +469,7 @@ setMethod(
     } else {
       return(object)
     }
-})
-
-if (!isGeneric(".preDigestByClass")) {
-  setGeneric(".preDigestByClass", function(object) {
-    standardGeneric(".preDigestByClass")
   })
-}
 
 ################################################################################
 #' Pre-digesting method for \code{simList}
