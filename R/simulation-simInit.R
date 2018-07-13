@@ -342,6 +342,12 @@ setMethod(
 
     names(modules) <- unlist(modules)
 
+    # Check that modules exist in paths$modulePath
+    moduleDirsExist <- dir.exists(file.path(paths$modulePath, unlist(modules)))
+    if (!isTRUE(all(moduleDirsExist))) {
+      stop("These modules: ", unlist(modules)[!moduleDirsExist], " , don't exist in ", paths$modulePath)
+    }
+
     # identify childModules, recursively
     childModules <- .identifyChildModules(sim = sim, modules = modules)
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
