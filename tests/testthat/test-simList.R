@@ -233,7 +233,7 @@ test_that("simList test all signatures", {
     argsTested <- vector("list", length = N)
     opts <- options("spades.moduleCodeChecks" = FALSE)
     on.exit({
-      options("spades.moduleCodeChecks" = opts)
+      options("spades.moduleCodeChecks" = opts[[1]])
     }, add = TRUE)
     for (i in 1L:N) {
       li <- list(

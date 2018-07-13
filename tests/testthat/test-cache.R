@@ -190,7 +190,7 @@ test_that("test .prepareOutput", {
     detach("package:igraph")
     detach("package:raster")
     unlink(tmpdir, recursive = TRUE)
-    options("spades.moduleCodeChecks" = opts)
+    options("spades.moduleCodeChecks" = opts[[1]])
   }, add = TRUE)
 
   try(clearCache(tmpdir), silent = TRUE)
@@ -416,7 +416,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
-    options("spades.moduleCodeChecks" = opts)
+    options("spades.moduleCodeChecks" = opts[[1]])
   }, add = TRUE)
 
   try(clearCache(tmpdir), silent = TRUE)
