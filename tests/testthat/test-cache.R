@@ -404,3 +404,92 @@ test_that("test objSize", {
   os <- objSize(a)
   expect_true(length(os)==4) # 2 objects, the environment, the rest
 })
+
+
+
+test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
+  library(igraph)
+  tmpdir <- file.path(tempdir(), paste(collapse = "", sample(LETTERS, 5))) %>% checkPath(create = TRUE)
+
+  opts <- options("spades.moduleCodeChecks" = FALSE)
+  on.exit({
+
+    detach("package:igraph")
+    unlink(tmpdir, recursive = TRUE)
+    options("spades.moduleCodeChecks" = opts)
+  }, add = TRUE)
+
+  try(clearCache(tmpdir), silent = TRUE)
+  setPaths(cachePath = tmpdir)
+  cwd <- getwd()
+  setwd(tmpdir)
+  Cache(rnorm, 1)
+
+  m1 <- "test"
+  m <- c(m1)
+  newModule(m1, tmpdir, open = FALSE)
+  fileNames <- dir(tmpdir, recursive = TRUE, pattern = "test.R$")
+  xxx <- lapply(fileNames, readLines)
+  set.seed(113)
+
+
+  lineWithInit <- grep(xxx[[1]], pattern = "^Init")
+  lineWithDotUseCache <- grep(xxx[[1]], pattern = "\\.useCache")
+  lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
+  lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+
+  xxx1 <- list()
+  xxx1[[1]] <- xxx[[1]]
+
+  cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei2', 'numeric', '', ''),
+      expectsInput('ei3', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx1[[1]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co2', 'numeric', ''),
+      createsOutput('co3', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx1[[1]][(lineWithOutputObjects+1):lineWithInit], "
+      sim$co1 <- 1
+      sim$co2 <- 1
+      sim$co3 <- 1
+      ",
+      xxx1[[1]][(lineWithInit+1):lineWithDotInputObjects], "
+      aaa <- 1
+      ",
+      xxx1[[1]][(lineWithDotInputObjects+1):length(xxx1[[1]])],
+      sep = "\n", fill = FALSE, file = fileNames[1])
+
+
+  try(clearCache(tmpdir), silent = TRUE)
+  mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]), params =
+            list(test = list(.useCache = "init")))
+  mySim$co4 <- 5
+  mySim$co5 <- 6
+  mySim2 <- spades(mySim)
+  expect_true(mySim2$co1 == 1)
+  expect_true(mySim2$co2 == 1)
+  expect_true(mySim2$co3 == 1)
+  expect_true(mySim2$co4 == 5)
+  expect_true(mySim2$co5 == 6)
+
+  mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
+                   objects = list(co4 = 3, co3 = 2, co1 = 4), params =
+                     list(test = list(.useCache = "init")))
+  expect_true(mySim$co3 == 2) # will be changed by init
+  expect_true(mySim$co1 == 4)# will be changed by init
+  mySim2 <- spades(mySim)
+  expect_true(mySim2$co1 == 1) # was affected
+  expect_true(mySim2$co2 == 1)# was affected
+  expect_true(mySim2$co3 == 1) # was affected
+  expect_false(mySim2$co4 == 5) # wasn't affected by init event
+  expect_true(mySim2$co4 == 3) # wasn't affect by init event
+  expect_true(is.null(mySim2$co5)) # wan't affected, and isn't there
+
+})
+

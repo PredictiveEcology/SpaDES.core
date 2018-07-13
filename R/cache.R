@@ -292,6 +292,65 @@ setMethod(
     checkPath(path = cacheRepo, create = create)
   })
 
+if (!isGeneric(".addChangedAttr")) {
+  setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
+    standardGeneric(".addChangedAttr")
+  })
+}
+
+##########################################
+#' \code{.addChangedAttr} for simList class objects
+#'
+#' This will evaluate which elements in the simList object changed following
+#' this Cached function call. It will add a named character string as an
+#' attribute \code{attr(x, ".Cache")$changed}, indicating which ones changed.
+#' When this function is subsequently called again, only these changed objects
+#' will be returned. All other \code{simList} objects will remain unchanged.
+#'
+#' @seealso \code{\link[reproducible]{.addChangedAttr}}.
+#'
+#' @importFrom reproducible .addChangedAttr
+#' @importMethodsFrom reproducible .addChangedAttr
+#' @inheritParams reproducible::.addChangedAttr
+#' @include simList-class.R
+#' @seealso \code{\link[reproducible]{.addChangedAttr}}
+#' @exportMethod .addChangedAttr
+#' @export
+#' @rdname addChangedAttr
+setMethod(
+  ".addChangedAttr",
+  signature = "simList",
+  definition = function(object, preDigest, origArguments, ...) {
+    dots <- list(...)
+    whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
+    # remove the "newCache" attribute, which is irrelevant for digest
+    if (!is.null(attr(object, ".Cache")$newCache)) attr(object, ".Cache")$newCache <- NULL
+    postDigest <-
+      .robustDigest(object, objects = dots$objects,
+                    length = dots$length,
+                    algo = dots$algo,
+                    quick = dots$quick,
+                    classOptions = dots$classOptions)
+    isNewObj <- !names(postDigest$.list$.envir) %in% names(preDigest[[whSimList]]$.list$.envir)
+    newObjs <- names(postDigest$.list$.envir)[isNewObj]
+    existingObjs <- names(postDigest$.list$.envir)[!isNewObj]
+    post <- lapply(postDigest$.list$.envir[existingObjs], fastdigest::fastdigest)
+    pre <- lapply(preDigest[[whSimList]]$.list$.envir[existingObjs], fastdigest::fastdigest)
+    changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
+    attr(object, ".Cache")$changed <- c(newObjs, changedObjs)
+    object
+  })
+
+
+
+if (!isGeneric(".preDigestByClass")) {
+  setGeneric(".preDigestByClass", function(object) {
+    standardGeneric(".preDigestByClass")
+  })
+}
+
+
+
 if (!isGeneric(".prepareOutput")) {
   setGeneric(".prepareOutput", function(object) {
     standardGeneric(".prepareOutput")

@@ -3,11 +3,20 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.2.0
 =============
 
+## package dependencies
+
+* requires new version of `reproducible` (>=0.2.1.9000)
+
 ## new features
+
 
 ## bugfixes
 
-* Cached functions with a `simList` in the arguments would erroneously return cached copies of functions. These now are copied through from argument `simList`, rather than cached `simList`. This means that changes to the function definitions in a module will persist (e.g., debugging via `browser()` will work correctly)
+* Improvements to caching of functions with `simList` objects:
+
+    - Cached functions with a `simList` in the arguments would erroneously return cached copies of functions. These now are copied through from argument `simList`, rather than cached `simList`. This means that changes to the function definitions in a module will persist (e.g., debugging via `browser()` will work correctly)
+    - functions with `simList` in arguments that return a `simList` will now do a post digest of the output. This will be compared with the predigest, and only those object which changed in the `simList` will be modified.
+    
 
 version 0.2.0
 =============
