@@ -343,7 +343,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
 
 test_that("conflicting function types", {
-  options("spades.moduleCodeChecks" = TRUE)
+  opts <- options("spades.moduleCodeChecks" = FALSE)
   library(igraph)
   tmpdir <- file.path(tempdir(), "test_conflictingFns") %>% checkPath(create = TRUE)
   cwd <- getwd()
@@ -352,6 +352,7 @@ test_that("conflicting function types", {
   on.exit({
     detach("package:igraph")
     setwd(cwd)
+    options("spades.moduleCodeChecks" = opts)
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 
