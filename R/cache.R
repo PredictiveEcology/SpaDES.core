@@ -351,8 +351,14 @@ setMethod(
       } else {
         # need to keep the tmpl slots ...
         # i.e., Caching of simLists is mostly about objects in .envir
+        #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
-        object2@.envir <- object@.envir
+
+        createOutputs <- tmpl[[whSimList]]@depends@dependencies[[currentModule(tmpl[[whSimList]])]]@outputObjects$objectName
+
+        # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
+        lsObjectEnv <- ls(object@.envir, all.names = TRUE)
+        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs], envir = object@.envir), envir = object2@.envir)
         object2@completed <- object@completed
         if (NROW(current(object2)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
