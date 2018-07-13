@@ -698,12 +698,12 @@ setMethod(
 
 .runEvent <- function(sim, cacheIt, debug, quotedFnCall, moduleCall, fnEnv, cur, notOlderThan) {
   if (cacheIt) { # means that a module or event is to be cached
-    objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     moduleSpecificObjects <-
       c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
         ls(fnEnv, all.names = TRUE), # functions in the namespaced location
-        na.omit(objNam)) # objects outputted by module
-    moduleSpecificOutputObjects <- objNam
+        na.omit(createsOutputs)) # objects outputted by module
+    moduleSpecificOutputObjects <- createsOutputs
     classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])

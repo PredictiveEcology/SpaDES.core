@@ -178,6 +178,7 @@ setMethod(
       } else {
         NULL
       }
+
       if (!(m %in% prevNamedModules)) { # This is about duplicate named modules
         filename <- paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
         tmp <- .parseConditional(envir = envir, filename = filename)
@@ -516,6 +517,7 @@ setMethod(
   return(tmp)
 }
 
+#' Evaluate code that has "active" code, i.e., functions like start(sim)
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame()) {
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = envir), error = function(y) "ERROR"))

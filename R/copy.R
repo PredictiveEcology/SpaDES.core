@@ -36,8 +36,8 @@ setMethod("Copy",
             if (missing(queues)) queues <- TRUE
             sim_ <- object
             if (queues) {
-              sim_@events <- data.table::copy(object@events)
-              sim_@current <- data.table::copy(object@current)
+              sim_@events <- object@events
+              sim_@current <- object@current
             }
             if (objects) {
               sim_@.envir <- Copy(sim_@.envir)

@@ -321,7 +321,7 @@ setMethod(
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
     if (simListInput) {
-      origEnv <- tmpl[[whSimList[1]]]@.envir
+      origEnv <- tmpl[[whSimList]]@.envir
 
       isListOfSimLists <- if (is.list(object)) {
         if (is(object[[1]], "simList")) TRUE else FALSE
@@ -372,6 +372,8 @@ setMethod(
         }
         object2@current <- object@current
 
+        # This is for objects that are not in the return environment yet because they are unrelated to the
+        #   current module -- these need to be copied over
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
