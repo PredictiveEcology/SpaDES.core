@@ -258,8 +258,8 @@ setMethod(
 #' @return
 #' See \code{\link[base]{all.equal}}
 all.equal.simList <- function(target, current, ...) {
-  attr(target, "newCache") <- NULL
-  attr(current, "newCache") <- NULL
+  attr(target, ".Cache")$newCache <- NULL
+  attr(current, ".Cache")$newCache <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
 
