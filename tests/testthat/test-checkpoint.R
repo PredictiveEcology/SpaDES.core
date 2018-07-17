@@ -53,10 +53,13 @@ test_that("test checkpointing", {
 test_that("test checkpointing with disk-backed raster", {
   library(igraph)
   library(raster)
-  tmpdir <- file.path(tempdir(), "test_checkpoint") %>% checkPath(create = TRUE)
+  tmpdir <- file.path(tempdir(), rndstr(1,6)) %>% checkPath(create = TRUE)
+  try(unlink(tmpdir, recursive = TRUE), silent = TRUE)
   file <- file.path("chkpnt.RData")
+  opts <- options("spades.moduleCodeChecks" = FALSE)
   on.exit({
     detach("package:igraph")
+    options("spades.moduleCodeChecks" = opts[[1]])
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 
@@ -79,11 +82,11 @@ test_that("test checkpointing with disk-backed raster", {
   simA$ras <- raster(extent(0,10,0,10), vals = 1)
   tmpRasFilename <- tempfile("tmpRas", fileext = ".tif")
   simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
-  simA <- suppressWarnings(spades(simA))
+  simA <- #suppressWarnings(
+    spades(simA)#)
 
   ## save checkpoints; with load/restore
   set.seed(1234)
-  times <- list(start = 0, end = 2, timeunit = "second")
   simB <- simInit(times = times, params = parameters, modules = modules,
                   paths = paths)
   simB$ras <- raster(extent(0,10,0,10), vals = 1)
@@ -91,17 +94,19 @@ test_that("test checkpointing with disk-backed raster", {
   expect_error(simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename))
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
   end(simB) <- 1
-  simB <- suppressWarnings(spades(simB))
+  simB <- #suppressWarnings(
+    spades(simB)#)
   rm(simB)
 
   checkpointLoad(file = file.path(paths$outputPath, file))
   end(simB) <- 2
   simB <- spades(simB)
 
+  # Because of no file overwriting, each checkpoint event saves the files with different names
+  #  This means that the file backed names will be slightly different, but the raster content and
+  #  names are the same -- next line will move from disk to memory
+  simA$ras[] <- simA$ras[]
+  simB$ras[] <- simB$ras[]
   ## both versions above should yield identical results
-  rm("._startClockTime", envir = envir(simB))
-  rm("._startClockTime", envir = envir(simA))
-  rm(".timestamp", envir = envir(simB))
-  rm(".timestamp", envir = envir(simA))
   expect_true(all.equal(simA, simB))
 })
