@@ -8,7 +8,7 @@ test_that("test cache", {
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
 
-  try(clearCache(tmpdir), silent = TRUE)
+  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   # Example of changing parameter values
   mySim <- simInit(
@@ -52,7 +52,7 @@ test_that("test cache", {
   # 2 cached copies of spades
   expect_true(NROW(unique(out2$artifact)) == 2)
 
-  clearCache(sims[[1]])
+  clearCache(sims[[1]], ask = FALSE)
   out <- showCache(sims[[1]])
   expect_true(NROW(out) == 0)
 })
@@ -67,7 +67,7 @@ test_that("test event-level cache", {
     detach("package:igraph")
     unlink(tmpdir, recursive = TRUE)
   }, add = TRUE)
-  try(clearCache(tmpdir), silent = TRUE)
+  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   # Example of changing parameter values
   mySim <- simInit(
@@ -105,7 +105,7 @@ test_that("test event-level cache", {
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
 
-  clearCache(sims)
+  clearCache(sims, ask = FALSE)
 })
 
 test_that("test module-level cache", {
@@ -122,7 +122,7 @@ test_that("test module-level cache", {
   tmpfile <- tempfile(fileext = ".pdf")
   expect_true(file.create(tmpfile))
   tmpfile <- normPath(tmpfile)
-  try(clearCache(tmpdir), silent = TRUE)
+  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   # Example of changing parameter values
   times <- list(start = 0.0, end = 1.0, timeunit = "year")
@@ -174,7 +174,7 @@ test_that("test module-level cache", {
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
 
-  clearCache(sims)
+  clearCache(sims, ask = FALSE)
 })
 
 
@@ -193,7 +193,7 @@ test_that("test .prepareOutput", {
     options("spades.moduleCodeChecks" = opts[[1]])
   }, add = TRUE)
 
-  try(clearCache(tmpdir), silent = TRUE)
+  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
   mapPath <- system.file("maps", package = "quickPlot")
@@ -232,7 +232,7 @@ test_that("test .prepareOutput", {
   }
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
 
-  clearCache(tmpdir)
+  clearCache(tmpdir, ask = FALSE)
 
 })
 
@@ -261,7 +261,7 @@ test_that("test .robustDigest for simLists", {
               paths = list(modulePath = tmpdir, cachePath = tmpCache),
               params = list(test = list(.useCache = ".inputObjects")))
 
-  try(clearCache(x = tmpCache), silent = TRUE)
+  try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
   expect_message(do.call(simInit, args),
                  regexp = "Using or creating cached copy|module code",
@@ -301,7 +301,7 @@ test_that("test .robustDigest for simLists", {
 
   # In some other location, test during spades call
   newModule(modName, path = tmpdir, open = FALSE)
-  try(clearCache(x = tmpCache), silent = TRUE)
+  try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
   expect_silent(spades(bbb, debug = FALSE))
@@ -419,7 +419,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
     options("spades.moduleCodeChecks" = opts[[1]])
   }, add = TRUE)
 
-  try(clearCache(tmpdir), silent = TRUE)
+  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   setPaths(cachePath = tmpdir)
   cwd <- getwd()
   setwd(tmpdir)
@@ -466,7 +466,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
       sep = "\n", fill = FALSE, file = fileNames[1])
 
 
-  try(clearCache(tmpdir), silent = TRUE)
+  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]), params =
             list(test = list(.useCache = "init")))
   mySim$co4 <- 5

@@ -238,7 +238,7 @@ test_that("timeunits with child and parent modules work correctly", {
   cat(xxx1, file = fileName, sep = "\n")
 
   cacheDir <- file.path(tmpdir, "cache")
-  try(clearCache(cacheDir), silent = TRUE)
+  try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
