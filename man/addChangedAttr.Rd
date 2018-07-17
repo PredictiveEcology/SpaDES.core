@@ -8,7 +8,7 @@
 \S4method{.addChangedAttr}{simList}(object, preDigest, origArguments, ...)
 }
 \arguments{
-\item{object}{Any R object}
+\item{object}{Any R object returned from a function}
 
 \item{preDigest}{The full, element by element hash of the input arguments to that same function,
 e.g., from \code{.robustDigest}}
@@ -16,7 +16,7 @@ e.g., from \code{.robustDigest}}
 \item{origArguments}{These are the actual arguments (i.e., the values, not the names) that
 were the source for \code{preDigest}}
 
-\item{...}{Arguments of \code{FUN} function .}
+\item{...}{Anything passed to methods.}
 }
 \description{
 This will evaluate which elements in the simList object changed following

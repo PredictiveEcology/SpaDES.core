@@ -262,6 +262,10 @@ all.equal.simList <- function(target, current, ...) {
   attr(current, ".Cache")$newCache <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
+  suppressWarnings(rm("._startClockTime", envir = envir(target)))
+  suppressWarnings(rm("._startClockTime", envir = envir(current)))
+  suppressWarnings(rm(".timestamp", envir = envir(target)))
+  suppressWarnings(rm(".timestamp", envir = envir(current)))
 
   # make a dummy class so it uses the default all.equal
   all.equal.default(target, current)
