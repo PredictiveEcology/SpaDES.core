@@ -337,6 +337,7 @@ setMethod(
     post <- lapply(postDigest$.list$.envir[existingObjs], fastdigest::fastdigest)
     pre <- lapply(preDigest[[whSimList]]$.list$.envir[existingObjs], fastdigest::fastdigest)
     changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
+    browser()
     attr(object, ".Cache")$changed <- c(newObjs, changedObjs)
     object
   })
@@ -376,6 +377,7 @@ setMethod(
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
     tmpl <- .findSimList(tmpl)
+    browser()
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
@@ -417,7 +419,7 @@ setMethod(
         # Convert to numeric index, as some modules don't have names
         hasCurrModule <- match(hasCurrModule, modules(tmpl[[whSimList]]))
 
-        createOutputs <-if (length(hasCurrModule)) {
+        createOutputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
         } else {
           aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
@@ -427,6 +429,14 @@ setMethod(
         createOutputs <- na.omit(createOutputs)
         # take only the ones that the file changed, based on attr(object, ".Cache")$changed
         createOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+
+        expectsInputs <- if (length(hasCurrModule)) {
+          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
+        } else {
+          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
+            dep@inputObjects$objectName)
+          unique(unlist(aa))
+        }
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.envir, all.names = TRUE)

@@ -162,6 +162,7 @@ doEvent <- function(sim, debug, notOlderThan) {
                               removeOthers = FALSE)
 
           quotedFnCall <- if (cacheIt) { # means that a module or event is to be cached
+            browser()
             quote(Cache(FUN = get(moduleCall, envir = fnEnv),
                                        sim = sim,
                                        eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
@@ -698,6 +699,7 @@ setMethod(
 
 .runEvent <- function(sim, cacheIt, debug, quotedFnCall, moduleCall, fnEnv, cur, notOlderThan) {
   if (cacheIt) { # means that a module or event is to be cached
+    browser()
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     moduleSpecificObjects <-
       c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName

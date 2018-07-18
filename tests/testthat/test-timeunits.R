@@ -109,15 +109,12 @@ test_that("timeunit works correctly", {
 })
 
 test_that("timeunits with child and parent modules work correctly", {
-  library(igraph)
-  tmpdir <- file.path(tempdir(), "test_timeunits") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  # puts tmpdir, opts in this environment,
+  # loads and libraries indicated plus testthat,
+  # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE
+  m <- testInit("igraph", smcc = TRUE)
   on.exit({
-    detach("package:igraph")
-    setwd(cwd)
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(m)
   }, add = TRUE)
 
   #suppressMessages({
@@ -237,13 +234,13 @@ test_that("timeunits with child and parent modules work correctly", {
             xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
   cat(xxx1, file = fileName, sep = "\n")
 
-  cacheDir <- file.path(tmpdir, "cache")
+  cacheDir <- file.path(tmpdir, rndstr(1,6))
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects"))),
-    "Using or creating cached|child6 -- outputObjects: b, dp, cm are assigned")
+    "Using or creating cached|child6 -- outputObjects: dp, cm are assigned")
   )
 
   # pulls cached value

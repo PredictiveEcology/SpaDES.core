@@ -367,6 +367,7 @@ setMethod(
             }
 
             if (cacheIt) {
+              browser()
               message(crayon::green("Using or creating cached copy of .inputObjects for ",
                                     m, sep = ""))
               moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] # nolint
@@ -398,7 +399,7 @@ setMethod(
               if (any(inSimList))
                 objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
                                                moduleSpecificInputObjects[inSimList])
-              sim <- Cache(FUN = do.call, .inputObjects, args = args,
+              sim <- Cache(FUN = do.call, .inputObjects, args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
                            outputObjects = moduleSpecificInputObjects,
