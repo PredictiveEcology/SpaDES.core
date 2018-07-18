@@ -337,7 +337,6 @@ setMethod(
     post <- lapply(postDigest$.list$.envir[existingObjs], fastdigest::fastdigest)
     pre <- lapply(preDigest[[whSimList]]$.list$.envir[existingObjs], fastdigest::fastdigest)
     changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
-    browser()
     attr(object, ".Cache")$changed <- c(newObjs, changedObjs)
     object
   })
@@ -377,7 +376,6 @@ setMethod(
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
     tmpl <- .findSimList(tmpl)
-    browser()
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
@@ -440,7 +438,7 @@ setMethod(
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.envir, all.names = TRUE)
-        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs], envir = object@.envir), envir = object2@.envir)
+        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs | lsObjectEnv %in% expectsInputs], envir = object@.envir), envir = object2@.envir)
         object2@completed <- object@completed
         if (NROW(current(object2)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call

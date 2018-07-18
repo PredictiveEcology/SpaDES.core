@@ -367,7 +367,6 @@ setMethod(
             }
 
             if (cacheIt) {
-              browser()
               message(crayon::green("Using or creating cached copy of .inputObjects for ",
                                     m, sep = ""))
               moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] # nolint
