@@ -314,7 +314,6 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
   aa <- .checkCacheRepo(list(mySim))
   expect_equal(aa, tmpCache)
 
-
   justAPath <- tmpCache ;
   options("spades.cachePath" = justAPath)
 
@@ -330,10 +329,7 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
   expect_equal(aa, tmpCache)
-
-
 })
-
 
 test_that("test objSize", {
   testInitOut <- testInit(smcc = FALSE)
@@ -343,10 +339,8 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os)==4) # 2 objects, the environment, the rest
+  expect_true(length(os) == 4) # 2 objects, the environment, the rest
 })
-
-
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE)
@@ -362,7 +356,6 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   xxx <- lapply(fileNames, readLines)
   set.seed(113)
 
-
   lineWithInit <- grep(xxx[[1]], pattern = "^Init")
   lineWithDotUseCache <- grep(xxx[[1]], pattern = "\\.useCache")
   lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
@@ -372,33 +365,32 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   xxx1 <- list()
   xxx1[[1]] <- xxx[[1]]
 
-  cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
+  cat(xxx1[[1]][1:(lineWithInputObjects - 1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx1[[1]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx1[[1]][(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co2', 'numeric', ''),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx1[[1]][(lineWithOutputObjects+1):lineWithInit], "
+      xxx1[[1]][(lineWithOutputObjects + 1):lineWithInit], "
       sim$co1 <- 1
       sim$co2 <- 1
       sim$co3 <- 1
       ",
-      xxx1[[1]][(lineWithInit+1):lineWithDotInputObjects], "
+      xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
       aaa <- 1
       ",
-      xxx1[[1]][(lineWithDotInputObjects+1):length(xxx1[[1]])],
+      xxx1[[1]][(lineWithDotInputObjects + 1):length(xxx1[[1]])],
       sep = "\n", fill = FALSE, file = fileNames[1])
 
-
   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
-  mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]), params =
-            list(test = list(.useCache = "init")))
+  mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
+                   params = list(test = list(.useCache = "init")))
   mySim$co4 <- 5
   mySim$co5 <- 6
   mySim2 <- spades(mySim)
@@ -420,6 +412,4 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_false(mySim2$co4 == 5) # wasn't affected by init event
   expect_true(mySim2$co4 == 3) # wasn't affect by init event
   expect_true(is.null(mySim2$co5)) # wan't affected, and isn't there
-
 })
-
