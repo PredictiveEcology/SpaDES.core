@@ -1,6 +1,9 @@
 test_that("defineModule correctly handles different inputs", {
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
   tmp <- simInit()
-  library(dplyr)
 
   # check empty metadata
   x0 <- list()

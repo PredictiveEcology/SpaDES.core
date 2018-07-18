@@ -1,4 +1,9 @@
 test_that("timeunit works correctly", {
+  testInitOut <- testInit()
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
   times <- list(start = 0.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
@@ -109,9 +114,6 @@ test_that("timeunit works correctly", {
 })
 
 test_that("timeunits with child and parent modules work correctly", {
-  # puts tmpdir, opts in this environment,
-  # loads and libraries indicated plus testthat,
-  # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE
   m <- testInit("igraph", smcc = TRUE)
   on.exit({
     testOnExit(m)
@@ -257,7 +259,7 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_true(all(unlist(lapply(fullMessage,
                                 function(x) any(grepl(mm1, pattern = x))))))
 
-  expect_identical(mySim$b, asPath(theFile))
+  expect_identical(mySim$b, asPath(normPath(theFile)))
 
   # Change the file that is in the arguments to .inputObjects
   write.table(x = data.frame(sample(1e6, 1)), file = theFile)

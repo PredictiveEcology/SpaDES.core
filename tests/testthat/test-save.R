@@ -1,6 +1,8 @@
 test_that("saving files does not work correctly", {
-  savePath <- file.path(tempdir(), "test_save")
-  on.exit(unlink(savePath, recursive = TRUE), add = TRUE)
+  testInitOut <- testInit(smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   times <- list(start = 0, end = 6, "month")
   parameters <- list(
@@ -20,7 +22,7 @@ test_that("saving files does not work correctly", {
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
     modulePath = system.file("sampleModules", package = "SpaDES.core"),
-    outputPath = savePath
+    outputPath = tmpdir
   )
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
@@ -28,12 +30,12 @@ test_that("saving files does not work correctly", {
   mySim <- spades(mySim)
 
   # test spades-level mechanism
-  expect_true(file.exists(file.path(savePath, "caribou_month1.rds")))
-  expect_false(file.exists(file.path(savePath, "landscape_month2.rds")))
+  expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))
+  expect_false(file.exists(file.path(tmpdir, "landscape_month2.rds")))
 
   # test module-level mechanism
-  expect_true(file.exists(file.path(savePath, "caribou_month3.rds")))
-  expect_true(file.exists(file.path(savePath, "caribou_month5.rds")))
+  expect_true(file.exists(file.path(tmpdir, "caribou_month3.rds")))
+  expect_true(file.exists(file.path(tmpdir, "caribou_month5.rds")))
 
   outputs <- data.frame(
     expand.grid(objectName = c("caribou", "landscape")),
@@ -51,25 +53,22 @@ test_that("saving files does not work correctly", {
   mySim <- spades(mySim)
 
   # test that if no save times are stated, then it is at end time
-  expect_true(file.exists(file.path(savePath, "caribou_month7.rds")))
-  expect_true(file.exists(file.path(savePath, "landscape_month7.rds")))
+  expect_true(file.exists(file.path(tmpdir, "caribou_month7.rds")))
+  expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
   rm(mySim)
 })
 
 test_that("saving csv files does not work correctly", {
-   library(igraph)
-   savePath <- file.path(tempdir(), "test_save") %>% checkPath(create = TRUE)
-
-   on.exit({
-     detach("package:igraph")
-     unlink(savePath, recursive = TRUE)
-   }, add = TRUE)
+  testInitOut <- testInit(smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
    tempObj <- 1:10
    tempObj2 <- paste("val", 1:10)
    df1 <- data.frame(col1 = tempObj, col2 = tempObj2)
    sim <- simInit(objects = c("tempObj", "tempObj2", "df1"),
-                  paths = list(outputPath = savePath))
+                  paths = list(outputPath = tmpdir))
    outputs(sim) <- data.frame(
         objectName = c(rep("tempObj", 2), rep("tempObj2", 3), "df1"),
         saveTime = c(c(1, 4), c(2, 6, 7), end(sim)),
@@ -84,7 +83,7 @@ test_that("saving csv files does not work correctly", {
    outputs(sim2)
 
    # read one back in just to test it all worked as planned
-   newObj <- read.csv(dir(savePath, pattern = "year10.csv", full.name = TRUE))
+   newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
    expect_true(identical(df1, newObj))
 
    # Confirm that arguments are actually being passed in by changing row.names to TRUE
@@ -93,7 +92,7 @@ test_that("saving csv files does not work correctly", {
    sim2 <- spades(sim2)
    outputs(sim2)
    # read one back in just to test it all worked as planned
-   newObj <- read.csv(dir(savePath, pattern = "year10.csv", full.name = TRUE))
+   newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
    expect_false(identical(df1, newObj))
 
 })

@@ -9,11 +9,12 @@ test_that("downloadModule downloads and unzips a single module", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  library(igraph); on.exit(detach("package:igraph"), add = TRUE)
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   m <- "test"
-  tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
     f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
@@ -45,11 +46,12 @@ test_that("downloadModule downloads and unzips a parent module", {
     options(download.file.method = "curl")
   }
 
-  library(igraph); on.exit(detach("package:igraph"), add = TRUE)
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   m <- "LCC2005"
-  tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
     f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))

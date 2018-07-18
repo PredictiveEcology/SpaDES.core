@@ -1,14 +1,9 @@
 test_that("test cache", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  testInitOut <- testInit(smcc = FALSE)
   on.exit({
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   # Example of changing parameter values
   mySim <- simInit(
@@ -58,16 +53,10 @@ test_that("test cache", {
 })
 
 test_that("test event-level cache", {
-  library(igraph)
-  library(reproducible)
-  tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
-
+  testInitOut <- testInit(smcc = FALSE)
   on.exit({
-
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   # Example of changing parameter values
   mySim <- simInit(
@@ -105,24 +94,17 @@ test_that("test event-level cache", {
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
 
-  clearCache(sims, ask = FALSE)
 })
 
 test_that("test module-level cache", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
+  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE)
   on.exit({
-
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   tmpfile <- tempfile(fileext = ".pdf")
   expect_true(file.create(tmpfile))
   tmpfile <- normPath(tmpfile)
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   # Example of changing parameter values
   times <- list(start = 0.0, end = 1.0, timeunit = "year")
@@ -147,7 +129,6 @@ test_that("test module-level cache", {
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
                   capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE))))
-  #sims <- spades(Copy(mySim), notOlderThan = Sys.time())
   dev.off()
 
   expect_true(file.info(tmpfile)$size > 20000)
@@ -174,26 +155,14 @@ test_that("test module-level cache", {
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
 
-  clearCache(sims, ask = FALSE)
 })
 
 
 test_that("test .prepareOutput", {
-  library(igraph)
-  library(reproducible)
-  library(raster)
-
-  tmpdir <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
-  opts <- options("spades.moduleCodeChecks" = FALSE)
+  testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
-
-    detach("package:igraph")
-    detach("package:raster")
-    unlink(tmpdir, recursive = TRUE)
-    options("spades.moduleCodeChecks" = opts[[1]])
+    testOnExit(testInitOut)
   }, add = TRUE)
-
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
   mapPath <- system.file("maps", package = "quickPlot")
@@ -237,12 +206,9 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  # puts tmpdir, opts in this environment,
-  # loads and libraries indicated plus testthat,
-  # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE
-  m <- testInit("igraph", smcc = TRUE)
+  testInitOut <- testInit("igraph", smcc = TRUE)
   on.exit({
-    testOnExit(m)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
@@ -326,21 +292,11 @@ test_that("test .robustDigest for simLists", {
 
 
 test_that("test .checkCacheRepo with function as spades.cachePath", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- tempdir()
-  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  testInitOut <- testInit("igraph", smcc = TRUE)
   on.exit({
-    setwd(cwd)
-
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
-
+  #tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
 
   awesomeCacheFun <- function() tmpCache ;
   options("spades.cachePath" = awesomeCacheFun)
@@ -380,19 +336,9 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
 
 
 test_that("test objSize", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- tempdir()
-  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  testInitOut <- testInit(smcc = FALSE)
   on.exit({
-    setwd(cwd)
-
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
@@ -403,21 +349,10 @@ test_that("test objSize", {
 
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
-  library(igraph)
-  tmpdir <- file.path(tempdir(), paste(collapse = "", sample(LETTERS, 5))) %>% checkPath(create = TRUE)
-
-  opts <- options("spades.moduleCodeChecks" = FALSE)
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE)
   on.exit({
-
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
-    options("spades.moduleCodeChecks" = opts[[1]])
+    testOnExit(testInitOut)
   }, add = TRUE)
-
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
-  setPaths(cachePath = tmpdir)
-  cwd <- getwd()
-  setwd(tmpdir)
   Cache(rnorm, 1)
 
   m1 <- "test"

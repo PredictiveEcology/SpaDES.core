@@ -1,12 +1,7 @@
 test_that("test userSuppliedObj", {
-  tmpdir <- file.path(tempdir(), paste(collapse = "", sample(LETTERS, 6)))
-  checkPath(tmpdir, create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  testInitOut <- testInit("raster", smcc = TRUE)
   on.exit({
-    setwd(cwd)
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   m <- "test"

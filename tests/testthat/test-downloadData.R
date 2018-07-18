@@ -10,10 +10,12 @@ test_that("downloadData downloads and unzips module data", {
   }
 
   m <- "test"
-  tmpdir <- file.path(tempdir(), "modules")
+  testInitOut <- testInit(smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
   datadir <- file.path(tmpdir, m, "data")
-  reproducible::checkPath(datadir, create = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  checkPath(datadir, create = TRUE)
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- numeric_version(paste0(R.version$major, ".", R.version$minor))

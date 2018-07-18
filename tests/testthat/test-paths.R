@@ -1,63 +1,71 @@
 test_that("paths file does not work correctly", {
+  testInitOut <- testInit(setPaths = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  #setPaths()
+
   times <- list(start = 0.0, end = 10)
   params <- list(.globals = list(burnStats = "npixelsburned", stackName = "landscape"))
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
 
-  tempPath <- file.path(tempdir(), "test-paths") %>% checkPath(create = TRUE)
+  #tmpdir <- file.path(tempdir(), "test-paths") %>% checkPath(create = TRUE)
 
-  on.exit(unlink(tempPath, recursive = TRUE), add = TRUE)
+  #on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   # test for mixture of named and unnamed
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                tempPath)
+                tmpdir)
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  expect_equal(paths(mySim),
-               list(cachePath = paths[[2]], inputPath = getPaths()[["inputPath"]],
+  expect_equal(lapply(paths(mySim), normPath),
+               lapply(list(cachePath = paths[[2]], inputPath = getPaths()[["inputPath"]],
                     modulePath = paths$modulePath,
-                    outputPath = getPaths()[["outputPath"]])
+                    outputPath = getPaths()[["outputPath"]]),
+                    normPath)
               )
 
   # test for non consecutive order, but named
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                outputPath = tempPath)
+                outputPath = tmpdir)
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  expect_equal(paths(mySim),
-               list(cachePath = getPaths()[["cachePath"]], inputPath = getPaths()[["inputPath"]],
-                    modulePath = paths$modulePath, outputPath = path.expand(paths[[2]])))
+  expect_equal(lapply(paths(mySim), normPath),
+               lapply(list(cachePath = getPaths()[["cachePath"]], inputPath = getPaths()[["inputPath"]],
+                    modulePath = paths$modulePath, outputPath = path.expand(paths$outputPath)), normPath))
 
   # test for all unnamed
-  paths <- list(tempPath,
-                tempPath,
+  paths <- list(tmpdir,
+                tmpdir,
                 system.file("sampleModules", package = "SpaDES.core"),
-                tempPath)
+                tmpdir)
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  expect_equal(paths(mySim),
-               list(cachePath = paths[[1]],
+  expect_equal(lapply(paths(mySim), normPath),
+               lapply(list(cachePath = paths[[1]],
                     inputPath = paths[[2]],
                     modulePath = paths[[3]],
-                    outputPath = paths[[4]]))
+                    outputPath = paths[[4]]), normPath))
+
 
   # test for all named, non consecutive, using accessors
-  paths <- list(cachePath = tempPath,
+  paths <- list(cachePath = tmpdir,
                 modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                outputPath = tempPath,
-                inputPath = tempPath)
+                outputPath = tmpdir,
+                inputPath = tmpdir)
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  expect_equal(paths(mySim),
-               list(cachePath = cachePath(mySim),
+  expect_equal(lapply(paths(mySim), normPath),
+               lapply(list(cachePath = cachePath(mySim),
                     inputPath = inputPath(mySim),
                     modulePath = modulePath(mySim),
-                    outputPath = outputPath(mySim)))
+                    outputPath = outputPath(mySim)), normPath))
 
-  inputPath(mySim) <- tempPath
-  expect_equal(inputPath(mySim), tempPath)
+  inputPath(mySim) <- tmpdir
+  expect_equal(inputPath(mySim), tmpdir)
 
-  outputPath(mySim) <- tempPath
-  expect_equal(outputPath(mySim), tempPath)
+  outputPath(mySim) <- tmpdir
+  expect_equal(outputPath(mySim), tmpdir)
 
-  modulePath(mySim) <- tempPath
-  expect_equal(modulePath(mySim), tempPath)
+  modulePath(mySim) <- tmpdir
+  expect_equal(modulePath(mySim), tmpdir)
 
-  cachePath(mySim) <- tempPath
-  expect_equal(cachePath(mySim), tempPath)
+  cachePath(mySim) <- tmpdir
+  expect_equal(cachePath(mySim), tmpdir)
 })

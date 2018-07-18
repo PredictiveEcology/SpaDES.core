@@ -1,14 +1,10 @@
 test_that("test checkpointing", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- file.path(tempdir(), "test_checkpoint") %>% checkPath(create = TRUE)
-  file <- file.path("chkpnt.RData")
+  testInitOut <- testInit(smcc = FALSE)
   on.exit({
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
+  file <- file.path("chkpnt.RData")
   ## save checkpoints; no load/restore
   set.seed(1234)
   times <- list(start = 0, end = 2, timeunit = "second")
@@ -51,17 +47,21 @@ test_that("test checkpointing", {
 
 
 test_that("test checkpointing with disk-backed raster", {
-  library(igraph)
-  library(raster)
-  tmpdir <- file.path(tempdir(), rndstr(1,6)) %>% checkPath(create = TRUE)
-  try(unlink(tmpdir, recursive = TRUE), silent = TRUE)
-  file <- file.path("chkpnt.RData")
-  opts <- options("spades.moduleCodeChecks" = FALSE)
+  testInitOut <- testInit(smcc = FALSE)
   on.exit({
-    detach("package:igraph")
-    options("spades.moduleCodeChecks" = opts[[1]])
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
+  # library(igraph)
+  # library(raster)
+  # tmpdir <- file.path(tempdir(), rndstr(1,6)) %>% checkPath(create = TRUE)
+  # try(unlink(tmpdir, recursive = TRUE), silent = TRUE)
+  file <- file.path("chkpnt.RData")
+  # opts <- options("spades.moduleCodeChecks" = FALSE)
+  # on.exit({
+  #   detach("package:igraph")
+  #   options("spades.moduleCodeChecks" = opts[[1]])
+  #   unlink(tmpdir, recursive = TRUE)
+  # }, add = TRUE)
 
   ## save checkpoints; no load/restore
   set.seed(1234)
