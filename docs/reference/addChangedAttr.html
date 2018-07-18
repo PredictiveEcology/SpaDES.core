@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse and extract a module's version — moduleVersion • SpaDES.core</title>
+<title><code>.addChangedAttr</code> for simList class objects — .addChangedAttr,simList-method • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,13 @@
 
 
 
-<meta property="og:title" content="Parse and extract a module's version — moduleVersion" />
+<meta property="og:title" content="<code>.addChangedAttr</code> for simList class objects — .addChangedAttr,simList-method" />
 
-<meta property="og:description" content="Parse and extract a module's version" />
+<meta property="og:description" content="This will evaluate which elements in the simList object changed following
+this Cached function call. It will add a named character string as an
+attribute attr(x, &quot;.Cache&quot;)$changed, indicating which ones changed.
+When this function is subsequently called again, only these changed objects
+will be returned. All other simList objects will remain unchanged." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -125,93 +129,61 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Parse and extract a module's version</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/moduleMetadata.R'><code>R/moduleMetadata.R</code></a></small>
-    <div class="hidden name"><code>moduleVersion.Rd</code></div>
+    <h1><code>.addChangedAttr</code> for simList class objects</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/cache.R'><code>R/cache.R</code></a></small>
+    <div class="hidden name"><code>addChangedAttr.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Parse and extract a module's version</p>
+    <p>This will evaluate which elements in the simList object changed following
+this Cached function call. It will add a named character string as an
+attribute <code><a href='objects.html'>attr(x, ".Cache")$changed</a></code>, indicating which ones changed.
+When this function is subsequently called again, only these changed objects
+will be returned. All other <code>simList</code> objects will remain unchanged.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>moduleVersion</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>sim</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
-
-<span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>moduleVersion</span>(<span class='no'>module</span>, <span class='no'>path</span>, <span class='no'>envir</span>)
-
-<span class='co'># S4 method for character,missing,missing</span>
-<span class='fu'>moduleVersion</span>(<span class='no'>module</span>, <span class='no'>envir</span>)
-
-<span class='co'># S4 method for character,missing,simList</span>
-<span class='fu'>moduleVersion</span>(<span class='no'>module</span>, <span class='no'>sim</span>, <span class='no'>envir</span>)</pre>
+    <pre class="usage"><span class='co'># S4 method for simList</span>
+<span class='fu'>.addChangedAttr</span>(<span class='no'>object</span>, <span class='no'>preDigest</span>, <span class='no'>origArguments</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>module</th>
-      <td><p>Character string. Your module's name.</p></td>
+      <th>object</th>
+      <td><p>Any R object returned from a function</p></td>
     </tr>
     <tr>
-      <th>path</th>
-      <td><p>Character string specifying the file path to modules directory.
-Default is to use the <code>spades.modulePath</code> option.</p></td>
+      <th>preDigest</th>
+      <td><p>The full, element by element hash of the input arguments to that same function,
+e.g., from <code>.robustDigest</code></p></td>
     </tr>
     <tr>
-      <th>sim</th>
-      <td><p>A <code>simList</code> simulation object, generally produced by <code>simInit</code>.</p></td>
+      <th>origArguments</th>
+      <td><p>These are the actual arguments (i.e., the values, not the names) that
+were the source for <code>preDigest</code></p></td>
     </tr>
     <tr>
-      <th>envir</th>
-      <td><p>Optional environment in which to store parsed code. This may be
-useful if the same file is being parsed multiple times. This
-function will check in that envir for the parsed file before
-parsing again. If the <code>envir</code> is transient, then this will
-have no effect.</p></td>
+      <th>...</th>
+      <td><p>Anything passed to methods.</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p><code>numeric_version</code> indicating the module's version.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='moduleMetadata.html'>moduleMetadata</a></code></p></div>
+    <div class='dont-index'><p><code><a href='http://reproducible.predictiveecology.org/reference/addChangedAttr.html'>.addChangedAttr</a></code>.</p>
+<p><code><a href='http://reproducible.predictiveecology.org/reference/addChangedAttr.html'>.addChangedAttr</a></code></p></div>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
-
-<span class='co'># using filepath</span>
-<span class='fu'>moduleVersion</span>(<span class='st'>"caribouMovement"</span>, <span class='no'>path</span>)</div><div class='output co'>#&gt; [1] ‘1.6.0’</div><div class='input'>
-<span class='co'># using simList</span>
-<span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-   <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>2000.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2002.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
-   <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(
-     <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>, <span class='kw'>burnStats</span> <span class='kw'>=</span> <span class='st'>"nPixelsBurned"</span>)
-   ),
-   <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"caribouMovement"</span>),
-   <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='no'>path</span>)
-)</div><div class='output co'>#&gt; <span class='message'>caribouMovement: module code: landscape is declared in inputObjects, but no default(s) is provided in .inputObjects</span></div><div class='output co'>#&gt; <span class='message'>caribouMovement: inputObjects: habitatQuality is used from sim inside Move, but is not declared in inputObjects</span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='input'><span class='fu'>moduleVersion</span>(<span class='st'>"caribouMovement"</span>, <span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>)</div><div class='output co'>#&gt; [1] ‘1.6.0’</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
       <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    
-Alex Chubaty
+          </ul>
 
   </div>
 </div>

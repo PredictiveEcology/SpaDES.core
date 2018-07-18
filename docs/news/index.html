@@ -68,7 +68,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.1</span>
       </span>
     </div>
 
@@ -128,11 +128,40 @@
 
     <div id="version-0-2-0" class="section level1">
 <h1 class="page-header">
-<a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> Unreleased </small>
+<a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
 </h1>
+<div id="package-dependencies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#package-dependencies" class="anchor"></a>package dependencies</h2>
+<ul>
+<li>requires new version of <code>reproducible</code> (&gt;=0.2.1.9000)</li>
+</ul>
+</div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
+</div>
+<div id="bugfixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugfixes" class="anchor"></a>bugfixes</h2>
+<ul>
+<li>
+<p>Improvements to caching of functions with <code>simList</code> objects:</p>
+<ul>
+<li>Cached functions with a <code>simList</code> in the arguments would erroneously return cached copies of functions. These now are copied through from argument <code>simList</code>, rather than cached <code>simList</code>. This means that changes to the function definitions in a module will persist (e.g., debugging via <code>browser()</code> will work correctly)</li>
+<li>functions with <code>simList</code> in arguments that return a <code>simList</code> will now do a post digest of the output. This will be compared with the predigest, and only those object which changed in the <code>simList</code> will be modified.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+    <div id="version-0-2-0-1" class="section level1">
+<h1 class="page-header">
+<a href="#version-0-2-0-1" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>new features</h2>
 <ul>
 <li>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code>
 </li>
@@ -275,6 +304,7 @@
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
         <li><a href="#version-0-2-0">0.2.0</a></li>
+        <li><a href="#version-0-2-0-1">0.2.0</a></li>
         <li><a href="#version-0-1-1">0.1.1</a></li>
         <li><a href="#version-0-1-0">0.1.0</a></li>
       </ul>

@@ -10,16 +10,15 @@
 |language |en_CA:en                     |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-07-09                   |
+|date     |2018-07-18                   |
 
 ## Packages
 
-|package      |*  |version    |date       |source                                          |
-|:------------|:--|:----------|:----------|:-----------------------------------------------|
-|quickPlot    |*  |0.1.4      |2018-07-09 |Github (PredictiveEcology/quickPlot@cba38b4)    |
-|reproducible |*  |0.2.1.9000 |2018-07-09 |Github (PredictiveEcology/reproducible@575b903) |
-|SpaDES.core  |*  |0.2.0      |2018-07-09 |local (PredictiveEcology/SpaDES.core@52b7f26)   |
-|SpaDES.tools |   |0.2.0.9000 |2018-07-09 |Github (PredictiveEcology/SpaDES.tools@c02ae99) |
+|package      |*  |version |date       |source                                          |
+|:------------|:--|:-------|:----------|:-----------------------------------------------|
+|reproducible |   |0.2.2   |2018-07-18 |Github (PredictiveEcology/reproducible@5f138c0) |
+|SpaDES.core  |   |0.2.1   |2018-07-18 |local (PredictiveEcology/SpaDES.core@126fa74)   |
+|SpaDES.tools |   |0.3.0   |2018-07-18 |Github (PredictiveEcology/SpaDES.tools@9b5b759) |
 
 # Check results
 
@@ -53,9 +52,6 @@ Bug reports: https://github.com/PredictiveEcology/SpaDES/issues
 checking whether package ‘SpaDES’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
-  Warning: replacing previous import ‘SpaDES.tools::checkGDALVersion’ by ‘reproducible::checkGDALVersion’ when loading ‘SpaDES’
-  Warning: replacing previous import ‘SpaDES.tools::getGDALVersion’ by ‘reproducible::getGDALVersion’ when loading ‘SpaDES’
-  Warning: replacing previous import ‘SpaDES.tools::fastMask’ by ‘reproducible::fastMask’ when loading ‘SpaDES’
 See ‘/home/achubaty/Documents/GitHub/SpaDES/SpaDES.core/revdep/checks/SpaDES.Rcheck/00install.out’ for details.
 ```
 
