@@ -237,20 +237,15 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- tempdir()
-  tmpCache <- file.path(tempdir(), "testCache") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  # puts tmpdir, opts in this environment,
+  # loads and libraries indicated plus testthat,
+  # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE
+  m <- testInit("igraph", smcc = TRUE)
   on.exit({
-    setwd(cwd)
-
-    detach("package:igraph")
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(m)
   }, add = TRUE)
+
+  tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
 
   modName <- "test"
   newModule(modName, path = tmpdir, open = FALSE)
