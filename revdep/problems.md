@@ -16,8 +16,8 @@
 
 |package      |*  |version |date       |source                                          |
 |:------------|:--|:-------|:----------|:-----------------------------------------------|
-|reproducible |   |0.2.2   |2018-07-18 |Github (PredictiveEcology/reproducible@5f138c0) |
-|SpaDES.core  |   |0.2.1   |2018-07-18 |local (PredictiveEcology/SpaDES.core@126fa74)   |
+|reproducible |   |0.2.2   |2018-07-18 |Github (PredictiveEcology/reproducible@a59a5ad) |
+|SpaDES.core  |   |0.2.1   |2018-07-18 |local (PredictiveEcology/SpaDES.core@cdcbd21)   |
 |SpaDES.tools |   |0.3.0   |2018-07-18 |Github (PredictiveEcology/SpaDES.tools@9b5b759) |
 
 # Check results
