@@ -417,7 +417,7 @@ setMethod(
         # Convert to numeric index, as some modules don't have names
         hasCurrModule <- match(hasCurrModule, modules(tmpl[[whSimList]]))
 
-        createOutputs <-if (length(hasCurrModule)) {
+        createOutputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
         } else {
           aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
@@ -428,9 +428,17 @@ setMethod(
         # take only the ones that the file changed, based on attr(object, ".Cache")$changed
         createOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
+        expectsInputs <- if (length(hasCurrModule)) {
+          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
+        } else {
+          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
+            dep@inputObjects$objectName)
+          unique(unlist(aa))
+        }
+
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.envir, all.names = TRUE)
-        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs], envir = object@.envir), envir = object2@.envir)
+        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs | lsObjectEnv %in% expectsInputs], envir = object@.envir), envir = object2@.envir)
         object2@completed <- object@completed
         if (NROW(current(object2)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
