@@ -46,13 +46,15 @@ test_that("downloadData downloads and unzips module data", {
     reproducible::checkPath(dataDir, create = TRUE)
 
     #f <- downloadModule(m, tmpdir, quiet = TRUE)
-    t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL))
+    t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+                                   files = c("DEM.tif", "habitatQuality.tif")))
     result <- checksums(m, tmpdir)$result
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))
 
     # shouldn't need a redownload because file exists
-    t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
+    t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
+                                   files = c("DEM.tif", "habitatQuality.tif")))
     expect_true(t1[3] > t2[3]) # compare elapsed times
 
     # if one file is missing, will fill in correctly
