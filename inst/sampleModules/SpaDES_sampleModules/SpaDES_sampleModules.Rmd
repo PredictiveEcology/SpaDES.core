@@ -15,7 +15,6 @@ Module groups make loading multiple modules easier: only the name of the module 
 
 ```{r module-group-init, eval=FALSE}
 library(SpaDES.core)
-library(SpaDES.tools)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 20.0)

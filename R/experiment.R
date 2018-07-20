@@ -54,7 +54,7 @@
 #'            all. See details.
 #'
 #' @inheritParams spades
-#' @inheritParams SpaDES.tools::splitRaster
+#' @inheritParams POM
 #'
 #' @details
 #' This function requires a complete simList: this simList will form the basis of

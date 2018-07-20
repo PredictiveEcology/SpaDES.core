@@ -153,17 +153,9 @@ test_that("depsEdgeList and depsGraph work", {
 })
 
 test_that("3 levels of parent and child modules load and show correctly", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- file.path(tempdir(), "test_hierachicalModules") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
-    detach("package:igraph")
-    setwd(cwd)
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   suppressMessages({
