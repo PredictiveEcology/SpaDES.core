@@ -30,6 +30,18 @@
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
 
+  # table of equivalent time conversions of first 1e4 integers, in seconds
+  .pkgEnv[["nUnitConversions"]] <- 1e4L
+  bb <- 0:.pkgEnv[["nUnitConversions"]]
+  bbs <- list()
+  for (u in .spadesTimes) {
+    bbs[[u]] <- bb
+    attr(bbs[[u]], "unit") <- u
+    bbs[[u]] <- round(as.numeric(convertTimeunit(bbs[[u]], "seconds",
+                                                 skipChecks = TRUE)), 0)
+  }
+  .pkgEnv[["unitConversions"]] <- as.matrix(as.data.frame(bbs))
+
   invisible()
 }
 
@@ -67,16 +79,5 @@
 
 .spadesTempDir <- file.path(tempdir(), "SpaDES")
 
-# table of equivalent time conversions of first 1e5 integers, in seconds
-.pkgEnv[["nUnitConversions"]] <- 1e5L
-bb <- 0:.pkgEnv[["nUnitConversions"]]
-bbs <- list()
-for (u in .spadesTimes) {
-  bbs[[u]] <- bb
-  attr(bbs[[u]], "unit") <- u
-  bbs[[u]] <- round(as.numeric(convertTimeunit(bbs[[u]], "seconds",
-                                               skipChecks = TRUE)), 0)
-}
-.pkgEnv[["unitConversions"]] <- as.matrix(as.data.frame(bbs))
 
 
