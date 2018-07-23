@@ -4,7 +4,6 @@ test_that("test cache", {
     testOnExit(testInitOut)
   }, add = TRUE)
 
-
   # Example of changing parameter values
   mySim <- simInit(
     times = list(start = 0.0, end = 1.0, timeunit = "year"),
@@ -83,7 +82,6 @@ test_that("test event-level cache", {
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
-
   mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
@@ -200,8 +198,6 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
   }
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
-
-  clearCache(tmpdir, ask = FALSE)
 
 })
 

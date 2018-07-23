@@ -667,20 +667,25 @@ setMethod(
                         notOlderThan = NULL,
                         ...) {
     stopifnot(class(sim) == "simList")
+    dots <- list(...)
+    omitArgs <- "notOlderThan"
+    if (isTRUE("omitArgs" %in% names(dots))) {
+      omitArgs <- c(dots$omitArgs, omitArgs)
+      dots$omitArgs <- NULL
+    }
 
     if (cache) {
       return(
-        Cache(
-          cacheRepo = sim@paths$cachePath,
-          spades,
-          sim = sim,
-          debug = debug,
-          progress = progress,
-          .plotInitialTime = .plotInitialTime,
-          .saveInitialTime = .saveInitialTime,
-          notOlderThan = notOlderThan,
-          ...
-        )
+        do.call(Cache,
+                args = append(list(
+                  spades,
+                  sim = sim,
+                  debug = debug,
+                  progress = progress,
+                  .plotInitialTime = .plotInitialTime,
+                  .saveInitialTime = .saveInitialTime,
+                  omitArgs = omitArgs, notOlderThan = notOlderThan),
+                  dots))
       )
     } else {
       return(
