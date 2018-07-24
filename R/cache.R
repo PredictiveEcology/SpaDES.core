@@ -103,8 +103,8 @@ setMethod(
       if (!is.null(deps[[i]])) {
         object@depends@dependencies[[i]] <- lapply(
           slotNames(object@depends@dependencies[[i]]), function(x) {
-          slot(object@depends@dependencies[[i]], x)
-        })
+            slot(object@depends@dependencies[[i]], x)
+          })
         names(object@depends@dependencies[[i]]) <- slotNames(deps[[i]])
         object@depends@dependencies[[i]][["timeframe"]] <- as.Date(deps[[i]]@timeframe)
       }
@@ -501,7 +501,7 @@ setMethod(
   definition = function(object) {
     obj <- ls(object@.envir, all.names = TRUE)
     return(obj)
-})
+  })
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -550,7 +550,7 @@ setMethod(
     }
 
     outputToSave
-})
+  })
 
 if (!isGeneric(".objSizeInclEnviros")) {
   setGeneric(".objSizeInclEnviros", function(object) {
@@ -576,7 +576,7 @@ setMethod(
   signature = "simList",
   definition = function(object) {
     object.size(as.list(object@.envir, all.names = TRUE)) + object.size(object)
-})
+  })
 
 
 #' Find simList in a nested list

@@ -373,7 +373,12 @@ setMethod(
     reqdPkgs <- packages(modules=unlist(modules), paths = paths(sim)$modulePath,
                          envir = sim@.envir[[".parsedFiles"]])
     if (length(unlist(reqdPkgs))) {
-      Require(c(unique(unlist(reqdPkgs), "SpaDES.core")))
+      allPkgs <- c(unique(unlist(reqdPkgs), "SpaDES.core"))
+      if (getOption("spades.useRequire")) {
+        Require(allPkgs)
+      } else {
+        loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
+      }
     }
 
     ## timeunit is needed before all parsing of modules.

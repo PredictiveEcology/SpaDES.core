@@ -59,6 +59,6 @@ testOnExit <- function(testInitOut) {
   unlink(testInitOut$tmpdir, recursive = TRUE)
   lapply(testInitOut$libs, function(lib) {
     detach(paste0("package:", lib), character.only = TRUE)}
-    )
+  )
 
 }
