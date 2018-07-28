@@ -319,7 +319,7 @@ setReplaceMethod(
 #' @rdname objects
 setMethod("[[", signature(x = "simList", i = "ANY", j = "ANY"),
           definition = function(x, i, j, ..., drop) {
-            return(x@.envir[[i]])
+            x@.envir[[i]]
 })
 
 #' @export
@@ -330,8 +330,9 @@ setMethod("[[", signature(x = "simList", i = "ANY", j = "ANY"),
 setReplaceMethod("[[", signature(x = "simList", value = "ANY"),
                  definition = function(x, i, value) {
                    assign(i, value, envir = x@.envir, inherits = FALSE)
-                   return(x)
+                   x
 })
+
 
 #' @export
 #' @name $
@@ -340,7 +341,7 @@ setReplaceMethod("[[", signature(x = "simList", value = "ANY"),
 #' @rdname objects
 setMethod("$", signature(x = "simList"),
           definition = function(x, name) {
-            return(x@.envir[[name]])
+            x@.envir[[name]]
 })
 
 #' @export
@@ -350,8 +351,8 @@ setMethod("$", signature(x = "simList"),
 #' @rdname objects
 setReplaceMethod("$", signature(x = "simList", value = "ANY"),
                  definition = function(x, name, value) {
-                   x@.envir[[name]] <- value
-                   return(x)
+                   assign(name, value, envir = x@.envir, inherits = FALSE)
+                   x
 })
 
 ################################################################################
