@@ -19,10 +19,12 @@ simInit(times, params, modules, objects, paths, inputs, outputs, loadOrder,
   notOlderThan = NULL)
 
 \S4method{simInit}{ANY,ANY,ANY,character,ANY,ANY,ANY,ANY}(times, params,
-  modules, objects, paths, inputs, outputs, loadOrder, notOlderThan = NULL)
+  modules, objects, paths, inputs, outputs, loadOrder,
+  notOlderThan = NULL)
 
 \S4method{simInit}{ANY,ANY,character,ANY,ANY,ANY,ANY,ANY}(times, params,
-  modules, objects, paths, inputs, outputs, loadOrder, notOlderThan = NULL)
+  modules, objects, paths, inputs, outputs, loadOrder,
+  notOlderThan = NULL)
 
 \S4method{simInit}{ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(times, params, modules,
   objects, paths, inputs, outputs, loadOrder, notOlderThan = NULL)

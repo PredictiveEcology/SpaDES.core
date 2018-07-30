@@ -4,7 +4,6 @@
 \alias{setPaths}
 \alias{.paths}
 \alias{getPaths}
-\alias{setPaths}
 \title{Get and set default working directories}
 \usage{
 .paths()

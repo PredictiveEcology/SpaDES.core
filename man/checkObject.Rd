@@ -16,16 +16,17 @@ checkObject(sim, name, object, layer, ...)
 \S4method{checkObject}{simList,missing,Raster,character}(sim, name, object,
   layer, ...)
 
-\S4method{checkObject}{simList,missing,ANY,missing}(sim, name, object, layer,
+\S4method{checkObject}{simList,missing,ANY,missing}(sim, name, object,
+  layer, ...)
+
+\S4method{checkObject}{simList,character,missing,missing}(sim, name,
+  object, layer, ...)
+
+\S4method{checkObject}{simList,character,missing,character}(sim, name,
+  object, layer, ...)
+
+\S4method{checkObject}{missing,ANY,missing,ANY}(sim, name, object, layer,
   ...)
-
-\S4method{checkObject}{simList,character,missing,missing}(sim, name, object,
-  layer, ...)
-
-\S4method{checkObject}{simList,character,missing,character}(sim, name, object,
-  layer, ...)
-
-\S4method{checkObject}{missing,ANY,missing,ANY}(sim, name, object, layer, ...)
 }
 \arguments{
 \item{sim}{A \code{\link{simList}} object.}

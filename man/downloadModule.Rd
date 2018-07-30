@@ -8,19 +8,21 @@
 \alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
 \title{Download a module from a SpaDES module GitHub repository}
 \usage{
-downloadModule(name, path, version, repo, data, quiet, quickCheck = FALSE,
-  overwrite = FALSE)
+downloadModule(name, path, version, repo, data, quiet,
+  quickCheck = FALSE, overwrite = FALSE)
 
 
   \S4method{downloadModule}{character,character,character,character,logical,logical,ANY,logical}(name,
-  path, version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)
+  path, version, repo, data, quiet, quickCheck = FALSE,
+  overwrite = FALSE)
 
 
   \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,ANY}(name,
   quickCheck, overwrite)
 
-\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name, path,
-  version, repo, data, quiet, quickCheck = FALSE, overwrite = FALSE)
+\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name,
+  path, version, repo, data, quiet, quickCheck = FALSE,
+  overwrite = FALSE)
 }
 \arguments{
 \item{name}{Character string giving the module name.}

@@ -9,8 +9,9 @@
   gpText = gpar(), gpAxis = gpar(), axes = FALSE, speedup = 1,
   size = 5, cols = NULL, col = NULL, zoomExtent = NULL,
   visualSqueeze = NULL, legend = TRUE, legendRange = NULL,
-  legendText = NULL, pch = 19, title = NULL, na.color = "#FFFFFF00",
-  zero.color = NULL, length = NULL, arr = NULL, plotFn = "plot")
+  legendText = NULL, pch = 19, title = NULL,
+  na.color = "#FFFFFF00", zero.color = NULL, length = NULL,
+  arr = NULL, plotFn = "plot")
 }
 \arguments{
 \item{...}{A combination of \code{spatialObjects} or non-spatial objects.

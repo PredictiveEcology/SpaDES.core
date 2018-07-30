@@ -93,3 +93,4 @@ Other module creation helpers: \code{\link{newModuleCode}},
 \author{
 Alex Chubaty and Eliot McIntire
 }
+\concept{module creation helpers}

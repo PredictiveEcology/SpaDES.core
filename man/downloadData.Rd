@@ -9,21 +9,22 @@
 \alias{downloadData,character,character,missing-method}
 \title{Download module data}
 \usage{
-downloadData(module, path, quiet, quickCheck = FALSE, overwrite = FALSE,
-  files = NULL, checked = NULL, urls = NULL, children = NULL, ...)
+downloadData(module, path, quiet, quickCheck = FALSE,
+  overwrite = FALSE, files = NULL, checked = NULL, urls = NULL,
+  children = NULL, ...)
 
 \S4method{downloadData}{character,character,logical}(module, path, quiet,
-  quickCheck = FALSE, overwrite = FALSE, files = NULL, checked = NULL,
-  urls = NULL, children = NULL, ...)
+  quickCheck = FALSE, overwrite = FALSE, files = NULL,
+  checked = NULL, urls = NULL, children = NULL, ...)
 
 \S4method{downloadData}{character,missing,missing}(module, quickCheck,
   overwrite, files, checked, urls, children)
 
-\S4method{downloadData}{character,missing,logical}(module, quiet, quickCheck,
-  overwrite, files, checked, urls, children)
+\S4method{downloadData}{character,missing,logical}(module, quiet,
+  quickCheck, overwrite, files, checked, urls, children)
 
-\S4method{downloadData}{character,character,missing}(module, path, quickCheck,
-  overwrite, files, checked, urls, children)
+\S4method{downloadData}{character,character,missing}(module, path,
+  quickCheck, overwrite, files, checked, urls, children)
 }
 \arguments{
 \item{module}{Character string giving the name of the module.}

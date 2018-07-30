@@ -13,7 +13,8 @@ expectsInput(objectName, objectClass, desc, sourceURL, ...)
 \S4method{expectsInput}{ANY,ANY,ANY,ANY}(objectName, objectClass, desc,
   sourceURL, ...)
 
-\S4method{expectsInput}{character,character,character,character}(objectName,
+
+  \S4method{expectsInput}{character,character,character,character}(objectName,
   objectClass, desc, sourceURL, ...)
 
 \S4method{expectsInput}{character,character,character,missing}(objectName,

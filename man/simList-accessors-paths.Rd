@@ -6,26 +6,21 @@
 \alias{simList-accessors-paths}
 \alias{paths,.simList-method}
 \alias{paths<-}
-\alias{paths<-}
 \alias{paths<-,.simList-method}
 \alias{cachePath}
 \alias{cachePath,.simList-method}
-\alias{cachePath<-}
 \alias{cachePath<-}
 \alias{cachePath<-,.simList-method}
 \alias{inputPath}
 \alias{inputPath,.simList-method}
 \alias{inputPath<-}
-\alias{inputPath<-}
 \alias{inputPath<-,.simList-method}
 \alias{outputPath}
 \alias{outputPath,.simList-method}
 \alias{outputPath<-}
-\alias{outputPath<-}
 \alias{outputPath<-,.simList-method}
 \alias{modulePath}
 \alias{modulePath,.simList-method}
-\alias{modulePath<-}
 \alias{modulePath<-}
 \alias{modulePath<-,.simList-method}
 \alias{dataPath}
@@ -125,3 +120,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{params}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}

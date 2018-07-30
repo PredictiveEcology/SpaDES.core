@@ -8,16 +8,17 @@
 \title{Run a spatial discrete event simulation}
 \usage{
 spades(sim, debug = getOption("spades.debug"), progress = NA, cache,
-  .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
-  ...)
+  .plotInitialTime = NULL, .saveInitialTime = NULL,
+  notOlderThan = NULL, ...)
 
 \S4method{spades}{simList,ANY,ANY,missing}(sim,
   debug = getOption("spades.debug"), progress = NA, cache,
-  .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
-  ...)
+  .plotInitialTime = NULL, .saveInitialTime = NULL,
+  notOlderThan = NULL, ...)
 
-\S4method{spades}{ANY,ANY,ANY,logical}(sim, debug = getOption("spades.debug"),
-  progress = NA, cache, .plotInitialTime = NULL, .saveInitialTime = NULL,
+\S4method{spades}{ANY,ANY,ANY,logical}(sim,
+  debug = getOption("spades.debug"), progress = NA, cache,
+  .plotInitialTime = NULL, .saveInitialTime = NULL,
   notOlderThan = NULL, ...)
 }
 \arguments{

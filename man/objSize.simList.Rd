@@ -4,7 +4,8 @@
 \alias{objSize.simList}
 \title{Object size for simLists}
 \usage{
-\method{objSize}{simList}(x, quick = getOption("reproducible.quick", FALSE))
+\method{objSize}{simList}(x, quick = getOption("reproducible.quick",
+  FALSE))
 }
 \arguments{
 \item{x}{An object}

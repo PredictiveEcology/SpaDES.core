@@ -26,27 +26,20 @@ We have introduced several new functions and bug fixes (see NEWS.md).
 
 ### Development R version
 * Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-06-20 r74923)
-* Ubuntu 18.04         (local), R 3.6.0 (2018-06-28 r74935)
-* Windows           (appveyor), R 3.6.0 (2018-07-01 r74950)
-* Windows        (win-builder), R 3.6.0 (2018-07-15 r74966)
+* Ubuntu 18.04         (local), R 3.6.0 (2018-07-30 r75011)
+* Windows           (appveyor), R 3.6.0 (2018-07-23 r75001)
+* Windows        (win-builder), R 3.6.0 (2018-07-23 r75001)
 
 ## R CMD check results
 
-There are no ERRORs nor WARNINGs.
-
-There was 1 NOTE:
-
-1. The package size has increased; we will work to reduce package size in future updates.
-
-    installed size is 12.4Mb
-    sub-directories of 1Mb or more:
-      R    10.1Mb
-      doc   1.4Mb
+There are no ERRORs nor WARNINGs nor NOTEs.
 
 ## Downstream dependencies
 
 I have run R CMD check on downstream dependencies and all have passed, except as noted below.
 
 Summary at https://github.com/PredictiveEcology/SpaDES.core/blob/master/revdep/README.md.
+
+* `NetLogoR` shows a note regarding a non-CRAN package in Suggests.
 
 * `SpaDES` and `SpaDES.addins` both show a warning due to `DISPLAY` not being set in the headless session.

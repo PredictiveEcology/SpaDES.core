@@ -37,4 +37,5 @@ Other functions to access elements of a \code{simList} object: \code{\link{doEve
 \author{
 Alex Chubaty
 }
+\concept{functions to access elements of a \code{simList} object}
 \keyword{internal}

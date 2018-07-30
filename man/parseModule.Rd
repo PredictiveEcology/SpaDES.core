@@ -9,13 +9,15 @@
 \alias{.parseModule,simList,list-method}
 \title{Parse and initialize a module}
 \usage{
-.parseModulePartial(sim, modules, filename, defineModuleElement, envir = NULL)
+.parseModulePartial(sim, modules, filename, defineModuleElement,
+  envir = NULL)
 
-\S4method{.parseModulePartial}{missing,missing,character,character}(filename,
+
+  \S4method{.parseModulePartial}{missing,missing,character,character}(filename,
   defineModuleElement, envir)
 
-\S4method{.parseModulePartial}{simList,list,missing,character}(sim, modules,
-  defineModuleElement, envir = NULL)
+\S4method{.parseModulePartial}{simList,list,missing,character}(sim,
+  modules, defineModuleElement, envir = NULL)
 
 .parseModule(sim, modules, userSuppliedObjNames = NULL, envir = NULL,
   notOlderThan, ...)

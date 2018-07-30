@@ -15,9 +15,11 @@ newModuleDocumentation(name, path, open, type, children)
   \S4method{newModuleDocumentation}{character,character,logical,character,character}(name,
   path, open, type, children)
 
-\S4method{newModuleDocumentation}{character,missing,logical,ANY,ANY}(name, open)
+\S4method{newModuleDocumentation}{character,missing,logical,ANY,ANY}(name,
+  open)
 
-\S4method{newModuleDocumentation}{character,character,missing,ANY,ANY}(name,
+
+  \S4method{newModuleDocumentation}{character,character,missing,ANY,ANY}(name,
   path)
 
 \S4method{newModuleDocumentation}{character,missing,missing,ANY,ANY}(name)
@@ -47,3 +49,4 @@ Other module creation helpers: \code{\link{newModuleCode}},
 \author{
 Eliot McIntire and Alex Chubaty
 }
+\concept{module creation helpers}

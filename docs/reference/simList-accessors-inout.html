@@ -39,10 +39,7 @@ or outputs. See ?simInit. 2) With the inputs(simList) or outputs(simList)
 function call.
 3) By adding a function called .inputObjects inside a module, which will be executed
 during the simInit call. This last way is the most &quot;modular&quot; way to create
-default data sets for your model. See below for more details.
-inputArgs and outputArgs are ways to specify any
-arguments that are needed for file loading and file saving. This
-is still somewhat experimental." />
+default data sets for your model. See below for more details." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -150,9 +147,6 @@ function call.
 3) By adding a function called <code>.inputObjects</code> inside a module, which will be executed
 during the <code>simInit</code> call. This last way is the most "modular" way to create
 default data sets for your model. See below for more details.</p>
-<p><code>inputArgs</code> and <code>outputArgs</code> are ways to specify any
-arguments that are needed for file loading and file saving. This
-is still somewhat experimental.</p>
     
     </div>
 
@@ -344,15 +338,15 @@ rules of recycling for each <code>fun</code>.</td></tr>
 <span class='fu'>saveRDS</span>(<span class='no'>test</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>)
 <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>) <span class='co'># using only required column, "file"</span>
 <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='co'># see that it is not yet loaded, but when it is scheduled to be loaded</span></div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
-#&gt; 1 /tmp/RtmpCt288r/inputs/test.rds readRDS    base       test        0     NA
+#&gt; 1 /tmp/RtmpVQI1o7/inputs/test.rds readRDS    base       test        0     NA
 #&gt;   arguments intervals
 #&gt; 1        NA        NA</div><div class='input'><span class='no'>simOut</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
-#&gt; 0         load       inputs    1            </div><div class='output co'>#&gt; <span class='message'>test read from /tmp/RtmpCt288r/inputs/test.rds using readRDS</span></div><div class='output co'>#&gt; 0         checkpoint init      5            
+#&gt; 0         load       inputs    1            </div><div class='output co'>#&gt; <span class='message'>test read from /tmp/RtmpVQI1o7/inputs/test.rds using readRDS</span></div><div class='output co'>#&gt; 0         checkpoint init      5            
 #&gt; 0         save       init      5            
 #&gt; 0         progress   init      5            
 #&gt; 0         load       init      5            </div><div class='input'><span class='fu'>inputs</span>(<span class='no'>simOut</span>) <span class='co'># confirm it was loaded</span></div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
-#&gt; 1 /tmp/RtmpCt288r/inputs/test.rds readRDS    base       test        0   TRUE
+#&gt; 1 /tmp/RtmpVQI1o7/inputs/test.rds readRDS    base       test        0   TRUE
 #&gt;   arguments intervals
 #&gt; 1        NA        NA</div><div class='input'><span class='no'>simOut</span>$<span class='no'>test</span></div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'>
 <span class='co'># can put data.frame for inputs directly inside simInit call</span>
@@ -445,7 +439,7 @@ rules of recycling for each <code>fun</code>.</td></tr>
                <span class='kw'>outputs</span> <span class='kw'>=</span> <span class='fu'>data.frame</span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"tempObj"</span>),
                <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))
 <span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see what will be saved, when, what filename</span></div><div class='output co'>#&gt;   objectName                                       file     fun package
-#&gt; 1    tempObj /tmp/RtmpCt288r/outputs/tempObj_year10.rds saveRDS    base
+#&gt; 1    tempObj /tmp/RtmpVQI1o7/outputs/tempObj_year10.rds saveRDS    base
 #&gt;   saveTime saved arguments
 #&gt; 1       10    NA        NA</div><div class='input'><span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
@@ -454,7 +448,7 @@ rules of recycling for each <code>fun</code>.</td></tr>
 #&gt; 0         progress   init      5            
 #&gt; 0         load       init      5            
 #&gt; 10        save       spades    10           </div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename</span></div><div class='output co'>#&gt;   objectName                                       file     fun package
-#&gt; 1    tempObj /tmp/RtmpCt288r/outputs/tempObj_year10.rds saveRDS    base
+#&gt; 1    tempObj /tmp/RtmpVQI1o7/outputs/tempObj_year10.rds saveRDS    base
 #&gt;   saveTime saved arguments
 #&gt; 1       10  TRUE        NA</div><div class='input'>
 <span class='co'># Also can add using assignment after a simList object has been made</span>
@@ -476,16 +470,16 @@ rules of recycling for each <code>fun</code>.</td></tr>
 #&gt; 8         save       later     10           
 #&gt; 9         save       later     10           
 #&gt; 10        save       later     10           </div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename.</span></div><div class='output co'>#&gt;    objectName saveTime                                       file     fun
-#&gt; 1     tempObj        1 /tmp/RtmpCt288r/outputs/tempObj_year01.rds saveRDS
-#&gt; 2     tempObj        2 /tmp/RtmpCt288r/outputs/tempObj_year02.rds saveRDS
-#&gt; 3     tempObj        3 /tmp/RtmpCt288r/outputs/tempObj_year03.rds saveRDS
-#&gt; 4     tempObj        4 /tmp/RtmpCt288r/outputs/tempObj_year04.rds saveRDS
-#&gt; 5     tempObj        5 /tmp/RtmpCt288r/outputs/tempObj_year05.rds saveRDS
-#&gt; 6     tempObj        6 /tmp/RtmpCt288r/outputs/tempObj_year06.rds saveRDS
-#&gt; 7     tempObj        7 /tmp/RtmpCt288r/outputs/tempObj_year07.rds saveRDS
-#&gt; 8     tempObj        8 /tmp/RtmpCt288r/outputs/tempObj_year08.rds saveRDS
-#&gt; 9     tempObj        9 /tmp/RtmpCt288r/outputs/tempObj_year09.rds saveRDS
-#&gt; 10    tempObj       10 /tmp/RtmpCt288r/outputs/tempObj_year10.rds saveRDS
+#&gt; 1     tempObj        1 /tmp/RtmpVQI1o7/outputs/tempObj_year01.rds saveRDS
+#&gt; 2     tempObj        2 /tmp/RtmpVQI1o7/outputs/tempObj_year02.rds saveRDS
+#&gt; 3     tempObj        3 /tmp/RtmpVQI1o7/outputs/tempObj_year03.rds saveRDS
+#&gt; 4     tempObj        4 /tmp/RtmpVQI1o7/outputs/tempObj_year04.rds saveRDS
+#&gt; 5     tempObj        5 /tmp/RtmpVQI1o7/outputs/tempObj_year05.rds saveRDS
+#&gt; 6     tempObj        6 /tmp/RtmpVQI1o7/outputs/tempObj_year06.rds saveRDS
+#&gt; 7     tempObj        7 /tmp/RtmpVQI1o7/outputs/tempObj_year07.rds saveRDS
+#&gt; 8     tempObj        8 /tmp/RtmpVQI1o7/outputs/tempObj_year08.rds saveRDS
+#&gt; 9     tempObj        9 /tmp/RtmpVQI1o7/outputs/tempObj_year09.rds saveRDS
+#&gt; 10    tempObj       10 /tmp/RtmpVQI1o7/outputs/tempObj_year10.rds saveRDS
 #&gt;    package saved arguments
 #&gt; 1     base  TRUE        NA
 #&gt; 2     base  TRUE        NA
@@ -530,12 +524,12 @@ rules of recycling for each <code>fun</code>.</td></tr>
 #&gt; 5   tempObj2        7   saveRDS    base
 #&gt; 6        df1       10 write.csv   utils
 #&gt;                                          file saved arguments
-#&gt; 1  /tmp/RtmpCt288r/outputs/tempObj_year01.rds  TRUE        NA
-#&gt; 2  /tmp/RtmpCt288r/outputs/tempObj_year04.rds  TRUE        NA
-#&gt; 3 /tmp/RtmpCt288r/outputs/tempObj2_year02.rds  TRUE        NA
-#&gt; 4 /tmp/RtmpCt288r/outputs/tempObj2_year06.rds  TRUE        NA
-#&gt; 5 /tmp/RtmpCt288r/outputs/tempObj2_year07.rds  TRUE        NA
-#&gt; 6      /tmp/RtmpCt288r/outputs/df1_year10.csv  TRUE     FALSE</div><div class='input'>
+#&gt; 1  /tmp/RtmpVQI1o7/outputs/tempObj_year01.rds  TRUE        NA
+#&gt; 2  /tmp/RtmpVQI1o7/outputs/tempObj_year04.rds  TRUE        NA
+#&gt; 3 /tmp/RtmpVQI1o7/outputs/tempObj2_year02.rds  TRUE        NA
+#&gt; 4 /tmp/RtmpVQI1o7/outputs/tempObj2_year06.rds  TRUE        NA
+#&gt; 5 /tmp/RtmpVQI1o7/outputs/tempObj2_year07.rds  TRUE        NA
+#&gt; 6      /tmp/RtmpVQI1o7/outputs/df1_year10.csv  TRUE     FALSE</div><div class='input'>
 <span class='co'># read one back in just to test it all worked as planned</span>
 <span class='no'>newObj</span> <span class='kw'>&lt;-</span> <span class='fu'>read.csv</span>(<span class='fu'>dir</span>(<span class='no'>tmpdir</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"year10.csv"</span>, <span class='kw'>full.name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
 <span class='no'>newObj</span></div><div class='output co'>#&gt;    col1   col2

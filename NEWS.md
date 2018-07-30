@@ -9,13 +9,11 @@ version 0.2.1
 
 ## new features
 
-* 2 new options: 
-
-    - `spades.useRequire`, a logical which causes simInit to load packages with `Require` or `require`. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.
-    - `spades.keepCompleted`, a logical which causes `spades` to keep (`TRUE`) or not keep a record of completed events. Keeping track of completed events when they are many (>1e5) gets slow enough that it may be worth turning it off.
+* new option `spades.useRequire`: a logical which causes `simInit` to load packages with `Require` or `require`. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.
+*    - * new option `spades.keepCompleted`: a logical which causes `spades()` to keep (`TRUE`) or not keep a record of completed events. Keeping track of completed events when they are many (>1e5) gets slow enough that it may be worth turning it off.
 
 * more robust and faster tests are used now, care of helper functions in `tests`
-* `all.equal.simList` now removes all time dependent attributes, e.g,. `._startClockTime` and `.timestamp`
+* `all.equal.simList` now removes all time dependent attributes, *e.g.*, `._startClockTime` and `.timestamp`
 * speed enhancements for Discrete Event Simulator; now overhead is 1.3 seconds for 5000 events or, per event, 260 microseconds (185 microseconds if `options("spades.keepCompleted" = FALSE)`
 
 ## bugfixes

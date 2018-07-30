@@ -8,7 +8,8 @@
 \usage{
 newModuleCode(name, path, open, type, children)
 
-\S4method{newModuleCode}{character,character,logical,character,character}(name,
+
+  \S4method{newModuleCode}{character,character,logical,character,character}(name,
   path, open, type, children)
 }
 \arguments{
@@ -36,3 +37,4 @@ Other module creation helpers: \code{\link{newModuleDocumentation}},
 \author{
 Eliot McIntire and Alex Chubaty
 }
+\concept{module creation helpers}

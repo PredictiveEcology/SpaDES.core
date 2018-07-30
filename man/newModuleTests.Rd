@@ -30,3 +30,4 @@ Other module creation helpers: \code{\link{newModuleCode}},
 \author{
 Eliot McIntire and Alex Chubaty
 }
+\concept{module creation helpers}
