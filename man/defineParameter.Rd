@@ -10,14 +10,16 @@
 \usage{
 defineParameter(name, class, default, min, max, desc)
 
-\S4method{defineParameter}{character,character,ANY,ANY,ANY,character}(name,
+
+  \S4method{defineParameter}{character,character,ANY,ANY,ANY,character}(name,
   class, default, min, max, desc)
 
 
   \S4method{defineParameter}{character,character,ANY,missing,missing,character}(name,
   class, default, desc)
 
-\S4method{defineParameter}{missing,missing,missing,missing,missing,missing}()
+
+  \S4method{defineParameter}{missing,missing,missing,missing,missing,missing}()
 }
 \arguments{
 \item{name}{Character string giving the parameter name.}

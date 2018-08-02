@@ -6,21 +6,17 @@
 \alias{simList-accessors-inout}
 \alias{inputs,.simList-method}
 \alias{inputs<-}
-\alias{inputs<-}
 \alias{inputs<-,.simList-method}
 \alias{outputs}
 \alias{outputs,.simList-method}
-\alias{outputs<-}
 \alias{outputs<-}
 \alias{outputs<-,.simList-method}
 \alias{inputArgs}
 \alias{inputArgs,.simList-method}
 \alias{inputArgs<-}
-\alias{inputArgs<-}
 \alias{inputArgs<-,.simList-method}
 \alias{outputArgs}
 \alias{outputArgs,.simList-method}
-\alias{outputArgs<-}
 \alias{outputArgs<-}
 \alias{outputArgs<-,.simList-method}
 \title{Inputs and outputs}
@@ -76,10 +72,6 @@ function call.
 3) By adding a function called \code{.inputObjects} inside a module, which will be executed
 during the \code{simInit} call. This last way is the most "modular" way to create
 default data sets for your model. See below for more details.
-
-\code{inputArgs} and \code{outputArgs} are ways to specify any
-arguments that are needed for file loading and file saving. This
-is still somewhat experimental.
 }
 \details{
 Accessor functions for the \code{inputs} and \code{outputs} slots in a
@@ -358,3 +350,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}

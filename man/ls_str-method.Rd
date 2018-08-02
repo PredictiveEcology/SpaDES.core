@@ -23,8 +23,6 @@ A variation of applying \code{\link{str}} to each matched name.
 Can be used with a \code{simList} object, because the method for this class
 is simply a wrapper for calling \code{ls} on the simulation environment
 stored in the \code{simList} object.
-
-export
 }
 \seealso{
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
@@ -36,3 +34,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}

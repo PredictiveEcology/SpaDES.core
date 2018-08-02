@@ -1,5 +1,29 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.1
+=============
+
+## package dependencies
+
+* requires new version of `reproducible` (>=0.2.2)
+
+## new features
+
+* new option `spades.useRequire`: a logical which causes `simInit` to load packages with `Require` or `require`. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.
+*    - * new option `spades.keepCompleted`: a logical which causes `spades()` to keep (`TRUE`) or not keep a record of completed events. Keeping track of completed events when they are many (>1e5) gets slow enough that it may be worth turning it off.
+
+* more robust and faster tests are used now, care of helper functions in `tests`
+* `all.equal.simList` now removes all time dependent attributes, *e.g.*, `._startClockTime` and `.timestamp`
+* speed enhancements for Discrete Event Simulator; now overhead is 1.3 seconds for 5000 events or, per event, 260 microseconds (185 microseconds if `options("spades.keepCompleted" = FALSE)`
+
+## bugfixes
+
+* Improvements to caching of functions with `simList` objects:
+
+    - Cached functions with a `simList` in the arguments would erroneously return cached copies of functions. These now are copied through from argument `simList`, rather than cached `simList`. This means that changes to the function definitions in a module will persist (e.g., debugging via `browser()` will work correctly)
+    - functions with `simList` in arguments that return a `simList` will now do a post digest of the output. This will be compared with the predigest, and only those object which changed in the `simList` will be modified.
+    - caching of `.inputObjects` function was incorrect. Fixed.
+
 version 0.2.0
 =============
 

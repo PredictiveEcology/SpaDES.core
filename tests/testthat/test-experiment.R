@@ -1,11 +1,8 @@
 test_that("experiment does not work correctly", {
-  library(raster); on.exit(detach("package:raster"), add = TRUE)
-  library(igraph); on.exit(detach("package:igraph"), add = TRUE)
-  library(dplyr); on.exit(detach("package:dplyr"), add = TRUE)
-  library(reproducible)
-
-  tmpdir <- file.path(tempdir(), "testParallel") %>% checkPath(create = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   # Example of changing parameter values
   mySimFull <- simInit(
@@ -155,13 +152,10 @@ test_that("parallel does not work with experiment function", {
 
   skip("Can't automatically test parallel processing - Run Manually")
 
-  library(raster); on.exit(detach("package:raster"), add = TRUE)
-  library(magrittr); on.exit(detach("package:magrittr"), add = TRUE)
-  library(dplyr); on.exit(detach("package:dplyr"), add = TRUE)
-
-  tmpdir <- file.path(tempdir(), "testParallel") %>% checkPath(create = TRUE)
-
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   # Example of changing parameter values
   mySimFull <- simInit(

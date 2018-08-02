@@ -103,8 +103,8 @@ setMethod(
       if (!is.null(deps[[i]])) {
         object@depends@dependencies[[i]] <- lapply(
           slotNames(object@depends@dependencies[[i]]), function(x) {
-          slot(object@depends@dependencies[[i]], x)
-        })
+            slot(object@depends@dependencies[[i]], x)
+          })
         names(object@depends@dependencies[[i]]) <- slotNames(deps[[i]])
         object@depends@dependencies[[i]][["timeframe"]] <- as.Date(deps[[i]]@timeframe)
       }
@@ -292,6 +292,65 @@ setMethod(
     checkPath(path = cacheRepo, create = create)
   })
 
+if (!isGeneric(".addChangedAttr")) {
+  setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
+    standardGeneric(".addChangedAttr")
+  })
+}
+
+##########################################
+#' \code{.addChangedAttr} for simList class objects
+#'
+#' This will evaluate which elements in the simList object changed following
+#' this Cached function call. It will add a named character string as an
+#' attribute \code{attr(x, ".Cache")$changed}, indicating which ones changed.
+#' When this function is subsequently called again, only these changed objects
+#' will be returned. All other \code{simList} objects will remain unchanged.
+#'
+#' @seealso \code{\link[reproducible]{.addChangedAttr}}.
+#'
+#' @importFrom reproducible .addChangedAttr
+#' @importMethodsFrom reproducible .addChangedAttr
+#' @inheritParams reproducible::.addChangedAttr
+#' @include simList-class.R
+#' @seealso \code{\link[reproducible]{.addChangedAttr}}
+#' @exportMethod .addChangedAttr
+#' @export
+#' @rdname addChangedAttr
+setMethod(
+  ".addChangedAttr",
+  signature = "simList",
+  definition = function(object, preDigest, origArguments, ...) {
+    dots <- list(...)
+    whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
+    # remove the "newCache" attribute, which is irrelevant for digest
+    if (!is.null(attr(object, ".Cache")$newCache)) attr(object, ".Cache")$newCache <- NULL
+    postDigest <-
+      .robustDigest(object, objects = dots$objects,
+                    length = dots$length,
+                    algo = dots$algo,
+                    quick = dots$quick,
+                    classOptions = dots$classOptions)
+    isNewObj <- !names(postDigest$.list$.envir) %in% names(preDigest[[whSimList]]$.list$.envir)
+    newObjs <- names(postDigest$.list$.envir)[isNewObj]
+    existingObjs <- names(postDigest$.list$.envir)[!isNewObj]
+    post <- lapply(postDigest$.list$.envir[existingObjs], fastdigest::fastdigest)
+    pre <- lapply(preDigest[[whSimList]]$.list$.envir[existingObjs], fastdigest::fastdigest)
+    changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
+    attr(object, ".Cache")$changed <- c(newObjs, changedObjs)
+    object
+  })
+
+
+
+if (!isGeneric(".preDigestByClass")) {
+  setGeneric(".preDigestByClass", function(object) {
+    standardGeneric(".preDigestByClass")
+  })
+}
+
+
+
 if (!isGeneric(".prepareOutput")) {
   setGeneric(".prepareOutput", function(object) {
     standardGeneric(".prepareOutput")
@@ -299,7 +358,7 @@ if (!isGeneric(".prepareOutput")) {
 }
 
 ##########################################
-#' prepareOutput for simList class objects
+#' \code{.prepareOutput} for simList
 #'
 #' See \code{\link[reproducible]{.prepareOutput}}.
 #'
@@ -321,7 +380,7 @@ setMethod(
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
     if (simListInput) {
-      origEnv <- tmpl[[whSimList[1]]]@.envir
+      origEnv <- tmpl[[whSimList]]@.envir
 
       isListOfSimLists <- if (is.list(object)) {
         if (is(object[[1]], "simList")) TRUE else FALSE
@@ -351,8 +410,35 @@ setMethod(
       } else {
         # need to keep the tmpl slots ...
         # i.e., Caching of simLists is mostly about objects in .envir
+        #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
-        object2@.envir <- object@.envir
+
+        hasCurrModule <- currentModule(tmpl[[whSimList]])
+        # Convert to numeric index, as some modules don't have names
+        hasCurrModule <- match(hasCurrModule, modules(tmpl[[whSimList]]))
+
+        createOutputs <- if (length(hasCurrModule)) {
+          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
+        } else {
+          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
+            dep@outputObjects$objectName)
+          unique(unlist(aa))
+        }
+        createOutputs <- na.omit(createOutputs)
+        # take only the ones that the file changed, based on attr(object, ".Cache")$changed
+        createOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+
+        expectsInputs <- if (length(hasCurrModule)) {
+          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
+        } else {
+          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
+            dep@inputObjects$objectName)
+          unique(unlist(aa))
+        }
+
+        # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
+        lsObjectEnv <- ls(object@.envir, all.names = TRUE)
+        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs | lsObjectEnv %in% expectsInputs], envir = object@.envir), envir = object2@.envir)
         object2@completed <- object@completed
         if (NROW(current(object2)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
@@ -362,10 +448,12 @@ setMethod(
           # if this is FALSE, it means that events were added by the event
           if (!isTRUE(all.equal(object@events, object2@events)))
             object2@events <- do.call(unique, args = list(append(object@events, object2@events)))
-            #object2@events <- unique(rbindlist(list(object@events, object2@events)))
+          #object2@events <- unique(rbindlist(list(object@events, object2@events)))
         }
         object2@current <- object@current
 
+        # This is for objects that are not in the return environment yet because they are unrelated to the
+        #   current module -- these need to be copied over
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.envir, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.envir)
@@ -389,13 +477,7 @@ setMethod(
     } else {
       return(object)
     }
-})
-
-if (!isGeneric(".preDigestByClass")) {
-  setGeneric(".preDigestByClass", function(object) {
-    standardGeneric(".preDigestByClass")
   })
-}
 
 ################################################################################
 #' Pre-digesting method for \code{simList}
@@ -419,7 +501,7 @@ setMethod(
   definition = function(object) {
     obj <- ls(object@.envir, all.names = TRUE)
     return(obj)
-})
+  })
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -468,7 +550,7 @@ setMethod(
     }
 
     outputToSave
-})
+  })
 
 if (!isGeneric(".objSizeInclEnviros")) {
   setGeneric(".objSizeInclEnviros", function(object) {
@@ -494,7 +576,7 @@ setMethod(
   signature = "simList",
   definition = function(object) {
     object.size(as.list(object@.envir, all.names = TRUE)) + object.size(object)
-})
+  })
 
 
 #' Find simList in a nested list

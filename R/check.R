@@ -51,7 +51,7 @@ setMethod(
                     "does not exist."))
       return(FALSE)
     }
-})
+  })
 
 #' @export
 #' @rdname checkObject
@@ -66,7 +66,7 @@ setMethod(
                     "does not exist"))
       return(FALSE)
     }
-})
+  })
 
 #' @export
 #' @rdname checkObject
@@ -81,7 +81,7 @@ setMethod(
       message(paste(name, "does not exist in", simName))
       return(FALSE)
     }
-})
+  })
 
 #' @export
 #' @rdname checkObject

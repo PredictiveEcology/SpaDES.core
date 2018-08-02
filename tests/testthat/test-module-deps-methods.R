@@ -1,6 +1,9 @@
 test_that("defineModule correctly handles different inputs", {
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
   tmp <- simInit()
-  library(dplyr)
 
   # check empty metadata
   x0 <- list()
@@ -150,17 +153,9 @@ test_that("depsEdgeList and depsGraph work", {
 })
 
 test_that("3 levels of parent and child modules load and show correctly", {
-  library(igraph)
-  library(reproducible)
-
-  tmpdir <- file.path(tempdir(), "test_hierachicalModules") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
-    detach("package:igraph")
-    setwd(cwd)
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   suppressMessages({

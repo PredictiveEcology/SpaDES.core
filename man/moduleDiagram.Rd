@@ -9,7 +9,8 @@
 \usage{
 moduleDiagram(sim, type, showParents, ...)
 
-\S4method{moduleDiagram}{simList,character,logical}(sim, type, showParents, ...)
+\S4method{moduleDiagram}{simList,character,logical}(sim, type, showParents,
+  ...)
 
 \S4method{moduleDiagram}{simList,missing,ANY}(sim, type, showParents, ...)
 }

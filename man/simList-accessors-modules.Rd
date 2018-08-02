@@ -6,11 +6,9 @@
 \alias{simList-accessors-modules}
 \alias{modules,.simList-method}
 \alias{modules<-}
-\alias{modules<-}
 \alias{modules<-,.simList-method}
 \alias{depends}
 \alias{depends,.simList-method}
-\alias{depends<-}
 \alias{depends<-}
 \alias{depends<-,.simList-method}
 \title{Simulation modules and dependencies}
@@ -70,3 +68,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty
 }
+\concept{functions to access elements of a \code{simList} object}

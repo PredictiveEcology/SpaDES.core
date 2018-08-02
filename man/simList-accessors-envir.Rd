@@ -6,7 +6,6 @@
 \alias{simList-accessors-envir}
 \alias{envir,simList-method}
 \alias{envir<-}
-\alias{envir<-}
 \alias{envir<-,simList-method}
 \title{Simulation environment}
 \usage{
@@ -49,3 +48,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty
 }
+\concept{functions to access elements of a \code{simList} object}

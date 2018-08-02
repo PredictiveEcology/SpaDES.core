@@ -57,10 +57,13 @@ setMethod(
                      if (is(out5, "try-error")) yyyyy <- deparse(yyyyy)
                      return(yyyyy)
                     })
+
                   }
                  if (is.list(yyy)) yyy <- as.call(yyy)
                  return(yyy)
                })
+
+
                out2 <- as.call(inner2)
              }
              aa <- capture.output(type = "message", bb <- eval(out2))

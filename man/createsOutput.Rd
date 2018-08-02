@@ -11,8 +11,8 @@ createsOutput(objectName, objectClass, desc, ...)
 
 \S4method{createsOutput}{ANY,ANY,ANY}(objectName, objectClass, desc, ...)
 
-\S4method{createsOutput}{character,character,character}(objectName, objectClass,
-  desc, ...)
+\S4method{createsOutput}{character,character,character}(objectName,
+  objectClass, desc, ...)
 }
 \arguments{
 \item{objectName}{Character string to define the output object's name.}

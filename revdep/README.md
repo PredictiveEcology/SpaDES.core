@@ -6,20 +6,18 @@
 |:--------|:----------------------------|
 |version  |R version 3.4.4 (2018-03-15) |
 |system   |x86_64, linux-gnu            |
-|ui       |X11                          |
-|language |en_CA:en                     |
+|ui       |RStudio (1.1.456)            |
+|language |(EN)                         |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-07-09                   |
+|date     |2018-07-30                   |
 
 ## Packages
 
-|package      |*  |version    |date       |source                                          |
-|:------------|:--|:----------|:----------|:-----------------------------------------------|
-|quickPlot    |*  |0.1.4      |2018-07-09 |Github (PredictiveEcology/quickPlot@cba38b4)    |
-|reproducible |*  |0.2.1.9000 |2018-07-09 |Github (PredictiveEcology/reproducible@575b903) |
-|SpaDES.core  |*  |0.2.0      |2018-07-09 |local (PredictiveEcology/SpaDES.core@52b7f26)   |
-|SpaDES.tools |   |0.2.0.9000 |2018-07-09 |Github (PredictiveEcology/SpaDES.tools@c02ae99) |
+|package      |*  |version |date       |source                                          |
+|:------------|:--|:-------|:----------|:-----------------------------------------------|
+|reproducible |   |0.2.2   |2018-07-30 |Github (PredictiveEcology/reproducible@41f46c2) |
+|SpaDES.core  |   |0.2.1   |2018-07-30 |local (PredictiveEcology/SpaDES.core@NA)        |
 
 # Check results
 
@@ -27,7 +25,7 @@
 
 |package       |version | errors| warnings| notes|
 |:-------------|:-------|------:|--------:|-----:|
-|NetLogoR      |0.3.3   |      0|        0|     0|
+|NetLogoR      |0.3.3   |      0|        0|     1|
 |SpaDES.addins |0.1.1   |      0|        1|     0|
 |SpaDES        |2.0.2   |      0|        1|     0|
 
@@ -35,7 +33,12 @@
 Maintainer: Sarah Bauduin <sarahbauduin@hotmail.fr>  
 Bug reports: https://github.com/PredictiveEcology/NetLogoR/issues
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note 
+
+```
+checking package dependencies ... NOTE
+Package suggested but not available for checking: ‘fastshp’
+```
 
 ## SpaDES.addins (0.1.1)
 Maintainer: Alex M Chubaty <alex.chubaty@gmail.com>  
@@ -47,7 +50,7 @@ Bug reports: https://github.com/PredictiveEcology/SpaDES.addins/issues
 checking whether package ‘SpaDES.addins’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
-See ‘/home/achubaty/Documents/GitHub/SpaDES/SpaDES.core/revdep/checks/SpaDES.addins.Rcheck/00install.out’ for details.
+See ‘/home/achubaty/Documents/GitHub/PredictiveEcology/SpaDES.core/revdep/checks/SpaDES.addins.Rcheck/00install.out’ for details.
 ```
 
 ## SpaDES (2.0.2)
@@ -60,9 +63,6 @@ Bug reports: https://github.com/PredictiveEcology/SpaDES/issues
 checking whether package ‘SpaDES’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
-  Warning: replacing previous import ‘SpaDES.tools::checkGDALVersion’ by ‘reproducible::checkGDALVersion’ when loading ‘SpaDES’
-  Warning: replacing previous import ‘SpaDES.tools::getGDALVersion’ by ‘reproducible::getGDALVersion’ when loading ‘SpaDES’
-  Warning: replacing previous import ‘SpaDES.tools::fastMask’ by ‘reproducible::fastMask’ when loading ‘SpaDES’
-See ‘/home/achubaty/Documents/GitHub/SpaDES/SpaDES.core/revdep/checks/SpaDES.Rcheck/00install.out’ for details.
+See ‘/home/achubaty/Documents/GitHub/PredictiveEcology/SpaDES.core/revdep/checks/SpaDES.Rcheck/00install.out’ for details.
 ```
 

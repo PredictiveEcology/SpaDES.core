@@ -178,6 +178,7 @@ setMethod(
       } else {
         NULL
       }
+
       if (!(m %in% prevNamedModules)) { # This is about duplicate named modules
         filename <- paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
         tmp <- .parseConditional(envir = envir, filename = filename)
@@ -251,8 +252,13 @@ setMethod(
 
         # Evaluate defineModule into the sim environment
         # Capture messages which will be about defineParameter at the moment
+        on.exit({
+          if (!exists("finishedClean"))
+            try(mess)
+        })
         mess <- capture.output(type = "message",
-                               out <- suppressWarnings(eval(pf, envir = env)))
+                               out <- try(suppressWarnings(eval(pf, envir = env))))
+        if (is(out, "try-error")) stop(out)
         opt <- getOption("spades.moduleCodeChecks")
         if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {
           messFile <- capture.output(type = "message",
@@ -392,7 +398,7 @@ setMethod(
               if (any(inSimList))
                 objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
                                                moduleSpecificInputObjects[inSimList])
-              sim <- Cache(FUN = do.call, .inputObjects, args = args,
+              sim <- Cache(FUN = do.call, .inputObjects, args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
                            outputObjects = moduleSpecificInputObjects,
@@ -480,6 +486,7 @@ setMethod(
       }
     }
 
+    finishedClean <- TRUE
     return(sim)
 })
 

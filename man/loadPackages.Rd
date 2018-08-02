@@ -13,9 +13,11 @@ loadPackages(packageList, install = FALSE, quiet = TRUE)
 \S4method{loadPackages}{character}(packageList, install = FALSE,
   quiet = TRUE)
 
-\S4method{loadPackages}{list}(packageList, install = FALSE, quiet = TRUE)
+\S4method{loadPackages}{list}(packageList, install = FALSE,
+  quiet = TRUE)
 
-\S4method{loadPackages}{`NULL`}(packageList, install = FALSE, quiet = TRUE)
+\S4method{loadPackages}{`NULL`}(packageList, install = FALSE,
+  quiet = TRUE)
 }
 \arguments{
 \item{packageList}{A list of character strings specifying

@@ -1,22 +1,15 @@
 test_that("module templates work", {
-  library(knitr)
-  library(igraph)
-  library(reproducible)
-
-  path <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
-
+  testInitOut <- testInit("knitr", smcc = FALSE)
   on.exit({
-    detach("package:igraph")
-    detach("package:knitr")
-    unlink(path, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
-  expect_true(file.exists(path))
+  expect_true(file.exists(tmpdir))
   moduleName <- "myModule"
 
-  newModule(moduleName, path, open = FALSE, unitTests = TRUE)
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE)
 
-  mpath <- file.path(path, moduleName)
+  mpath <- file.path(tmpdir, moduleName)
 
   expect_true(file.exists(mpath))
   expect_true(file.exists(file.path(mpath, "citation.bib")))
@@ -32,7 +25,7 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, "data", "CHECKSUMS.txt")))
 
   utils::capture.output(
-    zipModule(name = moduleName, path = path, version = "0.0.2", flags = "-q -r9X")
+    zipModule(name = moduleName, path = tmpdir, version = "0.0.2", flags = "-q -r9X")
   )
 
   expect_true(file.exists(file.path(mpath, paste0(moduleName, "_0.0.2.zip"))))
@@ -49,11 +42,11 @@ test_that("module templates work", {
 
 
 test_that("empty defineModule", {
-  library(knitr)
-  library(igraph)
-  library(reproducible)
+  testInitOut <- testInit("knitr", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
-  path <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   sim <- simInit()
   expect_warning(sim <- defineModule(sim, list()))
   b <- depends(sim)

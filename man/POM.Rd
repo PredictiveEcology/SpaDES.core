@@ -12,8 +12,8 @@ POM(sim, params, objects = NULL, objFn, cl, optimizer = "DEoptim",
 
 \S4method{POM}{simList,character}(sim, params, objects = NULL, objFn, cl,
   optimizer = "DEoptim", sterr = FALSE, ..., objFnCompare = "MAD",
-  optimControl = NULL, NaNRetries = NA, logObjFnVals = FALSE, weights,
-  useLog = FALSE)
+  optimControl = NULL, NaNRetries = NA, logObjFnVals = FALSE,
+  weights, useLog = FALSE)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}

@@ -6,10 +6,8 @@
 \alias{simList-accessors-params}
 \alias{params,.simList-method}
 \alias{params<-}
-\alias{params<-}
 \alias{params<-,.simList-method}
 \alias{P}
-\alias{simList-accessors-params}
 \alias{parameters}
 \alias{parameters,.simList-method}
 \title{Get and set simulation parameters.}
@@ -49,12 +47,6 @@ Returns or sets the value of the slot from the \code{simList} object.
 \description{
 \code{params} and \code{P} access the parameter slot in the \code{simList}.
 \code{params} has a replace method, so can be used to update a parameter value.
-
-\code{P} is a concise way to access parameters within a module. It works more like
-a namespaced function in the sense that the module from which it is called is the
-default place it will look for the parameter. To access a parameter from within
-a module, you can use \code{P(sim)$paramName} instead of
-\code{params(sim)$moduleName$paramName}
 }
 \note{
 The differences between P, params and being explicit with passing arguments
@@ -85,3 +77,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}

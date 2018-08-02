@@ -163,14 +163,14 @@ doEvent <- function(sim, debug, notOlderThan) {
 
           quotedFnCall <- if (cacheIt) { # means that a module or event is to be cached
             quote(Cache(FUN = get(moduleCall, envir = fnEnv),
-                                       sim = sim,
-                                       eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                                       objects = moduleSpecificObjects,
-                                       notOlderThan = notOlderThan,
-                                       outputObjects = moduleSpecificOutputObjects,
-                                       classOptions = classOptions,
-                                       cacheRepo = sim@paths[["cachePath"]],
-                                       userTags = c("function:doEvent")))
+                        sim = sim,
+                        eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+                        objects = moduleSpecificObjects,
+                        notOlderThan = notOlderThan,
+                        outputObjects = moduleSpecificOutputObjects,
+                        classOptions = classOptions,
+                        cacheRepo = sim@paths[["cachePath"]],
+                        userTags = c("function:doEvent")))
           } else {
             quote(get(moduleCall,
                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
@@ -192,7 +192,7 @@ doEvent <- function(sim, debug, notOlderThan) {
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
-                            #instead of sim@.envir because collisions with parallel sims from same sim object
+          #instead of sim@.envir because collisions with parallel sims from same sim object
 
           # next section replaces sim@completed <- append(sim@completed, list(cur)),
           # which gets slower with size of sim@completed
@@ -667,20 +667,25 @@ setMethod(
                         notOlderThan = NULL,
                         ...) {
     stopifnot(class(sim) == "simList")
+    dots <- list(...)
+    omitArgs <- "notOlderThan"
+    if (isTRUE("omitArgs" %in% names(dots))) {
+      omitArgs <- c(dots$omitArgs, omitArgs)
+      dots$omitArgs <- NULL
+    }
 
     if (cache) {
       return(
-        Cache(
-          cacheRepo = sim@paths$cachePath,
-          spades,
-          sim = sim,
-          debug = debug,
-          progress = progress,
-          .plotInitialTime = .plotInitialTime,
-          .saveInitialTime = .saveInitialTime,
-          notOlderThan = notOlderThan,
-          ...
-        )
+        do.call(Cache,
+                args = append(list(
+                  spades,
+                  sim = sim,
+                  debug = debug,
+                  progress = progress,
+                  .plotInitialTime = .plotInitialTime,
+                  .saveInitialTime = .saveInitialTime,
+                  omitArgs = omitArgs, notOlderThan = notOlderThan),
+                  dots))
       )
     } else {
       return(
@@ -698,12 +703,12 @@ setMethod(
 
 .runEvent <- function(sim, cacheIt, debug, quotedFnCall, moduleCall, fnEnv, cur, notOlderThan) {
   if (cacheIt) { # means that a module or event is to be cached
-    objNam <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     moduleSpecificObjects <-
       c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
         ls(fnEnv, all.names = TRUE), # functions in the namespaced location
-        na.omit(objNam)) # objects outputted by module
-    moduleSpecificOutputObjects <- objNam
+        na.omit(createsOutputs)) # objects outputted by module
+    moduleSpecificOutputObjects <- createsOutputs
     classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])

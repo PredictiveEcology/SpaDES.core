@@ -36,3 +36,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}

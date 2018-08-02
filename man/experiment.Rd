@@ -6,10 +6,10 @@
 \alias{experiment,simList-method}
 \title{Run an experiment using \code{\link{spades}}}
 \usage{
-experiment(sim, replicates = 1, params, modules, objects = list(), inputs,
-  dirPrefix = "simNum", substrLength = 3, saveExperiment = TRUE,
-  experimentFile = "experiment.RData", clearSimEnv = FALSE, notOlderThan,
-  cl, ...)
+experiment(sim, replicates = 1, params, modules, objects = list(),
+  inputs, dirPrefix = "simNum", substrLength = 3,
+  saveExperiment = TRUE, experimentFile = "experiment.RData",
+  clearSimEnv = FALSE, notOlderThan, cl, ...)
 
 \S4method{experiment}{simList}(sim, replicates = 1, params, modules,
   objects = list(), inputs, dirPrefix = "simNum", substrLength = 3,

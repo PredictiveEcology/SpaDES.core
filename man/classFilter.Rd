@@ -11,8 +11,8 @@
 \usage{
 classFilter(x, include, exclude, envir)
 
-\S4method{classFilter}{character,character,character,environment}(x, include,
-  exclude, envir)
+\S4method{classFilter}{character,character,character,environment}(x,
+  include, exclude, envir)
 
 \S4method{classFilter}{character,character,character,missing}(x, include,
   exclude)

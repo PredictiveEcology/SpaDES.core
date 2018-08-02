@@ -1,4 +1,9 @@
 test_that("timeunit works correctly", {
+  testInitOut <- testInit()
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
   times <- list(start = 0.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
@@ -109,15 +114,9 @@ test_that("timeunit works correctly", {
 })
 
 test_that("timeunits with child and parent modules work correctly", {
-  library(igraph)
-  tmpdir <- file.path(tempdir(), "test_timeunits") %>% checkPath(create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  m <- testInit("igraph", smcc = TRUE)
   on.exit({
-    detach("package:igraph")
-    setwd(cwd)
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(m)
   }, add = TRUE)
 
   #suppressMessages({
@@ -237,13 +236,13 @@ test_that("timeunits with child and parent modules work correctly", {
             xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
   cat(xxx1, file = fileName, sep = "\n")
 
-  cacheDir <- file.path(tmpdir, "cache")
-  try(clearCache(cacheDir), silent = TRUE)
+  cacheDir <- file.path(tmpdir, rndstr(1,6))
+  try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects"))),
-    "Using or creating cached|child6 -- outputObjects: b, dp, cm are assigned")
+    "Using or creating cached|child6 -- outputObjects: dp, cm are assigned")
   )
 
   # pulls cached value
@@ -260,7 +259,7 @@ test_that("timeunits with child and parent modules work correctly", {
   expect_true(all(unlist(lapply(fullMessage,
                                 function(x) any(grepl(mm1, pattern = x))))))
 
-  expect_identical(mySim$b, asPath(theFile))
+  expect_identical(mySim$b, asPath(normPath(theFile)))
 
   # Change the file that is in the arguments to .inputObjects
   write.table(x = data.frame(sample(1e6, 1)), file = theFile)

@@ -8,11 +8,9 @@
 \alias{checkpointFile}
 \alias{checkpointFile,.simList-method}
 \alias{checkpointFile<-}
-\alias{checkpointFile<-}
 \alias{checkpointFile<-,.simList-method}
 \alias{checkpointInterval}
 \alias{checkpointInterval,.simList-method}
-\alias{checkpointInterval<-}
 \alias{checkpointInterval<-}
 \alias{checkpointInterval<-,.simList-method}
 \title{Simulation checkpoints.}
@@ -82,3 +80,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty
 }
+\concept{functions to access elements of a \code{simList} object}

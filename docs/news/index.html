@@ -68,7 +68,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.1</span>
       </span>
     </div>
 
@@ -126,13 +126,58 @@
       <small>Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-0-2-0" class="section level1">
+    <div id="version-0-2-1" class="section level1">
 <h1 class="page-header">
-<a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> Unreleased </small>
+<a href="#version-0-2-1" class="anchor"></a>version 0.2.1<small> Unreleased </small>
 </h1>
+<div id="package-dependencies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#package-dependencies" class="anchor"></a>package dependencies</h2>
+<ul>
+<li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
+</ul>
+</div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
+<ul>
+<li>new option <code>spades.useRequire</code>: a logical which causes <code>simInit</code> to load packages with <code>Require</code> or <code>require</code>. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.</li>
+<li><ul>
+<li><ul>
+<li>new option <code>spades.keepCompleted</code>: a logical which causes <code><a href="../reference/spades.html">spades()</a></code> to keep (<code>TRUE</code>) or not keep a record of completed events. Keeping track of completed events when they are many (&gt;1e5) gets slow enough that it may be worth turning it off.</li>
+</ul></li>
+</ul></li>
+<li>more robust and faster tests are used now, care of helper functions in <code>tests</code>
+</li>
+<li>
+<code>all.equal.simList</code> now removes all time dependent attributes, <em>e.g.</em>, <code>._startClockTime</code> and <code>.timestamp</code>
+</li>
+<li>speed enhancements for Discrete Event Simulator; now overhead is 1.3 seconds for 5000 events or, per event, 260 microseconds (185 microseconds if <code>options("spades.keepCompleted" = FALSE)</code>
+</li>
+</ul>
+</div>
+<div id="bugfixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugfixes" class="anchor"></a>bugfixes</h2>
+<ul>
+<li>
+<p>Improvements to caching of functions with <code>simList</code> objects:</p>
+<ul>
+<li>Cached functions with a <code>simList</code> in the arguments would erroneously return cached copies of functions. These now are copied through from argument <code>simList</code>, rather than cached <code>simList</code>. This means that changes to the function definitions in a module will persist (e.g., debugging via <code>browser()</code> will work correctly)</li>
+<li>functions with <code>simList</code> in arguments that return a <code>simList</code> will now do a post digest of the output. This will be compared with the predigest, and only those object which changed in the <code>simList</code> will be modified.</li>
+<li>caching of <code>.inputObjects</code> function was incorrect. Fixed.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+    <div id="version-0-2-0" class="section level1">
+<h1 class="page-header">
+<a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>new features</h2>
 <ul>
 <li>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code>
 </li>
@@ -274,6 +319,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#version-0-2-1">0.2.1</a></li>
         <li><a href="#version-0-2-0">0.2.0</a></li>
         <li><a href="#version-0-1-1">0.1.1</a></li>
         <li><a href="#version-0-1-0">0.1.0</a></li>

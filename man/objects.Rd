@@ -6,7 +6,6 @@
 \alias{simList-accessors-objects}
 \alias{objs,simList-method}
 \alias{objs<-}
-\alias{objs<-}
 \alias{objs<-,simList-method}
 \alias{[[}
 \alias{[[,simList,ANY,ANY-method}
@@ -76,3 +75,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}

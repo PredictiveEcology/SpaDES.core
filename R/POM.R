@@ -89,7 +89,10 @@
 #' in the \file{ObjectiveFnValues.txt} file.
 #'
 #' @inheritParams spades
-#' @inheritParams SpaDES.tools::splitRaster
+#' @param cl A cluster object. Optional. This would generally be created using
+#'           parallel::makeCluster or equivalent. This is an alternative way, instead
+#'           of \code{beginCluster()}, to use parallelism for this function, allowing for
+#'           more control over cluster use.
 #'
 #' @param params Character vector of parameter names that can be changed by the optimizer. These
 #'               must be accessible with \code{params(sim)} internally.

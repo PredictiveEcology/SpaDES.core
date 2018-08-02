@@ -52,3 +52,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty & Eliot McIntire
 }
+\concept{functions to access elements of a \code{simList} object}

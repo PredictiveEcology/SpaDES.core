@@ -6,25 +6,20 @@
 \alias{simList-accessors-times}
 \alias{times,.simList-method}
 \alias{times<-}
-\alias{times<-}
 \alias{times<-,.simList-method}
 \alias{time..simList}
-\alias{time<-}
 \alias{time<-}
 \alias{time<-,.simList-method}
 \alias{end}
 \alias{end..simList}
 \alias{end<-}
-\alias{end<-}
 \alias{end<-,.simList-method}
 \alias{start}
 \alias{start..simList}
 \alias{start<-}
-\alias{start<-}
 \alias{start<-,.simList-method}
 \alias{timeunit}
 \alias{timeunit,.simList-method}
-\alias{timeunit<-}
 \alias{timeunit<-}
 \alias{timeunit<-,.simList-method}
 \alias{timeunits}
@@ -162,3 +157,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty and Eliot McIntire
 }
+\concept{functions to access elements of a \code{simList} object}

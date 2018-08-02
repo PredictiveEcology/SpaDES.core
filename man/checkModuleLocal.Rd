@@ -9,7 +9,8 @@
 \usage{
 checkModuleLocal(name, path, version)
 
-\S4method{checkModuleLocal}{character,character,character}(name, path, version)
+\S4method{checkModuleLocal}{character,character,character}(name, path,
+  version)
 
 \S4method{checkModuleLocal}{character,ANY,ANY}(name, path, version)
 }

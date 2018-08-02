@@ -250,7 +250,13 @@ setMethod(
       #urls <- moduleMetadata(module, path)$inputObjects$sourceURL
     }
 
+    targetFiles <- if (is.null(files)) {
+      lapply(urls, function(x) files)
+    } else {
+      files
+    }
     res <- Map(url = urls, reproducible::preProcess,
+               targetFile = targetFiles,
                MoreArgs = append(list(quick = quickCheck, overwrite = overwrite,
                                destinationPath = file.path(path, module, "data")), list(...))
                )

@@ -1,12 +1,7 @@
 test_that("test userSuppliedObj", {
-  tmpdir <- file.path(tempdir(), "test_conflictingFns")
-  checkPath(tmpdir, create = TRUE)
-  cwd <- getwd()
-  setwd(tmpdir)
-
+  testInitOut <- testInit("raster", smcc = TRUE)
   on.exit({
-    setwd(cwd)
-    unlink(tmpdir, recursive = TRUE)
+    testOnExit(testInitOut)
   }, add = TRUE)
 
   m <- "test"

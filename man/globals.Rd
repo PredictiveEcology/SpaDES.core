@@ -5,11 +5,9 @@
 \alias{globals}
 \alias{globals,.simList-method}
 \alias{globals<-}
-\alias{globals<-}
 \alias{globals<-,.simList-method}
 \alias{G}
 \alias{G,.simList-method}
-\alias{G<-}
 \alias{G<-}
 \alias{G<-,.simList-method}
 \title{Get and set simulation globals.}
@@ -53,3 +51,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
+\concept{functions to access elements of a \code{simList} object}
