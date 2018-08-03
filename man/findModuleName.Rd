@@ -15,7 +15,7 @@
 Character vector of modules names
 }
 \description{
-With children, parents, grandparents, etc, there can be severl "layers" of recursion.
+With children, parents, grandparents, etc.; there can be several "layers" of recursion.
 Some functions need to evaluate the outer level for a value, if found, they don't need
 to proceed further. If not found, increment one more level of recursion, etc.
 }

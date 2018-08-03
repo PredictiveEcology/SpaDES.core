@@ -78,7 +78,7 @@ The class \code{simList_} is only used internally.
 Several slot (and sub-slot) accessor methods are provided for use, and
 categorized into separate help pages:
 \tabular{ll}{
-  \code{\link{simList-accessors-envir}} \tab Simulation enviroment. \cr
+  \code{\link{simList-accessors-envir}} \tab Simulation environment. \cr
   \code{\link{simList-accessors-events}} \tab Scheduled and completed events. \cr
   \code{\link{simList-accessors-inout}} \tab Passing data in to / out of simulations. \cr
   \code{\link{simList-accessors-modules}} \tab Modules loaded and used; module dependencies. \cr
@@ -106,7 +106,7 @@ Each event is represented by a \code{\link{data.table}} row consisting of:
 
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Fransisco, CA: No Starch Press, Inc..
+            San Francisco, CA: No Starch Press, Inc..
             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 }
 \author{

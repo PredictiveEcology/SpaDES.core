@@ -438,7 +438,7 @@ cantCodeCheckMessage <- ": line could not be checked "
              "\n  It is a good idea to be explicit about the package sources",
              ", e.g., ", paste(whichFnsWithPackage, collapse = ", "),
              " but only for the 'get' functions, not the 'set' function ","
-             (e.g., don't change when on the left hand side of an assignement operator)")
+             (e.g., don't change when on the left hand side of an assignment operator)")
     )
   }
 

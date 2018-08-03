@@ -11,5 +11,5 @@
 \code{simList} in it}
 }
 \description{
-THis is recursive, so it will find the all simLists even if they are deeply nested.
+This is recursive, so it will find the all simLists even if they are deeply nested.
 }

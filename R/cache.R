@@ -581,7 +581,7 @@ setMethod(
 
 #' Find simList in a nested list
 #'
-#' THis is recursive, so it will find the all simLists even if they are deeply nested.
+#' This is recursive, so it will find the all simLists even if they are deeply nested.
 #'
 #' @param x any object, used here only when it is a list with at least one
 #'        \code{simList} in it
