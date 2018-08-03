@@ -111,85 +111,88 @@ options(spades.moduleCodeChecks = FALSE)
 ## ----event-functions, echo=TRUE, eval=FALSE------------------------------
 #  ## sample event functions from the default `randomLandscapes` module
 #  library(raster)
-#  library(SpaDES.tools)
+#  if (require(SpaDES.tools)) {
 #  
-#  randomLandscapesInit <- function(sim) {
-#    if (is.null(params(sim)$randomLandscapes$inRAM)) {
-#      inMemory <- FALSE
-#    } else {
-#      inMemory <- params(sim)$randomLandscapes$inRAM
-#    }
-#    # Give dimensions of dummy raster
-#    nx <- params(sim)$randomLandscapes$nx
-#    ny <- params(sim)$randomLandscapes$ny
-#    r <- raster(nrows = ny, ncols = nx, xmn = -nx/2, xmx = nx/2,
-#                ymn = -ny/2, ymx = ny/2)
-#    speedup <- max(1, nx/5e2)
-#    # Make dummy maps for testing of models
-#    DEM <- gaussMap(template, scale = 300, var = 0.03,
-#                    speedup = speedup, inMemory = inMemory)
-#    DEM[] <- round(getValues(DEM), 1) * 1000
-#    forestAge <- gaussMap(template, scale = 10, var = 0.1,
-#                          speedup = speedup, inMemory = inMemory)
-#    forestAge[] <- round(getValues(forestAge), 1) * 20
-#    percentPine <- gaussMap(template, scale = 50, var = 1,
+#    randomLandscapesInit <- function(sim) {
+#      if (is.null(params(sim)$randomLandscapes$inRAM)) {
+#        inMemory <- FALSE
+#      } else {
+#        inMemory <- params(sim)$randomLandscapes$inRAM
+#      }
+#      # Give dimensions of dummy raster
+#      nx <- params(sim)$randomLandscapes$nx
+#      ny <- params(sim)$randomLandscapes$ny
+#      r <- raster(nrows = ny, ncols = nx, xmn = -nx/2, xmx = nx/2,
+#                  ymn = -ny/2, ymx = ny/2)
+#      speedup <- max(1, nx/5e2)
+#      # Make dummy maps for testing of models
+#      DEM <- gaussMap(template, scale = 300, var = 0.03,
+#                      speedup = speedup, inMemory = inMemory)
+#      DEM[] <- round(getValues(DEM), 1) * 1000
+#      forestAge <- gaussMap(template, scale = 10, var = 0.1,
 #                            speedup = speedup, inMemory = inMemory)
-#    percentPine[] <- round(getValues(percentPine), 1)
+#      forestAge[] <- round(getValues(forestAge), 1) * 20
+#      percentPine <- gaussMap(template, scale = 50, var = 1,
+#                              speedup = speedup, inMemory = inMemory)
+#      percentPine[] <- round(getValues(percentPine), 1)
 #  
-#    # Scale them as needed
-#    forestAge <- forestAge / maxValue(forestAge) * 100
-#    percentPine <- percentPine / maxValue(percentPine) * 100
+#      # Scale them as needed
+#      forestAge <- forestAge / maxValue(forestAge) * 100
+#      percentPine <- percentPine / maxValue(percentPine) * 100
 #  
-#    # Make layers that are derived from other layers
-#    habitatQuality <- (DEM + 10 + (forestAge + 2.5) * 10) / 100
-#    habitatQuality <- habitatQuality / maxValue(habitatQuality)
+#      # Make layers that are derived from other layers
+#      habitatQuality <- (DEM + 10 + (forestAge + 2.5) * 10) / 100
+#      habitatQuality <- habitatQuality / maxValue(habitatQuality)
 #  
-#    # Stack them into a single stack and assign to sim envir
-#    mapStack <- stack(DEM, forestAge, habitatQuality, percentPine)
-#    names(mapStack) <- c("DEM", "forestAge", "habitatQuality", "percentPine")
-#    setColors(mapStack) <- list(DEM = brewer.pal(9, "YlOrBr"),
-#                                forestAge = brewer.pal(9, "BuGn"),
-#                                habitatQuality = brewer.pal(8, "Spectral"),
-#                                percentPine = brewer.pal(9, "Greens"))
-#    sim[[globals(sim)$stackName]] <- mapStack
-#    return(invisible(sim))
+#      # Stack them into a single stack and assign to sim envir
+#      mapStack <- stack(DEM, forestAge, habitatQuality, percentPine)
+#      names(mapStack) <- c("DEM", "forestAge", "habitatQuality", "percentPine")
+#      setColors(mapStack) <- list(DEM = brewer.pal(9, "YlOrBr"),
+#                                  forestAge = brewer.pal(9, "BuGn"),
+#                                  habitatQuality = brewer.pal(8, "Spectral"),
+#                                  percentPine = brewer.pal(9, "Greens"))
+#      sim[[globals(sim)$stackName]] <- mapStack
+#      return(invisible(sim))
+#    }
 #  }
 
 ## ----sim-eventDiagram, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE----
 library(igraph) # for %>%
 library(SpaDES.core)
-library(SpaDES.tools)
-
-parameters <- list(
-  .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-  .progress = list(NA),
-  randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
-  fireSpread = list(nFires = 10L, spreadprob = 0.225, its = 1e6,
-                    persistprob = 0, returnInterval = 1, startTime = 0,
-                    .plotInitialTime = 0, .plotInterval = 10),
-  caribouMovement = list(N = 100L, moveInterval = 1, torus = TRUE,
-                         .plotInitialTime = 1, .plotInterval = 1)
-)
-
-ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
-pdf(ftmp)
-clearPlot()
-mySim <- simInit(
-  times = list(start = 0.0, end = 2.0, timeunit = "year"),
-  params = parameters,
-  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-  objects = list(),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-  ) %>% 
-  spades()
-dev.off()
-unlink(ftmp)
+if (require(SpaDES.tools)) {
+  parameters <- list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+    .progress = list(NA),
+    randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
+    fireSpread = list(nFires = 10L, spreadprob = 0.225, its = 1e6,
+                      persistprob = 0, returnInterval = 1, startTime = 0,
+                      .plotInitialTime = 0, .plotInterval = 10),
+    caribouMovement = list(N = 100L, moveInterval = 1, torus = TRUE,
+                           .plotInitialTime = 1, .plotInterval = 1)
+  )
+  
+  ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
+  pdf(ftmp)
+  clearPlot()
+  mySim <- simInit(
+    times = list(start = 0.0, end = 2.0, timeunit = "year"),
+    params = parameters,
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    objects = list(),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+    ) %>% 
+    spades()
+  dev.off()
+  unlink(ftmp)
+}
 
 ## ----eventDiagram, eval=TRUE, fig.height=10, fig.width=7-----------------
-mySim <- spades(mySim) # runs the simulation
-
-# overview of the events in the simulation
-eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
+if (require(SpaDES.tools))  {
+  mySim <- spades(mySim) # runs the simulation
+  
+  # overview of the events in the simulation
+  eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
+}
 
 ## ----checksums, eval=FALSE-----------------------------------------------
 #  ## 1. specify your module here

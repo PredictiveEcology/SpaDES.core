@@ -35,7 +35,7 @@ simInitAndSpades(...)
 \item{times}{A named list of numeric simulation start and end times
 (e.g., \code{times = list(start = 0.0, end = 10.0)}).}
 
-\item{params}{A list of lists of the form list(moduleName=list(param1=value, param2=value)).
+\item{params}{A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 See details.}
 
 \item{modules}{A named list of character strings specifying the names
@@ -166,15 +166,16 @@ the defaults are as follows:
 }
 \note{
 The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
-These can be added later with the accessor methods (See example). These are not required for initializing the
-simulation via simInit. \code{modules}, \code{paths}, \code{params}, and \code{objects}
-are all needed for successful initialization.
+These can be added later with the accessor methods (See example).
+These are not required for initializing the simulation via simInit.
+All of \code{modules}, \code{paths}, \code{params}, and \code{objects} are needed
+for successful initialization.
 }
 \section{Parsing and Checking Code}{
 
 
 The \code{simInit} function will attempt to find usage of sim$xxx
-or sim[['xxx']] on either side of the assignement "<-" operator.
+or sim[['xxx']] on either side of the assignment "<-" operator.
 It will compare these to the module metadata, specifically
 \code{inputObjects} for cases where objects or "gotten" from the
 simList and \code{outputObjects} for cases where objects are
@@ -186,7 +187,7 @@ Plot (in quickPlot and some modules).
 
 \emph{This code checking is young and may get false positives and
 false negatives -- i.e., miss things}. It also takes computational
-time, which may be undesireable in operational code.
+time, which may be undesirable in operational code.
 To turn off checking (i.e.,
 if there are too many false positives and negatives), set
 the option \code{spades.moduleCodeChecks} to \code{FALSE},
@@ -196,9 +197,9 @@ e.g., \code{options(spades.moduleCodeChecks = FALSE)}
 \section{Caching}{
 
 
-Using caching with \code{SpaDES} is vital when building re-useable and reproducible
-content. Please see the vignette dedicated to this topic. See
-\url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
+Using caching with \code{SpaDES} is vital when building re-useble and reproducible content.
+Please see the vignette dedicated to this topic.
+See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
 }
 
 \examples{
@@ -310,7 +311,7 @@ if (require(rgdal)) {
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Fransisco, CA: No Starch Press, Inc..
+            San Francisco, CA: No Starch Press, Inc..
             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 }
 \seealso{

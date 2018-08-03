@@ -189,7 +189,7 @@ to <code>spades</code></p>
     </tr>
     <tr>
       <th>params</th>
-      <td><p>A list of lists of the form list(moduleName=list(param1=value, param2=value)).
+      <td><p>A list of lists of the form <code>list(moduleName=list(param1=value, param2=value))</code>.
 See details.</p></td>
     </tr>
     <tr>
@@ -320,15 +320,16 @@ the defaults are as follows:</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>The user can opt to run a simpler <code>simInit</code> call without inputs, outputs, and times.
-These can be added later with the accessor methods (See example). These are not required for initializing the
-simulation via simInit. <code>modules</code>, <code>paths</code>, <code>params</code>, and <code>objects</code>
-are all needed for successful initialization.</p>
+These can be added later with the accessor methods (See example).
+These are not required for initializing the simulation via simInit.
+All of <code>modules</code>, <code>paths</code>, <code>params</code>, and <code>objects</code> are needed
+for successful initialization.</p>
     
     <h2 class="hasAnchor" id="parsing-and-checking-code"><a class="anchor" href="#parsing-and-checking-code"></a>Parsing and Checking Code</h2>
 
     
     <p>The <code>simInit</code> function will attempt to find usage of sim$xxx
-or sim[['xxx']] on either side of the assignement "&lt;-" operator.
+or sim[['xxx']] on either side of the assignment "&lt;-" operator.
 It will compare these to the module metadata, specifically
 <code>inputObjects</code> for cases where objects or "gotten" from the
 simList and <code>outputObjects</code> for cases where objects are
@@ -338,7 +339,7 @@ with things like scale and stack (both in base and raster), and
 Plot (in quickPlot and some modules).</p>
 <p><em>This code checking is young and may get false positives and
 false negatives -- i.e., miss things</em>. It also takes computational
-time, which may be undesireable in operational code.
+time, which may be undesirable in operational code.
 To turn off checking (i.e.,
 if there are too many false positives and negatives), set
 the option <code>spades.moduleCodeChecks</code> to <code>FALSE</code>,
@@ -347,14 +348,14 @@ e.g., <code>options(spades.moduleCodeChecks = FALSE)</code></p>
     <h2 class="hasAnchor" id="caching"><a class="anchor" href="#caching"></a>Caching</h2>
 
     
-    <p>Using caching with <code>SpaDES</code> is vital when building re-useable and reproducible
-content. Please see the vignette dedicated to this topic. See
-<a href='https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html</a></p>
+    <p>Using caching with <code>SpaDES</code> is vital when building re-useble and reproducible content.
+Please see the vignette dedicated to this topic.
+See <a href='https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html</a></p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Fransisco, CA: No Starch Press, Inc..
+            San Francisco, CA: No Starch Press, Inc..
             Retrieved from <a href='https://www.nostarch.com/artofr.htm'>https://www.nostarch.com/artofr.htm</a></p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

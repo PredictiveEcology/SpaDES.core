@@ -26,7 +26,7 @@ if (getRversion() >= "3.1.0") {
 #' @return Returns the modified \code{simList} object.
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Fransisco, CA: No Starch Press, Inc..
+#'             San Francisco, CA: No Starch Press, Inc..
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @author Alex Chubaty
@@ -273,7 +273,7 @@ doEvent <- function(sim, debug, notOlderThan) {
 #' @author Alex Chubaty
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Fransisco, CA: No Starch Press, Inc..
+#'             San Francisco, CA: No Starch Press, Inc..
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @examples
@@ -515,7 +515,7 @@ scheduleEvent <- function(sim,
 #' @export
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Fransisco, CA: No Starch Press, Inc..
+#'             San Francisco, CA: No Starch Press, Inc..
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @examples

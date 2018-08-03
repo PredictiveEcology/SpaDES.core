@@ -22,7 +22,7 @@
 #' the \file{tests/testthat/} directory under module path.
 #' To automatically generate this folder, please set \code{unitTests = TRUE}
 #' when creating a new module using \code{\link{newModule}}.
-#' To accurately test your module, the test filename must follw the format
+#' To accurately test your module, the test filename must follow the format
 #' \code{test-functionName.R}.
 #'
 #' @seealso \code{\link{newModule}}.
