@@ -6,18 +6,17 @@
 |:--------|:----------------------------|
 |version  |R version 3.4.4 (2018-03-15) |
 |system   |x86_64, linux-gnu            |
-|ui       |RStudio (1.1.456)            |
+|ui       |X11                          |
 |language |(EN)                         |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-07-30                   |
+|date     |2018-08-02                   |
 
 ## Packages
 
-|package      |*  |version |date       |source                                          |
-|:------------|:--|:-------|:----------|:-----------------------------------------------|
-|reproducible |   |0.2.2   |2018-07-30 |Github (PredictiveEcology/reproducible@41f46c2) |
-|SpaDES.core  |   |0.2.1   |2018-07-30 |local (PredictiveEcology/SpaDES.core@NA)        |
+|package     |*  |version |date       |source                                        |
+|:-----------|:--|:-------|:----------|:---------------------------------------------|
+|SpaDES.core |   |0.2.1   |2018-08-02 |local (PredictiveEcology/SpaDES.core@c370f31) |
 
 # Check results
 
