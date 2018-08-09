@@ -28,7 +28,7 @@ We have introduced several new functions and bug fixes (see NEWS.md).
 * Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-08-03 r75056)
 * Ubuntu 18.04         (local), R 3.6.0 (2018-07-30 r75011)
 * Windows           (appveyor), R 3.6.0 (2018-08-02 r75051)
-* Windows        (win-builder), R 3.6.0 (2018-08-05 r75062)
+* Windows        (win-builder), R 3.6.0 (2018-08-07 r75080)
 
 ## R CMD check results
 
