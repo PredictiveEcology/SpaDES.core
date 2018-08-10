@@ -10,13 +10,13 @@
 |language |(EN)                         |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-08-02                   |
+|date     |2018-08-10                   |
 
 ## Packages
 
-|package     |*  |version |date       |source                                        |
-|:-----------|:--|:-------|:----------|:---------------------------------------------|
-|SpaDES.core |   |0.2.1   |2018-08-02 |local (PredictiveEcology/SpaDES.core@c370f31) |
+|package     |*  |version    |date       |source                                        |
+|:-----------|:--|:----------|:----------|:---------------------------------------------|
+|SpaDES.core |   |0.2.1.9000 |2018-08-10 |local (PredictiveEcology/SpaDES.core@4021354) |
 
 # Check results
 
@@ -24,7 +24,7 @@
 
 |package       |version | errors| warnings| notes|
 |:-------------|:-------|------:|--------:|-----:|
-|NetLogoR      |0.3.3   |      0|        0|     1|
+|NetLogoR      |0.3.3   |      0|        0|     0|
 |SpaDES.addins |0.1.1   |      0|        1|     0|
 |SpaDES        |2.0.2   |      0|        1|     0|
 
@@ -32,12 +32,7 @@
 Maintainer: Sarah Bauduin <sarahbauduin@hotmail.fr>  
 Bug reports: https://github.com/PredictiveEcology/NetLogoR/issues
 
-0 errors | 0 warnings | 1 note 
-
-```
-checking package dependencies ... NOTE
-Package suggested but not available for checking: ‘fastshp’
-```
+0 errors | 0 warnings | 0 notes
 
 ## SpaDES.addins (0.1.1)
 Maintainer: Alex M Chubaty <alex.chubaty@gmail.com>  

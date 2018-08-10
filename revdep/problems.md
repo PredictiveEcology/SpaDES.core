@@ -10,13 +10,13 @@
 |language |(EN)                         |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-08-02                   |
+|date     |2018-08-10                   |
 
 ## Packages
 
-|package     |*  |version |date       |source                                        |
-|:-----------|:--|:-------|:----------|:---------------------------------------------|
-|SpaDES.core |   |0.2.1   |2018-08-02 |local (PredictiveEcology/SpaDES.core@c370f31) |
+|package     |*  |version    |date       |source                                        |
+|:-----------|:--|:----------|:----------|:---------------------------------------------|
+|SpaDES.core |   |0.2.1.9000 |2018-08-10 |local (PredictiveEcology/SpaDES.core@4021354) |
 
 # Check results
 
