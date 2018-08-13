@@ -1,6 +1,6 @@
 ## Updated release
 
-We have introduced several new functions and bug fixes (see NEWS.md).
+This release fixes errors found in tests on macOS.
 
 ## Test environments
 

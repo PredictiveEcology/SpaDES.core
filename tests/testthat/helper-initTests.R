@@ -32,7 +32,7 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   if (missing(libraries)) libraries <- list()
   unlist(lapply(libraries, require, character.only = TRUE))
   require("testthat")
-  tmpdir <- file.path(tempdir(), rndstr(1,6))
+  tmpdir <- file.path(tempdir(), rndstr(1, 6))
   if (setPaths)
     setPaths(cachePath = tmpdir)
   checkPath(tmpdir, create = TRUE)
