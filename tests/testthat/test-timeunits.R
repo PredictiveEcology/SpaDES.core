@@ -119,15 +119,13 @@ test_that("timeunits with child and parent modules work correctly", {
     testOnExit(m)
   }, add = TRUE)
 
-  #suppressMessages({
-    newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
-    newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)
-    newModule("child1", tmpdir, open = FALSE)
-    newModule("child2", tmpdir, open = FALSE)
-    newModule("child3", tmpdir, open = FALSE)
-    newModule("child4", tmpdir, open = FALSE)
-    newModule("child5", tmpdir, open = FALSE)
-    #})
+  newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
+  newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)
+  newModule("child1", tmpdir, open = FALSE)
+  newModule("child2", tmpdir, open = FALSE)
+  newModule("child3", tmpdir, open = FALSE)
+  newModule("child4", tmpdir, open = FALSE)
+  newModule("child5", tmpdir, open = FALSE)
 
   fileName <- "child2/child2.R"
   xxx <- readLines(fileName)
@@ -201,7 +199,6 @@ test_that("timeunits with child and parent modules work correctly", {
   mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month") # because par1 is month, grandpar1 is NA
 
-
   ### Tese dataPath and currentModule function, which is namespaced
   xxx <- readLines(fileName)
   modName <- basename(dirname(fileName))
@@ -212,11 +209,11 @@ test_that("timeunits with child and parent modules work correctly", {
   cat(xxx1, file = fileName, sep = "\n")
   mySim <- simInit(modules = list(modName), paths = list(modulePath = tmpdir))
   expect_true(mySim[[modName]]$cm1 == file.path(modName))
-  expect_true(mySim[[modName]]$dp1 == file.path(dirname(fileName), "data"))
+  expect_true(mySim[[modName]]$dp1 == normPath(file.path(dirname(fileName), "data")))
 
   mySimOut <- spades(mySim)
-  expect_true(mySimOut$dp == file.path(dirname(fileName), "data"))
   expect_true(mySimOut$cm == file.path(modName))
+  expect_true(mySimOut$dp == normPath(file.path(dirname(fileName), "data")))
 
   ######
   theFile <- file.path(tmpdir, "test")

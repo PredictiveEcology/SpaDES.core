@@ -41,7 +41,8 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
 
-  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir, origDir = origDir, libs = libraries,
+  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
+                  origDir = origDir, libs = libraries,
                   tmpCache = tmpCache, optsAsk = optsAsk)
   list2env(outList, envir = parent.frame())
   return(outList)
