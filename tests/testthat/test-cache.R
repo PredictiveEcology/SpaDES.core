@@ -207,8 +207,6 @@ test_that("test .robustDigest for simLists", {
     testOnExit(testInitOut)
   }, add = TRUE)
 
-  tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
-
   modName <- "test"
   newModule(modName, path = tmpdir, open = FALSE)
   fileName <- file.path(modName, paste0(modName,".R"))
@@ -282,10 +280,7 @@ test_that("test .robustDigest for simLists", {
   expect_output(spades(bbb),
                 regexp = "Using cached copy of init",
                 all = TRUE)
-
-
 })
-
 
 test_that("test .checkCacheRepo with function as spades.cachePath", {
   testInitOut <- testInit("igraph", smcc = TRUE)

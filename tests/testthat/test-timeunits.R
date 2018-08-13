@@ -233,7 +233,7 @@ test_that("timeunits with child and parent modules work correctly", {
             xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
   cat(xxx1, file = fileName, sep = "\n")
 
-  cacheDir <- file.path(tmpdir, rndstr(1,6))
+  cacheDir <- file.path(tmpdir, rndstr(1,6)) %>% checkPath(create = TRUE)
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
