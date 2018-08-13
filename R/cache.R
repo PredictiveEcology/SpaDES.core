@@ -260,14 +260,14 @@ if (!isGeneric(".checkCacheRepo")) {
 #'
 #' See \code{\link[reproducible]{.checkCacheRepo}}.
 #'
+#' @export
+#' @exportMethod .checkCacheRepo
 #' @importFrom reproducible .checkCacheRepo
 #' @importMethodsFrom reproducible .checkCacheRepo
-#' @inheritParams reproducible::.checkCacheRepo
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.checkCacheRepo}}
-#' @exportMethod .checkCacheRepo
-#' @export
+#' @inheritParams reproducible::.checkCacheRepo
 #' @rdname checkCacheRepo
+#' @seealso \code{\link[reproducible]{.checkCacheRepo}}
 setMethod(
   ".checkCacheRepo",
   signature = "list",
@@ -290,7 +290,7 @@ setMethod(
       }
     }
     checkPath(path = cacheRepo, create = create)
-  })
+})
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
