@@ -36,10 +36,6 @@ There are no ERRORs nor WARNINGs nor NOTEs.
 
 ## Downstream dependencies
 
-I have run R CMD check on downstream dependencies and all have passed, except as noted below.
+I have run R CMD check on downstream dependencies and all have passed.
 
 Summary at https://github.com/PredictiveEcology/SpaDES.core/blob/master/revdep/README.md.
-
-* `NetLogoR` shows a note regarding a non-CRAN package in Suggests.
-
-* `SpaDES` and `SpaDES.addins` both show a warning due to `DISPLAY` not being set in the headless session.
