@@ -169,8 +169,7 @@ doEvent <- function(sim, debug, notOlderThan) {
                         notOlderThan = notOlderThan,
                         outputObjects = moduleSpecificOutputObjects,
                         classOptions = classOptions,
-                        cacheRepo = sim@paths[["cachePath"]],
-                        userTags = c("function:doEvent")))
+                        cacheRepo = sim@paths[["cachePath"]]))
           } else {
             quote(get(moduleCall,
                       envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
