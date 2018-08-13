@@ -37,8 +37,7 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
     setPaths(cachePath = tmpdir)
   checkPath(tmpdir, create = TRUE)
   origDir <- setwd(tmpdir)
-  tmpCache <- normPath(file.path(tmpdir, "testCache"))
-  checkPath(tmpCache, create = TRUE)
+  tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
 
