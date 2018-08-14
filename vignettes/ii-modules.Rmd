@@ -177,10 +177,9 @@ Parameters are often module-specific, where they are only used within the module
 Module-specific parameters are specified using `defineParameter` (with `rbind`) within `defineModule` to build a `data.frame` of input parameters.
 Global parameters are defined at the simulation level as part of the `simInit` call.
 
-The parameter list in the `simList` object (accessed via `params`) may be used to pass named parameter values to modules.
-The general structure of this parameter list is `parameters$moduleName$moduleParameter`.
-This nested list structure allows passing as many parameters as needed for your simulation.
-We suggest passing a list of all the parameters needed for a single module together.
+The parameter list in the `simList` object (accessed via `P` or `params`) may be used to pass named parameter values to modules.
+The general structure of this parameter list is a nested list of lists: the top level list contains all module names, each of those is a list of module parameters: This would normally be accessed using the `P`: `P(sim)$paramName` if inside a module, or  `P(mySim)$moduleName$moduleParameter` if not inside a module. This nested list structure allows passing as many parameters as needed for your simulation.
+We suggest passing a list of all the parameters needed for a single module together, but this is not strictly necessary.
 
 A module's metadata defines default values for module-specific parameters, and these defaults will be used unless overridden by the user.
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
@@ -211,6 +210,19 @@ paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core")
 
 mySim <- simInit(times = times, params = parameters, modules = modules,
                  objects = objects, paths = paths)
+
+# Access parameters
+params(mySim)               # shows all parameters
+P(mySim)                    # same, but more concise
+P(mySim, "caribouMovement") # only parameters in caribouMovement
+P(mySim)$caribouMovement    # same
+P(mySim)$caribouMovement$N  # Only one parameter
+
+# If used within the module source code, then module name can be omitted:
+# This will return NULL here, but will return the actual value if used
+# in a module
+P(sim)$N  # Only one parameter
+
 ```
 
 ### Event types
