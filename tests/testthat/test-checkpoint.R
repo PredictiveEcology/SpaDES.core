@@ -83,9 +83,8 @@ test_that("test checkpointing with disk-backed raster", {
   tmpRasFilename <- tempfile("tmpRas", fileext = ".tif") %T>%
     file.create() %>%
     normPath()
-  simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
-  simA <- #suppressWarnings(
-    spades(simA)#)
+  simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
+  simA <- spades(simA)
 
   ## save checkpoints; with load/restore
   set.seed(1234)
@@ -96,8 +95,7 @@ test_that("test checkpointing with disk-backed raster", {
   expect_error(simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename))
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
   end(simB) <- 1
-  simB <- #suppressWarnings(
-    spades(simB)#)
+  simB <- spades(simB)
   rm(simB)
 
   checkpointLoad(file = file.path(paths$outputPath, file))

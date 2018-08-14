@@ -68,7 +68,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
       </span>
     </div>
 
@@ -126,20 +126,46 @@
       <small>Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-0-2-1" class="section level1">
+    <div id="version-0-2-2" class="section level1">
 <h1 class="page-header">
-<a href="#version-0-2-1" class="anchor"></a>version 0.2.1<small> Unreleased </small>
+<a href="#version-0-2-2" class="anchor"></a>version 0.2.2<small> Unreleased </small>
 </h1>
 <div id="package-dependencies" class="section level2">
 <h2 class="hasAnchor">
 <a href="#package-dependencies" class="anchor"></a>package dependencies</h2>
 <ul>
-<li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
+<li>remove <code>sp</code> from imports</li>
 </ul>
 </div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
+<ul>
+<li>TEMP</li>
+</ul>
+</div>
+<div id="bugfixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugfixes" class="anchor"></a>bugfixes</h2>
+<ul>
+<li>fix issues with failing tests on macOS</li>
+</ul>
+</div>
+</div>
+    <div id="version-0-2-1" class="section level1">
+<h1 class="page-header">
+<a href="#version-0-2-1" class="anchor"></a>version 0.2.1<small> 2018-08-09 </small>
+</h1>
+<div id="package-dependencies-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#package-dependencies-1" class="anchor"></a>package dependencies</h2>
+<ul>
+<li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
+</ul>
+</div>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>new features</h2>
 <ul>
 <li>new option <code>spades.useRequire</code>: a logical which causes <code>simInit</code> to load packages with <code>Require</code> or <code>require</code>. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.</li>
 <li><ul>
@@ -156,9 +182,9 @@
 </li>
 </ul>
 </div>
-<div id="bugfixes" class="section level2">
+<div id="bugfixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-1" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>
 <p>Improvements to caching of functions with <code>simList</code> objects:</p>
@@ -175,9 +201,9 @@
 <h1 class="page-header">
 <a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
 </h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>new features</h2>
+<a href="#new-features-2" class="anchor"></a>new features</h2>
 <ul>
 <li>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code>
 </li>
@@ -319,6 +345,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#version-0-2-2">0.2.2</a></li>
         <li><a href="#version-0-2-1">0.2.1</a></li>
         <li><a href="#version-0-2-0">0.2.0</a></li>
         <li><a href="#version-0-1-1">0.1.1</a></li>
