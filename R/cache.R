@@ -155,6 +155,7 @@ if (!isGeneric(".tagsByClass")) {
 #' @author Eliot McIntire
 #' @exportMethod .tagsByClass
 #' @importFrom reproducible .tagsByClass
+#' @importFrom reproducible .grepSysCalls
 #' @importMethodsFrom reproducible .tagsByClass
 #' @include simList-class.R
 #' @seealso \code{\link[reproducible]{.tagsByClass}}
@@ -173,10 +174,11 @@ setMethod(
         paste0("function:spades")
       ) # add this because it will be an outer function, if there are events occurring
     } else {
+
       scalls <- sys.calls()
-      parseModuleFrameNum <- grep(scalls, pattern = "(^.parseModule)")[2]
+      parseModuleFrameNum <- .grepSysCalls(scalls, "^.parseModule")[2]
       if (!is.na(parseModuleFrameNum)) {
-        inObj <- grepl(scalls, pattern = ".inputObjects")
+        inObj <- .grepSysCalls(scalls, pattern = "^.inputObjects")
         if (any(!is.na(inObj))) {
           userTags <- c("function:.inputObjects")
           userTags1 <- tryCatch(paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
@@ -261,6 +263,7 @@ if (!isGeneric(".checkCacheRepo")) {
 #' See \code{\link[reproducible]{.checkCacheRepo}}.
 #'
 #' @importFrom reproducible .checkCacheRepo
+#' @importFrom reproducible .grepSysCalls
 #' @importMethodsFrom reproducible .checkCacheRepo
 #' @inheritParams reproducible::.checkCacheRepo
 #' @include simList-class.R
@@ -280,7 +283,9 @@ setMethod(
       # just take the first simList, if there are >1
       cacheRepo <- object[whSimList][[1]]@paths$cachePath
     } else {
-      doEventFrameNum <- grep(sys.calls(), pattern = "(^doEvent)|(^.parseModule)")[2]
+
+      doEventFrameNum <- .grepSysCalls(sys.calls(), "(^doEvent)|(^.parseModule)")[2]
+
       if (!is.na(doEventFrameNum)) {
         sim <- get("sim", envir = sys.frame(doEventFrameNum))
         cacheRepo <- sim@paths$cachePath

@@ -144,13 +144,19 @@ setMethod(
 #' searched in the call stack. Default is "simInit"
 #'
 #' @author Eliot McIntire
+#' @importFrom reproducible .grepSysCalls
 #' @keywords internal
 #' @name findObjects
 #' @rdname findObjects
 #'
 .findObjects <- function(objects, functionCall = "simInit") {
+
   scalls <- sys.calls()
-  grep1 <- grep(as.character(scalls), pattern = functionCall)
+  grep1 <- .grepSysCalls(scalls, functionCall)
+
+  #scallsFirstElement <- lapply(scalls, function(x) x[1])
+  #grep1 <- grep(scallsFirstElement, pattern = functionCall)
+  #grep1 <- grep(as.character(scalls), pattern = functionCall)
   grep1 <- pmax(min(grep1[sapply(scalls[grep1], function(x) {
     tryCatch(is(parse(text = x), "expression"), error = function(y) NA)
   })], na.rm = TRUE) - 1, 1)
@@ -267,6 +273,6 @@ all.equal.simList <- function(target, current, ...) {
   suppressWarnings(rm(".timestamp", envir = envir(target)))
   suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  # make a dummy class so it uses the default all.equal
   all.equal.default(target, current)
 }
+

@@ -173,6 +173,7 @@
 #' @importFrom stats optim
 #' @importFrom raster getCluster returnCluster
 #' @importFrom parallel clusterEvalQ clusterExport
+#' @importFrom reproducible .grepSysCalls
 #' @include module-dependencies-class.R
 #' @include helpers.R
 #' @include simList-class.R
@@ -255,7 +256,11 @@ setMethod(
             }
           })
 
-          envPOMCalled <- sys.frame(min(grep("POM", sys.calls()))-1)
+          POMFrameNum <- .grepSysCalls(sys.calls(), pattern = "POM")
+          # scallsFirstElement <- lapply(sys.calls(), function(x) x[1])
+          # POMFrameNum <- grep(scallsFirstElement, pattern = "POM")
+
+          envPOMCalled <- sys.frame(min(POMFrameNum)-1)
 
           objectiveRes <- lapply(seq_along(outputObjects), function(x) {
             if (is(outputObjects[[x]], "Raster")) {

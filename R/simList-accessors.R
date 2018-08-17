@@ -475,6 +475,7 @@ setReplaceMethod("depends",
 #'
 #' @author Eliot McIntire
 #' @export
+#' @importFrom reproducible .grepSysCalls
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname namespacing
@@ -492,10 +493,12 @@ setMethod(
     # Only return module name if inside a spades call,
     #  because this only makes sense if there is an "active" module
     sc <- sys.calls()
-    st <- grepl(sc, pattern = "moduleCall")
-    if (any(st)) {
+    st <- .grepSysCalls(sc, pattern = "moduleCall")
+    #rep(FALSE, length = length(sc))
+    #st <- grepl(sc, pattern = "moduleCall")
+    if (length(st)) {
       mod <- parse(text = "moduleCall") %>%
-        eval(., envir = sys.frame(which(st)[1] - 1)) %>%
+        eval(., envir = sys.frame(st[1] - 1)) %>%
         strsplit(., split = "\\.")[[1]][2]
     } else {
       mod <- NULL
@@ -594,6 +597,7 @@ setReplaceMethod("params",
 #'
 #' @aliases simList-accessors-params
 #' @export
+#' @importFrom reproducible .grepSysCalls
 #' @include simList-class.R
 #' @rdname params
 #'
@@ -609,9 +613,12 @@ P <- function(sim, module, param) {
       return(sim@params[[module]][[param]])
     }
   } else {
-    inSimInit <- grep(sys.calls(), pattern = ".parseModule")
+    #scallsFirstElement <- lapply(sys.calls(), function(x) x[1])
+    inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
+    #inSimInit <- grep(sys.calls(), pattern = ".parseModule")
     if (any(inSimInit)) {
-      module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
+      #module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
+      module <- get("m", sys.frame(inSimInit[2]))
       if (missing(param)) {
         return(sim@params[[module]])
       } else {
