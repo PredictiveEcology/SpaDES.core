@@ -1,6 +1,6 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.2.1.9000
+version 0.2.2
 =============
 
 ## package dependencies
@@ -10,7 +10,7 @@ version 0.2.1.9000
 - TEMP
 
 ## bugfixes
-- TEMP
+- fix issues with failing tests on macOS
 
 version 0.2.1
 =============

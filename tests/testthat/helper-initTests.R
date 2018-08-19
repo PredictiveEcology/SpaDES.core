@@ -32,17 +32,17 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   if (missing(libraries)) libraries <- list()
   unlist(lapply(libraries, require, character.only = TRUE))
   require("testthat")
-  tmpdir <- file.path(tempdir(), rndstr(1,6))
+  tmpdir <- file.path(tempdir(), rndstr(1, 6))
   if (setPaths)
     setPaths(cachePath = tmpdir)
   checkPath(tmpdir, create = TRUE)
   origDir <- setwd(tmpdir)
-  tmpCache <- normPath(file.path(tmpdir, "testCache"))
-  checkPath(tmpCache, create = TRUE)
+  tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
 
-  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir, origDir = origDir, libs = libraries,
+  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
+                  origDir = origDir, libs = libraries,
                   tmpCache = tmpCache, optsAsk = optsAsk)
   list2env(outList, envir = parent.frame())
   return(outList)
