@@ -9,18 +9,15 @@ test_that("downloadData downloads and unzips module data", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  m <- "test"
   testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-  datadir <- file.path(tmpdir, m, "data")
-  checkPath(datadir, create = TRUE)
+  on.exit(testOnExit(testInitOut), add = TRUE)
+
+  m <- "test"
+  datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- numeric_version(paste0(R.version$major, ".", R.version$minor))
   if (Rversion > "3.4.2") { ## TODO: need o test on earlier versions too!
-
     # write checksums
     chksums <- structure(
       list(
@@ -30,22 +27,18 @@ test_that("downloadData downloads and unzips module data", {
       .Names = c("file", "checksum"),
       class = "data.frame", row.names = c(NA, -2L)
     )
-    moduleDir <- file.path(tmpdir, "test")
-    dataDir <- file.path(moduleDir, "data")
-    write.table(chksums, file = file.path(dataDir, "CHECKSUMS.txt") )
-
+    write.table(chksums[order(chksums$file),], file = file.path(datadir, "CHECKSUMS.txt"))
 
     expectsInputs <- data.frame(
       objectName = c("DEM", "habitatQuality"),
       objectClass = "RasterLayer",
-      sourceURL = c("https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/DEM.tif",
-                    "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/habitatQuality.tif"),
+      sourceURL = c(
+        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/DEM.tif",
+        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/habitatQuality.tif"
+      ),
       stringsAsFactors = FALSE
     )
 
-    reproducible::checkPath(dataDir, create = TRUE)
-
-    #f <- downloadModule(m, tmpdir, quiet = TRUE)
     t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
                                    files = c("DEM.tif", "habitatQuality.tif")))
     result <- checksums(m, tmpdir)$result

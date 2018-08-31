@@ -97,8 +97,8 @@ downloadData("thisModule", "there", files = "theFilename.zip")
 
 }
 \seealso{
-\code{\link{prepInputs}}, \code{checksums} and \code{downloadModule} in
-      \code{SpaDES.core} package for downloading modules and building a checksums file.
+\code{\link{prepInputs}}, \code{\link{checksums}}, and \code{\link{downloadModule}}
+for downloading modules and building a checksums file.
 }
 \author{
 Alex Chubaty & Eliot McIntire
