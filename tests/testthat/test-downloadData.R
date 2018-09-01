@@ -16,7 +16,7 @@ test_that("downloadData downloads and unzips module data", {
   datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
-  Rversion <- numeric_version(paste0(R.version$major, ".", R.version$minor))
+  Rversion <- getRversion()
   if (Rversion > "3.4.2") { ## TODO: need o test on earlier versions too!
     # write checksums
     chksums <- structure(

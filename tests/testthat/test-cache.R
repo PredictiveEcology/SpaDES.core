@@ -28,7 +28,7 @@ test_that("test cache", {
                            omitArgs = c("progress", "debug", ".plotInitialTime", ".saveInitialTime")))
   sims <- eval(expr)
   out <- showCache(sims[[1]])
-  expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies
+  expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies, one for each "experiment"
   expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
