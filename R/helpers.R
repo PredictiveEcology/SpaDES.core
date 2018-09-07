@@ -150,16 +150,12 @@ setMethod(
 #' @rdname findObjects
 #'
 .findObjects <- function(objects, functionCall = "simInit") {
-
   scalls <- sys.calls()
   grep1 <- .grepSysCalls(scalls, functionCall)
-
-  #scallsFirstElement <- lapply(scalls, function(x) x[1])
-  #grep1 <- grep(scallsFirstElement, pattern = functionCall)
-  #grep1 <- grep(as.character(scalls), pattern = functionCall)
   grep1 <- pmax(min(grep1[sapply(scalls[grep1], function(x) {
     tryCatch(is(parse(text = x), "expression"), error = function(y) NA)
   })], na.rm = TRUE) - 1, 1)
+
   # Convert character strings to their objects
   lapply(objects, function(x) get(x, envir = sys.frames()[[grep1]]))
 }
@@ -275,4 +271,3 @@ all.equal.simList <- function(target, current, ...) {
 
   all.equal.default(target, current)
 }
-

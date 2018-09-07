@@ -198,7 +198,6 @@ test_that("test .prepareOutput", {
     cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
   }
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
-
 })
 
 test_that("test .robustDigest for simLists", {
@@ -212,9 +211,9 @@ test_that("test .robustDigest for simLists", {
   fileName <- file.path(modName, paste0(modName,".R"))
   newCode <- "\"hi\"" # this will be added below in 2 different spots
 
-  args = list(modules = list("test"),
-              paths = list(modulePath = tmpdir, cachePath = tmpCache),
-              params = list(test = list(.useCache = ".inputObjects")))
+  args <- list(modules = list("test"),
+               paths = list(modulePath = tmpdir, cachePath = tmpCache),
+               params = list(test = list(.useCache = ".inputObjects")))
 
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 

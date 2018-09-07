@@ -105,9 +105,7 @@ setMethod("updateList",
 #'
 #' Similar to \code{updateList} but does not require named lists.
 #'
-#' @param x  A \code{list} of items with optional attributes.
-#'
-#' @param y  See \code{x}.
+#' @param x,y  A \code{list} of items with optional attributes.
 #'
 #' @return An updated \code{list} with attributes.
 #'

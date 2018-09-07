@@ -627,8 +627,7 @@ setMethod(
             "loadTime in ?simInit"
           )
         )
-        events(sim) <-
-          events(sim)[eventTime >= start(sim)]
+        events(sim) <- events(sim)[eventTime >= start(sim)]
       }
     }
 
