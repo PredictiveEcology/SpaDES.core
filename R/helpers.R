@@ -127,11 +127,11 @@ setMethod(
       documentation = list(),
       reqdPkgs = list(),
       parameters = defineParameter(),
-      inputObjects = .inputObjects(),
-      outputObjects = .outputObjects()
+      inputObjects = ._inputObjectsDF(),
+      outputObjects = ._outputObjectsDF()
     )
     return(out)
-  })
+})
 
 #' Find objects if passed as character strings
 #'

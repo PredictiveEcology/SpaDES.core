@@ -116,7 +116,6 @@ setMethod(
     return(out)
 })
 
-################################################################################
 #' Parse and initialize a module
 #'
 #' Internal function, used during \code{\link{simInit}}.
@@ -199,9 +198,10 @@ setMethod(
         # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir[[m]])
         activeCode <- list()
         activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                           sim@.envir[[m]])
+                                                   sim@.envir[[m]])
 
-        doesntUseNamespacing <- isTRUE(any(grepl(paste0("^", m), ls(sim@.envir[[m]]))))
+        doesntUseNamespacing <- !.isNamespaced(sim, m)
+
         # evaluate the rest of the parsed file
         if (doesntUseNamespacing)
           eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir)
@@ -392,12 +392,15 @@ setMethod(
                 all(nzchar(x))))], eval, envir = env)
               args[["sim"]] <- sim
 
-              # This next line will make the Caching sensitive to userSuppliedObjs (which are already
-              #   in the simList) or objects supplied by another module
+              ## This next line will make the Caching sensitive to userSuppliedObjs
+              ##  (which are already in the simList) or objects supplied by another module
               inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
-              if (any(inSimList))
+              if (any(inSimList)) {
                 objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
-                                               moduleSpecificInputObjects[inSimList])
+                                                 moduleSpecificInputObjects[inSimList])
+              }
+
+              .inputObjects <- .getModuleInputObjects(sim, m)
               sim <- Cache(FUN = do.call, .inputObjects, args,
                            objects = objectsToEvaluateForCaching,
                            notOlderThan = notOlderThan,
@@ -411,13 +414,7 @@ setMethod(
               message(crayon::green("Running .inputObjects for ", m, sep = ""))
               .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
 
-              # ensure backwards compatibility with non-namespaced modules
-              if (doesntUseNamespacing) {
-                .inputObjects <- sim@.envir[[".inputObjects"]]
-                rm(".inputObjects", envir = sim@.envir)
-              } else {
-                .inputObjects <- sim@.envir[[m]][[".inputObjects"]]
-              }
+              .inputObjects <- .getModuleInputObjects(sim, m)
               sim <- .inputObjects(sim)
             }
           }
@@ -517,6 +514,7 @@ setMethod(
   return(tmp)
 }
 
+#' @keywords internal
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame()) {
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = envir), error = function(y) "ERROR"))
@@ -530,4 +528,28 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     list2env(as.list(env), envir)
   }
   activeCode
+}
+
+#' Extract the user-defined \code{.inputObjects} function from a module
+#'
+#' @keywords internal
+#' @rdname getModuleInputObjects
+.getModuleInputObjects <- function(sim, m) {
+  # ensure backwards compatibility with non-namespaced modules
+  if (.isNamespaced(sim, m)) {
+    sim@.envir[[m]][[".inputObjects"]]
+  } else {
+    sim@.envir[[".inputObjects"]]
+    on.exit(rm(".inputObjects", envir = sim@.envir))
+  }
+}
+
+#' Check is module uses module namespacing
+#'
+#' Older modules may not have their functions etc. namespaced in the \code{simList}.
+#'
+#' @keywords internal
+#' @rdname isNamespaced
+.isNamespaced <- function(sim, m) {
+  !isTRUE(any(grepl(paste0("^", m), ls(sim@.envir[[m]]))))
 }

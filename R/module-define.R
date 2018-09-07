@@ -283,17 +283,17 @@ setMethod(
     }
 
     if (is.null(x$inputObjects)) {
-      x$inputObjects <- .inputObjects()
+      x$inputObjects <- ._inputObjectsDF()
     } else {
       if (is(x$inputObjects, "data.frame")) {
-        if (!all(colnames(x$inputObjects) %in% colnames(.inputObjects())) ||
-            !all(colnames(.inputObjects()) %in% colnames(x$inputObjects))) {
+        if (!all(colnames(x$inputObjects) %in% colnames(._inputObjectsDF())) ||
+            !all(colnames(._inputObjectsDF()) %in% colnames(x$inputObjects))) {
           stop("invalid data.frame `inputObjects` in module `", x$name, "`:\n",
                "provided: ", paste(colnames(x$inputObjects), collapse = ", "),
-               "expected: ", paste(colnames(.inputObjects()), collapse = ", "))
+               "expected: ", paste(colnames(._inputObjectsDF()), collapse = ", "))
         }
       } else {
-        x$inputObjects <- .inputObjects()
+        x$inputObjects <- ._inputObjectsDF()
       }
     }
     if (NROW(x$inputObjects)) {
@@ -307,17 +307,17 @@ setMethod(
     }
 
     if (is.null(x$outputObjects)) {
-      x$outputObjects <- .outputObjects()
+      x$outputObjects <- ._outputObjectsDF()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        if (!all(colnames(x$outputObjects) %in% colnames(.outputObjects())) ||
-            !all(colnames(.outputObjects()) %in% colnames(x$outputObjects))) {
+        if (!all(colnames(x$outputObjects) %in% colnames(._outputObjectsDF())) ||
+            !all(colnames(._outputObjectsDF()) %in% colnames(x$outputObjects))) {
           stop("invalid data.frame `outputObjects` in module `", x$name, "`:",
                "provided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
-               "expected: ", paste(colnames(.outputObjects()), collapse = ", "))
+               "expected: ", paste(colnames(._outputObjectsDF()), collapse = ", "))
         }
       } else {
-        x$outputObjects <- .outputObjects()
+        x$outputObjects <- ._outputObjectsDF()
       }
     }
 

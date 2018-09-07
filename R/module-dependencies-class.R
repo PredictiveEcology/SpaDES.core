@@ -13,25 +13,25 @@ setOldClass("person", S4Class = "person4")
 selectMethod("show", "person")
 removeClass("person4")
 
-################################################################################
-#' Create an empty (template) inputObjects and outputObjects data.frames
+#' Create an empty \code{data.frame} object for use with \code{inputObjects} or
+#' \code{outputObjects}
 #'
 #' Internal function.
 #'
 #' @param x Not used. Should be missing.
 #'
-#' @return An empty inputObjects or outputObjects data.frame.
+#' @return A \code{data.frame} object.
 #'
 #' @author Alex Chubaty
 #' @keywords internal
-#' @rdname inputObjects
-#'
-setGeneric(".inputObjects", function(x) {
-  standardGeneric(".inputObjects")
+#' @rdname inputObjectsDF
+#' @seealso \code{\link{defineModule}}
+setGeneric("._inputObjectsDF", function(x) {
+  standardGeneric("._inputObjectsDF")
 })
 
-#' @rdname inputObjects
-setMethod(".inputObjects",
+#' @rdname inputObjectsDF
+setMethod("._inputObjectsDF",
           signature(x = "missing"),
           definition = function() {
             data.frame(
@@ -41,13 +41,13 @@ setMethod(".inputObjects",
             )
 })
 
-#' @rdname inputObjects
-setGeneric(".outputObjects", function(x) {
-  standardGeneric(".outputObjects")
+#' @rdname inputObjectsDF
+setGeneric("._outputObjectsDF", function(x) {
+  standardGeneric("._outputObjectsDF")
 })
 
-#' @rdname inputObjects
-setMethod(".outputObjects",
+#' @rdname inputObjectsDF
+setMethod("._outputObjectsDF",
           signature(x = "missing"),
           definition = function() {
             out.df <- data.frame(
@@ -143,8 +143,8 @@ setClass(
       default = I(list()), min = I(list()), max = I(list()),
       paramDesc = character(0), stringsAsFactors = FALSE
     ),
-    inputObjects = .inputObjects(),
-    outputObjects = .outputObjects()
+    inputObjects = ._inputObjectsDF(),
+    outputObjects = ._outputObjectsDF()
   ),
   validity = function(object) {
     if (length(object@name) != 1L) stop("name must be a single character string.")
@@ -164,16 +164,13 @@ setClass(
       stop("input object name and class must be specified, or NA.")
     if (length(object@outputObjects) < 1L)
       stop("output object name and class must be specified, or NA.")
-    if (!all(names(.inputObjects()) %in% colnames(object@inputObjects)))
+    if (!all(names(._inputObjectsDF()) %in% colnames(object@inputObjects)))
       stop(paste("input object data.frame must use colnames",
-                 paste(collapse = ", ", colnames(.inputObjects()))))
+                 paste(collapse = ", ", colnames(._inputObjectsDF()))))
 
-    # if ( !("sourceURL" %in% colnames(object@inputObjects)) ) {
-    #   warning("input object data.frame should use colnames sourceURL.")
-    # }
-    if ( !all(colnames(.outputObjects()) %in% colnames(object@outputObjects)) ) {
+    if ( !all(colnames(._outputObjectsDF()) %in% colnames(object@outputObjects)) ) {
      stop(paste("output object data.frame must use colnames",
-                paste(collapse = ", ", colnames(.outputObjects()))))
+                paste(collapse = ", ", colnames(._outputObjectsDF()))))
     }
     # try coercing to character because if data.frame was created without specifying
     # `stringsAsFactors=FALSE`, or used `NA` (logical) there will be problems...

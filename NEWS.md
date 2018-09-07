@@ -1,16 +1,28 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.2.9000
+=============
+
+## package dependencies
+* no changes
+
+## new features
+* none
+
+## bugfixes
+* resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
+
 version 0.2.2
 =============
 
 ## package dependencies
-- remove `sp` from imports
+* remove `sp` from imports
 
 ## new features
-- TEMP
+* none
 
 ## bugfixes
-- fix issues with failing tests on macOS
+* fix issues with failing tests on macOS
 
 version 0.2.1
 =============
