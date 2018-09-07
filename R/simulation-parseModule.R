@@ -73,8 +73,8 @@ setMethod(
   definition = function(filename, defineModuleElement, envir) {
 
     if (file.exists(filename)) {
-      tmp <- .parseConditional(envir = envir, filename = filename) # parse file, conditioned on it
-                                                                  #  not already been done
+      # parse file, conditioned on it not already been done
+      tmp <- .parseConditional(envir = envir, filename = filename)
       namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
 
       element <- (namesParsedList == defineModuleElement)
@@ -107,8 +107,7 @@ setMethod(
     out <- list()
     for (j in seq_along(modules)) {
       m <- modules[[j]][1]
-      filename <-
-        paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
+      filename <- paste(sim@paths[["modulePath"]], "/", m, "/", m, ".R", sep = "")
       out[[m]] <- .parseModulePartial(filename = filename,
                                       defineModuleElement = defineModuleElement,
                                       envir = envir)
@@ -333,9 +332,6 @@ setMethod(
           parent_ids <- c(parent_ids, j)
         }
 
-        ## TODO: move this down after loadOrder computed
-        sim <- .runModuleInputObjects(sim, m, i, objs, notOlderThan, userSuppliedObjNames, ...)
-
         ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
         opt <- getOption("spades.moduleCodeChecks")
         if (isTRUE(opt) || length(names(opt)) > 1) {
@@ -468,95 +464,4 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #' @rdname isNamespaced
 .isNamespaced <- function(sim, m) {
   !isTRUE(any(grepl(paste0("^", m), ls(sim@.envir[[m]]))))
-}
-
-#' Run module's \code{.inputObjects}
-#'
-#' Run \code{.inputObjects()} from each module file from each module, one at a time,
-#' and remove it from the \code{simList} so next module won't rerun it.
-#'
-#' @keywords internal
-#' @rdname runModuleInputsObjects
-.runModuleInputObjects <- function(sim, m, i, objs, notOlderThan, userSuppliedObjNames, ...) {
-  # If user supplies the needed objects, then test whether all are supplied.
-  # If they are all supplied, then skip the .inputObjects code
-  cacheIt <- FALSE
-
-  allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
-    userSuppliedObjNames
-  if (!all(allObjsProvided)) {
-    if (!is.null(sim@.envir[[m]][[".inputObjects"]])) {
-      list2env(objs[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
-               envir = sim@.envir)
-      a <- sim@params[[m]][[".useCache"]]
-      if (!is.null(a)) {
-        # user supplied values
-        if (".useCache" %in% names(list(...)[["params"]])) {
-          b <- list(...)[["params"]][[i]][[".useCache"]]
-          if (!is.null(b)) a <- b
-        }
-        #.useCache is a parameter
-        if (!identical(FALSE, a)) {
-          #.useCache is not FALSE
-          if (!isTRUE(a)) {
-            #.useCache is not TRUE
-            if (".inputObjects" %in% a) {
-              cacheIt <- TRUE
-            }
-          } else {
-            cacheIt <- TRUE
-          }
-        }
-      }
-
-      if (cacheIt) {
-        message(crayon::green("Using or creating cached copy of .inputObjects for ",
-                              m, sep = ""))
-        moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] # nolint
-
-        # ensure backwards compatibility with non-namespaced modules
-        if (.isNamespaced(sim, m)) {
-          moduleSpecificObjs <- paste(m, ".inputObjects", sep = ":")
-          objectsToEvaluateForCaching <- c(moduleSpecificObjs)
-          .inputObjects <- sim@.envir[[m]][[".inputObjects"]]
-        } else {
-          objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
-                                                pattern = m, value = TRUE),
-                                           na.omit(moduleSpecificInputObjects))
-          .inputObjects <- sim@.envir[[".inputObjects"]]
-        }
-
-        args <- as.list(formals(.inputObjects))
-        env <- environment()
-        args <- lapply(args[unlist(lapply(args, function(x)
-          all(nzchar(x))))], eval, envir = env)
-        args[["sim"]] <- sim
-
-        ## This next line will make the Caching sensitive to userSuppliedObjs
-        ##  (which are already in the simList) or objects supplied by another module
-        inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
-        if (any(inSimList)) {
-          objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
-                                           moduleSpecificInputObjects[inSimList])
-        }
-
-        .inputObjects <- .getModuleInputObjects(sim, m)
-        sim <- Cache(FUN = do.call, .inputObjects, args,
-                     objects = objectsToEvaluateForCaching,
-                     notOlderThan = notOlderThan,
-                     outputObjects = moduleSpecificInputObjects,
-                     quick = getOption("reproducible.quick", FALSE),
-                     userTags = c(paste0("module:", m),
-                                  "eventType:.inputObjects",
-                                  "function:.inputObjects"))
-
-      } else {
-        message(crayon::green("Running .inputObjects for ", m, sep = ""))
-        .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
-        .inputObjects <- .getModuleInputObjects(sim, m)
-        sim <- .inputObjects(sim)
-      }
-    }
-  }
-  return(sim)
 }

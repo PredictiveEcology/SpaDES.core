@@ -249,13 +249,12 @@ test_that("timeunits with child and parent modules work correctly", {
                      params = list("child6" = list(.useCache = ".inputObjects")))
   )
   mm1 <- cleanMessage(mm1)
-  fullMessage <- c("Using or creating cached copy of inputObjects for child6",
+  fullMessage <- c(
+    "Using or creating cached copy of inputObjects for child6",
     "child6: module code: b is declared in inputObjects, but is not used in the module",
     "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
   )
-  expect_true(all(unlist(lapply(fullMessage,
-                                function(x) any(grepl(mm1, pattern = x))))))
-
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
   expect_identical(mySim$b, asPath(normPath(theFile)))
 
   # Change the file that is in the arguments to .inputObjects
@@ -267,25 +266,16 @@ test_that("timeunits with child and parent modules work correctly", {
                      params = list("child6" = list(.useCache = ".inputObjects"))))
 
   mm1 <- cleanMessage(mm1)
-  fullMessage <- c("Using or creating cached copy of inputObjects for child6",
-                   "child6: module code: b is declared in inputObjects, but is not used in the module",
-                   "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
-  )
-  expect_true(all(unlist(lapply(fullMessage,
-                                function(x) any(grepl(mm1, pattern = x))))))
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
 
   # pulls cached value
-  mm1 <- capture_messages(mm2 <- capture_output(
+  mm1 <- capture_messages(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects")))
-  ))
-  mm1 <- cleanMessage(mm1)
-  fullMessage <- c("Using or creating cached copy of inputObjects for child6",
-                   "child6: module code: b is declared in inputObjects, but is not used in the module",
-                   "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
   )
+  mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage,
                                 function(x) any(grepl(mm1, pattern = x))))))
-  expect_true(grepl("Using cached", mm2))
+  expect_true(any(grepl("Using or creating cached copy", mm1)))
 })

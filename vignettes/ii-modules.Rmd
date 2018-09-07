@@ -222,7 +222,6 @@ P(mySim)$caribouMovement$N  # Only one parameter
 # This will return NULL here, but will return the actual value if used
 # in a module
 P(sim)$N  # Only one parameter
-
 ```
 
 ### Event types

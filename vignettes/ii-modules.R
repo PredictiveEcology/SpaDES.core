@@ -79,7 +79,6 @@ options(spades.moduleCodeChecks = FALSE)
 #  # This will return NULL here, but will return the actual value if used
 #  # in a module
 #  P(sim)$N  # Only one parameter
-#  
 
 ## ----event-types, echo=TRUE, eval=FALSE----------------------------------
 #  ## sample event type definitions from the default `randomLandscapes` module

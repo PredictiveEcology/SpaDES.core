@@ -221,8 +221,7 @@ test_that("test .robustDigest for simLists", {
                  regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Using cached copy|module code",
-                 all = TRUE)
+                 regexp = "Using or creating cached copy|Using cached copy|module code")
 
 
   # make change to .inputObjects code -- should rerun .inputObjects
@@ -249,9 +248,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result|module code",
-                 all = TRUE)
-
+                 regexp = "Using or creating cached copy|loading cached result|module code")
 
   # In some other location, test during spades call
   newModule(modName, path = tmpdir, open = FALSE)

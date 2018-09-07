@@ -89,6 +89,8 @@ i.e., rerun.}
 \value{
 A \code{simList} simulation object, pre-initialized from values
 specified in the arguments supplied.
+
+A \code{simList} object.
 }
 \description{
 Create a new simulation object, the "sim" object. This object is implemented
@@ -99,9 +101,9 @@ pass by reference, "putting" objects in the sim object does no actual copy. The
 and other important simulation information, such
 as times, paths, modules, and module load order. See more details below.
 
-This may allow for more efficient Caching. This passes all
-arguments to simInit, then the created \code{simList} is passed
-to \code{spades}
+This may allow for more efficient Caching.
+Passes all arguments to \code{simInit}, then passes the created \code{simList}
+to \code{spades}.
 }
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
