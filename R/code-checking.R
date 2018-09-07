@@ -283,7 +283,8 @@ cantCodeCheckMessage <- ": line could not be checked "
   hasConflicts <- fg[fg %in% conflictingFnsSimple]
 
   # Can't code check:
-  allChecks <- list(simAssigns = simAssigns, simGets = simGets, returnsSim = returnsSim, assignToSim = assignToSim, fg = fg)
+  allChecks <- list(simAssigns = simAssigns, simGets = simGets,
+                    returnsSim = returnsSim, assignToSim = assignToSim, fg = fg)
   cantCodeCheck <- lapply(allChecks, function(xx) grepl(cantCodeCheckMessage, xx))
   anyCantCodeCheck <- unlist(lapply(cantCodeCheck, any))
   if (any(anyCantCodeCheck)) {
