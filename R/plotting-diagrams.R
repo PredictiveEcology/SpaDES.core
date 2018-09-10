@@ -450,7 +450,7 @@ setMethod(
       parents <- unique(mg[, "from"])
 
       deps <- depsEdgeList(sim)[, list(from, to)]
-      el <- rbind(mg, deps) # don't seem to need the rbinded version
+      el <- rbind(mg, deps)
 
       # This is just for the dummy case of having no object dependencies
       if (NROW(deps) == 0) deps <- mg
