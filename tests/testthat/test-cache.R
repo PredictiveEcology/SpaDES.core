@@ -326,7 +326,7 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os) == 4) # 2 objects, the environment, the rest
+  expect_true(length(os) == 6) # 4 objects, the environment, the rest
 })
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
