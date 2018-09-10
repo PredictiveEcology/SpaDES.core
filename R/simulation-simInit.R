@@ -418,22 +418,21 @@ setMethod(
     }
 
     # recursive function to extract parent and child structures
-    buildModuleGraph <- function(sim, mods, childModules) {
-      # provide childModules
+    buildParentChildGraph <- function(sim, mods, childModules) {
       out <- childModules
       isParent <- unlist(lapply(out, function(x) length(x) > 1))
       from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
       to <- unlist(lapply(out, function(x) names(x)))
       if (is.null(to)) to <- character(0)
       outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
-      aa <- lapply(childModules[isParent], function(x) buildModuleGraph(sim, mods, x))
+      aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
       aa <- rbindlist(aa)
       outDF <- rbind(outDF, aa)
       outDF
     }
 
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
-    moduleGraph <- as.data.frame(buildModuleGraph(sim, modules(sim), childModules = childModules))
+    parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
 
     timeunits <- findSmallestTU(sim, modules(sim), childModules)
 
@@ -582,7 +581,7 @@ setMethod(
     }
 
     ## Add the data.frame as an attribute
-    attr(sim@modules, "modulesGraph") <- moduleGraph
+    attr(sim@modules, "modulesGraph") <- parentChildGraph
 
     ## END OF MODULE PARSING AND LOADING
     if (length(objects)) {
