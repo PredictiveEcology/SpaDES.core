@@ -876,11 +876,25 @@ simInitAndSpades <- function(...) {
   # If user supplies the needed objects, then test whether all are supplied.
   # If they are all supplied, then skip the .inputObjects code
   cacheIt <- FALSE
-  allObjsProvided <- sim@depends@dependencies[[m]]@inputObjects[["objectName"]] %in%
+
+  mnames <- vapply(seq_along(sim@depends@dependencies), function(k) {
+    sim@depends@dependencies[[k]]@name
+  }, character(1))
+  i <- which(mnames == m)
+
+  ## temporarily assign current module
+  sim@current <- newEventList <- list(
+    eventTime = start(sim),
+    moduleName = m,
+    eventType = ".inputObjects",
+    eventPriority = .normal()
+  )
+
+  allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
     if (!is.null(sim@.envir[[m]][[".inputObjects"]])) {
-      list2env(objects[sim@depends@dependencies[[m]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
+      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
                envir = sim@.envir)
       a <- P(sim, m, ".useCache")
       if (!is.null(a)) {
@@ -898,7 +912,7 @@ simInitAndSpades <- function(...) {
       if (isTRUE(cacheIt)) {
         message(crayon::green("Using or creating cached copy of .inputObjects for ",
                               m, sep = ""))
-        moduleSpecificInputObjects <- sim@depends@dependencies[[m]]@inputObjects[["objectName"]] # nolint
+        moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] # nolint
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, m)) {
@@ -914,8 +928,7 @@ simInitAndSpades <- function(...) {
 
         args <- as.list(formals(.inputObjects))
         env <- environment()
-        args <- lapply(args[unlist(lapply(args, function(x)
-          all(nzchar(x))))], eval, envir = env)
+        args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
         args[["sim"]] <- sim
 
         ## This next line will make the Caching sensitive to userSuppliedObjs
@@ -938,11 +951,13 @@ simInitAndSpades <- function(...) {
 
       } else {
         message(crayon::green("Running .inputObjects for ", m, sep = ""))
-        .modifySearchPath(pkgs = sim@depends@dependencies[[m]]@reqdPkgs)
+        .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
         .inputObjects <- .getModuleInputObjects(sim, m)
         sim <- .inputObjects(sim)
       }
     }
   }
+
+  sim@current <- list()
   return(sim)
 }

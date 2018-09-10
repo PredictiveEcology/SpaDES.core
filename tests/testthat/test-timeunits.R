@@ -199,7 +199,7 @@ test_that("timeunits with child and parent modules work correctly", {
   mySim <- simInit(modules = list("grandpar2"), paths = list(modulePath = tmpdir))
   expect_equal(timeunit(mySim), "month") # because par1 is month, grandpar1 is NA
 
-  ### Tese dataPath and currentModule function, which is namespaced
+  ### Test dataPath and currentModule function, which is namespaced
   xxx <- readLines(fileName)
   modName <- basename(dirname(fileName))
   initLine <- grep(xxx, pattern = "Init\\(sim\\)")
@@ -233,7 +233,7 @@ test_that("timeunits with child and parent modules work correctly", {
             xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
   cat(xxx1, file = fileName, sep = "\n")
 
-  cacheDir <- file.path(tmpdir, rndstr(1,6)) %>% checkPath(create = TRUE)
+  cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),

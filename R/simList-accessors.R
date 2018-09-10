@@ -2406,11 +2406,6 @@ setMethod(
         if (!is.null(sim@current$eventTime)) {
           sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit, sim@.envir)
           sim@current
-          # obj <- copy(sim@current) # don't change original sim
-          # obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
-          # obj[]
-          # obj
-
         }
       } else {
         sim@current
