@@ -449,13 +449,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #' @keywords internal
 #' @rdname getModuleInputObjects
 .getModuleInputObjects <- function(sim, m) {
-  # ensure backwards compatibility with non-namespaced modules
-  if (.isNamespaced(sim, m)) {
-    sim@.envir[[m]][[".inputObjects"]]
-  } else {
-    sim@.envir[[".inputObjects"]]
-    on.exit(rm(".inputObjects", envir = sim@.envir))
-  }
+  sim@.envir[[m]][[".inputObjects"]]
 }
 
 #' Check is module uses module namespacing

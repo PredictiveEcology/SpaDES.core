@@ -908,50 +908,50 @@ simInitAndSpades <- function(...) {
       }
 
       if (isTRUE(cacheIt)) {
-        message(crayon::green("Using or creating cached copy of .inputObjects for ",
-                              m, sep = ""))
-        moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] # nolint
+        message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
+        moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, m)) {
           moduleSpecificObjs <- paste(m, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
-          .inputObjects <- sim@.envir[[m]][[".inputObjects"]]
         } else {
           objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
                                                 pattern = m, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))
-          .inputObjects <- sim@.envir[[".inputObjects"]]
-        }
-
-        args <- as.list(formals(.inputObjects))
-        env <- environment()
-        args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
-        args[["sim"]] <- sim
-
-        ## This next line will make the Caching sensitive to userSuppliedObjs
-        ##  (which are already in the simList) or objects supplied by another module
-        inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
-        if (any(inSimList)) {
-          objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
-                                           moduleSpecificInputObjects[inSimList])
         }
 
         .inputObjects <- .getModuleInputObjects(sim, m)
-        sim <- Cache(FUN = do.call, .inputObjects, args,
-                     objects = objectsToEvaluateForCaching,
-                     notOlderThan = notOlderThan,
-                     outputObjects = moduleSpecificInputObjects,
-                     quick = getOption("reproducible.quick", FALSE),
-                     userTags = c(paste0("module:", m),
-                                  "eventType:.inputObjects",
-                                  "function:.inputObjects"))
+        if (!is.null(.inputObjects)) {
+          args <- as.list(formals(.inputObjects))
+          env <- environment()
+          args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
+          args[["sim"]] <- sim
 
+          ## This next line will make the Caching sensitive to userSuppliedObjs
+          ##  (which are already in the simList) or objects supplied by another module
+          inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
+          if (any(inSimList)) {
+            objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
+                                             moduleSpecificInputObjects[inSimList])
+          }
+
+          sim <- Cache(FUN = do.call, .inputObjects, args,
+                       objects = objectsToEvaluateForCaching,
+                       notOlderThan = notOlderThan,
+                       outputObjects = moduleSpecificInputObjects,
+                       quick = getOption("reproducible.quick", FALSE),
+                       userTags = c(paste0("module:", m),
+                                    "eventType:.inputObjects",
+                                    "function:.inputObjects"))
+        }
       } else {
         message(crayon::green("Running .inputObjects for ", m, sep = ""))
         .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
         .inputObjects <- .getModuleInputObjects(sim, m)
-        sim <- .inputObjects(sim)
+        if (!is.null(.inputObjects)) {
+          sim <- .inputObjects(sim)
+        }
       }
     }
   }
