@@ -12,6 +12,7 @@ version 0.2.2.9000
 ## bugfixes
 * resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
 * module `.inputObjects` evaluated based on module load order (#72)
+* `.robustDigest` fix for simLists -- needed to omit `._startClockTime` and `.timestamp`
 
 version 0.2.2
 =============
