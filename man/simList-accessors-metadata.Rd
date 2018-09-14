@@ -24,8 +24,8 @@ in which to replace element(s).}
 
 \item{module}{Optional character string indicating which module params should come from.}
 
-\item{package}{a character string with the name of a single package.
-    An error occurs if more than one package name is given.}
+\item{package}{For compatibility with \code{\link[utils]{citation}}. This can be
+a \code{simList} or a character string for a package name.}
 
 \item{lib.loc}{a character vector with path names of \R libraries, or
     the directory containing the source for \code{package}, or

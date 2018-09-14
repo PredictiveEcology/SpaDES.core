@@ -2779,6 +2779,8 @@ setMethod("documentation",
 
 
 ################################################################################
+#' @param package For compatibility with \code{\link[utils]{citation}}. This can be
+#'                a \code{simList} or a character string for a package name.
 #' @inheritParams P
 #' @inheritParams utils::citation
 #' @include simList-class.R
