@@ -1574,6 +1574,49 @@ setReplaceMethod(
    return(sim)
 })
 
+
+################################################################################
+#' @param package For compatibility with \code{\link[utils]{citation}}. This can be
+#'                a \code{simList} or a character string for a package name.
+#' @inheritParams P
+#' @inheritParams utils::citation
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
+  standardGeneric("citation")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setMethod("citation",
+          signature = ".simList",
+          definition = function(package, lib.loc, auto, module) {
+            if (missing(module)) {
+              module <- current(package)
+              if (NROW(module) == 0)
+                module <- unlist(modules(package))
+            }
+            out <- if (length(module) > 1) {
+              lapply(package@depends@dependencies[module], function(deps)
+                deps@citation)
+            } else {
+              package@depends@dependencies[[module]]@citation
+            }
+            return(out)
+          })
+
+#' @export
+#' @rdname simList-accessors-paths
+setMethod("citation",
+          signature = "character",
+          definition = function(package, lib.loc, auto, module) {
+            utils::citation(package = package, lib.loc = lib.loc, auto = auto)
+          })
+
+
+
 ################################################################################
 #' Specify paths for modules, inputs, and outputs
 #'
@@ -2777,44 +2820,4 @@ setMethod("documentation",
             return(out)
           })
 
-
-################################################################################
-#' @param package For compatibility with \code{\link[utils]{citation}}. This can be
-#'                a \code{simList} or a character string for a package name.
-#' @inheritParams P
-#' @inheritParams utils::citation
-#' @include simList-class.R
-#' @export
-#' @rdname simList-accessors-metadata
-#'
-setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
-  standardGeneric("citation")
-})
-
-#' @export
-#' @rdname simList-accessors-paths
-setMethod("citation",
-          signature = ".simList",
-          definition = function(package, lib.loc, auto, module) {
-            if (missing(module)) {
-              module <- current(package)
-              if (NROW(module) == 0)
-                module <- unlist(modules(package))
-            }
-            out <- if (length(module) > 1) {
-              lapply(package@depends@dependencies[module], function(deps)
-                deps@citation)
-            } else {
-              package@depends@dependencies[[module]]@citation
-            }
-            return(out)
-          })
-
-#' @export
-#' @rdname simList-accessors-paths
-setMethod("citation",
-          signature = "character",
-          definition = function(package, lib.loc, auto, module) {
-            utils::citation(package = package, lib.loc = lib.loc, auto = auto)
-          })
 
