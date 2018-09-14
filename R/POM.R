@@ -138,7 +138,8 @@
 #'                   made so that it doesn't produce \code{NaN}. But, sometimes
 #'                   it is difficult to diagnose stochastic results.
 #'
-#' @param logObjFnVals Logical or Character string indicating a filename. Ignored if
+#' @param logObjFnVals Logical or Character string indicating a filename to log the outputs.
+#'                       Ignored if
 #'                       \code{objFn} is supplied.
 #'                       If TRUE (and there is no \code{objFn} supplied), then the
 #'                       value of the individual patterns will be output the console
