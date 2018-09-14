@@ -314,18 +314,3 @@ test_that("simList object initializes correctly", {
 
 })
 
-test_that("simList accessors", {
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-  ## test with outputs
-  s <- simInit()
-  aa <- (capture_warnings(mySim <- simInit(times = list(start = 1.0, end = 2.0),
-                                           modules = list("test"), paths = paths,
-                                           objects = obj)))
-  expect_length(aa, 0)
-
-
-})
-
