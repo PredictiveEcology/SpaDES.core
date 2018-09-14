@@ -25,6 +25,12 @@
 \alias{modulePath<-,.simList-method}
 \alias{dataPath}
 \alias{dataPath,.simList-method}
+\alias{inputObjects,.simList-method}
+\alias{outputObjects,.simList-method}
+\alias{reqdPkgs,.simList-method}
+\alias{documentation,.simList-method}
+\alias{citation,.simList-method}
+\alias{citation,character-method}
 \title{Specify paths for modules, inputs, and outputs}
 \usage{
 paths(sim)
@@ -70,12 +76,28 @@ modulePath(sim) <- value
 dataPath(sim)
 
 \S4method{dataPath}{.simList}(sim)
+
+\S4method{inputObjects}{.simList}(sim, module)
+
+\S4method{outputObjects}{.simList}(sim, module)
+
+\S4method{reqdPkgs}{.simList}(sim, module)
+
+\S4method{documentation}{.simList}(sim, module)
+
+\S4method{citation}{.simList}(package, lib.loc = NULL, auto = NULL,
+  module = character())
+
+\S4method{citation}{character}(package, lib.loc = NULL, auto = NULL,
+  module = character())
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
 \item{value}{The object to be stored at the slot.}
+
+\item{module}{Optional character string indicating which module params should come from.}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.
