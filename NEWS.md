@@ -7,7 +7,8 @@ version 0.2.2.9000
 * no changes
 
 ## new features
-* none
+* most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.
+* new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
 
 ## bugfixes
 * resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
