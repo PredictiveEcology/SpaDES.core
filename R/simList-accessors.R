@@ -2837,13 +2837,20 @@ elapsedTime <- function(x, ...) UseMethod("elapsedTime")
 #' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
 #'                \code{FALSE} will report only by module. Default is \code{TRUE}
 elapsedTime..simList <- function(x, byEvent = TRUE, ...) {
-  comp <- completed(x)[, list(moduleName, eventType,
-                        diffTime = diff(c(x@.envir[["._firstEventClockTime"]], clockTime)))]
-  theBy <- if (isTRUE(byEvent)) {
-    c("moduleName", "eventType")
-  } else {
-    c("moduleName")
-  }
-  comp[, list(elapsedTimeInSecs = sum(diffTime)), by = theBy]
+  comp <- completed(x)
 
+  if (!is.null(comp)) {
+    comp <- comp[, list(moduleName, eventType,
+                          diffTime = diff(c(x@.envir[["._firstEventClockTime"]], clockTime)))]
+    theBy <- if (isTRUE(byEvent)) {
+      c("moduleName", "eventType")
+    } else {
+      c("moduleName")
+    }
+    ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy]
+  } else {
+    ret <- NULL
+
+  }
+  return(ret)
 }

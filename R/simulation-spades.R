@@ -104,6 +104,7 @@ doEvent <- function(sim, debug, notOlderThan) {
               }
             }
           } else if (debug[[i]] == 1) {
+            browser()
             print(paste0(Sys.time(),
                          " | total elpsd: ", format(Sys.time() - sim@.envir$._startClockTime, digits = 2),
                          " | ", paste(unname(current(sim)), collapse = ' ')))
@@ -113,7 +114,6 @@ doEvent <- function(sim, debug, notOlderThan) {
             } else {
               .POSIXct(sim@completed[[attr(sim, "completedCounter")-1]]$._clockTime)
             }
-            browser()
             print(paste0(format(Sys.time(), format = "%H:%M:%S"),
                          " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
                          " | ", paste(unname(current(sim)), collapse = ' ')))
@@ -138,9 +138,6 @@ doEvent <- function(sim, debug, notOlderThan) {
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
-          if (is.null(sim@.envir[["._firstEventClockTime"]])) {
-            sim@.envir[["._firstEventClockTime"]] <- .Internal(Sys.time())
-          }
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]])
         } else {
@@ -200,7 +197,7 @@ doEvent <- function(sim, debug, notOlderThan) {
 
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
-        cur$._clockTime <- .Internal(Sys.time()) # very fast -- needs to be wrapped with .POSIXct to translate it
+        cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
           #instead of sim@.envir because collisions with parallel sims from same sim object
 
@@ -663,6 +660,9 @@ setMethod(
       .pkgEnv[[".spadesDebugFirst"]] <- TRUE
       .pkgEnv[[".spadesDebugWidth"]] <- c(9, 10, 9, 13)
     }
+
+    sim@.envir[["._firstEventClockTime"]] <- Sys.time()
+
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
 
