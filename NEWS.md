@@ -7,6 +7,7 @@ version 0.2.2.9000
 * no changes
 
 ## new features
+* `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
 * new function `elapsedTime` which gives a summary of the clock time used by each module or event
 * most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.
 * new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
