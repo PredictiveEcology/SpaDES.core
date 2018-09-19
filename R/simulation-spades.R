@@ -131,6 +131,8 @@ doEvent <- function(sim, debug, notOlderThan) {
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
+          if (is.null(sim@.envir[["._firstEventClockTime"]]))
+            sim@.envir[["._firstEventClockTime"]] <- .Internal(Sys.time())
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]])
         } else {
@@ -190,6 +192,7 @@ doEvent <- function(sim, debug, notOlderThan) {
 
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
+        cur$._clockTime <- .Internal(Sys.time()) # very fast -- needs to be wrapped with .POSIXct to translate it
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
           #instead of sim@.envir because collisions with parallel sims from same sim object
 

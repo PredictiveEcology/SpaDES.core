@@ -2478,7 +2478,9 @@ setMethod(
         #if (!is.null(obj$eventTime)) {
           #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
           #sim@completed
-          obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
+          obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
+                     clockTime=.POSIXct(obj$._clockTime),
+                     ._clockTime=NULL)]
           obj[]
         }
       } #else {
@@ -2821,3 +2823,27 @@ setMethod("citation",
           })
 
 
+
+################################################################################
+#' @inheritParams times
+#' @include simList-class.R
+#' @include times.R
+#' @export
+#' @rdname simList-accessors-times
+elapsedTime <- function(x, ...) UseMethod("elapsedTime")
+
+#' @export
+#' @rdname simList-accessors-times
+#' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
+#'                \code{FALSE} will report only by module. Default is \code{TRUE}
+elapsedTime..simList <- function(x, byEvent = TRUE, ...) {
+  comp <- completed(x)[, list(moduleName, eventType,
+                        diffTime = diff(c(x@.envir[["._firstEventClockTime"]], clockTime)))]
+  theBy <- if (isTRUE(byEvent)) {
+    c("moduleName", "eventType")
+  } else {
+    c("moduleName")
+  }
+  comp[, list(elapsedTimeInSecs = sum(diffTime)), by = theBy]
+
+}
