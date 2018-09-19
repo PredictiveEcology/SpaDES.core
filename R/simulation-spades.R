@@ -138,8 +138,9 @@ doEvent <- function(sim, debug, notOlderThan) {
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
-          if (is.null(sim@.envir[["._firstEventClockTime"]]))
+          if (is.null(sim@.envir[["._firstEventClockTime"]])) {
             sim@.envir[["._firstEventClockTime"]] <- .Internal(Sys.time())
+          }
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]])
         } else {
@@ -593,6 +594,7 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
+    sim@.envir[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))

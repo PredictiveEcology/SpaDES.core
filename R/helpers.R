@@ -264,10 +264,18 @@ all.equal.simList <- function(target, current, ...) {
   attr(current, ".Cache")$newCache <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
-  suppressWarnings(rm("._startClockTime", envir = envir(target)))
-  suppressWarnings(rm("._startClockTime", envir = envir(current)))
-  suppressWarnings(rm(".timestamp", envir = envir(target)))
-  suppressWarnings(rm(".timestamp", envir = envir(current)))
+
+  # remove all objects starting with ._ in the simList@.envir
+  objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
+  objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  rm(list = objsTarget, envir = envir(target))
+  rm(list = objsCurrent, envir = envir(current))
+  # suppressWarnings(rm("._startClockTime", envir = envir(target)))
+  # suppressWarnings(rm("._startClockTime", envir = envir(current)))
+  # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
+  # suppressWarnings(rm("._firstEventClockTime", envir = envir(current)))
+  # suppressWarnings(rm(".timestamp", envir = envir(target)))
+  # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
   all.equal.default(target, current)
 }
