@@ -4,7 +4,7 @@ version 0.2.2.9000
 =============
 
 ## package dependencies
-* no changes
+* add `RandomFields` to Suggests, as it is in the Suggests of `SpaDES.tools` and used in examples/tests.
 
 ## new features
 * most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.
