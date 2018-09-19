@@ -335,7 +335,6 @@ setMethod(
     modulesLoaded <- list()
     # create simList object for the simulation
     sim <- new("simList")
-    sim@.envir[["._startClockTime"]] <- Sys.time()
     # Make a temporary place to store parsed module files
     sim@.envir[[".parsedFiles"]] <- new.env(parent = sim@.envir)
     on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )

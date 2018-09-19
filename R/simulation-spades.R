@@ -15,13 +15,6 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param sim Character string for the \code{simList} simulation object.
 #'
-#' @param debug Optional. Either Logical or character. If logical, entire \code{simList}
-#'              will be printed at each event. If a character string, then it can be one
-#'              of the many simList accessors, such as \code{events}, \code{params}.
-#'              It can also be any R expression that will be evaluated with access
-#'              to the \code{sim} object.
-#'              If \code{"current"} is used, then it will be a compact list of the events
-#'              as they go by.
 #' @inheritParams spades
 #' @return Returns the modified \code{simList} object.
 #'
@@ -110,6 +103,20 @@ doEvent <- function(sim, debug, notOlderThan) {
                 write.table(evnts1, quote = FALSE, row.names = FALSE)
               }
             }
+          } else if (debug[[i]] == 1) {
+            print(paste0(Sys.time(),
+                         " | total elpsd: ", format(Sys.time() - sim@.envir$._startClockTime, digits = 2),
+                         " | ", paste(unname(current(sim)), collapse = ' ')))
+          } else if (debug[[i]] == 2) {
+            compareTime <- if (is.null(attr(sim, "completedCounter")) || attr(sim, "completedCounter")==1) {
+              sim@.envir$._startClockTime
+            } else {
+              .POSIXct(sim@completed[[attr(sim, "completedCounter")-1]]$._clockTime)
+            }
+            browser()
+            print(paste0(format(Sys.time(), format = "%H:%M:%S"),
+                         " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
+                         " | ", paste(unname(current(sim)), collapse = ' ')))
           } else if (debug[[i]] == "simList") {
             print(sim)
           } else if (grepl(debug[[i]], pattern = "\\(")) {
@@ -131,8 +138,9 @@ doEvent <- function(sim, debug, notOlderThan) {
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
       if (cur[["moduleName"]] %in% sim@modules) {
         if (cur[["moduleName"]] %in% core) {
-          if (is.null(sim@.envir[["._firstEventClockTime"]]))
+          if (is.null(sim@.envir[["._firstEventClockTime"]])) {
             sim@.envir[["._firstEventClockTime"]] <- .Internal(Sys.time())
+          }
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]])
         } else {
@@ -473,15 +481,17 @@ scheduleEvent <- function(sim,
 #'
 #' @section \code{debug}:
 #'
-#' If \code{debug} is specified and is not \code{FALSE}, 2 things will happen:
+#' \code{debug} can be a logical, character vector or a numeric scalar (currently
+#' 1 or 2).
+#' If \code{debug} is specified and is not \code{FALSE}, 2 things could happen:
 #' 1) there can be messages sent to console, such as events as they pass by, and
-#' 2) (experimental still) if there is an error, it will attempt to open a browser
+#' 2) if \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+#' there is an error, it will attempt to open a browser
 #' in the event where the error occurred. You can edit, and then press \code{c} to continue
 #' or \code{Q} to quit, plus all other normal interactive browser tools.
 #' \code{c} will trigger a reparse and events will continue as scheduled, starting
 #' with the one just edited. There may be some unexpected consequences if the
 #' \code{simList} objects had already been changed before the error occurred.
-#' \code{debug} can be a logical or character vector.
 #'
 #' If not specified in the function call, the package
 #' option \code{spades.debug} is used. The following
@@ -499,9 +509,14 @@ scheduleEvent <- function(sim,
 #'                                        will be entered interactively\cr
 #'   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
 #'                                             will be entered into. \cr
-#'   Any other R expression  \tab Will be evaluated with access to the simList as 'sim'.
+#'   Any other R expression expressed as a character string  \tab
+#'                                 Will be evaluated with access to the simList as 'sim'.
 #'                                If this is more than one character string, then all will
 #'                                be printed to the screen in their sequence. \cr
+#'   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
+#'                                           information that users may find useful \cr
+#'                                           information that users may find useful \cr
+#'
 #' }
 #'
 #'
@@ -579,6 +594,7 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
+    sim@.envir[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))
