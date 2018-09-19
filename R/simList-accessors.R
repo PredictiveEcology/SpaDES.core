@@ -1573,6 +1573,8 @@ setReplaceMethod(
    return(sim)
 })
 
+
+
 ################################################################################
 #' Specify paths for modules, inputs, and outputs
 #'
@@ -2651,3 +2653,170 @@ setMethod(
     }
     return(pkgs)
 })
+
+
+################################################################################
+#' Metadata accessors
+#'
+#' These accessors extract the metadata for a module (if specified) or all modules
+#' in a \code{simList} if not specified.
+#'
+#' @inheritParams P
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+setGeneric("inputObjects", function(sim, module) {
+  standardGeneric("inputObjects")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+setMethod("inputObjects",
+          signature = ".simList",
+          definition = function(sim, module) {
+            if (missing(module)) {
+              module <- current(sim)
+              if (NROW(module) == 0)
+                module <- unlist(modules(sim))
+            }
+            out <- if (length(module) > 1) {
+              lapply(sim@depends@dependencies[module], function(deps)
+                deps@inputObjects)
+            } else {
+              sim@depends@dependencies[[module]]@inputObjects
+            }
+            return(out)
+          })
+
+################################################################################
+#' @inheritParams P
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+setGeneric("outputObjects", function(sim, module) {
+  standardGeneric("outputObjects")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+setMethod("outputObjects",
+          signature = ".simList",
+          definition = function(sim, module) {
+            if (missing(module)) {
+              module <- current(sim)
+              if (NROW(module) == 0)
+                module <- unlist(modules(sim))
+            }
+            out <- if (length(module) > 1) {
+              lapply(sim@depends@dependencies[module], function(deps)
+                deps@outputObjects)
+            } else {
+              sim@depends@dependencies[[module]]@outputObjects
+            }
+            return(out)
+          })
+
+
+################################################################################
+#' @inheritParams P
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+setGeneric("reqdPkgs", function(sim, module) {
+  standardGeneric("reqdPkgs")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+setMethod("reqdPkgs",
+          signature = ".simList",
+          definition = function(sim, module) {
+            if (missing(module)) {
+              module <- current(sim)
+              if (NROW(module) == 0)
+                module <- unlist(modules(sim))
+            }
+            out <- if (length(module) > 1) {
+              lapply(sim@depends@dependencies[module], function(deps)
+                unlist(deps@reqdPkgs))
+            } else {
+              unlist(sim@depends@dependencies[[module]]@reqdPkgs)
+            }
+            return(out)
+          })
+
+
+################################################################################
+#' @inheritParams P
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+setGeneric("documentation", function(sim, module) {
+  standardGeneric("documentation")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+setMethod("documentation",
+          signature = ".simList",
+          definition = function(sim, module) {
+            if (missing(module)) {
+              module <- current(sim)
+              if (NROW(module) == 0)
+                module <- unlist(modules(sim))
+            }
+            out <- if (length(module) > 1) {
+              lapply(sim@depends@dependencies[module], function(deps)
+                deps@documentation)
+            } else {
+              sim@depends@dependencies[[module]]@documentation
+            }
+            return(out)
+          })
+
+
+################################################################################
+#' @param package For compatibility with \code{\link[utils]{citation}}. This can be
+#'                a \code{simList} or a character string for a package name.
+#' @inheritParams P
+#' @inheritParams utils::citation
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
+  standardGeneric("citation")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+setMethod("citation",
+          signature = ".simList",
+          definition = function(package, lib.loc, auto, module) {
+            if (missing(module)) {
+              module <- current(package)
+              if (NROW(module) == 0)
+                module <- unlist(modules(package))
+            }
+            out <- if (length(module) > 1) {
+              lapply(package@depends@dependencies[module], function(deps)
+                deps@citation)
+            } else {
+              package@depends@dependencies[[module]]@citation
+            }
+            return(out)
+          })
+
+#' @export
+#' @rdname simList-accessors-metadata
+setMethod("citation",
+          signature = "character",
+          definition = function(package, lib.loc, auto, module) {
+            utils::citation(package = package, lib.loc = lib.loc, auto = auto)
+          })
+
+

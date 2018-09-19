@@ -125,6 +125,8 @@ setMethod(
     nonDotList <- grep(".list", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
     obj$.list <- object@.list
+    obj$.list$.envir$._startClockTime <- NULL
+    obj$.list$.envir$.timestamp <- NULL
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
     if (!is.null(classOptions$events))
