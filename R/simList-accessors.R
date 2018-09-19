@@ -1371,8 +1371,7 @@ setMethod(
 
   out <- if (is.na(pmatch(saveTimeUnit, simUnit)) &
              length(sim@outputs$saveTime) > 0) {
-    #note the above line captures empty saveTime,
-    # whereas is.na does not
+    ## note the above line captures empty saveTime, whereas is.na does not
     if (any(!is.na(sim@outputs$saveTime))) {
       if (!is.null(sim@outputs$saveTime)) {
         obj <- copy(sim@outputs) # don't change original sim
