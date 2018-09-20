@@ -1,5 +1,5 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".SD", "eventTime", "savetime", "exts", "eventType", "unit"))
+  utils::globalVariables(c(".SD", "eventTime", "savetime", "exts", "eventType", "unit", "diffTime", "clockTime"))
 }
 
 ### `show` generic is already defined in the methods package
@@ -735,14 +735,14 @@ setGeneric("parameters", function(sim, asDF = FALSE) {
 setMethod("parameters",
           signature = ".simList",
           definition = function(sim, asDF) {
-            if (any(!unlist(lapply(depends(sim)@dependencies, is.null)))) {
+            if (any(!unlist(lapply(sim@depends@dependencies, is.null)))) {
               if (asDF) {
-                tmp <- lapply(depends(sim)@dependencies, function(x) {
+                tmp <- lapply(sim@depends@dependencies, function(x) {
                   out <- x@parameters
                 })
                 tmp <- do.call(rbind, tmp)
               } else {
-                tmp <- lapply(depends(sim)@dependencies, function(x) {
+                tmp <- lapply(sim@depends@dependencies, function(x) {
                   out <- lapply(seq_len(NROW(x@parameters)),
                                 function(y) x@parameters[y, -1])
                   names(out) <- x@parameters$paramName
@@ -2247,22 +2247,22 @@ setMethod(
   "timeunits",
   signature = ".simList",
   definition = function(x) {
-    isNonParent <- !sapply(depends(x)@dependencies, function(y) {
+    isNonParent <- !unlist(lapply(x@depends@dependencies, function(y) {
       if (!is.null(y)) {
         length(y@childModules) > 0
       } else {
         FALSE
       }
-    })
-    if (all(sapply(depends(x)@dependencies[isNonParent], is.null))) {
+    }))
+    if (all(unlist(lapply(x@depends@dependencies[isNonParent], is.null)))) {
       timestepUnits <- NULL
     } else {
-      timestepUnits <- lapply(depends(x)@dependencies[isNonParent], function(y) {
+      timestepUnits <- lapply(x@depends@dependencies[isNonParent], function(y) {
         y@timeunit
       })
-      names(timestepUnits) <- sapply(depends(x)@dependencies[isNonParent], function(y) {
+      names(timestepUnits) <- unlist(lapply(x@depends@dependencies[isNonParent], function(y) {
         y@name
-      })
+      }))
     }
     return(timestepUnits)
 })
@@ -2454,10 +2454,11 @@ setReplaceMethod("current",
 #' @include simList-class.R
 #' @importFrom data.table := data.table
 #' @importFrom stats setNames
+#' @param times Logical. Should this function report the clockTime
 #' @export
 #' @rdname simList-accessors-events
 #'
-setGeneric("completed", function(sim, unit) {
+setGeneric("completed", function(sim, unit, times = TRUE) {
   standardGeneric("completed")
 })
 
@@ -2466,26 +2467,34 @@ setGeneric("completed", function(sim, unit) {
 setMethod(
   "completed",
   signature = c(".simList", "character"),
-  definition = function(sim, unit) {
+  definition = function(sim, unit, times = TRUE) {
     obj <- rbindlist(sim@completed)
-    if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
-      # note the above line captures empty eventTime, whereas `is.na` does not
-      #compl <- rbindlist(sim@completed)
-      if (any(!is.na(obj$eventTime))) {
-        if (!is.null(obj$eventTime)) {
-          #if (any(!is.na(obj$eventTime))) {
-        #if (!is.null(obj$eventTime)) {
-          #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+    if (length(sim@completed)) {
+      if (!isTRUE(times)) {
+        set(obj, , "._clockTime", NULL)
+      }
+      if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+        # note the above line captures empty eventTime, whereas `is.na` does not
+        #compl <- rbindlist(sim@completed)
+        if (any(!is.na(obj$eventTime))) {
+          if (!is.null(obj$eventTime)) {
+            #if (any(!is.na(obj$eventTime))) {
+          #if (!is.null(obj$eventTime)) {
+            #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+            #sim@completed
+            if (!is.null(obj$._clockTime))
+              obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
+                         clockTime=obj$._clockTime,
+                         ._clockTime=NULL)]
+            obj[]
+          }
+        } #else {
           #sim@completed
-          obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
-          obj[]
-        }
+        #}
       } #else {
         #sim@completed
       #}
-    } #else {
-      #sim@completed
-    #}
+    }
     return(obj)
 })
 
@@ -2493,8 +2502,8 @@ setMethod(
 #' @rdname simList-accessors-events
 setMethod("completed",
           signature = c(".simList", "missing"),
-          definition = function(sim, unit) {
-            out <- completed(sim, sim@simtimes[["timeunit"]])
+          definition = function(sim, unit, times = TRUE) {
+            out <- completed(sim, sim@simtimes[["timeunit"]], times = times)
             return(out)
 })
 
@@ -2555,7 +2564,7 @@ setMethod(
   ".addDepends",
   signature(sim = ".simList", x = ".moduleDeps"),
   definition = function(sim, x) {
-    deps <- depends(sim)
+    deps <- sim@depends
     n <- length(deps@dependencies)
     if (n == 1L) {
       if (is.null(deps@dependencies[[1L]])) n <- 0L
@@ -2608,7 +2617,7 @@ setMethod(
                         #   i.e., with no reqdPkgs slot filled
       depsInSim <- list(NULL)
     } else {
-      depsInSim <- depends(sim)@dependencies
+      depsInSim <- sim@depends@dependencies
     }
 
     if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,
@@ -2820,3 +2829,34 @@ setMethod("citation",
           })
 
 
+
+################################################################################
+#' @inheritParams times
+#' @include simList-class.R
+#' @include times.R
+#' @export
+#' @rdname simList-accessors-times
+elapsedTime <- function(x, ...) UseMethod("elapsedTime")
+
+#' @export
+#' @rdname simList-accessors-times
+#' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
+#'                \code{FALSE} will report only by module. Default is \code{TRUE}
+elapsedTime..simList <- function(x, byEvent = TRUE, ...) {
+  comp <- completed(x)
+
+  if (!is.null(comp)) {
+    comp <- comp[, list(moduleName, eventType,
+                          diffTime = diff(c(x@.envir[["._firstEventClockTime"]], clockTime)))]
+    theBy <- if (isTRUE(byEvent)) {
+      c("moduleName", "eventType")
+    } else {
+      c("moduleName")
+    }
+    ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy]
+  } else {
+    ret <- NULL
+
+  }
+  return(ret)
+}

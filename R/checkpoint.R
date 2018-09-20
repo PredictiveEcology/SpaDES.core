@@ -89,9 +89,9 @@ checkpointLoad <- function(file) {
     simListName <- load(file, envir = .GlobalEnv)
     sim <- get(simListName, envir = .GlobalEnv)
 
-    do.call("RNGkind", as.list(sim$.rng.kind))
-    assign(".Random.seed", sim$.rng.state, envir = .GlobalEnv)
-    rm(list = c(".rng.kind", ".rng.state", ".timestamp"), envir = sim@.envir)
+    do.call("RNGkind", as.list(sim$._rng.kind))
+    assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
+    rm(list = c("._rng.kind", "._rng.state", "._timestamp"), envir = sim@.envir)
     return(invisible(TRUE))
   } else {
     return(invisible(FALSE))
@@ -100,9 +100,9 @@ checkpointLoad <- function(file) {
 
 #' @rdname checkpoint
 .checkpointSave <- function(sim, file) {
-  sim$.timestamp <- Sys.time() # nolint
-  sim$.rng.state <- get(".Random.seed", envir = .GlobalEnv) # nolint
-  sim$.rng.kind <- RNGkind() # nolint
+  sim$._timestamp <- Sys.time() # nolint
+  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv) # nolint
+  sim$._rng.kind <- RNGkind() # nolint
 
   tmpEnv <- new.env()
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)

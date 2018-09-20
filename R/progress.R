@@ -9,14 +9,14 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
       # Check whether a .progress is specified in the simList
       if ( is.null(P(sim, ".progress")$type) &&
              is.null(P(sim, ".progress")$interval) ) {
-        params(sim)[[".progress"]] <- defaults
+        sim@params[[".progress"]] <- defaults
       } else {
-        params(sim)[[".progress"]][names(defaults)[-ids]] <- defaults[-ids]
+        sim@params[[".progress"]][names(defaults)[-ids]] <- defaults[-ids]
       }
     } else {
       # don't use progress bar when non-interactive (this is already set during simInit)
       #  NOTE: this has been sorted in simInit because of updateList -- use sorted order here
-      params(sim)[[".progress"]] <- .pkgEnv$.progressEmpty[ids]
+      sim@params[[".progress"]] <- .pkgEnv$.progressEmpty[ids]
     }
 
     # if NA then don't use progress bar

@@ -126,7 +126,7 @@ setMethod(
     obj <- list()
     obj$.list <- object@.list
     obj$.list$.envir$._startClockTime <- NULL
-    obj$.list$.envir$.timestamp <- NULL
+    obj$.list$.envir$._timestamp <- NULL
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
     if (!is.null(classOptions$events))
@@ -446,7 +446,14 @@ setMethod(
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.envir, all.names = TRUE)
         list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs | lsObjectEnv %in% expectsInputs], envir = object@.envir), envir = object2@.envir)
-        object2@completed <- object@completed
+        if (length(object2@current)==0) { # means it is not in a spades call
+          # numCompleted <- if (length(object2@completed)) {
+          #   length(unlist(object2@completed, recursive = FALSE))/(length(object2@completed[[1]]))
+          # } else {
+          #   0
+          # }
+          object2@completed <- object@completed
+        }
         if (NROW(current(object2)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
           object2@events <- object@events

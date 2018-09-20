@@ -40,11 +40,11 @@ current(sim) <- value
 
 \S4method{current}{.simList}(sim) <- value
 
-completed(sim, unit)
+completed(sim, unit, times = TRUE)
 
-\S4method{completed}{.simList,character}(sim, unit)
+\S4method{completed}{.simList,character}(sim, unit, times = TRUE)
 
-\S4method{completed}{.simList,missing}(sim, unit)
+\S4method{completed}{.simList,missing}(sim, unit, times = TRUE)
 
 completed(sim) <- value
 
@@ -57,6 +57,8 @@ in which to replace element(s).}
 \item{unit}{Character. One of the time units used in \code{SpaDES}.}
 
 \item{value}{The object to be stored at the slot.}
+
+\item{times}{Logical. Should this function report the clockTime}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.

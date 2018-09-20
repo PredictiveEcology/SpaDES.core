@@ -253,7 +253,9 @@ setMethod(
 #' All equal method for simLists
 #'
 #' This function removes a few attributes that are added internally
-#' by SpaDES.core and are not relevant to the \code{all.equal}.
+#' by SpaDES.core and are not relevant to the \code{all.equal}. One
+#' key element removed is any time stamps, as these are guaranteed
+#' to be different.
 #'
 #' @inheritParams base::all.equal
 #' @export
@@ -264,10 +266,23 @@ all.equal.simList <- function(target, current, ...) {
   attr(current, ".Cache")$newCache <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
-  suppressWarnings(rm("._startClockTime", envir = envir(target)))
-  suppressWarnings(rm("._startClockTime", envir = envir(current)))
-  suppressWarnings(rm(".timestamp", envir = envir(target)))
-  suppressWarnings(rm(".timestamp", envir = envir(current)))
+
+  if (length(target@completed))
+    completed(target) <- completed(target, times = FALSE)
+  if (length(current@completed))
+    completed(current) <- completed(current, times = FALSE)
+
+  # remove all objects starting with ._ in the simList@.envir
+  objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
+  objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  rm(list = objsTarget, envir = envir(target))
+  rm(list = objsCurrent, envir = envir(current))
+  # suppressWarnings(rm("._startClockTime", envir = envir(target)))
+  # suppressWarnings(rm("._startClockTime", envir = envir(current)))
+  # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
+  # suppressWarnings(rm("._firstEventClockTime", envir = envir(current)))
+  # suppressWarnings(rm(".timestamp", envir = envir(target)))
+  # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
   all.equal.default(target, current)
 }

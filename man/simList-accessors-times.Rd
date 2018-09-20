@@ -24,6 +24,8 @@
 \alias{timeunit<-,.simList-method}
 \alias{timeunits}
 \alias{timeunits,.simList-method}
+\alias{elapsedTime}
+\alias{elapsedTime..simList}
 \title{Time usage in \code{SpaDES}}
 \usage{
 times(x, ...)
@@ -67,6 +69,10 @@ timeunit(x) <- value
 timeunits(x)
 
 \S4method{timeunits}{.simList}(x)
+
+elapsedTime(x, ...)
+
+\method{elapsedTime}{.simList}(x, byEvent = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{simList} object from which to extract element(s) or
@@ -79,6 +85,9 @@ but this will be deduced from the model time units or module
 time units (if used within a module).}
 
 \item{unit}{Character. One of the time units used in \code{SpaDES}.}
+
+\item{byEvent}{Logical. If \code{TRUE}, the elapsed time will be by module and event;
+\code{FALSE} will report only by module. Default is \code{TRUE}}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.

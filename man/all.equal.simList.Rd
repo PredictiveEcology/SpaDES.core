@@ -19,5 +19,7 @@ See \code{\link[base]{all.equal}}
 }
 \description{
 This function removes a few attributes that are added internally
-by SpaDES.core and are not relevant to the \code{all.equal}.
+by SpaDES.core and are not relevant to the \code{all.equal}. One
+key element removed is any time stamps, as these are guaranteed
+to be different.
 }

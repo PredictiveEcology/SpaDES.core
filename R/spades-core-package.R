@@ -18,8 +18,8 @@
 #' include additional functionality by running user-built simulation modules.
 #' Included are numerous tools to visualize various spatial data formats,
 #' as well as non-spatial data. Much work has been done to speed up the core
-#' of the DES, with current benchmarking as low as 700 microseconds overhead for
-#' each event (including queuing, sorting, spawning event etc.) or 180 microseconds
+#' of the DES, with current benchmarking as low as 500 microseconds overhead for
+#' each event (including queuing, sorting, spawning event etc.) or 52 microseconds
 #' if there is no sorting
 #'
 #' Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
@@ -123,6 +123,7 @@
 #'      \code{\link{events}} \tab Scheduled simulation events (the event queue). (advanced)\cr
 #'      \code{\link{current}} \tab Currently executing event. (advanced)\cr
 #'      \code{\link{completed}} \tab Completed simulation events. (advanced)\cr
+#'      \code{\link{elapsedTime}} \tab The amount of clock time that modules & events use\cr
 #'   }
 #' }
 #'
@@ -201,6 +202,16 @@
 #'     \code{\link{defineParameter}} \tab Specify a parameter's name, value and set a default\cr
 #'     \code{\link{expectsInput}} \tab Specify an input object's name, class, description, sourceURL and other specifications\cr
 #'     \code{\link{createsOutput}} \tab Specify an output object's name, class, description and other specifications\cr
+#'   }
+#'
+#'   There are also accessors for many of the metadata entries:
+#'   \tabular{ll}{
+#'     \code{\link{timeunit}} \tab Accesses metadata of same name\cr
+#'     \code{\link{citation}} \tab Accesses metadata of same name\cr
+#'     \code{\link{documentation}} \tab Accesses metadata of same name\cr
+#'     \code{\link{reqdPkgs}} \tab Accesses metadata of same name\cr
+#'     \code{\link{inputObjects}} \tab Accesses metadata of same name\cr
+#'     \code{\link{outputObjects}} \tab Accesses metadata of same name\cr
 #'   }
 #' }
 #'
