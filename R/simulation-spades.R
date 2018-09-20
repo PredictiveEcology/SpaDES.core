@@ -345,9 +345,10 @@ scheduleEvent <- function(sim,
             sim@.envir, skipChecks = TRUE) +
               sim@simtimes[["current"]])
           } else {
-            eventTimeInSeconds <-
+            eventTimeInSeconds <- if (!startsWith(attr(eventTime, "unit"), "second")) {
               as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
                                          skipChecks = TRUE))
+            } else eventTime
           }
         } else {
           # for core modules because they have no metadata

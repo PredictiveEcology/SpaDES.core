@@ -18,8 +18,8 @@
 #' include additional functionality by running user-built simulation modules.
 #' Included are numerous tools to visualize various spatial data formats,
 #' as well as non-spatial data. Much work has been done to speed up the core
-#' of the DES, with current benchmarking as low as 700 microseconds overhead for
-#' each event (including queuing, sorting, spawning event etc.) or 180 microseconds
+#' of the DES, with current benchmarking as low as 600 microseconds overhead for
+#' each event (including queuing, sorting, spawning event etc.) or 72 microseconds
 #' if there is no sorting
 #'
 #' Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
