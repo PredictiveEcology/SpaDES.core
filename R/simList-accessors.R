@@ -2469,31 +2469,35 @@ setMethod(
   "completed",
   signature = c(".simList", "character"),
   definition = function(sim, unit, times = TRUE) {
-    obj <- rbindlist(sim@completed)
-    if (!isTRUE(times)) {
-      set(obj, , "._clockTime", NULL)
-    }
-    if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
-      # note the above line captures empty eventTime, whereas `is.na` does not
-      #compl <- rbindlist(sim@completed)
-      if (any(!is.na(obj$eventTime))) {
-        if (!is.null(obj$eventTime)) {
-          #if (any(!is.na(obj$eventTime))) {
-        #if (!is.null(obj$eventTime)) {
-          #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+    if (length(sim@completed)) {
+      obj <- rbindlist(sim@completed)
+      if (!isTRUE(times)) {
+        set(obj, , "._clockTime", NULL)
+      }
+      if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+        # note the above line captures empty eventTime, whereas `is.na` does not
+        #compl <- rbindlist(sim@completed)
+        if (any(!is.na(obj$eventTime))) {
+          if (!is.null(obj$eventTime)) {
+            #if (any(!is.na(obj$eventTime))) {
+          #if (!is.null(obj$eventTime)) {
+            #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+            #sim@completed
+            if (!is.null(obj$._clockTime))
+              obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
+                         clockTime=obj$._clockTime,
+                         ._clockTime=NULL)]
+            obj[]
+          }
+        } #else {
           #sim@completed
-          if (!is.null(obj$._clockTime))
-            obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
-                       clockTime=obj$._clockTime,
-                       ._clockTime=NULL)]
-          obj[]
-        }
+        #}
       } #else {
         #sim@completed
       #}
-    } #else {
-      #sim@completed
-    #}
+    } else {
+      obj <- sim@completed
+    }
     return(obj)
 })
 

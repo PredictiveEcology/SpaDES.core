@@ -267,9 +267,10 @@ all.equal.simList <- function(target, current, ...) {
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
 
-
-  completed(target) <- completed(target, times = FALSE)
-  completed(current) <- completed(current, times = FALSE)
+  if (length(target@completed))
+    completed(target) <- completed(target, times = FALSE)
+  if (length(current@completed))
+    completed(current) <- completed(current, times = FALSE)
 
   # remove all objects starting with ._ in the simList@.envir
   objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
