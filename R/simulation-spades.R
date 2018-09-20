@@ -58,14 +58,14 @@ doEvent <- function(sim, debug, notOlderThan) {
   #  but stop time is not reached
   cur <- sim@current
   if  (length(cur) == 0) {
-    sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
+    slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
   } else {
 
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
       fnEnv <- sim@.envir[[cur[["moduleName"]]]]
       # update current simulated time
-      sim@simtimes[["current"]] <- cur[["eventTime"]]
+      slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
 
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
@@ -235,7 +235,7 @@ doEvent <- function(sim, debug, notOlderThan) {
 
     } else {
       # update current simulated time and event
-      sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
+      slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
       # i.e., if no more events
       slot(sim, "events") <- append(list(sim@current), sim@events)
       slot(sim, "current") <- list()
@@ -731,11 +731,10 @@ setMethod(
                          modules = cur[["moduleName"]])
   }
   if (.pkgEnv[["spades.browserOnError"]]) {
-    sim <- .runEventWithBrowser(sim, quotedFnCall, moduleCall, fnEnv, cur)
+    .runEventWithBrowser(sim, quotedFnCall, moduleCall, fnEnv, cur)
   } else {
-    sim <- eval(quotedFnCall)
+    eval(quotedFnCall)
   }
-  sim
 }
 
 .runEventWithBrowser <- function(sim, quotedFnCall, moduleCall, fnEnv, cur) {

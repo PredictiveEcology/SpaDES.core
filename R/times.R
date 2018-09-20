@@ -272,7 +272,8 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
 
     if (!is.null(attr(time, "unit"))) {
       if (startsWith(timeUnit, prefix = "second")) {
-        time <- time / inSeconds(unit, envir, skipChecks = TRUE)
+        if (!startsWith(unit, prefix = "second"))
+          time <- time / inSeconds(unit, envir, skipChecks = TRUE)
       } else if (startsWith(unit, prefix = "second")) {
         time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE)
       } else {
@@ -283,14 +284,6 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
     attr(time, "unit") <- unit
 
   }
-  #   } else {
-  #     # if timeunit is NA
-  #     time <- 0
-  #     attr(time, "unit") <- unit
-  #   }
-  # } else {
-  #
-  # }
   return(time)
 }
 ################################################################################
