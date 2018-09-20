@@ -261,7 +261,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
 
   # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
-  # New with "seconds" -- Sept 218, 2018 is 0.637 seconds --> 127 microseconds/event
+  # New with "seconds" -- Sept 218, 2018 is 0.523 seconds --> 105 microseconds/event
   #system.time({spades(mySim, debug = FALSE)})
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
@@ -270,7 +270,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   #  Changed to use "seconds" -- better comparison with simple loop
   # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
   #                         -- This is 161 microseconds per event
-  # New times using "second" -- Sept 19, 2018 0.360 Seconds --> 72 microseconds/event
+  # New times using "second" -- Sept 19, 2018 0.263 Seconds --> 52 microseconds/event
   options("spades.keepCompleted" = FALSE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
