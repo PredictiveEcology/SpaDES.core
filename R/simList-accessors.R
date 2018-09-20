@@ -2469,8 +2469,8 @@ setMethod(
   "completed",
   signature = c(".simList", "character"),
   definition = function(sim, unit, times = TRUE) {
+    obj <- rbindlist(sim@completed)
     if (length(sim@completed)) {
-      obj <- rbindlist(sim@completed)
       if (!isTRUE(times)) {
         set(obj, , "._clockTime", NULL)
       }
@@ -2495,8 +2495,6 @@ setMethod(
       } #else {
         #sim@completed
       #}
-    } else {
-      obj <- sim@completed
     }
     return(obj)
 })
