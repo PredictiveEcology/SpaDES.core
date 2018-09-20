@@ -46,11 +46,14 @@ doEvent <- function(sim, debug, notOlderThan) {
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
     if (length(sim@events)) {
-      slot(sim, "current") <- sim@events[[1]]
-      slot(sim, "events") <- sim@events[-1]
+      # Do same check as would be done with "slot(..., check = FALSE)", but much faster
+      if (is.list(sim@events[[1]]))
+        slot(sim, "current", check = FALSE) <- sim@events[[1]]
+      if (is.list(sim@events[-1]))
+        slot(sim, "events", check = FALSE) <- sim@events[-1]
     } else {
       # no more events, return empty event list
-      slot(sim, "current") <- list()
+      slot(sim, "current", check = FALSE) <- list() # this is guaranteed to be a list
     }
   }
 
@@ -231,14 +234,14 @@ doEvent <- function(sim, debug, notOlderThan) {
       }
 
       # current event completed, replace current with empty
-      slot(sim, "current") <- list()
+      slot(sim, "current", check = FALSE) <- list() # is a list
 
     } else {
       # update current simulated time and event
       slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
       # i.e., if no more events
-      slot(sim, "events") <- append(list(sim@current), sim@events)
-      slot(sim, "current") <- list()
+      slot(sim, "events", check = FALSE) <- append(list(sim@current), sim@events) # will be a list b/c append
+      slot(sim, "current", check = FALSE) <- list() # is a list
     }
 
   }
