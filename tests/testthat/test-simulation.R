@@ -212,7 +212,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
     spatialExtent = raster::extent(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = "year",
+    timeunit = "second",
     citation = list("citation.bib"),
     documentation = list("README.txt", "test.Rmd"),
     reqdPkgs = list(),
@@ -228,10 +228,10 @@ test_that("simulation runs with simInit with duplicate modules named", {
     switch(
       eventType,
       init = {
-        sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       },
       event1 = {
-        sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       })
     return(invisible(sim))
   }
@@ -260,11 +260,19 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
 
   # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
+  # New with "seconds" -- Sept 218, 2018 is 0.779 seconds --> 156 microseconds/event
   #system.time({spades(mySim, debug = FALSE)})
+  # New times using "second" -- Sept 19, 2018 0.48 Seconds --> 96 microseconds/event
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
 
-  # Turn off completed list -- June 29, 2018 is 0.775 seconds
+  # Turn off completed list
+  #  Changed to use "seconds" -- better comparison with simple loop
+  # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
+  #                         -- This is 161 microseconds per event
+  # New times using "second" -- Sept 19, 2018 0.48 Seconds --> 96 microseconds/event
+
+  #  Changed to use "seconds" -- better comparison with simple loop
   options("spades.keepCompleted" = FALSE)
   microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
