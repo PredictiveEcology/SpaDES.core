@@ -253,7 +253,9 @@ setMethod(
 #' All equal method for simLists
 #'
 #' This function removes a few attributes that are added internally
-#' by SpaDES.core and are not relevant to the \code{all.equal}.
+#' by SpaDES.core and are not relevant to the \code{all.equal}. One
+#' key element removed is any time stamps, as these are guaranteed
+#' to be different.
 #'
 #' @inheritParams base::all.equal
 #' @export
@@ -264,6 +266,10 @@ all.equal.simList <- function(target, current, ...) {
   attr(current, ".Cache")$newCache <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
+
+
+  completed(target) <- completed(target, times = FALSE)
+  completed(current) <- completed(current, times = FALSE)
 
   # remove all objects starting with ._ in the simList@.envir
   objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")

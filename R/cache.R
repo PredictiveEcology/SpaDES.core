@@ -126,7 +126,7 @@ setMethod(
     obj <- list()
     obj$.list <- object@.list
     obj$.list$.envir$._startClockTime <- NULL
-    obj$.list$.envir$.timestamp <- NULL
+    obj$.list$.envir$._timestamp <- NULL
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
     if (!is.null(classOptions$events))

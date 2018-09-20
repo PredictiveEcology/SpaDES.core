@@ -2455,10 +2455,11 @@ setReplaceMethod("current",
 #' @include simList-class.R
 #' @importFrom data.table := data.table
 #' @importFrom stats setNames
+#' @param times Logical. Should this function report the clockTime
 #' @export
 #' @rdname simList-accessors-events
 #'
-setGeneric("completed", function(sim, unit) {
+setGeneric("completed", function(sim, unit, times = TRUE) {
   standardGeneric("completed")
 })
 
@@ -2467,8 +2468,11 @@ setGeneric("completed", function(sim, unit) {
 setMethod(
   "completed",
   signature = c(".simList", "character"),
-  definition = function(sim, unit) {
+  definition = function(sim, unit, times = TRUE) {
     obj <- rbindlist(sim@completed)
+    if (!isTRUE(times)) {
+      set(obj, , "._clockTime", NULL)
+    }
     if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
       #compl <- rbindlist(sim@completed)
@@ -2478,9 +2482,10 @@ setMethod(
         #if (!is.null(obj$eventTime)) {
           #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
           #sim@completed
-          obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
-                     clockTime=.POSIXct(obj$._clockTime),
-                     ._clockTime=NULL)]
+          if (!is.null(obj$._clockTime))
+            obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
+                       clockTime=obj$._clockTime,
+                       ._clockTime=NULL)]
           obj[]
         }
       } #else {
@@ -2496,8 +2501,8 @@ setMethod(
 #' @rdname simList-accessors-events
 setMethod("completed",
           signature = c(".simList", "missing"),
-          definition = function(sim, unit) {
-            out <- completed(sim, sim@simtimes[["timeunit"]])
+          definition = function(sim, unit, times = TRUE) {
+            out <- completed(sim, sim@simtimes[["timeunit"]], times = times)
             return(out)
 })
 
