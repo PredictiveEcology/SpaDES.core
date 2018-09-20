@@ -104,7 +104,6 @@ doEvent <- function(sim, debug, notOlderThan) {
               }
             }
           } else if (debug[[i]] == 1) {
-            browser()
             print(paste0(Sys.time(),
                          " | total elpsd: ", format(Sys.time() - sim@.envir$._startClockTime, digits = 2),
                          " | ", paste(unname(current(sim)), collapse = ' ')))

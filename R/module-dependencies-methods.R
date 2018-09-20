@@ -39,7 +39,7 @@ setMethod(
   "depsEdgeList",
   signature(sim = "simList", plot = "logical"),
   definition = function(sim, plot) {
-    deps <- depends(sim)
+    deps <- sim@depends
     DT <- .depsEdgeListMem(deps, plot)
     return(DT)
 })

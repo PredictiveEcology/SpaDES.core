@@ -735,14 +735,14 @@ setGeneric("parameters", function(sim, asDF = FALSE) {
 setMethod("parameters",
           signature = ".simList",
           definition = function(sim, asDF) {
-            if (any(!unlist(lapply(depends(sim)@dependencies, is.null)))) {
+            if (any(!unlist(lapply(sim@depends@dependencies, is.null)))) {
               if (asDF) {
-                tmp <- lapply(depends(sim)@dependencies, function(x) {
+                tmp <- lapply(sim@depends@dependencies, function(x) {
                   out <- x@parameters
                 })
                 tmp <- do.call(rbind, tmp)
               } else {
-                tmp <- lapply(depends(sim)@dependencies, function(x) {
+                tmp <- lapply(sim@depends@dependencies, function(x) {
                   out <- lapply(seq_len(NROW(x@parameters)),
                                 function(y) x@parameters[y, -1])
                   names(out) <- x@parameters$paramName
@@ -2248,22 +2248,22 @@ setMethod(
   "timeunits",
   signature = ".simList",
   definition = function(x) {
-    isNonParent <- !sapply(depends(x)@dependencies, function(y) {
+    isNonParent <- !unlist(lapply(x@depends@dependencies, function(y) {
       if (!is.null(y)) {
         length(y@childModules) > 0
       } else {
         FALSE
       }
-    })
-    if (all(sapply(depends(x)@dependencies[isNonParent], is.null))) {
+    }))
+    if (all(unlist(lapply(x@depends@dependencies[isNonParent], is.null)))) {
       timestepUnits <- NULL
     } else {
-      timestepUnits <- lapply(depends(x)@dependencies[isNonParent], function(y) {
+      timestepUnits <- lapply(x@depends@dependencies[isNonParent], function(y) {
         y@timeunit
       })
-      names(timestepUnits) <- sapply(depends(x)@dependencies[isNonParent], function(y) {
+      names(timestepUnits) <- unlist(lapply(x@depends@dependencies[isNonParent], function(y) {
         y@name
-      })
+      }))
     }
     return(timestepUnits)
 })
@@ -2565,7 +2565,7 @@ setMethod(
   ".addDepends",
   signature(sim = ".simList", x = ".moduleDeps"),
   definition = function(sim, x) {
-    deps <- depends(sim)
+    deps <- sim@depends
     n <- length(deps@dependencies)
     if (n == 1L) {
       if (is.null(deps@dependencies[[1L]])) n <- 0L
@@ -2618,7 +2618,7 @@ setMethod(
                         #   i.e., with no reqdPkgs slot filled
       depsInSim <- list(NULL)
     } else {
-      depsInSim <- depends(sim)@dependencies
+      depsInSim <- sim@depends@dependencies
     }
 
     if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,

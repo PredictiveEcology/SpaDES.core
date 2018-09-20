@@ -317,9 +317,9 @@ setMethod(
   "maxTimeunit",
   signature(sim = "simList"),
   definition = function(sim) {
-    if (length(depends(sim)@dependencies)) {
-      if (!is.null(depends(sim)@dependencies[[1]])) {
-        timesteps <- lapply(depends(sim)@dependencies, function(x) {
+    if (length(sim@depends@dependencies)) {
+      if (!is.null(sim@depends@dependencies[[1]])) {
+        timesteps <- lapply(sim@depends@dependencies, function(x) {
           x@timeunit
         })
         if (!all(sapply(timesteps, is.na))) {
@@ -360,9 +360,9 @@ setMethod(
   "minTimeunit",
   signature(sim = "simList"),
   definition = function(sim) {
-    if (length(depends(sim)@dependencies)) {
-      if (!is.null(depends(sim)@dependencies[[1]])) {
-        timesteps <- lapply(depends(sim)@dependencies, function(x) {
+    if (length(sim@depends@dependencies)) {
+      if (!is.null(sim@depends@dependencies[[1]])) {
+        timesteps <- lapply(sim@depends@dependencies, function(x) {
           x@timeunit
         })
         if (!all(sapply(timesteps, is.na))) {
