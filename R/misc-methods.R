@@ -621,6 +621,11 @@ getPaths <- function() {
   return(.paths())
 }
 
+
+#' @export
+#' @rdname setPaths
+Paths <- .paths()
+
 #' @export
 #' @rdname setPaths
 #' @importFrom reproducible checkPath
