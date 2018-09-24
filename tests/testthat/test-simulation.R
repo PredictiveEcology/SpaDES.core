@@ -238,12 +238,13 @@ test_that("simulation runs with simInit with duplicate modules named", {
   }
   ', fill = TRUE)
 
+  N <- 5000
 
   moduleDir <- file.path(tmpdir)
   inputDir <- file.path(moduleDir, "inputs") %>% reproducible::checkPath(create = TRUE)
   outputDir <- file.path(moduleDir, "outputs")
   cacheDir <- file.path(outputDir, "cache")
-  times <- list(start = 0, end = 5000)
+  times <- list(start = 0, end = N)
   parameters <- list(
   )
   modules <- list("test")
@@ -259,12 +260,13 @@ test_that("simulation runs with simInit with duplicate modules named", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    objects = objects, paths = paths)
 
+  nTimes <- 20
 
   # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
   # New with "seconds" -- Sept 218, 2018 is 492 seconds --> 98 microseconds/event
   #system.time({spades(mySim, debug = FALSE)})
   options("spades.keepCompleted" = TRUE)
-  microbenchmark::microbenchmark(times = 20, {spades(mySim, debug = FALSE)})
+  microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
   # Turn off completed list
   #  Changed to use "seconds" -- better comparison with simple loop
@@ -272,8 +274,17 @@ test_that("simulation runs with simInit with duplicate modules named", {
   #                         -- This is 161 microseconds per event
   # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
   options("spades.keepCompleted" = FALSE)
-  microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
+  a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
+
+  a <- 0
+  a3 <- microbenchmark::microbenchmark(
+    for (i in 1:N) {
+      a <- a + 1
+    }
+  )
+
+  summary(a2)[, "median"]/summary(a3)[, "median"]
 })
 
 

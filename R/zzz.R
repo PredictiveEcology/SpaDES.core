@@ -59,6 +59,12 @@
       "These can be changed using 'setPaths()'. See '?setPaths'."
     )
   }
+
+  makeActiveBinding(sym = "Paths",
+                    fun = .paths,
+                    env = as.environment("package:SpaDES.core")
+  )
+
 }
 
 .onUnload <- function(libpath) {

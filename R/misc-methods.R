@@ -563,6 +563,8 @@ setMethod(
 #' Get and set default working directories
 #'
 #' Wrapper functions to access the packages options for default working directories.
+#' Note: there is an active binding made to \code{Paths}, so a user can use
+#' \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
 #'
 #' @param cachePath   The default local directory in which to cache simulation outputs.
 #'                    If not specified, defaults to \code{getOption("spades.cachePath")}.
@@ -592,6 +594,14 @@ setMethod(
 #' setPaths(inputPath = tempdir())  ## sets custom inputPath with other paths default
 #' setPaths(modulePath = tempdir()) ## sets custom modulePath with other paths default
 #' setPaths(outputPath = tempdir()) ## sets custom outputPath with other paths default
+#'
+#' # NOTE: on loading and attaching SpaDES.core,
+#' # an active binding is made to "Paths"
+#'
+#' getPaths()
+#' Paths # same
+#' setPaths(outputPath = tempdir())
+#' Paths # shows change
 #' }
 #'
 .paths <- function() {
@@ -602,6 +612,7 @@ setMethod(
     outputPath = getOption("spades.outputPath")
   )
 }
+
 
 
 #' @export
