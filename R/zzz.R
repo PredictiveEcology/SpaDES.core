@@ -59,6 +59,14 @@
       "These can be changed using 'setPaths()'. See '?setPaths'."
     )
   }
+
+  rm("Paths", envir = as.environment("package:SpaDES.core"))
+  makeActiveBinding(sym = "Paths",
+                    fun = .paths,
+                    env = as.environment("package:SpaDES.core")
+  )
+  lockBinding("Paths", as.environment("package:SpaDES.core"))
+
 }
 
 .onUnload <- function(libpath) {

@@ -98,7 +98,9 @@ setMethod(
 #' @importFrom reproducible Checksums
 checksums <- function(module, path, ...) {
   path <- if (length(module)) {
-    file.path(path, module, "data")
+    fp <- file.path(path, module, "data")
+    checkPath(fp, create = TRUE)
+    fp
   } else {
     file.path(path)
   }

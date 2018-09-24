@@ -282,6 +282,7 @@ setMethod(
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
     path <- checkPath(path, create = TRUE)
+    checkPath(file.path(path, name), create = TRUE)
 
     # check locally for module. only download if doesn't exist locally,
     # or if overwrite is wanted

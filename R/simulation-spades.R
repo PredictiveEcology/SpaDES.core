@@ -61,14 +61,22 @@ doEvent <- function(sim, debug, notOlderThan) {
   #  but stop time is not reached
   cur <- sim@current
   if  (length(cur) == 0) {
-    slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
+    # Test replacement for speed
+    #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
+    st <- slot(sim, "simtimes")
+    st[["current"]] <- sim@simtimes[["end"]] + 1
+    slot(sim, "simtimes", check = FALSE) <- st
   } else {
 
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
       fnEnv <- sim@.envir[[cur[["moduleName"]]]]
       # update current simulated time
-      slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
+      # Test replacement for speed
+      #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
+      st <- slot(sim, "simtimes")
+      st[["current"]] <- cur[["eventTime"]]
+      slot(sim, "simtimes", check = FALSE) <- st
 
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
@@ -238,7 +246,12 @@ doEvent <- function(sim, debug, notOlderThan) {
 
     } else {
       # update current simulated time and event
-      slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
+      # Test replacement for speed
+      #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
+      st <- slot(sim, "simtimes")
+      st[["current"]] <- sim@simtimes[["end"]] + 1
+      slot(sim, "simtimes", check = FALSE) <- st
+
       # i.e., if no more events
       slot(sim, "events", check = FALSE) <- append(list(sim@current), sim@events) # will be a list b/c append
       slot(sim, "current", check = FALSE) <- list() # is a list
