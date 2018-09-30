@@ -46,7 +46,7 @@ defineModule(sim, list(
                  other = NA_character_)
   ),
   outputObjects = bind_rows(
-    createsOutput(objectName = P(sim, "randomLandscapes")$stackName, objectClass = "RasterStack",
+    createsOutput(objectName = SpaDES.core::P(sim, "randomLandscapes")$stackName, objectClass = "RasterStack",
                   desc = NA_character_, other = NA_character_)
   )
 ))
@@ -60,19 +60,19 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- Init(sim)
 
       # schedule the next events
-      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, "randomLandscapes", "plot", .last())
-      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, "randomLandscapes", "save", .last() + 1)
+      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.plotInitialTime, "randomLandscapes", "plot", .last())
+      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.saveInitialTime, "randomLandscapes", "save", .last() + 1)
     },
     plot = {
       # do stuff for this event
-      Plot(sim[[P(sim)$stackName]])
+      Plot(sim[[SpaDES.core::P(sim)$stackName]])
     },
     save = {
       # do stuff for this event
       sim <- saveFiles(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + P(sim)$.saveInterval, "randomLandscapes", "save", .last() + 1)
+      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.saveInterval, "randomLandscapes", "save", .last() + 1)
     },
     warning(paste(
       "Undefined event type: \'", events(sim)[1, "eventType", with = FALSE],
@@ -84,14 +84,14 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
 
 ## event functions
 Init <- function(sim) {
-  if (is.null(P(sim)$inRAM)) {
+  if (is.null(SpaDES.core::P(sim)$inRAM)) {
     inMemory <- FALSE
   } else {
-    inMemory <- P(sim)$inRAM
+    inMemory <- SpaDES.core::P(sim)$inRAM
   }
   # Give dimensions of dummy raster
-  nx <- P(sim)$nx
-  ny <- P(sim)$ny
+  nx <- SpaDES.core::P(sim)$nx
+  ny <- SpaDES.core::P(sim)$ny
   template <- raster(nrows = ny, ncols = nx, xmn = -nx / 2, xmx = nx / 2,
                      ymn = -ny / 2, ymx = ny / 2)
   speedup <- max(1, nx / 5e2)
@@ -120,6 +120,6 @@ Init <- function(sim) {
                               forestAge = brewer.pal(9, "BuGn"),
                               habitatQuality = brewer.pal(8, "Spectral"),
                               percentPine = brewer.pal(9, "Greens"))
-  sim[[P(sim)$stackName]] <- mapStack
+  sim[[SpaDES.core::P(sim)$stackName]] <- mapStack
   return(invisible(sim))
 }

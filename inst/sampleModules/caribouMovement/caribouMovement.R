@@ -40,7 +40,7 @@ defineModule(sim, list(
                     "time interval between save events")
   ),
   inputObjects = bind_rows(
-    expectsInput(objectName = P(sim, "caribouMovement")$stackName,
+    expectsInput(objectName = SpaDES.core::P(sim, "caribouMovement")$stackName,
                  objectClass = "RasterStack", desc = "layername = \"habitatQuality\"",
                  sourceURL = NA_character_)
   ),
@@ -57,17 +57,17 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
     init = {
       ### check for more detailed object dependencies:
       ### (use `checkObject` or similar)
-      checkObject(sim, name = P(sim)$stackName, layer = "habitatQuality")
+      checkObject(sim, name = SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
 
       # do stuff for this event
       sim <- Init(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, P(sim)$moveInitialTime,
+      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$moveInitialTime,
                            "caribouMovement", "move")
-      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime,
+      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.plotInitialTime,
                            "caribouMovement", "plot.init", .last())
-      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime,
+      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.saveInitialTime,
                            "caribouMovement", "save", .last() + 1)
     },
     move = {
@@ -75,31 +75,31 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- Move(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + P(sim)$moveInterval, "caribouMovement", "move")
+      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$moveInterval, "caribouMovement", "move")
     },
     plot.init = {
       # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", P(sim)$stackName, "habitatQuality", sep = "$"),
+      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
            new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, "caribouMovement", "plot", .last())
+      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
     },
     plot = {
       # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", P(sim)$stackName, "habitatQuality", sep = "$"),
+      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
            new = FALSE, pch = 19, size = 0.2, gp = gpar(cex = 0.6))
       Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, "caribouMovement", "plot", .last())
+      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
     },
     save = {
       # do stuff for this event
       sim <- saveFiles(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + P(sim)$.saveInterval, "caribouMovement", "save", .last() + 1)
+      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.saveInterval, "caribouMovement", "save", .last() + 1)
 
     },
     warning(paste(
@@ -112,13 +112,13 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
 
 ## event functions
 Init <- function(sim) {
-  yrange <- c(ymin(sim[[P(sim)$stackName]]),
-              ymax(sim[[P(sim)$stackName]]))
-  xrange <- c(xmin(sim[[P(sim)$stackName]]),
-              xmax(sim[[P(sim)$stackName]]))
+  yrange <- c(ymin(sim[[SpaDES.core::P(sim)$stackName]]),
+              ymax(sim[[SpaDES.core::P(sim)$stackName]]))
+  xrange <- c(xmin(sim[[SpaDES.core::P(sim)$stackName]]),
+              xmax(sim[[SpaDES.core::P(sim)$stackName]]))
 
   # initialize caribou agents
-  N <- P(sim)$N
+  N <- SpaDES.core::P(sim)$N
   IDs <- as.character(1:N)
   sex <- sample(c("female", "male"), N, replace = TRUE)
   age <- round(rnorm(N, mean = 8, sd = 3))
@@ -137,11 +137,11 @@ Init <- function(sim) {
 
 Move <- function(sim) {
   # crop any caribou that went off maps
-  sim$caribou <- crop(sim$caribou, sim[[P(sim)$stackName]])
+  sim$caribou <- crop(sim$caribou, sim[[SpaDES.core::P(sim)$stackName]])
   if (length(sim$caribou) == 0) stop("All agents are off map")
 
   # find out what pixels the individuals are on now
-  ex <- sim[[P(sim)$stackName]][["habitatQuality"]][sim$caribou]
+  ex <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]][sim$caribou]
 
   # step length is a function of current cell's habitat quality
   sl <- 0.25 / ex
@@ -150,9 +150,9 @@ Move <- function(sim) {
   sd <- 30 # could be specified globally in params
 
   sim$caribou <- move("crw", agent = sim$caribou,
-                      extent = extent(sim[[P(sim)$stackName]]),
+                      extent = extent(sim[[SpaDES.core::P(sim)$stackName]]),
                       stepLength = ln, stddev = sd, lonlat = FALSE,
-                      torus = P(sim)$torus)
+                      torus = SpaDES.core::P(sim)$torus)
 
   return(invisible(sim))
 }
