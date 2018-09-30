@@ -789,18 +789,55 @@ setMethod(
 
 #' Call \code{simInit} and \code{spades} together
 #'
-#' This may allow for more efficient Caching.
+#' These functions are convenience wrappers that may allow for
+#' more efficient Caching.
 #' Passes all arguments to \code{simInit}, then passes the created \code{simList}
-#' to \code{spades}.
+#' to \code{spades} or \code{experiment}.
 #'
-#' @param ... Passed to simInit
+#' @param ... Arguments passed to simInit, and spades or experiment
 #'
-#' @return A \code{simList} object.
+#' @return Same as \code{\link{spades}} (a \code{simList}) or
+#'     \code{\link{experiment}} (list of \code{simList} objects)
 #'
 #' @export
-#' @rdname simInit
+#' @aliases simInitAndSpades
+#' @rdname simInitAnd
 simInitAndSpades <- function(...) {
-  simInit(...) %>% spades()
+  formsSimInit <- formalArgs(simInit)
+  formsSpades <- formalArgs(spades)
+  mc <- match.call()
+  forSimInit <- names(mc)[names(mc) %in% formsSimInit]
+  forSpades <- names(mc)[names(mc) %in% formsSpades]
+  dots <- list(...)
+
+  # simInit
+  sim <- do.call(simInit, args = dots[forSimInit])
+  # spades
+  args <- append(list(sim = sim), dots[forSpades])
+  do.call(spades, args = args)
+
+}
+
+#' @export
+#' @aliases simInitAndExperiment
+#' @rdname simInitAnd
+simInitAndExperiment <- function(...) {
+  formsSimInit <- formalArgs(simInit)
+  formsExperiment <- formalArgs(experiment)
+  formsSpades <- formalArgs(spades)
+  mc <- match.call()
+
+  forSimInit <- names(mc)[names(mc) %in% formsSimInit]
+  forExperiment <- names(mc)[names(mc) %in% formsExperiment]
+  forSpades <- names(mc)[names(mc) %in% formsSpades]
+  dots <- list(...)
+
+  # simInit
+  sim <- do.call(simInit, args = dots[forSimInit])
+  # experiment
+  args <- append(dots[forExperiment], dots[forSpades])
+  do.call(experiment, args = append(list(sim = sim),
+                                  args))
 }
 
 #' Identify Child Modules from a recursive list
