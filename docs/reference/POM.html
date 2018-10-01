@@ -78,7 +78,7 @@ and have not been widely tested and are not supported within POM." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -239,7 +239,8 @@ it is difficult to diagnose stochastic results.</p></td>
     </tr>
     <tr>
       <th>logObjFnVals</th>
-      <td><p>Logical or Character string indicating a filename. Ignored if
+      <td><p>Logical or Character string indicating a filename to log the outputs.
+Ignored if
 <code>objFn</code> is supplied.
 If TRUE (and there is no <code>objFn</code> supplied), then the
 value of the individual patterns will be output the console
@@ -375,17 +376,17 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
   <span class='no'>outData</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw pkg'>reproducible</span><span class='kw ns'>::</span><span class='fu'><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></span>(<span class='no'>mySim</span>), <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
   <span class='co'># Extract the "true" data, in this case, the "proportion of cells burned"</span>
-  <span class='co'># Function defined that will use landscape$fires map from simList,</span>
-  <span class='co'>#  i.e., sim$landscape$fires</span>
+  <span class='co'># Function defined that will use landscape$Fires map from simList,</span>
+  <span class='co'>#  i.e., sim$landscape$Fires</span>
   <span class='co'>#  the return value being compared via MAD with propCellBurnedData</span>
   <span class='no'>propCellBurnedFn</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>landscape</span>) {
-    <span class='fu'>sum</span>(<span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/getValues'>getValues</a></span>(<span class='no'>landscape</span>$<span class='no'>fires</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) / <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/ncell'>ncell</a></span>(<span class='no'>landscape</span>$<span class='no'>fires</span>)
+    <span class='fu'>sum</span>(<span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/getValues'>getValues</a></span>(<span class='no'>landscape</span>$<span class='no'>Fires</span>) <span class='kw'>&gt;</span> <span class='fl'>0</span>) / <span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/ncell'>ncell</a></span>(<span class='no'>landscape</span>$<span class='no'>Fires</span>)
   }
   <span class='co'># visualize the burned maps of true "data"</span>
   <span class='no'>propCellBurnedData</span> <span class='kw'>&lt;-</span> <span class='fu'>propCellBurnedFn</span>(<span class='no'>outData</span>$<span class='no'>landscape</span>)
   <span class='fu'>clearPlot</span>()
   <span class='kw'>if</span> (<span class='fu'>interactive</span>()) {
-    <span class='no'>fires</span> <span class='kw'>&lt;-</span> <span class='no'>outData</span>$<span class='no'>landscape</span>$<span class='no'>fires</span> <span class='co'># Plot doesn't do well with many nested layers</span>
+    <span class='no'>fires</span> <span class='kw'>&lt;-</span> <span class='no'>outData</span>$<span class='no'>landscape</span>$<span class='no'>Fires</span> <span class='co'># Plot doesn't do well with many nested layers</span>
     <span class='fu'>Plot</span>(<span class='no'>fires</span>)
   }
 
@@ -395,9 +396,8 @@ in the <code class="file">ObjectiveFnValues.txt</code> file.</p>
   <span class='co'>#  is as close as possible to the proportion area burned in</span>
   <span class='co'>#  the "data", using \code{DEoptim()}.</span>
 
-  <span class='co'># Can use cluster if computer is multi-threaded (but not yet via cl arg, which is not</span>
-  <span class='co'>#                                                implemented yet in DEoptim)</span>
-  <span class='co'># This example uses parallelType = 1 in DEoptim. For this, you must manually</span>
+  <span class='co'># Can use cluster if computer is multi-threaded.</span>
+  <span class='co'># This example can use parallelType = 1 in DEoptim. For this, you must manually</span>
   <span class='co'>#  pass all packages and variables as character strings.</span>
   <span class='co'># cl &lt;- makeCluster(detectCores() - 1) # not implemented yet in DEoptim</span>
   <span class='no'>out1</span> <span class='kw'>&lt;-</span> <span class='fu'>POM</span>(<span class='no'>mySim</span>, <span class='st'>"spreadprob"</span>,

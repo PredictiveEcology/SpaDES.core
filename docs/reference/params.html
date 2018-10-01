@@ -72,7 +72,7 @@ params has a replace method, so can be used to update a parameter value." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -215,7 +215,7 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
     <pre class="examples"><div class='input'><span class='no'>modules</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='st'>"randomLandscapes"</span>)
 <span class='no'>paths</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'>system.file</span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='no'>modules</span>, <span class='kw'>paths</span> <span class='kw'>=</span> <span class='no'>paths</span>,
-                 <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)))</div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='output co'>#&gt; <span class='message'>randomLandscapes: module code appears clean</span></div><div class='input'><span class='fu'>parameters</span>(<span class='no'>mySim</span>)</div><div class='output co'>#&gt; $randomLandscapes
+                 <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)))</div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='output co'>#&gt; <span class='message'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in inputObjects</span></div><div class='input'><span class='fu'>parameters</span>(<span class='no'>mySim</span>)</div><div class='output co'>#&gt; $randomLandscapes
 #&gt; $randomLandscapes$inRAM
 #&gt;   paramClass default  min   max                              paramDesc
 #&gt; 1    logical   FALSE TRUE FALSE should the raster be stored in memory?

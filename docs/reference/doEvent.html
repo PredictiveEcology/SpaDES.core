@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -147,13 +147,9 @@
     </tr>
     <tr>
       <th>debug</th>
-      <td><p>Optional. Either Logical or character. If logical, entire <code>simList</code>
-will be printed at each event. If a character string, then it can be one
-of the many simList accessors, such as <code>events</code>, <code>params</code>.
-It can also be any R expression that will be evaluated with access
-to the <code>sim</code> object.
-If <code>"current"</code> is used, then it will be a compact list of the events
-as they go by.</p></td>
+      <td><p>Optional logical flag or character vector indicating what to print to
+console at each event. See details.
+Default is to use the value in <code>getOption("spades.debug")</code>.</p></td>
     </tr>
     <tr>
       <th>notOlderThan</th>

@@ -75,7 +75,7 @@ shows the user time in the units of the model as shown with timeunit(sim)" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -195,7 +195,12 @@ shows the user time in the units of the model as shown with <code>timeunit(sim)<
 <span class='fu'>timeunits</span>(<span class='no'>x</span>)
 
 <span class='co'># S4 method for .simList</span>
-<span class='fu'>timeunits</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>timeunits</span>(<span class='no'>x</span>)
+
+<span class='fu'>elapsedTime</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for .simList</span>
+<span class='fu'>elapsedTime</span>(<span class='no'>x</span>, <span class='kw'>byEvent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -218,6 +223,11 @@ time units (if used within a module).</p></td>
     <tr>
       <th>unit</th>
       <td><p>Character. One of the time units used in <code>SpaDES</code>.</p></td>
+    </tr>
+    <tr>
+      <th>byEvent</th>
+      <td><p>Logical. If <code>TRUE</code>, the elapsed time will be by module and event;
+<code>FALSE</code> will report only by module. Default is <code>TRUE</code></p></td>
     </tr>
     </table>
     

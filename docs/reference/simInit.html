@@ -38,10 +38,7 @@ Since environments in R are
 pass by reference, &quot;putting&quot; objects in the sim object does no actual copy. The
 simList also stores all parameters,
 and other important simulation information, such
-as times, paths, modules, and module load order. See more details below.
-This may allow for more efficient Caching. This passes all
-arguments to simInit, then the created simList is passed
-to spades" />
+as times, paths, modules, and module load order. See more details below." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -80,7 +77,7 @@ to spades" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -148,9 +145,6 @@ pass by reference, "putting" objects in the sim object does no actual copy. The
 <code>simList</code> also stores all parameters,
 and other important simulation information, such
 as times, paths, modules, and module load order. See more details below.</p>
-<p>This may allow for more efficient Caching. This passes all
-arguments to simInit, then the created <code>simList</code> is passed
-to <code>spades</code></p>
     
     </div>
 
@@ -175,9 +169,7 @@ to <code>spades</code></p>
 
 <span class='co'># S4 method for ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY</span>
 <span class='fu'>simInit</span>(<span class='no'>times</span>, <span class='no'>params</span>, <span class='no'>modules</span>,
-  <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
-
-<span class='fu'>simInitAndSpades</span>(<span class='no'>...</span>)</pre>
+  <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -251,10 +243,6 @@ then the <code>.inputObjects</code> will be cached.
 Setting <code>notOlderThan = Sys.time()</code> will cause the
 cached versions of <code>.inputObjects</code> to be refreshed,
 i.e., rerun.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Passed to simInit</p></td>
     </tr>
     </table>
     

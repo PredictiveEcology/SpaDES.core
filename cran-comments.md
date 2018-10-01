@@ -1,6 +1,6 @@
 ## Updated release
 
-This release fixes errors found in tests on macOS.
+This release fixes problems revealed in CRAN check results, and other bug fixes and enhancements.
 
 ## Test environments
 
@@ -17,7 +17,7 @@ This release fixes errors found in tests on macOS.
 ### Current R versions
 * macOS El Capitan     (r-hub), R 3.5.0
 * macOS Sierra     (travis-ci), R 3.5.0
-* macOS High Sierra    (local), R 3.5.1
+* macOS Mojave         (local), R 3.5.1
 * Ubuntu 14.04     (travis-ci), R 3.5.1
 * Ubuntu 18.04         (local), R 3.5.1
 * Windows           (appveyor), R 3.5.1
@@ -25,10 +25,10 @@ This release fixes errors found in tests on macOS.
 * Windows 7            (local), R 3.5.1
 
 ### Development R version
-* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-08-13 r75128)
-* Ubuntu 18.04         (local), R 3.6.0 (2018-08-13 r75128)
-* Windows           (appveyor), R 3.6.0 (2018-08-10 r75101)
-* Windows        (win-builder), R 3.6.0 (2018-08-11 r75106)
+* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-10-01 r75383)
+* Ubuntu 18.04         (local), R 3.6.0 (2018-10-01 r75383)
+* Windows           (appveyor), R 3.6.0 (2018-09-29 r75382)
+* Windows        (win-builder), R 3.6.0 (2018-09-29 r75382)
 
 ## R CMD check results
 

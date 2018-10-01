@@ -115,6 +115,13 @@ matrix:
     - brew update
     - brew install glpk
     - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
+  - os: osx
+    osx_image: xcode8.3
+    latex: false
+    r_build_args: "--no-build-vignettes"
+    r_check_args: "--as-cran --ignore-vignettes --no-examples"
+    before_install:
+    - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true

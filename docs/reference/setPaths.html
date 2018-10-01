@@ -32,7 +32,9 @@
 
 <meta property="og:title" content="Get and set default working directories — setPaths" />
 
-<meta property="og:description" content="Wrapper functions to access the packages options for default working directories." />
+<meta property="og:description" content="Wrapper functions to access the packages options for default working directories.
+Note: there is an active binding made to Paths, so a user can use
+Paths$cachePath for example instead of getPaths()$cachePath" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -71,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -132,13 +134,17 @@
 
     <div class="ref-description">
     
-    <p>Wrapper functions to access the packages options for default working directories.</p>
+    <p>Wrapper functions to access the packages options for default working directories.
+Note: there is an active binding made to <code>Paths</code>, so a user can use
+<code><a href='objects.html'>Paths$cachePath</a></code> for example instead of <code><a href='objects.html'>getPaths()$cachePath</a></code></p>
     
     </div>
 
     <pre class="usage"><span class='fu'>.paths</span>()
 
 <span class='fu'>getPaths</span>()
+
+<span class='no'>Paths</span>
 
 <span class='fu'>setPaths</span>(<span class='no'>cachePath</span>, <span class='no'>inputPath</span>, <span class='no'>modulePath</span>, <span class='no'>outputPath</span>)</pre>
     
@@ -168,6 +174,10 @@ If not specified, defaults to <code>getOption("spades.outputPath")</code>.</p></
     </tr>
     </table>
     
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>An object of class <code>list</code> of length 4.</p>
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Returns a named list of the user's default working directories.
@@ -181,6 +191,14 @@ If not specified, defaults to <code>getOption("spades.outputPath")</code>.</p></
 <span class='fu'>setPaths</span>(<span class='kw'>inputPath</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>())  <span class='co'>## sets custom inputPath with other paths default</span>
 <span class='fu'>setPaths</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>()) <span class='co'>## sets custom modulePath with other paths default</span>
 <span class='fu'>setPaths</span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>()) <span class='co'>## sets custom outputPath with other paths default</span>
+
+<span class='co'># NOTE: on loading and attaching SpaDES.core,</span>
+<span class='co'># an active binding is made to "Paths"</span>
+
+<span class='fu'>getPaths</span>()
+<span class='no'>Paths</span> <span class='co'># same</span>
+<span class='fu'>setPaths</span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>())
+<span class='no'>Paths</span> <span class='co'># shows change</span>
 <span class='co'># }</span><div class='input'>
 </div></pre>
   </div>
@@ -189,6 +207,8 @@ If not specified, defaults to <code>getOption("spades.outputPath")</code>.</p></
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
+      <li><a href="#format">Format</a></li>
+
       <li><a href="#value">Value</a></li>
       
       <li><a href="#examples">Examples</a></li>

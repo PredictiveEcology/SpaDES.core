@@ -73,7 +73,7 @@ provided to the simInit function in the path argument." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -166,13 +166,13 @@ provided to the <code>simInit</code> function in the <code>path</code> argument.
 <span class='co'># S4 method for .simList</span>
 <span class='fu'>current</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='fu'>completed</span>(<span class='no'>sim</span>, <span class='no'>unit</span>)
+<span class='fu'>completed</span>(<span class='no'>sim</span>, <span class='no'>unit</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for .simList,character</span>
-<span class='fu'>completed</span>(<span class='no'>sim</span>, <span class='no'>unit</span>)
+<span class='fu'>completed</span>(<span class='no'>sim</span>, <span class='no'>unit</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for .simList,missing</span>
-<span class='fu'>completed</span>(<span class='no'>sim</span>, <span class='no'>unit</span>)
+<span class='fu'>completed</span>(<span class='no'>sim</span>, <span class='no'>unit</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>completed</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
@@ -194,6 +194,10 @@ in which to replace element(s).</p></td>
     <tr>
       <th>value</th>
       <td><p>The object to be stored at the slot.</p></td>
+    </tr>
+    <tr>
+      <th>times</th>
+      <td><p>Logical. Should this function report the clockTime</p></td>
     </tr>
     </table>
     

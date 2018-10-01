@@ -40,8 +40,8 @@ framework that facilitates modularity, and easily enables the user to
 include additional functionality by running user-built simulation modules.
 Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
-of the DES, with current benchmarking as low as 700 microseconds overhead for
-each event (including queuing, sorting, spawning event etc.) or 180 microseconds
+of the DES, with current benchmarking as low as 500 microseconds overhead for
+each event (including queuing, sorting, spawning event etc.) or 52 microseconds
 if there is no sorting
 Bug reports: https://github.com/PredictiveEcology/SpaDES.core/issues
 Module repository: https://github.com/PredictiveEcology/SpaDES-modules
@@ -85,7 +85,7 @@ Wiki: https://github.com/PredictiveEcology/SpaDES/wiki
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -154,8 +154,8 @@ framework that facilitates modularity, and easily enables the user to
 include additional functionality by running user-built simulation modules.
 Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
-of the DES, with current benchmarking as low as 700 microseconds overhead for
-each event (including queuing, sorting, spawning event etc.) or 180 microseconds
+of the DES, with current benchmarking as low as 500 microseconds overhead for
+each event (including queuing, sorting, spawning event etc.) or 52 microseconds
 if there is no sorting</p>
 <p>Bug reports: <a href='https://github.com/PredictiveEcology/SpaDES.core/issues'>https://github.com/PredictiveEcology/SpaDES.core/issues</a></p>
 <p>Module repository: <a href='https://github.com/PredictiveEcology/SpaDES-modules'>https://github.com/PredictiveEcology/SpaDES-modules</a></p>
@@ -250,6 +250,7 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 <tr><td><code><a href='simList-accessors-events.html'>events</a></code></td><td>Scheduled simulation events (the event queue). (advanced)</td></tr>
 <tr><td><code><a href='simList-accessors-events.html'>current</a></code></td><td>Currently executing event. (advanced)</td></tr>
 <tr><td><code><a href='simList-accessors-events.html'>completed</a></code></td><td>Completed simulation events. (advanced)</td></tr>
+<tr><td><code><a href='simList-accessors-times.html'>elapsedTime</a></code></td><td>The amount of clock time that modules &amp; events use</td></tr>
 <tr><td></td><td><code><a href='simList-accessors-events.html'>events</a></code></td></tr>
 </table>
     <h3>3.7 Modules, dependencies, packages</h3>
@@ -321,6 +322,16 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 <tr><td><code><a href='expectsInput.html'>expectsInput</a></code></td><td>Specify an input object's name, class, description, sourceURL and other specifications</td></tr>
 <tr><td><code><a href='createsOutput.html'>createsOutput</a></code></td><td>Specify an output object's name, class, description and other specifications</td></tr>
 <tr><td></td><td><code><a href='defineModule.html'>defineModule</a></code></td></tr>
+</table>
+    There are also accessors for many of the metadata entries:
+  <table class='table'>
+<tr><td><code><a href='simList-accessors-times.html'>timeunit</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='simList-accessors-metadata.html'>citation</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='simList-accessors-metadata.html'>documentation</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='simList-accessors-metadata.html'>reqdPkgs</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='simList-accessors-metadata.html'>inputObjects</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='simList-accessors-metadata.html'>outputObjects</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td></td><td><code><a href='simList-accessors-times.html'>timeunit</a></code></td></tr>
 </table>
     <h3>4.3 Module dependencies</h3>
     Once a set of modules have been chosen, the dependency information is automatically
