@@ -105,7 +105,8 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       )
 
       clearPlot()
-      Plot(sim[[SpaDES.core::P(sim)$stackName]],
+      stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long names -- create local variable
+      Plot(sim[[stackName]],
            legendRange = list(0:maxValue(sim[[SpaDES.core::P(sim)$stackName]]$DEM), 0:100,
                               c(0, 1), 0:100, 0:10))
 

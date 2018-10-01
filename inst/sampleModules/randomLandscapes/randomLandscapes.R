@@ -65,7 +65,8 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot = {
       # do stuff for this event
-      Plot(sim[[SpaDES.core::P(sim)$stackName]])
+      stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long variables
+      Plot(sim[[stackName]])
     },
     save = {
       # do stuff for this event
