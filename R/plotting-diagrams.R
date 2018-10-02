@@ -443,7 +443,9 @@ setMethod(
     if ((Sys.info()[['sysname']] == "Darwin") && (Sys.which("glpsol") == "")) {
       stop("GLPK not found on this system.\n",
            "igraph is used internally and requires a GLPK installation.\n",
-           "It can be installed using, e.g., `brew install glpk`.\n",
+           "It can be installed using, e.g., `brew install glpk`, ",
+           "after which you should reinstall igraph from source using:\n",
+           "`install.packages('igraph', type = 'source')`\n",
            "For more info see https://github.com/igraph/rigraph/issues/273.")
     } else {
       mg <- attr(sim@modules, "modulesGraph")
