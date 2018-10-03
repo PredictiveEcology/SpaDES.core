@@ -1,6 +1,6 @@
 ## Updated release
 
-This release fixes problems revealed in CRAN check results, and other bug fixes and enhancements.
+This release fixes problems revealed in CRAN check results, and includes bug fixes and enhancements (see NEWS).
 
 ## Test environments
 
@@ -33,12 +33,6 @@ This release fixes problems revealed in CRAN check results, and other bug fixes 
 ## R CMD check results
 
 There are no ERRORs nor WARNINGs.
-
-There was one NOTE:
-
-    Days since last update: 4
-
-We are resubmitting this fixed version at CRAN's request.
 
 ## Downstream dependencies
 
