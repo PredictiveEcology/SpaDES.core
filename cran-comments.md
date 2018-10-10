@@ -25,9 +25,9 @@ This release fixes problems revealed in CRAN check results, and includes bug fix
 * Windows 7            (local), R 3.5.1
 
 ### Development R version
-* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-10-01 r75383)
-* Ubuntu 18.04         (local), R 3.6.0 (2018-10-01 r75383)
-* Windows           (appveyor), R 3.6.0 (2018-09-29 r75382)
+* Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-10-10 r75427)
+* Ubuntu 18.04         (local), R 3.6.0 (2018-10-10 r75427)
+* Windows           (appveyor), R 3.6.0 (2018-10-07 r75409)
 * Windows        (win-builder), R 3.6.0 (2018-09-29 r75382)
 
 ## R CMD check results
