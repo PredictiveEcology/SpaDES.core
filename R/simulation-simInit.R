@@ -815,7 +815,6 @@ simInitAndSpades <- function(...) {
   # spades
   args <- append(list(sim = sim), dots[forSpades])
   do.call(spades, args = args)
-
 }
 
 #' @export
