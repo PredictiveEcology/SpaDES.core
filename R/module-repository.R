@@ -360,7 +360,7 @@ setMethod(
     } else {
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
-    message(crayon::magenta("Download complete for module ", name, ".", sep = ""))
+    message(crayon::magenta("Download complete for module ", name, " (v", version, ").", sep = ""))
 
     return(list(c(files, files2), bind_rows(dataList, dataList2)))
 })
