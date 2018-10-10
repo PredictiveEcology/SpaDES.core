@@ -146,6 +146,7 @@
 <li>new function <code>elapsedTime</code> which gives a summary of the clock time used by each module or event</li>
 <li>most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.</li>
 <li>new function <code>citation</code> replaces <code><a href="http://www.rdocumentation.org/packages/utils/topics/citation">utils::citation</a></code> with an S4 generic. If <code>package</code> arg is a <code>character</code>, it dispatches <code><a href="http://www.rdocumentation.org/packages/utils/topics/citation">utils::citation</a></code>; if a <code>simList</code>, it gives the citation for the module(s)</li>
+<li>improved messaging when GLPK not installed (<em>e.g.</em>, on macOS)</li>
 </ul>
 </div>
 <div id="bugfixes" class="section level2">
