@@ -805,16 +805,19 @@ setMethod(
 simInitAndSpades <- function(...) {
   formsSimInit <- formalArgs(simInit)
   formsSpades <- formalArgs(spades)
-  mc <- match.call()
-  forSimInit <- names(mc)[names(mc) %in% formsSimInit]
-  forSpades <- names(mc)[names(mc) %in% formsSpades]
-  dots <- list(...)
+  mcSI <- match.call(simInit)
+  mcSI[[1]] <- as.name("simInit")
+
+  mcSp <- match.call(spades, expand.dots = FALSE)
+  mcSp[[1]] <- as.name("spades")
+  mcSp$... <- NULL
 
   # simInit
-  sim <- do.call(simInit, args = dots[forSimInit])
+  sim <- eval(mcSI)
+
   # spades
-  args <- append(list(sim = sim), dots[forSpades])
-  do.call(spades, args = args)
+  mcSp$sim <- sim
+  sim <- eval(mcSp)
 
 }
 
