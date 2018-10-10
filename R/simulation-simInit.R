@@ -803,8 +803,7 @@ setMethod(
 #' @aliases simInitAndSpades
 #' @rdname simInitAnd
 simInitAndSpades <- function(...) {
-  formsSimInit <- formalArgs(simInit)
-  formsSpades <- formalArgs(spades)
+
   mcSI <- match.call(simInit)
   mcSI[[1]] <- as.name("simInit")
 
@@ -825,22 +824,20 @@ simInitAndSpades <- function(...) {
 #' @aliases simInitAndExperiment
 #' @rdname simInitAnd
 simInitAndExperiment <- function(...) {
-  formsSimInit <- formalArgs(simInit)
-  formsExperiment <- formalArgs(experiment)
-  formsSpades <- formalArgs(spades)
-  mc <- match.call()
+  mcSI <- match.call(simInit)
+  mcSI[[1]] <- as.name("simInit")
 
-  forSimInit <- names(mc)[names(mc) %in% formsSimInit]
-  forExperiment <- names(mc)[names(mc) %in% formsExperiment]
-  forSpades <- names(mc)[names(mc) %in% formsSpades]
-  dots <- list(...)
+  mcSp <- match.call(spades, expand.dots = FALSE)
+  mcSp[[1]] <- as.name("experiment")
+  mcSp$... <- NULL
 
   # simInit
-  sim <- do.call(simInit, args = dots[forSimInit])
-  # experiment
-  args <- append(dots[forExperiment], dots[forSpades])
-  do.call(experiment, args = append(list(sim = sim),
-                                  args))
+  sim <- eval(mcSI)
+
+  # spades
+  mcSp$sim <- sim
+  sim <- eval(mcSp)
+
 }
 
 #' Identify Child Modules from a recursive list
