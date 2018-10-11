@@ -13,21 +13,34 @@ cleanMessage <- function(mm) {
 # loads and libraries indicated plus testthat,
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
-testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE) {
-  opts <- if (!smcc)
-    options("spades.moduleCodeChecks" = smcc)
+testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
+                     opts = list()) {
+  opts1 <- if (!smcc)
+    list(spades.moduleCodeChecks = smcc)
   else
     list()
+
+  if (length(opts)) {
+    opts1 <- append( opts1, opts)
+  }
 
   optsDebug <- if (!debug)
-    options("spades.debug" = debug)
+    list(spades.debug = debug)
   else
     list()
 
+  if (length(optsDebug)) {
+    opts1 <- append( opts1, optsDebug)
+  }
+
   optsAsk <- if (!ask)
-    options("reproducible.ask" = ask)
+    list(reproducible.ask = ask)
   else
     list()
+  if (length(optsAsk)) {
+    opts1 <- append(opts1, optsAsk)
+  }
+  opts <- options(opts1)
 
   if (missing(libraries)) libraries <- list()
   unlist(lapply(libraries, require, character.only = TRUE))
@@ -41,7 +54,7 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
 
-  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
+  outList <- list(opts = opts1, optsDebug = optsDebug, tmpdir = tmpdir,
                   origDir = origDir, libs = libraries,
                   tmpCache = tmpCache, optsAsk = optsAsk)
   list2env(outList, envir = parent.frame())
