@@ -367,7 +367,6 @@ setMethod(
     dotParamsChar <- list(".savePath", ".saveObjects")
     dotParams <- append(dotParamsChar, dotParamsReal)
 
-
     sim@modules <- modules  ## will be updated below
 
     reqdPkgs <- packages(modules = unlist(modules), paths = paths(sim)$modulePath,
@@ -396,15 +395,13 @@ setMethod(
       ## Time unit could be NA, in which case, it should find the smallest one that is inside a parent...
       ## if none there, then inside grandparent etc.
       while (stillFinding && length(modsForTU)) {
-
         tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                envir = sim@.envir[[".parsedFiles"]])
+                                  envir = sim@.envir[[".parsedFiles"]])
         hasTU <- !is.na(tu)
         innerNames <- .findModuleName(childModules, recursive = recurseLevel)
         modsForTU <- innerNames[nzchar(names(innerNames))]
         stillFinding <- all(!hasTU)
         recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
-
       }
       if (!exists("tu", inherits = FALSE)) {
         return(list("year")) # default
@@ -519,8 +516,7 @@ setMethod(
     ## assign user-specified non-global params, while
     ## keeping defaults for params not specified by user
     omit <- c(which(core == "load"), which(core == "save"))
-    pnames <-
-      unique(c(paste0(".", core[-omit]), names(sim@params)))
+    pnames <- unique(c(paste0(".", core[-omit]), names(sim@params)))
 
     if (is.null(params$.progress) || any(is.na(params$.progress))) {
       params$.progress <- .pkgEnv$.progressEmpty

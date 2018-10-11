@@ -264,8 +264,8 @@ setMethod(
         opt <- getOption("spades.moduleCodeChecks")
         if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {
           messFile <- capture.output(type = "message",
-                                               message(grep(paste0(m, ".R"),
-                                                            ls(sim@.envir$.parsedFiles), value = TRUE)))
+                                     message(grep(paste0(m, ".R"),
+                                                  ls(sim@.envir$.parsedFiles), value = TRUE)))
           codeCheckMsgs <- c(
             codeCheckMsgs,
             messFile,
