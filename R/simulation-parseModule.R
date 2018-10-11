@@ -217,7 +217,7 @@ setMethod(
 
         # parse any scripts in R subfolder
         RSubFolder <- file.path(dirname(filename), "R")
-        RScript <- dir(RSubFolder)
+        RScript <- dir(RSubFolder, pattern = "([.]R$|[.]r$)") ## only R files
         if (length(RScript) > 0) {
           for (Rfiles in RScript) {
             parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
