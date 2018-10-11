@@ -3,19 +3,19 @@
 \docType{methods}
 \name{.callingModuleName}
 \alias{.callingModuleName}
-\alias{.callingModuleName,.simList-method}
+\alias{.callingModuleName,simList-method}
 \alias{currentModule}
-\alias{currentModule,.simList-method}
+\alias{currentModule,simList-method}
 \alias{.callingFrameTimeunit}
 \title{Namespacing within \code{SpaDES}}
 \usage{
 .callingModuleName(sim)
 
-\S4method{.callingModuleName}{.simList}(sim)
+\S4method{.callingModuleName}{simList}(sim)
 
 currentModule(sim)
 
-\S4method{currentModule}{.simList}(sim)
+\S4method{currentModule}{simList}(sim)
 
 .callingFrameTimeunit(x)
 }

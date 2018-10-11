@@ -3,30 +3,30 @@
 \docType{methods}
 \name{progressInterval}
 \alias{progressInterval}
-\alias{progressInterval,.simList-method}
+\alias{progressInterval,simList-method}
 \alias{progressInterval<-}
 \alias{progressInterval<-,.simList-method}
 \alias{progressType}
-\alias{progressType,.simList-method}
+\alias{progressType,simList-method}
 \alias{progressType<-}
 \alias{progressType<-,.simList-method}
 \title{Get and set simulation progress bar details}
 \usage{
 progressInterval(sim)
 
-\S4method{progressInterval}{.simList}(sim)
+\S4method{progressInterval}{simList}(sim)
 
 progressInterval(sim) <- value
 
-\S4method{progressInterval}{.simList}(sim) <- value
+\S4method{progressInterval}{simList}(sim) <- value
 
 progressType(sim)
 
-\S4method{progressType}{.simList}(sim)
+\S4method{progressType}{simList}(sim)
 
 progressType(sim) <- value
 
-\S4method{progressType}{.simList}(sim) <- value
+\S4method{progressType}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

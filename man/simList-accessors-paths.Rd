@@ -4,72 +4,72 @@
 \name{paths}
 \alias{paths}
 \alias{simList-accessors-paths}
-\alias{paths,.simList-method}
+\alias{paths,simList-method}
 \alias{paths<-}
 \alias{paths<-,.simList-method}
 \alias{cachePath}
-\alias{cachePath,.simList-method}
+\alias{cachePath,simList-method}
 \alias{cachePath<-}
 \alias{cachePath<-,.simList-method}
 \alias{inputPath}
-\alias{inputPath,.simList-method}
+\alias{inputPath,simList-method}
 \alias{inputPath<-}
 \alias{inputPath<-,.simList-method}
 \alias{outputPath}
-\alias{outputPath,.simList-method}
+\alias{outputPath,simList-method}
 \alias{outputPath<-}
 \alias{outputPath<-,.simList-method}
 \alias{modulePath}
-\alias{modulePath,.simList-method}
+\alias{modulePath,simList-method}
 \alias{modulePath<-}
 \alias{modulePath<-,.simList-method}
 \alias{dataPath}
-\alias{dataPath,.simList-method}
+\alias{dataPath,simList-method}
 \title{Specify paths for modules, inputs, and outputs}
 \usage{
 paths(sim)
 
-\S4method{paths}{.simList}(sim)
+\S4method{paths}{simList}(sim)
 
 paths(sim) <- value
 
-\S4method{paths}{.simList}(sim) <- value
+\S4method{paths}{simList}(sim) <- value
 
 cachePath(sim)
 
-\S4method{cachePath}{.simList}(sim)
+\S4method{cachePath}{simList}(sim)
 
 cachePath(sim) <- value
 
-\S4method{cachePath}{.simList}(sim) <- value
+\S4method{cachePath}{simList}(sim) <- value
 
 inputPath(sim)
 
-\S4method{inputPath}{.simList}(sim)
+\S4method{inputPath}{simList}(sim)
 
 inputPath(sim) <- value
 
-\S4method{inputPath}{.simList}(sim) <- value
+\S4method{inputPath}{simList}(sim) <- value
 
 outputPath(sim)
 
-\S4method{outputPath}{.simList}(sim)
+\S4method{outputPath}{simList}(sim)
 
 outputPath(sim) <- value
 
-\S4method{outputPath}{.simList}(sim) <- value
+\S4method{outputPath}{simList}(sim) <- value
 
 modulePath(sim)
 
-\S4method{modulePath}{.simList}(sim)
+\S4method{modulePath}{simList}(sim)
 
 modulePath(sim) <- value
 
-\S4method{modulePath}{.simList}(sim) <- value
+\S4method{modulePath}{simList}(sim) <- value
 
 dataPath(sim)
 
-\S4method{dataPath}{.simList}(sim)
+\S4method{dataPath}{simList}(sim)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

@@ -4,27 +4,27 @@
 \name{params}
 \alias{params}
 \alias{simList-accessors-params}
-\alias{params,.simList-method}
+\alias{params,simList-method}
 \alias{params<-}
 \alias{params<-,.simList-method}
 \alias{P}
 \alias{parameters}
-\alias{parameters,.simList-method}
+\alias{parameters,simList-method}
 \title{Get and set simulation parameters.}
 \usage{
 params(sim)
 
-\S4method{params}{.simList}(sim)
+\S4method{params}{simList}(sim)
 
 params(sim) <- value
 
-\S4method{params}{.simList}(sim) <- value
+\S4method{params}{simList}(sim) <- value
 
 P(sim, module, param)
 
 parameters(sim, asDF = FALSE)
 
-\S4method{parameters}{.simList}(sim, asDF = FALSE)
+\S4method{parameters}{simList}(sim, asDF = FALSE)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

@@ -4,54 +4,54 @@
 \name{inputs}
 \alias{inputs}
 \alias{simList-accessors-inout}
-\alias{inputs,.simList-method}
+\alias{inputs,simList-method}
 \alias{inputs<-}
 \alias{inputs<-,.simList-method}
 \alias{outputs}
-\alias{outputs,.simList-method}
+\alias{outputs,simList-method}
 \alias{outputs<-}
 \alias{outputs<-,.simList-method}
 \alias{inputArgs}
-\alias{inputArgs,.simList-method}
+\alias{inputArgs,simList-method}
 \alias{inputArgs<-}
 \alias{inputArgs<-,.simList-method}
 \alias{outputArgs}
-\alias{outputArgs,.simList-method}
+\alias{outputArgs,simList-method}
 \alias{outputArgs<-}
 \alias{outputArgs<-,.simList-method}
 \title{Inputs and outputs}
 \usage{
 inputs(sim)
 
-\S4method{inputs}{.simList}(sim)
+\S4method{inputs}{simList}(sim)
 
 inputs(sim) <- value
 
-\S4method{inputs}{.simList}(sim) <- value
+\S4method{inputs}{simList}(sim) <- value
 
 outputs(sim)
 
-\S4method{outputs}{.simList}(sim)
+\S4method{outputs}{simList}(sim)
 
 outputs(sim) <- value
 
-\S4method{outputs}{.simList}(sim) <- value
+\S4method{outputs}{simList}(sim) <- value
 
 inputArgs(sim)
 
-\S4method{inputArgs}{.simList}(sim)
+\S4method{inputArgs}{simList}(sim)
 
 inputArgs(sim) <- value
 
-\S4method{inputArgs}{.simList}(sim) <- value
+\S4method{inputArgs}{simList}(sim) <- value
 
 outputArgs(sim)
 
-\S4method{outputArgs}{.simList}(sim)
+\S4method{outputArgs}{simList}(sim)
 
 outputArgs(sim) <- value
 
-\S4method{outputArgs}{.simList}(sim) <- value
+\S4method{outputArgs}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

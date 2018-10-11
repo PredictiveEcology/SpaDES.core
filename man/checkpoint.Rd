@@ -6,11 +6,11 @@
 \alias{checkpointLoad}
 \alias{.checkpointSave}
 \alias{checkpointFile}
-\alias{checkpointFile,.simList-method}
+\alias{checkpointFile,simList-method}
 \alias{checkpointFile<-}
 \alias{checkpointFile<-,.simList-method}
 \alias{checkpointInterval}
-\alias{checkpointInterval,.simList-method}
+\alias{checkpointInterval,simList-method}
 \alias{checkpointInterval<-}
 \alias{checkpointInterval<-,.simList-method}
 \title{Simulation checkpoints.}
@@ -23,19 +23,19 @@ checkpointLoad(file)
 
 checkpointFile(sim)
 
-\S4method{checkpointFile}{.simList}(sim)
+\S4method{checkpointFile}{simList}(sim)
 
 checkpointFile(sim) <- value
 
-\S4method{checkpointFile}{.simList}(sim) <- value
+\S4method{checkpointFile}{simList}(sim) <- value
 
 checkpointInterval(sim)
 
-\S4method{checkpointInterval}{.simList}(sim)
+\S4method{checkpointInterval}{simList}(sim)
 
 checkpointInterval(sim) <- value
 
-\S4method{checkpointInterval}{.simList}(sim) <- value
+\S4method{checkpointInterval}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object.}

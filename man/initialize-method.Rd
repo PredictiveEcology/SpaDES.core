@@ -3,14 +3,22 @@
 \docType{methods}
 \name{initialize,simList-method}
 \alias{initialize,simList-method}
+\alias{initialize,simList_-method}
 \title{Generate a \code{simList} object}
 \usage{
-\S4method{initialize}{simList}(.Object)
+\S4method{initialize}{simList}(.Object, ...)
+
+\S4method{initialize}{simList_}(.Object, ...)
 }
 \arguments{
 \item{.Object}{A \code{simList} object.}
+
+\item{.Object}{A \code{simList} object.}
 }
 \description{
+Given the name or the definition of a class, plus optionally data to be
+included in the object, \code{new} returns an object from that class.
+
 Given the name or the definition of a class, plus optionally data to be
 included in the object, \code{new} returns an object from that class.
 }

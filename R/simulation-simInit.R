@@ -336,8 +336,8 @@ setMethod(
     # create simList object for the simulation
     sim <- new("simList")
     # Make a temporary place to store parsed module files
-    sim@.envir[[".parsedFiles"]] <- new.env(parent = sim@.envir)
-    on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )
+    sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
+    on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
@@ -371,7 +371,7 @@ setMethod(
     sim@modules <- modules  ## will be updated below
 
     reqdPkgs <- packages(modules = unlist(modules), paths = paths(sim)$modulePath,
-                         envir = sim@.envir[[".parsedFiles"]])
+                         envir = sim@.xData[[".parsedFiles"]])
     if (length(unlist(reqdPkgs))) {
       allPkgs <- c(unique(unlist(reqdPkgs), "SpaDES.core"))
       if (getOption("spades.useRequire")) {
@@ -398,7 +398,7 @@ setMethod(
       while (stillFinding && length(modsForTU)) {
 
         tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                envir = sim@.envir[[".parsedFiles"]])
+                                envir = sim@.xData[[".parsedFiles"]])
         hasTU <- !is.na(tu)
         innerNames <- .findModuleName(childModules, recursive = recurseLevel)
         modsForTU <- innerNames[nzchar(names(innerNames))]
@@ -456,7 +456,7 @@ setMethod(
       minTimeunit(timeunits)
     }
 
-    timestep <- inSeconds(sim@simtimes[["timeunit"]], sim@.envir)
+    timestep <- inSeconds(sim@simtimes[["timeunit"]], sim@.xData)
     times(sim) <- list(
       current = times$start * timestep,
       start = times$start * timestep,
@@ -480,7 +480,7 @@ setMethod(
 
     ## source module metadata and code files
     lapply(modules(sim), function(m) moduleVersion(m, sim = sim,
-                                                   envir = sim@.envir[[".parsedFiles"]]))
+                                                   envir = sim@.xData[[".parsedFiles"]]))
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
@@ -488,7 +488,7 @@ setMethod(
       sim <- .parseModule(sim,
                           sim@modules,
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
-                          envir = sim@.envir[[".parsedFiles"]],
+                          envir = sim@.xData[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
                           objects = objects, paths = paths)
       if (length(.unparsed(sim@modules)) == 0) {
@@ -858,7 +858,7 @@ simInitAndExperiment <- function(...) {
   if (length(modules) > 0) {
     modulesToSearch <- lapply(.parseModulePartial(sim, modulesToSearch,
                                                   defineModuleElement = "childModules",
-                                                  envir = sim@.envir[[".parsedFiles"]]),
+                                                  envir = sim@.xData[[".parsedFiles"]]),
                               as.list)
     isParent <- unlist(lapply(modulesToSearch, function(x) length(x)>1))
 
@@ -927,9 +927,9 @@ simInitAndExperiment <- function(...) {
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
-    if (!is.null(sim@.envir[[m]][[".inputObjects"]])) {
+    if (!is.null(sim@.xData[[m]][[".inputObjects"]])) {
       list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
-               envir = sim@.envir)
+               envir = sim@.xData)
       a <- P(sim, m, ".useCache")
       if (!is.null(a)) {
         if (!identical(FALSE, a)) {
@@ -952,7 +952,7 @@ simInitAndExperiment <- function(...) {
           moduleSpecificObjs <- paste(m, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
         } else {
-          objectsToEvaluateForCaching <- c(grep(ls(sim@.envir, all.names = TRUE),
+          objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = m, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))
         }

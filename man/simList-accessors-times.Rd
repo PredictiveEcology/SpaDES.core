@@ -4,7 +4,7 @@
 \name{times}
 \alias{times}
 \alias{simList-accessors-times}
-\alias{times,.simList-method}
+\alias{times,simList-method}
 \alias{times<-}
 \alias{times<-,.simList-method}
 \alias{time..simList}
@@ -19,28 +19,28 @@
 \alias{start<-}
 \alias{start<-,.simList-method}
 \alias{timeunit}
-\alias{timeunit,.simList-method}
+\alias{timeunit,simList-method}
 \alias{timeunit<-}
 \alias{timeunit<-,.simList-method}
 \alias{timeunits}
-\alias{timeunits,.simList-method}
+\alias{timeunits,simList-method}
 \alias{elapsedTime}
 \alias{elapsedTime..simList}
 \title{Time usage in \code{SpaDES}}
 \usage{
 times(x, ...)
 
-\S4method{times}{.simList}(x)
+\S4method{times}{simList}(x)
 
 times(x) <- value
 
-\S4method{times}{.simList}(x) <- value
+\S4method{times}{simList}(x) <- value
 
 \method{time}{.simList}(x, unit, ...)
 
 time(x) <- value
 
-\S4method{time}{.simList}(x) <- value
+\S4method{time}{simList}(x) <- value
 
 end(x, ...)
 
@@ -48,7 +48,7 @@ end(x, ...)
 
 end(x) <- value
 
-\S4method{end}{.simList}(x) <- value
+\S4method{end}{simList}(x) <- value
 
 start(x, ...)
 
@@ -56,19 +56,19 @@ start(x, ...)
 
 start(x) <- value
 
-\S4method{start}{.simList}(x) <- value
+\S4method{start}{simList}(x) <- value
 
 timeunit(x)
 
-\S4method{timeunit}{.simList}(x)
+\S4method{timeunit}{simList}(x)
 
 timeunit(x) <- value
 
-\S4method{timeunit}{.simList}(x) <- value
+\S4method{timeunit}{simList}(x) <- value
 
 timeunits(x)
 
-\S4method{timeunits}{.simList}(x)
+\S4method{timeunits}{simList}(x)
 
 elapsedTime(x, ...)
 
