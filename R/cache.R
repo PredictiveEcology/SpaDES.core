@@ -82,11 +82,9 @@ setMethod(
     envirHash <- envirHash[lens]
 
     # Copy all parts except environment, clear that, then convert to list
-    browser()
     objectTmp <- object
+    browser()
     object <- Copy(object, objects = FALSE, queues = FALSE)
-    object@.xData <- new.env()
-    object@.envir <- object@.xData
     object <- as(object, "simList_")
     # Replace the .list slot with the hashes of the slots
     object@.Data <- envirHash
@@ -667,6 +665,7 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
 #' @seealso \code{\link[reproducible]{makeMemoiseable}}
 #' @export
 makeMemoiseable.simList <- function(x) {
+  browser()
   as(x, "simList_")
 }
 
@@ -675,6 +674,7 @@ makeMemoiseable.simList <- function(x) {
 #' @export
 #' @rdname makeMemoiseable
 unmakeMemoiseable.simList_ <- function(x) {
+  browser()
   as(x, "simList")
 }
 

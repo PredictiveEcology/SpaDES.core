@@ -7,15 +7,15 @@
 \alias{times,simList-method}
 \alias{times<-}
 \alias{times<-,.simList-method}
-\alias{time..simList}
+\alias{time.simList}
 \alias{time<-}
 \alias{time<-,.simList-method}
 \alias{end}
-\alias{end..simList}
+\alias{end.simList}
 \alias{end<-}
 \alias{end<-,.simList-method}
 \alias{start}
-\alias{start..simList}
+\alias{start.simList}
 \alias{start<-}
 \alias{start<-,.simList-method}
 \alias{timeunit}
@@ -25,7 +25,7 @@
 \alias{timeunits}
 \alias{timeunits,simList-method}
 \alias{elapsedTime}
-\alias{elapsedTime..simList}
+\alias{elapsedTime.simList}
 \title{Time usage in \code{SpaDES}}
 \usage{
 times(x, ...)
@@ -36,7 +36,7 @@ times(x) <- value
 
 \S4method{times}{simList}(x) <- value
 
-\method{time}{.simList}(x, unit, ...)
+\method{time}{simList}(x, unit, ...)
 
 time(x) <- value
 
@@ -44,7 +44,7 @@ time(x) <- value
 
 end(x, ...)
 
-\method{end}{.simList}(x, unit, ...)
+\method{end}{simList}(x, unit, ...)
 
 end(x) <- value
 
@@ -52,7 +52,7 @@ end(x) <- value
 
 start(x, ...)
 
-\method{start}{.simList}(x, unit = NULL, ...)
+\method{start}{simList}(x, unit = NULL, ...)
 
 start(x) <- value
 
@@ -72,7 +72,7 @@ timeunits(x)
 
 elapsedTime(x, ...)
 
-\method{elapsedTime}{.simList}(x, byEvent = TRUE, ...)
+\method{elapsedTime}{simList}(x, byEvent = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{simList} object from which to extract element(s) or
@@ -157,8 +157,7 @@ of the simulation:
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
-  \code{\link{inputs}}, \code{\link{ls.simList}},
-  \code{\link{ls.str.simList}}, \code{\link{modules}},
+  \code{\link{inputs}}, \code{\link{modules}},
   \code{\link{objs}}, \code{\link{packages}},
   \code{\link{params}}, \code{\link{paths}},
   \code{\link{progressInterval}}

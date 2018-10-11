@@ -45,7 +45,6 @@ but it is a \code{.globals} element in the \code{params} slot of the \code{simLi
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{inputs}},
-  \code{\link{ls.simList}}, \code{\link{ls.str.simList}},
   \code{\link{modules}}, \code{\link{objs}},
   \code{\link{packages}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},

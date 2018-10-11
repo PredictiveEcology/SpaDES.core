@@ -205,7 +205,6 @@ setClass("simList_",
 )
 
 setAs(from = "simList_", to = "simList", def = function(from) {
-  browser()
   x <- new(to,
            modules = from@modules,
            params = from@params,
@@ -220,6 +219,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   #x <- as(as(from, ".simList"), "simList")
   x@.xData <- new.env(new.env(parent = emptyenv()))
   x@.envir <- x@.xData
+  browser()
   list2env(from@.Data, envir = x@.xData)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
@@ -261,7 +261,6 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
 setMethod("initialize",
           signature(.Object = "simList_"),
           definition = function(.Object, ...) {
-            browser()
             .Object <- callNextMethod(.Object, ...)
 
             .Object@.list <- .Object@.Data # backwards compatibility
