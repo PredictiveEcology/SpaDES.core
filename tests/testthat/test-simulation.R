@@ -290,6 +290,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
 test_that("conflicting function types", {
   testInitOut <- testInit(smcc = TRUE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)

@@ -14,8 +14,8 @@ cleanMessage <- function(mm) {
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
-                     opts = list()) {
-  opts1 <- if (!smcc)
+                     opts = list(reproducible.inputPaths = NULL)) {
+  opts1 <- if (smcc)
     list(spades.moduleCodeChecks = smcc)
   else
     list()
