@@ -126,23 +126,36 @@ setClass(
 #'
 setMethod("initialize",
           signature(.Object = ".simList"),
-          definition = function(.Object) {
+          definition = function(.Object, ...) {
 
-            .Object@modules = as.list(NULL)
-            .Object@params = list(
+            sn <- slotNames(.Object)
+            dots <- list(...)
+            slotsProvided <- sn %in% names(dots)
+            for (ss in sn[slotsProvided]) {
+              slot(.Object, ss) <- dots[[ss]]
+            }
+
+
+            if ("modules" %in% sn[!slotsProvided])
+              .Object@modules = as.list(NULL)
+
+            if ("params" %in% sn[!slotsProvided])
+              .Object@params = list(
                 .checkpoint = list(interval = NA_real_, file = NULL),
                 .progress = list(type = NULL, interval = NULL)
               )
-            .Object@events = list()
-            .Object@current = list() #.emptyEventListObj,
-            .Object@completed = list()
-            .Object@depends = new(".simDeps", dependencies = list(NULL))
-            .Object@simtimes = list(
+            if ("depends" %in% sn[!slotsProvided])
+              .Object@depends = new(".simDeps", dependencies = list(NULL))
+            if ("simtimes" %in% sn[!slotsProvided])
+              .Object@simtimes = list(
                 current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
               )
-            .Object@inputs = .fileTableIn()
-            .Object@outputs = .fileTableOut()
-            .Object@paths = .paths()
+            if ("inputs" %in% sn[!slotsProvided])
+              .Object@inputs = .fileTableIn()
+            if ("outputs" %in% sn[!slotsProvided])
+              .Object@outputs = .fileTableOut()
+            if ("paths" %in% sn[!slotsProvided])
+              .Object@paths = .paths()
 
             .Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             attr(.Object@.xData, "name") <- "sim"
@@ -190,12 +203,40 @@ setClass("simList",
 #' @author Alex Chubaty
 #'
 setClass("simList_",
-         contains = ".simList",
-         slots = list(.list = "list"),
-         prototype = list(.list = list())
+         contains = "list",
+         slots = list(
+           modules = "list", params = "list", events = "list",#data.table",
+           current = "list", #"data.table",
+           completed = "list", depends = ".simDeps",
+           simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
+           .list = "list"
+         )
 )
 
 setAs(from = "simList_", to = "simList", def = function(from) {
+  browser()
+  x <- new(to,
+           modules = from@modules,
+           params = from@params,
+           events = from@events,
+           current = from@current,
+           completed = from@completed,
+           depends = from@depends,
+           simtimes = from@simtimes,
+           inputs = from@inputs,
+           outputs = from@outputs,
+           paths = from@paths)
+  #x <- as(as(from, ".simList"), "simList")
+  x@.xData <- new.env(new.env(parent = emptyenv()))
+  x@.envir <- x@.xData
+  list2env(from@.Data, envir = x@.xData)
+  x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  return(x)
+})
+
+setAs(from = ".simList", to = "simList_", def = function(from) {
+  browser()
+  to <- from
   x <- as(as(from, ".simList"), "simList")
   x@.envir <- new.env(new.env(parent = emptyenv()))
   list2env(from@.list, envir = x@.envir)
@@ -203,9 +244,38 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   return(x)
 })
 
-setAs(from = "simList", to = "simList_", def = function(from) {
-  x <- as(as(from, ".simList"), "simList_")
-  x@.list <- as.list(envir(from), all.names = TRUE)
+setAs(from = "simList_", to = ".simList", def = function(from, to) {
+  browser()
+  x <- new(to,
+           modules = from@modules,
+           params = from@params,
+           events = from@events,
+           current = from@current,
+           completed = from@completed,
+           depends = from@depends,
+           simtimes = from@simtimes,
+           inputs = from@inputs,
+           outputs = from@outputs,
+           paths = from@paths)
+  x@.Data <- as.list(envir(from), all.names = TRUE)
+  x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  return(x)
+})
+
+setAs(from = "simList", to = "simList_", def = function(from, to) {
+  browser()
+  x <- new(to,
+           modules = from@modules,
+           params = from@params,
+           events = from@events,
+           current = from@current,
+           completed = from@completed,
+           depends = from@depends,
+           simtimes = from@simtimes,
+           inputs = from@inputs,
+           outputs = from@outputs,
+           paths = from@paths)
+  x@.Data <- as.list(envir(from), all.names = TRUE)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
 })
@@ -224,10 +294,35 @@ setAs(from = "simList", to = "simList_", def = function(from) {
 #'
 setMethod("initialize",
           signature(.Object = "simList"),
-          definition = function(.Object) {
-            .Object <- callNextMethod()
+          definition = function(.Object, ...) {
+            browser()
+            .Object <- callNextMethod(.Object, ...)
             .Object@.envir <- .Object@.xData # backwards compatibility
             #.Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
             #attr(.Object@.envir, "name") <- "sim"
             return(.Object)
 })
+
+### `initialize` generic is already defined in the methods package
+#' Generate a \code{simList} object
+#'
+#' Given the name or the definition of a class, plus optionally data to be
+#' included in the object, \code{new} returns an object from that class.
+#'
+#' @param .Object  A \code{simList} object.
+#'
+#' @export
+#' @include misc-methods.R
+#' @rdname initialize-method
+#'
+setMethod("initialize",
+          signature(.Object = "simList_"),
+          definition = function(.Object, ...) {
+            browser()
+            .Object <- callNextMethod(.Object, ...)
+
+            .Object@.list <- .Object@.Data # backwards compatibility
+            #.Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
+            #attr(.Object@.envir, "name") <- "sim"
+            return(.Object)
+          })

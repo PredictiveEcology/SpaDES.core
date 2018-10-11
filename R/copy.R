@@ -40,7 +40,8 @@ setMethod("Copy",
               sim_@current <- object@current
             }
             if (objects) {
-              sim_@.envir <- Copy(sim_@.envir, filebackedDir = cachePath(object))
+              sim_@.xData <- Copy(sim_@.xData, filebackedDir = cachePath(object))
+              sim_@.envir <- sim_@.xData
             }
             return(sim_)
 })

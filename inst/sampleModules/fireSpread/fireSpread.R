@@ -62,6 +62,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     init = {
       ### check for more object dependencies:
       ### (use `checkObject` or similar)
+      browser()
       checkObject(sim, SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
 
       if (is.null(sim[[globals(sim)$burnStats]])) {
