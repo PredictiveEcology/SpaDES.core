@@ -205,8 +205,11 @@ setMethod(
         doesntUseNamespacing <- !.isNamespaced(sim, m)
 
         # evaluate the rest of the parsed file
-        if (doesntUseNamespacing)
+        if (doesntUseNamespacing) {
+          #lockBinding(m, sim@.envir) ## guard against clobbering from module code (#80)
           eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.envir)
+          #unlockBinding(m, sim@.envir) ## will be re-locked later on
+        }
 
         # attach source code to simList in a hidden spot
         opt <- getOption("spades.moduleCodeChecks")
