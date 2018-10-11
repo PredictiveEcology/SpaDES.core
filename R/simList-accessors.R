@@ -235,51 +235,6 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
-#' @inheritParams objs
-#' @export
-#' @include simList-class.R
-#' @name [[
-#' @aliases [[,simList,ANY,ANY-method
-#' @aliases simList-accessors-objects
-#' @rdname objects
-setMethod("[[", signature(x = "simList", i = "ANY", j = "ANY"),
-          definition = function(x, i, j, ..., drop) {
-            x@.xData[[i]]
-})
-
-#' @export
-#' @name [[<-
-#' @aliases [[<-,simList,ANY,ANY,ANY-method
-#' @aliases simList-accessors-objects
-#' @rdname objects
-setReplaceMethod("[[", signature(x = "simList", value = "ANY"),
-                 definition = function(x, i, value) {
-                   assign(i, value, envir = x@.xData, inherits = FALSE)
-                   x
-})
-
-
-#' @export
-#' @name $
-#' @aliases $,simList-method
-#' @aliases simList-accessors-objects
-#' @rdname objects
-setMethod("$", signature(x = "simList"),
-          definition = function(x, name) {
-            x@.xData[[name]]
-})
-
-#' @export
-#' @name $<-
-#' @aliases $<-,simList-method
-#' @aliases simList-accessors-objects
-#' @rdname objects
-setReplaceMethod("$", signature(x = "simList", value = "ANY"),
-                 definition = function(x, name, value) {
-                   assign(name, value, envir = x@.xData, inherits = FALSE)
-                   x
-})
 
 ################################################################################
 #' Simulation modules and dependencies

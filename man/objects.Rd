@@ -7,14 +7,6 @@
 \alias{objs,simList-method}
 \alias{objs<-}
 \alias{objs<-,simList-method}
-\alias{[[}
-\alias{[[,simList,ANY,ANY-method}
-\alias{[[<-}
-\alias{[[<-,simList,ANY,ANY,ANY-method}
-\alias{$}
-\alias{$,simList-method}
-\alias{$<-}
-\alias{$<-,simList-method}
 \title{Extract or replace an object from the simulation environment}
 \usage{
 objs(sim, ...)
@@ -24,14 +16,6 @@ objs(sim, ...)
 objs(sim) <- value
 
 \S4method{objs}{simList}(sim) <- value
-
-\S4method{[[}{simList,ANY,ANY}(x, i, j, ..., drop)
-
-\S4method{[[}{simList,ANY,ANY,ANY}(x, i) <- value
-
-\S4method{$}{simList}(x, name)
-
-\S4method{$}{simList}(x, name) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -44,9 +28,9 @@ in which to replace element(s).}
 
 \item{i, j, ...}{Indices specifying elements to extract or replace.}
 
-\item{drop}{not implemented.}
-
 \item{name}{A literal character string or a \code{\link{name}}.}
+
+\item{drop}{not implemented.}
 }
 \value{
 Returns or sets a list of objects in the \code{simList} environment.
