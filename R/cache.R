@@ -35,6 +35,7 @@ setMethod(
   signature = "simList",
   definition = function(object, objects, length, algo,
                         quick, classOptions) {
+
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.xData)
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
@@ -125,8 +126,10 @@ setMethod(
     nonDotList <- grep(".list", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
     obj$.list <- object@.Data
-    obj$.list[[1]]$._startClockTime <- NULL
-    obj$.list[[1]]$._timestamp <- NULL
+    if (length(obj$.list)) {
+      obj$.list[[1]]$._startClockTime <- NULL
+      obj$.list[[1]]$._timestamp <- NULL
+    }
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
     if (!is.null(classOptions$events))
@@ -338,13 +341,18 @@ setMethod(
                     algo = dots$algo,
                     quick = dots$quick,
                     classOptions = dots$classOptions)
-    isNewObj <- !names(postDigest$.list[[1]]) %in% names(preDigest[[whSimList]]$.list[[1]])
-    newObjs <- names(postDigest$.list[[1]])[isNewObj]
-    existingObjs <- names(postDigest$.list[[1]])[!isNewObj]
-    post <- lapply(postDigest$.list[[1]][existingObjs], fastdigest::fastdigest)
-    pre <- lapply(preDigest[[whSimList]]$.list[[1]][existingObjs], fastdigest::fastdigest)
-    changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
-    attr(object, ".Cache")$changed <- c(newObjs, changedObjs)
+    changed <- if (length(postDigest$.list)) {
+      isNewObj <- !names(postDigest$.list[[1]]) %in% names(preDigest[[whSimList]]$.list[[1]])
+      newObjs <- names(postDigest$.list[[1]])[isNewObj]
+      existingObjs <- names(postDigest$.list[[1]])[!isNewObj]
+      post <- lapply(postDigest$.list[[1]][existingObjs], fastdigest::fastdigest)
+      pre <- lapply(preDigest[[whSimList]]$.list[[1]][existingObjs], fastdigest::fastdigest)
+      changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
+      c(newObjs, changedObjs)
+    } else {
+      character()
+    }
+    attr(object, ".Cache")$changed <- changed
     object
   })
 
