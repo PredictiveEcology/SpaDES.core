@@ -47,7 +47,7 @@ test_that("simList object initializes correctly", {
   expect_equal(length(out), nline)
   options(width = w); rm(w)
 
-  ### SLOT .envir
+  ### SLOT .xData
   expect_is(envir(mySim), "environment")
   expect_is(objs(mySim), "list")
   expect_equal(sort(names(objs(mySim, all.names = TRUE))),

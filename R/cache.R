@@ -39,7 +39,7 @@ setMethod(
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.xData)
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
-    allObjsInSimList <- append(list(".envir" = outerObjs), moduleObjs)
+    allObjsInSimList <- append(list(".xData" = outerObjs), moduleObjs)
     allEnvsInSimList <- append(list(object@.xData), moduleEnvirs)
 
     ord <- .orderDotsUnderscoreFirst(allObjsInSimList)
@@ -66,7 +66,7 @@ setMethod(
         unlist(lapply(objects1[lens > 1][objects1ByMod == mod], function(x) x[[2]]))
       })
       names(objects2) <- mods
-      objects <- append(list(".envir" = unlist(objects1[lens == 1])), objects2)
+      objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
     } else {
       objects <- allObjsInSimList
     }
@@ -407,7 +407,7 @@ setMethod(
         object2 <- list()
         for (i in seq_along(object)) {
           # need to keep the list(...) slots ...
-          # i.e., Caching of simLists is mostly about objects in .envir
+          # i.e., Caching of simLists is mostly about objects in .xData
           object2[[i]] <- Copy(tmpl[[whSimList]], objects = FALSE)
           object2[[i]]@.xData <- object[[i]]@.xData
           object2[[i]]@completed <- object[[i]]@completed
@@ -424,7 +424,7 @@ setMethod(
         }
       } else {
         # need to keep the tmpl slots ...
-        # i.e., Caching of simLists is mostly about objects in .envir
+        # i.e., Caching of simLists is mostly about objects in .xData
         #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
 

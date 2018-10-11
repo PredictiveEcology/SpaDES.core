@@ -102,7 +102,9 @@ setMethod(
 ################################################################################
 #' Simulation environment
 #'
-#' Accessor functions for the \code{.envir} slot in a \code{simList} object.
+#' Accessor functions for the \code{.xData} slot, which is the default virtual
+#' slot for an S4 class object that inherits from an S3 object (specifically,
+#' the \code{simList} inherits from \code{environment}) in a \code{simList} object.
 #' These are included for advanced users.
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.

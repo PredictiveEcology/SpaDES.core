@@ -182,7 +182,7 @@ cantCodeCheckMessage <- ": line could not be checked "
       } else if (identical(x[[1]], quote(`<-`)) ) {
         if (length(x[[2]]) > 1) {
           if (is.call(x[[2]][[2]])) {
-            if (any(grepl(x[[2]][[2]], pattern = ".envir"))) {# i.e., sim@.xData
+            if (any(grepl(x[[2]][[2]], pattern = ".xData"))) {# i.e., sim@.xData
               assigner <- FALSE
             } else {
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"

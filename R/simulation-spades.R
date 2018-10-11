@@ -739,7 +739,7 @@ setMethod(
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     moduleSpecificObjects <-
-      c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
+      c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
         ls(fnEnv, all.names = TRUE), # functions in the namespaced location
         na.omit(createsOutputs)) # objects outputted by module
     moduleSpecificOutputObjects <- createsOutputs
