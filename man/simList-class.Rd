@@ -56,7 +56,7 @@ and \code{outputPath} paths. Partial matching is performed.}
 Several "shortcuts" to accessing objects referenced by this
 environment are provided, and can be used on the
 \code{simList} object directly instead of specifying the
-\code{.envir} slot: \code{$}, \code{[[}, \code{ls},
+\code{.xData} slot: \code{$}, \code{[[}, \code{ls},
 \code{ls.str}, \code{objs}. See examples.}
 
 \item{\code{.envir}}{Deprecated. Please do not use any more.}
@@ -64,7 +64,7 @@ environment are provided, and can be used on the
 
 \note{
 The \code{simList} class extends the \code{.simList} superclass by adding
-a slot \code{.envir} to store the simulation environment containing references
+a slot \code{.xData} to store the simulation environment containing references
 to simulation objects.
 The \code{\link{simList_}} class extends the \code{.simList} superclass, by
 adding a slot \code{.list} containing the simulation objects.
