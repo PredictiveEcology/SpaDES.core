@@ -44,13 +44,13 @@ defineModule(sim, list(
   inputObjects = bind_rows(
     expectsInput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
                  desc = NA_character_, sourceURL = NA_character_),
-    expectsInput(objectName = globals(sim)$burnStats, objectClass = "numeric",
+    expectsInput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                  desc = NA_character_, sourceURL = NA_character_)
   ),
   outputObjects = bind_rows(
     createsOutput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
                   desc = NA_character_, other = NA_character_),
-    createsOutput(objectName = globals(sim)$burnStats, objectClass = "numeric",
+    createsOutput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                   desc = NA_character_, other = NA_character_)
   )
 ))
@@ -64,10 +64,10 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       ### (use `checkObject` or similar)
       SpaDES.core::checkObject(sim, SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
 
-      if (is.null(sim[[globals(sim)$burnStats]])) {
-        sim[[globals(sim)$burnStats]] <- numeric()
+      if (is.null(sim[[SpaDES.core::globals(sim)$burnStats]])) {
+        sim[[SpaDES.core::globals(sim)$burnStats]] <- numeric()
       } else {
-        npix <- sim[[(globals(sim)$burnStats)]]
+        npix <- sim[[(SpaDES.core::globals(sim)$burnStats)]]
         stopifnot("numeric" %in% is(npix), "vector" %in% is(npix))
       }
 
@@ -180,11 +180,11 @@ Burn <- function(sim) {
 }
 
 Stats <- function(sim) {
-  npix <- sim[[globals(sim)$burnStats]]
+  npix <- sim[[SpaDES.core::globals(sim)$burnStats]]
 
   landscapes <- sim[[SpaDES.core::P(sim)$stackName]]
 
-  sim[[globals(sim)$burnStats]] <- c(npix, length(which(values(landscapes$Fires) > 0)))
+  sim[[SpaDES.core::globals(sim)$burnStats]] <- c(npix, length(which(values(landscapes$Fires) > 0)))
 
   return(invisible(sim))
 }

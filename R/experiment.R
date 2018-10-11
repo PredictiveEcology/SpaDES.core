@@ -207,7 +207,6 @@ setMethod(
       objects <- unlist(objects, recursive = FALSE)
     }
 
-    browser()
     if (missing(cl)) {
       cl <- tryCatch(getCluster(), error = function(x) NULL)
       on.exit(if (!is.null(cl)) returnCluster(), add = TRUE)
@@ -296,7 +295,6 @@ setMethod(
         paramValues <- paramValues[notNA]
       }
 
-      browser()
       sim_ <- Copy(sim) # nolint
       experimentDF <- data.frame(module = character(0),
                                  param = character(0),

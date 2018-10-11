@@ -160,10 +160,10 @@ test_that("simInit with R subfolder scripts", {
           poiuoiu + 1
       }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
-  expect_true(sum(grepl(unlist(lapply(ls(mySim@.envir, all.names = TRUE), function(x) {
-    if (is.environment(mySim@.envir[[x]])) ls(envir = mySim@.envir[[x]], all.names = TRUE)
+  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
+    if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.envir$child1$a(2) == 3) # Fns
+  expect_true(mySim@.xData$child1$a(2) == 3) # Fns
 })
 
 test_that("simulation runs with simInit with duplicate modules named", {
@@ -364,10 +364,10 @@ test_that("conflicting function types", {
       d <- sim$d
       f <- sim[['f']]
       f <- sim[[P(sim)$value]]
-      poiuoiu <- sim@.envir$d1
-      qwerqwer <- sim@.envir[['test']]
+      poiuoiu <- sim@.xData$d1
+      qwerqwer <- sim@.xData[['test']]
       sim$g <- f
-      sim@.envir$g1 <- f
+      sim@.xData$g1 <- f
       return(list(a, d, f, sim))
       ",
       xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)

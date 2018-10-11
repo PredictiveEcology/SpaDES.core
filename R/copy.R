@@ -32,7 +32,6 @@ if (!isGeneric("Copy")) {
 setMethod("Copy",
           signature(object = "simList"),
           definition = function(object, objects, queues) {
-            browser()
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object

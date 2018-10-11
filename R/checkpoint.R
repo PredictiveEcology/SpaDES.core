@@ -91,7 +91,7 @@ checkpointLoad <- function(file) {
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
-    rm(list = c("._rng.kind", "._rng.state", "._timestamp"), envir = sim@.envir)
+    rm(list = c("._rng.kind", "._rng.state", "._timestamp"), envir = sim@.xData)
     return(invisible(TRUE))
   } else {
     return(invisible(FALSE))

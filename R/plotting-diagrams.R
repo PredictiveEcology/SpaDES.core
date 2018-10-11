@@ -81,8 +81,8 @@ setMethod(
 
     # simulation timestep in 'days'
     ts <- sim@simtimes[["timeunit"]] %>%
-      inSeconds(envir = sim@.envir) %>%
-      convertTimeunit("day", envir = sim@.envir) %>%
+      inSeconds(envir = sim@.xData) %>%
+      convertTimeunit("day", envir = sim@.xData) %>%
       as.numeric()
 
     out <- lapply(modules, function(x) {

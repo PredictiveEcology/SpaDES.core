@@ -83,7 +83,6 @@ setMethod(
 
     # Copy all parts except environment, clear that, then convert to list
     objectTmp <- object
-    browser()
     object <- Copy(object, objects = FALSE, queues = FALSE)
     object <- as(object, "simList_")
     # Replace the .list slot with the hashes of the slots
@@ -126,8 +125,8 @@ setMethod(
     nonDotList <- grep(".list", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
     obj$.list <- object@.Data
-    obj$.list$.envir$._startClockTime <- NULL
-    obj$.list$.envir$._timestamp <- NULL
+    obj$.list[[1]]$._startClockTime <- NULL
+    obj$.list[[1]]$._timestamp <- NULL
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
     if (!is.null(classOptions$events))
@@ -339,11 +338,11 @@ setMethod(
                     algo = dots$algo,
                     quick = dots$quick,
                     classOptions = dots$classOptions)
-    isNewObj <- !names(postDigest$.list$.envir) %in% names(preDigest[[whSimList]]$.list$.envir)
-    newObjs <- names(postDigest$.list$.envir)[isNewObj]
-    existingObjs <- names(postDigest$.list$.envir)[!isNewObj]
-    post <- lapply(postDigest$.list$.envir[existingObjs], fastdigest::fastdigest)
-    pre <- lapply(preDigest[[whSimList]]$.list$.envir[existingObjs], fastdigest::fastdigest)
+    isNewObj <- !names(postDigest$.list[[1]]) %in% names(preDigest[[whSimList]]$.list[[1]])
+    newObjs <- names(postDigest$.list[[1]])[isNewObj]
+    existingObjs <- names(postDigest$.list[[1]])[!isNewObj]
+    post <- lapply(postDigest$.list[[1]][existingObjs], fastdigest::fastdigest)
+    pre <- lapply(preDigest[[whSimList]]$.list[[1]][existingObjs], fastdigest::fastdigest)
     changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
     attr(object, ".Cache")$changed <- c(newObjs, changedObjs)
     object
@@ -384,7 +383,6 @@ setMethod(
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
     tmpl <- .findSimList(tmpl)
-    browser()
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
@@ -665,7 +663,6 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
 #' @seealso \code{\link[reproducible]{makeMemoiseable}}
 #' @export
 makeMemoiseable.simList <- function(x) {
-  browser()
   as(x, "simList_")
 }
 
@@ -674,7 +671,6 @@ makeMemoiseable.simList <- function(x) {
 #' @export
 #' @rdname makeMemoiseable
 unmakeMemoiseable.simList_ <- function(x) {
-  browser()
   as(x, "simList")
 }
 
@@ -686,10 +682,12 @@ unmakeMemoiseable.simList_ <- function(x) {
 #' @param x an object with attributes
 #' @param y an object with attributes
 #' @rdname keepAttrs
-.keepAttrs <- function(x, y, omitAttrs = c(".envir", ".list")) {
+.keepAttrs <- function(x, y, omitAttrs = c(".envir", ".list", ".xData", ".Data")) {
   keepAttrs <- setdiff(names(attributes(x)), names(attributes(y)))
   keepAttrs <- setdiff(keepAttrs, omitAttrs)
-  for (att in keepAttrs)
+  keepAttrs <- keepAttrs[keepAttrs != "names"]
+  for (att in keepAttrs) {
     attr(y, att) <- attr(x, att)
+  }
   return(y)
 }

@@ -130,7 +130,7 @@ setGeneric("envir", function(sim) {
 setMethod("envir",
           signature = "simList",
           definition = function(sim) {
-            return(sim@.envir)
+            return(sim@.xData)
 })
 
 #' @export
@@ -147,7 +147,7 @@ setReplaceMethod("envir",
                  signature = "simList",
                  function(sim, value) {
                    if (!is.environment(value)) stop("Must be an environment")
-                   sim@.envir <- value
+                   sim@.xData <- value
                    return(sim)
 })
 
@@ -192,10 +192,10 @@ setGeneric("objs", function(sim, ...) {
 setMethod("objs",
           signature = "simList",
           definition = function(sim, ...) {
-            w <- lapply(ls(sim@.envir, ...), function(z) {
-              eval(parse(text = z), envir = sim@.envir)
+            w <- lapply(ls(sim@.xData, ...), function(z) {
+              eval(parse(text = z), envir = sim@.xData)
             })
-            names(w) <- ls(sim@.envir, ...)
+            names(w) <- ls(sim@.xData, ...)
             return(w)
 })
 
@@ -215,7 +215,7 @@ setReplaceMethod(
   signature = "simList",
   function(sim, value) {
     if (is.list(value)) {
-     list2env(value, envir = sim@.envir)
+     list2env(value, envir = sim@.xData)
      newInputs <- data.frame(
        objectName = names(value),
        loadTime = as.numeric(sim@simtimes[["current"]]),
@@ -224,7 +224,7 @@ setReplaceMethod(
      inputs(sim) <- rbind(inputs(sim), newInputs)
 
     # lapply(names(value), function(z) {
-    #   sim@.envir[[z]] <- value[[z]]
+    #   sim@.xData[[z]] <- value[[z]]
     # })
     } else {
      stop("must provide a named list.")
@@ -243,7 +243,7 @@ setReplaceMethod(
 #' @rdname objects
 setMethod("[[", signature(x = "simList", i = "ANY", j = "ANY"),
           definition = function(x, i, j, ..., drop) {
-            x@.envir[[i]]
+            x@.xData[[i]]
 })
 
 #' @export
@@ -253,7 +253,7 @@ setMethod("[[", signature(x = "simList", i = "ANY", j = "ANY"),
 #' @rdname objects
 setReplaceMethod("[[", signature(x = "simList", value = "ANY"),
                  definition = function(x, i, value) {
-                   assign(i, value, envir = x@.envir, inherits = FALSE)
+                   assign(i, value, envir = x@.xData, inherits = FALSE)
                    x
 })
 
@@ -265,7 +265,7 @@ setReplaceMethod("[[", signature(x = "simList", value = "ANY"),
 #' @rdname objects
 setMethod("$", signature(x = "simList"),
           definition = function(x, name) {
-            x@.envir[[name]]
+            x@.xData[[name]]
 })
 
 #' @export
@@ -275,7 +275,7 @@ setMethod("$", signature(x = "simList"),
 #' @rdname objects
 setReplaceMethod("$", signature(x = "simList", value = "ANY"),
                  definition = function(x, name, value) {
-                   assign(name, value, envir = x@.envir, inherits = FALSE)
+                   assign(name, value, envir = x@.xData, inherits = FALSE)
                    x
 })
 
@@ -1064,8 +1064,8 @@ setMethod("inputs",
               if (any(!is.na(sim@inputs$loadTime))) {
                 if (!is.null(sim@inputs$loadTime)) {
                   obj <- copy(sim@inputs) # don't change original sim
-                  set(obj, NULL, j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.envir))
-                  #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.envir)]
+                  set(obj, NULL, j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.xData))
+                  #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.xData)]
                   obj[]
                 }
               } else {
@@ -1299,7 +1299,7 @@ setMethod(
     if (any(!is.na(sim@outputs$saveTime))) {
       if (!is.null(sim@outputs$saveTime)) {
         obj <- copy(sim@outputs) # don't change original sim
-        obj[, saveTime := convertTimeunit(saveTime, unit, sim@.envir)]
+        obj[, saveTime := convertTimeunit(saveTime, unit, sim@.xData)]
         obj[]
         obj
       }
@@ -1890,9 +1890,9 @@ setReplaceMethod(
      if (is.null(attributes(value$end)$unit))
        attributes(value$end)$unit <- value$timeunit
 
-     x@simtimes$current <- convertTimeunit(value$current, "second", x@.envir)
-     x@simtimes$start <- convertTimeunit(value$start, "second", x@.envir)
-     x@simtimes$end <- convertTimeunit(value$end, "second", x@.envir)
+     x@simtimes$current <- convertTimeunit(value$current, "second", x@.xData)
+     x@simtimes$start <- convertTimeunit(value$start, "second", x@.xData)
+     x@simtimes$end <- convertTimeunit(value$end, "second", x@.xData)
      x@simtimes$timeunit <- value$timeunit
 
      validObject(x)
@@ -1917,7 +1917,7 @@ time.simList <- function(x, unit, ...) {
     }
     if (isTRUE(!startsWith(unit, "second"))) {
 
-      t <- convertTimeunit(x@simtimes[["current"]], unit, x@.envir,
+      t <- convertTimeunit(x@simtimes[["current"]], unit, x@.xData,
                            skipChecks = TRUE)
       return(t)
     }
@@ -1942,7 +1942,7 @@ setReplaceMethod(
      if (is.null(attributes(value)$unit)) {
        attributes(value)$unit <- x@simtimes[["timeunit"]]
      }
-     x@simtimes$current <- convertTimeunit(value, "second", x@.envir)
+     x@simtimes$current <- convertTimeunit(value, "second", x@.xData)
 
      if (!is.numeric(x@simtimes$current)) stop("time must be a numeric")
      if (!any(pmatch(.spadesTimes, attr(x@simtimes$current, "unit")))) {
@@ -1971,7 +1971,7 @@ end.simList <- function(x, unit, ...) {
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
-        t <- convertTimeunit(x@simtimes$end, unit, x@.envir)
+        t <- convertTimeunit(x@simtimes$end, unit, x@.xData)
         return(t)
       }
     }
@@ -1997,7 +1997,7 @@ setReplaceMethod(
     if (is.null(attributes(value)$unit)) {
       attributes(value)$unit <- x@simtimes[["timeunit"]]
     }
-    x@simtimes$end <- convertTimeunit(value, "second", x@.envir)
+    x@simtimes$end <- convertTimeunit(value, "second", x@.xData)
     validObject(x)
     return(x)
 })
@@ -2024,7 +2024,7 @@ start.simList <- function(x, unit = NULL, ...) {
     if (!is.na(unit)) {
       if (is.na(pmatch("second", unit))) {
         # i.e., if not in same units as simulation
-        t <- convertTimeunit(x@simtimes$start, unit, x@.envir)
+        t <- convertTimeunit(x@simtimes$start, unit, x@.xData)
         return(t)
       }
     }
@@ -2049,7 +2049,7 @@ setReplaceMethod(
      if (is.null(attributes(value)$unit)) {
        attributes(value)$unit <- x@simtimes[["timeunit"]]
      }
-     x@simtimes$start <- convertTimeunit(value, "second", x@.envir)
+     x@simtimes$start <- convertTimeunit(value, "second", x@.xData)
      validObject(x)
      return(x)
 })
@@ -2065,8 +2065,8 @@ setReplaceMethod(
   #if (!is(x, "simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
   out <- if (length(mod) > 0) {
-    if (!is.null(x@.envir[[".timeunits"]])) {
-      x@.envir[[".timeunits"]][[mod]]
+    if (!is.null(x@.xData[[".timeunits"]])) {
+      x@.xData[[".timeunits"]][[mod]]
     } else {
       timeunits(x)[[mod]]
     }
@@ -2135,7 +2135,7 @@ setReplaceMethod(
   signature = "simList",
   function(x, value) {
     value <- as.character(value)
-    if (checkTimeunit(value, envir = x@.envir)) {
+    if (checkTimeunit(value, envir = x@.xData)) {
         x@simtimes$timeunit <- value
     } else {
       x@simtimes$timeunit <- NA_character_
@@ -2248,10 +2248,10 @@ setMethod(
       # note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
-          #obj$eventTime <- convertTimeunit(obj$eventTime, unit, sim@.envir)
+          #obj$eventTime <- convertTimeunit(obj$eventTime, unit, sim@.xData)
           #obj
           #obj <- copy(sim@events) # don't change original sim
-          obj[, eventTime := convertTimeunit(eventTime, unit, sim@.envir)]
+          obj[, eventTime := convertTimeunit(eventTime, unit, sim@.xData)]
           obj[]
         }
        } #else {
@@ -2295,7 +2295,7 @@ setReplaceMethod(
        attributes(value$eventTime)$unit <- sim@simtimes[["timeunit"]]
      }
      if (is.na(pmatch("second", attributes(value$eventTime)$unit))) {
-       value[, eventTime := convertTimeunit(eventTime, "second", sim@.envir)]
+       value[, eventTime := convertTimeunit(eventTime, "second", sim@.xData)]
      }
 
      if (NROW(value)) {
@@ -2329,7 +2329,7 @@ setMethod(
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
-          sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit, sim@.envir)
+          sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit, sim@.xData)
           sim@current
         }
       } else {
@@ -2404,10 +2404,10 @@ setMethod(
           if (!is.null(obj$eventTime)) {
             #if (any(!is.na(obj$eventTime))) {
           #if (!is.null(obj$eventTime)) {
-            #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.envir)
+            #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.xData)
             #sim@completed
             if (!is.null(obj$._clockTime))
-              obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.envir),
+              obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.xData),
                          clockTime=obj$._clockTime,
                          ._clockTime=NULL)]
             obj[]
@@ -2771,7 +2771,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, ...) {
 
   if (!is.null(comp)) {
     comp <- comp[, list(moduleName, eventType,
-                          diffTime = diff(c(x@.envir[["._firstEventClockTime"]], clockTime)))]
+                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], clockTime)))]
     theBy <- if (isTRUE(byEvent)) {
       c("moduleName", "eventType")
     } else {

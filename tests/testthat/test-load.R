@@ -190,7 +190,7 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
     )
     sim2 <- simInit(times = times, params = parameters, modules = modules,
                     paths = paths, inputs = inputs)
-    expect_equal(sim2@.envir[[basename(tmpFile)]], dt)
+    expect_equal(sim2@.xData[[basename(tmpFile)]], dt)
 
     inputs <- data.frame(
       files = tmpFile,

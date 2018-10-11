@@ -182,7 +182,7 @@ cantCodeCheckMessage <- ": line could not be checked "
       } else if (identical(x[[1]], quote(`<-`)) ) {
         if (length(x[[2]]) > 1) {
           if (is.call(x[[2]][[2]])) {
-            if (any(grepl(x[[2]][[2]], pattern = ".envir"))) {# i.e., sim@.envir
+            if (any(grepl(x[[2]][[2]], pattern = ".envir"))) {# i.e., sim@.xData
               assigner <- FALSE
             } else {
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
@@ -267,19 +267,19 @@ cantCodeCheckMessage <- ": line could not be checked "
   outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
-  simAssigns <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assign")
+  simAssigns <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "assign")
   simAssigns <- simAssigns[!(simAssigns %in% ignoreObjectsAssign)]
 
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-  simGets <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "get")
+  simGets <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "get")
   simGets <- simGets[!(simGets %in% ignoreObjectsGet)]
 
-  returnsSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "returnSim")
+  returnsSim <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "returnSim")
   returnsSim <- tapply(returnsSim, names(returnsSim), function(xx) any(xx == "sim"))
 
-  assignToSim <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "assignToSim")
+  assignToSim <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "assignToSim")
 
-  fg <- .findElementsInEnv(environment(), sim@.envir[[m]], type = "globals")
+  fg <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "globals")
   hasConflicts <- fg[fg %in% conflictingFnsSimple]
 
   # Can't code check:
@@ -412,7 +412,7 @@ cantCodeCheckMessage <- ": line could not be checked "
   }
 
   checkUsageMsg <- capture.output(
-    do.call(checkUsageEnv, args = append(list(env = sim@.envir[[m]]), checks))
+    do.call(checkUsageEnv, args = append(list(env = sim@.xData[[m]]), checks))
   )
   checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
                         invert = TRUE, value = TRUE)
@@ -524,9 +524,9 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 
   # search for conflicts in module function names with common problems, like quickPlot::Plot
-  clashingFuns <- names(sim@.envir[[m]])[names(sim@.envir[[m]]) %in% clashingFnsSimple]
+  clashingFuns <- names(sim@.xData[[m]])[names(sim@.xData[[m]]) %in% clashingFnsSimple]
   if (length(clashingFuns)) {
-    fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.envir[[m]])]
+    fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.xData[[m]])]
     verb <- .verb(clashingFuns)
     hadPrevMessage <- .parseMessage(m, "module functions", paste0(
             paste(clashingFuns, collapse = ", "), " ", verb,
@@ -595,7 +595,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 .parsingSim <- function(x, type) {
   if (length(x) > 1) {
     if (!is.pairlist(x[[2]])) {
-      grepForSim <- grepl("^sim|^sim@.envir", deparse(x[[2]], backtick = TRUE))
+      grepForSim <- grepl("^sim|^sim@.envir|^sim@.xData", deparse(x[[2]], backtick = TRUE))
       if (as.character(x)[1] %in% c("$", "[[") &&
           grepForSim &&
           is.name(x[[3]])) {
@@ -646,7 +646,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 .lineNumbersInSrcFile <- function(sim, module, namedTxt,
                                   pd) {
   if (!missing(sim)) {
-    pd <- sim@.envir[[module]][["._parsedData"]]
+    pd <- sim@.xData[[module]][["._parsedData"]]
   }
   lineNumbers <- lapply(seq(namedTxt), function(patternIndex) {
     wh <- which(grepl(pattern = paste0("\\b", namedTxt[patternIndex], "\\b"), pd$text) &

@@ -144,25 +144,28 @@ setMethod("initialize",
             }
 
 
-            if ("modules" %in% sn[!slotsProvided])
+            expected <- c("modules", "params", "depends", "simtimes",
+              "inputs", "outputs", "paths")
+            haves <- na.omit(match(sn[!slotsProvided], expected))
+            if (any(1==haves))
               .Object@modules = as.list(NULL)
 
-            if ("params" %in% sn[!slotsProvided])
+            if (any(2==haves))
               .Object@params = list(
                 .checkpoint = list(interval = NA_real_, file = NULL),
                 .progress = list(type = NULL, interval = NULL)
               )
-            if ("depends" %in% sn[!slotsProvided])
-              .Object@depends = new(".simDeps", dependencies = list(NULL))
-            if ("simtimes" %in% sn[!slotsProvided])
+            if (any(3==haves))
+              .Object@depends = .emptySimDeps #new(".simDeps", dependencies = list(NULL))
+            if (any(4==haves))
               .Object@simtimes = list(
                 current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
               )
-            if ("inputs" %in% sn[!slotsProvided])
-              .Object@inputs = .fileTableIn()
-            if ("outputs" %in% sn[!slotsProvided])
-              .Object@outputs = .fileTableOut()
-            if ("paths" %in% sn[!slotsProvided])
+            if (any(5==haves))
+              .Object@inputs = .fileTableInDF
+            if (any(6==haves))
+              .Object@outputs = .fileTableOutDF
+            if (any(7==haves))
               .Object@paths = .paths()
 
             .Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
@@ -219,8 +222,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   #x <- as(as(from, ".simList"), "simList")
   x@.xData <- new.env(new.env(parent = emptyenv()))
   x@.envir <- x@.xData
-  browser()
-  list2env(from@.Data, envir = x@.xData)
+  list2env(from, envir = x@.xData)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
 })
@@ -228,7 +230,6 @@ setAs(from = "simList_", to = "simList", def = function(from) {
 
 
 setAs(from = "simList", to = "simList_", def = function(from, to) {
-  browser()
   x <- new(to,
            modules = from@modules,
            params = from@params,
