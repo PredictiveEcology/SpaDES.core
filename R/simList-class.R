@@ -12,11 +12,12 @@
 #' \code{\link{data.frame}} to implement the event queue (because it is much
 #' more efficient).
 #'
-#' @note The \code{simList} class extends the \code{.simList} superclass by adding
-#' a slot \code{.xData} to store the simulation environment containing references
-#' to simulation objects.
-#' The \code{\link{simList_}} class extends the \code{.simList} superclass, by
-#' adding a slot \code{.list} containing the simulation objects.
+#' @note The \code{simList} class extends the \code{environment}, by adding
+#' several slots that provide information about the metadata for a discrete
+#' event simulation. The environment slot, if accessed directly is \code{.xData}
+#' and this is where input and output objects from modules are placed.
+#' The \code{\link{simList_}} class is similar, but it extends the \code{list}
+#' class. All other slots are the same.
 #' Thus, \code{simList} is identical to \code{simList_}, except that the former
 #' uses an environment for objects and the latter uses a list.
 #' The class \code{simList_} is only used internally.
@@ -87,8 +88,9 @@
 #'   \code{eventPriority} \tab The priority given to the event. \cr
 #' }
 #'
-#' @aliases .simList
+#' @aliases simList
 #' @rdname simList-class
+#' @rdname simList
 #' @importFrom data.table as.data.table data.table
 #' @include helpers.R misc-methods.R module-dependencies-class.R
 #'
@@ -97,6 +99,7 @@
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @author Alex Chubaty and Eliot McIntire
+#' @exportClass simList
 #'
 setClass(
   "simList",
@@ -186,7 +189,7 @@ setMethod("initialize",
 #' environment contained within the \code{simList}.
 #' Saving/loading a list behaves more reliably than saving/loading an environment.
 #'
-#' @inheritParams .simList
+#' @inheritParams simList
 #'
 #' @seealso \code{\link{simList}}
 #'
@@ -219,7 +222,6 @@ setAs(from = "simList_", to = "simList", def = function(from) {
            inputs = from@inputs,
            outputs = from@outputs,
            paths = from@paths)
-  #x <- as(as(from, ".simList"), "simList")
   x@.xData <- new.env(new.env(parent = emptyenv()))
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)

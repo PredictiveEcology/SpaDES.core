@@ -3,7 +3,7 @@
 \docType{class}
 \name{simList-class}
 \alias{simList-class}
-\alias{.simList}
+\alias{simList}
 \title{The \code{simList} class}
 \description{
 Contains the minimum components of a \code{SpaDES} simulation.
@@ -63,11 +63,12 @@ environment are provided, and can be used on the
 }}
 
 \note{
-The \code{simList} class extends the \code{.simList} superclass by adding
-a slot \code{.xData} to store the simulation environment containing references
-to simulation objects.
-The \code{\link{simList_}} class extends the \code{.simList} superclass, by
-adding a slot \code{.list} containing the simulation objects.
+The \code{simList} class extends the \code{environment}, by adding
+several slots that provide information about the metadata for a discrete
+event simulation. The environment slot, if accessed directly is \code{.xData}
+and this is where input and output objects from modules are placed.
+The \code{\link{simList_}} class is similar, but it extends the \code{list}
+class. All other slots are the same.
 Thus, \code{simList} is identical to \code{simList_}, except that the former
 uses an environment for objects and the latter uses a list.
 The class \code{simList_} is only used internally.

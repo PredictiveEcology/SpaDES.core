@@ -11,7 +11,7 @@ if (getRversion() >= "3.1.0") {
 #' @export
 #' @importFrom dplyr mutate
 #' @importFrom stats na.omit
-#' @importFrom utils capture.output
+#' @importFrom utils capture.output ls.str
 #' @include simList-class.R
 #' @rdname show-method
 setMethod(
