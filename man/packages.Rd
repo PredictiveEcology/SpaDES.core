@@ -3,6 +3,7 @@
 \docType{methods}
 \name{packages}
 \alias{packages}
+\alias{simList-accessors-packages}
 \alias{packages,ANY-method}
 \title{Get module or simulation package dependencies}
 \usage{

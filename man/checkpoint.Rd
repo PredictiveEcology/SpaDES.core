@@ -8,11 +8,11 @@
 \alias{checkpointFile}
 \alias{checkpointFile,simList-method}
 \alias{checkpointFile<-}
-\alias{checkpointFile<-,.simList-method}
+\alias{checkpointFile<-,simList-method}
 \alias{checkpointInterval}
 \alias{checkpointInterval,simList-method}
 \alias{checkpointInterval<-}
-\alias{checkpointInterval<-,.simList-method}
+\alias{checkpointInterval<-,simList-method}
 \title{Simulation checkpoints.}
 \usage{
 doEvent.checkpoint(sim, eventTime, eventType, debug = FALSE)

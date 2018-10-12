@@ -7,17 +7,17 @@
 \alias{events,simList,character-method}
 \alias{events,simList,missing-method}
 \alias{events<-}
-\alias{events<-,.simList-method}
+\alias{events<-,simList-method}
 \alias{current}
 \alias{current,simList,character-method}
 \alias{current,simList,missing-method}
 \alias{current<-}
-\alias{current<-,.simList-method}
+\alias{current<-,simList-method}
 \alias{completed}
 \alias{completed,simList,character-method}
 \alias{completed,simList,missing-method}
 \alias{completed<-}
-\alias{completed<-,.simList-method}
+\alias{completed<-,simList-method}
 \title{Simulation event lists}
 \usage{
 events(sim, unit)

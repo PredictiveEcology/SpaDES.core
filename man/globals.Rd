@@ -5,11 +5,11 @@
 \alias{globals}
 \alias{globals,simList-method}
 \alias{globals<-}
-\alias{globals<-,.simList-method}
+\alias{globals<-,simList-method}
 \alias{G}
 \alias{G,simList-method}
 \alias{G<-}
-\alias{G<-,.simList-method}
+\alias{G<-,simList-method}
 \title{Get and set simulation globals.}
 \usage{
 globals(sim)

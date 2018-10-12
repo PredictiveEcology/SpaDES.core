@@ -6,11 +6,11 @@
 \alias{simList-accessors-modules}
 \alias{modules,simList-method}
 \alias{modules<-}
-\alias{modules<-,.simList-method}
+\alias{modules<-,simList-method}
 \alias{depends}
 \alias{depends,simList-method}
 \alias{depends<-}
-\alias{depends<-,.simList-method}
+\alias{depends<-,simList-method}
 \title{Simulation modules and dependencies}
 \usage{
 modules(sim, hidden = FALSE)

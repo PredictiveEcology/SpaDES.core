@@ -6,19 +6,19 @@
 \alias{simList-accessors-inout}
 \alias{inputs,simList-method}
 \alias{inputs<-}
-\alias{inputs<-,.simList-method}
+\alias{inputs<-,simList-method}
 \alias{outputs}
 \alias{outputs,simList-method}
 \alias{outputs<-}
-\alias{outputs<-,.simList-method}
+\alias{outputs<-,simList-method}
 \alias{inputArgs}
 \alias{inputArgs,simList-method}
 \alias{inputArgs<-}
-\alias{inputArgs<-,.simList-method}
+\alias{inputArgs<-,simList-method}
 \alias{outputArgs}
 \alias{outputArgs,simList-method}
 \alias{outputArgs<-}
-\alias{outputArgs<-,.simList-method}
+\alias{outputArgs<-,simList-method}
 \title{Inputs and outputs}
 \usage{
 inputs(sim)

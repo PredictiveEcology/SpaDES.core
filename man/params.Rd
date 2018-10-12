@@ -6,7 +6,7 @@
 \alias{simList-accessors-params}
 \alias{params,simList-method}
 \alias{params<-}
-\alias{params<-,.simList-method}
+\alias{params<-,simList-method}
 \alias{P}
 \alias{parameters}
 \alias{parameters,simList-method}

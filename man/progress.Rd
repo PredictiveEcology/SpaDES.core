@@ -5,11 +5,11 @@
 \alias{progressInterval}
 \alias{progressInterval,simList-method}
 \alias{progressInterval<-}
-\alias{progressInterval<-,.simList-method}
+\alias{progressInterval<-,simList-method}
 \alias{progressType}
 \alias{progressType,simList-method}
 \alias{progressType<-}
-\alias{progressType<-,.simList-method}
+\alias{progressType<-,simList-method}
 \title{Get and set simulation progress bar details}
 \usage{
 progressInterval(sim)

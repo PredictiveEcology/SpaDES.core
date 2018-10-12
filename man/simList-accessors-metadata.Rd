@@ -3,6 +3,7 @@
 \docType{methods}
 \name{inputObjects}
 \alias{inputObjects}
+\alias{simList-accessors-metadata}
 \alias{inputObjects,simList-method}
 \alias{outputObjects}
 \alias{outputObjects,simList-method}
