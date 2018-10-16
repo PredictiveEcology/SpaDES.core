@@ -66,7 +66,6 @@
                     env = as.environment("package:SpaDES.core")
   )
   lockBinding("Paths", as.environment("package:SpaDES.core"))
-
 }
 
 .onUnload <- function(libpath) {

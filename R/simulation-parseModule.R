@@ -205,8 +205,11 @@ setMethod(
         doesntUseNamespacing <- !.isNamespaced(sim, m)
 
         # evaluate the rest of the parsed file
-        if (doesntUseNamespacing)
+        if (doesntUseNamespacing) {
+          #lockBinding(m, sim@.envir) ## guard against clobbering from module code (#80)
           eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData)
+          #unlockBinding(m, sim@.envir) ## will be re-locked later on
+        }
 
         # attach source code to simList in a hidden spot
         opt <- getOption("spades.moduleCodeChecks")
@@ -217,7 +220,7 @@ setMethod(
 
         # parse any scripts in R subfolder
         RSubFolder <- file.path(dirname(filename), "R")
-        RScript <- dir(RSubFolder)
+        RScript <- dir(RSubFolder, pattern = "([.]R$|[.]r$)") ## only R files
         if (length(RScript) > 0) {
           for (Rfiles in RScript) {
             parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
