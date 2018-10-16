@@ -129,8 +129,6 @@ setClass(
 #' Given the name or the definition of a class, plus optionally data to be
 #' included in the object, \code{new} returns an object from that class.
 #'
-#' @param .Object  A \code{simList} object.
-#'
 #' @export
 #' @include misc-methods.R
 #' @rdname initialize-method
@@ -256,6 +254,7 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
 #' included in the object, \code{new} returns an object from that class.
 #'
 #' @param .Object  A \code{simList} object.
+#' @param ... Optional Values passed to any or all slot
 #'
 #' @export
 #' @include misc-methods.R

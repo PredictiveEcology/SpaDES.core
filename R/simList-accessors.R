@@ -168,12 +168,6 @@ setReplaceMethod("envir",
 #'
 #' @param sim      A \code{simList} object from which to extract element(s) or
 #'                 in which to replace element(s).
-#' @param x        A \code{simList} object from which to extract element(s) or
-#'                 in which to replace element(s).
-#' @param i,j,...  Indices specifying elements to extract or replace.
-#' @param name     A literal character string or a \code{\link{name}}.
-#' @param drop     not implemented.
-#' @param value    Any R object.
 #'
 #' @return Returns or sets a list of objects in the \code{simList} environment.
 #'

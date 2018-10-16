@@ -13,7 +13,7 @@
 \arguments{
 \item{.Object}{A \code{simList} object.}
 
-\item{.Object}{A \code{simList} object.}
+\item{...}{Optional Values passed to any or all slot}
 }
 \description{
 Given the name or the definition of a class, plus optionally data to be

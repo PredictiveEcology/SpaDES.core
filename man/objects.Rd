@@ -20,17 +20,6 @@ objs(sim) <- value
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
-
-\item{value}{Any R object.}
-
-\item{x}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
-
-\item{i, j, ...}{Indices specifying elements to extract or replace.}
-
-\item{name}{A literal character string or a \code{\link{name}}.}
-
-\item{drop}{not implemented.}
 }
 \value{
 Returns or sets a list of objects in the \code{simList} environment.

@@ -22,9 +22,6 @@ currentModule(sim)
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
-
-\item{x}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
 }
 \description{
 \code{.callingModuleName} returns the name of the module that is currently

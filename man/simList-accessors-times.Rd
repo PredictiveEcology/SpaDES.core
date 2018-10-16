@@ -75,9 +75,6 @@ elapsedTime(x, ...)
 \method{elapsedTime}{simList}(x, byEvent = TRUE, ...)
 }
 \arguments{
-\item{x}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
-
 \item{...}{Additional parameters.}
 
 \item{value}{A time, given as a numeric, optionally with a unit attribute,
