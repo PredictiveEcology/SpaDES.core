@@ -20,6 +20,10 @@ objs(sim) <- value
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
+
+\item{...}{passed to \code{ls}}
+
+\item{value}{objects to assign to the \code{simList}}
 }
 \value{
 Returns or sets a list of objects in the \code{simList} environment.

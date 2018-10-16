@@ -168,6 +168,8 @@ setReplaceMethod("envir",
 #'
 #' @param sim      A \code{simList} object from which to extract element(s) or
 #'                 in which to replace element(s).
+#' @param value objects to assign to the \code{simList}
+#' @param ... passed to \code{ls}
 #'
 #' @return Returns or sets a list of objects in the \code{simList} environment.
 #'
@@ -1787,6 +1789,8 @@ setMethod("dataPath",
 #' @inheritParams objs
 #'
 #' @param unit   Character. One of the time units used in \code{SpaDES}.
+#'
+#' @param x A \code{simList}
 #'
 #' @param value  A time, given as a numeric, optionally with a unit attribute,
 #'               but this will be deduced from the model time units or module

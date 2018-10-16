@@ -75,6 +75,8 @@ elapsedTime(x, ...)
 \method{elapsedTime}{simList}(x, byEvent = TRUE, ...)
 }
 \arguments{
+\item{x}{A \code{simList}}
+
 \item{...}{Additional parameters.}
 
 \item{value}{A time, given as a numeric, optionally with a unit attribute,
