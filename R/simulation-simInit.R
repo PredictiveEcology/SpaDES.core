@@ -800,10 +800,14 @@ setMethod(
 #' @rdname simInitAnd
 simInitAndSpades <- function(...) {
 
-  mcSI <- match.call(simInit)
+  fullCall <- sys.call(sys.parent())
+  simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
+
+  mcSI <- match.call(simInit, simInitCall)
   mcSI[[1]] <- as.name("simInit")
 
-  mcSp <- match.call(spades, expand.dots = FALSE)
+  spadesCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(spades))]
+  mcSp <- match.call(spades, spadesCall)
   mcSp[[1]] <- as.name("spades")
   mcSp$... <- NULL
 
@@ -820,10 +824,15 @@ simInitAndSpades <- function(...) {
 #' @aliases simInitAndExperiment
 #' @rdname simInitAnd
 simInitAndExperiment <- function(...) {
-  mcSI <- match.call(simInit)
+
+  fullCall <- sys.call(sys.parent())
+  simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
+
+  mcSI <- match.call(simInit, simInitCall)
   mcSI[[1]] <- as.name("simInit")
 
-  mcSp <- match.call(spades, expand.dots = FALSE)
+  experimentCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(experiment))]
+  mcSp <- match.call(spades, experimentCall)
   mcSp[[1]] <- as.name("experiment")
   mcSp$... <- NULL
 
