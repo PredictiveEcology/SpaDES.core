@@ -811,12 +811,13 @@ simInitAndSpades <- function(...) {
   mcSp[[1]] <- as.name("spades")
   mcSp$... <- NULL
 
+  dots <- list(...)
   # simInit
-  sim <- eval(mcSI)
+  sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
 
   # spades
   mcSp$sim <- sim
-  sim <- eval(mcSp)
+  sim <- do.call("spades", append(list(sim), dots[names(as.list(mcSp)[-1])]))
 
 }
 
@@ -836,12 +837,15 @@ simInitAndExperiment <- function(...) {
   mcSp[[1]] <- as.name("experiment")
   mcSp$... <- NULL
 
+  dots <- list(...)
   # simInit
-  sim <- eval(mcSI)
+  dots <- list(...)
+  # simInit
+  sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
 
   # spades
   mcSp$sim <- sim
-  sim <- eval(mcSp)
+  sim <- do.call("experiment", append(list(sim), dots[names(as.list(mcSp)[-1])]))
 
 }
 
