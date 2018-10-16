@@ -832,7 +832,6 @@ simInitAndExperiment <- function(...) {
   mcSI <- match.call(simInit, simInitCall)
   mcSI[[1]] <- as.name("simInit")
 
-  browser()
   experimentCall <- fullCall[c(TRUE, names(fullCall)[-1] %in%
                                  setdiff(formalArgs(experiment), formalArgs(simInit)))]
   mcSp <- match.call(experiment, experimentCall)
