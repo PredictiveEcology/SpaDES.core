@@ -800,52 +800,89 @@ setMethod(
 #' @rdname simInitAnd
 simInitAndSpades <- function(...) {
 
-  fullCall <- sys.call(sys.parent())
-  simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
+  # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
+  scalls <- sys.calls()
+  browser()
+  .simInitAndX(scalls, "simInitAndSpades", ...)
 
+}
+
+
+.simInitAndX <- function(scalls, firstFn, ...) {
+  scallsTxt <- as.character(scalls)
+  whScalls <- grep(firstFn, scallsTxt, value = FALSE)
+  fullCall <- scalls[[whScalls[1]]] # may be more than one occurrence of simInitAndSpades
+  while (!isTRUE(identical(as.character(fullCall)[1], firstFn))) {
+    fullCall <- fullCall[-1]
+    if (length(fullCall)==0) break
+  }
+
+  simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
   mcSI <- match.call(simInit, simInitCall)
   mcSI[[1]] <- as.name("simInit")
 
-  spadesCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(spades))]
-  mcSp <- match.call(spades, spadesCall)
-  mcSp[[1]] <- as.name("spades")
+  secondFn <- tolower(gsub(firstFn, pattern = "simInitAnd", replacement = ""))
+  secondFnCall <- fullCall[c(TRUE, names(fullCall)[-1] %in%
+                             setdiff(formalArgs(secondFn), formalArgs(simInit)))]
+  mcSp <- match.call(get(secondFn), secondFnCall)
+  mcSp[[1]] <- as.name(secondFn)
   mcSp$... <- NULL
 
+  # simInit
   dots <- list(...)
   # simInit
   sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
 
   # spades
   mcSp$sim <- sim
-  sim <- do.call("spades", append(list(sim), dots[names(as.list(mcSp)[-1])]))
+  inDots <- names(dots) %in% names(as.list(mcSp)[-1])
+  dotsFor2ndFn <- if (any(inDots)) {
+    dots[inDots]
+  } else {
+    list()
+  }
+
+  sim <- do.call(secondFn, append(list(sim), dotsFor2ndFn))
 
 }
-
 #' @export
 #' @aliases simInitAndExperiment
 #' @rdname simInitAnd
 simInitAndExperiment <- function(...) {
 
-  fullCall <- sys.call(sys.parent())
-  simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
+  scalls <- sys.calls()
+  sim <- .simInitAndX(scalls, "simInitAndExperiment", ...)
 
-  mcSI <- match.call(simInit, simInitCall)
-  mcSI[[1]] <- as.name("simInit")
-
-  experimentCall <- fullCall[c(TRUE, names(fullCall)[-1] %in%
-                                 setdiff(formalArgs(experiment), formalArgs(simInit)))]
-  mcSp <- match.call(experiment, experimentCall)
-  mcSp[[1]] <- as.name("experiment")
-  mcSp$... <- NULL
-
-  # simInit
-  dots <- list(...)
-  # simInit
-  sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
-
-  # spades
-  mcSp$sim <- sim
-  sim <- do.call("experiment", append(list(sim), dots[names(as.list(mcSp)[-1])]))
+  # # because Cache (and possibly others, we have to strip any other call wrapping simInitAndExperiment)
+  # scalls <- sys.calls()
+  # browser()
+  # scallsTxt <- as.character(scalls)
+  # whScalls <- grep("simInitAndExperiment", scallsTxt, value = FALSE)
+  # fullCall <- scalls[[whScalls[1]]]
+  # scallTxt <- scallsTxt[[whScalls]]
+  # while (!isTRUE(identical(as.character(fullCall)[1], "simInitAndExperiment"))) {
+  #   fullCall <- fullCall[-1]
+  #   if (length(fullCall)==0) break
+  # }
+  #
+  # simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
+  # mcSI <- match.call(simInit, simInitCall)
+  # mcSI[[1]] <- as.name("simInit")
+  #
+  # experimentCall <- fullCall[c(TRUE, names(fullCall)[-1] %in%
+  #                                setdiff(formalArgs(experiment), formalArgs(simInit)))]
+  # mcSp <- match.call(experiment, experimentCall)
+  # mcSp[[1]] <- as.name("experiment")
+  # mcSp$... <- NULL
+  #
+  # # simInit
+  # dots <- list(...)
+  # # simInit
+  # sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
+  #
+  # # spades
+  # mcSp$sim <- sim
+  # sim <- do.call("experiment", append(list(sim), dots[names(as.list(mcSp)[-1])]))
 
 }
 
