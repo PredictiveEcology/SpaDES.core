@@ -469,8 +469,13 @@ setMethod(
           object2@simtimes <- object@simtimes
         } else {
           # if this is FALSE, it means that events were added by the event
-          if (!isTRUE(all.equal(object@events, object2@events)))
-            object2@events <- do.call(unique, args = list(append(object@events, object2@events)))
+          eventsAddedByThisModule <- events(object)$moduleName==current(object2)$moduleName
+          if (isTRUE(any(eventsAddedByThisModule))) {
+            if (!isTRUE(all.equal(object@events, object2@events))) {
+              object2@events <- do.call(unique,
+                                        args = list(append(object@events[eventsAddedByThisModule], object2@events)))
+            }
+          }
           #object2@events <- unique(rbindlist(list(object@events, object2@events)))
         }
         object2@current <- object@current
