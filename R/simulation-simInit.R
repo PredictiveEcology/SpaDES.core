@@ -765,17 +765,16 @@ setMethod(
     ma <- match(expectedOrder, listNames)
     li <- li[ma]
 
-    if (!all(sapply(1:length(li), function(x) {
+    correctArgs <- (sapply(1:length(li), function(x) {
       is(li[[x]], expectedClasses[x])
-    }))) {
-      stop(
-        "simInit is incorrectly specified. simInit takes 8 arguments. ",
-        "Currently, times, params, modules, and paths must be lists (or missing), ",
-        "objects can be named list or character vector (or missing),",
-        "inputs and outputs must be data.frames (or missing)",
-        "and loadOrder must be a character vector (or missing)",
-        "For the currently defined options for simInit, type showMethods('simInit')."
-      )
+    }))
+    if (!all(correctArgs)) {
+      plural <- (sum(!correctArgs) > 1) + 1
+      expectedDF <- apply(data.frame(arg = names(li), expectedClasses), 1, paste, collapse = " = ")
+      stop("simInit is incorrectly specified. ", " The ", paste(names(li)[!correctArgs], collapse = ", "), " argument",
+           c("", "s")[plural], " ", c("is", "are")[plural], " specified incorrectly.",
+           c(" It is", " They are")[plural], " expected to be ",
+           paste(expectedDF[!correctArgs], collapse = ", "))
     }
     sim <- do.call("simInit", args = li)
 
