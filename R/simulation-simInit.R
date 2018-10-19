@@ -376,6 +376,10 @@ setMethod(
       if (getOption("spades.useRequire")) {
         Require(allPkgs)
       } else {
+        # clean up github identified repos
+        allPkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", allPkgs)
+        allPkgs <- gsub(".*\\/+(.+)",  "\\1", allPkgs)
+
         loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
       }
     }
