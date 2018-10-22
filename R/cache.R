@@ -472,8 +472,12 @@ setMethod(
           eventsAddedByThisModule <- events(object)$moduleName==current(object2)$moduleName
           if (isTRUE(any(eventsAddedByThisModule))) {
             if (!isTRUE(all.equal(object@events, object2@events))) {
-              object2@events <- do.call(unique,
-                                        args = list(append(object@events[eventsAddedByThisModule], object2@events)))
+              a <- do.call(unique,
+                           args = list(append(object@events[eventsAddedByThisModule], object2@events)))
+              a1 <- rbindlist(a)
+              object2@events <- a[order(a1$eventTime, a1$eventPriority)]
+              # object2@events <- do.call(unique,
+              #                           args = list(append(object@events[eventsAddedByThisModule], object2@events)))
             }
           }
           #object2@events <- unique(rbindlist(list(object@events, object2@events)))
