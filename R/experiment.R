@@ -423,16 +423,12 @@ setMethod(
       parFun <- "clusterApplyLB"
       args <- list(x = 1:NROW(factorialExp), fun = FunDef)
       args <- append(list(cl = cl), args)
-      #if (identical("windows", .Platform$OS.type)) {
-        #if (!is.na(pmatch("Windows", Sys.getenv("OS")))) {
-          parallel::clusterEvalQ(cl, require("SpaDES.core"))
-        #}
-        packagesToLoad <- SpaDES.core::packages(sim, clean = TRUE)
-        parallel::clusterExport(cl, "packagesToLoad", envir = environment())
-        parallel::clusterEvalQ(cl, {
-          lapply(packagesToLoad, require, character.only = TRUE)
-        })
-      #}
+      parallel::clusterEvalQ(cl, require("SpaDES.core", character.only = TRUE))
+      packagesToLoad <- SpaDES.core::packages(sim, clean = TRUE)
+      parallel::clusterExport(cl, "packagesToLoad", envir = environment())
+      b <- parallel::clusterEvalQ(cl, {
+        lapply(packagesToLoad, require, character.only = TRUE)
+      })
     } else {
       parFun <- "lapply"
       args <- list(X = 1:NROW(factorialExp), FUN = FunDef)
