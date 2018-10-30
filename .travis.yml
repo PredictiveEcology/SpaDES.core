@@ -107,7 +107,7 @@ matrix:
     r_packages:
     - devtools
   - os: osx
-    osx_image: xcode8.3
+    osx_image: xcode9.4
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
@@ -116,7 +116,7 @@ matrix:
     - brew install glpk
     - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
   - os: osx
-    osx_image: xcode8.3
+    osx_image: xcode9.4
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
