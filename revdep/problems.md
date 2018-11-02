@@ -5,55 +5,32 @@
 |setting  |value                        |
 |:--------|:----------------------------|
 |version  |R version 3.5.1 (2018-07-02) |
-|system   |x86_64, linux-gnu            |
-|ui       |RStudio (1.1.456)            |
+|system   |x86_64, darwin15.6.0         |
+|ui       |RStudio (1.1.419)            |
 |language |(EN)                         |
 |collate  |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-10-10                   |
+|date     |2018-11-02                   |
 
 ## Packages
 
-|package     |*  |version |date       |source        |
-|:-----------|:--|:-------|:----------|:-------------|
-|SpaDES.core |*  |0.2.2   |2018-08-13 |cran (@0.2.2) |
+|package        |*  |version    |date       |source                                          |
+|:--------------|:--|:----------|:----------|:-----------------------------------------------|
+|covr           |   |3.2.1      |2018-10-18 |cran (@3.2.1)                                   |
+|dplyr          |   |0.7.7      |2018-10-16 |cran (@0.7.7)                                   |
+|googledrive    |   |0.1.2      |2018-10-06 |cran (@0.1.2)                                   |
+|microbenchmark |   |1.4-6      |2018-10-18 |cran (@1.4-6)                                   |
+|quickPlot      |   |0.1.5.9001 |2018-11-02 |Github (PredictiveEcology/quickPlot@1c701e1)    |
+|raster         |   |2.7-15     |2018-10-16 |cran (@2.7-15)                                  |
+|reproducible   |   |0.2.5      |2018-11-02 |Github (PredictiveEcology/reproducible@153172b) |
+|SpaDES.core    |   |0.2.3      |2018-11-02 |local (PredictiveEcology/SpaDES.core@315fd99)   |
+|SpaDES.tools   |   |0.3.0.9001 |2018-11-02 |Github (PredictiveEcology/SpaDES.tools@42a02a1) |
+|testthat       |   |2.0.1      |2018-10-13 |cran (@2.0.1)                                   |
 
 # Check results
 
-1 packages with problems
+0 packages with problems
 
-|package |version | errors| warnings| notes|
-|:-------|:-------|------:|--------:|-----:|
-|SpaDES  |2.0.2   |      0|        1|     0|
 
-## SpaDES (2.0.2)
-Maintainer: Alex M Chubaty <alex.chubaty@gmail.com>  
-Bug reports: https://github.com/PredictiveEcology/SpaDES/issues
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-loading reproducible     0.2.4
-loading quickPlot        0.1.5.9000
-loading SpaDES.core      0.2.3
-loading SpaDES.tools     0.3.0.9001
-loading SpaDES.addins    0.1.1
-
-Default paths for SpaDES directories set to:
-... 8 lines ...
-randomLandscapes: defineParameter: '.useCache' is not of specified type 'logical'.
-randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in inputObjects
-/tmp/RtmpyLgmCc/revdep247d1aa58b2c/SpaDES.core/sampleModules/fireSpread/fireSpread.R
-fireSpread: module code: landscape, testStats are declared in inputObjects, but no default(s) are provided in .inputObjects
-fireSpread: inputObjects: stackName, DEM, Fires are used from sim inside doEvent.fireSpread, but are not declared in inputObjects
-###### Module Code Checking ########
-Failed with error:  'there is no package called 'RandomFields''
-Quitting from lines 66-68 (iii-cache.Rmd) 
-Error: processing vignette 'iii-cache.Rmd' failed with diagnostics:
-The 'RandomFields' package is required but not installed.
-Execution halted
-```
 
