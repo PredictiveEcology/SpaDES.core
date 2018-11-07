@@ -73,8 +73,7 @@ test_that("downloadData downloads and unzips module data", {
       #   because it doesn't know what targetFile is
       expect_error(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
       expect_false(exists("dwnload", inherits = FALSE))
-      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
-                              overwrite = TRUE, purge = 7)
+      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)
       expect_true(all(dwnload$result %in% "OK"))
       expect_true(all(file.exists(file.path(datadir, filenames))))
     }

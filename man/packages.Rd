@@ -7,9 +7,10 @@
 \alias{packages,ANY-method}
 \title{Get module or simulation package dependencies}
 \usage{
-packages(sim, modules, paths, filenames, envir, ...)
+packages(sim, modules, paths, filenames, envir, clean = FALSE, ...)
 
-\S4method{packages}{ANY}(sim, modules, paths, filenames, envir, ...)
+\S4method{packages}{ANY}(sim, modules, paths, filenames, envir,
+  clean = FALSE, ...)
 }
 \arguments{
 \item{sim}{A \code{simList} object.}
@@ -31,6 +32,10 @@ useful if the same file is being parsed multiple times. This
 function will check in that envir for the parsed file before
 parsing again. If the \code{envir} is transient, then this will
 have no effect.}
+
+\item{clean}{Optional logical. If \code{TRUE}, it will scrub any references to
+github repositories, e.g., "PredictiveEcology/reproducible" will be
+returned as "reproducible"}
 
 \item{...}{All \code{simInit} parameters.}
 }

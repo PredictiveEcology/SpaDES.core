@@ -376,6 +376,10 @@ setMethod(
       if (getOption("spades.useRequire")) {
         Require(allPkgs)
       } else {
+        # clean up github identified repos
+        allPkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", allPkgs)
+        allPkgs <- gsub(".*\\/+(.+)",  "\\1", allPkgs)
+
         loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
       }
     }
@@ -765,17 +769,16 @@ setMethod(
     ma <- match(expectedOrder, listNames)
     li <- li[ma]
 
-    if (!all(sapply(1:length(li), function(x) {
+    correctArgs <- (sapply(1:length(li), function(x) {
       is(li[[x]], expectedClasses[x])
-    }))) {
-      stop(
-        "simInit is incorrectly specified. simInit takes 8 arguments. ",
-        "Currently, times, params, modules, and paths must be lists (or missing), ",
-        "objects can be named list or character vector (or missing),",
-        "inputs and outputs must be data.frames (or missing)",
-        "and loadOrder must be a character vector (or missing)",
-        "For the currently defined options for simInit, type showMethods('simInit')."
-      )
+    }))
+    if (!all(correctArgs)) {
+      plural <- (sum(!correctArgs) > 1) + 1
+      expectedDF <- apply(data.frame(arg = names(li), expectedClasses), 1, paste, collapse = " = ")
+      stop("simInit is incorrectly specified. ", " The ", paste(names(li)[!correctArgs], collapse = ", "), " argument",
+           c("", "s")[plural], " ", c("is", "are")[plural], " specified incorrectly.",
+           c(" It is", " They are")[plural], " expected to be ",
+           paste(expectedDF[!correctArgs], collapse = ", "))
     }
     sim <- do.call("simInit", args = li)
 
@@ -798,92 +801,56 @@ setMethod(
 #' @export
 #' @aliases simInitAndSpades
 #' @rdname simInitAnd
-simInitAndSpades <- function(...) {
+simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
+                             notOlderThan, debug, progress, cache,
+                             .plotInitialTime, .saveInitialTime, ...) {
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
   scalls <- sys.calls()
-  browser()
-  .simInitAndX(scalls, "simInitAndSpades", ...)
+  objsAll <- mget(ls(), envir = environment())
+  objsAll <- objsAll[!objsAll=="..."]
+  objsSimInit <- objsAll[formalArgs(simInit)]
+  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndSpades", ...)
+
+  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
+  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+  sim <- do.call(spades, objsSpades)#AndX(scalls, "simInitAndSpades", ...)
 
 }
 
 
-.simInitAndX <- function(scalls, firstFn, ...) {
-  scallsTxt <- as.character(scalls)
-  whScalls <- grep(firstFn, scallsTxt, value = FALSE)
-  fullCall <- scalls[[whScalls[1]]] # may be more than one occurrence of simInitAndSpades
-  while (!isTRUE(identical(as.character(fullCall)[1], firstFn))) {
-    fullCall <- fullCall[-1]
-    if (length(fullCall)==0) break
-  }
-
-  simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
-  mcSI <- match.call(simInit, simInitCall)
-  mcSI[[1]] <- as.name("simInit")
-
-  secondFn <- tolower(gsub(firstFn, pattern = "simInitAnd", replacement = ""))
-  secondFnCall <- fullCall[c(TRUE, names(fullCall)[-1] %in%
-                             setdiff(formalArgs(secondFn), formalArgs(simInit)))]
-  mcSp <- match.call(get(secondFn), secondFnCall)
-  mcSp[[1]] <- as.name(secondFn)
-  mcSp$... <- NULL
-
-  # simInit
-  dots <- list(...)
-  # simInit
-  sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
-
-  # spades
-  mcSp$sim <- sim
-  inDots <- names(dots) %in% names(as.list(mcSp)[-1])
-  dotsFor2ndFn <- if (any(inDots)) {
-    dots[inDots]
-  } else {
-    list()
-  }
-
-  sim <- do.call(secondFn, append(list(sim), dotsFor2ndFn))
-
-}
 #' @export
 #' @aliases simInitAndExperiment
 #' @rdname simInitAnd
-simInitAndExperiment <- function(...) {
+#' @details
+#' \code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
+#' these are also in \code{simInit}. If the \code{experiment} is being used
+#' to vary these arguments, it must be done separately (i.e., \code{simInit} then
+#' \code{experiment}).
+simInitAndExperiment <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
+                                 notOlderThan, replicates,
+                                 dirPrefix, substrLength, saveExperiment,
+                                 experimentFile, clearSimEnv, cl, ...)  {
+  list2env(list(...), envir = environment())
+  objsAll <- mget(ls(all.names = TRUE), envir = environment())
+  objsAll <- objsAll[!names(objsAll)=="..."]
+  objsSimInit <- objsAll[formalArgs(simInit)]
+  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
 
-  scalls <- sys.calls()
-  sim <- .simInitAndX(scalls, "simInitAndExperiment", ...)
+  experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
+  objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
+  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
+  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
 
-  # # because Cache (and possibly others, we have to strip any other call wrapping simInitAndExperiment)
-  # scalls <- sys.calls()
-  # browser()
-  # scallsTxt <- as.character(scalls)
-  # whScalls <- grep("simInitAndExperiment", scallsTxt, value = FALSE)
-  # fullCall <- scalls[[whScalls[1]]]
-  # scallTxt <- scallsTxt[[whScalls]]
-  # while (!isTRUE(identical(as.character(fullCall)[1], "simInitAndExperiment"))) {
-  #   fullCall <- fullCall[-1]
-  #   if (length(fullCall)==0) break
-  # }
-  #
-  # simInitCall <- fullCall[c(TRUE, names(fullCall)[-1] %in% formalArgs(simInit))]
-  # mcSI <- match.call(simInit, simInitCall)
-  # mcSI[[1]] <- as.name("simInit")
-  #
-  # experimentCall <- fullCall[c(TRUE, names(fullCall)[-1] %in%
-  #                                setdiff(formalArgs(experiment), formalArgs(simInit)))]
-  # mcSp <- match.call(experiment, experimentCall)
-  # mcSp[[1]] <- as.name("experiment")
-  # mcSp$... <- NULL
-  #
-  # # simInit
-  # dots <- list(...)
-  # # simInit
-  # sim <- do.call("simInit", dots[names(as.list(mcSI)[-1])])
-  #
-  # # spades
-  # mcSp$sim <- sim
-  # sim <- do.call("experiment", append(list(sim), dots[names(as.list(mcSp)[-1])]))
+  # Because there are some arguments in BOTH simInit and Experiment, can't pass them
+  #  through, because they have different meaning
+  objsExperiment <- objsExperiment[!names(objsExperiment) %in% names(objsSimInit)]
+  onlyInSpades <- setdiff(names(objsSpades), names(objsExperiment))
+  if (length(onlyInSpades))
+    objsExperiment[onlyInSpades] <- objsSpades[onlyInSpades]
+  sims <- do.call(experiment, objsExperiment)#AndX(scalls, "simInitAndExperiment", ...)
 
+  return(sims)
 }
 
 #' Identify Child Modules from a recursive list

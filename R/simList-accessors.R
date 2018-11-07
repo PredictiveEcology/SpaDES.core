@@ -2516,6 +2516,9 @@ setMethod(
 #' @param filenames Character vector specifying filenames of modules (i.e.
 #'                 combined path & module. If this is specified, then \code{modules} and
 #'                 \code{path} are ignored.
+#' @param clean Optional logical. If \code{TRUE}, it will scrub any references to
+#'              github repositories, e.g., "PredictiveEcology/reproducible" will be
+#'              returned as "reproducible"
 #'
 #' @inheritParams .parseModulePartial
 #'
@@ -2530,7 +2533,8 @@ setMethod(
 #' @aliases simList-accessors-packages
 #'
 # igraph exports %>% from magrittr
-setGeneric("packages", function(sim, modules, paths, filenames, envir, ...) {
+setGeneric("packages", function(sim, modules, paths, filenames, envir,
+                                clean = FALSE, ...) {
   standardGeneric("packages")
 })
 
@@ -2540,7 +2544,8 @@ setGeneric("packages", function(sim, modules, paths, filenames, envir, ...) {
 setMethod(
   "packages",
   signature(sim = "ANY"),
-  definition = function(sim, modules, paths, filenames, envir, ...) {
+  definition = function(sim, modules, paths, filenames, envir,
+                        clean = FALSE, ...) {
     if (missing(sim)) { # can either have no sim, or can have a sim that is incomplete,
                         #   i.e., with no reqdPkgs slot filled
       depsInSim <- list(NULL)
@@ -2587,6 +2592,10 @@ setMethod(
         return(pkgs)
       })
       names(pkgs) <- modules
+    }
+    if (isTRUE(clean)) {
+      pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
+      pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
     }
     return(pkgs)
 })

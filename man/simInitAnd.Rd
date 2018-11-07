@@ -5,9 +5,13 @@
 \alias{simInitAndExperiment}
 \title{Call \code{simInit} and \code{spades} together}
 \usage{
-simInitAndSpades(...)
+simInitAndSpades(times, params, modules, objects, paths, inputs, outputs,
+  loadOrder, notOlderThan, debug, progress, cache, .plotInitialTime,
+  .saveInitialTime, ...)
 
-simInitAndExperiment(...)
+simInitAndExperiment(times, params, modules, objects, paths, inputs,
+  outputs, loadOrder, notOlderThan, replicates, dirPrefix, substrLength,
+  saveExperiment, experimentFile, clearSimEnv, cl, ...)
 }
 \arguments{
 \item{...}{Arguments passed to simInit, and spades or experiment}
@@ -21,4 +25,10 @@ These functions are convenience wrappers that may allow for
 more efficient Caching.
 Passes all arguments to \code{simInit}, then passes the created \code{simList}
 to \code{spades} or \code{experiment}.
+}
+\details{
+\code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
+these are also in \code{simInit}. If the \code{experiment} is being used
+to vary these arguments, it must be done separately (i.e., \code{simInit} then
+\code{experiment}).
 }
