@@ -90,7 +90,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("s" %in% where) {
-    match(objDeparsed, names(sim@.envir), nomatch = 0L) > 0L
+    match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
 
   } else {
     FALSE

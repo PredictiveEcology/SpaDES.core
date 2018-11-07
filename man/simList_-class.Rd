@@ -9,8 +9,8 @@
 Internal use only. Used when saving/loading a \code{simList}.
 }
 \details{
-This is identical to class \code{simList}, except that the \code{.envir} slot
-is replaced by a \code{.list} containing a list to store the objects from the
+This is identical to class \code{simList}, except that the \code{.xData} slot
+is replaced by a \code{.Data} containing a list to store the objects from the
 environment contained within the \code{simList}.
 Saving/loading a list behaves more reliably than saving/loading an environment.
 }

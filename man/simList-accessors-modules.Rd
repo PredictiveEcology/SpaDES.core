@@ -4,30 +4,30 @@
 \name{modules}
 \alias{modules}
 \alias{simList-accessors-modules}
-\alias{modules,.simList-method}
+\alias{modules,simList-method}
 \alias{modules<-}
-\alias{modules<-,.simList-method}
+\alias{modules<-,simList-method}
 \alias{depends}
-\alias{depends,.simList-method}
+\alias{depends,simList-method}
 \alias{depends<-}
-\alias{depends<-,.simList-method}
+\alias{depends<-,simList-method}
 \title{Simulation modules and dependencies}
 \usage{
 modules(sim, hidden = FALSE)
 
-\S4method{modules}{.simList}(sim, hidden = FALSE)
+\S4method{modules}{simList}(sim, hidden = FALSE)
 
 modules(sim) <- value
 
-\S4method{modules}{.simList}(sim) <- value
+\S4method{modules}{simList}(sim) <- value
 
 depends(sim)
 
-\S4method{depends}{.simList}(sim)
+\S4method{depends}{simList}(sim)
 
 depends(sim) <- value
 
-\S4method{depends}{.simList}(sim) <- value
+\S4method{depends}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -59,8 +59,7 @@ Currently, only get and set methods are defined. Subset methods are not.
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
-  \code{\link{inputs}}, \code{\link{ls.simList}},
-  \code{\link{ls.str.simList}}, \code{\link{objs}},
+  \code{\link{inputs}}, \code{\link{objs}},
   \code{\link{packages}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}

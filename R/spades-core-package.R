@@ -139,12 +139,12 @@
 #' }
 #'
 #' \subsection{3.8 \code{simList} environment}{
-#'   The \code{\link{simList}} has a slot called \code{.envir} which is an environment.
+#'   The \code{\link{simList}} has a slot called \code{.xData} which is an environment.
 #'   All objects in the \code{simList} are actually in this environment,
 #'   i.e., the \code{simList} is not a \code{list}.
 #'   In R, environments use pass-by-reference semantics, which means that copying
 #'   a \code{simList} object using normal R assignment operation (e.g., \code{sim2 <- sim1}),
-#'   will not copy the objects contained within the \code{.envir} slot.
+#'   will not copy the objects contained within the \code{.xData} slot.
 #'   The two objects (\code{sim1} and \code{sim2}) will share identical objects
 #'   within that slot. Sometimes, this not desired, and a true copy is required.
 #'

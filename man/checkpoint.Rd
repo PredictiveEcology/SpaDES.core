@@ -6,13 +6,13 @@
 \alias{checkpointLoad}
 \alias{.checkpointSave}
 \alias{checkpointFile}
-\alias{checkpointFile,.simList-method}
+\alias{checkpointFile,simList-method}
 \alias{checkpointFile<-}
-\alias{checkpointFile<-,.simList-method}
+\alias{checkpointFile<-,simList-method}
 \alias{checkpointInterval}
-\alias{checkpointInterval,.simList-method}
+\alias{checkpointInterval,simList-method}
 \alias{checkpointInterval<-}
-\alias{checkpointInterval<-,.simList-method}
+\alias{checkpointInterval<-,simList-method}
 \title{Simulation checkpoints.}
 \usage{
 doEvent.checkpoint(sim, eventTime, eventType, debug = FALSE)
@@ -23,19 +23,19 @@ checkpointLoad(file)
 
 checkpointFile(sim)
 
-\S4method{checkpointFile}{.simList}(sim)
+\S4method{checkpointFile}{simList}(sim)
 
 checkpointFile(sim) <- value
 
-\S4method{checkpointFile}{.simList}(sim) <- value
+\S4method{checkpointFile}{simList}(sim) <- value
 
 checkpointInterval(sim)
 
-\S4method{checkpointInterval}{.simList}(sim)
+\S4method{checkpointInterval}{simList}(sim)
 
 checkpointInterval(sim) <- value
 
-\S4method{checkpointInterval}{.simList}(sim) <- value
+\S4method{checkpointInterval}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object.}
@@ -71,7 +71,6 @@ and \url{https://stackoverflow.com/questions/13997444/}
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{envir}}, \code{\link{events}},
   \code{\link{globals}}, \code{\link{inputs}},
-  \code{\link{ls.simList}}, \code{\link{ls.str.simList}},
   \code{\link{modules}}, \code{\link{objs}},
   \code{\link{packages}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},

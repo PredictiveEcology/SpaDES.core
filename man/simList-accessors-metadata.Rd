@@ -3,37 +3,38 @@
 \docType{methods}
 \name{inputObjects}
 \alias{inputObjects}
-\alias{inputObjects,.simList-method}
+\alias{simList-accessors-metadata}
+\alias{inputObjects,simList-method}
 \alias{outputObjects}
-\alias{outputObjects,.simList-method}
+\alias{outputObjects,simList-method}
 \alias{reqdPkgs}
-\alias{reqdPkgs,.simList-method}
+\alias{reqdPkgs,simList-method}
 \alias{documentation}
-\alias{documentation,.simList-method}
+\alias{documentation,simList-method}
 \alias{citation}
-\alias{citation,.simList-method}
+\alias{citation,simList-method}
 \alias{citation,character-method}
 \title{Metadata accessors}
 \usage{
 inputObjects(sim, module)
 
-\S4method{inputObjects}{.simList}(sim, module)
+\S4method{inputObjects}{simList}(sim, module)
 
 outputObjects(sim, module)
 
-\S4method{outputObjects}{.simList}(sim, module)
+\S4method{outputObjects}{simList}(sim, module)
 
 reqdPkgs(sim, module)
 
-\S4method{reqdPkgs}{.simList}(sim, module)
+\S4method{reqdPkgs}{simList}(sim, module)
 
 documentation(sim, module)
 
-\S4method{documentation}{.simList}(sim, module)
+\S4method{documentation}{simList}(sim, module)
 
 citation(package, lib.loc = NULL, auto = NULL, module = character())
 
-\S4method{citation}{.simList}(package, lib.loc = NULL, auto = NULL,
+\S4method{citation}{simList}(package, lib.loc = NULL, auto = NULL,
   module = character())
 
 \S4method{citation}{character}(package, lib.loc = NULL, auto = NULL,

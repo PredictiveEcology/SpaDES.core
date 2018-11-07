@@ -140,8 +140,8 @@ saveFiles <- function(sim) {
   if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
-      if (exists(outputs(sim)[i, "objectName"], envir = sim@.envir)) {
-        args <- append(list(get(outputs(sim)[i, "objectName"], envir = sim@.envir),
+      if (exists(outputs(sim)[i, "objectName"], envir = sim@.xData)) {
+        args <- append(list(get(outputs(sim)[i, "objectName"], envir = sim@.xData),
                             file = outputs(sim)[i, "file"]),
                        outputArgs(sim)[[i]])
         args <- args[!sapply(args, is.null)]
@@ -227,7 +227,7 @@ saveSimList <- function(sim, filename, keepFileBackedAsIs, envir = parent.frame(
   simName <- sim
   sim <- get(sim, envir = envir)
 
-  isRaster <- unlist(lapply(sim@.envir, function(x) is(x, "Raster")))
+  isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
   if (any(isRaster)) {
     if (keepFileBackedAsIs) {
       for (x in names(isRaster)[isRaster])

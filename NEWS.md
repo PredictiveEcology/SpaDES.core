@@ -7,6 +7,7 @@ version 0.2.3
 * add `RandomFields` to Suggests, as it is in the Suggests of `SpaDES.tools` and used in examples/tests.
 
 ## new features
+* `simList` internals changed. It now inherits from `environment`. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the `simList`. Also, we removed several associated methods, `$`, `[[`, `ls`, `ls.str`, `objects`, as the defaults for environments work correctly with the `simList` now
 * `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
 * new function `elapsedTime` which gives a summary of the clock time used by each module or event
 * most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.

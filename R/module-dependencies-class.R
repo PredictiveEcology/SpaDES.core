@@ -224,3 +224,5 @@ setClass(
       stop("invalid type: not a .moduleDeps object")
     }
 })
+
+.emptySimDeps <- new(".simDeps")
