@@ -32,7 +32,9 @@
 
 <meta property="og:title" content="Simulation environment — envir" />
 
-<meta property="og:description" content="Accessor functions for the .envir slot in a simList object.
+<meta property="og:description" content="Accessor functions for the .xData slot, which is the default virtual
+slot for an S4 class object that inherits from an S3 object (specifically,
+the simList inherits from environment) in a simList object.
 These are included for advanced users." />
 <meta name="twitter:card" content="summary" />
 
@@ -133,7 +135,9 @@ These are included for advanced users." />
 
     <div class="ref-description">
     
-    <p>Accessor functions for the <code>.envir</code> slot in a <code>simList</code> object.
+    <p>Accessor functions for the <code>.xData</code> slot, which is the default virtual
+slot for an S4 class object that inherits from an S3 object (specifically,
+the <code>simList</code> inherits from <code>environment</code>) in a <code>simList</code> object.
 These are included for advanced users.</p>
     
     </div>
@@ -176,7 +180,6 @@ in which to replace element(s).</p></td>
 <p>Other functions to access elements of a <code>simList</code> object: <code><a href='addDepends.html'>.addDepends</a></code>,
   <code><a href='checkpoint.html'>doEvent.checkpoint</a></code>, <code><a href='simList-accessors-events.html'>events</a></code>,
   <code><a href='globals.html'>globals</a></code>, <code><a href='simList-accessors-inout.html'>inputs</a></code>,
-  <code><a href='ls-method.html'>ls.simList</a></code>, <code><a href='ls_str-method.html'>ls.str.simList</a></code>,
   <code><a href='simList-accessors-modules.html'>modules</a></code>, <code><a href='objects.html'>objs</a></code>,
   <code><a href='packages.html'>packages</a></code>, <code><a href='params.html'>params</a></code>,
   <code><a href='simList-accessors-paths.html'>paths</a></code>, <code><a href='progress.html'>progressInterval</a></code>,

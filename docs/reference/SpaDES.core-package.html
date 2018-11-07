@@ -263,12 +263,12 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 <tr><td></td><td><code><a href='simList-accessors-modules.html'>depends</a></code></td></tr>
 </table>
     <h3>3.8 <code>simList</code> environment</h3>
-    The <code><a href='simList-class.html'>simList</a></code> has a slot called <code>.envir</code> which is an environment.
+    The <code><a href='simList-class.html'>simList</a></code> has a slot called <code>.xData</code> which is an environment.
   All objects in the <code>simList</code> are actually in this environment,
   i.e., the <code>simList</code> is not a <code>list</code>.
   In R, environments use pass-by-reference semantics, which means that copying
   a <code>simList</code> object using normal R assignment operation (e.g., <code>sim2 &lt;- sim1</code>),
-  will not copy the objects contained within the <code>.envir</code> slot.
+  will not copy the objects contained within the <code>.xData</code> slot.
   The two objects (<code>sim1</code> and <code>sim2</code>) will share identical objects
   within that slot. Sometimes, this not desired, and a true copy is required.
     <table class='table'>

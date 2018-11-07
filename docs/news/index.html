@@ -142,6 +142,8 @@
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
 <li>
+<code>simList</code> internals changed. It now inherits from <code>environment</code>. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the <code>simList</code>. Also, we removed several associated methods, <code>$</code>, <code>[[</code>, <code>ls</code>, <code>ls.str</code>, <code>objects</code>, as the defaults for environments work correctly with the <code>simList</code> now</li>
+<li>
 <code>debug</code> arg in <code>spades</code> call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event</li>
 <li>new function <code>elapsedTime</code> which gives a summary of the clock time used by each module or event</li>
 <li>most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.</li>
@@ -251,7 +253,7 @@
 <li>use <code>codetools</code> to check for various code problems</li>
 <li>detects conflicts with known common functions (<code>raster::level</code>, <code><a href="http://www.rdocumentation.org/packages/raster/topics/scale">raster::scale</a></code>, <code><a href="http://quickplot.predictiveecology.org//reference/Plot.html">quickPlot::Plot</a></code>)</li>
 <li>use <code>checkCodeEnv</code> on every function inside a module</li>
-<li>checking for <code><a href="../reference/objects.html">sim$xxx</a></code> occurrences in modules, comparing to <code>outputObjects</code> in metadata if used in assignment (i.e., left hand side of assign operator), or comparing to <code>inputObjects</code> if used on the right hand side</li>
+<li>checking for <code>sim$xxx</code> occurrences in modules, comparing to <code>outputObjects</code> in metadata if used in assignment (i.e., left hand side of assign operator), or comparing to <code>inputObjects</code> if used on the right hand side</li>
 <li>check that all objects declared in <code>inputObjects</code> have default values assigned in the <code>.inputObjects</code> function</li>
 <li>messages colour coded, and separated by file with absolute path explicit</li>
 </ul>

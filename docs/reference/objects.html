@@ -142,27 +142,15 @@ one can simply use <code>sim$object</code> or <code>sim[["object"]]</code>.</p>
     
     </div>
 
-    <pre class="usage">objs(sim, ...)
+    <pre class="usage"><span class='fu'>objs</span>(<span class='no'>sim</span>, <span class='no'>...</span>)
 
-# S4 method for simList
-objs(sim, ...)
+<span class='co'># S4 method for simList</span>
+<span class='fu'>objs</span>(<span class='no'>sim</span>, <span class='no'>...</span>)
 
-objs(sim) <- value
+<span class='fu'>objs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-# S4 method for simList
-objs(sim) <- value
-
-# S4 method for simList,ANY,ANY
-[[(x, i, j, ..., drop)
-
-# S4 method for simList,ANY,ANY,ANY
-[[(x, i) <- value
-
-# S4 method for simList
-$(x, name)
-
-# S4 method for simList
-$(x, name) <- value</pre>
+<span class='co'># S4 method for simList</span>
+<span class='fu'>objs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -173,25 +161,12 @@ $(x, name) <- value</pre>
 in which to replace element(s).</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>passed to <code>ls</code></p></td>
+    </tr>
+    <tr>
       <th>value</th>
-      <td><p>Any R object.</p></td>
-    </tr>
-    <tr>
-      <th>x</th>
-      <td><p>A <code>simList</code> object from which to extract element(s) or
-in which to replace element(s).</p></td>
-    </tr>
-    <tr>
-      <th>i, j, ...</th>
-      <td><p>Indices specifying elements to extract or replace.</p></td>
-    </tr>
-    <tr>
-      <th>drop</th>
-      <td><p>not implemented.</p></td>
-    </tr>
-    <tr>
-      <th>name</th>
-      <td><p>A literal character string or a <code>name</code>.</p></td>
+      <td><p>objects to assign to the <code>simList</code></p></td>
     </tr>
     </table>
     
@@ -212,8 +187,7 @@ the simulation environment.</p>
 <p>Other functions to access elements of a <code>simList</code> object: <code><a href='addDepends.html'>.addDepends</a></code>,
   <code><a href='checkpoint.html'>doEvent.checkpoint</a></code>, <code><a href='simList-accessors-envir.html'>envir</a></code>,
   <code><a href='simList-accessors-events.html'>events</a></code>, <code><a href='globals.html'>globals</a></code>,
-  <code><a href='simList-accessors-inout.html'>inputs</a></code>, <code><a href='ls-method.html'>ls.simList</a></code>,
-  <code><a href='ls_str-method.html'>ls.str.simList</a></code>, <code><a href='simList-accessors-modules.html'>modules</a></code>,
+  <code><a href='simList-accessors-inout.html'>inputs</a></code>, <code><a href='simList-accessors-modules.html'>modules</a></code>,
   <code><a href='packages.html'>packages</a></code>, <code><a href='params.html'>params</a></code>,
   <code><a href='simList-accessors-paths.html'>paths</a></code>, <code><a href='progress.html'>progressInterval</a></code>,
   <code><a href='simList-accessors-times.html'>times</a></code></p></div>

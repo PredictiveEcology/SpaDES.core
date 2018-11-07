@@ -136,7 +136,7 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
     
     <p>Find all references to sim$</p>
 <p><code>.parsingSim</code> will pull out the various ways to use sim, e.g.,
-<code><a href='objects.html'>sim$xxx</a></code>, <code><a href='objects.html'>sim[['xxx']]</a></code>, <code><a href='objects.html'>sim[[P(sim)$xxx]]</a></code></p>
+<code>sim$xxx</code>, <code>sim[['xxx']]</code>, <code>sim[[P(sim)$xxx]]</code></p>
     
     </div>
 
@@ -154,7 +154,7 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
       <th>envToFindSim</th>
       <td><p>An environment where sim is defined. This is used when
 the element accessing the simList is actually a call, e.g.,
-<code><a href='objects.html'>sim[[P(sim)$stackName]]</a></code></p></td>
+<code>sim[[P(sim)$stackName]]</code></p></td>
     </tr>
     <tr>
       <th>moduleEnv</th>
@@ -179,7 +179,7 @@ the element accessing the simList is actually a call, e.g.,
     <p><code>.findElementsInEnv</code> is a wrapper around <code>.findElements</code>. It will convert
 function code to a call, and then pass it to <code>.findElements</code>. It also does
 some cleaning for duplications, <code>NA</code> values, and cases where the element
-inside a <code><a href='objects.html'>sim[["xxx"]]</a></code> is a variable that should be evaluated, rather than
+inside a <code>sim[["xxx"]]</code> is a variable that should be evaluated, rather than
 simply taken verbatim (e.g., <code>sim[[P(sim)$stackName]])</code>.</p>
 <p>When <b><code>type = "get"</code></b>, the function scans for sim$xxx or sim[["xxx"]]] on
 the RHS of an assignment operator or when there is no assignment. When

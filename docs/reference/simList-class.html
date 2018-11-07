@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>The <code>simList</code> class — .simList-class • SpaDES.core</title>
+<title>The <code>simList</code> class — simList-class • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:title" content="The <code>simList</code> class — .simList-class" />
+<meta property="og:title" content="The <code>simList</code> class — simList-class" />
 
 <meta property="og:description" content="Contains the minimum components of a SpaDES simulation.
 Various slot accessor methods (i.e., get and set functions) are provided
@@ -175,21 +175,23 @@ metadata</p></dd>
 metadata</p></dd>
     <dt><code>paths</code></dt><dd><p>Named list of <code>modulePath</code>, <code>inputPath</code>,
 and <code>outputPath</code> paths. Partial matching is performed.</p></dd>
-    <dt><code>.envir</code></dt><dd><p>Environment referencing the objects used in the simulation.
+    <dt><code>.xData</code></dt><dd><p>Environment referencing the objects used in the simulation.
 Several "shortcuts" to accessing objects referenced by this
 environment are provided, and can be used on the
 <code>simList</code> object directly instead of specifying the
-<code>.envir</code> slot: <code>$</code>, <code>[[</code>, <code>ls</code>,
+<code>.xData</code> slot: <code>$</code>, <code>[[</code>, <code>ls</code>,
 <code>ls.str</code>, <code>objs</code>. See examples.</p></dd>
+    <dt><code>.envir</code></dt><dd><p>Deprecated. Please do not use any more.</p></dd>
 </dl>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The <code>simList</code> class extends the <code>.simList</code> superclass by adding
-a slot <code>.envir</code> to store the simulation environment containing references
-to simulation objects.
-The <code><a href='simList_-class.html'>simList_</a></code> class extends the <code>.simList</code> superclass, by
-adding a slot <code>.list</code> containing the simulation objects.
+    <p>The <code>simList</code> class extends the <code>environment</code>, by adding
+several slots that provide information about the metadata for a discrete
+event simulation. The environment slot, if accessed directly is <code>.xData</code>
+and this is where input and output objects from modules are placed.
+The <code><a href='simList_-class.html'>simList_</a></code> class is similar, but it extends the <code>list</code>
+class. All other slots are the same.
 Thus, <code>simList</code> is identical to <code>simList_</code>, except that the former
 uses an environment for objects and the latter uses a list.
 The class <code>simList_</code> is only used internally.</p>
