@@ -27,8 +27,6 @@ Default is \code{FALSE}.}
 \value{
 A list with 2 elements, an \code{\link{igraph}} object and an \code{igraph}
 communities object.
-
-# @importFrom igraph graph_from_data_frame cluster_optimal edges # already with import igraph
 }
 \description{
 This is still experimental, but this will show the hierarchical structure of

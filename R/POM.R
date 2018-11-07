@@ -78,7 +78,7 @@
 #'
 #' Setting \code{logObjFnVals} to \code{TRUE} may help diagnosing some problems.
 #' Using the POM derived objective function, essentially all patterns are treated equally.
-#' This may not give the correct behavior for the objective function.
+#' This may not give the correct behaviour for the objective function.
 #' Because \code{POM} weighs the patterns equally, it may be useful to use the
 #' log files to examine the behaviour of the pattern--data pairs.
 #' The first file, ObjectiveFnValues.txt, shows the result of each of the

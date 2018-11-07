@@ -1764,12 +1764,12 @@ setMethod("dataPath",
 #' Time usage in \code{SpaDES}
 #'
 #' Functions for the \code{simtimes} slot of a \code{simList} object
-#' and its elements. To maintain modularity, the behavior of these functions depends
+#' and its elements. To maintain modularity, the behaviour of these functions depends
 #' on where they are used. In other words, different modules can have their own
 #' timeunit. \code{SpaDES} converts these to seconds when running a simulation, but
 #' shows the user time in the units of the model as shown with \code{timeunit(sim)}
 #'
-#' @note These have default behavior that is based on the calling frame timeunit.
+#' @note These have default behaviour that is based on the calling frame timeunit.
 #' When used inside a module, then the time is in the units of the module.
 #' If used in an interactive mode, then the time will be in the units of the
 #' simulation.

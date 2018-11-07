@@ -4,7 +4,7 @@ if (getRversion() >= "3.1.0") {
 
 #' Extract a url from module metadata
 #'
-#' This will get the sourceURL for the object named.
+#' This will get the \code{sourceURL} for the object named.
 #'
 #' @param objectName A character string of the object name in the metadata.
 #' @param sim A \code{simList} object from which to extract the \code{sourceURL}
@@ -156,7 +156,7 @@ remoteFileSize <- function(url) {
 #' To try this, put the Google Drive URL in \code{sourceURL} argument of
 #' \code{expectsInputs} in the module metadata, and put the filename once downloaded
 #' in the \code{objectName} argument.
-#' If using Rstudio Server, you may need to use "out of band" authentication by
+#' If using RStudio Server, you may need to use "out of band" authentication by
 #' setting \code{options(httr_oob_default = TRUE)}.
 #' To avoid caching of Oauth credentials, set \code{options(httr_oauth_cache = TRUE)}.
 #'

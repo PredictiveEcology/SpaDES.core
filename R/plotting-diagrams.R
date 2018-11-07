@@ -422,14 +422,14 @@ setMethod(
 #' @return A list with 2 elements, an \code{\link{igraph}} object and an \code{igraph}
 #' communities object.
 #'
-#' # @importFrom igraph graph_from_data_frame cluster_optimal edges # already with import igraph
-#' @include simList-class.R
-#' @importFrom data.table rbindlist
+#' @author Eliot McIntire
 #' @export
+#' @importFrom data.table rbindlist
+# @importFrom igraph graph_from_data_frame cluster_optimal edges # already with import igraph
+#' @include simList-class.R
 #' @rdname moduleGraph
 #' @seealso moduleDiagram
 #'
-#' @author Eliot McIntire
 setGeneric("moduleGraph", function(sim, plot, ...) {
   standardGeneric("moduleGraph")
 })

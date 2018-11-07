@@ -200,7 +200,7 @@
 #'   \tabular{ll}{
 #'     \code{\link{defineModule}} \tab Define the module metadata\cr
 #'     \code{\link{defineParameter}} \tab Specify a parameter's name, value and set a default\cr
-#'     \code{\link{expectsInput}} \tab Specify an input object's name, class, description, sourceURL and other specifications\cr
+#'     \code{\link{expectsInput}} \tab Specify an input object's name, class, description, \code{sourceURL}uD and other specifications\cr
 #'     \code{\link{createsOutput}} \tab Specify an output object's name, class, description and other specifications\cr
 #'   }
 #'
