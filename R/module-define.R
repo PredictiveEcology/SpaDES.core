@@ -191,7 +191,7 @@ setGeneric("defineModule", function(sim, x) {
 #' @rdname defineModule
 setMethod(
   "defineModule",
-  signature(sim = ".simList", x = "list"),
+  signature(sim = "simList", x = "list"),
   definition = function(sim, x) {
     # check that all metadata elements are present
     metadataRequired <- slotNames(new(".moduleDeps"))

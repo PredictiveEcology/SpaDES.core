@@ -539,6 +539,9 @@ setMethod(
 .fileTableInCols <- colnames(.fileTableIn())
 
 #' @rdname fileTable
+.fileTableInDF <- .fileTableIn()
+
+#' @rdname fileTable
 setGeneric(".fileTableOut", function(x) {
   standardGeneric(".fileTableOut")
 })
@@ -558,6 +561,9 @@ setMethod(
 
 #' @rdname fileTable
 .fileTableOutCols <- colnames(.fileTableOut())
+
+#' @rdname fileTable
+.fileTableOutDF <- .fileTableOut()
 
 ################################################################################
 #' Get and set default working directories
@@ -612,7 +618,6 @@ setMethod(
     outputPath = getOption("spades.outputPath")
   )
 }
-
 
 
 #' @export

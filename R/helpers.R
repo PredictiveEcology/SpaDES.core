@@ -272,7 +272,7 @@ all.equal.simList <- function(target, current, ...) {
   if (length(current@completed))
     completed(current) <- completed(current, times = FALSE)
 
-  # remove all objects starting with ._ in the simList@.envir
+  # remove all objects starting with ._ in the simList@.xData
   objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
   objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
   rm(list = objsTarget, envir = envir(target))

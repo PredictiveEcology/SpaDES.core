@@ -5,9 +5,11 @@
 \alias{.fileTableIn}
 \alias{.fileTableIn,missing-method}
 \alias{.fileTableInCols}
+\alias{.fileTableInDF}
 \alias{.fileTableOut}
 \alias{.fileTableOut,missing-method}
 \alias{.fileTableOutCols}
+\alias{.fileTableOutDF}
 \title{Create empty fileTable for inputs and outputs}
 \format{An object of class \code{character} of length 8.}
 \usage{
@@ -17,11 +19,15 @@
 
 .fileTableInCols
 
+.fileTableInDF
+
 .fileTableOut(x)
 
 \S4method{.fileTableOut}{missing}()
 
 .fileTableOutCols
+
+.fileTableOutDF
 }
 \arguments{
 \item{x}{Not used (should be missing)}

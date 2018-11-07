@@ -38,12 +38,12 @@ setMethod(
     # Section 1 - extract object names, and determine which ones need plotting,
     # which ones need replotting etc.
     sim <- list(...)[[1]]
-    plotList <- ls(sim@.envir, all.names = TRUE)
+    plotList <- ls(sim@.xData, all.names = TRUE)
     plotables <- sapply(plotList, function(x)
-      is(get(x, envir = sim@.envir), ".quickPlottables"))
+      is(get(x, envir = sim@.xData), ".quickPlottables"))
     if (any(plotables)) {
-      plotObjects <- mget(plotList[plotables], sim@.envir) %>%
-        append(., list(env = sim@.envir))
+      plotObjects <- mget(plotList[plotables], sim@.xData) %>%
+        append(., list(env = sim@.xData))
       Plot(plotObjects)
     }
   })
@@ -78,12 +78,12 @@ setMethod(
     # If the user is passing a sub-element to say a Raster Stack
     if (length(rev(elems)[-1]) > 1) {
       # Only RasterStack implemented yet
-      if (is(get(deparse(rev(elems)[[2]]), envir = tmp@.envir), "RasterStack")) {
+      if (is(get(deparse(rev(elems)[[2]]), envir = tmp@.xData), "RasterStack")) {
         useElem <- 2
       }
     }
     out <- tryCatch(
-      eval(parse(text=deparse(elems[[useElem]])), envir=tmp@.envir),
+      eval(parse(text=deparse(elems[[useElem]])), envir=tmp@.xData),
       error=function(x) eval(parse(text=deparse(elems[[useElem]])), envir=envir))
     return(out)
 

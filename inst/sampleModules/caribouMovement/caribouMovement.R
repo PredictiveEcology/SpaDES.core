@@ -57,7 +57,7 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
     init = {
       ### check for more detailed object dependencies:
       ### (use `checkObject` or similar)
-      checkObject(sim, name = SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
+      SpaDES.core::checkObject(sim, name = SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
 
       # do stuff for this event
       sim <- Init(sim)

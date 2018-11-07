@@ -27,7 +27,9 @@ in which to replace element(s).}
 Returns or sets the value of the slot from the \code{simList} object.
 }
 \description{
-Accessor functions for the \code{.envir} slot in a \code{simList} object.
+Accessor functions for the \code{.xData} slot, which is the default virtual
+slot for an S4 class object that inherits from an S3 object (specifically,
+the \code{simList} inherits from \code{environment}) in a \code{simList} object.
 These are included for advanced users.
 }
 \details{
@@ -39,7 +41,6 @@ Currently, only get and set methods are defined. Subset methods are not.
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{events}},
   \code{\link{globals}}, \code{\link{inputs}},
-  \code{\link{ls.simList}}, \code{\link{ls.str.simList}},
   \code{\link{modules}}, \code{\link{objs}},
   \code{\link{packages}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},

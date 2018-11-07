@@ -9,7 +9,8 @@ test_that("downloadData downloads and unzips module data", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE,
+                          opts = list(reproducible.inputPaths = NULL))
   on.exit(testOnExit(testInitOut), add = TRUE)
 
   m <- "test"
@@ -66,8 +67,10 @@ test_that("downloadData downloads and unzips module data", {
     if (require(rgdal, quietly = TRUE)) {
       on.exit(detach("package:rgdal"), add = TRUE)
       ras <- raster(file.path(datadir, filenames[2]))
-      ras[4] <- maxValue(ras) + 1
+      ras[5] <- maxValue(ras) + 1
       writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
+      # It updates it to new file -- but it doesn't do this correctly -- it downloads both
+      #   because it doesn't know what targetFile is
       expect_error(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
       expect_false(exists("dwnload", inherits = FALSE))
       dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)

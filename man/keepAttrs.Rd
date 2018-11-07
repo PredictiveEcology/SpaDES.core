@@ -4,7 +4,7 @@
 \alias{.keepAttrs}
 \title{Attach missing attributes from x to y}
 \usage{
-.keepAttrs(x, y, omitAttrs = c(".envir", ".list"))
+.keepAttrs(x, y, omitAttrs = c(".envir", ".list", ".xData", ".Data"))
 }
 \arguments{
 \item{x}{an object with attributes}

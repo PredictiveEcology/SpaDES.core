@@ -6,8 +6,9 @@
 \alias{Cache}
 \title{\code{.robustDigest} for \code{simList} class objects}
 \usage{
-\S4method{.robustDigest}{simList}(object, objects, length = 1e+06,
-  algo = "xxhash64", quick = getOption("reproducible.quick", FALSE),
+\S4method{.robustDigest}{simList}(object, objects,
+  length = getOption("reproducible.length", Inf), algo = "xxhash64",
+  quick = getOption("reproducible.quick", FALSE),
   classOptions = list())
 }
 \arguments{
@@ -20,9 +21,12 @@ in the default cases; the only known method that uses this
 argument is the \code{simList} class from \code{SpaDES.core}.}
 
 \item{length}{Numeric. If the element passed to Cache is a \code{Path} class
-object (from e.g., \code{asPath(filename)}) or it is a \code{Raster} with file-backing, then this will be
+object (from e.g., \code{asPath(filename)}) or it is a \code{Raster} with
+file-backing, then this will be
 passed to \code{digest::digest}, essentially limiting the number of bytes
-to digest (for speed). This will only be used if \code{quick = FALSE}.}
+to digest (for speed). This will only be used if \code{quick = FALSE}.
+Default is \code{getOption("reproducible.length")},
+which is set to \code{Inf}.}
 
 \item{algo}{The algorithms to be used; currently available choices are
     \code{md5}, which is also the default, \code{sha1}, \code{crc32},
