@@ -1,7 +1,7 @@
 if (!isGeneric(".robustDigest")) {
   setGeneric(
     ".robustDigest",
-    function(object, objects, length = 1e6, algo = "xxhash64") {
+    function(object, objects, length = Inf, algo = "xxhash64") {
       standardGeneric(".robustDigest")
   })
 }
