@@ -23,7 +23,7 @@ if (!isGeneric(".robustDigest")) {
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
-#' @importFrom reproducible asPath .robustDigest .sortDotsUnderscoreFirst .orderDotsUnderscoreFirst
+#' @importFrom reproducible asPath  .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
 #' @aliases Cache
