@@ -199,7 +199,7 @@ test_that("test .prepareOutput", {
     cat(file = testFile, "\n##############################\n", append = TRUE)
     cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(isTRUE(all.equal(simCached1, simCached2)))
+  expect_true(all.equal(simCached1, simCached2))
 })
 
 test_that("test .robustDigest for simLists", {
