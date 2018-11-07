@@ -155,7 +155,6 @@ test_that("test module-level cache", {
 
 })
 
-
 test_that("test .prepareOutput", {
   testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
@@ -189,13 +188,16 @@ test_that("test .prepareOutput", {
   simCached2 <- spades(Copy(mySim), cache = TRUE, debug = FALSE)
 
   if (interactive()) {
-    cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
-    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
-    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
-    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
+    tmpDir <- "~/tmp"
+    testFile <- file.path(tmpDir, "test-cache-out.txt")
+    if (!dir.exists(tmpDir)) dir.create(tmpDir, recursive = TRUE)
+    cat(file = testFile, names(params(mySim)$.progress), append = FALSE)
+    cat(file = testFile, "\n##############################\n", append = TRUE)
+    cat(file = testFile, names(params(simCached1)$.progress), append = TRUE)
+    cat(file = testFile, "\n##############################\n", append = TRUE)
+    cat(file = testFile, names(params(simCached2)$.progress), append = TRUE)
+    cat(file = testFile, "\n##############################\n", append = TRUE)
+    cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
   }
   expect_true(isTRUE(all.equal(simCached1, simCached2)))
 })
