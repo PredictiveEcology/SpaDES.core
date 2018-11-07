@@ -786,7 +786,7 @@ setMethod(
 })
 
 
-#' Call \code{simInit} and \code{spades} together
+#' Call \code{simInit} and \code{spades} or \code{experiment} together
 #'
 #' These functions are convenience wrappers that may allow for
 #' more efficient Caching.
@@ -798,7 +798,12 @@ setMethod(
 #' @return Same as \code{\link{spades}} (a \code{simList}) or
 #'     \code{\link{experiment}} (list of \code{simList} objects)
 #'
+#' @seealso \code{\link{simInit}}, \code{\link{spades}}
+#'     \code{\link{experiment}}
 #' @export
+#' @inheritParams simInit
+#' @inheritParams spades
+#'
 #' @aliases simInitAndSpades
 #' @rdname simInitAnd
 simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
@@ -822,6 +827,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' @export
 #' @aliases simInitAndExperiment
 #' @rdname simInitAnd
+#' @inheritParams simInit
+#' @inheritParams experiment
 #' @details
 #' \code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
 #' these are also in \code{simInit}. If the \code{experiment} is being used
