@@ -342,11 +342,19 @@ setMethod(
                     quick = dots$quick,
                     classOptions = dots$classOptions)
     changed <- if (length(postDigest$.list)) {
-      isNewObj <- !names(postDigest$.list[[1]]) %in% names(preDigest[[whSimList]]$.list[[1]])
-      newObjs <- names(postDigest$.list[[1]])[isNewObj]
-      existingObjs <- names(postDigest$.list[[1]])[!isNewObj]
-      post <- lapply(postDigest$.list[[1]][existingObjs], fastdigest::fastdigest)
-      pre <- lapply(preDigest[[whSimList]]$.list[[1]][existingObjs], fastdigest::fastdigest)
+      internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
+                                       function(x) !any(startsWith(names(x), "doEvent"))))
+      whSimList2 <- if (is.null(internalSimList)) {
+        1
+      } else {
+        which(internalSimList)
+      }
+      isNewObj <- !names(postDigest$.list[[whSimList2]]) %in% names(preDigest[[whSimList]]$.list[[whSimList2]])
+      newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
+      newObjs <- newObjs[!startsWith(newObjs, "._")]
+      existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
+      post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+      pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
       changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
       c(newObjs, changedObjs)
     } else {
