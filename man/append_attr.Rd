@@ -11,9 +11,7 @@ append_attr(x, y)
 \S4method{append_attr}{list,list}(x, y)
 }
 \arguments{
-\item{x}{A \code{list} of items with optional attributes.}
-
-\item{y}{See \code{x}.}
+\item{x, y}{A \code{list} of items with optional attributes.}
 }
 \value{
 An updated \code{list} with attributes.

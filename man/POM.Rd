@@ -68,7 +68,8 @@ this should not be used as the objective function should be
 made so that it doesn't produce \code{NaN}. But, sometimes
 it is difficult to diagnose stochastic results.}
 
-\item{logObjFnVals}{Logical or Character string indicating a filename. Ignored if
+\item{logObjFnVals}{Logical or Character string indicating a filename to log the outputs.
+Ignored if
 \code{objFn} is supplied.
 If TRUE (and there is no \code{objFn} supplied), then the
 value of the individual patterns will be output the console
@@ -174,7 +175,7 @@ necessary, by sending \code{names(objects)} to \code{parVar} in \code{DEoptim.co
 
 Setting \code{logObjFnVals} to \code{TRUE} may help diagnosing some problems.
 Using the POM derived objective function, essentially all patterns are treated equally.
-This may not give the correct behavior for the objective function.
+This may not give the correct behaviour for the objective function.
 Because \code{POM} weighs the patterns equally, it may be useful to use the
 log files to examine the behaviour of the pattern--data pairs.
 The first file, ObjectiveFnValues.txt, shows the result of each of the
@@ -209,17 +210,17 @@ if (interactive()) {
   outData <- spades(reproducible::Copy(mySim), .plotInitialTime = NA)
 
   # Extract the "true" data, in this case, the "proportion of cells burned"
-  # Function defined that will use landscape$fires map from simList,
-  #  i.e., sim$landscape$fires
+  # Function defined that will use landscape$Fires map from simList,
+  #  i.e., sim$landscape$Fires
   #  the return value being compared via MAD with propCellBurnedData
   propCellBurnedFn <- function(landscape) {
-    sum(getValues(landscape$fires) > 0) / ncell(landscape$fires)
+    sum(getValues(landscape$Fires) > 0) / ncell(landscape$Fires)
   }
   # visualize the burned maps of true "data"
   propCellBurnedData <- propCellBurnedFn(outData$landscape)
   clearPlot()
   if (interactive()) {
-    fires <- outData$landscape$fires # Plot doesn't do well with many nested layers
+    fires <- outData$landscape$Fires # Plot doesn't do well with many nested layers
     Plot(fires)
   }
 
@@ -229,9 +230,8 @@ if (interactive()) {
   #  is as close as possible to the proportion area burned in
   #  the "data", using \\code{DEoptim()}.
 
-  # Can use cluster if computer is multi-threaded (but not yet via cl arg, which is not
-  #                                                implemented yet in DEoptim)
-  # This example uses parallelType = 1 in DEoptim. For this, you must manually
+  # Can use cluster if computer is multi-threaded.
+  # This example can use parallelType = 1 in DEoptim. For this, you must manually
   #  pass all packages and variables as character strings.
   # cl <- makeCluster(detectCores() - 1) # not implemented yet in DEoptim
   out1 <- POM(mySim, "spreadprob",

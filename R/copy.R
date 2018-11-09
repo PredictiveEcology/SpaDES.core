@@ -40,7 +40,10 @@ setMethod("Copy",
               sim_@current <- object@current
             }
             if (objects) {
-              sim_@.envir <- Copy(sim_@.envir)
+              sim_@.xData <- Copy(sim_@.xData, filebackedDir = cachePath(object))
+            } else {
+              sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             }
+            sim_@.envir <- sim_@.xData
             return(sim_)
 })

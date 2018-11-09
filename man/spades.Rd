@@ -96,15 +96,17 @@ See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details
 \section{\code{debug}}{
 
 
-If \code{debug} is specified and is not \code{FALSE}, 2 things will happen:
+\code{debug} can be a logical, character vector or a numeric scalar (currently
+1 or 2).
+If \code{debug} is specified and is not \code{FALSE}, 2 things could happen:
 1) there can be messages sent to console, such as events as they pass by, and
-2) (experimental still) if there is an error, it will attempt to open a browser
+2) if \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+there is an error, it will attempt to open a browser
 in the event where the error occurred. You can edit, and then press \code{c} to continue
 or \code{Q} to quit, plus all other normal interactive browser tools.
 \code{c} will trigger a reparse and events will continue as scheduled, starting
 with the one just edited. There may be some unexpected consequences if the
 \code{simList} objects had already been changed before the error occurred.
-\code{debug} can be a logical or character vector.
 
 If not specified in the function call, the package
 option \code{spades.debug} is used. The following
@@ -122,9 +124,14 @@ runs (equivalent to \code{current(sim)}).\cr
                                        will be entered interactively\cr
   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
                                             will be entered into. \cr
-  Any other R expression  \tab Will be evaluated with access to the simList as 'sim'.
+  Any other R expression expressed as a character string  \tab
+                                Will be evaluated with access to the simList as 'sim'.
                                If this is more than one character string, then all will
                                be printed to the screen in their sequence. \cr
+  A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
+                                          information that users may find useful \cr
+                                          information that users may find useful \cr
+
 }
 }
 

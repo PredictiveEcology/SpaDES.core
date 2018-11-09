@@ -197,7 +197,6 @@ setMethod(
                         dirPrefix, substrLength, saveExperiment,
                         experimentFile, clearSimEnv, notOlderThan, cl, ...) {
 
-    #sim <- Copy(sim, objects = FALSE, queues = TRUE)
     if (missing(params)) params <- list()
     if (missing(modules)) modules <- list(unlist(SpaDES.core::modules(sim)))
     if (missing(inputs)) inputs <- list()
@@ -341,16 +340,20 @@ setMethod(
             fill = TRUE)
         }
 
-        if ("modules" %in% names(factorialExp)) {
-          if (!identical(sort(unlist(modules[factorialExp[ind, "modules"]])),
-                         sort(unlist(SpaDES.core::modules(sim))))) {
-            # test if modules are different from sim; if yes, rerun simInit
-            sim_ <- simInit(params = params(sim_), # nolint
-                            modules = as.list(unlist(modules[factorialExp[ind, "modules"]])),
-                            times = append(lapply(times(sim_)[2:3], as.numeric), times(sim_)[4]),
-                            paths = paths(sim_),
-                            outputs = outputs(sim_))
+        if (!any(unlist(lapply(modules, is.null)))) {
+          if ("modules" %in% names(factorialExp)) {
+            if (!identical(sort(unlist(modules[factorialExp[ind, "modules"]])),
+                           sort(unlist(SpaDES.core::modules(sim))))) {
+              # test if modules are different from sim; if yes, rerun simInit
+              sim_ <- simInit(params = params(sim_), # nolint
+                              modules = as.list(unlist(modules[factorialExp[ind, "modules"]])),
+                              times = append(lapply(times(sim_)[2:3], as.numeric), times(sim_)[4]),
+                              paths = paths(sim_),
+                              outputs = outputs(sim_))
+            }
           }
+        } else {
+          sim_ <- sim
         }
       }
 
@@ -420,16 +423,12 @@ setMethod(
       parFun <- "clusterApplyLB"
       args <- list(x = 1:NROW(factorialExp), fun = FunDef)
       args <- append(list(cl = cl), args)
-      if (!is.na(pmatch("Windows", Sys.getenv("OS")))) {
-        parallel::clusterEvalQ(cl, library(SpaDES.core))
-      }
-      packagesToLoad <- SpaDES.core::packages(sim)
+      parallel::clusterEvalQ(cl, require("SpaDES.core", character.only = TRUE))
+      packagesToLoad <- SpaDES.core::packages(sim, clean = TRUE)
       parallel::clusterExport(cl, "packagesToLoad", envir = environment())
-      parallel::clusterEvalQ(cl, {
-        lapply(packagesToLoad, library, character.only = TRUE)
+      b <- parallel::clusterEvalQ(cl, {
+        lapply(packagesToLoad, require, character.only = TRUE)
       })
-
-
     } else {
       parFun <- "lapply"
       args <- list(X = 1:NROW(factorialExp), FUN = FunDef)

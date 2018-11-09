@@ -26,7 +26,7 @@ if defined.}
 The url.
 }
 \description{
-This will get the sourceURL for the object named.
+This will get the \code{sourceURL} for the object named.
 }
 \author{
 Eliot McIntire

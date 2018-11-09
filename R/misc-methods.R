@@ -105,9 +105,7 @@ setMethod("updateList",
 #'
 #' Similar to \code{updateList} but does not require named lists.
 #'
-#' @param x  A \code{list} of items with optional attributes.
-#'
-#' @param y  See \code{x}.
+#' @param x,y  A \code{list} of items with optional attributes.
 #'
 #' @return An updated \code{list} with attributes.
 #'
@@ -541,6 +539,9 @@ setMethod(
 .fileTableInCols <- colnames(.fileTableIn())
 
 #' @rdname fileTable
+.fileTableInDF <- .fileTableIn()
+
+#' @rdname fileTable
 setGeneric(".fileTableOut", function(x) {
   standardGeneric(".fileTableOut")
 })
@@ -561,10 +562,15 @@ setMethod(
 #' @rdname fileTable
 .fileTableOutCols <- colnames(.fileTableOut())
 
+#' @rdname fileTable
+.fileTableOutDF <- .fileTableOut()
+
 ################################################################################
 #' Get and set default working directories
 #'
 #' Wrapper functions to access the packages options for default working directories.
+#' Note: there is an active binding made to \code{Paths}, so a user can use
+#' \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
 #'
 #' @param cachePath   The default local directory in which to cache simulation outputs.
 #'                    If not specified, defaults to \code{getOption("spades.cachePath")}.
@@ -594,6 +600,14 @@ setMethod(
 #' setPaths(inputPath = tempdir())  ## sets custom inputPath with other paths default
 #' setPaths(modulePath = tempdir()) ## sets custom modulePath with other paths default
 #' setPaths(outputPath = tempdir()) ## sets custom outputPath with other paths default
+#'
+#' # NOTE: on loading and attaching SpaDES.core,
+#' # an active binding is made to "Paths"
+#'
+#' getPaths()
+#' Paths # same
+#' setPaths(outputPath = tempdir())
+#' Paths # shows change
 #' }
 #'
 .paths <- function() {
@@ -611,6 +625,11 @@ setMethod(
 getPaths <- function() {
   return(.paths())
 }
+
+
+#' @export
+#' @rdname setPaths
+Paths <- .paths()
 
 #' @export
 #' @rdname setPaths

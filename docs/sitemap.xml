@@ -142,6 +142,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/ganttStatus.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/getModuleInputObjects.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/getModuleVersion.html</loc>
   </url>
   <url>
@@ -154,7 +157,10 @@
     <loc>http://spades-core.predictiveecology.org//reference/initialize-method.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/inputObjects.html</loc>
+    <loc>http://spades-core.predictiveecology.org//reference/inputObjectsDF.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/isNamespaced.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/keepAttrs.html</loc>
@@ -164,12 +170,6 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/loadPackages.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/ls-method.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/ls_str-method.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/makeMemoiseable.html</loc>
@@ -289,6 +289,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/runCodeChecks.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/runModuleInputsObjects.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/saveFiles.html</loc>
   </url>
   <url>
@@ -310,6 +313,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/simInit.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/simInitAnd.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-envir.html</loc>
   </url>
   <url>
@@ -317,6 +323,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-inout.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-metadata.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-modules.html</loc>

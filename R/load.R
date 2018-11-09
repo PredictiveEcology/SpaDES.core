@@ -174,7 +174,7 @@ setMethod(
             }
             names(objList) <- filelist$objectName[y]
             if (length(objList) > 0) {
-              list2env(objList, envir = sim@.envir)
+              list2env(objList, envir = sim@.xData)
               filelist[y, "loaded"] <- TRUE
               message(filelist[y, "objectName"], " loaded into simList")
             } else {
@@ -210,7 +210,7 @@ setMethod(
             # The actual load call
             if (identical(loadFun[y], "load")) {
               do.call(getFromNamespace(loadFun[y], loadPackage[y]),
-                      args = argument, envir = sim@.envir)
+                      args = argument, envir = sim@.xData)
 
             } else {
               sim[[filelist[y, "objectName"]]] <-

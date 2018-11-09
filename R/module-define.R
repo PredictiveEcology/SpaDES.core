@@ -89,7 +89,7 @@ moduleDefaults <- list(
 #'                           the default values that will be used unless a module user
 #'                           overrides them with the \code{params} argument in the
 #'                           \code{\link{simInit}} call. The minimum and maximum are
-#'                           currently used by the \code{shine} function and the
+#'                           currently used by the \code{SpaDES.shiny::shine} function and the
 #'                           \code{POM} function, and they should indicate the range
 #'                           of values that are reasonable scientifically.\cr
 #'    \code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as
@@ -191,7 +191,7 @@ setGeneric("defineModule", function(sim, x) {
 #' @rdname defineModule
 setMethod(
   "defineModule",
-  signature(sim = ".simList", x = "list"),
+  signature(sim = "simList", x = "list"),
   definition = function(sim, x) {
     # check that all metadata elements are present
     metadataRequired <- slotNames(new(".moduleDeps"))
@@ -283,17 +283,17 @@ setMethod(
     }
 
     if (is.null(x$inputObjects)) {
-      x$inputObjects <- .inputObjects()
+      x$inputObjects <- ._inputObjectsDF()
     } else {
       if (is(x$inputObjects, "data.frame")) {
-        if (!all(colnames(x$inputObjects) %in% colnames(.inputObjects())) ||
-            !all(colnames(.inputObjects()) %in% colnames(x$inputObjects))) {
+        if (!all(colnames(x$inputObjects) %in% colnames(._inputObjectsDF())) ||
+            !all(colnames(._inputObjectsDF()) %in% colnames(x$inputObjects))) {
           stop("invalid data.frame `inputObjects` in module `", x$name, "`:\n",
                "provided: ", paste(colnames(x$inputObjects), collapse = ", "),
-               "expected: ", paste(colnames(.inputObjects()), collapse = ", "))
+               "expected: ", paste(colnames(._inputObjectsDF()), collapse = ", "))
         }
       } else {
-        x$inputObjects <- .inputObjects()
+        x$inputObjects <- ._inputObjectsDF()
       }
     }
     if (NROW(x$inputObjects)) {
@@ -307,17 +307,17 @@ setMethod(
     }
 
     if (is.null(x$outputObjects)) {
-      x$outputObjects <- .outputObjects()
+      x$outputObjects <- ._outputObjectsDF()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        if (!all(colnames(x$outputObjects) %in% colnames(.outputObjects())) ||
-            !all(colnames(.outputObjects()) %in% colnames(x$outputObjects))) {
+        if (!all(colnames(x$outputObjects) %in% colnames(._outputObjectsDF())) ||
+            !all(colnames(._outputObjectsDF()) %in% colnames(x$outputObjects))) {
           stop("invalid data.frame `outputObjects` in module `", x$name, "`:",
                "provided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
-               "expected: ", paste(colnames(.outputObjects()), collapse = ", "))
+               "expected: ", paste(colnames(._outputObjectsDF()), collapse = ", "))
         }
       } else {
-        x$outputObjects <- .outputObjects()
+        x$outputObjects <- ._outputObjectsDF()
       }
     }
 
@@ -374,11 +374,36 @@ setMethod(
 #' @export
 #' @rdname defineParameter
 #'
+#' @seealso \code{\link{P}}, \code{\link{params}} for accessing these parameters in
+#'          a module.
 #' @examples
 #' parameters = rbind(
 #'   defineParameter("lambda", "numeric", 1.23, desc = "intrinsic rate of increase"),
 #'   defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack")
 #' )
+#'
+#' \dontrun{
+#' # Create a new module, then access parameters using \code{P}
+#' tmpdir <- file.path(tempdir(), "test")
+#' checkPath(tmpdir, create = TRUE)
+#'
+#' # creates a  new, "empty" module -- it has defaults for everything that is required
+#' newModule("testModule", tmpdir)
+#'
+#' # Look at new module code -- see defineParameter
+#' file.edit(file.path(tmpdir, "testModule", "testModule.R"))
+#'
+#' # initialize the simList
+#' mySim <- simInit(modules = "testModule",
+#'                  paths = list(modulePath = tmpdir))
+#'
+#' # Access one of the parameters -- because this line is not inside a module
+#' #  function, we must specify the module name. If used within a module,
+#' #  we can omit the module name
+#' P(mySim, "testModule")$.useCache
+#'
+#' }
+#'
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc) {
   standardGeneric("defineParameter")

@@ -9,13 +9,9 @@ doEvent(sim, debug, notOlderThan)
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}
 
-\item{debug}{Optional. Either Logical or character. If logical, entire \code{simList}
-will be printed at each event. If a character string, then it can be one
-of the many simList accessors, such as \code{events}, \code{params}.
-It can also be any R expression that will be evaluated with access
-to the \code{sim} object.
-If \code{"current"} is used, then it will be a compact list of the events
-as they go by.}
+\item{debug}{Optional logical flag or character vector indicating what to print to
+console at each event. See details.
+Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{notOlderThan}{Date or time. Passed to \code{reproducible::Cache} to update the cache.
 Default is \code{NULL}, meaning don't update the cache.

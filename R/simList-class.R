@@ -12,11 +12,12 @@
 #' \code{\link{data.frame}} to implement the event queue (because it is much
 #' more efficient).
 #'
-#' @note The \code{simList} class extends the \code{.simList} superclass by adding
-#' a slot \code{.envir} to store the simulation environment containing references
-#' to simulation objects.
-#' The \code{\link{simList_}} class extends the \code{.simList} superclass, by
-#' adding a slot \code{.list} containing the simulation objects.
+#' @note The \code{simList} class extends the \code{environment}, by adding
+#' several slots that provide information about the metadata for a discrete
+#' event simulation. The environment slot, if accessed directly is \code{.xData}
+#' and this is where input and output objects from modules are placed.
+#' The \code{\link{simList_}} class is similar, but it extends the \code{list}
+#' class. All other slots are the same.
 #' Thus, \code{simList} is identical to \code{simList_}, except that the former
 #' uses an environment for objects and the latter uses a list.
 #' The class \code{simList_} is only used internally.
@@ -51,6 +52,13 @@
 #'
 #' @slot paths      Named list of \code{modulePath}, \code{inputPath},
 #'                  and \code{outputPath} paths. Partial matching is performed.
+#' @slot .xData     Environment referencing the objects used in the simulation.
+#'                  Several "shortcuts" to accessing objects referenced by this
+#'                  environment are provided, and can be used on the
+#'                  \code{simList} object directly instead of specifying the
+#'                  \code{.xData} slot: \code{$}, \code{[[}, \code{ls},
+#'                  \code{ls.str}, \code{objs}. See examples.
+#' @slot .envir     Deprecated. Please do not use any more.
 #'
 #' @section Accessor Methods:
 #'
@@ -80,8 +88,9 @@
 #'   \code{eventPriority} \tab The priority given to the event. \cr
 #' }
 #'
-#' @aliases .simList
+#' @aliases simList
 #' @rdname simList-class
+#' @rdname simList
 #' @importFrom data.table as.data.table data.table
 #' @include helpers.R misc-methods.R module-dependencies-class.R
 #'
@@ -90,31 +99,17 @@
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @author Alex Chubaty and Eliot McIntire
+#' @exportClass simList
 #'
 setClass(
-  ".simList",
+  "simList",
+  contains = "environment",
   slots = list(
     modules = "list", params = "list", events = "list",#data.table",
     current = "list", #"data.table",
     completed = "list", depends = ".simDeps",
-    simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list"
-  ),
-  prototype = list(
-    modules = as.list(NULL),
-    params = list(
-      .checkpoint = list(interval = NA_real_, file = NULL),
-      .progress = list(type = NULL, interval = NULL)
-    ),
-    events = list(),#.emptyEventListObj,
-    current = list(), #.emptyEventListObj,
-    completed = list(),
-    depends = new(".simDeps", dependencies = list(NULL)),
-    simtimes = list(
-      current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
-    ),
-    inputs = .fileTableIn(),
-    outputs = .fileTableOut(),
-    paths = .paths()
+    simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
+    .envir = "environment"
   ),
   validity = function(object) {
     # check for valid sim times
@@ -128,37 +123,71 @@ setClass(
   }
 )
 
-################################################################################
-#' @inheritParams .simList
+### `initialize` generic is already defined in the methods package
+#' Generate a \code{simList} object
 #'
-#' @slot .envir     Environment referencing the objects used in the simulation.
-#'                  Several "shortcuts" to accessing objects referenced by this
-#'                  environment are provided, and can be used on the
-#'                  \code{simList} object directly instead of specifying the
-#'                  \code{.envir} slot: \code{$}, \code{[[}, \code{ls},
-#'                  \code{ls.str}, \code{objs}. See examples.
+#' Given the name or the definition of a class, plus optionally data to be
+#' included in the object, \code{new} returns an object from that class.
 #'
-#' @aliases simList
-#' @rdname simList-class
-#' @exportClass simList
+#' @export
+#' @include misc-methods.R
+#' @rdname initialize-method
 #'
-setClass("simList",
-         contains = ".simList",
-         slots = list(.envir = "environment"),
-         prototype = list(.envir = new.env(parent = asNamespace("SpaDES.core"))) #emptyenv()))#
-)
+setMethod("initialize",
+          signature(.Object = "simList"),
+          definition = function(.Object, ...) {
+
+            sn <- slotNames(.Object)
+            dots <- list(...)
+            slotsProvided <- sn %in% names(dots)
+            for (ss in sn[slotsProvided]) {
+              slot(.Object, ss) <- dots[[ss]]
+            }
+
+
+            expected <- c("modules", "params", "depends", "simtimes",
+              "inputs", "outputs", "paths")
+            haves <- na.omit(match(sn[!slotsProvided], expected))
+            if (any(1==haves))
+              .Object@modules = as.list(NULL)
+
+            if (any(2==haves))
+              .Object@params = list(
+                .checkpoint = list(interval = NA_real_, file = NULL),
+                .progress = list(type = NULL, interval = NULL)
+              )
+            if (any(3==haves))
+              .Object@depends = .emptySimDeps #new(".simDeps", dependencies = list(NULL))
+            if (any(4==haves))
+              .Object@simtimes = list(
+                current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
+              )
+            if (any(5==haves))
+              .Object@inputs = .fileTableInDF
+            if (any(6==haves))
+              .Object@outputs = .fileTableOutDF
+            if (any(7==haves))
+              .Object@paths = .paths()
+
+            .Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            .Object@.envir <- .Object@.xData
+            attr(.Object@.xData, "name") <- "sim"
+            #
+            return(.Object)
+          })
+
 
 ################################################################################
 #' The \code{simList_} class
 #'
 #' Internal use only. Used when saving/loading a \code{simList}.
 #'
-#' This is identical to class \code{simList}, except that the \code{.envir} slot
-#' is replaced by a \code{.list} containing a list to store the objects from the
+#' This is identical to class \code{simList}, except that the \code{.xData} slot
+#' is replaced by a \code{.Data} containing a list to store the objects from the
 #' environment contained within the \code{simList}.
 #' Saving/loading a list behaves more reliably than saving/loading an environment.
 #'
-#' @inheritParams .simList
+#' @inheritParams simList
 #'
 #' @seealso \code{\link{simList}}
 #'
@@ -169,25 +198,54 @@ setClass("simList",
 #' @author Alex Chubaty
 #'
 setClass("simList_",
-         contains = ".simList",
-         slots = list(.list = "list"),
-         prototype = list(.list = list())
+         contains = "list",
+         slots = list(
+           modules = "list", params = "list", events = "list",#data.table",
+           current = "list", #"data.table",
+           completed = "list", depends = ".simDeps",
+           simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
+           .list = "list"
+         )
 )
 
 setAs(from = "simList_", to = "simList", def = function(from) {
-  x <- as(as(from, ".simList"), "simList")
-  x@.envir <- new.env(new.env(parent = emptyenv()))
-  list2env(from@.list, envir = x@.envir)
+  x <- new(to,
+           modules = from@modules,
+           params = from@params,
+           events = from@events,
+           current = from@current,
+           completed = from@completed,
+           depends = from@depends,
+           simtimes = from@simtimes,
+           inputs = from@inputs,
+           outputs = from@outputs,
+           paths = from@paths)
+  x@.xData <- new.env(new.env(parent = emptyenv()))
+  x@.envir <- x@.xData
+  list2env(from, envir = x@.xData)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
 })
 
-setAs(from = "simList", to = "simList_", def = function(from) {
-  x <- as(as(from, ".simList"), "simList_")
-  x@.list <- as.list(envir(from), all.names = TRUE)
+
+
+setAs(from = "simList", to = "simList_", def = function(from, to) {
+  x <- new(to,
+           modules = from@modules,
+           params = from@params,
+           events = from@events,
+           current = from@current,
+           completed = from@completed,
+           depends = from@depends,
+           simtimes = from@simtimes,
+           inputs = from@inputs,
+           outputs = from@outputs,
+           paths = from@paths)
+  x@.Data <- as.list(envir(from), all.names = TRUE)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
 })
+
 
 ### `initialize` generic is already defined in the methods package
 #' Generate a \code{simList} object
@@ -196,15 +254,19 @@ setAs(from = "simList", to = "simList_", def = function(from) {
 #' included in the object, \code{new} returns an object from that class.
 #'
 #' @param .Object  A \code{simList} object.
+#' @param ... Optional Values passed to any or all slot
 #'
 #' @export
 #' @include misc-methods.R
 #' @rdname initialize-method
 #'
 setMethod("initialize",
-          signature(.Object = "simList"),
-          definition = function(.Object) {
-            .Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
-            attr(.Object@.envir, "name") <- "sim"
+          signature(.Object = "simList_"),
+          definition = function(.Object, ...) {
+            .Object <- callNextMethod(.Object, ...)
+
+            .Object@.list <- .Object@.Data # backwards compatibility
+            #.Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
+            #attr(.Object@.envir, "name") <- "sim"
             return(.Object)
-})
+          })

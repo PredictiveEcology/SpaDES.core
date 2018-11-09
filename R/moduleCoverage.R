@@ -14,7 +14,7 @@
 #' for the module.
 #' The `functionCoverage` object contains percentage values for unit test
 #' coverage for each function defined in the module.
-#' Please use \code{\link[covr]{shine}} to view the coverage information.
+#' Please use \code{\link[covr]{report}} to view the coverage information.
 #' Two data.tables give the information of all the tested and untested functions
 #' in the module.
 #'
@@ -42,8 +42,8 @@
 #'  moduleName <- "forestAge" # sample module to test
 #'  downloadModule(name = moduleName, path = modulePath) # download sample module
 #'  testResults <- moduleCoverage(name = moduleName, path = modulePath)
-#'  shine(testResults$moduleCoverage)
-#'  shine(testResults$functionCoverage)
+#'  report(testResults$moduleCoverage)
+#'  report(testResults$functionCoverage)
 #'  unlink(tmpdir, recursive = TRUE)
 #' }
 setGeneric("moduleCoverage", function(name, path) {

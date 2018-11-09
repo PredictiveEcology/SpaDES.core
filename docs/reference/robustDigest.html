@@ -73,7 +73,7 @@ converted to a repeatably digestible object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -141,8 +141,9 @@ converted to a repeatably digestible object.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>.robustDigest</span>(<span class='no'>object</span>, <span class='no'>objects</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1e+06</span>,
-  <span class='kw'>algo</span> <span class='kw'>=</span> <span class='st'>"xxhash64"</span>, <span class='kw'>quick</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"reproducible.quick"</span>, <span class='fl'>FALSE</span>),
+<span class='fu'>.robustDigest</span>(<span class='no'>object</span>, <span class='no'>objects</span>,
+  <span class='kw'>length</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"reproducible.length"</span>, <span class='fl'>Inf</span>), <span class='kw'>algo</span> <span class='kw'>=</span> <span class='st'>"xxhash64"</span>,
+  <span class='kw'>quick</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"reproducible.quick"</span>, <span class='fl'>FALSE</span>),
   <span class='kw'>classOptions</span> <span class='kw'>=</span> <span class='fu'>list</span>())</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -163,9 +164,12 @@ argument is the <code>simList</code> class from <code>SpaDES.core</code>.</p></t
     <tr>
       <th>length</th>
       <td><p>Numeric. If the element passed to Cache is a <code>Path</code> class
-object (from e.g., <code>asPath(filename)</code>) or it is a <code>Raster</code> with file-backing, then this will be
+object (from e.g., <code>asPath(filename)</code>) or it is a <code>Raster</code> with
+file-backing, then this will be
 passed to <code><a href='http://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>, essentially limiting the number of bytes
-to digest (for speed). This will only be used if <code>quick = FALSE</code>.</p></td>
+to digest (for speed). This will only be used if <code>quick = FALSE</code>.
+Default is <code>getOption("reproducible.length")</code>,
+which is set to <code>Inf</code>.</p></td>
     </tr>
     <tr>
       <th>algo</th>

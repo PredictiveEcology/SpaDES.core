@@ -96,7 +96,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @section Caching:
 #'
-#' Using caching with \code{SpaDES} is vital when building re-useble and reproducible content.
+#' Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
 #' Please see the vignette dedicated to this topic.
 #' See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
 #'
@@ -335,10 +335,9 @@ setMethod(
     modulesLoaded <- list()
     # create simList object for the simulation
     sim <- new("simList")
-    sim@.envir[["._startClockTime"]] <- Sys.time()
     # Make a temporary place to store parsed module files
-    sim@.envir[[".parsedFiles"]] <- new.env(parent = sim@.envir)
-    on.exit(rm(".parsedFiles", envir = sim@.envir), add = TRUE )
+    sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
+    on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
@@ -368,16 +367,19 @@ setMethod(
     dotParamsChar <- list(".savePath", ".saveObjects")
     dotParams <- append(dotParamsChar, dotParamsReal)
 
-
     sim@modules <- modules  ## will be updated below
 
-    reqdPkgs <- packages(modules=unlist(modules), paths = paths(sim)$modulePath,
-                         envir = sim@.envir[[".parsedFiles"]])
+    reqdPkgs <- packages(modules = unlist(modules), paths = paths(sim)$modulePath,
+                         envir = sim@.xData[[".parsedFiles"]])
     if (length(unlist(reqdPkgs))) {
       allPkgs <- c(unique(unlist(reqdPkgs), "SpaDES.core"))
       if (getOption("spades.useRequire")) {
         Require(allPkgs)
       } else {
+        # clean up github identified repos
+        allPkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", allPkgs)
+        allPkgs <- gsub(".*\\/+(.+)",  "\\1", allPkgs)
+
         loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
       }
     }
@@ -394,17 +396,16 @@ setMethod(
       modsForTU <- names(childModules)
       stillFinding <- TRUE
       recurseLevel <- 1
-      # Time unit could be NA, in which case, it should find the smallest one that is inside a parent... if none there, then inside grandparent etc.
+      ## Time unit could be NA, in which case, it should find the smallest one that is inside a parent...
+      ## if none there, then inside grandparent etc.
       while (stillFinding && length(modsForTU)) {
-
         tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                envir = sim@.envir[[".parsedFiles"]])
+                                envir = sim@.xData[[".parsedFiles"]])
         hasTU <- !is.na(tu)
         innerNames <- .findModuleName(childModules, recursive = recurseLevel)
         modsForTU <- innerNames[nzchar(names(innerNames))]
         stillFinding <- all(!hasTU)
         recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
-
       }
       if (!exists("tu", inherits = FALSE)) {
         return(list("year")) # default
@@ -417,23 +418,21 @@ setMethod(
     }
 
     # recursive function to extract parent and child structures
-    buildModuleGraph <- function(sim, mods, childModules) {
-      # provide childModules
+    buildParentChildGraph <- function(sim, mods, childModules) {
       out <- childModules
       isParent <- unlist(lapply(out, function(x) length(x) > 1))
       from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
       to <- unlist(lapply(out, function(x) names(x)))
-      if (is.null(to))
-        to <- character(0)
+      if (is.null(to)) to <- character(0)
       outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
-      aa <- lapply(childModules[isParent], function(x) buildModuleGraph(sim, mods, x))
+      aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
       aa <- rbindlist(aa)
       outDF <- rbind(outDF, aa)
       outDF
     }
 
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
-    moduleGraph <- as.data.frame(buildModuleGraph(sim, modules(sim), childModules = childModules))
+    parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
 
     timeunits <- findSmallestTU(sim, modules(sim), childModules)
 
@@ -458,7 +457,7 @@ setMethod(
       minTimeunit(timeunits)
     }
 
-    timestep <- inSeconds(sim@simtimes[["timeunit"]], sim@.envir)
+    timestep <- inSeconds(sim@simtimes[["timeunit"]], sim@.xData)
     times(sim) <- list(
       current = times$start * timestep,
       start = times$start * timestep,
@@ -482,7 +481,7 @@ setMethod(
 
     ## source module metadata and code files
     lapply(modules(sim), function(m) moduleVersion(m, sim = sim,
-                                                   envir = sim@.envir[[".parsedFiles"]]))
+                                                   envir = sim@.xData[[".parsedFiles"]]))
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
@@ -490,7 +489,7 @@ setMethod(
       sim <- .parseModule(sim,
                           sim@modules,
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
-                          envir = sim@.envir[[".parsedFiles"]],
+                          envir = sim@.xData[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
                           objects = objects, paths = paths)
       if (length(.unparsed(sim@modules)) == 0) {
@@ -521,8 +520,7 @@ setMethod(
     ## assign user-specified non-global params, while
     ## keeping defaults for params not specified by user
     omit <- c(which(core == "load"), which(core == "save"))
-    pnames <-
-      unique(c(paste0(".", core[-omit]), names(sim@params)))
+    pnames <- unique(c(paste0(".", core[-omit]), names(sim@params)))
 
     if (is.null(params$.progress) || any(is.na(params$.progress))) {
       params$.progress <- .pkgEnv$.progressEmpty
@@ -543,6 +541,9 @@ setMethod(
 
     ## load user-defined modules
     for (m in loadOrder) {
+      ## run .inputObjects() for each module
+      sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+
       ## schedule each module's init event:
       sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .normal())
 
@@ -579,7 +580,7 @@ setMethod(
     }
 
     ## Add the data.frame as an attribute
-    attr(sim@modules, "modulesGraph") <- moduleGraph
+    attr(sim@modules, "modulesGraph") <- parentChildGraph
 
     ## END OF MODULE PARSING AND LOADING
     if (length(objects)) {
@@ -627,8 +628,7 @@ setMethod(
             "loadTime in ?simInit"
           )
         )
-        events(sim) <-
-          events(sim)[eventTime >= start(sim)]
+        events(sim) <- events(sim)[eventTime >= start(sim)]
       }
     }
 
@@ -769,17 +769,16 @@ setMethod(
     ma <- match(expectedOrder, listNames)
     li <- li[ma]
 
-    if (!all(sapply(1:length(li), function(x) {
+    correctArgs <- (sapply(1:length(li), function(x) {
       is(li[[x]], expectedClasses[x])
-    }))) {
-      stop(
-        "simInit is incorrectly specified. simInit takes 8 arguments. ",
-        "Currently, times, params, modules, and paths must be lists (or missing), ",
-        "objects can be named list or character vector (or missing),",
-        "inputs and outputs must be data.frames (or missing)",
-        "and loadOrder must be a character vector (or missing)",
-        "For the currently defined options for simInit, type showMethods('simInit')."
-      )
+    }))
+    if (!all(correctArgs)) {
+      plural <- (sum(!correctArgs) > 1) + 1
+      expectedDF <- apply(data.frame(arg = names(li), expectedClasses), 1, paste, collapse = " = ")
+      stop("simInit is incorrectly specified. ", " The ", paste(names(li)[!correctArgs], collapse = ", "), " argument",
+           c("", "s")[plural], " ", c("is", "are")[plural], " specified incorrectly.",
+           c(" It is", " They are")[plural], " expected to be ",
+           paste(expectedDF[!correctArgs], collapse = ", "))
     }
     sim <- do.call("simInit", args = li)
 
@@ -787,20 +786,79 @@ setMethod(
 })
 
 
-#' Put simInit and spades together
+#' Call \code{simInit} and \code{spades} or \code{experiment} together
 #'
-#' This may allow for more efficient Caching. This passes all
-#' arguments to simInit, then the created \code{simList} is passed
-#' to \code{spades}
+#' These functions are convenience wrappers that may allow for
+#' more efficient Caching.
+#' Passes all arguments to \code{simInit}, then passes the created \code{simList}
+#' to \code{spades} or \code{experiment}.
 #'
-#' @param ... Passed to simInit
+#' @param ... Arguments passed to simInit, and spades or experiment
+#'
+#' @return Same as \code{\link{spades}} (a \code{simList}) or
+#'     \code{\link{experiment}} (list of \code{simList} objects)
+#'
+#' @seealso \code{\link{simInit}}, \code{\link{spades}}
+#'     \code{\link{experiment}}
 #' @export
-#' @rdname simInit
-simInitAndSpades <- function(...) {
-  simIn <- simInit(...)
-  spades(simIn)
+#' @inheritParams simInit
+#' @inheritParams spades
+#'
+#' @aliases simInitAndSpades
+#' @rdname simInitAnd
+simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
+                             notOlderThan, debug, progress, cache,
+                             .plotInitialTime, .saveInitialTime, ...) {
+
+  # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
+  scalls <- sys.calls()
+  objsAll <- mget(ls(), envir = environment())
+  objsAll <- objsAll[!objsAll=="..."]
+  objsSimInit <- objsAll[formalArgs(simInit)]
+  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndSpades", ...)
+
+  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
+  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+  sim <- do.call(spades, objsSpades)#AndX(scalls, "simInitAndSpades", ...)
+
 }
 
+
+#' @export
+#' @aliases simInitAndExperiment
+#' @rdname simInitAnd
+#' @inheritParams simInit
+#' @inheritParams experiment
+#' @details
+#' \code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
+#' these are also in \code{simInit}. If the \code{experiment} is being used
+#' to vary these arguments, it must be done separately (i.e., \code{simInit} then
+#' \code{experiment}).
+simInitAndExperiment <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
+                                 notOlderThan, replicates,
+                                 dirPrefix, substrLength, saveExperiment,
+                                 experimentFile, clearSimEnv, cl, ...)  {
+  list2env(list(...), envir = environment())
+  objsAll <- mget(ls(all.names = TRUE), envir = environment())
+  objsAll <- objsAll[!names(objsAll)=="..."]
+  objsSimInit <- objsAll[formalArgs(simInit)]
+  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
+
+  experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
+  objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
+  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
+  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+
+  # Because there are some arguments in BOTH simInit and Experiment, can't pass them
+  #  through, because they have different meaning
+  objsExperiment <- objsExperiment[!names(objsExperiment) %in% names(objsSimInit)]
+  onlyInSpades <- setdiff(names(objsSpades), names(objsExperiment))
+  if (length(onlyInSpades))
+    objsExperiment[onlyInSpades] <- objsSpades[onlyInSpades]
+  sims <- do.call(experiment, objsExperiment)#AndX(scalls, "simInitAndExperiment", ...)
+
+  return(sims)
+}
 
 #' Identify Child Modules from a recursive list
 #'
@@ -818,11 +876,10 @@ simInitAndSpades <- function(...) {
     message("Duplicate module, ", modules[duplicated(modules)], ", specified. Skipping loading it twice.")
   }
   if (length(modules) > 0) {
-    #isParent <- unlist(lapply(modulesToSearch, function(x) length(x)>0))
     modulesToSearch <- lapply(.parseModulePartial(sim, modulesToSearch,
-                                                     defineModuleElement = "childModules",
-                                                     envir = sim@.envir[[".parsedFiles"]]),
-                                 as.list)
+                                                  defineModuleElement = "childModules",
+                                                  envir = sim@.xData[[".parsedFiles"]]),
+                              as.list)
     isParent <- unlist(lapply(modulesToSearch, function(x) length(x)>1))
 
     modulesToSearch[isParent] <- lapply(modulesToSearch[isParent], function(x) .identifyChildModules(sim = sim, modules = x))
@@ -862,3 +919,99 @@ simInitAndSpades <- function(...) {
   return(parentNames)
 }
 
+#' Run module's \code{.inputObjects}
+#'
+#' Run \code{.inputObjects()} from each module file from each module, one at a time,
+#' and remove it from the \code{simList} so next module won't rerun it.
+#'
+#' @keywords internal
+#' @rdname runModuleInputsObjects
+.runModuleInputObjects <- function(sim, m, objects, notOlderThan) {
+  # If user supplies the needed objects, then test whether all are supplied.
+  # If they are all supplied, then skip the .inputObjects code
+  cacheIt <- FALSE
+
+  mnames <- vapply(seq_along(sim@depends@dependencies), function(k) {
+    sim@depends@dependencies[[k]]@name
+  }, character(1))
+  i <- which(mnames == m)
+
+  ## temporarily assign current module
+  sim@current <- newEventList <- list(
+    eventTime = start(sim),
+    moduleName = m,
+    eventType = ".inputObjects",
+    eventPriority = .normal()
+  )
+
+  allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
+    sim$.userSuppliedObjNames
+  if (!all(allObjsProvided)) {
+    if (!is.null(sim@.xData[[m]][[".inputObjects"]])) {
+      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
+               envir = sim@.xData)
+      a <- P(sim, m, ".useCache")
+      if (!is.null(a)) {
+        if (!identical(FALSE, a)) {
+          if (isTRUE(a)) {
+            cacheIt <- TRUE
+          } else {
+            if (".inputObjects" %in% a) {
+              cacheIt <- TRUE
+            }
+          }
+        }
+      }
+
+      if (isTRUE(cacheIt)) {
+        message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
+        moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+
+        # ensure backwards compatibility with non-namespaced modules
+        if (.isNamespaced(sim, m)) {
+          moduleSpecificObjs <- paste(m, ".inputObjects", sep = ":")
+          objectsToEvaluateForCaching <- c(moduleSpecificObjs)
+        } else {
+          objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
+                                                pattern = m, value = TRUE),
+                                           na.omit(moduleSpecificInputObjects))
+        }
+
+        .inputObjects <- .getModuleInputObjects(sim, m)
+        if (!is.null(.inputObjects)) {
+          args <- as.list(formals(.inputObjects))
+          env <- environment()
+          args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
+          args[["sim"]] <- sim
+
+          ## This next line will make the Caching sensitive to userSuppliedObjs
+          ##  (which are already in the simList) or objects supplied by another module
+          inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
+          if (any(inSimList)) {
+            objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
+                                             moduleSpecificInputObjects[inSimList])
+          }
+
+          sim <- Cache(FUN = do.call, .inputObjects, args,
+                       objects = objectsToEvaluateForCaching,
+                       notOlderThan = notOlderThan,
+                       outputObjects = moduleSpecificInputObjects,
+                       quick = getOption("reproducible.quick", FALSE),
+                       userTags = c(paste0("module:", m),
+                                    "eventType:.inputObjects",
+                                    "function:.inputObjects"))
+        }
+      } else {
+        message(crayon::green("Running .inputObjects for ", m, sep = ""))
+        .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
+        .inputObjects <- .getModuleInputObjects(sim, m)
+        if (!is.null(.inputObjects)) {
+          sim <- .inputObjects(sim)
+        }
+      }
+    }
+  }
+
+  sim@current <- list()
+  return(sim)
+}

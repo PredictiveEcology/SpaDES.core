@@ -16,8 +16,8 @@ framework that facilitates modularity, and easily enables the user to
 include additional functionality by running user-built simulation modules.
 Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
-of the DES, with current benchmarking as low as 700 microseconds overhead for
-each event (including queuing, sorting, spawning event etc.) or 180 microseconds
+of the DES, with current benchmarking as low as 500 microseconds overhead for
+each event (including queuing, sorting, spawning event etc.) or 52 microseconds
 if there is no sorting
 
 Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
@@ -128,6 +128,7 @@ of a \code{\link{simList}} object are summarized further below.
      \code{\link{events}} \tab Scheduled simulation events (the event queue). (advanced)\cr
      \code{\link{current}} \tab Currently executing event. (advanced)\cr
      \code{\link{completed}} \tab Completed simulation events. (advanced)\cr
+     \code{\link{elapsedTime}} \tab The amount of clock time that modules & events use\cr
   }
 }
 
@@ -143,12 +144,12 @@ of a \code{\link{simList}} object are summarized further below.
 }
 
 \subsection{3.8 \code{simList} environment}{
-  The \code{\link{simList}} has a slot called \code{.envir} which is an environment.
+  The \code{\link{simList}} has a slot called \code{.xData} which is an environment.
   All objects in the \code{simList} are actually in this environment,
   i.e., the \code{simList} is not a \code{list}.
   In R, environments use pass-by-reference semantics, which means that copying
   a \code{simList} object using normal R assignment operation (e.g., \code{sim2 <- sim1}),
-  will not copy the objects contained within the \code{.envir} slot.
+  will not copy the objects contained within the \code{.xData} slot.
   The two objects (\code{sim1} and \code{sim2}) will share identical objects
   within that slot. Sometimes, this not desired, and a true copy is required.
 
@@ -207,8 +208,18 @@ of a \code{\link{simList}} object are summarized further below.
   \tabular{ll}{
     \code{\link{defineModule}} \tab Define the module metadata\cr
     \code{\link{defineParameter}} \tab Specify a parameter's name, value and set a default\cr
-    \code{\link{expectsInput}} \tab Specify an input object's name, class, description, sourceURL and other specifications\cr
+    \code{\link{expectsInput}} \tab Specify an input object's name, class, description, \code{sourceURL}uD and other specifications\cr
     \code{\link{createsOutput}} \tab Specify an output object's name, class, description and other specifications\cr
+  }
+
+  There are also accessors for many of the metadata entries:
+  \tabular{ll}{
+    \code{\link{timeunit}} \tab Accesses metadata of same name\cr
+    \code{\link{citation}} \tab Accesses metadata of same name\cr
+    \code{\link{documentation}} \tab Accesses metadata of same name\cr
+    \code{\link{reqdPkgs}} \tab Accesses metadata of same name\cr
+    \code{\link{inputObjects}} \tab Accesses metadata of same name\cr
+    \code{\link{outputObjects}} \tab Accesses metadata of same name\cr
   }
 }
 
@@ -511,11 +522,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Alex M Chubaty \email{alex.chubaty@gmail.com} (https://orcid.org/0000-0001-7146-8135)
+\strong{Maintainer}: Alex M Chubaty \email{alex.chubaty@gmail.com} (0000-0001-7146-8135)
 
 Authors:
 \itemize{
-  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (https://orcid.org/0000-0002-6914-8316)
+  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (0000-0002-6914-8316)
 }
 
 Other contributors:

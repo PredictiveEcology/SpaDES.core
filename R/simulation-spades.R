@@ -15,13 +15,6 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param sim Character string for the \code{simList} simulation object.
 #'
-#' @param debug Optional. Either Logical or character. If logical, entire \code{simList}
-#'              will be printed at each event. If a character string, then it can be one
-#'              of the many simList accessors, such as \code{events}, \code{params}.
-#'              It can also be any R expression that will be evaluated with access
-#'              to the \code{sim} object.
-#'              If \code{"current"} is used, then it will be a compact list of the events
-#'              as they go by.
 #' @inheritParams spades
 #' @return Returns the modified \code{simList} object.
 #'
@@ -53,11 +46,14 @@ doEvent <- function(sim, debug, notOlderThan) {
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
     if (length(sim@events)) {
-      slot(sim, "current") <- sim@events[[1]]
-      slot(sim, "events") <- sim@events[-1]
+      # Do same check as would be done with "slot(..., check = FALSE)", but much faster
+      if (is.list(sim@events[[1]]))
+        slot(sim, "current", check = FALSE) <- sim@events[[1]]
+      if (is.list(sim@events[-1]))
+        slot(sim, "events", check = FALSE) <- sim@events[-1]
     } else {
       # no more events, return empty event list
-      slot(sim, "current") <- list()
+      slot(sim, "current", check = FALSE) <- list() # this is guaranteed to be a list
     }
   }
 
@@ -65,14 +61,22 @@ doEvent <- function(sim, debug, notOlderThan) {
   #  but stop time is not reached
   cur <- sim@current
   if  (length(cur) == 0) {
-    sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
+    # Test replacement for speed
+    #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
+    st <- slot(sim, "simtimes")
+    st[["current"]] <- sim@simtimes[["end"]] + 1
+    slot(sim, "simtimes", check = FALSE) <- st
   } else {
 
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
-      fnEnv <- sim@.envir[[cur[["moduleName"]]]]
+      fnEnv <- sim@.xData[[cur[["moduleName"]]]]
       # update current simulated time
-      sim@simtimes[["current"]] <- cur[["eventTime"]]
+      # Test replacement for speed
+      #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
+      st <- slot(sim, "simtimes")
+      st[["current"]] <- cur[["eventTime"]]
+      slot(sim, "simtimes", check = FALSE) <- st
 
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
@@ -110,6 +114,19 @@ doEvent <- function(sim, debug, notOlderThan) {
                 write.table(evnts1, quote = FALSE, row.names = FALSE)
               }
             }
+          } else if (debug[[i]] == 1) {
+            print(paste0(Sys.time(),
+                         " | total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
+                         " | ", paste(unname(current(sim)), collapse = ' ')))
+          } else if (debug[[i]] == 2) {
+            compareTime <- if (is.null(attr(sim, "completedCounter")) || attr(sim, "completedCounter")==1) {
+              sim@.xData$._startClockTime
+            } else {
+              .POSIXct(sim@completed[[attr(sim, "completedCounter")-1]]$._clockTime)
+            }
+            print(paste0(format(Sys.time(), format = "%H:%M:%S"),
+                         " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
+                         " | ", paste(unname(current(sim)), collapse = ' ')))
           } else if (debug[[i]] == "simList") {
             print(sim)
           } else if (grepl(debug[[i]], pattern = "\\(")) {
@@ -190,8 +207,9 @@ doEvent <- function(sim, debug, notOlderThan) {
 
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
+        cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
-          #instead of sim@.envir because collisions with parallel sims from same sim object
+          #instead of sim@.xData because collisions with parallel sims from same sim object
 
           # next section replaces sim@completed <- append(sim@completed, list(cur)),
           # which gets slower with size of sim@completed
@@ -224,14 +242,19 @@ doEvent <- function(sim, debug, notOlderThan) {
       }
 
       # current event completed, replace current with empty
-      slot(sim, "current") <- list()
+      slot(sim, "current", check = FALSE) <- list() # is a list
 
     } else {
       # update current simulated time and event
-      sim@simtimes[["current"]] <- sim@simtimes[["end"]] + 1
+      # Test replacement for speed
+      #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
+      st <- slot(sim, "simtimes")
+      st[["current"]] <- sim@simtimes[["end"]] + 1
+      slot(sim, "simtimes", check = FALSE) <- st
+
       # i.e., if no more events
-      slot(sim, "events") <- append(list(sim@current), sim@events)
-      slot(sim, "current") <- list()
+      slot(sim, "events", check = FALSE) <- append(list(sim@current), sim@events) # will be a list b/c append
+      slot(sim, "current", check = FALSE) <- list() # is a list
     }
 
   }
@@ -331,27 +354,28 @@ scheduleEvent <- function(sim,
             eventTimeInSeconds <- as.numeric(convertTimeunit((
               eventTime -
                 convertTimeunit(sim@simtimes[["start"]],
-                                sim@simtimes[["timeunit"]], sim@.envir,
+                                sim@simtimes[["timeunit"]], sim@.xData,
                                 skipChecks = TRUE)
             ),
             "seconds",
-            sim@.envir, skipChecks = TRUE) +
+            sim@.xData, skipChecks = TRUE) +
               sim@simtimes[["current"]])
           } else {
-            eventTimeInSeconds <-
-              as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
+            eventTimeInSeconds <- if (!startsWith(attr(eventTime, "unit"), "second")) {
+              as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
                                          skipChecks = TRUE))
+            } else eventTime
           }
         } else {
           # for core modules because they have no metadata
           eventTimeInSeconds <-
-            as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
+            as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
                                        skipChecks = TRUE))
         }
       } else {
         # when eventTime is NA... can't seem to get an example
         eventTimeInSeconds <-
-          as.numeric(convertTimeunit(eventTime, "seconds", sim@.envir,
+          as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
                                      skipChecks = TRUE))
       }
       attr(eventTimeInSeconds, "unit") <- "second"
@@ -470,15 +494,17 @@ scheduleEvent <- function(sim,
 #'
 #' @section \code{debug}:
 #'
-#' If \code{debug} is specified and is not \code{FALSE}, 2 things will happen:
+#' \code{debug} can be a logical, character vector or a numeric scalar (currently
+#' 1 or 2).
+#' If \code{debug} is specified and is not \code{FALSE}, 2 things could happen:
 #' 1) there can be messages sent to console, such as events as they pass by, and
-#' 2) (experimental still) if there is an error, it will attempt to open a browser
+#' 2) if \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+#' there is an error, it will attempt to open a browser
 #' in the event where the error occurred. You can edit, and then press \code{c} to continue
 #' or \code{Q} to quit, plus all other normal interactive browser tools.
 #' \code{c} will trigger a reparse and events will continue as scheduled, starting
 #' with the one just edited. There may be some unexpected consequences if the
 #' \code{simList} objects had already been changed before the error occurred.
-#' \code{debug} can be a logical or character vector.
 #'
 #' If not specified in the function call, the package
 #' option \code{spades.debug} is used. The following
@@ -496,9 +522,14 @@ scheduleEvent <- function(sim,
 #'                                        will be entered interactively\cr
 #'   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
 #'                                             will be entered into. \cr
-#'   Any other R expression  \tab Will be evaluated with access to the simList as 'sim'.
+#'   Any other R expression expressed as a character string  \tab
+#'                                 Will be evaluated with access to the simList as 'sim'.
 #'                                If this is more than one character string, then all will
 #'                                be printed to the screen in their sequence. \cr
+#'   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
+#'                                           information that users may find useful \cr
+#'                                           information that users may find useful \cr
+#'
 #' }
 #'
 #'
@@ -576,6 +607,7 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
+    sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))
@@ -584,11 +616,11 @@ setMethod(
     .pkgEnv[["spades.keepCompleted"]] <- getOption("spades.keepCompleted", TRUE)
 
     # timeunits gets accessed every event -- this should only be needed once per simList
-    sim@.envir$.timeunits <- timeunits(sim)
+    sim@.xData$.timeunits <- timeunits(sim)
     on.exit({
       if (!.pkgEnv[["skipNamespacing"]])
         .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
-      rm(".timeunits", envir = sim@.envir)
+      rm(".timeunits", envir = sim@.xData)
     })
 
     if (!is.null(.plotInitialTime)) {
@@ -644,6 +676,9 @@ setMethod(
       .pkgEnv[[".spadesDebugFirst"]] <- TRUE
       .pkgEnv[[".spadesDebugWidth"]] <- c(9, 10, 9, 13)
     }
+
+    sim@.xData[["._firstEventClockTime"]] <- Sys.time()
+
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
 
@@ -704,7 +739,7 @@ setMethod(
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     moduleSpecificObjects <-
-      c(ls(sim@.envir, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .envir that are prefixed with moduleName
+      c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
         ls(fnEnv, all.names = TRUE), # functions in the namespaced location
         na.omit(createsOutputs)) # objects outputted by module
     moduleSpecificOutputObjects <- createsOutputs
@@ -713,11 +748,10 @@ setMethod(
                          modules = cur[["moduleName"]])
   }
   if (.pkgEnv[["spades.browserOnError"]]) {
-    sim <- .runEventWithBrowser(sim, quotedFnCall, moduleCall, fnEnv, cur)
+    .runEventWithBrowser(sim, quotedFnCall, moduleCall, fnEnv, cur)
   } else {
-    sim <- eval(quotedFnCall)
+    eval(quotedFnCall)
   }
-  sim
 }
 
 .runEventWithBrowser <- function(sim, quotedFnCall, moduleCall, fnEnv, cur) {
@@ -728,9 +762,9 @@ setMethod(
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
-        tmp <- .parseConditional(filename = sim@.envir[[cur$moduleName]]$._sourceFilename)
+        tmp <- .parseConditional(filename = sim@.xData[[cur$moduleName]]$._sourceFilename)
         eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-             envir = sim@.envir[[cur[["moduleName"]]]])
+             envir = sim@.xData[[cur[["moduleName"]]]])
         numTries <- 0
       } else {
         message("There was an error in the code in the ", moduleCall,

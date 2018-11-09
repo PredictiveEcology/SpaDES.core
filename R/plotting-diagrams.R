@@ -81,8 +81,8 @@ setMethod(
 
     # simulation timestep in 'days'
     ts <- sim@simtimes[["timeunit"]] %>%
-      inSeconds(envir = sim@.envir) %>%
-      convertTimeunit("day", envir = sim@.envir) %>%
+      inSeconds(envir = sim@.xData) %>%
+      convertTimeunit("day", envir = sim@.xData) %>%
       as.numeric()
 
     out <- lapply(modules, function(x) {
@@ -422,14 +422,14 @@ setMethod(
 #' @return A list with 2 elements, an \code{\link{igraph}} object and an \code{igraph}
 #' communities object.
 #'
-#' # @importFrom igraph graph_from_data_frame cluster_optimal edges # already with import igraph
-#' @include simList-class.R
-#' @importFrom data.table rbindlist
+#' @author Eliot McIntire
 #' @export
+#' @importFrom data.table rbindlist
+# @importFrom igraph graph_from_data_frame cluster_optimal edges # already with import igraph
+#' @include simList-class.R
 #' @rdname moduleGraph
 #' @seealso moduleDiagram
 #'
-#' @author Eliot McIntire
 setGeneric("moduleGraph", function(sim, plot, ...) {
   standardGeneric("moduleGraph")
 })
@@ -440,39 +440,48 @@ setMethod(
   "moduleGraph",
   signature(sim = "simList", plot = "logical"),
   definition = function(sim, plot, ...) {
-    mg <- attr(sim@modules, "modulesGraph")
-    parents <- unique(mg[, "from"])
+    if ((Sys.info()[['sysname']] == "Darwin") && (Sys.which("glpsol") == "")) {
+      stop("GLPK not found on this system.\n",
+           "igraph is used internally and requires a GLPK installation.\n",
+           "It can be installed using, e.g., `brew install glpk`, ",
+           "after which you should reinstall igraph from source using:\n",
+           "`install.packages('igraph', type = 'source')`\n",
+           "For more info see https://github.com/igraph/rigraph/issues/273.")
+    } else {
+      mg <- attr(sim@modules, "modulesGraph")
+      parents <- unique(mg[, "from"])
 
-    deps <- depsEdgeList(sim)[, list(from, to)]
-    el <- rbind(mg, deps) # don't seem to need the rbinded version
+      deps <- depsEdgeList(sim)[, list(from, to)]
+      el <- rbind(mg, deps)
 
-    # This is just for the dummy case of having no object dependencies
-    if (NROW(deps) == 0) deps <- mg
+      # This is just for the dummy case of having no object dependencies
+      if (NROW(deps) == 0) deps <- mg
 
-    grph <- graph_from_data_frame(el, directed = TRUE)
-    grps <- cluster_optimal(grph)
+      grph <- graph_from_data_frame(el, directed = TRUE)
+      grps <- cluster_optimal(grph)
 
-    membership <- as.numeric(as.factor(mg[match(names(V(grph)), mg[, 2]), 1]))
-    membership[is.na(membership)] <- 1
-    membership[which(names(V(grph)) == "_INPUT_")] <- max(membership, na.rm = TRUE) + 1
-    grps$membership <- membership
+      membership <- as.numeric(as.factor(mg[match(names(V(grph)), mg[, 2]), 1]))
+      membership[is.na(membership)] <- 1
+      membership[which(names(V(grph)) == "_INPUT_")] <- max(membership, na.rm = TRUE) + 1
+      grps$membership <- membership
 
-    el1 <- lapply(parents, function(par) data.frame(el[from == par]))
-    el1 <- rbindlist(el1)
-    e <- apply(el1, 1, paste, collapse = "|")
-    e <- edges(e)
+      el1 <- lapply(parents, function(par) data.frame(el[from == par]))
+      el1 <- rbindlist(el1)
+      e <- apply(el1, 1, paste, collapse = "|")
+      e <- edges(e)
 
-    if (plot) {
-      vs <- c(15, 0)[(names(V(grph)) %in% parents) + 1]
-      dots <- list(...)
-      if ("title" %in% names(dots)) {
-        Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE, ...)
-      } else {
-        Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE,
-             title = "Module Graph", ...)
+      if (plot) {
+        vs <- c(15, 0)[(names(V(grph)) %in% parents) + 1]
+        dots <- list(...)
+        if ("title" %in% names(dots)) {
+          Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE, ...)
+        } else {
+          Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE,
+               title = "Module Graph", ...)
+        }
       }
+      return(invisible(list(graph = grph, communities = grps)))
     }
-    return(invisible(list(graph = grph, communities = grps)))
 })
 
 #' @export

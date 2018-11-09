@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -166,7 +166,7 @@ The `moduleCoverage` object contains the percent value of unit test coverage
 for the module.
 The `functionCoverage` object contains percentage values for unit test
 coverage for each function defined in the module.
-Please use <code><a href='http://www.rdocumentation.org/packages/covr/topics/covr-deprecated'>shine</a></code> to view the coverage information.
+Please use <code><a href='http://www.rdocumentation.org/packages/covr/topics/report'>report</a></code> to view the coverage information.
 Two data.tables give the information of all the tested and untested functions
 in the module.</p>
     
@@ -193,8 +193,8 @@ To accurately test your module, the test filename must follow the format
  <span class='no'>moduleName</span> <span class='kw'>&lt;-</span> <span class='st'>"forestAge"</span> <span class='co'># sample module to test</span>
  <span class='fu'><a href='downloadModule.html'>downloadModule</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>) <span class='co'># download sample module</span>
  <span class='no'>testResults</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleCoverage</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>)
- <span class='fu'>shine</span>(<span class='no'>testResults</span>$<span class='no'>moduleCoverage</span>)
- <span class='fu'>shine</span>(<span class='no'>testResults</span>$<span class='no'>functionCoverage</span>)
+ <span class='fu'>report</span>(<span class='no'>testResults</span>$<span class='no'>moduleCoverage</span>)
+ <span class='fu'>report</span>(<span class='no'>testResults</span>$<span class='no'>functionCoverage</span>)
  <span class='fu'>unlink</span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='co'># }</span></pre>
   </div>

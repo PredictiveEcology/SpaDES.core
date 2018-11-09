@@ -73,7 +73,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -247,15 +247,17 @@ See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https:/
     <h2 class="hasAnchor" id="debug"><a class="anchor" href="#debug"></a><code>debug</code></h2>
 
     
-    <p>If <code>debug</code> is specified and is not <code>FALSE</code>, 2 things will happen:
+    <p><code>debug</code> can be a logical, character vector or a numeric scalar (currently
+1 or 2).
+If <code>debug</code> is specified and is not <code>FALSE</code>, 2 things could happen:
 1) there can be messages sent to console, such as events as they pass by, and
-2) (experimental still) if there is an error, it will attempt to open a browser
+2) if <code>options("spades.browserOnError" = TRUE)</code> (experimental still) if
+there is an error, it will attempt to open a browser
 in the event where the error occurred. You can edit, and then press <code>c</code> to continue
 or <code>Q</code> to quit, plus all other normal interactive browser tools.
 <code>c</code> will trigger a reparse and events will continue as scheduled, starting
 with the one just edited. There may be some unexpected consequences if the
-<code>simList</code> objects had already been changed before the error occurred.
-<code>debug</code> can be a logical or character vector.</p>
+<code>simList</code> objects had already been changed before the error occurred.</p>
 <p>If not specified in the function call, the package
 option <code>spades.debug</code> is used. The following
 options for debug are available:</p>
@@ -271,10 +273,12 @@ runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</
                                        will be entered interactively</td></tr>
 <tr><td><code>c(&lt;moduleName&gt;, &lt;eventName&gt;)</code></td><td>Only the event in that specified module
                                             will be entered into.</td></tr>
-<tr><td>Any other R expression</td><td>Will be evaluated with access to the simList as 'sim'.
+<tr><td>Any other R expression expressed as a character string</td><td>Will be evaluated with access to the simList as 'sim'.
                                If this is more than one character string, then all will
                                be printed to the screen in their sequence.</td></tr>
-<tr><td></td><td><code>TRUE</code></td></tr>
+<tr><td>A numeric scalar, currently 1 or 2 (maybe others)</td><td>This will print out alternative forms of event
+                                          information that users may find useful</td></tr>
+<tr><td>information that users may find useful</td><td></td></tr>
 </table>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>

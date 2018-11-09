@@ -67,6 +67,18 @@ options(spades.moduleCodeChecks = FALSE)
 #  
 #  mySim <- simInit(times = times, params = parameters, modules = modules,
 #                   objects = objects, paths = paths)
+#  
+#  # Access parameters
+#  params(mySim)               # shows all parameters
+#  P(mySim)                    # same, but more concise
+#  P(mySim, "caribouMovement") # only parameters in caribouMovement
+#  P(mySim)$caribouMovement    # same
+#  P(mySim)$caribouMovement$N  # Only one parameter
+#  
+#  # If used within the module source code, then module name can be omitted:
+#  # This will return NULL here, but will return the actual value if used
+#  # in a module
+#  P(sim)$N  # Only one parameter
 
 ## ----event-types, echo=TRUE, eval=FALSE----------------------------------
 #  ## sample event type definitions from the default `randomLandscapes` module
@@ -159,7 +171,8 @@ options(spades.moduleCodeChecks = FALSE)
 ## ----sim-eventDiagram, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE----
 library(igraph) # for %>%
 library(SpaDES.core)
-if (require(SpaDES.tools)) {
+if (require(SpaDES.tools) && require(RandomFields)) {
+
   parameters <- list(
     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
     .progress = list(NA),
@@ -187,7 +200,7 @@ if (require(SpaDES.tools)) {
 }
 
 ## ----eventDiagram, eval=TRUE, fig.height=10, fig.width=7-----------------
-if (require(SpaDES.tools))  {
+if (require(SpaDES.tools) && require(RandomFields))  {
   mySim <- spades(mySim) # runs the simulation
   
   # overview of the events in the simulation

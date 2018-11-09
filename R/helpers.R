@@ -127,11 +127,11 @@ setMethod(
       documentation = list(),
       reqdPkgs = list(),
       parameters = defineParameter(),
-      inputObjects = .inputObjects(),
-      outputObjects = .outputObjects()
+      inputObjects = ._inputObjectsDF(),
+      outputObjects = ._outputObjectsDF()
     )
     return(out)
-  })
+})
 
 #' Find objects if passed as character strings
 #'
@@ -144,16 +144,18 @@ setMethod(
 #' searched in the call stack. Default is "simInit"
 #'
 #' @author Eliot McIntire
+#' @importFrom reproducible .grepSysCalls
 #' @keywords internal
 #' @name findObjects
 #' @rdname findObjects
 #'
 .findObjects <- function(objects, functionCall = "simInit") {
   scalls <- sys.calls()
-  grep1 <- grep(as.character(scalls), pattern = functionCall)
+  grep1 <- .grepSysCalls(scalls, functionCall)
   grep1 <- pmax(min(grep1[sapply(scalls[grep1], function(x) {
     tryCatch(is(parse(text = x), "expression"), error = function(y) NA)
   })], na.rm = TRUE) - 1, 1)
+
   # Convert character strings to their objects
   lapply(objects, function(x) get(x, envir = sys.frames()[[grep1]]))
 }
@@ -251,7 +253,9 @@ setMethod(
 #' All equal method for simLists
 #'
 #' This function removes a few attributes that are added internally
-#' by SpaDES.core and are not relevant to the \code{all.equal}.
+#' by SpaDES.core and are not relevant to the \code{all.equal}. One
+#' key element removed is any time stamps, as these are guaranteed
+#' to be different.
 #'
 #' @inheritParams base::all.equal
 #' @export
@@ -262,11 +266,23 @@ all.equal.simList <- function(target, current, ...) {
   attr(current, ".Cache")$newCache <- NULL
   attr(target, "removedObjs") <- NULL
   attr(current, "removedObjs") <- NULL
-  suppressWarnings(rm("._startClockTime", envir = envir(target)))
-  suppressWarnings(rm("._startClockTime", envir = envir(current)))
-  suppressWarnings(rm(".timestamp", envir = envir(target)))
-  suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  # make a dummy class so it uses the default all.equal
+  if (length(target@completed))
+    completed(target) <- completed(target, times = FALSE)
+  if (length(current@completed))
+    completed(current) <- completed(current, times = FALSE)
+
+  # remove all objects starting with ._ in the simList@.xData
+  objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
+  objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  rm(list = objsTarget, envir = envir(target))
+  rm(list = objsCurrent, envir = envir(current))
+  # suppressWarnings(rm("._startClockTime", envir = envir(target)))
+  # suppressWarnings(rm("._startClockTime", envir = envir(current)))
+  # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
+  # suppressWarnings(rm("._firstEventClockTime", envir = envir(current)))
+  # suppressWarnings(rm(".timestamp", envir = envir(target)))
+  # suppressWarnings(rm(".timestamp", envir = envir(current)))
+
   all.equal.default(target, current)
 }

@@ -3,12 +3,14 @@
 \docType{methods}
 \name{packages}
 \alias{packages}
+\alias{simList-accessors-packages}
 \alias{packages,ANY-method}
 \title{Get module or simulation package dependencies}
 \usage{
-packages(sim, modules, paths, filenames, envir, ...)
+packages(sim, modules, paths, filenames, envir, clean = FALSE, ...)
 
-\S4method{packages}{ANY}(sim, modules, paths, filenames, envir, ...)
+\S4method{packages}{ANY}(sim, modules, paths, filenames, envir,
+  clean = FALSE, ...)
 }
 \arguments{
 \item{sim}{A \code{simList} object.}
@@ -31,6 +33,10 @@ function will check in that envir for the parsed file before
 parsing again. If the \code{envir} is transient, then this will
 have no effect.}
 
+\item{clean}{Optional logical. If \code{TRUE}, it will scrub any references to
+github repositories, e.g., "PredictiveEcology/reproducible" will be
+returned as "reproducible"}
+
 \item{...}{All \code{simInit} parameters.}
 }
 \value{
@@ -43,8 +49,7 @@ Get module or simulation package dependencies
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
-  \code{\link{inputs}}, \code{\link{ls.simList}},
-  \code{\link{ls.str.simList}}, \code{\link{modules}},
+  \code{\link{inputs}}, \code{\link{modules}},
   \code{\link{objs}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}

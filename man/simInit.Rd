@@ -7,7 +7,6 @@
 \alias{simInit,ANY,ANY,ANY,character,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,character,ANY,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
-\alias{simInitAndSpades}
 \title{Initialize a new simulation}
 \usage{
 simInit(times, params, modules, objects, paths, inputs, outputs, loadOrder,
@@ -28,8 +27,6 @@ simInit(times, params, modules, objects, paths, inputs, outputs, loadOrder,
 
 \S4method{simInit}{ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(times, params, modules,
   objects, paths, inputs, outputs, loadOrder, notOlderThan = NULL)
-
-simInitAndSpades(...)
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times
@@ -83,8 +80,6 @@ then the \code{.inputObjects} will be cached.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
-
-\item{...}{Passed to simInit}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
@@ -98,10 +93,6 @@ pass by reference, "putting" objects in the sim object does no actual copy. The
 \code{simList} also stores all parameters,
 and other important simulation information, such
 as times, paths, modules, and module load order. See more details below.
-
-This may allow for more efficient Caching. This passes all
-arguments to simInit, then the created \code{simList} is passed
-to \code{spades}
 }
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
@@ -197,7 +188,7 @@ e.g., \code{options(spades.moduleCodeChecks = FALSE)}
 \section{Caching}{
 
 
-Using caching with \code{SpaDES} is vital when building re-useble and reproducible content.
+Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
 Please see the vignette dedicated to this topic.
 See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
 }

@@ -8,13 +8,13 @@ Description: Provide the core discrete event simulation (DES) framework for
 URL:
     http://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2018-08-13
-Version: 0.2.2
+Date: 2018-10-16
+Version: 0.2.3
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
-    role = c("aut", "cre"), comment = c(ORCID = "https://orcid.org/0000-0001-7146-8135")),
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
     person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
-    role = c("aut"), comment=c(ORCID = "https://orcid.org/0000-0002-6914-8316")),
+    role = c("aut"), comment = c(ORCID = "0000-0002-6914-8316")),
     person("Yong", "Luo", email = "yluo1@lakeheadu.ca",
     role = c("ctb")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
@@ -27,7 +27,7 @@ Authors@R: c(
 Depends:
     R (>= 3.3.0),
     quickPlot (>= 0.1.4),
-    reproducible (>= 0.2.2)
+    reproducible (>= 0.2.3.9004)
 Imports:
     codetools,
     crayon,
@@ -53,12 +53,12 @@ Imports:
     utils
 Suggests:
     covr,
-    hunspell,
     knitr,
     Matrix,
     magrittr,
     microbenchmark,
     png,
+    RandomFields (>= 3.1.24),
     RColorBrewer (>= 1.1-2),
     rgdal,
     rgenoud,
@@ -67,6 +67,7 @@ Suggests:
     rmarkdown,
     testthat (>= 1.0.2)
 Encoding: UTF-8
+Language: en-CA
 License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
@@ -107,4 +108,4 @@ Collate:
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

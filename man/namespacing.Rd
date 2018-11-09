@@ -3,19 +3,19 @@
 \docType{methods}
 \name{.callingModuleName}
 \alias{.callingModuleName}
-\alias{.callingModuleName,.simList-method}
+\alias{.callingModuleName,simList-method}
 \alias{currentModule}
-\alias{currentModule,.simList-method}
+\alias{currentModule,simList-method}
 \alias{.callingFrameTimeunit}
 \title{Namespacing within \code{SpaDES}}
 \usage{
 .callingModuleName(sim)
 
-\S4method{.callingModuleName}{.simList}(sim)
+\S4method{.callingModuleName}{simList}(sim)
 
 currentModule(sim)
 
-\S4method{currentModule}{.simList}(sim)
+\S4method{currentModule}{simList}(sim)
 
 .callingFrameTimeunit(x)
 }
@@ -23,8 +23,7 @@ currentModule(sim)
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{x}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{x}{A \code{simList}}
 }
 \description{
 \code{.callingModuleName} returns the name of the module that is currently

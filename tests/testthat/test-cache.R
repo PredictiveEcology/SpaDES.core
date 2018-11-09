@@ -28,7 +28,7 @@ test_that("test cache", {
                            omitArgs = c("progress", "debug", ".plotInitialTime", ".saveInitialTime")))
   sims <- eval(expr)
   out <- showCache(sims[[1]])
-  expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies
+  expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies, one for each "experiment"
   expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
@@ -155,7 +155,6 @@ test_that("test module-level cache", {
 
 })
 
-
 test_that("test .prepareOutput", {
   testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
@@ -189,16 +188,18 @@ test_that("test .prepareOutput", {
   simCached2 <- spades(Copy(mySim), cache = TRUE, debug = FALSE)
 
   if (interactive()) {
-    cat(file = "~/tmp/out.txt", names(params(mySim)$.progress), append = FALSE)
-    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", names(params(simCached1)$.progress), append = TRUE)
-    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", names(params(simCached2)$.progress), append = TRUE)
-    cat(file = "~/tmp/out.txt", "\n##############################\n", append = TRUE)
-    cat(file = "~/tmp/out.txt", all.equal(simCached1, simCached2), append = TRUE)
+    tmpDir <- "~/tmp"
+    testFile <- file.path(tmpDir, "test-cache-out.txt")
+    if (!dir.exists(tmpDir)) dir.create(tmpDir, recursive = TRUE)
+    cat(file = testFile, names(params(mySim)$.progress), append = FALSE)
+    cat(file = testFile, "\n##############################\n", append = TRUE)
+    cat(file = testFile, names(params(simCached1)$.progress), append = TRUE)
+    cat(file = testFile, "\n##############################\n", append = TRUE)
+    cat(file = testFile, names(params(simCached2)$.progress), append = TRUE)
+    cat(file = testFile, "\n##############################\n", append = TRUE)
+    cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(isTRUE(all.equal(simCached1, simCached2)))
-
+  expect_true(all.equal(simCached1, simCached2))
 })
 
 test_that("test .robustDigest for simLists", {
@@ -212,9 +213,9 @@ test_that("test .robustDigest for simLists", {
   fileName <- file.path(modName, paste0(modName,".R"))
   newCode <- "\"hi\"" # this will be added below in 2 different spots
 
-  args = list(modules = list("test"),
-              paths = list(modulePath = tmpdir, cachePath = tmpCache),
-              params = list(test = list(.useCache = ".inputObjects")))
+  args <- list(modules = list("test"),
+               paths = list(modulePath = tmpdir, cachePath = tmpCache),
+               params = list(test = list(.useCache = ".inputObjects")))
 
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
@@ -222,8 +223,7 @@ test_that("test .robustDigest for simLists", {
                  regexp = "Using or creating cached copy|module code",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Using cached copy|module code",
-                 all = TRUE)
+                 regexp = "Using or creating cached copy|Using cached copy|module code")
 
 
   # make change to .inputObjects code -- should rerun .inputObjects
@@ -250,9 +250,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result|module code",
-                 all = TRUE)
-
+                 regexp = "Using or creating cached copy|loading cached result|module code")
 
   # In some other location, test during spades call
   newModule(modName, path = tmpdir, open = FALSE)
@@ -330,7 +328,7 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os) == 4) # 2 objects, the environment, the rest
+  expect_true(length(os) == 5) # 4 objects, the environment, the rest
 })
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {

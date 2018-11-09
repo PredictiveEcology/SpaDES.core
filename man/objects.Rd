@@ -7,14 +7,6 @@
 \alias{objs,simList-method}
 \alias{objs<-}
 \alias{objs<-,simList-method}
-\alias{[[}
-\alias{[[,simList,ANY,ANY-method}
-\alias{[[<-}
-\alias{[[<-,simList,ANY,ANY,ANY-method}
-\alias{$}
-\alias{$,simList-method}
-\alias{$<-}
-\alias{$<-,simList-method}
 \title{Extract or replace an object from the simulation environment}
 \usage{
 objs(sim, ...)
@@ -24,29 +16,14 @@ objs(sim, ...)
 objs(sim) <- value
 
 \S4method{objs}{simList}(sim) <- value
-
-\S4method{[[}{simList,ANY,ANY}(x, i, j, ..., drop)
-
-\S4method{[[}{simList,ANY,ANY,ANY}(x, i) <- value
-
-\S4method{$}{simList}(x, name)
-
-\S4method{$}{simList}(x, name) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{Any R object.}
+\item{...}{passed to \code{ls}}
 
-\item{x}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
-
-\item{i, j, ...}{Indices specifying elements to extract or replace.}
-
-\item{drop}{not implemented.}
-
-\item{name}{A literal character string or a \code{\link{name}}.}
+\item{value}{objects to assign to the \code{simList}}
 }
 \value{
 Returns or sets a list of objects in the \code{simList} environment.
@@ -69,8 +46,7 @@ the simulation environment.
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
-  \code{\link{inputs}}, \code{\link{ls.simList}},
-  \code{\link{ls.str.simList}}, \code{\link{modules}},
+  \code{\link{inputs}}, \code{\link{modules}},
   \code{\link{packages}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}

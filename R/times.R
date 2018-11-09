@@ -272,7 +272,8 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
 
     if (!is.null(attr(time, "unit"))) {
       if (startsWith(timeUnit, prefix = "second")) {
-        time <- time / inSeconds(unit, envir, skipChecks = TRUE)
+        if (!startsWith(unit, prefix = "second"))
+          time <- time / inSeconds(unit, envir, skipChecks = TRUE)
       } else if (startsWith(unit, prefix = "second")) {
         time <- time * inSeconds(timeUnit, envir, skipChecks = TRUE)
       } else {
@@ -283,14 +284,6 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
     attr(time, "unit") <- unit
 
   }
-  #   } else {
-  #     # if timeunit is NA
-  #     time <- 0
-  #     attr(time, "unit") <- unit
-  #   }
-  # } else {
-  #
-  # }
   return(time)
 }
 ################################################################################
@@ -317,15 +310,15 @@ setMethod(
   "maxTimeunit",
   signature(sim = "simList"),
   definition = function(sim) {
-    if (length(depends(sim)@dependencies)) {
-      if (!is.null(depends(sim)@dependencies[[1]])) {
-        timesteps <- lapply(depends(sim)@dependencies, function(x) {
+    if (length(sim@depends@dependencies)) {
+      if (!is.null(sim@depends@dependencies[[1]])) {
+        timesteps <- lapply(sim@depends@dependencies, function(x) {
           x@timeunit
         })
         if (!all(sapply(timesteps, is.na))) {
           return(timesteps[!is.na(timesteps)][[which.max(sapply(
             timesteps[!sapply(timesteps, is.na)], function(ts) {
-              eval(parse(text = paste0("d", ts, "(1)")), envir = sim@.envir)
+              eval(parse(text = paste0("d", ts, "(1)")), envir = sim@.xData)
           }))]])
         }
       }
@@ -360,15 +353,15 @@ setMethod(
   "minTimeunit",
   signature(sim = "simList"),
   definition = function(sim) {
-    if (length(depends(sim)@dependencies)) {
-      if (!is.null(depends(sim)@dependencies[[1]])) {
-        timesteps <- lapply(depends(sim)@dependencies, function(x) {
+    if (length(sim@depends@dependencies)) {
+      if (!is.null(sim@depends@dependencies[[1]])) {
+        timesteps <- lapply(sim@depends@dependencies, function(x) {
           x@timeunit
         })
         if (!all(sapply(timesteps, is.na))) {
           return(timesteps[!is.na(timesteps)][[which.min(sapply(
             timesteps[!sapply(timesteps, is.na)], function(ts) {
-              eval(parse(text = paste0("d", ts, "(1)")), envir = sim@.envir)
+              eval(parse(text = paste0("d", ts, "(1)")), envir = sim@.xData)
           }))]])
         }
       }

@@ -9,18 +9,16 @@ test_that("downloadData downloads and unzips module data", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
+  testInitOut <- testInit(smcc = FALSE,
+                          opts = list(reproducible.inputPaths = NULL))
+  on.exit(testOnExit(testInitOut), add = TRUE)
+
   m <- "test"
-  testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-  datadir <- file.path(tmpdir, m, "data")
-  checkPath(datadir, create = TRUE)
+  datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
-  Rversion <- numeric_version(paste0(R.version$major, ".", R.version$minor))
+  Rversion <- getRversion()
   if (Rversion > "3.4.2") { ## TODO: need o test on earlier versions too!
-
     # write checksums
     chksums <- structure(
       list(
@@ -30,22 +28,18 @@ test_that("downloadData downloads and unzips module data", {
       .Names = c("file", "checksum"),
       class = "data.frame", row.names = c(NA, -2L)
     )
-    moduleDir <- file.path(tmpdir, "test")
-    dataDir <- file.path(moduleDir, "data")
-    write.table(chksums, file = file.path(dataDir, "CHECKSUMS.txt") )
-
+    write.table(chksums[order(chksums$file),], file = file.path(datadir, "CHECKSUMS.txt"))
 
     expectsInputs <- data.frame(
       objectName = c("DEM", "habitatQuality"),
       objectClass = "RasterLayer",
-      sourceURL = c("https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/DEM.tif",
-                    "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/habitatQuality.tif"),
+      sourceURL = c(
+        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/DEM.tif",
+        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/habitatQuality.tif"
+      ),
       stringsAsFactors = FALSE
     )
 
-    reproducible::checkPath(dataDir, create = TRUE)
-
-    #f <- downloadModule(m, tmpdir, quiet = TRUE)
     t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
                                    files = c("DEM.tif", "habitatQuality.tif")))
     result <- checksums(m, tmpdir)$result
@@ -73,11 +67,13 @@ test_that("downloadData downloads and unzips module data", {
     if (require(rgdal, quietly = TRUE)) {
       on.exit(detach("package:rgdal"), add = TRUE)
       ras <- raster(file.path(datadir, filenames[2]))
-      ras[4] <- maxValue(ras) + 1
+      ras[5] <- maxValue(ras) + 1
       writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
+      # It updates it to new file -- but it doesn't do this correctly -- it downloads both
+      #   because it doesn't know what targetFile is
       expect_error(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
       expect_false(exists("dwnload", inherits = FALSE))
-      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, purge = 7)
+      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)
       expect_true(all(dwnload$result %in% "OK"))
       expect_true(all(file.exists(file.path(datadir, filenames))))
     }

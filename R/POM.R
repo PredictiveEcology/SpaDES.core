@@ -78,7 +78,7 @@
 #'
 #' Setting \code{logObjFnVals} to \code{TRUE} may help diagnosing some problems.
 #' Using the POM derived objective function, essentially all patterns are treated equally.
-#' This may not give the correct behavior for the objective function.
+#' This may not give the correct behaviour for the objective function.
 #' Because \code{POM} weighs the patterns equally, it may be useful to use the
 #' log files to examine the behaviour of the pattern--data pairs.
 #' The first file, ObjectiveFnValues.txt, shows the result of each of the
@@ -138,7 +138,8 @@
 #'                   made so that it doesn't produce \code{NaN}. But, sometimes
 #'                   it is difficult to diagnose stochastic results.
 #'
-#' @param logObjFnVals Logical or Character string indicating a filename. Ignored if
+#' @param logObjFnVals Logical or Character string indicating a filename to log the outputs.
+#'                       Ignored if
 #'                       \code{objFn} is supplied.
 #'                       If TRUE (and there is no \code{objFn} supplied), then the
 #'                       value of the individual patterns will be output the console
@@ -173,6 +174,7 @@
 #' @importFrom stats optim
 #' @importFrom raster getCluster returnCluster
 #' @importFrom parallel clusterEvalQ clusterExport
+#' @importFrom reproducible .grepSysCalls
 #' @include module-dependencies-class.R
 #' @include helpers.R
 #' @include simList-class.R
@@ -255,7 +257,11 @@ setMethod(
             }
           })
 
-          envPOMCalled <- sys.frame(min(grep("POM", sys.calls()))-1)
+          POMFrameNum <- .grepSysCalls(sys.calls(), pattern = "POM")
+          # scallsFirstElement <- lapply(sys.calls(), function(x) x[1])
+          # POMFrameNum <- grep(scallsFirstElement, pattern = "POM")
+
+          envPOMCalled <- sys.frame(min(POMFrameNum)-1)
 
           objectiveRes <- lapply(seq_along(outputObjects), function(x) {
             if (is(outputObjects[[x]], "Raster")) {

@@ -1,16 +1,36 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.3
+=============
+
+## package dependencies
+* add `RandomFields` to Suggests, as it is in the Suggests of `SpaDES.tools` and used in examples/tests.
+
+## new features
+* `simList` internals changed. It now inherits from `environment`. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the `simList`. Also, we removed several associated methods, `$`, `[[`, `ls`, `ls.str`, `objects`, as the defaults for environments work correctly with the `simList` now
+* `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
+* new function `elapsedTime` which gives a summary of the clock time used by each module or event
+* most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.
+* new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
+* improved messaging when GLPK not installed (*e.g.*, on macOS)
+* `downloadModule()` now prints the module version downloaded (#77)
+
+## bugfixes
+* resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
+* module `.inputObjects` evaluated based on module load order (#72)
+* `.robustDigest` fix for simLists -- needed to omit `._startClockTime` and `.timestamp`
+
 version 0.2.2
 =============
 
 ## package dependencies
-- remove `sp` from imports
+* remove `sp` from imports
 
 ## new features
-- TEMP
+* none
 
 ## bugfixes
-- fix issues with failing tests on macOS
+* fix issues with failing tests on macOS
 
 version 0.2.1
 =============

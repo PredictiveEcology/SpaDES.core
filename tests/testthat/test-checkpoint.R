@@ -38,13 +38,11 @@ test_that("test checkpointing", {
 
   rm("._startClockTime", envir = envir(simB))
   rm("._startClockTime", envir = envir(simA))
-  rm(".timestamp", envir = envir(simB))
-  rm(".timestamp", envir = envir(simA))
+  rm("._timestamp", envir = envir(simB))
+  rm("._timestamp", envir = envir(simA))
   ## both versions above should yield identical results
   expect_true(all.equal(simA, simB))
-
 })
-
 
 test_that("test checkpointing with disk-backed raster", {
   testInitOut <- testInit(smcc = FALSE)

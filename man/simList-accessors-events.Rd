@@ -4,51 +4,51 @@
 \name{events}
 \alias{events}
 \alias{simList-accessors-events}
-\alias{events,.simList,character-method}
-\alias{events,.simList,missing-method}
+\alias{events,simList,character-method}
+\alias{events,simList,missing-method}
 \alias{events<-}
-\alias{events<-,.simList-method}
+\alias{events<-,simList-method}
 \alias{current}
-\alias{current,.simList,character-method}
-\alias{current,.simList,missing-method}
+\alias{current,simList,character-method}
+\alias{current,simList,missing-method}
 \alias{current<-}
-\alias{current<-,.simList-method}
+\alias{current<-,simList-method}
 \alias{completed}
-\alias{completed,.simList,character-method}
-\alias{completed,.simList,missing-method}
+\alias{completed,simList,character-method}
+\alias{completed,simList,missing-method}
 \alias{completed<-}
-\alias{completed<-,.simList-method}
+\alias{completed<-,simList-method}
 \title{Simulation event lists}
 \usage{
 events(sim, unit)
 
-\S4method{events}{.simList,character}(sim, unit)
+\S4method{events}{simList,character}(sim, unit)
 
-\S4method{events}{.simList,missing}(sim, unit)
+\S4method{events}{simList,missing}(sim, unit)
 
 events(sim) <- value
 
-\S4method{events}{.simList}(sim) <- value
+\S4method{events}{simList}(sim) <- value
 
 current(sim, unit)
 
-\S4method{current}{.simList,character}(sim, unit)
+\S4method{current}{simList,character}(sim, unit)
 
-\S4method{current}{.simList,missing}(sim, unit)
+\S4method{current}{simList,missing}(sim, unit)
 
 current(sim) <- value
 
-\S4method{current}{.simList}(sim) <- value
+\S4method{current}{simList}(sim) <- value
 
-completed(sim, unit)
+completed(sim, unit, times = TRUE)
 
-\S4method{completed}{.simList,character}(sim, unit)
+\S4method{completed}{simList,character}(sim, unit, times = TRUE)
 
-\S4method{completed}{.simList,missing}(sim, unit)
+\S4method{completed}{simList,missing}(sim, unit, times = TRUE)
 
 completed(sim) <- value
 
-\S4method{completed}{.simList}(sim) <- value
+\S4method{completed}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -57,6 +57,8 @@ in which to replace element(s).}
 \item{unit}{Character. One of the time units used in \code{SpaDES}.}
 
 \item{value}{The object to be stored at the slot.}
+
+\item{times}{Logical. Should this function report the clockTime}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.
@@ -90,7 +92,6 @@ Each event is represented by a \code{\link{data.table}} row consisting of:
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{globals}}, \code{\link{inputs}},
-  \code{\link{ls.simList}}, \code{\link{ls.str.simList}},
   \code{\link{modules}}, \code{\link{objs}},
   \code{\link{packages}}, \code{\link{params}},
   \code{\link{paths}}, \code{\link{progressInterval}},

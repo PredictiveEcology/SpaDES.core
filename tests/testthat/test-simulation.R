@@ -160,10 +160,10 @@ test_that("simInit with R subfolder scripts", {
           poiuoiu + 1
       }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
-  expect_true(sum(grepl(unlist(lapply(ls(mySim@.envir, all.names = TRUE), function(x) {
-    if (is.environment(mySim@.envir[[x]])) ls(envir = mySim@.envir[[x]], all.names = TRUE)
+  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
+    if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.envir$child1$a(2) == 3) # Fns
+  expect_true(mySim@.xData$child1$a(2) == 3) # Fns
 })
 
 test_that("simulation runs with simInit with duplicate modules named", {
@@ -202,6 +202,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
   sim <- simInit()
 
+  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
   cat(file = file.path(tmpdir, "test", "test.R"),'
   defineModule(sim, list(
     name = "test",
@@ -212,7 +213,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
     spatialExtent = raster::extent(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = "year",
+    timeunit = "second",
     citation = list("citation.bib"),
     documentation = list("README.txt", "test.Rmd"),
     reqdPkgs = list(),
@@ -228,21 +229,22 @@ test_that("simulation runs with simInit with duplicate modules named", {
     switch(
       eventType,
       init = {
-        sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       },
       event1 = {
-        sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       })
     return(invisible(sim))
   }
   ', fill = TRUE)
 
+  N <- 5000
 
   moduleDir <- file.path(tmpdir)
   inputDir <- file.path(moduleDir, "inputs") %>% reproducible::checkPath(create = TRUE)
   outputDir <- file.path(moduleDir, "outputs")
   cacheDir <- file.path(outputDir, "cache")
-  times <- list(start = 0, end = 5000)
+  times <- list(start = 0, end = N)
   parameters <- list(
   )
   modules <- list("test")
@@ -258,21 +260,39 @@ test_that("simulation runs with simInit with duplicate modules named", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    objects = objects, paths = paths)
 
+  nTimes <- 20
 
   # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
+  # New with "seconds" -- Sept 218, 2018 is 492 seconds --> 98 microseconds/event
   #system.time({spades(mySim, debug = FALSE)})
   options("spades.keepCompleted" = TRUE)
-  microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
+  microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
-  # Turn off completed list -- June 29, 2018 is 0.775 seconds
+  # Turn off completed list
+  #  Changed to use "seconds" -- better comparison with simple loop
+  # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
+  #                         -- This is 161 microseconds per event
+  # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
   options("spades.keepCompleted" = FALSE)
-  microbenchmark::microbenchmark(times = 10, {spades(mySim, debug = FALSE)})
+  a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
   #profvis::profvis({spades(mySim, debug = FALSE)})
+
+  a <- 0
+  a3 <- microbenchmark::microbenchmark(
+    for (i in 1:N) {
+      a <- a + 1
+    }
+  )
+
+  summary(a2)[, "median"]/summary(a3)[, "median"]
 })
 
 
 test_that("conflicting function types", {
   testInitOut <- testInit(smcc = TRUE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)
@@ -347,10 +367,10 @@ test_that("conflicting function types", {
       d <- sim$d
       f <- sim[['f']]
       f <- sim[[P(sim)$value]]
-      poiuoiu <- sim@.envir$d1
-      qwerqwer <- sim@.envir[['test']]
+      poiuoiu <- sim@.xData$d1
+      qwerqwer <- sim@.xData[['test']]
       sim$g <- f
-      sim@.envir$g1 <- f
+      sim@.xData$g1 <- f
       return(list(a, d, f, sim))
       ",
       xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)

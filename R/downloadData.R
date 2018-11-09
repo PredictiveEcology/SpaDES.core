@@ -4,7 +4,7 @@ if (getRversion() >= "3.1.0") {
 
 #' Extract a url from module metadata
 #'
-#' This will get the sourceURL for the object named.
+#' This will get the \code{sourceURL} for the object named.
 #'
 #' @param objectName A character string of the object name in the metadata.
 #' @param sim A \code{simList} object from which to extract the \code{sourceURL}
@@ -98,7 +98,9 @@ setMethod(
 #' @importFrom reproducible Checksums
 checksums <- function(module, path, ...) {
   path <- if (length(module)) {
-    file.path(path, module, "data")
+    fp <- file.path(path, module, "data")
+    checkPath(fp, create = TRUE)
+    fp
   } else {
     file.path(path)
   }
@@ -154,7 +156,7 @@ remoteFileSize <- function(url) {
 #' To try this, put the Google Drive URL in \code{sourceURL} argument of
 #' \code{expectsInputs} in the module metadata, and put the filename once downloaded
 #' in the \code{objectName} argument.
-#' If using Rstudio Server, you may need to use "out of band" authentication by
+#' If using RStudio Server, you may need to use "out of band" authentication by
 #' setting \code{options(httr_oob_default = TRUE)}.
 #' To avoid caching of Oauth credentials, set \code{options(httr_oauth_cache = TRUE)}.
 #'
@@ -194,15 +196,15 @@ remoteFileSize <- function(url) {
 #'
 #' @return Invisibly, a list of downloaded files.
 #'
-#' @seealso \code{\link{prepInputs}}, \code{checksums} and \code{downloadModule} in
-#'       \code{SpaDES.core} package for downloading modules and building a checksums file.
+#' @seealso \code{\link{prepInputs}}, \code{\link{checksums}}, and \code{\link{downloadModule}}
+#' for downloading modules and building a checksums file.
 #'
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @importFrom dplyr mutate bind_rows
 #' @importFrom googledrive as_id drive_auth drive_download
-#' @importFrom reproducible checkPath compareNA
 #' @importFrom RCurl url.exists
+#' @importFrom reproducible checkPath compareNA
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
@@ -251,15 +253,22 @@ setMethod(
     }
 
     targetFiles <- if (is.null(files)) {
-      lapply(urls, function(x) files)
+      lapply(urls, function(x) NULL)
     } else {
       files
     }
-    res <- Map(url = urls, reproducible::preProcess,
+    res <- Map(reproducible::preProcess,
                targetFile = targetFiles,
-               MoreArgs = append(list(quick = quickCheck, overwrite = overwrite,
-                               destinationPath = file.path(path, module, "data")), list(...))
+               url = urls,
+               MoreArgs = append(
+                 list(
+                   quick = quickCheck,
+                   overwrite = overwrite,
+                   destinationPath = file.path(path, module, "data")
+                  ),
+                 list(...)
                )
+    )
     chksums <- rbindlist(lapply(res, function(x) x$checkSums))
     chksums <- chksums[order(-result)]
     chksums <- unique(chksums, by = "expectedFile")

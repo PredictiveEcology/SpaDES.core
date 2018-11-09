@@ -3,12 +3,12 @@
 \docType{methods}
 \name{defineModule}
 \alias{defineModule}
-\alias{defineModule,.simList,list-method}
+\alias{defineModule,simList,list-method}
 \title{Define a new module.}
 \usage{
 defineModule(sim, x)
 
-\S4method{defineModule}{.simList,list}(sim, x)
+\S4method{defineModule}{simList,list}(sim, x)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -88,7 +88,7 @@ values set to defaults
                           the default values that will be used unless a module user
                           overrides them with the \code{params} argument in the
                           \code{\link{simInit}} call. The minimum and maximum are
-                          currently used by the \code{shine} function and the
+                          currently used by the \code{SpaDES.shiny::shine} function and the
                           \code{POM} function, and they should indicate the range
                           of values that are reasonable scientifically.\cr
    \code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as

@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -93,7 +93,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">August 13 2018</h4>
+            <h4 class="date">November 07 2018</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -124,7 +124,7 @@
 <p>When beginning development of this package, we sought a general simulation platform at least the following characteristics:</p>
 <ol style="list-style-type: decimal">
 <li>Allow rapid building of models of a wide diversity of types (<em>e.g.</em>, agent-based models, raster models, differential equation models);</li>
-<li>Run faster and more memory efficiently than current systems for doing similar things (<em>e.g.</em>, NetLogo <span class="citation">(Wilensky 1999)</span>, SELES <span class="citation">(Fall and Fall 2001)</span>);</li>
+<li>Run faster and more memory efficiently than current systems for doing similar things (<em>e.g.</em>, NetLogo <span class="citation">(Wilensky 1999)</span>, SELES <span class="citation">(A. Fall and Fall 2001)</span>);</li>
 <li>Use a platform that already has strong data analysis, manipulation, and visualization capacities;</li>
 <li>Be open source, but also make it as easy as possible for many people to easily contribute modules and code;</li>
 <li>Be easy to use for a large number of scientists who aren’t formally trained as computer programmers or have limited programming experience;</li>
@@ -135,7 +135,7 @@
 <div id="is-r-fast-enough" class="section level3">
 <h3 class="hasAnchor">
 <a href="#is-r-fast-enough" class="anchor"></a>Is <code>R</code> fast enough?</h3>
-<p>High-level programming languages are often criticized for being much slower than their low-level counterparts. <code>R</code> has definitely received its share of criticism over not just speed but also memory use<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. While some of these criticisms may be legitimate, many of them are overblown. They are based on test code that is not written for how <code>R</code> works<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. The best example of this is using traditional <code>C</code>-like loops in <code>R</code>. <code>R</code> is a vectorized language, and code should rarely be written as loops in <code>R</code>. It should be vectorized, yet these sorts of biased comparisons get made all of the time, giving the false impression that <code>R</code> is too slow. Thus, these tests show that poorly written code can be slow, in any language.</p>
+<p>High-level programming languages are often criticized for being much slower than their low-level counterparts. <code>R</code> has definitely received its share of criticism over not just speed but also memory use<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. While some of these criticisms may be legitimate, many of them are overblown. They are based on test code that is not written for how <code>R</code> works<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>. The best example of this is using traditional <code>C</code>-like loops in <code>R</code>. <code>R</code> is a vectorized language, and code should rarely be written as loops in <code>R</code>. It should be vectorized, yet these sorts of biased comparisons get made all of the time, giving the false impression that <code>R</code> is too slow. Thus, these tests show that poorly written code can be slow, in any language.</p>
 <p>Another major criticism of <code>R</code> is its high memory footprint. It’s true that similar structures take up less memory in <code>C</code> than in <code>R</code>. However, there are various simple optimizations for <code>R</code> code, such as explicitly pre-allocating memory to objects, that can drastically improve performance. In cases were further improvements are required, the <code>Rcpp</code> package <span class="citation">(Eddelbuettel and Francois 2011; Eddelbuettel 2013)</span> allows easy writing of low memory footprint <code>C++</code> code that can then be called in <code>R</code>. Likewise, numerous upgrades to R, including minimizing object copying since <code>R</code> version <code>3.0</code>, and extremely powerful user developed packages, like <code>data.table</code> and <code>dplyr</code> are eliminating many of these concerns.</p>
 </div>
 </div>
@@ -146,7 +146,9 @@
 <p>Discrete event simulation (DES) as implemented here is ‘event driven’, meaning that an activity changes the state of the system at particular times (called events). This approach assumes that state of the system only changes due to events, therefore there is no change between events. A particular activity may have several events associated with it. Future events are scheduled in an event queue, and then processed in chronological order (with ties being resolved using ‘first-in-first-out’). Because the system state doesn’t change between events, we do not need to ‘run the clock’ in fixed increments each timestep. Rather, time advances to the time of the next event in the queue, effectively optimizing computations especially when different modules have different characteristic time intervals (<em>i.e.</em>, ‘timestep’).</p>
 <p>‘Time’ is the core concept linking various simulation components via the event queue. Activities schedule events (which change the state of the system according to their programmed rules) and do not need to know about each other. Rather than wrapping a sequence of functions (events) inside a <code>for</code> loop for time and iterating through each timestep, each event is simply scheduled to be completed. Repeated events are simply scheduled repeatedly. This not only allows for modularity of simulation components, it also allows complex model dynamics to emerge based on scheduling rules of each activity (module). Thus, complex simulations involving multiple processes (activities) can be built fairly easily, provided these processes are modelled using a common DES framework.</p>
 <p><code>SpaDES</code> provides such a framework, facilitating interaction between multiple processes (built as ‘modules’) that don’t interact with one another directly, but are scheduled in the event queue and carry out operations on shared data objects in the simulation environment. This package provides tools for building modules natively in <code>R</code> that can be reused. Additionally, because of the flexibility <code>R</code> provides for interacting with other programming languages and external data sources, modules can also be built using external tools and integrated with <code>SpaDES</code> (see figure below).</p>
-<p><img src="../man/figures/SpaDES-overview-diagram.png" title="Schematic representation of a `SpaDES` simulation model."></p>
+<div class="figure">
+<img src="../man/figures/SpaDES-overview-diagram.png" title="Schematic representation of a `SpaDES` simulation model.">
+</div>
 </div>
 <div id="spades-modules" class="section level2">
 <h2 class="hasAnchor">
@@ -160,10 +162,10 @@
 <a href="#spades-demos-and-sample-modules" class="anchor"></a><code>SpaDES</code> demos and sample modules</h2>
 <p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to check out the included demos, to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
 <p>A simple demo is provided with the package that highlights the ‘real time’ graphics capabilities of package’s <code>Plot</code> function. This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">"SpaDES.core"</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">demo</span>(<span class="st">"spades-simulation"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">"SpaDES.core"</span>)
+<span class="kw">demo</span>(<span class="st">"spades-simulation"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)</code></pre></div>
 <p>Additional <code>SpaDES</code> modules are available via a GitHub repository: <a href="https://github.com/PredictiveEcology/SpaDES-modules" class="uri">https://github.com/PredictiveEcology/SpaDES-modules</a>. Modules from this repository can be downloaded to a local directory using:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="dt">name =</span> <span class="st">"moduleName"</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="dt">name =</span> <span class="st">"moduleName"</span>)</code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved to the directory specified by the <code>spades.modulesPath</code>. An alternate path can be provided to <code>downloadModule</code> directly via the <code>path</code> argument, or specified using <code>options(spades.modulesPath = "path/to/my/modules")</code>.</p>
 <p>A detailed guide to module development is provided in the <a href="ii-modules.html">modules vignette</a>.</p>
 </div>
@@ -192,32 +194,32 @@
 <p>The details of each simulation are stored in a <code>simList</code> object, including the simulation parameters and modules used, as well as storing the current state of the simulation and the future event queue. A list of completed events is also stored, which can provide useful debugging information. This <code>simList</code> object contains a unique <code>unique</code> object, along with data used/created during the simulation. The <code>envir</code> object is simply an environment, which means objects stored in it are updated using reference semantics (so objects don’t need to be copied). You can access objects stored in environments using the same syntax as for lists (<em>e.g.</em>, <code>$</code>, <code>[[</code>), in addition to <code>get</code>, which makes working with simulated data easy to do inside modules.</p>
 <p>A new simulation is initialized using the <code>simInit</code> function, which does all the work of creating the <code>envir</code> and <code>simList</code> objects for your simulation. This function also attempts to provide additional feedback to the user regarding parameters that may be improperly specified.</p>
 <p>Once a simulation is initialized you can inspect the contents of a <code>envir</code> object using:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># full simulation details:</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#  simList object info + simulation data</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">mySim</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co"># less detail:</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co"># simList object isn't shown; object details are</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="kw">ls.str</span>(mySim)                 </a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co"># least detail:</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co"># simList object isn't shown; object names only </span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw">ls</span>(mySim)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># full simulation details:</span>
+<span class="co">#  simList object info + simulation data</span>
+mySim
+
+<span class="co"># less detail:</span>
+<span class="co"># simList object isn't shown; object details are</span>
+<span class="kw">ls.str</span>(mySim)                 
+
+<span class="co"># least detail:</span>
+<span class="co"># simList object isn't shown; object names only </span>
+<span class="kw">ls</span>(mySim)</code></pre></div>
 <p>Simulation module object dependencies can be viewed using:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(igraph)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)        <span class="co"># plots simplified module (object) dependency graph</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim)        <span class="co"># plots object dependency diagram</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(igraph)
+<span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span>
+<span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)        <span class="co"># plots simplified module (object) dependency graph</span>
+<span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim)        <span class="co"># plots object dependency diagram</span></code></pre></div>
 <p>They can viewed directly by printing the output of the <code>depsEdgeList</code> function.</p>
 </div>
 <div id="running-a-simulation-the-spades-function" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-a-simulation-the-spades-function" class="anchor"></a>Running a simulation: the <code>spades</code> function</h2>
 <p>Once a simulation is properly initialized it is executed using the <code>spades</code> function. By default in an interactive session, a progress bar is displayed in the console (this can be customized), and any specified files are loaded (via including an <code>input</code> <code>data.frame</code> or <code>data.table</code>, see examples). Debugging mode, <em>i.e.</em>, setting <code><a href="../reference/spades.html">spades(mySim, debug = TRUE)</a></code>, prints the contents of the <code>simList</code> object after the completion of every event during simulation. See the <a href="https://github.com/PredictiveEcology/SpaDES/wiki/Debugging">wiki entry on debugging</a> for more details on debugging SpaDES models.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">spades.nCompleted =</span> <span class="dv">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(...)             <span class="co"># initialize a simulation using valid parameters</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)            <span class="co"># run the simulation, returning the completed sim object</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(mySim)               <span class="co"># visualize the sequence of events for all modules</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">spades.nCompleted =</span> <span class="dv">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span>
+mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(...)             <span class="co"># initialize a simulation using valid parameters</span>
+mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)            <span class="co"># run the simulation, returning the completed sim object</span>
+<span class="kw"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(mySim)               <span class="co"># visualize the sequence of events for all modules</span></code></pre></div>
 </div>
 </div>
 <div id="types-of-models" class="section level1">
@@ -267,21 +269,21 @@
 <h2 class="hasAnchor">
 <a href="#running-a-groups-of-simulations-the-experiment-function" class="anchor"></a>Running a groups of simulations: the <code>experiment</code> function</h2>
 <p>Once a simulation is properly initialized and runs correctly with the <code>spades</code> function, it is likely time to do things like run replicates. There is a function, <code>experiment</code> to do this, as well as building parameter and module “simulation experiments”. For example, you can pass alternative values to parameters in modules and the <code>experiment</code> will build a fully factorial experiment, with replication and run them. This function (as with <code>POM</code> and <code>splitRaster</code>) is parallel-aware and can either proceed with a cluster object (<code>cl</code> argument) or a cluster running in the background using the <code><a href="http://www.rdocumentation.org/packages/raster/topics/cluster">raster::beginCluster</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">?experiment <span class="co"># will give many more examples than here</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co"># Copy Example 5 here:</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"> mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">    <span class="dt">times =</span> <span class="kw">list</span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">2.0</span>, <span class="dt">timeunit =</span> <span class="st">"year"</span>),</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">    <span class="dt">params =</span> <span class="kw">list</span>(<span class="dt">.globals =</span> <span class="kw">list</span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>)),</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">    <span class="dt">modules =</span> <span class="kw">list</span>(<span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span>),</a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">    <span class="dt">paths =</span> <span class="kw">list</span>(<span class="dt">modulePath =</span> <span class="kw">system.file</span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),</a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">                 <span class="dt">outputPath =</span> tmpdir),</a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">    <span class="co"># Save final state of landscape and caribou</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">    <span class="dt">outputs =</span> <span class="kw">data.frame</span>(<span class="dt">objectName =</span> <span class="kw">c</span>(<span class="st">"landscape"</span>, <span class="st">"caribou"</span>), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">sims &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="kw">attr</span>(sims, <span class="st">"experiment"</span>)<span class="op">$</span>expDesign <span class="co"># shows 2 replicates of same experiment</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">?experiment <span class="co"># will give many more examples than here</span>
+
+<span class="co"># Copy Example 5 here:</span>
+ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(
+    <span class="dt">times =</span> <span class="kw">list</span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">2.0</span>, <span class="dt">timeunit =</span> <span class="st">"year"</span>),
+    <span class="dt">params =</span> <span class="kw">list</span>(<span class="dt">.globals =</span> <span class="kw">list</span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>)),
+    <span class="dt">modules =</span> <span class="kw">list</span>(<span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span>),
+    <span class="dt">paths =</span> <span class="kw">list</span>(<span class="dt">modulePath =</span> <span class="kw">system.file</span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),
+                 <span class="dt">outputPath =</span> tmpdir),
+    <span class="co"># Save final state of landscape and caribou</span>
+    <span class="dt">outputs =</span> <span class="kw">data.frame</span>(<span class="dt">objectName =</span> <span class="kw">c</span>(<span class="st">"landscape"</span>, <span class="st">"caribou"</span>), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+  )
+
+sims &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>)
+<span class="kw">attr</span>(sims, <span class="st">"experiment"</span>)<span class="op">$</span>expDesign <span class="co"># shows 2 replicates of same experiment</span></code></pre></div>
 </div>
 </div>
 <div id="additional-resources" class="section level1">
@@ -361,7 +363,7 @@
 <p>Grimm, Volker, and Steven F Railsback. 2005. <em>Individual-based modelling and ecology</em>. Princeton, NJ: Princeton University Press. <a href="http://www.humboldt.edu/ecomodel/documents/Grimm-Railsback05.pdf" class="uri">http://www.humboldt.edu/ecomodel/documents/Grimm-Railsback05.pdf</a>.</p>
 </div>
 <div id="ref-Grimm2005science">
-<p>Grimm, Volker, Eloy Revilla, Uta Berger, Florian Jeltsch, Wolf M Mooij, Steven F Railsback, Hans-Hermann Thulke, Jacob Weiner, Thorsten Wiegand, and Donald L DeAngelis. 2005. “Pattern-oriented modeling of agent-based complex systems: lessons from ecology.” <em>Science</em> 310 (5750): 987–91. <a href="https://doi.org/10.1126/science.1116681" class="uri">https://doi.org/10.1126/science.1116681</a>.</p>
+<p>Grimm, Volker, Eloy Revilla, Uta Berger, Florian Jeltsch, Wolf M Mooij, Steven F Railsback, Hans-Hermann Thulke, Jacob Weiner, Thorsten Wiegand, and Donald L DeAngelis. 2005. “Pattern-oriented modeling of agent-based complex systems: lessons from ecology.” <em>Science</em> 310 (5750): 987–91. doi:<a href="https://doi.org/10.1126/science.1116681">10.1126/science.1116681</a>.</p>
 </div>
 <div id="ref-raster:2015">
 <p>Hijmans, Robert J. 2015. <em>raster: Geographic Data Analysis and Modeling</em>. <a href="https://CRAN.R-project.org/package=raster" class="uri">https://CRAN.R-project.org/package=raster</a>.</p>
@@ -370,10 +372,10 @@
 <p>Pebesma, Edzer J, and Roger S Bivand. 2005. “Classes and methods for spatial data in R.” <em>R News</em> 5 (2). <a href="https://cran.r-project.org/doc/Rnews/" class="uri">https://cran.r-project.org/doc/Rnews/</a>.</p>
 </div>
 <div id="ref-Scheller:2007em">
-<p>Scheller, Robert M, James B Domingo, Brian R Sturtevant, Jeremy S Williams, Arnold Rudy, Eric J Gustafson, and David J Mladenoff. 2007. “Design, development, and application of LANDIS-II, a spatial landscape simulation model with flexible temporal and spatial resolution.” <em>Ecological Modelling</em> 201: 409–19. <a href="https://doi.org/10.1016/j.ecolmodel.2006.10.009" class="uri">https://doi.org/10.1016/j.ecolmodel.2006.10.009</a>.</p>
+<p>Scheller, Robert M, James B Domingo, Brian R Sturtevant, Jeremy S Williams, Arnold Rudy, Eric J Gustafson, and David J Mladenoff. 2007. “Design, development, and application of LANDIS-II, a spatial landscape simulation model with flexible temporal and spatial resolution.” <em>Ecological Modelling</em> 201: 409–19. doi:<a href="https://doi.org/10.1016/j.ecolmodel.2006.10.009">10.1016/j.ecolmodel.2006.10.009</a>.</p>
 </div>
 <div id="ref-Thiele2015">
-<p>Thiele, Jan C, and Volker Grimm. 2015. “Replicating and breaking models: good for you and good for ecology.” <em>Oikos</em>. <a href="https://doi.org/10.1111/oik.02170" class="uri">https://doi.org/10.1111/oik.02170</a>.</p>
+<p>Thiele, Jan C, and Volker Grimm. 2015. “Replicating and breaking models: good for you and good for ecology.” <em>Oikos</em>. doi:<a href="https://doi.org/10.1111/oik.02170">10.1111/oik.02170</a>.</p>
 </div>
 <div id="ref-NetLogo">
 <p>Wilensky, U. 1999. “NetLogo.” Evanston, IL: Center for Connected Learning; Computer-Based Modeling, Northwestern University. <a href="http://ccl.northwestern.edu/netlogo" class="uri">http://ccl.northwestern.edu/netlogo</a>.</p>
@@ -383,8 +385,8 @@
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p><a href="http://julialang.org" class="uri">http://julialang.org</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p><a href="http://PredictiveEcology.org/benchmarking" class="uri">http://PredictiveEcology.org/benchmarking</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p><a href="http://julialang.org" class="uri">http://julialang.org</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://PredictiveEcology.org/benchmarking" class="uri">http://PredictiveEcology.org/benchmarking</a><a href="#fnref2">↩</a></p></li>
 </ol>
 </div>
   </div>

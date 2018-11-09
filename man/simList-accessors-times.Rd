@@ -4,73 +4,78 @@
 \name{times}
 \alias{times}
 \alias{simList-accessors-times}
-\alias{times,.simList-method}
+\alias{times,simList-method}
 \alias{times<-}
-\alias{times<-,.simList-method}
-\alias{time..simList}
+\alias{times<-,simList-method}
+\alias{time.simList}
 \alias{time<-}
-\alias{time<-,.simList-method}
+\alias{time<-,simList-method}
 \alias{end}
-\alias{end..simList}
+\alias{end.simList}
 \alias{end<-}
-\alias{end<-,.simList-method}
+\alias{end<-,simList-method}
 \alias{start}
-\alias{start..simList}
+\alias{start.simList}
 \alias{start<-}
-\alias{start<-,.simList-method}
+\alias{start<-,simList-method}
 \alias{timeunit}
-\alias{timeunit,.simList-method}
+\alias{timeunit,simList-method}
 \alias{timeunit<-}
-\alias{timeunit<-,.simList-method}
+\alias{timeunit<-,simList-method}
 \alias{timeunits}
-\alias{timeunits,.simList-method}
+\alias{timeunits,simList-method}
+\alias{elapsedTime}
+\alias{elapsedTime.simList}
 \title{Time usage in \code{SpaDES}}
 \usage{
 times(x, ...)
 
-\S4method{times}{.simList}(x)
+\S4method{times}{simList}(x)
 
 times(x) <- value
 
-\S4method{times}{.simList}(x) <- value
+\S4method{times}{simList}(x) <- value
 
-\method{time}{.simList}(x, unit, ...)
+\method{time}{simList}(x, unit, ...)
 
 time(x) <- value
 
-\S4method{time}{.simList}(x) <- value
+\S4method{time}{simList}(x) <- value
 
 end(x, ...)
 
-\method{end}{.simList}(x, unit, ...)
+\method{end}{simList}(x, unit, ...)
 
 end(x) <- value
 
-\S4method{end}{.simList}(x) <- value
+\S4method{end}{simList}(x) <- value
 
 start(x, ...)
 
-\method{start}{.simList}(x, unit = NULL, ...)
+\method{start}{simList}(x, unit = NULL, ...)
 
 start(x) <- value
 
-\S4method{start}{.simList}(x) <- value
+\S4method{start}{simList}(x) <- value
 
 timeunit(x)
 
-\S4method{timeunit}{.simList}(x)
+\S4method{timeunit}{simList}(x)
 
 timeunit(x) <- value
 
-\S4method{timeunit}{.simList}(x) <- value
+\S4method{timeunit}{simList}(x) <- value
 
 timeunits(x)
 
-\S4method{timeunits}{.simList}(x)
+\S4method{timeunits}{simList}(x)
+
+elapsedTime(x, ...)
+
+\method{elapsedTime}{simList}(x, byEvent = TRUE, ...)
 }
 \arguments{
-\item{x}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{x}{A \code{simList}}
 
 \item{...}{Additional parameters.}
 
@@ -79,13 +84,16 @@ but this will be deduced from the model time units or module
 time units (if used within a module).}
 
 \item{unit}{Character. One of the time units used in \code{SpaDES}.}
+
+\item{byEvent}{Logical. If \code{TRUE}, the elapsed time will be by module and event;
+\code{FALSE} will report only by module. Default is \code{TRUE}}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.
 }
 \description{
 Functions for the \code{simtimes} slot of a \code{simList} object
-and its elements. To maintain modularity, the behavior of these functions depends
+and its elements. To maintain modularity, the behaviour of these functions depends
 on where they are used. In other words, different modules can have their own
 timeunit. \code{SpaDES} converts these to seconds when running a simulation, but
 shows the user time in the units of the model as shown with \code{timeunit(sim)}
@@ -125,7 +133,7 @@ than \code{time(sim)}. So as a module developer, it is advantageous to
 write out the longer one, minimizing the looking up that R must do.
 }
 \note{
-These have default behavior that is based on the calling frame timeunit.
+These have default behaviour that is based on the calling frame timeunit.
 When used inside a module, then the time is in the units of the module.
 If used in an interactive mode, then the time will be in the units of the
 simulation.
@@ -148,8 +156,7 @@ of the simulation:
 Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
-  \code{\link{inputs}}, \code{\link{ls.simList}},
-  \code{\link{ls.str.simList}}, \code{\link{modules}},
+  \code{\link{inputs}}, \code{\link{modules}},
   \code{\link{objs}}, \code{\link{packages}},
   \code{\link{params}}, \code{\link{paths}},
   \code{\link{progressInterval}}

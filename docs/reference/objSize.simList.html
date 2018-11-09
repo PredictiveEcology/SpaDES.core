@@ -72,7 +72,7 @@ Currently, this will not assess object.size of the other elements" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -160,18 +160,21 @@ used instead of <code>object.size</code>.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>d</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='fl'>2</span>:<span class='fl'>20</span>))
-<span class='fu'>objSize</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; $`x@.envir$b`
+<span class='fu'>objSize</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; $`x@.xData$b`
 #&gt; 176 bytes
 #&gt; 
-#&gt; $`x@.envir$d`
+#&gt; $`x@.xData$d`
 #&gt; 96 bytes
 #&gt; 
-#&gt; $`x@.envir`
+#&gt; $`x@.xData$.userSuppliedObjNames`
+#&gt; 176 bytes
+#&gt; 
+#&gt; $`x@.xData`
 #&gt; 280 bytes
 #&gt; 
 #&gt; $simList
-#&gt; 16080 bytes
-#&gt; </div><div class='input'><span class='fu'>object.size</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; 16304 bytes</div></pre>
+#&gt; 15848 bytes
+#&gt; </div><div class='input'><span class='fu'>object.size</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; 16312 bytes</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

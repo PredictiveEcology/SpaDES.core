@@ -282,6 +282,7 @@ setMethod(
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
     path <- checkPath(path, create = TRUE)
+    checkPath(file.path(path, name), create = TRUE)
 
     # check locally for module. only download if doesn't exist locally,
     # or if overwrite is wanted
@@ -359,7 +360,7 @@ setMethod(
     } else {
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
-    message(crayon::magenta("Download complete for module ", name, ".", sep = ""))
+    message(crayon::magenta("Download complete for module ", name, " (v", version, ").", sep = ""))
 
     return(list(c(files, files2), bind_rows(dataList, dataList2)))
 })

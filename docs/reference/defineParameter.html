@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.3</span>
       </span>
     </div>
 
@@ -194,12 +194,39 @@ Non-standard evaluation is used for the expression.</p></td>
       real (<code>NA_real_</code>), complex (<code>NA_complex_</code>), or character (<code>NA_character_</code>).
       See <code>NA</code>.</p>
     
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='params.html'>P</a></code>, <code><a href='params.html'>params</a></code> for accessing these parameters in
+         a module.</p></div>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>parameters</span> <span class='kw'>=</span> <span class='fu'>rbind</span>(
   <span class='fu'>defineParameter</span>(<span class='st'>"lambda"</span>, <span class='st'>"numeric"</span>, <span class='fl'>1.23</span>, <span class='kw'>desc</span> <span class='kw'>=</span> <span class='st'>"intrinsic rate of increase"</span>),
   <span class='fu'>defineParameter</span>(<span class='st'>"P"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='st'>"probability of attack"</span>)
-)</div></pre>
+)</div><span class='co'># NOT RUN {</span>
+<span class='co'># Create a new module, then access parameters using \code{P}</span>
+<span class='no'>tmpdir</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"test"</span>)
+<span class='fu'>checkPath</span>(<span class='no'>tmpdir</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># creates a  new, "empty" module -- it has defaults for everything that is required</span>
+<span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"testModule"</span>, <span class='no'>tmpdir</span>)
+
+<span class='co'># Look at new module code -- see defineParameter</span>
+<span class='fu'>file.edit</span>(<span class='fu'>file.path</span>(<span class='no'>tmpdir</span>, <span class='st'>"testModule"</span>, <span class='st'>"testModule.R"</span>))
+
+<span class='co'># initialize the simList</span>
+<span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='st'>"testModule"</span>,
+                 <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))
+
+<span class='co'># Access one of the parameters -- because this line is not inside a module</span>
+<span class='co'>#  function, we must specify the module name. If used within a module,</span>
+<span class='co'>#  we can omit the module name</span>
+<span class='fu'><a href='params.html'>P</a></span>(<span class='no'>mySim</span>, <span class='st'>"testModule"</span>)$<span class='no'>.useCache</span>
+
+<span class='co'># }</span><div class='input'>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -209,6 +236,8 @@ Non-standard evaluation is used for the expression.</p></td>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#note">Note</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

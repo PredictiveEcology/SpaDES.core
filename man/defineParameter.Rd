@@ -54,6 +54,33 @@ parameters = rbind(
   defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack")
 )
 
+\dontrun{
+# Create a new module, then access parameters using \\code{P}
+tmpdir <- file.path(tempdir(), "test")
+checkPath(tmpdir, create = TRUE)
+
+# creates a  new, "empty" module -- it has defaults for everything that is required
+newModule("testModule", tmpdir)
+
+# Look at new module code -- see defineParameter
+file.edit(file.path(tmpdir, "testModule", "testModule.R"))
+
+# initialize the simList
+mySim <- simInit(modules = "testModule",
+                 paths = list(modulePath = tmpdir))
+
+# Access one of the parameters -- because this line is not inside a module
+#  function, we must specify the module name. If used within a module,
+#  we can omit the module name
+P(mySim, "testModule")$.useCache
+
+}
+
+
+}
+\seealso{
+\code{\link{P}}, \code{\link{params}} for accessing these parameters in
+         a module.
 }
 \author{
 Alex Chubaty
