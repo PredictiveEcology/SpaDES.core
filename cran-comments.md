@@ -28,7 +28,7 @@ This release fixes problems revealed in CRAN check results, and includes bug fix
 * Ubuntu 14.04     (travis-ci), R 3.6.0 (2018-11-06 r75545)
 * Ubuntu 18.04         (local), R 3.6.0 (2018-11-06 r75553)
 * Windows           (appveyor), R 3.6.0 (2018-11-02 r75540)
-* Windows        (win-builder), R 3.6.0 (2018-11-05 r75543)
+* Windows        (win-builder), R 3.6.0 (2018-11-08 r75566)
 
 ## R CMD check results
 
