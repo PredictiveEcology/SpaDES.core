@@ -248,7 +248,7 @@ defineModule(sim, list(
     #createsOutput(\"objectName\", \"objectClass\", \"output object description\", ...),
     createsOutput(objectName = NA, objectClass = NA, desc = NA)
   )")},"
-)\n",
+))\n",
       file = filenameR, fill = FALSE, sep = "")
 
     if (type == "child") {
