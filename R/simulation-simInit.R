@@ -605,6 +605,9 @@ setMethod(
           .fillInputRows(startTime = start(sim))
         inputs(sim) <- newInputs
       }
+      if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
+        sim <- .checkObjectSynonyms(sim)
+      }
     }
 
     ## load files in the filelist

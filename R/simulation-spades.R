@@ -258,6 +258,12 @@ doEvent <- function(sim, debug, notOlderThan) {
     }
 
   }
+
+  if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
+    sim <- .checkObjectSynonyms(sim)
+
+  }
+
   return(invisible(sim))
 }
 
