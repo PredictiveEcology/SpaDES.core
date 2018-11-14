@@ -4,30 +4,32 @@
 \alias{objectSynonyms}
 \title{Identify synonyms in a \code{simList}}
 \usage{
-objectSynonyms(sim, synonyms)
+objectSynonyms(envir, synonyms)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
+\item{envir}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
 \item{synonyms}{A list of synonym vectors,
 \code{list(c("age", "ageMap", "age2"), c("veg", "vegMap"))}}
 }
 \value{
-Active bindings in the \code{simList} so that all synonyms point to the same
-object, e.g., they would be at \code{sim[[synonym[[1]][1]]]} and \code{sim[[synonym[[1]][2]]]},
-each bound to \code{sim[[paste0("._", synonym[[1]][1])]]}, for a list of length one, that
-element with a character vector of length two. See examples.
+Active bindings in the \code{envir} so that all synonyms point to the same
+canonical object, e.g., they would be at \code{envir[[synonym[[1]][1]]]} and
+\code{envir[[synonym[[1]][2]]]}, if a list of length one is passed into
+\code{synonyms}, with a character vector of length two. See examples.
 }
 \description{
-This will create active bindings from each element in the vector of names
-to one or more new, hidden object(s) whose name(s) will be \code{paste0("._", synonym[1])}.
-The user should not
-need to use the new hidden object directly; rather they should be able to continue
-using \code{sim$obj} or \code{sim$obj2}, only now those two or more object names
-refer to the same
-object. If the objects are removed during a \code{spades} call, at the end of the
-event, they will be replaced. In other words, if a module deletes the object, it will
+This will create active bindings amongs the synonyms. To minimize copying,
+the first one that exists in the character vector will become the "canonical"
+object. All others named in the character vector will be activeBindings to that
+canonical one.  This synonym list will be assigned to the \code{envir}, as an
+object named \code{objectSynonyms}. That object will have an attribute called,
+\code{bindings} indicating which one is the canonical one and which is/are the
+activeBindings. If the objects are removed during a \code{spades} call by, say,
+a module, then at the end of the
+event, the \code{spades} call will replace the bindings.
+In other words, if a module deletes the object, it will
 "come back". This may not always be desired.
 }
 \details{
@@ -36,7 +38,7 @@ not working, and under what circumstances (e.g., please submit a reproducible ex
 to our issues tracker)
 
 This function will append any new \code{objectSynonym} to any pre-existing
-\code{objectSynonym} in the \code{simList}
+\code{objectSynonym} in the \code{envir}
 }
 \examples{
 sim <- simInit()

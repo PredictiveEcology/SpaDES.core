@@ -1,5 +1,6 @@
 test_that("test objectSynonyms", {
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
+  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
+                                      spades.useRequire = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -27,11 +28,11 @@ test_that("test objectSynonyms", {
   sim <- simInit(times, params, modules, objects = list(), paths)
   sim <- objectSynonyms(sim, list(c("caribou", "caribouObj")))
 
-  simOut <- spades(sim)
+  simOut <- spades(sim, .plotInitialTime = NA)
   expect_true(identical(simOut$caribou, simOut$caribouObj))
   simOut$caribou$x1[2] <- 20
   expect_true(identical(simOut$caribou, simOut$caribouObj))
-  caribouName <- grep("\\._cari", ls(simOut, all.names = TRUE), value = TRUE)
-  expect_true(identical(simOut[[caribouName]], simOut$caribouObj))
+  expect_true(bindingIsActive("caribouObj", simOut))
+  expect_false(bindingIsActive("caribou", simOut))
 
 })
