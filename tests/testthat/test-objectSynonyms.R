@@ -52,5 +52,12 @@ test_that("test objectSynonyms", {
   expect_true(length(sim$objectSynonyms)==4)
   expect_true(identical(sim$objectSynonyms[[2]], unique(c(os[[1]], os2[[1]]))))
 
+  e <- new.env()
+  e <- objectSynonyms(e, list(c("age", "ageMap")))
+  expect_true(is.null(e$age))
+  rm("age", envir = e)
+  expect_true(is.null(e$age))
+  expect_warning(e$ageMap)
+
 
 })

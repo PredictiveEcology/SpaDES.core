@@ -113,10 +113,12 @@ objectSynonyms <- function(envir, synonyms) {
           makeActiveBinding(sym = nam,
                             fun = function(value){
                               if (missing(value)) {
-                                if (exists(canonicalVersion, envir))
-                                  get(canonicalVersion, envir = envir)
-                                else
+                                if (exists(canonicalVersion, envir)) {
+                                  get(canonicalVersion, envir = envir, inherits = FALSE)
+                                } else {
+                                  warning("Canonical object does not exist")
                                   NULL
+                                }
                               } else {
                                 assign(canonicalVersion, value, envir = envir)
                               }
