@@ -7,10 +7,11 @@
 objectSynonyms(envir, synonyms)
 }
 \arguments{
-\item{envir}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{envir}{An environment, which in the context of SpaDES.core is usually
+a \code{simList} to find and/or place the \code{objectSynonyms}
+object.}
 
-\item{synonyms}{A list of synonym vectors,
+\item{synonyms}{A list of synonym character vectors, such as
 \code{list(c("age", "ageMap", "age2"), c("veg", "vegMap"))}}
 }
 \value{
@@ -20,17 +21,16 @@ canonical object, e.g., they would be at \code{envir[[synonym[[1]][1]]]} and
 \code{synonyms}, with a character vector of length two. See examples.
 }
 \description{
-This will create active bindings amongs the synonyms. To minimize copying,
+This will create active bindings amongst the synonyms. To minimize copying,
 the first one that exists in the character vector will become the "canonical"
-object. All others named in the character vector will be activeBindings to that
-canonical one.  This synonym list will be assigned to the \code{envir}, as an
-object named \code{objectSynonyms}. That object will have an attribute called,
-\code{bindings} indicating which one is the canonical one and which is/are the
-activeBindings. If the objects are removed during a \code{spades} call by, say,
-a module, then at the end of the
-event, the \code{spades} call will replace the bindings.
-In other words, if a module deletes the object, it will
-"come back". This may not always be desired.
+object. All others named in the character vector will be activeBindings to
+that canonical one.  This synonym list will be assigned to the \code{envir},
+as an object named \code{objectSynonyms}. That object will have an attribute
+called, \code{bindings} indicating which one is the canonical one and which
+is/are the activeBindings. EXPERIMENTAL: If the objects are removed during a
+\code{spades} call by, say, a module, then at the end of the event, the
+\code{spades} call will replace the bindings. In other words, if a module
+deletes the object, it will "come back". This may not always be desired.
 }
 \details{
 This is very experimental and only has minimal tests. Please report if this is
@@ -38,7 +38,9 @@ not working, and under what circumstances (e.g., please submit a reproducible ex
 to our issues tracker)
 
 This function will append any new \code{objectSynonym} to any pre-existing
-\code{objectSynonym} in the \code{envir}
+\code{objectSynonym} in the \code{envir}. Similarly, this function assumes
+transitivity, i.e., if age and ageMap are synonyms, and ageMap and timeSinceFire
+are synonyms, then age and timeSinceFire must be synonyms.
 }
 \examples{
 sim <- simInit()
@@ -59,5 +61,18 @@ sim <- simInit(objects = list(objectSynonyms = objectSynonyms))
 identical(sim$ageMap, sim$age) # they are NULL at this point
 sim$age <- 1:10
 identical(sim$ageMap, sim$age) # they are not NULL at this point
+
+## More complicated, with 'updating' i.e., you can add new synonyms to previous
+sim <- simInit()
+os <- list(c("age", "ageMap"), c("vegMap", "veg"), c("studyArea", "studyArea2"))
+os2 <- list(c("ageMap", "timeSinceFire", "tsf"),
+            c("systime", "systime2"),
+            c("vegMap", "veg"))
+sim <- objectSynonyms(sim, os)
+sim <- objectSynonyms(sim, os2)
+
+# check
+sim$objectSynonyms
+
 
 }
