@@ -1,21 +1,21 @@
 ################################################################################
 #' Identify synonyms in a \code{simList}
 #'
-#' This will create active bindings amongs the synonyms. To minimize copying,
+#' This will create active bindings amongst the synonyms. To minimize copying,
 #' the first one that exists in the character vector will become the "canonical"
-#' object. All others named in the character vector will be activeBindings to that
-#' canonical one.  This synonym list will be assigned to the \code{envir}, as an
-#' object named \code{objectSynonyms}. That object will have an attribute called,
-#' \code{bindings} indicating which one is the canonical one and which is/are the
-#' activeBindings. If the objects are removed during a \code{spades} call by, say,
-#' a module, then at the end of the
-#' event, the \code{spades} call will replace the bindings.
-#' In other words, if a module deletes the object, it will
-#' "come back". This may not always be desired.
+#' object. All others named in the character vector will be activeBindings to
+#' that canonical one.  This synonym list will be assigned to the \code{envir},
+#' as an object named \code{objectSynonyms}. That object will have an attribute
+#' called, \code{bindings} indicating which one is the canonical one and which
+#' is/are the activeBindings. EXPERIMENTAL: If the objects are removed during a
+#' \code{spades} call by, say, a module, then at the end of the event, the
+#' \code{spades} call will replace the bindings. In other words, if a module
+#' deletes the object, it will "come back". This may not always be desired.
 #'
-#' @param envir      A \code{simList} object from which to extract element(s) or
-#'                 in which to replace element(s).
-#' @param synonyms A list of synonym vectors,
+#' @param envir  An environment, which in the context of SpaDES.core is usually
+#'               a \code{simList} to find and/or place the \code{objectSynonyms}
+#'               object.
+#' @param synonyms A list of synonym character vectors, such as
 #' \code{list(c("age", "ageMap", "age2"), c("veg", "vegMap"))}
 #'
 #' @details
@@ -24,7 +24,9 @@
 #' to our issues tracker)
 #'
 #' This function will append any new \code{objectSynonym} to any pre-existing
-#' \code{objectSynonym} in the \code{envir}
+#' \code{objectSynonym} in the \code{envir}. Similarly, this function assumes
+#' transitivity, i.e., if age and ageMap are synonyms, and ageMap and timeSinceFire
+#' are synonyms, then age and timeSinceFire must be synonyms.
 #'
 #' @return Active bindings in the \code{envir} so that all synonyms point to the same
 #' canonical object, e.g., they would be at \code{envir[[synonym[[1]][1]]]} and
@@ -53,7 +55,38 @@
 #' sim$age <- 1:10
 #' identical(sim$ageMap, sim$age) # they are not NULL at this point
 #'
+#' ## More complicated, with 'updating' i.e., you can add new synonyms to previous
+#' sim <- simInit()
+#' os <- list(c("age", "ageMap"), c("vegMap", "veg"), c("studyArea", "studyArea2"))
+#' os2 <- list(c("ageMap", "timeSinceFire", "tsf"),
+#'             c("systime", "systime2"),
+#'             c("vegMap", "veg"))
+#' sim <- objectSynonyms(sim, os)
+#' sim <- objectSynonyms(sim, os2)
+#'
+#' # check
+#' sim$objectSynonyms
+#'
+#'
 objectSynonyms <- function(envir, synonyms) {
+
+  # First, this may be an overwrite of an existing set of synonyms.
+  #  If already in the envir$objectSynonyms, then remove it first
+  if (exists("objectSynonyms", envir = envir, inherits = FALSE)) {
+
+    for (syns in seq_along(synonyms)) {
+      for(cur in envir$objectSynonyms) {
+        if (any(cur %in% synonyms[[syns]])) {
+          synonyms[[syns]] <- unique(c(cur, synonyms[[syns]]))
+          whSyn <- unlist(lapply(envir$objectSynonyms, identical, cur))
+          attrs <- attr(envir$objectSynonyms, "bindings")
+          envir$objectSynonyms <- envir$objectSynonyms[!whSyn]
+          attr(envir$objectSynonyms, "bindings") <- attrs[!whSyn]
+        }
+      }
+
+    }
+  }
   canonicalVersions <- Map(syns = synonyms, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, envir) {
 
@@ -96,15 +129,23 @@ objectSynonyms <- function(envir, synonyms) {
       })
   attrs <- attr(envir$objectSynonyms, "bindings")
   envir$objectSynonyms <- append(envir$objectSynonyms, synonyms)
-  attr(envir$objectSynonyms, "bindings") <- append(attrs,canonicalVersions)
+  attr(envir$objectSynonyms, "bindings") <- append(attrs, canonicalVersions)
   envir
 }
 
 
 
 .checkObjectSynonyms <- function(envir) {
-  synonyms <- envir$objectSynonyms
-  Map(syns = synonyms, bindings = attr(synonyms, "bindings"), #name2 = names(synonyms),
+
+  bindings <- attr(envir$objectSynonyms, "bindings")
+
+  # It may be passed in as a list with no attributes
+  if (is.null(bindings)) {
+    envir <- objectSynonyms(envir, envir$objectSynonyms)
+    bindings <- attr(envir$objectSynonyms, "bindings")
+  }
+
+  Map(syns = envir$objectSynonyms, bindings = bindings, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, bindings, envir) {
         if (!exists(bindings$canonicalVersion, envir)) {
           envir <<- objectSynonyms(envir, list(syns))
