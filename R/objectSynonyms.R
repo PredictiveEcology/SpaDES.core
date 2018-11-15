@@ -54,6 +54,29 @@
 #' identical(sim$ageMap, sim$age) # they are not NULL at this point
 #'
 objectSynonyms <- function(envir, synonyms) {
+
+  # First, this may be an overwrite of an existing set of synonyms.
+  #  If already in the envir$objectSynonyms, then remove it first
+  browser()
+  alreadyIn <- lapply(envir$objectSynonyms, function(prev) {
+    alreadyIn2 <- lapply(synonyms, function(curr) {
+      alreadyIn3 <- curr %in% prev
+      alreadyIn3 <- if (any(alreadyIn3))
+        if (!all(alreadyIn3))
+          unique(c(prev, curr))
+        else
+          curr
+      else
+        curr
+      browser()
+      alreadyIn3
+    })
+    browser()
+    alreadyIn2
+  })
+  if (any(alreadyIn)) {
+    envir$objectSynonyms <- envir$objectSynonyms[!alreadyIn]
+  }
   canonicalVersions <- Map(syns = synonyms, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, envir) {
 
@@ -103,9 +126,20 @@ objectSynonyms <- function(envir, synonyms) {
 
 
 .checkObjectSynonyms <- function(envir) {
+
+  #synonyms <- envir$objectSynonyms
+  browser()
+  bindings <- attr(envir$objectSynonyms, "bindings")
+
+  # It may be passed in as a list with no attributes
+  if (is.null(bindings))
+    envir <- objectSynonyms(envir, envir$objectSynonyms)
+
   synonyms <- envir$objectSynonyms
-  Map(syns = synonyms, bindings = attr(synonyms, "bindings"), #name2 = names(synonyms),
+
+  Map(syns = synonyms, bindings = bindings, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, bindings, envir) {
+        browser()
         if (!exists(bindings$canonicalVersion, envir)) {
           envir <<- objectSynonyms(envir, list(syns))
         }
