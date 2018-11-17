@@ -200,8 +200,8 @@ test_that("3 levels of parent and child modules load and show correctly", {
     expect_true(is(mg$graph, "igraph"))
     expect_true(is(mg$communities, "communities"))
     expect_true(length(unique(mg$communities$member)) == 3)
-    expect_true(any(communities(mg$communities)[['1']] %in% "grandpar1"))
-    expect_true(identical(communities(mg$communities)[['1']],
+    expect_true(any(grepl("grandpar1", communities(mg$communities)[['1']])))
+    expect_true(identical(basename(communities(mg$communities)[['1']]),
                           c("grandpar1", "par1", "par2", "child1", "child2")))
   }
 })

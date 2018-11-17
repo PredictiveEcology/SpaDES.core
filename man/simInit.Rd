@@ -54,7 +54,9 @@ from the simList as a normal list, e.g,. \code{mySim$obj}.}
 
 \item{paths}{An optional named list with up to 4 named elements,
 \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
-See details.}
+See details. NOTE: Experimental feature now allows for multiple \code{modulePath}s
+to be specified in a character vector. The modules will be searched for sequentially
+in the first \code{modulePath}, then if it doesn't find it, in the second etc.}
 
 \item{inputs}{A \code{data.frame}. Can specify from 1 to 6
 columns with following column names: \code{objectName} (character, required),
