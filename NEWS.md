@@ -1,5 +1,12 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.4
+=============
+
+## new features
+* An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
+* User can now specify `modulePath` as a character vector, e.g., `simInit(..., paths = list(modulePath = c(".", "test")))`. This means that a user can organize the modules in different locations.
+
 version 0.2.3
 =============
 
@@ -7,7 +14,6 @@ version 0.2.3
 * add `RandomFields` to Suggests, as it is in the Suggests of `SpaDES.tools` and used in examples/tests.
 
 ## new features
-* An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
 * `simList` internals changed. It now inherits from `environment`. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the `simList`. Also, we removed several associated methods, `$`, `[[`, `ls`, `ls.str`, `objects`, as the defaults for environments work correctly with the `simList` now
 * `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
 * new function `elapsedTime` which gives a summary of the clock time used by each module or event

@@ -3,22 +3,17 @@
 \docType{methods}
 \name{checkParams}
 \alias{checkParams}
-\alias{checkParams,simList,list,list,character-method}
+\alias{checkParams,simList,list-method}
 \title{Check use and existence of params passed to simulation.}
 \usage{
-checkParams(sim, coreModules, coreParams, path, ...)
+checkParams(sim, coreParams, ...)
 
-\S4method{checkParams}{simList,list,list,character}(sim, coreModules,
-  coreParams, path, ...)
+\S4method{checkParams}{simList,list}(sim, coreParams, ...)
 }
 \arguments{
 \item{sim}{A simList simulation object.}
 
-\item{coreModules}{List of core modules.}
-
 \item{coreParams}{List of default core parameters.}
-
-\item{path}{The location of the modules' source files.}
 
 \item{...}{Additional arguments. Not implemented.}
 }

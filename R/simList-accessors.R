@@ -37,7 +37,7 @@ setMethod(
     out[[8]] <- capture.output(cat(">> Modules:\n"))
     ord <- match(unlist(modules(object)), names(timeunits(object))) %>% na.omit
     out[[9]] <- capture.output(print(
-      cbind(Name = modules(object),
+      cbind(Name = unname(modules(object)),
             #Timeunit = c(rep(NA_character_, 4), unname(timeunits(object))[ord])),
             Timeunit = unname(timeunits(object))[ord]),
       quote = FALSE, row.names = FALSE))
@@ -251,7 +251,6 @@ setReplaceMethod(
 #' @param value The object to be stored at the slot.
 #'
 #' @param hidden Logical. If TRUE, show the default core modules.
-#'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
 #' @family functions to access elements of a \code{simList} object
@@ -2562,16 +2561,23 @@ setMethod(
     } else {
       if (!missing(filenames))  {
         paths <- filenames
-        modules <- sub(basename(paths), replacement = "", pattern = ".R")
+        if (missing(modules)) {
+          modules <- sub(basename(paths), replacement = "", pattern = ".R")
+        }
       } else if (!missing("modules")) {
-        prefix <- if (!missing("paths")) {
-            paths
+        prefix <- if (!file.exists(modules)) {
+          if (!missing("paths")) {
+            pre <- paths
           } else {
-            getOption("spades.modulePath")
+            pre <- getOption("spades.modulePath")
           }
-        paths <- file.path(prefix, modules, paste0(modules, ".R"))
+          file.path(pre, modules)
+        } else {
+          modules
+        }
+        paths <- file.path(prefix, paste0(modules, ".R"))
       } else {
-        stop("one of sim, module, modules, or filename must be supplied.")
+        stop("one of sim, modules, or filename must be supplied.")
       }
 
       if (missing(envir)) {

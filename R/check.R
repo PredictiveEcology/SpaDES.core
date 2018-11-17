@@ -123,11 +123,7 @@ setMethod(
 #'
 #' @param sim    A simList simulation object.
 #'
-#' @param coreModules List of core modules.
-#'
 #' @param coreParams List of default core parameters.
-#'
-#' @param path The location of the modules' source files.
 #'
 #' @param ...    Additional arguments. Not implemented.
 #'
@@ -141,19 +137,19 @@ setMethod(
 #' @author Alex Chubaty
 #'
 # igraph exports %>% from magrittr
-setGeneric("checkParams", function(sim, coreModules, coreParams, path, ...) {
+setGeneric("checkParams", function(sim, coreParams, ...) {
   standardGeneric("checkParams")
 })
 
 #' @rdname checkParams
 setMethod(
   "checkParams",
-  signature(sim = "simList", coreModules = "list", coreParams = "list",
-            path = "character"),
-  definition = function(sim, coreModules, coreParams, path, ...) {
+  signature(sim = "simList", coreParams = "list"),
+  definition = function(sim, coreParams, ...) {
     params <- sim@params
-    modules <- sim@modules
-    userModules <- modules[-which(coreModules %in% modules)]
+    userModules <- modules(sim) # already removes core modules
+    # modules <- sim@modules
+    # userModules <- modules[-which(coreModules %in% modules)]
     globalParams <- sim@params$.globals
     allFound <- TRUE
 
@@ -161,8 +157,11 @@ setMethod(
       ### check whether each param in simInit occurs in a module's .R file
       globalsFound <- list()
       readFile <- list()
-      for (uM in userModules) {
-        filename <- paste(path, "/", uM, "/", uM, ".R", sep = "")
+      userModulePaths <- names(userModules)
+
+      for (uMP in userModulePaths) {
+        uM <- basename(uMP)
+        filename <- paste(uMP, "/", uM, ".R", sep = "")
         readFile[[uM]] <- if (!is.null(sim@.xData[[".parsedFiles"]][[filename]])) {
           # a little faster to use already parsed objects --
           #   might have happened earlier during simInit,
@@ -171,8 +170,7 @@ setMethod(
                                   filename = filename)
           deparse(tmp$parsedFile)
         } else {
-          readLines(paste(path, "/", uM, "/", uM, ".R",
-                                            sep = ""))
+          readLines(filename)
         }
 
 

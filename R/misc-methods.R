@@ -135,7 +135,8 @@ setMethod("append_attr",
                 attributes(out[i]) <- attrs[[i]]
               }
             }
-            return(unique(out))
+            dups <- duplicated(out) # unique strips names ... out[!dups] does not
+            return(out[!dups])
 })
 
 ################################################################################
@@ -645,4 +646,13 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
           spades.modulePath = modulePath, spades.outputPath = outputPath)
 
   lapply(.paths(), checkPath, create = TRUE)
+}
+
+.basename <- function (x) {
+  if (is.null(x)) {
+    NULL
+  }
+  else {
+    basename(x)
+  }
 }

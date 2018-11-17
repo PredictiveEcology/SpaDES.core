@@ -116,9 +116,8 @@ setMethod("depsGraph",
             } else {
               el <- depsEdgeList(sim, plot) %>% .depsPruneEdges()
             }
-            core <- .pkgEnv$.coreModules %>% unlist()
-            m <- sim@modules %>% unlist()
-            v <- unique(c(el$to, el$from, m[-which(m %in% core)]))
+            m <- modules(sim) %>% unlist() # modules(sim) doesn't return hidden modules
+            v <- unique(c(el$to, el$from, m)) # so no need to remove them
             return(graph_from_data_frame(el, vertices = v, directed = TRUE))
 })
 
