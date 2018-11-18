@@ -1,19 +1,29 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.2.4
+version 0.2.3.9000
 =============
+
+## package dependencies
+
+* lorem ipsum
 
 ## new features
 * An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
 * User can now specify `modulePath` as a character vector, e.g., `simInit(..., paths = list(modulePath = c(".", "test")))`. This means that a user can organize the modules in different locations.
 
+## bug fixes
+
+* lorem ipsum
+
 version 0.2.3
 =============
 
 ## package dependencies
+
 * add `RandomFields` to Suggests, as it is in the Suggests of `SpaDES.tools` and used in examples/tests.
 
 ## new features
+
 * `simList` internals changed. It now inherits from `environment`. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the `simList`. Also, we removed several associated methods, `$`, `[[`, `ls`, `ls.str`, `objects`, as the defaults for environments work correctly with the `simList` now
 * `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
 * new function `elapsedTime` which gives a summary of the clock time used by each module or event
@@ -22,7 +32,8 @@ version 0.2.3
 * improved messaging when GLPK not installed (*e.g.*, on macOS)
 * `downloadModule()` now prints the module version downloaded (#77)
 
-## bugfixes
+## bug fixes
+
 * resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
 * module `.inputObjects` evaluated based on module load order (#72)
 * `.robustDigest` fix for simLists -- needed to omit `._startClockTime` and `.timestamp`
@@ -31,12 +42,15 @@ version 0.2.2
 =============
 
 ## package dependencies
+
 * remove `sp` from imports
 
 ## new features
+
 * none
 
-## bugfixes
+## bug fixes
+
 * fix issues with failing tests on macOS
 
 version 0.2.1
@@ -55,7 +69,7 @@ version 0.2.1
 * `all.equal.simList` now removes all time dependent attributes, *e.g.*, `._startClockTime` and `.timestamp`
 * speed enhancements for Discrete Event Simulator; now overhead is 1.3 seconds for 5000 events or, per event, 260 microseconds (185 microseconds if `options("spades.keepCompleted" = FALSE)`
 
-## bugfixes
+## bug fixes
 
 * Improvements to caching of functions with `simList` objects:
 
