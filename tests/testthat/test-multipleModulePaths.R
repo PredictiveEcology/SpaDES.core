@@ -1,3 +1,5 @@
+if (interactive()) library(testthat)
+
 test_that("simulation runs with simInit and spades", {
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
   on.exit({
@@ -9,10 +11,10 @@ test_that("simulation runs with simInit and spades", {
   sysFiles <- system.file("sampleModules", package = "SpaDES.core")
   modules <- list("randomLandscapes", "caribouMovement")
   files <- dir(sysFiles, recursive = TRUE, full.names = TRUE)
-  rootPth1 <- file.path(tmpdir, modules[[1]])
-  checkPath(rootPth1, create = TRUE)
-  rootPth2 <- file.path(tmpCache, modules[[2]])
-  checkPath(rootPth2, create = TRUE)
+  rootPth1 <- file.path(tmpdir, modules[[1]]) %>%
+    checkPath(., create = TRUE)
+  rootPth2 <- file.path(tmpCache, modules[[2]]) %>%
+    checkPath(., create = TRUE)
 
   file.copy(grep(modules[[1]], files, value = TRUE), file.path(rootPth1, paste0(modules[[1]], ".R")))
   file.copy(grep(modules[[2]], files, value = TRUE), file.path(rootPth2, paste0(modules[[2]], ".R")))
@@ -27,8 +29,6 @@ test_that("simulation runs with simInit and spades", {
   paths <- list(modulePath = c(tmpdir, tmpCache))
 
   newModule("test", tmpdir, open = FALSE)
-
-  #sim <- simInit()
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
   cat(file = file.path(tmpdir, "test", "test.R"),'
@@ -80,17 +80,17 @@ test_that("simulation runs with simInit and spades", {
   expect_true(identical(normPath(mySim$dp), normPath(file.path(rootPth3, "data"))))
 
   # Test new modules arg for modulePath
-  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[2:3]))),
-                        normPath(sort(dirname(c(rootPth2, rootPth3))))))
-  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[1:2]))),
-                        normPath(sort(dirname(c(rootPth1, rootPth2))))))
-  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[1]))),
-                        normPath(sort(dirname(c(rootPth1))))))
+  expect_true(identical(sort(normPath(modulePath(mySim, unlist(modules)[2:3]))),
+                        sort(normPath(dirname(c(rootPth2, rootPth3))))))
+  expect_true(identical(sort(normPath(modulePath(mySim, unlist(modules)[1:2]))),
+                        sort(normPath(dirname(c(rootPth1, rootPth2))))))
+  expect_true(identical(sort(normPath(modulePath(mySim, unlist(modules)[1]))),
+                        sort(normPath(dirname(c(rootPth1))))))
 
   # Here it is different than just modulePath(mySim) because user is asking for
   #  3 modulePaths explicitly, rather than just the modulePaths ... i.e., there are
   #  2 unique modulePaths here, but there are 3 modules
-  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[1:3]))),
-                        normPath(sort(dirname(c(rootPth1, rootPth2, rootPth3))))))
+  expect_true(identical(sort(normPath(modulePath(mySim, unlist(modules)[1:3]))),
+                        sort(normPath(dirname(c(rootPth1, rootPth2, rootPth3))))))
 
 })
