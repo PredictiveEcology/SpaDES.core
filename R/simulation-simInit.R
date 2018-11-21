@@ -293,7 +293,7 @@ setGeneric(
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
            notOlderThan = NULL) {
     standardGeneric("simInit")
-})
+  })
 
 #' @rdname simInit
 setMethod(
@@ -416,7 +416,7 @@ setMethod(
       ## if none there, then inside grandparent etc.
       while (stillFinding && length(modsForTU)) {
         tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                envir = sim@.xData[[".parsedFiles"]])
+                                  envir = sim@.xData[[".parsedFiles"]])
         hasTU <- !is.na(tu)
         innerNames <- .findModuleName(childModules, recursive = recurseLevel)
         modsForTU <- innerNames[nzchar(names(innerNames))]
@@ -561,6 +561,13 @@ setMethod(
     loadOrder[] <- loadOrderBase
     loadOrderNames <- names(loadOrder)
 
+    # This is a quick override so that .runInputObjects has access to these
+    #   synonynms
+    if (!is.null(objects$objectSynonyms)) {
+      sim$objectSynonyms <- objects$objectSynonyms
+      sim <- .checkObjectSynonyms(sim)
+    }
+
     ## load user-defined modules
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]
@@ -630,9 +637,9 @@ setMethod(
           .fillInputRows(startTime = start(sim))
         inputs(sim) <- newInputs
       }
-      if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
-        sim <- .checkObjectSynonyms(sim)
-      }
+      # if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
+      #   sim <- .checkObjectSynonyms(sim)
+      # }
     }
 
     ## load files in the filelist
@@ -1046,6 +1053,8 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
         }
       }
     }
+  } else {
+    message("All requierd input Objects provided; skipping .inputObjects")
   }
 
   sim@current <- list()

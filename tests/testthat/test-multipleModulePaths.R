@@ -29,8 +29,6 @@ test_that("simulation runs with simInit and spades", {
   paths <- list(modulePath = c(tmpdir, tmpCache))
 
   newModule("test", tmpdir, open = FALSE)
-
-  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
   cat(file = file.path(tmpdir, "test", "test.R"),'
     defineModule(sim, list(
     name = "test",
