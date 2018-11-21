@@ -109,7 +109,9 @@ setMethod(
     for (j in seq_along(modules)) {
       m <- modules[[j]][1]
       mBase <- basename(m)
-      filename <- paste(m, "/", mBase, ".R", sep = "")
+      possFiles <- file.path(modulePath(sim), mBase, paste(mBase, ".R", sep = ""))
+      ids <- which(file.exists(possFiles))
+      filename <- possFiles[ids[1]]
       out[[m]] <- .parseModulePartial(filename = filename,
                                       defineModuleElement = defineModuleElement,
                                       envir = envir)
