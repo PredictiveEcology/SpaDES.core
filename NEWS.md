@@ -10,6 +10,8 @@ version 0.2.3.9000
 ## new features
 * An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
 * User can now specify `modulePath` as a character vector, e.g., `simInit(..., paths = list(modulePath = c(".", "test")))`. This means that a user can organize the modules in different locations.
+* `modulePath` now has a new argument, `module`, where user can specify (a) specific module(s)'s path. Modifications were implemented to `dataPath` to utilize this
+new feature
 
 ## bug fixes
 
