@@ -1693,11 +1693,14 @@ setReplaceMethod(
 
 ################################################################################
 #' @inheritParams paths
+#' @param module The optional character string of the module(s) whose
+#'               paths are desired. If omitted, will return all modulePaths,
+#'               if more than one exist.
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-paths
 #' @aliases simList-accessors-paths
-setGeneric("modulePath", function(sim) {
+setGeneric("modulePath", function(sim, module) {
   standardGeneric("modulePath")
 })
 
@@ -1706,8 +1709,14 @@ setGeneric("modulePath", function(sim) {
 #' @aliases simList-accessors-paths
 setMethod("modulePath",
           signature = "simList",
-          definition = function(sim) {
-            return(sim@paths$modulePath)
+          definition = function(sim, module) {
+            if (!missing(module)) {
+              mods <- unlist(lapply(sim@modules, function(x) x %in% module))
+              dirname(names(mods)[mods])
+            } else {
+              sim@paths$modulePath
+            }
+
 })
 
 #' @export
@@ -1756,7 +1765,7 @@ setGeneric("dataPath", function(sim) {
 setMethod("dataPath",
           signature = "simList",
           definition = function(sim) {
-            return(file.path(modulePath(sim), currentModule(sim), "data"))
+            return(file.path(modulePath(sim, currentModule(sim)), currentModule(sim), "data"))
           })
 
 ################################################################################

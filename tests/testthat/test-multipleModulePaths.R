@@ -26,11 +26,71 @@ test_that("simulation runs with simInit and spades", {
   )
   paths <- list(modulePath = c(tmpdir, tmpCache))
 
-  mySim <- simInit(times, params, modules, objects = list(), paths) %>%
+  newModule("test", tmpdir, open = FALSE)
+
+  #sim <- simInit()
+
+  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  cat(file = file.path(tmpdir, "test", "test.R"),'
+    defineModule(sim, list(
+    name = "test",
+    description = "insert module description here",
+    keywords = c("insert key words here"),
+    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+    childModules = character(0),
+    version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+    spatialExtent = raster::extent(rep(NA_real_, 4)),
+    timeframe = as.POSIXlt(c(NA, NA)),
+    timeunit = "second",
+    citation = list("citation.bib"),
+    documentation = list("README.txt", "test.Rmd"),
+    reqdPkgs = list(),
+    parameters = rbind(
+    ),
+    inputObjects = bind_rows(
+    ),
+    outputObjects = bind_rows(
+    )
+    ))
+
+    doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+    switch(
+    eventType,
+    init = {
+      sim$dp <- dataPath(sim)
+      #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+    },
+    event1 = {
+    #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+    })
+    return(invisible(sim))
+    }
+    ', fill = TRUE)
+  rootPth3 <- file.path(tmpdir, "test")
+  modules <- append(modules, "test")
+  mySim <- simInit(times, params, modules = modules, objects = list(), paths) %>%
     spades(debug = FALSE)
 
   expect_true(all(modules(mySim) %in% unlist(modules)))
   expect_true(all(unlist(modules) %in% completed(mySim)$moduleName))
-  expect_true(all(normPath(names(modules(mySim))) %in% normPath(c(rootPth1, rootPth2))))
+  expect_true(all(normPath(names(modules(mySim))) %in%
+                    normPath(c(rootPth1, rootPth2, rootPth3))))
+
+  # Test dataPath(sim)
+  expect_true(identical(normPath(mySim$dp), normPath(file.path(rootPth3, "data"))))
+
+  # Test new modules arg for modulePath
+  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[2:3]))),
+                        normPath(sort(dirname(c(rootPth2, rootPth3))))))
+  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[1:2]))),
+                        normPath(sort(dirname(c(rootPth1, rootPth2))))))
+  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[1]))),
+                        normPath(sort(dirname(c(rootPth1))))))
+
+  # Here it is different than just modulePath(mySim) because user is asking for
+  #  3 modulePaths explicitly, rather than just the modulePaths ... i.e., there are
+  #  2 unique modulePaths here, but there are 3 modules
+  expect_true(identical(normPath(sort(modulePath(mySim, unlist(modules)[1:3]))),
+                        normPath(sort(dirname(c(rootPth1, rootPth2, rootPth3))))))
 
 })
