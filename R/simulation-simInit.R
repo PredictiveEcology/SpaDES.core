@@ -495,9 +495,9 @@ setMethod(
     ## add core module name to the loaded list (loaded with the package)
     modulesLoaded <- append(modulesLoaded, core)
 
-    ## source module metadata and code files
-    lapply(modules(sim), function(m) moduleVersion(m, sim = sim,
-                                                   envir = sim@.xData[[".parsedFiles"]]))
+    # ## source module metadata and code files
+    # lapply(names(modules(sim)), function(m) moduleVersion(m, sim = sim,
+    #                                                envir = sim@.xData[[".parsedFiles"]]))
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
