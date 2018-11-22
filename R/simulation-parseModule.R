@@ -106,12 +106,23 @@ setMethod(
   definition = function(sim, modules, defineModuleElement, envir = NULL) {
     out <- list()
 
+
     for (j in seq_along(modules)) {
       m <- modules[[j]][1]
       mBase <- basename(m)
-      possFiles <- file.path(modulePath(sim), mBase, paste(mBase, ".R", sep = ""))
-      ids <- which(file.exists(possFiles))
-      filename <- possFiles[ids[1]]
+
+      # the module may not have absolute path, i.e., including the correct modulePath
+      #  Check first if it is there for speed, then if not, try file.exists (slow)
+      filename <- file.path(m, paste0(mBase, ".R"))
+      if (length(sim@paths$modulePath) > 1) {
+        hasFullModulePath <- unlist(lapply(sim@paths$modulePath,
+                                           function(mp) startsWith(prefix = mp, m)))
+        if (!isTRUE(any(hasFullModulePath))) {
+          possFiles <- file.path(modulePath(sim), mBase, paste(mBase, ".R", sep = ""))
+          ids <- which(file.exists(possFiles))
+          filename <- possFiles[ids[1]] # override filename if it wasn't already there
+        }
+      }
       out[[m]] <- .parseModulePartial(filename = filename,
                                       defineModuleElement = defineModuleElement,
                                       envir = envir)
