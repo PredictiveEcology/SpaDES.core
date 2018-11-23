@@ -56,6 +56,8 @@ test_that("simulation runs with simInit and spades", {
     eventType,
     init = {
       sim$dp <- dataPath(sim)
+      sim$cachePath <- cachePath(sim)
+      sim$optionsCachePath <- getOption("spades.cachePath")
       #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
     },
     event1 = {
@@ -66,6 +68,12 @@ test_that("simulation runs with simInit and spades", {
     ', fill = TRUE)
   rootPth3 <- file.path(tmpdir, "test")
   modules <- append(modules, "test")
+
+  paths$cachePath <- tmpCache
+  lapply(paths, checkPath, create = TRUE)
+  expect_false(identical(normPath(paths$cachePath), normPath(.paths()$cachePath)))
+
+  # Do a single run of simInit for this whole test
   mySim <- simInit(times, params, modules = modules, objects = list(), paths) %>%
     spades(debug = FALSE)
 
@@ -90,5 +98,14 @@ test_that("simulation runs with simInit and spades", {
   #  2 unique modulePaths here, but there are 3 modules
   expect_true(identical(sort(normPath(modulePath(mySim, unlist(modules)[1:3]))),
                         sort(normPath(dirname(c(rootPth1, rootPth2, rootPth3))))))
+
+  # Test the set up paths in the simList correctly
+  # First check that the interactive .paths() is still the original way
+  expect_false(identical(normPath(mySim@paths$cachePath), normPath(.paths()$cachePath)))
+  # Then check that internally, the options("spades.xxxPath") was set correctly
+  expect_true(identical(normPath(mySim@paths$cachePath), mySim$cachePath))
+  expect_true(identical(normPath(mySim@paths$cachePath), mySim$cachePath))
+  expect_true(identical(normPath(mySim@paths$cachePath), mySim$optionsCachePath))
+
 
 })
