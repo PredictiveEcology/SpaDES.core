@@ -324,9 +324,6 @@ setMethod(
     #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
     # })
     paths <- lapply(paths, function(p)
-      if (length(p) > 1)
-        lapply(p, checkPath, create = TRUE)
-      else
         checkPath(p, create = TRUE)
     )
 
