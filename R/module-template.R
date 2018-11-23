@@ -254,7 +254,7 @@ defineModule(sim, list(
     if (type == "child") {
       cat("
 ## event types
-#   - type `init` is required for initialiazation
+#   - type `init` is required for initialization
 
 doEvent.", name, " = function(sim, eventTime, eventType) {
   switch(
@@ -331,8 +331,6 @@ doEvent.", name, " = function(sim, eventTime, eventType) {
 }
 
 ## event functions
-#   - follow the naming convention `modulenameEventtype()`;
-#   - `modulenameInit()` function is required for initiliazation;
 #   - keep event functions short and clean, modularize by calling subroutines from section below.
 
 ### template initialization
