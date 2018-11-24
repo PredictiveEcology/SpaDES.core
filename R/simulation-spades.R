@@ -613,6 +613,12 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
+
+    # set the options("spades.xxxPath") to the values in the sim@paths
+    oldGetPaths <- getPaths()
+    do.call(setPaths, sim@paths)
+    on.exit({do.call(setPaths, oldGetPaths)}, add = TRUE)
+
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
@@ -627,7 +633,7 @@ setMethod(
       if (!.pkgEnv[["skipNamespacing"]])
         .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
       rm(".timeunits", envir = sim@.xData)
-    })
+    }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {
       if (!is.numeric(.plotInitialTime))

@@ -76,7 +76,7 @@
   if (getOption("spades.inputPath") == file.path(.spadesTempDir, "inputs")) {
     options(spades.inputPath = NULL)
   }
-  if (getOption("spades.modulePath") == file.path(.spadesTempDir, "modules")) {
+  if (all(getOption("spades.modulePath") %in% file.path(.spadesTempDir, "modules"))) {
     options(spades.modulePath = NULL)
   }
   if (getOption("spades.outputPath") == file.path(.spadesTempDir, "outputs")) {

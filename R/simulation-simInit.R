@@ -324,9 +324,6 @@ setMethod(
     #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
     # })
     paths <- lapply(paths, function(p)
-      if (length(p) > 1)
-        lapply(p, checkPath, create = TRUE)
-      else
         checkPath(p, create = TRUE)
     )
 
@@ -345,6 +342,9 @@ setMethod(
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
+    oldGetPaths <- getPaths()
+    do.call(setPaths, paths)
+    on.exit({do.call(setPaths, oldGetPaths)}, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)

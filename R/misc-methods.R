@@ -643,7 +643,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
   if (missing(outputPath)) outputPath <- getOption("spades.outputPath") # nolint
 
   options(spades.cachePath = cachePath, spades.inputPath = inputPath,
-          spades.modulePath = modulePath, spades.outputPath = outputPath)
+          spades.modulePath = unlist(modulePath), spades.outputPath = outputPath)
 
   lapply(.paths(), checkPath, create = TRUE)
 }
