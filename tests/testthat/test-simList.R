@@ -260,6 +260,7 @@ test_that("simList test all signatures", {
     N <- 256L
     successes <- logical(N)
     argsTested <- vector("list", length = N)
+    #setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
     for (i in 1L:N) {
       li <- list(
         {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
@@ -283,8 +284,9 @@ test_that("simList test all signatures", {
       argsTested[[i]] <- names(li)
     }
 
+    browser()
     # needs paths and params; many defaults are fine
-    expect_equal(sum(successes, na.rm = TRUE), 192)
+    expect_equal(sum(successes, na.rm = TRUE), 256)
 
   }
 })
