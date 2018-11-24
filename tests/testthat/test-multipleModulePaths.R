@@ -57,7 +57,7 @@ test_that("simulation runs with simInit and spades", {
     init = {
       sim$dp <- dataPath(sim)
       sim$cachePath <- cachePath(sim)
-      sim$optionsCachePath <- getOption("spades.cachePath")
+      sim$optionsCachePath <- getOption("reproducible.cachePath")
       #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
     },
     event1 = {

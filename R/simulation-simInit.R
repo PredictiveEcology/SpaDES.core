@@ -64,7 +64,7 @@ if (getRversion() >= "3.1.0") {
 #' the defaults are as follows:
 #'
 #' \itemize{
-#'   \item \code{cachePath}: \code{getOption("spades.cachePath")};
+#'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 #'
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
 #'

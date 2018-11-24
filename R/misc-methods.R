@@ -574,7 +574,7 @@ setMethod(
 #' \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
 #'
 #' @param cachePath   The default local directory in which to cache simulation outputs.
-#'                    If not specified, defaults to \code{getOption("spades.cachePath")}.
+#'                    If not specified, defaults to \code{getOption("reproducible.cachePath")}.
 #'
 #' @param inputPath   The default local directory in which to look for simulation inputs
 #'                    If not specified, defaults to \code{getOption("spades.inputPath")}.
@@ -613,7 +613,7 @@ setMethod(
 #'
 .paths <- function() {
   list(
-    cachePath = .getOption("spades.cachePath"),
+    cachePath = .getOption("reproducible.cachePath"),
     inputPath = getOption("spades.inputPath"),
     modulePath = getOption("spades.modulePath"),
     outputPath = getOption("spades.outputPath")
