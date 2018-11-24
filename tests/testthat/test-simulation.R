@@ -439,7 +439,7 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-    pattern = c(paste0(m, ": module code: b is declared in outputObjects|child4: module code: a is declared in inputObjects|Running .input")))))
+    pattern = c(paste0(m, ": module code: b is declared in outputObjects|child4: module code: a is declared in inputObjects|Running .input|Setting|Paths")))))
 
   # assign to sim for functions like scheduleEvent
   lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
