@@ -39,7 +39,7 @@ test_that("simulation runs with simInit and spades", {
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
     spatialExtent = raster::extent(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = "second",
+    timeunit = "year",
     citation = list("citation.bib"),
     documentation = list("README.txt", "test.Rmd"),
     reqdPkgs = list(),
@@ -58,7 +58,7 @@ test_that("simulation runs with simInit and spades", {
       sim$dp <- dataPath(sim)
       sim$cachePath <- cachePath(sim)
       sim$optionsCachePath <- getOption("reproducible.cachePath")
-      #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, 2L, "test", "event1")
     },
     event1 = {
     #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
@@ -107,5 +107,7 @@ test_that("simulation runs with simInit and spades", {
   expect_true(identical(normPath(mySim@paths$cachePath), mySim$cachePath))
   expect_true(identical(normPath(mySim@paths$cachePath), mySim$optionsCachePath))
 
+  # Test for integer values in scheduleEvent
+  expect_true(completed(mySim)[moduleName == "test" & eventType == 'event1', eventTime == 2])
 
 })
