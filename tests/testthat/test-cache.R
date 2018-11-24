@@ -1,5 +1,8 @@
 test_that("test cache", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
+                                      spades.useRequire = FALSE),
+                          setPaths = FALSE)
+
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -219,9 +222,9 @@ test_that("test .robustDigest for simLists", {
 
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
-  expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|module code",
-                 all = TRUE)
+  mess1 <- capture_messages(do.call(simInit, args))
+  expect_true(all(grepl("Using or creating cached copy|module code|Setting|Paths", mess1)))
+
   expect_message(do.call(simInit, args),
                  regexp = "Using or creating cached copy|Using cached copy|module code")
 
@@ -235,10 +238,10 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|module code",
+                 regexp = "Using or creating cached copy|module code|Setting|Paths",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result|module code",
+                 regexp = "Using or creating cached copy|loading cached result|module code|Setting|Paths",
                  all = TRUE)
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -280,7 +283,7 @@ test_that("test .robustDigest for simLists", {
                 all = TRUE)
 })
 
-test_that("test .checkCacheRepo with function as spades.cachePath", {
+test_that("test .checkCacheRepo with function as reproducible.cachePath", {
   testInitOut <- testInit("igraph", smcc = TRUE)
   on.exit({
     testOnExit(testInitOut)
@@ -288,7 +291,7 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
   #tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
 
   awesomeCacheFun <- function() tmpCache ;
-  options("spades.cachePath" = awesomeCacheFun)
+  options("reproducible.cachePath" = awesomeCacheFun)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
@@ -304,7 +307,7 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
   expect_equal(aa, tmpCache)
 
   justAPath <- tmpCache ;
-  options("spades.cachePath" = justAPath)
+  options("reproducible.cachePath" = justAPath)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)

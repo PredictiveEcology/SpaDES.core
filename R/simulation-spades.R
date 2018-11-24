@@ -616,8 +616,8 @@ setMethod(
 
     # set the options("spades.xxxPath") to the values in the sim@paths
     oldGetPaths <- getPaths()
-    do.call(setPaths, sim@paths)
-    on.exit({do.call(setPaths, oldGetPaths)}, add = TRUE)
+    suppressMessages(do.call(setPaths, sim@paths))
+    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
 
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
@@ -712,7 +712,13 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan = NULL,
                         ...) {
+
     stopifnot(class(sim) == "simList")
+
+    oldGetPaths <- getPaths()
+    suppressMessages(do.call(setPaths, sim@paths))
+    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+
     dots <- list(...)
     omitArgs <- "notOlderThan"
     if (isTRUE("omitArgs" %in% names(dots))) {
@@ -731,6 +737,7 @@ setMethod(
                   .plotInitialTime = .plotInitialTime,
                   .saveInitialTime = .saveInitialTime,
                   omitArgs = omitArgs, notOlderThan = notOlderThan),
+                  #cacheRepo = sim@paths$cachePath),
                   dots))
       )
     } else {

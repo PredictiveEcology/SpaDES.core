@@ -344,9 +344,9 @@ setMethod(
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
 
     # paths
-    oldGetPaths <- .paths()
+    suppressMessages(oldGetPaths <- .paths())
     do.call(setPaths, paths)
-    on.exit({do.call(setPaths, oldGetPaths)}, add = TRUE)
+    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
@@ -781,7 +781,7 @@ setMethod(
     if (missing(params)) li$params <- list()
     if (missing(modules)) li$modules <- list()
     if (missing(objects)) li$objects <- list()
-    if (missing(paths)) li$paths <- .paths()
+    if (missing(paths)) li$paths <- suppressMessages(.paths())
     if (missing(inputs)) li$inputs <- as.data.frame(NULL)
     if (missing(outputs)) li$outputs <- as.data.frame(NULL)
     if (missing(loadOrder)) li$loadOrder <- character(0)
@@ -1042,6 +1042,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
+                       cacheRepo = sim@paths$cachePath,
                        userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
                                     "function:.inputObjects"))
