@@ -679,13 +679,21 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
           spades.modulePath = unlist(modulePath), spades.outputPath = outputPath,
           reproducible.cachePath = cachePath)
 
+  modPaths <- if (length(modulePath) > 1) {
+    paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
+
+  } else {
+    normPath(modulePath)
+  }
+
   if (!allDefault) {
     message("Setting:\n",
             "  options(\n",
             if (!defaults$CP) paste0("    reproducible.cachePath = '",normPath(cachePath),"'\n"),
             if (!defaults$IP) paste0("    spades.inputPath = '",normPath(inputPath),"'\n"),
             if (!defaults$OP) paste0("    spades.outputPath = '",normPath(outputPath),"'\n"),
-            if (!defaults$MP) paste0("    spades.modulePath = '",normPath(modulePath),"'\n"),
+            if (!defaults$MP) paste0("    spades.modulePath = '",modPaths,
+                                     "'\n"),
             "  )")
   }
   message("Paths set to:\n",
@@ -693,7 +701,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
             "    reproducible.cachePath = '",normPath(cachePath),"'\n",
             "    spades.inputPath = '",normPath(inputPath),"'\n",
             "    spades.outputPath = '",normPath(outputPath),"'\n",
-            "    spades.modulePath = '",normPath(modulePath),"'\n",
+            "    spades.modulePath = '",modPaths,"'\n",
             "  )")
 
   suppressMessages(lapply(.paths(), checkPath, create = TRUE))
