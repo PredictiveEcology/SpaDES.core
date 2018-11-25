@@ -284,7 +284,6 @@ test_that("simList test all signatures", {
       argsTested[[i]] <- names(li)
     }
 
-    browser()
     # needs paths and params; many defaults are fine
     expect_equal(sum(successes, na.rm = TRUE), 256)
 

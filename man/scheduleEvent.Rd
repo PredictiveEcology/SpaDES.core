@@ -51,7 +51,7 @@ Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{priority}}
+\code{\link{priority}}, \code{\link{scheduleConditionalEvent}}
 }
 \author{
 Alex Chubaty
