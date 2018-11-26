@@ -356,9 +356,9 @@ scheduleEvent <- function(sim,
 
       # put new event into event queue
       if (numEvents == 0L) {
-        slot(sim, "events") <- newEventList
+        slot(sim, "events", check = FALSE) <- newEventList
       } else {
-        slot(sim, "events") <- append(sim@events, newEventList)
+        slot(sim, "events", check = FALSE) <- append(sim@events, newEventList)
         needSort <- TRUE
         if (eventTimeInSeconds>sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
