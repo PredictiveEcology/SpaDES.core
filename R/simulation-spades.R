@@ -296,7 +296,7 @@ doEvent <- function(sim, debug, notOlderThan) {
 #' @include priority.R
 #' @export
 #' @rdname scheduleEvent
-#' @seealso \code{\link{priority}}
+#' @seealso \code{\link{priority}}, \code{\link{scheduleConditionalEvent}}
 #'
 #' @author Alex Chubaty
 #'
@@ -343,47 +343,7 @@ scheduleEvent <- function(sim,
 
   if (length(eventTime)) {
     if (!is.na(eventTime)) {
-      # if there is no metadata, meaning for the first
-      #  "default" modules...load, save, checkpoint, progress
-      if (!is.null(sim@depends@dependencies[[1]])) {
-        # first check if this moduleName matches the name of a module
-        #  with meta-data (i.e., depends(sim)@dependencies filled)
-        if (moduleName %in% unlist(lapply(sim@depends@dependencies, function(x) {
-          x@name
-        }))) {
-          # If the eventTime doesn't have units, it's a user generated
-          #  value, likely because of times in the simInit call.
-          #  This must be intercepted, and units added based on this
-          #  assumption, that the units are in \code{timeunit}
-          if (is.null(attr(eventTime, "unit"))) {
-            attributes(eventTime)$unit <- .callingFrameTimeunit(sim)
-            eventTimeInSeconds <- as.numeric(convertTimeunit((
-              eventTime -
-                convertTimeunit(sim@simtimes[["start"]],
-                                sim@simtimes[["timeunit"]], sim@.xData,
-                                skipChecks = TRUE)
-            ),
-            "seconds",
-            sim@.xData, skipChecks = TRUE) +
-              sim@simtimes[["current"]])
-          } else {
-            eventTimeInSeconds <- if (!startsWith(attr(eventTime, "unit"), "second")) {
-              as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-                                         skipChecks = TRUE))
-            } else eventTime
-          }
-        } else {
-          # for core modules because they have no metadata
-          eventTimeInSeconds <-
-            as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-                                       skipChecks = TRUE))
-        }
-      } else {
-        # when eventTime is NA... can't seem to get an example
-        eventTimeInSeconds <-
-          as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-                                     skipChecks = TRUE))
-      }
+      eventTimeInSeconds <- calculateEventTimeInSeconds(sim, eventTime, moduleName)
       attr(eventTimeInSeconds, "unit") <- "second"
 
       newEventList <- list(list(
@@ -425,6 +385,141 @@ scheduleEvent <- function(sim,
   return(invisible(sim))
 }
 
+################################################################################
+#' Schedule a conditional simulation event
+#'
+#' Adds a new event to the simulation's conditional event queue,
+#' updating the simulation object by creating or appending to
+#' \code{sim$._conditionalEvents}. This is very experimental. Use with caution.
+#'
+#' @inheritParams scheduleEvent
+#'
+#' @param minEventTime   A numeric specifying the time before which the event should not occur,
+#'         even if the condition is met. Defaults to \code{start(sim)}
+#'
+#' @param maxEventTime   A numeric specifying the time after which the event should not occur,
+#'         even if the condition is met. Defaults to \code{end(sim)}
+#'
+#' @param condition A quoted expression that can be assessed after each event in the regular
+#' event queue. It can access objects in the \code{simList} by using functions of \code{sim},
+#' e.g., \code{"sim$age > 1"}
+#'
+#' @return Returns the modified \code{simList} object, i.e., \code{sim$._conditionalEvents}
+#'
+#' This conditional event queue will be assessed at every single event in the normal event
+#' queue. If there are no conditional events, then \code{spades} will proceed as normal. As
+#' conditional event conditions are found to be true, then it will trigger a call to
+#' \code{scheduleEvent(...)} with the current time passed to \code{eventTime} \emph{and} it will
+#' remove the conditional event from the conditional queue. If the user
+#' would like the triggered conditional event to occur as the very next event, then
+#' a possible strategy would be to set \code{eventPriority} of the conditional event to
+#' very low or even negative to ensure it gets inserted at the top of the event queue.
+#'
+#' @importFrom data.table setkey
+#' @include priority.R
+#' @export
+#' @rdname scheduleConditionalEvent
+#' @seealso \code{\link{scheduleEvent}}
+#'
+#' @author Eliot McIntire
+#'
+#' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
+#'             San Francisco, CA: No Starch Press, Inc..
+#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'
+#' @examples
+#' \dontrun{
+#'  sim <- scheduleConditionalEvent(x, "sim$age > 1", "firemodule", "burn") # default priority
+#' }
+scheduleConditionalEvent <- function(sim,
+                          condition,
+                          moduleName,
+                          eventType,
+                          eventPriority = .pkgEnv$.normalVal,
+                          minEventTime = start(sim),
+                          maxEventTime = end(sim)) {
+  if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+
+  if (!is.numeric(minEventTime)) {
+    if (is.na(minEventTime)) {
+      eventTime <- NA_real_
+    } else {
+      stop(paste(
+        "Invalid or missing minEventTime. minEventTime must be a numeric.",
+        "This is usually caused by an attempt to scheduleEvent at time NULL",
+        "or by using an undefined parameter."
+      ))
+    }
+  }
+  if (!is.numeric(maxEventTime)) {
+    if (is.na(maxEventTime)) {
+      eventTime <- NA_real_
+    } else {
+      stop(paste(
+        "Invalid or missing maxEventTime. maxEventTime must be a numeric.",
+        "This is usually caused by an attempt to scheduleEvent at time NULL",
+        "or by using an undefined parameter."
+      ))
+    }
+  }
+
+  if (!is.character(eventType)) stop("eventType must be a character")
+  if (!is.character(moduleName)) stop("moduleName must be a character")
+  #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
+  if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
+
+  if (length(condition)) {
+    if (!is.na(condition)) {
+
+      # minEventTime
+      minEventTimeInSeconds <- calculateEventTimeInSeconds(sim, minEventTime, moduleName)
+      attr(minEventTimeInSeconds, "unit") <- "second"
+
+      # maxEventTime
+      maxEventTimeInSeconds <- calculateEventTimeInSeconds(sim, maxEventTime, moduleName)
+      attr(maxEventTimeInSeconds, "unit") <- "second"
+
+      newEventList <- list(list(
+        condition = parse(text = condition),
+        minEventTime = minEventTimeInSeconds,
+        maxEventTime = maxEventTimeInSeconds,
+        moduleName = moduleName,
+        eventType = eventType,
+        eventPriority = eventPriority
+      ))
+      numEvents <- length(sim$._conditionalEvents)
+
+      # put new event into event queue
+      if (numEvents == 0L) {
+        sim$._conditionalEvents <- newEventList
+      } else {
+        sim$._conditionalEvents <- append(sim$._conditionalEvents, newEventList)
+        needSort <- TRUE
+        if (minEventTimeInSeconds > sim$._conditionalEvents[[numEvents]]$minEventTime) {
+          needSort <- FALSE
+        } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &
+                   eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority){
+          needSort <- FALSE
+        }
+        if (needSort) {
+          ord <- order(unlist(lapply(sim$._conditionalEvents, function(x) x$eventTime)),
+                       unlist(lapply(sim$._conditionalEvents, function(x) x$eventPriority)))
+          sim$._conditionalEvents <- sim$._conditionalEvents[ord]
+        }
+      }
+    }
+  } else {
+    warning(
+      paste(
+        "Invalid or missing condition ",
+        "This is usually caused by an attempt to scheduleEvent at an empty condition ",
+        "or by using an undefined parameter."
+      )
+    )
+  }
+
+  return(invisible(sim))
+}
 
 ################################################################################
 #' Run a spatial discrete event simulation
@@ -616,8 +711,8 @@ setMethod(
 
     # set the options("spades.xxxPath") to the values in the sim@paths
     oldGetPaths <- getPaths()
-    do.call(setPaths, sim@paths)
-    on.exit({do.call(setPaths, oldGetPaths)}, add = TRUE)
+    suppressMessages(do.call(setPaths, sim@paths))
+    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
 
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
@@ -694,6 +789,29 @@ setMethod(
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
 
+      # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
+      if (exists("._conditionalEvents", envir = sim)) {
+        condEventsToOmit <- integer()
+        for(condNum in seq(sim$._conditionalEvents)) {
+          cond <- sim$._conditionalEvents[[condNum]]
+          if (isTRUE(eval(cond$condition))) {
+            curTime <- time(sim)
+            if (curTime >= cond$minEventTime && curTime <= cond$maxEventTime) {
+              message("  Conditional Event -- ", cond$condition, " is true. Scheduling for now")
+              sim <- scheduleEvent(sim, eventTime = curTime, moduleName = cond$moduleName,
+                                   eventType = cond$eventType, eventPriority = cond$eventPriority)
+              condEventsToOmit <- c(condEventsToOmit, condNum)
+            }
+          }
+
+        }
+        if (length(condEventsToOmit)) {
+          sim$._conditionalEvents <- sim$._conditionalEvents[-condEventsToOmit]
+          if (length(sim$._conditionalEvents) == 0) {
+            rm("._conditionalEvents", envir = sim)
+          }
+        }
+      }
     }
     sim@simtimes[["current"]] <- sim@simtimes[["end"]]
     return(invisible(sim))
@@ -712,7 +830,13 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan = NULL,
                         ...) {
+
     stopifnot(class(sim) == "simList")
+
+    oldGetPaths <- getPaths()
+    suppressMessages(do.call(setPaths, sim@paths))
+    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+
     dots <- list(...)
     omitArgs <- "notOlderThan"
     if (isTRUE("omitArgs" %in% names(dots))) {
@@ -731,6 +855,7 @@ setMethod(
                   .plotInitialTime = .plotInitialTime,
                   .saveInitialTime = .saveInitialTime,
                   omitArgs = omitArgs, notOlderThan = notOlderThan),
+                  #cacheRepo = sim@paths$cachePath),
                   dots))
       )
     } else {
@@ -789,4 +914,47 @@ setMethod(
     }
   }
   sim <- out
+}
+
+calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
+  if (!is.null(sim@depends@dependencies[[1]])) {
+    # first check if this moduleName matches the name of a module
+    #  with meta-data (i.e., depends(sim)@dependencies filled)
+    if (moduleName %in% unlist(lapply(sim@depends@dependencies, function(x) {
+      x@name
+    }))) {
+      # If the eventTime doesn't have units, it's a user generated
+      #  value, likely because of times in the simInit call.
+      #  This must be intercepted, and units added based on this
+      #  assumption, that the units are in \code{timeunit}
+      if (is.null(attr(eventTime, "unit"))) {
+        attributes(eventTime)$unit <- .callingFrameTimeunit(sim)
+        eventTimeInSeconds <- as.numeric(convertTimeunit((
+          eventTime -
+            convertTimeunit(sim@simtimes[["start"]],
+                            sim@simtimes[["timeunit"]], sim@.xData,
+                            skipChecks = TRUE)
+        ),
+        "seconds",
+        sim@.xData, skipChecks = TRUE) +
+          sim@simtimes[["current"]])
+      } else {
+        eventTimeInSeconds <- if (!startsWith(attr(eventTime, "unit"), "second")) {
+          as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
+                                     skipChecks = TRUE))
+        } else eventTime
+      }
+    } else {
+      # for core modules because they have no metadata
+      eventTimeInSeconds <-
+        as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
+                                   skipChecks = TRUE))
+    }
+  } else {
+    # when eventTime is NA... can't seem to get an example
+    eventTimeInSeconds <-
+      as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
+                                 skipChecks = TRUE))
+  }
+  eventTimeInSeconds
 }

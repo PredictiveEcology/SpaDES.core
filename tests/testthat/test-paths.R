@@ -1,5 +1,6 @@
 test_that("paths file does not work correctly", {
   testInitOut <- testInit(setPaths = FALSE)
+
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -57,6 +58,20 @@ test_that("paths file does not work correctly", {
                     modulePath = modulePath(mySim),
                     outputPath = outputPath(mySim)), normPath))
 
+  # missing paths
+  oldPaths <- getPaths()
+  do.call(setPaths, paths)
+  on.exit({do.call(setPaths, paths)}, add = TRUE)
+  mySim1 <- simInit(times, params, modules, objects = list())
+  expect_equal(lapply(paths(mySim), normPath),
+               lapply(paths(mySim1), normPath))
+
+  # setting paths via setPaths works for changing the paths in the simInit & therefore simList
+  setPaths(cachePath = oldPaths$cachePath)
+  mySim2 <- simInit(times, params, modules, objects = list())
+  expect_false(identical(lapply(paths(mySim), normPath),
+               lapply(paths(mySim2), normPath)))
+
   inputPath(mySim) <- tmpdir
   expect_equal(inputPath(mySim), tmpdir)
 
@@ -68,4 +83,6 @@ test_that("paths file does not work correctly", {
 
   cachePath(mySim) <- tmpdir
   expect_equal(cachePath(mySim), tmpdir)
+
+
 })

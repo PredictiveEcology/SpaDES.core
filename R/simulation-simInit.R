@@ -64,7 +64,7 @@ if (getRversion() >= "3.1.0") {
 #' the defaults are as follows:
 #'
 #' \itemize{
-#'   \item \code{cachePath}: \code{getOption("spades.cachePath")};
+#'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 #'
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
 #'
@@ -342,9 +342,11 @@ setMethod(
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
-    oldGetPaths <- getPaths()
+
+    # paths
+    suppressMessages(oldGetPaths <- .paths())
     do.call(setPaths, paths)
-    on.exit({do.call(setPaths, oldGetPaths)}, add = TRUE)
+    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
@@ -779,7 +781,7 @@ setMethod(
     if (missing(params)) li$params <- list()
     if (missing(modules)) li$modules <- list()
     if (missing(objects)) li$objects <- list()
-    if (missing(paths)) li$paths <- .paths()
+    if (missing(paths)) li$paths <- suppressMessages(.paths())
     if (missing(inputs)) li$inputs <- as.data.frame(NULL)
     if (missing(outputs)) li$outputs <- as.data.frame(NULL)
     if (missing(loadOrder)) li$loadOrder <- character(0)
@@ -1040,6 +1042,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
+                       cacheRepo = sim@paths$cachePath,
                        userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
                                     "function:.inputObjects"))

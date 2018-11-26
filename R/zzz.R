@@ -4,9 +4,10 @@
 .onLoad <- function(libname, pkgname) {
   ## set options using the approach used by devtools
   opts <- options()
+  reproCachePath <- getOption("reproducible.cachePath")
   opts.spades <- list( # nolint
     spades.browserOnError = FALSE,
-    spades.cachePath = file.path(.spadesTempDir, "cache"),
+    #spades.cachePath = reproCachePath,
     spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
@@ -50,13 +51,11 @@
 .onAttach <- function(libname, pkgname) {
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
+    a <- capture.output(setPaths(), type = "message")
+    a <- paste(a, collapse = "\n")
+    packageStartupMessage(a)
     packageStartupMessage(
-      "Default paths for SpaDES directories set to:\n",
-      "  cachePath:  ", reproducible::normPath(.getOption("spades.cachePath")), "\n",
-      "  inputPath:  ", reproducible::normPath(getOption("spades.inputPath")), "\n",
-      "  modulePath: ", reproducible::normPath(getOption("spades.modulePath")), "\n",
-      "  outputPath: ", reproducible::normPath(getOption("spades.outputPath")), "\n",
-      "These can be changed using 'setPaths()'. See '?setPaths'."
+      "To change these, use setPaths(...); see ?setPaths"
     )
   }
 
@@ -70,9 +69,9 @@
 
 .onUnload <- function(libpath) {
   ## if temp session dir is being used, ensure it gets reset each session
-  if (.getOption("spades.cachePath") == file.path(.spadesTempDir, "cache")) {
-    options(spades.cachePath = NULL)
-  }
+  #if (.getOption("spades.cachePath") == file.path(.spadesTempDir, "cache")) {
+  #  options(spades.cachePath = NULL)
+  #}
   if (getOption("spades.inputPath") == file.path(.spadesTempDir, "inputs")) {
     options(spades.inputPath = NULL)
   }

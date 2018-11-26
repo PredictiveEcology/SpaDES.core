@@ -437,7 +437,7 @@
 #'   first time makes the error, the second time has \code{debugonce} and the third time
 #'   is after the error is addressed. \code{TRUE} is likely somewhat slower.
 #'
-#'   \item \code{spades.cachePath}: The default local directory in which to
+#'   \item \code{reproducible.cachePath}: The default local directory in which to
 #'   cache simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
 #'

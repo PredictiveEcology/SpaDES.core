@@ -103,7 +103,7 @@ Each has a function to get or set the value in a \code{simList} object.
 If no paths are specified, the defaults are as follows:
 
 \itemize{
-  \item \code{cachePath}: \code{getOption("spades.cachePath")};
+  \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 
 \item \code{inputPath}: \code{getOption("spades.modulePath")};
 

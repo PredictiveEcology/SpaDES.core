@@ -19,7 +19,7 @@ setPaths(cachePath, inputPath, modulePath, outputPath)
 }
 \arguments{
 \item{cachePath}{The default local directory in which to cache simulation outputs.
-If not specified, defaults to \code{getOption("spades.cachePath")}.}
+If not specified, defaults to \code{getOption("reproducible.cachePath")}.}
 
 \item{inputPath}{The default local directory in which to look for simulation inputs
 If not specified, defaults to \code{getOption("spades.inputPath")}.}

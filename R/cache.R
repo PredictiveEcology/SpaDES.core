@@ -295,7 +295,7 @@ setMethod(
         sim <- get("sim", envir = sys.frame(doEventFrameNum))
         cacheRepo <- sim@paths$cachePath
       } else {
-        cacheRepo <- .getOption("spades.cachePath")
+        cacheRepo <- .getOption("reproducible.cachePath")
         #checkPath(cacheRepo, create = TRUE) #SpaDES dependency
       }
     }
