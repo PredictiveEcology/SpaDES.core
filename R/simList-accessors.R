@@ -2317,7 +2317,7 @@ setMethod(
   "conditionalEvents",
   signature = c("simList", "character"),
   definition = function(sim, unit) {
-    if (exists("._conditionalEvents", sim)) {
+    if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
       conds <- sim$._conditionalEvents
       conds <- lapply(conds, function(x) {
         if (is.call(x$condition)) {

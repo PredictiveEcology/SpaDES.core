@@ -811,7 +811,7 @@ setMethod(
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
 
       # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
-      if (exists("._conditionalEvents", envir = sim)) {
+      if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
         condEventsToOmit <- integer()
         for(condNum in seq(sim$._conditionalEvents)) {
           cond <- sim$._conditionalEvents[[condNum]]
