@@ -732,8 +732,8 @@ setMethod(
 
     # set the options("spades.xxxPath") to the values in the sim@paths
     oldGetPaths <- getPaths()
-    suppressMessages(do.call(setPaths, sim@paths))
-    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+    do.call(setPaths, append(sim@paths, list(silent = TRUE)))
+    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
@@ -855,8 +855,8 @@ setMethod(
     stopifnot(class(sim) == "simList")
 
     oldGetPaths <- getPaths()
-    suppressMessages(do.call(setPaths, sim@paths))
-    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+    do.call(setPaths, append(list(silent = TRUE), sim@paths))
+    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     dots <- list(...)
     omitArgs <- "notOlderThan"

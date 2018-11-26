@@ -648,7 +648,8 @@ Paths <- .paths()
 #' @rdname setPaths
 #' @importFrom reproducible checkPath
 #' @importFrom R.utils getOption
-setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
+#' @param silent Logical. Should the messaging occur.
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALSE) {
   defaults <- list(
     CP = FALSE,
     IP = FALSE,
@@ -674,7 +675,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
 
   allDefault <- all(unlist(defaults))
 
-  suppressMessages(originalPaths <- .paths())
+  originalPaths <- .paths()
   options(spades.inputPath = inputPath,
           spades.modulePath = unlist(modulePath), spades.outputPath = outputPath,
           reproducible.cachePath = cachePath)
@@ -686,25 +687,28 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
     normPath(modulePath)
   }
 
-  if (!allDefault) {
-    message("Setting:\n",
-            "  options(\n",
-            if (!defaults$CP) paste0("    reproducible.cachePath = '",normPath(cachePath),"'\n"),
-            if (!defaults$IP) paste0("    spades.inputPath = '",normPath(inputPath),"'\n"),
-            if (!defaults$OP) paste0("    spades.outputPath = '",normPath(outputPath),"'\n"),
-            if (!defaults$MP) paste0("    spades.modulePath = '",modPaths,
-                                     "'\n"),
-            "  )")
+  if (!silent) {
+    if (!allDefault) {
+      message("Setting:\n",
+              "  options(\n",
+              if (!defaults$CP) paste0("    reproducible.cachePath = '",normPath(cachePath),"'\n"),
+              if (!defaults$IP) paste0("    spades.inputPath = '",normPath(inputPath),"'\n"),
+              if (!defaults$OP) paste0("    spades.outputPath = '",normPath(outputPath),"'\n"),
+              if (!defaults$MP) paste0("    spades.modulePath = '",modPaths,
+                                       "'\n"),
+              "  )")
+    }
+    if (any(unlist(defaults)))
+      message("Paths set to:\n",
+              "  options(\n",
+              "    reproducible.cachePath = '",normPath(cachePath),"'\n",
+              "    spades.inputPath = '",normPath(inputPath),"'\n",
+              "    spades.outputPath = '",normPath(outputPath),"'\n",
+              "    spades.modulePath = '",modPaths,"'\n",
+              "  )")
   }
-  message("Paths set to:\n",
-            "  options(\n",
-            "    reproducible.cachePath = '",normPath(cachePath),"'\n",
-            "    spades.inputPath = '",normPath(inputPath),"'\n",
-            "    spades.outputPath = '",normPath(outputPath),"'\n",
-            "    spades.modulePath = '",modPaths,"'\n",
-            "  )")
 
-  suppressMessages(lapply(.paths(), checkPath, create = TRUE))
+  lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
 
 }

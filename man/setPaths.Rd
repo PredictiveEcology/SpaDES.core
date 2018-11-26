@@ -15,7 +15,7 @@ getPaths()
 
 Paths
 
-setPaths(cachePath, inputPath, modulePath, outputPath)
+setPaths(cachePath, inputPath, modulePath, outputPath, silent = FALSE)
 }
 \arguments{
 \item{cachePath}{The default local directory in which to cache simulation outputs.
@@ -30,6 +30,8 @@ If not specified, defaults to \code{getOption("spades.modulePath")}.}
 
 \item{outputPath}{The default local directory in which to save simulation outputs.
 If not specified, defaults to \code{getOption("spades.outputPath")}.}
+
+\item{silent}{Logical. Should the messaging occur.}
 }
 \value{
 Returns a named list of the user's default working directories.

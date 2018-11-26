@@ -344,9 +344,9 @@ setMethod(
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
 
     # paths
-    suppressMessages(oldGetPaths <- .paths())
+    oldGetPaths <- .paths()
     do.call(setPaths, paths)
-    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
