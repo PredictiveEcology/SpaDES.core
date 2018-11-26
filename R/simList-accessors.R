@@ -2246,17 +2246,10 @@ setMethod(
       # note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
-          #obj$eventTime <- convertTimeunit(obj$eventTime, unit, sim@.xData)
-          #obj
-          #obj <- copy(sim@events) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.xData)]
           obj[]
         }
        } #else {
-    #     sim@events
-    #   }
-    # } else {
-    #   sim@events
     }
     return(obj)
 })
@@ -2306,6 +2299,61 @@ setReplaceMethod(
      }
      return(sim)
 })
+
+
+#############################
+#' @rdname simList-accessors-events
+#' @aliases simList-accessors-events
+#'
+#' @export
+setGeneric("conditionalEvents", function(sim, unit) {
+  standardGeneric("conditionalEvents")
+})
+
+#' @export
+#' @rdname simList-accessors-events
+#' @aliases simList-accessors-events
+setMethod(
+  "conditionalEvents",
+  signature = c("simList", "character"),
+  definition = function(sim, unit) {
+    if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
+      conds <- sim$._conditionalEvents
+      conds <- lapply(conds, function(x) {
+        if (is.call(x$condition)) {
+          x$condition <- deparse(x$condition);
+        } else {
+          x$condition <- as.character(x$condition);
+        }
+        x
+      })
+      obj <- rbindlist(conds)
+      if (is.na(pmatch("second", unit)) &&
+          (length(conds) > 0)) {
+        # note the above line captures empty eventTime, whereas is.na does not
+        if (any(!is.na(obj$minEventTime)) && (any(!is.na(obj$maxEventTime)))) {
+          if (!is.null(obj$minEventTime) && !is.null(obj$maxEventTime)) {
+            obj[, minEventTime := convertTimeunit(minEventTime, unit, sim@.xData)]
+            obj[, maxEventTime := convertTimeunit(maxEventTime, unit, sim@.xData)]
+            obj[]
+          }
+        }
+      }
+      return(obj)
+    } else {
+      return(NULL)
+    }
+  })
+
+#' @export
+#' @rdname simList-accessors-events
+#' @aliases simList-accessors-events
+setMethod("conditionalEvents",
+          signature = c("simList", "missing"),
+          definition = function(sim, unit) {
+            res <- conditionalEvents(sim, sim@simtimes[["timeunit"]])
+            return(res)
+          })
 
 ################################################################################
 #' @inheritParams events

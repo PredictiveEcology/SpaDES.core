@@ -356,9 +356,9 @@ scheduleEvent <- function(sim,
 
       # put new event into event queue
       if (numEvents == 0L) {
-        slot(sim, "events") <- newEventList
+        slot(sim, "events", check = FALSE) <- newEventList
       } else {
-        slot(sim, "events") <- append(sim@events, newEventList)
+        slot(sim, "events", check = FALSE) <- append(sim@events, newEventList)
         needSort <- TRUE
         if (eventTimeInSeconds>sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
@@ -400,9 +400,10 @@ scheduleEvent <- function(sim,
 #' @param maxEventTime   A numeric specifying the time after which the event should not occur,
 #'         even if the condition is met. Defaults to \code{end(sim)}
 #'
-#' @param condition A quoted expression that can be assessed after each event in the regular
-#' event queue. It can access objects in the \code{simList} by using functions of \code{sim},
-#' e.g., \code{"sim$age > 1"}
+#' @param condition A string, call or expression that will be assessed for \code{TRUE}
+#'      after each event in the regular event queue.
+#'      It can access objects in the \code{simList} by using functions of \code{sim},
+#'      e.g., \code{"sim$age > 1"}
 #'
 #' @return Returns the modified \code{simList} object, i.e., \code{sim$._conditionalEvents}
 #'
@@ -419,7 +420,7 @@ scheduleEvent <- function(sim,
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
-#' @seealso \code{\link{scheduleEvent}}
+#' @seealso \code{\link{scheduleEvent}}, \code{\link{conditionalEvents}}
 #'
 #' @author Eliot McIntire
 #'
@@ -428,9 +429,18 @@ scheduleEvent <- function(sim,
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
 #' @examples
-#' \dontrun{
-#'  sim <- scheduleConditionalEvent(x, "sim$age > 1", "firemodule", "burn") # default priority
-#' }
+#'   sim <- simInit(times = list(start = 0, end = 2))
+#'   condition <- "sim$age > 1" # provide as string
+#'   condition <- quote(sim$age > 1) # provide as a call
+#'   condition <- expression(sim$age > 1) # provide as an expression
+#'   sim <- scheduleConditionalEvent(sim, condition, "firemodule", "burn")
+#'   conditionalEvents(sim)
+#'   sim <- spades(sim) # no changes to sim$age, i.e., it is absent
+#'   events(sim) # nothing scheduled
+#'   sim$age <- 2 # change the value
+#'   sim <- spades(sim) # Run spades, the condition is now true, so event is
+#'                      #  scheduled at current time
+#'   events(sim)        # now scheduled in the normal event queue
 scheduleConditionalEvent <- function(sim,
                           condition,
                           moduleName,
@@ -469,44 +479,55 @@ scheduleConditionalEvent <- function(sim,
   if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
   if (length(condition)) {
-    if (!is.na(condition)) {
+    #if (!is.na(condition)) {
 
-      # minEventTime
-      minEventTimeInSeconds <- calculateEventTimeInSeconds(sim, minEventTime, moduleName)
-      attr(minEventTimeInSeconds, "unit") <- "second"
+    # Convert quote or "" to expression
+    if (is.call(condition)) {
+      cond <- as.expression(condition)
+    } else if (is.character(condition)) {
+      cond <- parse(text = condition)
+    } else if (is.expression(condition)) {
+      cond <- condition
+    } else {
+      stop("condition must be a character string or call or expression")
+    }
 
-      # maxEventTime
-      maxEventTimeInSeconds <- calculateEventTimeInSeconds(sim, maxEventTime, moduleName)
-      attr(maxEventTimeInSeconds, "unit") <- "second"
+    # minEventTime
+    minEventTimeInSeconds <- calculateEventTimeInSeconds(sim, minEventTime, moduleName)
+    attr(minEventTimeInSeconds, "unit") <- "second"
 
-      newEventList <- list(list(
-        condition = parse(text = condition),
-        minEventTime = minEventTimeInSeconds,
-        maxEventTime = maxEventTimeInSeconds,
-        moduleName = moduleName,
-        eventType = eventType,
-        eventPriority = eventPriority
-      ))
-      numEvents <- length(sim$._conditionalEvents)
+    # maxEventTime
+    maxEventTimeInSeconds <- calculateEventTimeInSeconds(sim, maxEventTime, moduleName)
+    attr(maxEventTimeInSeconds, "unit") <- "second"
 
-      # put new event into event queue
-      if (numEvents == 0L) {
-        sim$._conditionalEvents <- newEventList
-      } else {
-        sim$._conditionalEvents <- append(sim$._conditionalEvents, newEventList)
-        needSort <- TRUE
-        if (minEventTimeInSeconds > sim$._conditionalEvents[[numEvents]]$minEventTime) {
-          needSort <- FALSE
-        } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &
-                   eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority){
-          needSort <- FALSE
-        }
-        if (needSort) {
-          ord <- order(unlist(lapply(sim$._conditionalEvents, function(x) x$eventTime)),
-                       unlist(lapply(sim$._conditionalEvents, function(x) x$eventPriority)))
-          sim$._conditionalEvents <- sim$._conditionalEvents[ord]
-        }
+    newEventList <- list(list(
+      condition = cond,
+      minEventTime = minEventTimeInSeconds,
+      maxEventTime = maxEventTimeInSeconds,
+      moduleName = moduleName,
+      eventType = eventType,
+      eventPriority = eventPriority
+    ))
+    numEvents <- length(sim$._conditionalEvents)
+
+    # put new event into event queue
+    if (numEvents == 0L) {
+      sim$._conditionalEvents <- newEventList
+    } else {
+      sim$._conditionalEvents <- append(sim$._conditionalEvents, newEventList)
+      needSort <- TRUE
+      if (minEventTimeInSeconds > sim$._conditionalEvents[[numEvents]]$minEventTime) {
+        needSort <- FALSE
+      } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &
+                 eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority){
+        needSort <- FALSE
       }
+      if (needSort) {
+        ord <- order(unlist(lapply(sim$._conditionalEvents, function(x) x$eventTime)),
+                     unlist(lapply(sim$._conditionalEvents, function(x) x$eventPriority)))
+        sim$._conditionalEvents <- sim$._conditionalEvents[ord]
+      }
+      #      }
     }
   } else {
     warning(
@@ -711,8 +732,8 @@ setMethod(
 
     # set the options("spades.xxxPath") to the values in the sim@paths
     oldGetPaths <- getPaths()
-    suppressMessages(do.call(setPaths, sim@paths))
-    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+    do.call(setPaths, append(sim@paths, list(silent = TRUE)))
+    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
@@ -790,7 +811,7 @@ setMethod(
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
 
       # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
-      if (exists("._conditionalEvents", envir = sim)) {
+      if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
         condEventsToOmit <- integer()
         for(condNum in seq(sim$._conditionalEvents)) {
           cond <- sim$._conditionalEvents[[condNum]]
@@ -834,8 +855,8 @@ setMethod(
     stopifnot(class(sim) == "simList")
 
     oldGetPaths <- getPaths()
-    suppressMessages(do.call(setPaths, sim@paths))
-    on.exit({suppressMessages(do.call(setPaths, oldGetPaths))}, add = TRUE)
+    do.call(setPaths, append(list(silent = TRUE), sim@paths))
+    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     dots <- list(...)
     omitArgs <- "notOlderThan"
