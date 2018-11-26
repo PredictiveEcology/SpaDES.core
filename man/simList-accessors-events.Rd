@@ -8,6 +8,9 @@
 \alias{events,simList,missing-method}
 \alias{events<-}
 \alias{events<-,simList-method}
+\alias{conditionalEvents}
+\alias{conditionalEvents,simList,character-method}
+\alias{conditionalEvents,simList,missing-method}
 \alias{current}
 \alias{current,simList,character-method}
 \alias{current,simList,missing-method}
@@ -29,6 +32,12 @@ events(sim, unit)
 events(sim) <- value
 
 \S4method{events}{simList}(sim) <- value
+
+conditionalEvents(sim, unit)
+
+\S4method{conditionalEvents}{simList,character}(sim, unit)
+
+\S4method{conditionalEvents}{simList,missing}(sim, unit)
 
 current(sim, unit)
 

@@ -49,9 +49,17 @@ updating the simulation object by creating or appending to
 \code{sim$._conditionalEvents}. This is very experimental. Use with caution.
 }
 \examples{
-\dontrun{
- sim <- scheduleConditionalEvent(x, "sim$age > 1", "firemodule", "burn") # default priority
-}
+  sim <- simInit(times = list(start = 0, end = 2))
+  condition <- "sim$age > 1" # provide as string
+  condition <- quote(sim$age > 1) # provide as a call
+  sim <- scheduleConditionalEvent(sim, condition, "firemodule", "burn")
+  conditionalEvents(sim)
+  sim <- spades(sim) # no changes to sim$age, i.e., it is absent
+  events(sim) # nothing scheduled
+  sim$age <- 2 # change the value
+  sim <- spades(sim) # Run spades, the condition is now true, so event is
+                     #  scheduled at current time
+  events(sim)        # now scheduled in the normal event queue
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -59,7 +67,7 @@ Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{scheduleEvent}}
+\code{\link{scheduleEvent}}, \code{\link{conditionalEvents}}
 }
 \author{
 Eliot McIntire

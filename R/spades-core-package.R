@@ -49,6 +49,7 @@
 #'
 #'   \tabular{ll}{
 #'     \code{\link{scheduleEvent}} \tab Schedule a simulation event\cr
+#'     \code{\link{scheduleConditionalEvent}} \tab Schedule a conditional simulation event\cr
 #'     \code{removeEvent} \tab Remove an event from the simulation queue (not yet implemented)\cr
 #'   }
 #' }
