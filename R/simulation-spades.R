@@ -32,8 +32,8 @@ if (getRversion() >= "3.1.0") {
 #' @keywords internal
 #' @rdname doEvent
 #'
-doEvent <- function(sim, debug, notOlderThan) {
-  if (missing(debug)) debug <- FALSE
+doEvent <- function(sim, debug = FALSE, notOlderThan) {
+  #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
   if (class(sim) != "simList") { # faster than `is` and `inherits`
@@ -178,21 +178,7 @@ doEvent <- function(sim, debug, notOlderThan) {
             .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
                               removeOthers = FALSE)
 
-          quotedFnCall <- if (cacheIt) { # means that a module or event is to be cached
-            quote(Cache(FUN = get(moduleCall, envir = fnEnv),
-                        sim = sim,
-                        eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                        objects = moduleSpecificObjects,
-                        notOlderThan = notOlderThan,
-                        outputObjects = moduleSpecificOutputObjects,
-                        classOptions = classOptions,
-                        cacheRepo = sim@paths[["cachePath"]]))
-          } else {
-            quote(get(moduleCall,
-                      envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
-          }
           sim <- .runEvent(sim, cacheIt, debug,
-                           quotedFnCall = quotedFnCall,
                            moduleCall, fnEnv, cur, notOlderThan)
         }
       } else {
@@ -289,6 +275,8 @@ doEvent <- function(sim, debug, notOlderThan) {
 #' @param eventPriority  A numeric specifying the priority of the event.
 #'                       Lower number means higher priority.
 #'                       See \code{\link{priority}}.
+#' @param .skipChecks Logical. If \code{TRUE}, then internal checks that arguments match
+#'                    expected types are skipped. Should only be used if speed is critical.
 #'
 #' @return Returns the modified \code{simList} object.
 #'
@@ -319,13 +307,15 @@ scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
                           eventType,
-                          eventPriority = .pkgEnv$.normalVal) {
+                          eventPriority = .pkgEnv$.normalVal,
+                          .skipChecks = FALSE) {
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
 
-  if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+  if (!.skipChecks) {
+    if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
 
-  if (!is.numeric(eventTime)) {
+    if (!is.numeric(eventTime)) {
     if (is.na(eventTime)) {
       eventTime <- NA_real_
     } else {
@@ -338,9 +328,10 @@ scheduleEvent <- function(sim,
   }
   if (!is.character(eventType)) stop("eventType must be a character")
   if (!is.character(moduleName)) stop("moduleName must be a character")
-  #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
-  if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
+    #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
+    if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
+  }
   if (length(eventTime)) {
     if (!is.na(eventTime)) {
       eventTimeInSeconds <- calculateEventTimeInSeconds(sim, eventTime, moduleName)
@@ -360,9 +351,10 @@ scheduleEvent <- function(sim,
       } else {
         slot(sim, "events", check = FALSE) <- append(sim@events, newEventList)
         needSort <- TRUE
-        if (eventTimeInSeconds>sim@events[[numEvents]][[1]]) {
+        if (eventTimeInSeconds > sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
-        } else if (eventTimeInSeconds==sim@events[[numEvents]][[1]] & eventPriority>=sim@events[[numEvents]][[4]]){
+        } else if (eventTimeInSeconds == sim@events[[numEvents]][[1]] &&
+                   eventPriority >= sim@events[[numEvents]][[4]]){
           needSort <- FALSE
         }
         if (needSort) {
@@ -893,7 +885,8 @@ setMethod(
   })
 
 
-.runEvent <- function(sim, cacheIt, debug, quotedFnCall, moduleCall, fnEnv, cur, notOlderThan) {
+.runEvent <- function(sim, cacheIt, debug,
+                      moduleCall, fnEnv, cur, notOlderThan) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     moduleSpecificObjects <-
@@ -905,18 +898,34 @@ setMethod(
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])
   }
-  if (.pkgEnv[["spades.browserOnError"]]) {
-    .runEventWithBrowser(sim, quotedFnCall, moduleCall, fnEnv, cur)
+  fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
+    expression(Cache(FUN = get(moduleCall, envir = fnEnv),
+                sim = sim,
+                eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+                objects = moduleSpecificObjects,
+                notOlderThan = notOlderThan,
+                outputObjects = moduleSpecificOutputObjects,
+                classOptions = classOptions,
+                cacheRepo = sim@paths[["cachePath"]]))
   } else {
-    eval(quotedFnCall)
+    # Faster just to pass the NULL and just call it directly inside .runEvent
+    expression(get(moduleCall,
+          envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
+  }
+
+  if (.pkgEnv[["spades.browserOnError"]]) {
+    .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
+  } else {
+    #fnEnv[[moduleCall]](sim, cur[["eventTime"]], cur[["eventType"]])
+    eval(fnCallAsExpr) # slower than more direct version just above
   }
 }
 
-.runEventWithBrowser <- function(sim, quotedFnCall, moduleCall, fnEnv, cur) {
+.runEventWithBrowser <- function(sim, fnCallAsExpr, moduleCall, fnEnv, cur) {
   canContinue <- TRUE
   numTries <- 0
   while(canContinue) {
-    out <- try(eval(quotedFnCall))
+    out <- try(eval(fnCallAsExpr))
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
@@ -938,44 +947,34 @@ setMethod(
 }
 
 calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
-  if (!is.null(sim@depends@dependencies[[1]])) {
-    # first check if this moduleName matches the name of a module
-    #  with meta-data (i.e., depends(sim)@dependencies filled)
-    if (moduleName %in% unlist(lapply(sim@depends@dependencies, function(x) {
-      x@name
-    }))) {
-      # If the eventTime doesn't have units, it's a user generated
-      #  value, likely because of times in the simInit call.
-      #  This must be intercepted, and units added based on this
-      #  assumption, that the units are in \code{timeunit}
-      if (is.null(attr(eventTime, "unit"))) {
-        attributes(eventTime)$unit <- .callingFrameTimeunit(sim)
-        eventTimeInSeconds <- as.numeric(convertTimeunit((
-          eventTime -
-            convertTimeunit(sim@simtimes[["start"]],
-                            sim@simtimes[["timeunit"]], sim@.xData,
-                            skipChecks = TRUE)
-        ),
-        "seconds",
-        sim@.xData, skipChecks = TRUE) +
-          sim@simtimes[["current"]])
-      } else {
-        eventTimeInSeconds <- if (!startsWith(attr(eventTime, "unit"), "second")) {
-          as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-                                     skipChecks = TRUE))
-        } else eventTime
-      }
-    } else {
-      # for core modules because they have no metadata
-      eventTimeInSeconds <-
-        as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-                                   skipChecks = TRUE))
-    }
+  #if (!is.null(sim@depends@dependencies[[1]])) {
+  unitAttr <- attr(eventTime, "unit")
+  if (is.null(unitAttr)) {
+    attributes(eventTime)$unit <- .callingFrameTimeunit(sim)
+    eventTime <- as.numeric(convertTimeunit((
+      eventTime -
+        convertTimeunit(sim@simtimes[["start"]],
+                        sim@simtimes[["timeunit"]], sim@.xData,
+                          skipChecks = TRUE)
+      ),
+      "seconds",
+    sim@.xData, skipChecks = TRUE) +
+      sim@simtimes[["current"]])
   } else {
+    #if (!startsWith(unitAttr, "second")) {
+    if (unitAttr != "second") { # faster to do 2 sequential tests like this than !startsWith
+      if (unitAttr != "seconds") {
+        eventTime <- as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
+                                                skipChecks = TRUE))
+      }
+    }
+  } #else eventTime
+
+#} else {
     # when eventTime is NA... can't seem to get an example
-    eventTimeInSeconds <-
-      as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-                                 skipChecks = TRUE))
-  }
-  eventTimeInSeconds
+    #eventTimeInSeconds <-
+    #  as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
+    #                             skipChecks = TRUE))
+  #}
+  eventTime
 }

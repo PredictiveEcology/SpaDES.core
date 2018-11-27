@@ -199,6 +199,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   }, add = TRUE)
 
   newModule("test", tmpdir, open = FALSE)
+  newModule("test2", tmpdir, open = FALSE)
 
   sim <- simInit()
 
@@ -229,14 +230,49 @@ test_that("simulation runs with simInit with duplicate modules named", {
     switch(
       eventType,
       init = {
-        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+        sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       },
       event1 = {
-        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+        sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       })
     return(invisible(sim))
   }
   ', fill = TRUE)
+
+  cat(file = file.path(tmpdir, "test2", "test2.R"),'
+  defineModule(sim, list(
+      name = "test2",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "second",
+      citation = list("citation.bib"),
+      documentation = list("README.txt", "test2.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+      ),
+      inputObjects = bind_rows(
+      ),
+      outputObjects = bind_rows(
+      )
+  ))
+
+      doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
+      },
+      event1 = {
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
+      })
+      return(invisible(sim))
+      }
+      ', fill = TRUE)
 
   N <- 5000
 
@@ -262,10 +298,15 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
   nTimes <- 20
 
-  # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
-  # New with "seconds" -- Sept 21, 2018 is 0.492 seconds --> 98 microseconds/event
-  # New with "seconds" -- Nov 26, 2018 is 0.899 seconds --> 179 microseconds/event!
-  #system.time({spades(mySim, debug = FALSE)})
+  #######################
+  # Tested on laptop
+  #######################
+  # laptop was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
+  # laptop New with "seconds" -- Sept 21, 2018 is 0.492 seconds --> 98 microseconds/event
+  # laptop New with "seconds" -- Nov 26, 2018 is 0.458 seconds --> 92 microseconds/event!
+  # Windows Desktop -- slower -- Nov 26, 2018 0.730 Seconds --> 148 microseconds/event!
+  # Linux Server -- slower -- Nov 26, 2018 0.795 Seconds --> 159 microseconds/event!
+  # BorealCloud Server -- slower -- Nov 26, 2018 0.972 Seconds --> 194 microseconds/event!
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
@@ -274,10 +315,13 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
   #                         -- This is 161 microseconds per event
   # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
-  # New times using "second" -- Nov 26, 2018 0.511 Seconds --> 102 microseconds/event!
+  # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
+  # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
+  # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
+  # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
   options("spades.keepCompleted" = FALSE)
-  a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
-  #profvis::profvis({spades(mySim, debug = FALSE)})
+  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
 
   a <- 0
   a3 <- microbenchmark::microbenchmark(
@@ -287,6 +331,25 @@ test_that("simulation runs with simInit with duplicate modules named", {
   )
 
   summary(a2)[, "median"]/summary(a3)[, "median"]
+
+  ########################################
+  # With 2 modules, therefore sorting
+  ########################################
+  modules <- list("test", "test2")
+  mySim <- simInit(times = times, params = parameters, modules = modules,
+                   objects = objects, paths = paths)
+
+  nTimes <- 10
+  # Turn off completed list
+  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
+  options("spades.keepCompleted" = FALSE)
+  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
+
+  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
+  options("spades.keepCompleted" = TRUE)
+  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+
 })
 
 
