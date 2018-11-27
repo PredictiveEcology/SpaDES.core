@@ -5,7 +5,7 @@
 \title{Schedule a simulation event}
 \usage{
 scheduleEvent(sim, eventTime, moduleName, eventType,
-  eventPriority = .pkgEnv$.normalVal)
+  eventPriority = .pkgEnv$.normalVal, .skipChecks = FALSE)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object.}
@@ -21,6 +21,9 @@ within the module.}
 \item{eventPriority}{A numeric specifying the priority of the event.
 Lower number means higher priority.
 See \code{\link{priority}}.}
+
+\item{.skipChecks}{Logical. If \code{TRUE}, then internal checks that arguments match
+expected types are skipped. Should only be used if speed is critical.}
 }
 \value{
 Returns the modified \code{simList} object.
