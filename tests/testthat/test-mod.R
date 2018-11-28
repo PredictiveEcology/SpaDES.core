@@ -7,8 +7,6 @@ test_that("local mod object", {
   newModule("test", tmpdir, open = FALSE)
   newModule("test2", tmpdir, open = FALSE)
 
-  sim <- simInit()
-
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
   cat(file = file.path(tmpdir, "test", "test.R"),'
       defineModule(sim, list(
@@ -27,6 +25,7 @@ test_that("local mod object", {
       parameters = rbind(
       ),
       inputObjects = bind_rows(
+        expectsInput("sdf", "sdf", "sdfd")
       ),
       outputObjects = bind_rows(
       )
@@ -44,6 +43,12 @@ test_that("local mod object", {
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       })
       return(invisible(sim))
+      }
+
+      .inputObjects <- function(sim) {
+        mod$x <- "sdf"
+        return(sim)
+
       }
       ', fill = TRUE)
 
@@ -64,6 +69,7 @@ test_that("local mod object", {
       parameters = rbind(
       ),
       inputObjects = bind_rows(
+        expectsInput("sdf", "sdf", "sdfd")
       ),
       outputObjects = bind_rows(
       )
@@ -78,16 +84,59 @@ test_that("local mod object", {
       },
       event1 = {
       mod$b <- mod$a + 1
+      mod$y <- paste0(mod$y, " is test2")
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
       })
       return(invisible(sim))
       }
+      .inputObjects <- function(sim) {
+        mod$y <- "This module"
+        return(sim)
+      }
       ', fill = TRUE)
+
   mySim <- simInit(times = list(start = 0, end = 0),
                    paths = list(modulePath = tmpdir), modules = c("test", "test2"))
+
+  expect_true(mySim$test2$y == "This module")
+  out2 <- spades(Copy(mySim))
+  out3 <- Cache(spades, Copy(mySim))
+  mess <- capture_messages(out4 <- Cache(spades, Copy(mySim))) # should get cached
   out <- spades(mySim)
-  expect_true(out$test$a == 2)
-  expect_true(out$test2$a == 1)
-  expect_true(out$test2$b == 2)
+
+  # Test the results
+  expect_true(out$test$a == 2) # object that results from addition
+  expect_true(out$test2$a == 1) # object that results from addition
+  expect_true(out$test2$b == 2) # object that results from addition -- didn't collide with sim$test$a
+  expect_true(out$test$x == "sdf") # correct module, i.e., x is in test, and is sdf
+  expect_true(is.null(out$test2$x)) # wrong module, i.e., x is in test
+  expect_true(!is.null(mySim$test$x)) # .inputObjects is run
+  expect_true(!is.null(mySim$test2$y)) # .inputObjects is run
+  expect_true(out$test2$y == "This module is test2") # paste0 from .inputObjects & event1 event
+
+  # Post Copy(mySim)
+  expect_true(out2$test$a == 2)
+  expect_true(out2$test2$a == 1)
+  expect_true(out2$test2$b == 2)
+  expect_true(is.null(out2$test2$x))
+  expect_true(!is.null(out2$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out2$test2$y == "This module is test2")
+
+  # Cache -- using the first time through
+  expect_true(out3$test$a == 2)
+  expect_true(out3$test2$a == 1)
+  expect_true(out3$test2$b == 2)
+  expect_true(is.null(out3$test2$x))
+  expect_true(!is.null(out3$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out3$test2$y == "This module is test2")
+
+  # Cached copy
+  expect_true(grepl("loading cached", mess))
+  expect_true(out4$test$a == 2)
+  expect_true(out4$test2$a == 1)
+  expect_true(out4$test2$b == 2)
+  expect_true(is.null(out4$test2$x))
+  expect_true(!is.null(out4$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out4$test2$y == "This module is test2")
 
 })
