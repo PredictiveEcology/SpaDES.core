@@ -8,6 +8,7 @@ version 0.2.3.9000
 * lorem ipsum
 
 ## new features
+* New active binding, `mod` that works as a module-specific variable, similar to a private object, i.e., `mod$a` is a local object inside the module that persists across events. It is a pointer to `sim[[currentModule(sim)]]$a`
 * New function `scheduleConditionalEvent`, which allows an event to be scheduled based on a condition. Still experimental.
 * An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
 * User can now specify `modulePath` as a character vector, e.g., `simInit(..., paths = list(modulePath = c(".", "test")))`. This means that a user can organize the modules in different locations.

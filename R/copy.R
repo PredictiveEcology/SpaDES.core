@@ -39,11 +39,38 @@ setMethod("Copy",
               sim_@events <- object@events
               sim_@current <- object@current
             }
+            sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            attr(sim_@.xData, "name") <- "sim"
             if (objects) {
-              sim_@.xData <- Copy(sim_@.xData, filebackedDir = cachePath(object))
-            } else {
-              sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+              objNames <- ls(object, all.names = TRUE)
+              names(objNames) <- objNames
+              isEnv <- unlist(lapply(objNames,
+                                     function(obj) is.environment(get(obj, envir = object))))
+              list2env(mget(objNames[!isEnv], envir = object@.xData), envir = sim_@.xData)
+              list2env(lapply(objNames[isEnv], function(x) {
+                e <- new.env(parent = sim_@.xData)
+                attr(e, "name") <- x
+                e
+              }
+              ),
+              envir = sim_@.xData)
+
+              lapply(objNames[isEnv], function(en) {
+                list2env(as.list(object@.xData[[en]], all.names = TRUE),
+                         envir = sim_@.xData[[en]])
+                isFn <- unlist(lapply(ls(sim_@.xData[[en]]), function(obj)
+                  if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
+                    environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
+                  }
+                  ))
+                }
+              )
+              # list2env(Copy(mget(objNames[isEnv], envir = object@.xData), all.names = TRUE),
+              #               filebackedDir = cachePath(object),
+              #          envir = sim_@.xData)
             }
             sim_@.envir <- sim_@.xData
             return(sim_)
 })
+
+

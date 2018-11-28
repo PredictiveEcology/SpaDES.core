@@ -727,6 +727,20 @@ setMethod(
     do.call(setPaths, append(sim@paths, list(silent = TRUE)))
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
+    # Make local activeBindings to mod
+    lapply(modules(sim), function(m) {
+      makeActiveBinding(sym = "mod",
+                        fun = function(value){
+                          if (missing(value)) {
+                            get(m, envir = sim, inherits = FALSE)
+                          } else {
+                            stop("Can't overwrite mod")
+                          }
+                        },
+                        env = sim[[m]])
+
+    })
+
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
@@ -889,11 +903,14 @@ setMethod(
                       moduleCall, fnEnv, cur, notOlderThan) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    fns <- ls(fnEnv, all.names = TRUE)
     moduleSpecificObjects <-
       c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
-        ls(fnEnv, all.names = TRUE), # functions in the namespaced location
+        fns, # functions in the namespaced location
         na.omit(createsOutputs)) # objects outputted by module
-    moduleSpecificOutputObjects <- createsOutputs
+    #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
+    #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
+    moduleSpecificOutputObjects <- c(createsOutputs, cur[["moduleName"]])
     classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])
