@@ -18,7 +18,7 @@ version 0.2.3.9000
 
 ## bug fixes
 
-* several minor
+* several minor, including to `Copy` (error existed because function inheritance persisted even though the location of the function was moved)
 
 version 0.2.3
 =============
