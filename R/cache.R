@@ -74,13 +74,14 @@ setMethod(
     }
     envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
                      function(objs, name) {
-      objectsToDigest <- sort(objs, method = "radix")
-      objectsToDigest <- objectsToDigest[objectsToDigest %in%
-                                           objects[[name]]]
-      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[name]]),
-                    quick = quick,
-                    length = length)
-    })
+                       objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "mod")]
+                       objectsToDigest <- sort(objs, method = "radix")
+                       objectsToDigest <- objectsToDigest[objectsToDigest %in%
+                                                            objects[[name]]]
+                       .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[name]]),
+                                     quick = quick,
+                                     length = length)
+                     })
     #names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
     envirHash <- envirHash[lens]
