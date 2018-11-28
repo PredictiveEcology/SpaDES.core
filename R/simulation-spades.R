@@ -727,20 +727,6 @@ setMethod(
     do.call(setPaths, append(sim@paths, list(silent = TRUE)))
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
-    # Make local activeBindings to mod
-    lapply(modules(sim), function(m) {
-      makeActiveBinding(sym = "mod",
-                        fun = function(value){
-                          if (missing(value)) {
-                            get(m, envir = sim, inherits = FALSE)
-                          } else {
-                            stop("Can't overwrite mod")
-                          }
-                        },
-                        env = sim[[m]])
-
-    })
-
     sim@.xData[["._startClockTime"]] <- Sys.time()
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-

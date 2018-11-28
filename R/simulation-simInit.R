@@ -570,6 +570,20 @@ setMethod(
       sim <- .checkObjectSynonyms(sim)
     }
 
+    # Make local activeBindings to mod
+    lapply(modules, function(mod) {
+      makeActiveBinding(sym = "mod",
+                        fun = function(value){
+                          if (missing(value)) {
+                            get(mod, envir = sim, inherits = FALSE)
+                          } else {
+                            stop("Can't overwrite mod")
+                          }
+                        },
+                        env = sim[[mod]])
+
+    })
+
     ## load user-defined modules
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]
