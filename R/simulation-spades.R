@@ -180,6 +180,25 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
           sim <- .runEvent(sim, cacheIt, debug,
                            moduleCall, fnEnv, cur, notOlderThan)
+
+          if (!exists(cur[["moduleName"]], envir = sim, inherits = FALSE))
+            stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
+                           "name from from the simList. ",
+                           "Please remove the section of code that does this in the event named: ",
+                           cur[["eventType"]])
+
+          if (!is.environment(get(cur[["moduleName"]], envir = sim)))
+            stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
+                 "name from from the simList. ",
+                 "Please remove the section of code that does this in the event named: ",
+                 cur[["eventType"]])
+
+          if (!exists("mod", envir = sim[[cur[["moduleName"]]]], inherits = FALSE))
+            stop("The module named ", cur[["moduleName"]], " just deleted the object named 'mod' from sim$",
+                 cur[["moduleName"]],". ",
+                 "Please remove the section of code that does this in the event named: ",
+                 cur[["eventType"]])
+
         }
       } else {
         stop(
