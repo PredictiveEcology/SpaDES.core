@@ -62,12 +62,28 @@ setMethod("Copy",
                   if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
                     environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
                   }
-                  ))
+                ))
+              })
+
+              # Deal with activeBinding for mod
+              lapply(objNames[isEnv], function(en) {
+                if (exists("mod", object[[en]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object[[en]])) {
+                    rm(list = "mod", envir = sim_[[en]])
+                    makeActiveBinding(sym = "mod",
+                                      fun = function(value){
+                                        if (missing(value)) {
+                                          get(en, envir = sim_, inherits = FALSE)
+                                        } else {
+                                          stop("Can't overwrite mod")
+                                        }
+                                      },
+                                      env = sim_[[en]])
+                  }
                 }
-              )
-              # list2env(Copy(mget(objNames[isEnv], envir = object@.xData), all.names = TRUE),
-              #               filebackedDir = cachePath(object),
-              #          envir = sim_@.xData)
+
+              })
+
             }
             sim_@.envir <- sim_@.xData
             return(sim_)
