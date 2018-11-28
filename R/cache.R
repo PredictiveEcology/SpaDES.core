@@ -37,7 +37,8 @@ setMethod(
                         quick, classOptions) {
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
-    moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.xData)
+    moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))],
+                         envir = object@.xData)
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
     allObjsInSimList <- append(list(".xData" = outerObjs), moduleObjs)
     allEnvsInSimList <- append(list(object@.xData), moduleEnvirs)
@@ -45,6 +46,7 @@ setMethod(
     ord <- .orderDotsUnderscoreFirst(allObjsInSimList)
     allObjsInSimList <- allObjsInSimList[ord]
     allEnvsInSimList <- allEnvsInSimList[ord]
+    names(allEnvsInSimList) <- names(allObjsInSimList)
 
     isObjectEmpty <- if (!missing(objects)) {
       if (!is.null(objects)) {
@@ -70,15 +72,16 @@ setMethod(
     } else {
       objects <- allObjsInSimList
     }
-    envirHash <- lapply(seq(allObjsInSimList), function(objs) {
-      objectsToDigest <- sort(allObjsInSimList[[objs]], method = "radix")
+    envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
+                     function(objs, name) {
+      objectsToDigest <- sort(objs, method = "radix")
       objectsToDigest <- objectsToDigest[objectsToDigest %in%
-                                           objects[[names(allObjsInSimList)[objs]]]]
-      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]),
+                                           objects[[name]]]
+      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[name]]),
                     quick = quick,
                     length = length)
     })
-    names(envirHash) <- names(allObjsInSimList)
+    #names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
     envirHash <- envirHash[lens]
 
@@ -341,6 +344,7 @@ setMethod(
                     algo = dots$algo,
                     quick = dots$quick,
                     classOptions = dots$classOptions)
+
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
@@ -349,7 +353,9 @@ setMethod(
       } else {
         which(internalSimList)
       }
-      isNewObj <- !names(postDigest$.list[[whSimList2]]) %in% names(preDigest[[whSimList]]$.list[[whSimList2]])
+
+      isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
+        names(preDigest[[whSimList]]$.list[[whSimList2]])
       newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
       newObjs <- newObjs[!startsWith(newObjs, "._")]
       existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
@@ -436,9 +442,10 @@ setMethod(
         #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
 
-        hasCurrModule <- currentModule(tmpl[[whSimList]])
+        currModules <- currentModule(tmpl[[whSimList]])
         # Convert to numeric index, as some modules don't have names
-        hasCurrModule <- match(hasCurrModule, modules(tmpl[[whSimList]]))
+        hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
+        if (length(currModules) == 0) currModules <- modules(tmpl[[whSimList]])
 
         createOutputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
@@ -448,8 +455,9 @@ setMethod(
           unique(unlist(aa))
         }
         createOutputs <- na.omit(createOutputs)
+        createOutputs <- c(createOutputs, currModules) # add the environments for each module - allow local objects
         # take only the ones that the file changed, based on attr(object, ".Cache")$changed
-        createOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+        changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
         expectsInputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
@@ -461,14 +469,9 @@ setMethod(
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.xData, all.names = TRUE)
-        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs | lsObjectEnv %in% expectsInputs],
+        list2env(mget(lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs],
                       envir = object@.xData), envir = object2@.xData)
         if (length(object2@current)==0) { # means it is not in a spades call
-          # numCompleted <- if (length(object2@completed)) {
-          #   length(unlist(object2@completed, recursive = FALSE))/(length(object2@completed[[1]]))
-          # } else {
-          #   0
-          # }
           object2@completed <- object@completed
         }
         if (NROW(current(object2)) == 0) {
