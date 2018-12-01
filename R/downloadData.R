@@ -33,7 +33,8 @@ setMethod(
   signature = c(objectName = "character", sim = "missing"),
   definition = function(objectName, sim, module) {
     i <- 0
-    while (missing(sim) && i < length(sys.calls())) {
+    lenSC <- length(sys.calls())
+    while (missing(sim) && i < lenSC) {
       i <- i + 1
       simEnv <- whereInStack("sim", -i)
       sim <- simEnv$sim

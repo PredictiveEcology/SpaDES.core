@@ -106,14 +106,24 @@ setMethod(
   definition = function(sim, modules, defineModuleElement, envir = NULL) {
     out <- list()
 
+    simMods <- modules(sim)
 
     for (j in seq_along(modules)) {
       m <- modules[[j]][1]
       mBase <- basename(m)
 
+      whModule <- simMods %in% m
+      filePath <- names(simMods)[whModule]
+
       # the module may not have absolute path, i.e., including the correct modulePath
       #  Check first if it is there for speed, then if not, try file.exists (slow)
-      filename <- file.path(m, paste0(mBase, ".R"))
+      filename <- if (length(filePath) == 0) {
+        # the module may not have absolute path, i.e., including the correct modulePath
+        #  Check first if it is there for speed, then if not, try file.exists (slow)
+        file.path(m, paste0(mBase, ".R"))
+      } else {
+        file.path(filePath, paste0(mBase, ".R"))
+      }
       if (length(sim@paths$modulePath) > 1) {
         hasFullModulePath <- unlist(lapply(sim@paths$modulePath,
                                            function(mp) startsWith(prefix = mp, m)))
