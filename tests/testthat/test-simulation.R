@@ -842,3 +842,45 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   expect_true(test1 || test2)
 
 })
+
+
+test_that("simInitAndSpades", {
+  testInitOut <- testInit(opts = list("spades.moduleCodeChecks" = FALSE))
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  set.seed(42)
+
+  times <- list(start = 0.0, end = 0, timeunit = "year")
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+  )
+  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  set.seed(123)
+  mySim <- simInitAndSpades(times = times, params = params,
+                 modules = modules, objects = list(), paths = paths, debug = FALSE)
+
+  set.seed(123)
+  mySim2 <- simInit(times = times, params = params,
+                 modules = modules, objects = list(), paths = paths) %>%
+    spades(debug = FALSE)
+
+  expect_true(all.equal(mySim, mySim2))
+
+  set.seed(123)
+  mySim <- simInitAndExperiment(times = times, params = params,
+                            modules = modules, objects = list(), paths = paths, debug = FALSE)
+
+  set.seed(123)
+  mySim2 <- simInit(times = times, params = params,
+                    modules = modules, objects = list(), paths = paths) %>%
+    experiment(debug = FALSE)
+
+  expect_true(all.equal(mySim, mySim2))
+
+})

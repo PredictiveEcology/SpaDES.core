@@ -862,15 +862,16 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                              .plotInitialTime, .saveInitialTime, ...) {
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
-  scalls <- sys.calls()
-  objsAll <- mget(ls(), envir = environment())
-  objsAll <- objsAll[!objsAll=="..."]
+  lsAllNames <- ls(all.names = TRUE)
+  lsAllNames <- lsAllNames[lsAllNames != "..."]
+
+  objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndSpades", ...)
+  sim <- do.call(simInit, objsSimInit)
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
-  sim <- do.call(spades, objsSpades)#AndX(scalls, "simInitAndSpades", ...)
+  sim <- do.call(spades, objsSpades)
 
 }
 
@@ -890,8 +891,11 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                  dirPrefix, substrLength, saveExperiment,
                                  experimentFile, clearSimEnv, cl, ...)  {
   list2env(list(...), envir = environment())
-  objsAll <- mget(ls(all.names = TRUE), envir = environment())
-  objsAll <- objsAll[!names(objsAll)=="..."]
+  lsAllNames <- ls(all.names = TRUE)
+  lsAllNames <- lsAllNames[lsAllNames != "..."]
+
+  objsAll <- mget(lsAllNames, envir = environment())
+
   objsSimInit <- objsAll[formalArgs(simInit)]
   sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
 
