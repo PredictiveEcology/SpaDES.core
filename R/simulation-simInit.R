@@ -1029,6 +1029,8 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
       if (isTRUE(cacheIt)) {
         message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
+
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {

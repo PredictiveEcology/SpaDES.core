@@ -50,11 +50,8 @@
                     fun = function() {
                       SpaDES.core:::.paths()
                     },
-                    #env = as.environment("package:SpaDES.core")
                     env = pkgEnv
   )
-  #lockBinding("Paths", as.environment("package:SpaDES.core"))
-  #lockBinding("Paths", pkgEnv)
 
   invisible()
 }
