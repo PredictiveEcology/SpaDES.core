@@ -43,6 +43,19 @@
   }
   .pkgEnv[["unitConversions"]] <- as.matrix(as.data.frame(bbs))
 
+  # Create active binding for "Paths"
+  pkgEnv <- parent.env(environment())
+  rm("Paths", envir = pkgEnv)
+  makeActiveBinding(sym = "Paths",
+                    fun = function() {
+                      SpaDES.core:::.paths()
+                    },
+                    #env = as.environment("package:SpaDES.core")
+                    env = pkgEnv
+  )
+  #lockBinding("Paths", as.environment("package:SpaDES.core"))
+  #lockBinding("Paths", pkgEnv)
+
   invisible()
 }
 
@@ -58,13 +71,26 @@
       "To change these, use setPaths(...); see ?setPaths"
     )
   }
+  #unlockBinding("Paths", as.environment("package:SpaDES.core"))
+  # rm("Paths", envir = as.environment("package:SpaDES.core"))
+  # makeActiveBinding(sym = "Paths",
+  #                   fun = function() {
+  #                     SpaDES.core:::.paths()
+  #                   },
+  #                   env = as.environment("package:SpaDES.core")
+  #                   #env = environment()#"package:SpaDES.core")
+  # )
+  # #lockBinding("Paths", as.environment("package:SpaDES.core"))
 
-  rm("Paths", envir = as.environment("package:SpaDES.core"))
-  makeActiveBinding(sym = "Paths",
-                    fun = .paths,
-                    env = as.environment("package:SpaDES.core")
-  )
-  lockBinding("Paths", as.environment("package:SpaDES.core"))
+  # rm("Paths", envir = as.environment("package:SpaDES.core"))
+  # makeActiveBinding(sym = "Paths",
+  #                   fun = function() {
+  #                     .paths()
+  #                   },
+  #                   env = as.environment("package:SpaDES.core")
+  # )
+  # lockBinding("Paths", as.environment("package:SpaDES.core"))
+
 }
 
 .onUnload <- function(libpath) {
