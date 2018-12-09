@@ -235,6 +235,27 @@ test_that("timeunits with child and parent modules work correctly", {
 
   cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
+  expect_error(
+    mySim <- simInit(modules = list(modName),
+                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                     params = list("child6" = list(.useCache = ".inputObjects")))
+  )
+
+
+  xxx1 <- c(xxx[seq(lineOfInterest1 - 1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
+            xxx[seq(length(xxx) - lineOfInterest1) + lineOfInterest1])
+  cat(xxx1, file = fileName, sep = "\n")
+
+  lineOfInterest <- grep(xxx1, pattern = ".inputObjects <- ")
+  xxx1 <- c(xxx1[seq(lineOfInterest - 1)],
+            "  .inputObjects <- function(sim) {",
+            "  a = asPath(file.path(inputPath(sim), \"test\")) ",
+            "  sim$b <- a",
+            xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
+  cat(xxx1, file = fileName, sep = "\n")
+
+  cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
+  try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),

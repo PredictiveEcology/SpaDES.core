@@ -352,7 +352,7 @@ setMethod(
       whSimList2 <- if (is.null(internalSimList)) {
         1
       } else {
-        which(internalSimList)
+        which(internalSimList)[1] # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
       }
 
       isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%

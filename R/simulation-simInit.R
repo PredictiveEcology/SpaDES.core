@@ -1029,6 +1029,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
       if (isTRUE(cacheIt)) {
         message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+        moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
 
 
@@ -1046,6 +1047,9 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
         if (!is.null(.inputObjects)) {
           args <- as.list(formals(.inputObjects))
           env <- environment()
+          if (!isTRUE(names(args) %in% "sim"))
+            stop("The .inputObjects can only have a single argument, specifically 'sim'. ",
+                 "Currently, ", mBase, " has others")
           args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
           args[["sim"]] <- sim
 
@@ -1057,7 +1061,8 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                              moduleSpecificInputObjects[inSimList])
           }
 
-          sim <- Cache(FUN = do.call, .inputObjects, args,
+          #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
+          sim <- Cache(.inputObjects, sim,
                        objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
