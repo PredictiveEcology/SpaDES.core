@@ -867,11 +867,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit, quote = TRUE)
+  sim <- do.call(simInit, objsSimInit)
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
-  sim <- do.call(spades, objsSpades, quote = TRUE)
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
+  sim <- do.call(spades, objsSpades)
 
 }
 
@@ -897,12 +897,12 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit, quote = TRUE)#AndX(scalls, "simInitAndExperiment", ...)
+  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
 
   experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
   objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
 
   # Because there are some arguments in BOTH simInit and Experiment, can't pass them
   #  through, because they have different meaning
@@ -910,7 +910,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   onlyInSpades <- setdiff(names(objsSpades), names(objsExperiment))
   if (length(onlyInSpades))
     objsExperiment[onlyInSpades] <- objsSpades[onlyInSpades]
-  sims <- do.call(experiment, objsExperiment, quote = TRUE)#AndX(scalls, "simInitAndExperiment", ...)
+  sims <- do.call(experiment, objsExperiment)#AndX(scalls, "simInitAndExperiment", ...)
 
   return(sims)
 }
