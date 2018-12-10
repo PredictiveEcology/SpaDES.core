@@ -728,7 +728,7 @@ setMethod(
     #   environment.
     li$objects <- .findObjects(objects)
     names(li$objects) <- objects
-    sim <- do.call("simInit", args = li)
+    sim <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -759,7 +759,7 @@ setMethod(
     li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
     names(li) <- names(match.call())[-1]
     li$modules <- as.list(modules)
-    sim <- do.call("simInit", args = li)
+    sim <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
   }
@@ -831,7 +831,7 @@ setMethod(
            c(" It is", " They are")[plural], " expected to be ",
            paste(expectedDF[!correctArgs], collapse = ", "))
     }
-    sim <- do.call("simInit", args = li)
+    sim <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -867,11 +867,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)
+  sim <- do.call(simInit, objsSimInit, quote = TRUE)
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
-  sim <- do.call(spades, objsSpades)
+  sim <- do.call(spades, objsSpades, quote = TRUE)
 
 }
 
@@ -897,7 +897,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
+  sim <- do.call(simInit, objsSimInit, quote = TRUE)#AndX(scalls, "simInitAndExperiment", ...)
 
   experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
   objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
@@ -910,7 +910,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   onlyInSpades <- setdiff(names(objsSpades), names(objsExperiment))
   if (length(onlyInSpades))
     objsExperiment[onlyInSpades] <- objsSpades[onlyInSpades]
-  sims <- do.call(experiment, objsExperiment)#AndX(scalls, "simInitAndExperiment", ...)
+  sims <- do.call(experiment, objsExperiment, quote = TRUE)#AndX(scalls, "simInitAndExperiment", ...)
 
   return(sims)
 }

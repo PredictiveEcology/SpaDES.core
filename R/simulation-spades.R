@@ -878,7 +878,7 @@ setMethod(
 
     if (cache) {
       return(
-        do.call(Cache,
+        do.call(quote = TRUE, Cache,
                 args = append(list(
                   spades,
                   sim = sim,
