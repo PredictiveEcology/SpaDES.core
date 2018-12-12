@@ -867,7 +867,24 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)
+  isMissing <- unlist(lapply(objsSimInit, is, "name"))
+
+  objsSimInit[isMissing] <- NULL
+  if (isMissing["times"]) objsSimInit$times <- list(start = 0, end = 10)
+  if (isMissing["params"]) objsSimInit$params <- list()
+  if (isMissing["modules"]) objsSimInit$modules <- list()
+  if (isMissing["objects"]) objsSimInit$objects <- list()
+  if (isMissing["paths"]) objsSimInit$paths <- suppressMessages(.paths())
+  if (isMissing["inputs"]) objsSimInit$inputs <- as.data.frame(NULL)
+  if (isMissing["outputs"]) objsSimInit$outputs <- as.data.frame(NULL)
+  if (isMissing["loadOrder"]) objsSimInit$loadOrder <- character(0)
+
+  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+                 modules = objsSimInit$modules, objects = objsSimInit$objects,
+                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+                 notOlderThan = objsSimInit$notOlderThan)
+  #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
@@ -897,7 +914,25 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
+
+  isMissing <- unlist(lapply(objsSimInit, is, "name"))
+
+  objsSimInit[isMissing] <- NULL
+  if (isMissing["times"]) objsSimInit$times <- list(start = 0, end = 10)
+  if (isMissing["params"]) objsSimInit$params <- list()
+  if (isMissing["modules"]) objsSimInit$modules <- list()
+  if (isMissing["objects"]) objsSimInit$objects <- list()
+  if (isMissing["paths"]) objsSimInit$paths <- suppressMessages(.paths())
+  if (isMissing["inputs"]) objsSimInit$inputs <- as.data.frame(NULL)
+  if (isMissing["outputs"]) objsSimInit$outputs <- as.data.frame(NULL)
+  if (isMissing["loadOrder"]) objsSimInit$loadOrder <- character(0)
+
+  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+                 modules = objsSimInit$modules, objects = objsSimInit$objects,
+                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+                 notOlderThan = objsSimInit$notOlderThan)
+  #sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
 
   experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
   objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
