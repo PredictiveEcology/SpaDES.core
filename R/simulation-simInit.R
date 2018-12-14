@@ -759,7 +759,24 @@ setMethod(
     li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
     names(li) <- names(match.call())[-1]
     li$modules <- as.list(modules)
-    sim <- do.call("simInit", args = li, quote = TRUE)
+
+    isMissing <- unlist(lapply(li, is, "name"))
+
+    li[isMissing] <- NULL
+    if (isMissing["times"]) li$times <- list(start = 0, end = 10)
+    if (isMissing["params"]) li$params <- list()
+    if (isMissing["modules"]) li$modules <- list()
+    if (isMissing["objects"]) li$objects <- list()
+    if (isMissing["paths"]) li$paths <- suppressMessages(.paths())
+    if (isMissing["inputs"]) li$inputs <- as.data.frame(NULL)
+    if (isMissing["outputs"]) li$outputs <- as.data.frame(NULL)
+    if (isMissing["loadOrder"]) li$loadOrder <- character(0)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
 
     return(invisible(sim))
   }
