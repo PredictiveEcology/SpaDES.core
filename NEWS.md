@@ -15,6 +15,7 @@ version 0.2.3.9000
 * `modulePath` now has a new argument, `module`, where user can specify (a) specific module(s)'s path. Modifications were implemented to `dataPath` to utilize this new feature
 * `simInit` and `spades` now call `setPaths(paths)` or `setPaths(sim$paths)`, unsetting them `on.exit` internally to make the paths used for functions e.g., `reproducible::Cache` to use the correct path
 * under-the-hood speed improvements for the DES (about 20% faster) -- 38 microseconds per event under ideal conditions
+* improved default path settings in `.inputObjects` (#83)
 
 ## bug fixes
 
