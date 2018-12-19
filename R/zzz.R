@@ -47,9 +47,7 @@
   pkgEnv <- parent.env(environment())
   rm("Paths", envir = pkgEnv)
   makeActiveBinding(sym = "Paths",
-                    fun = function() {
-                      SpaDES.core:::.paths()
-                    },
+                    fun = function() .paths(),
                     env = pkgEnv
   )
 
