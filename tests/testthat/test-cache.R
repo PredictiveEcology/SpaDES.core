@@ -226,8 +226,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(all(grepl("Using or creating cached copy|module code|Setting|Paths", mess1)))
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Using cached copy|module code")
-
+                 regexp = "Using or creating cached copy|Using cached copy|module code|Setting|Paths")
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -238,7 +237,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|module code|Setting|Paths",
+                 regexp = "Using or creating cached copy|module code|Setting|Paths|dataPath",
                  all = TRUE)
   expect_message(do.call(simInit, args),
                  regexp = "Using or creating cached copy|loading cached result|module code|Setting|Paths",
