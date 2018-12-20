@@ -731,7 +731,6 @@ setMethod(
     names(li$objects) <- objects
 
     li <- .fillInSimInit(li, namesMatchCall)
-    browser(expr = exists("aaaa"))
 
     sim <- simInit(times = li$times, params = li$params,
                    modules = li$modules, objects = li$objects,
@@ -775,7 +774,6 @@ setMethod(
 
     li <- .fillInSimInit(li, namesMatchCall)
 
-    browser(expr = exists("aaaa"))
     sim <- simInit(times = li$times, params = li$params,
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
@@ -812,7 +810,6 @@ setMethod(
     namesMatchCall <- names(match.call())
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
-    browser(expr = exists("aaaa"))
 
     li <- .fillInSimInit(li, namesMatchCall)
 
@@ -847,8 +844,6 @@ setMethod(
            c(" It is", " They are")[plural], " expected to be ",
            paste(expectedDF[!correctArgs], collapse = ", "))
     }
-
-    browser(expr = exists("aaaa"))
 
     sim <- simInit(times = li$times, params = li$params,
                    modules = li$modules, objects = li$objects,
@@ -896,7 +891,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   namesMatchCall <- names(match.call())
   objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
 
-  browser()
   sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
                  modules = objsSimInit$modules, objects = objsSimInit$objects,
                  paths = objsSimInit$paths, inputs = objsSimInit$inputs,
@@ -934,7 +928,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsSimInit <- objsAll[formalArgs(simInit)]
 
 
-  browser()
   namesMatchCall <- names(match.call())
   objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
 
@@ -1147,7 +1140,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 .notOlderThanDefault <- function() NULL
 
 .fillInSimInit <- function(li, namesMatchCall) {
-  browser(expr = exists("aaaa"))
+
   isMissing <- !formalArgs(simInit) %in% namesMatchCall[-1]
   formalsTF <- formalArgs(simInit)
 

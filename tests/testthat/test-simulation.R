@@ -529,7 +529,7 @@ test_that("conflicting function types", {
 
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
-  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1]
   cat(xxx[1:(lineWithInputObjects-1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
@@ -640,7 +640,7 @@ test_that("messaging with multiple modules", {
   lineWithInit <- grep(xxx[[1]], pattern = "^Init")
   lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
-  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")[1]
 
   xxx1 <- list()
   #lapply(seq(m), function(yy) sample(c("character", "numeric", "logical"), size = 3, replace = TRUE))
