@@ -189,7 +189,6 @@ test_that("simulation runs with simInit with duplicate modules named", {
   expect_true(length(modules(mySim)) == length(unique(modules)))
 })
 
-
 test_that("simulation runs with simInit with duplicate modules named", {
   skip("benchmarking DES")
 
@@ -349,9 +348,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
   options("spades.keepCompleted" = TRUE)
   (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-
 })
-
 
 test_that("conflicting function types", {
   testInitOut <- testInit(smcc = TRUE)
@@ -361,10 +358,9 @@ test_that("conflicting function types", {
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)
-  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  fileName <- file.path(m, paste0(m, ".R")) # child4/child4.R"
   xxx <- readLines(fileName)
   lineWithInit <- grep(xxx, pattern = "^Init")
-
 
   xxx1 <- gsub(xxx, pattern = 'plotFun', replacement = 'Plot') # nolint
   cat(xxx1, file = fileName, sep = "\n")
@@ -504,7 +500,11 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-    pattern = c(paste0(m, ": module code: b is declared in outputObjects|child4: module code: a is declared in inputObjects|Running .input|Setting|Paths")))))
+    pattern = c(paste0(m, ": module code: b is declared in outputObjects|",
+                       m, ": module code: a is declared in inputObjects|",
+                       "Running .inputObjects|",
+                       "Setting:|Paths set to:|",
+                       m, ": using dataPath")))))
 
   # assign to sim for functions like scheduleEvent
   lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
@@ -536,13 +536,13 @@ test_that("conflicting function types", {
       expectsInput('ei3', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co2', 'numeric', ''),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx[(lineWithOutputObjects+1):lineWithInit], "
+      xxx[(lineWithOutputObjects + 1):lineWithInit], "
       a <- sim$b
       sim$g <- f
       holy(sim$co4) <- f
@@ -553,7 +553,7 @@ test_that("conflicting function types", {
       xx <- c(1,2)
       xx[sim$ei4] <- NA
       ",
-      xxx[(lineWithInit+1):lineWithDotInputObjects], "
+      xxx[(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
       sim$g <- 1
       sim$ei1 <- 4
@@ -562,7 +562,7 @@ test_that("conflicting function types", {
       sim$co1 <- 123
       aaa <- sim$.userSuppliedObjNames # in the ignoreObjects
       ",
-      xxx[(lineWithDotInputObjects+1):length(xxx)],
+      xxx[(lineWithDotInputObjects + 1):length(xxx)],
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
@@ -590,10 +590,7 @@ test_that("conflicting function types", {
   #   }
   #   expect_true(theGrep)
   # }
-
-
 })
-
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
   testInitOut <- testInit(smcc = TRUE)
