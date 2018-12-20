@@ -760,6 +760,13 @@ setMethod(
       if (!.pkgEnv[["skipNamespacing"]])
         .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
       rm(".timeunits", envir = sim@.xData)
+      if (isTRUE(getOption("spades.saveSimOnExit", FALSE)))
+        if (isTRUE(.pkgEnv$.cleanEnd)) {
+          rm(list = ".sim", envir = .pkgEnv)
+        } else{
+          message("Because of a failed spades call, the sim object at the time of failure ",
+                  "was saved in SpaDES.core:::.pkgEnv$.sim . It will be deleted on next call to spades")
+        }
     }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {
@@ -818,8 +825,13 @@ setMethod(
 
     sim@.xData[["._firstEventClockTime"]] <- Sys.time()
 
+    saveSimOnExit <- getOption("spades.saveSimOnExit", FALSE)
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+      if (saveSimOnExit) {
+        .pkgEnv$.sim <- sim
+      }
+
 
       # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
       if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
@@ -846,6 +858,9 @@ setMethod(
       }
     }
     sim@simtimes[["current"]] <- sim@simtimes[["end"]]
+
+    # For determining if clean ending to spades call
+    .pkgEnv$.cleanEnd <- TRUE
     return(invisible(sim))
   })
 
