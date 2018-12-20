@@ -223,7 +223,7 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
   mess1 <- capture_messages(do.call(simInit, args))
-  expect_true(all(grepl("Using or creating cached copy|module code|Setting|Paths", mess1)))
+  expect_true(all(grepl("Using or creating cached copy|module code|Setting|Paths|using dataPath", mess1)))
 
   expect_message(do.call(simInit, args),
                  regexp = "Using or creating cached copy|Using cached copy|module code|Setting|Paths")
