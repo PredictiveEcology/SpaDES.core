@@ -721,14 +721,25 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
     #   in the environment of the parents of that call, and pass them to new
     #   environment.
     li$objects <- .findObjects(objects)
     names(li$objects) <- objects
-    sim <- do.call("simInit", args = li, quote = TRUE)
+
+    li <- .fillInSimInit(li, namesMatchCall)
+    browser(expr = exists("aaaa"))
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
+
+    # sim <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -756,22 +767,15 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
     li$modules <- as.list(modules)
 
-    isMissing <- unlist(lapply(li, is, "name"))
+    li <- .fillInSimInit(li, namesMatchCall)
 
-    li[isMissing] <- NULL
-    if (isMissing["times"]) li$times <- list(start = 0, end = 10)
-    if (isMissing["params"]) li$params <- list()
-    if (isMissing["modules"]) li$modules <- list()
-    if (isMissing["objects"]) li$objects <- list()
-    if (isMissing["paths"]) li$paths <- suppressMessages(.paths())
-    if (isMissing["inputs"]) li$inputs <- as.data.frame(NULL)
-    if (isMissing["outputs"]) li$outputs <- as.data.frame(NULL)
-    if (isMissing["loadOrder"]) li$loadOrder <- character(0)
-
+    browser(expr = exists("aaaa"))
     sim <- simInit(times = li$times, params = li$params,
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
@@ -805,17 +809,12 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
+    browser(expr = exists("aaaa"))
 
-    if (missing(times)) li$times <- list(start = 0, end = 10)
-    if (missing(params)) li$params <- list()
-    if (missing(modules)) li$modules <- list()
-    if (missing(objects)) li$objects <- list()
-    if (missing(paths)) li$paths <- suppressMessages(.paths())
-    if (missing(inputs)) li$inputs <- as.data.frame(NULL)
-    if (missing(outputs)) li$outputs <- as.data.frame(NULL)
-    if (missing(loadOrder)) li$loadOrder <- character(0)
+    li <- .fillInSimInit(li, namesMatchCall)
 
     expectedClasses <- c("list",
                          "list",
@@ -848,7 +847,16 @@ setMethod(
            c(" It is", " They are")[plural], " expected to be ",
            paste(expectedDF[!correctArgs], collapse = ", "))
     }
-    sim <- do.call("simInit", args = li, quote = TRUE)
+
+    browser(expr = exists("aaaa"))
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
+
+    # sim2 <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -884,18 +892,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  isMissing <- unlist(lapply(objsSimInit, is, "name"))
 
-  objsSimInit[isMissing] <- NULL
-  if (isMissing["times"]) objsSimInit$times <- list(start = 0, end = 10)
-  if (isMissing["params"]) objsSimInit$params <- list()
-  if (isMissing["modules"]) objsSimInit$modules <- list()
-  if (isMissing["objects"]) objsSimInit$objects <- list()
-  if (isMissing["paths"]) objsSimInit$paths <- suppressMessages(.paths())
-  if (isMissing["inputs"]) objsSimInit$inputs <- as.data.frame(NULL)
-  if (isMissing["outputs"]) objsSimInit$outputs <- as.data.frame(NULL)
-  if (isMissing["loadOrder"]) objsSimInit$loadOrder <- character(0)
+  namesMatchCall <- names(match.call())
+  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
 
+  browser()
   sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
                  modules = objsSimInit$modules, objects = objsSimInit$objects,
                  paths = objsSimInit$paths, inputs = objsSimInit$inputs,
@@ -932,17 +933,10 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
   objsSimInit <- objsAll[formalArgs(simInit)]
 
-  isMissing <- unlist(lapply(objsSimInit, is, "name"))
 
-  objsSimInit[isMissing] <- NULL
-  if (isMissing["times"]) objsSimInit$times <- list(start = 0, end = 10)
-  if (isMissing["params"]) objsSimInit$params <- list()
-  if (isMissing["modules"]) objsSimInit$modules <- list()
-  if (isMissing["objects"]) objsSimInit$objects <- list()
-  if (isMissing["paths"]) objsSimInit$paths <- suppressMessages(.paths())
-  if (isMissing["inputs"]) objsSimInit$inputs <- as.data.frame(NULL)
-  if (isMissing["outputs"]) objsSimInit$outputs <- as.data.frame(NULL)
-  if (isMissing["loadOrder"]) objsSimInit$loadOrder <- character(0)
+  browser()
+  namesMatchCall <- names(match.call())
+  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
 
   sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
                  modules = objsSimInit$modules, objects = objsSimInit$objects,
@@ -1139,4 +1133,39 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
   sim@current <- list()
   return(sim)
+}
+
+
+.timesDefault <- function() list(start = 0, end = 10)
+.paramsDefault <- function() list()
+.modulesDefault <- function() list()
+.objectsDefault <- function() list()
+.pathsDefault <- function() suppressMessages(.paths())
+.inputsDefault <- function() as.data.frame(NULL)
+.outputsDefault <- function() as.data.frame(NULL)
+.loadOrderDefault <- function() character(0)
+.notOlderThanDefault <- function() NULL
+
+.fillInSimInit <- function(li, namesMatchCall) {
+  browser(expr = exists("aaaa"))
+  isMissing <- !formalArgs(simInit) %in% namesMatchCall[-1]
+  formalsTF <- formalArgs(simInit)
+
+  names(isMissing) <- formalsTF
+
+  if (any(isMissing))
+    li[names(isMissing)[isMissing]] <- Map(x = isMissing[isMissing], nam = names(isMissing)[isMissing],
+                         function(x, nam) {
+                           get(paste0(".", nam, "Default"))()}
+    )
+  # if (isTRUE(isMissing["times"])) li$times <- .timesDefault
+  # if (isTRUE(isMissing["params"])) li$params <- .paramsDefault
+  # if (isTRUE(isMissing["modules"])) li$modules <- .modulesDefault
+  # if (isTRUE(isMissing["objects"])) li$objects <- .objectsDefault
+  # if (isTRUE(isMissing["paths"])) li$paths <- suppressMessages(.paths())
+  # if (isTRUE(isMissing["inputs"])) li$inputs <- .inputsDefault
+  # if (isTRUE(isMissing["outputs"])) li$outputs <- .outputsDefault
+  # if (isTRUE(isMissing["loadOrder"])) li$loadOrder <- .loadOrderDefault
+
+  return(li)
 }
