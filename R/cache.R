@@ -326,7 +326,7 @@ if (!isGeneric(".addChangedAttr")) {
 #'
 #' @seealso \code{\link[reproducible]{.addChangedAttr}}.
 #'
-#' @importFrom reproducible .addChangedAttr
+#' @importFrom reproducible .addChangedAttr .setSubAttrInList
 #' @importMethodsFrom reproducible .addChangedAttr
 #' @inheritParams reproducible::.addChangedAttr
 #' @include simList-class.R
@@ -343,15 +343,12 @@ setMethod(
 
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
-      .CacheAttr <- attr(object, ".Cache")
-      if (is.null(.CacheAttr)) .CacheAttr <- list()
-      .CacheAttr[["newCache"]] <- NULL
-      setattr(object, ".Cache", .CacheAttr)
+
+      .setSubAttrInList(outputToSave, ".Cache", "newCache", NULL)
+      #attr(object, ".Cache")$newCache <- NULL
 
       if (!identical(attr(object, ".Cache")$newCache, NULL))
         stop("attributes on the cache object are not correct - 4")
-
-      #attr(object, ".Cache")$newCache <- NULL
     }
     postDigest <-
       .robustDigest(object, objects = dots$objects,
@@ -382,15 +379,11 @@ setMethod(
       character()
     }
 
-    .CacheAttr <- attr(object, ".Cache")
-    if (is.null(.CacheAttr)) .CacheAttr <- list()
-    .CacheAttr[["changed"]] <- changed
-    setattr(object, ".Cache", .CacheAttr)
-
+    .setSubAttrInList(outputToSave, ".Cache", "changed", changed)
+    #attr(object, ".Cache")$changed <- changed
     if (!identical(attr(object, ".Cache")$changed, changed))
       stop("attributes on the cache object are not correct - 5")
 
-    #attr(object, ".Cache")$changed <- changed
     object
   })
 
@@ -552,10 +545,6 @@ setMethod(
 
       }
 
-      # attr(object2, "tags") <- attr(object, "tags")
-      # attr(object2, "call") <- attr(object, "call")
-      # attr(object2, "function") <- attr(object, "function")
-      #
       return(object2)
     } else {
       return(object)
