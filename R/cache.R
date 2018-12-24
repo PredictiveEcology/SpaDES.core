@@ -231,6 +231,7 @@ setMethod(
       })
 
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
+      if (is.na(fromMemoise)) fromMemoise <- FALSE
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
