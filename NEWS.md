@@ -16,6 +16,8 @@ version 0.2.3.9000
 * `simInit` and `spades` now call `setPaths(paths)` or `setPaths(sim$paths)`, unsetting them `on.exit` internally to make the paths used for functions e.g., `reproducible::Cache` to use the correct path
 * under-the-hood speed improvements for the DES (about 20% faster) -- 38 microseconds per event under ideal conditions
 * improved default path settings in `.inputObjects` (#83)
+* following `reproducible` package updates, now uses `data.table::setattr` internally to avoid copying of
+objects (this may have very little/no effect on simList objects)
 
 ## bug fixes
 
@@ -38,6 +40,7 @@ version 0.2.3
 * new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
 * improved messaging when GLPK not installed (*e.g.*, on macOS)
 * `downloadModule()` now prints the module version downloaded (#77)
+* 
 
 ## bug fixes
 
