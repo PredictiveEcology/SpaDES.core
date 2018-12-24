@@ -344,7 +344,7 @@ setMethod(
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
 
-      .setSubAttrInList(outputToSave, ".Cache", "newCache", NULL)
+      .setSubAttrInList(object, ".Cache", "newCache", NULL)
       #attr(object, ".Cache")$newCache <- NULL
 
       if (!identical(attr(object, ".Cache")$newCache, NULL))
@@ -379,7 +379,7 @@ setMethod(
       character()
     }
 
-    .setSubAttrInList(outputToSave, ".Cache", "changed", changed)
+    .setSubAttrInList(object, ".Cache", "changed", changed)
     #attr(object, ".Cache")$changed <- changed
     if (!identical(attr(object, ".Cache")$changed, changed))
       stop("attributes on the cache object are not correct - 5")
