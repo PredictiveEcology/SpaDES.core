@@ -39,7 +39,9 @@ setMethod("Copy",
               sim_@events <- object@events
               sim_@current <- object@current
             }
-            sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
+            sim_@.xData <- new.env(parent = emptyenv())
             attr(sim_@.xData, "name") <- "sim"
             if (objects) {
               objNames <- ls(object, all.names = TRUE)
@@ -48,6 +50,7 @@ setMethod("Copy",
                                      function(obj) is.environment(get(obj, envir = object))))
               list2env(mget(objNames[!isEnv], envir = object@.xData), envir = sim_@.xData)
               list2env(lapply(objNames[isEnv], function(x) {
+                browser()
                 e <- new.env(parent = sim_@.xData)
                 attr(e, "name") <- x
                 e
