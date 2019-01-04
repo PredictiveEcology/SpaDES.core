@@ -1,6 +1,6 @@
 ## Updated release
 
-This release fixes problems revealed in CRAN check results, and includes bug fixes and enhancements (see NEWS).
+This release includes various bug fixes and enhancements (see NEWS).
 
 ## Test environments
 
@@ -15,7 +15,7 @@ This release fixes problems revealed in CRAN check results, and includes bug fix
 * macOS High Sierra  (travis-ci), R 3.5.0
 * macOS Mojave           (local), R 3.5.1
 * Ubuntu 14.04       (travis-ci), R 3.5.1
-* Ubuntu 18.04           (local), R 3.5.1
+* Ubuntu 18.04           (local), R 3.5.2
 * Windows             (appveyor), R 3.5.1
 * Windows          (win-builder), R 3.5.1
 * Windows 7              (local), R 3.5.1
