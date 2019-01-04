@@ -3,7 +3,9 @@ cleanMessage <- function(mm) {
   mm1 <- gsub("\\n", "", mm1)
   mm1 <- gsub(" *$", "", mm1)
   #mm1 <- gsub("\\(.*\\)", "", mm1)
+  mm1 <- gsub("\\.inputObjects", "\\_inputObjects", mm1) ## TODO: workaround to omit .inputObjects matches
   mm1 <- gsub("\\.", "", mm1)
+  mm1 <- gsub("\\_inputObjects", "\\.inputObjects", mm1) ## TODO: end workaround
   mm1 <- gsub("‘", "", mm1, ignore.case = TRUE) # Doesn't actually work non-interactively
   mm1 <- gsub("’", "", mm1, ignore.case = TRUE) # Doesn't actually work non-interactively
   mm1

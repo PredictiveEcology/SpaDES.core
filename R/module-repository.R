@@ -1,9 +1,7 @@
-### deal with spurious httr warnings
 if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("actualFile", "checksum.x", "checksum.y", "content",
                            "expectedFile", "filesize.x", "filesize.y", "result"))
 }
-
 
 #' Find the latest module version from a SpaDES module repository
 #'
@@ -399,5 +397,3 @@ setMethod(
     files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
 })
-
-

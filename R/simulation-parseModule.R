@@ -291,6 +291,7 @@ setMethod(
           if (!exists("finishedClean"))
             try(mess)
         })
+
         mess <- capture.output(type = "message",
                                out <- try(suppressWarnings(eval(pf, envir = env))))
         if (is(out, "try-error")) stop(out)

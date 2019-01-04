@@ -883,13 +883,12 @@ setReplaceMethod("progressType",
 #' @section \code{.inputObjects} function placed inside module:
 #'
 #' Any code placed inside a function called \code{.inputObjects} will be run during
-#' the simInit for the purpose of creating
-#' any objects required by this module, i.e., objects  identified in the \code{inputObjects}
-#' element of \code{defineModule}.
+#' \code{simInit()} for the purpose of creating any objects required by this module,
+#' i.e., objects  identified in the \code{inputObjects} element of \code{defineModule}.
 #' This is useful if there is something required before simulation to produce the module
 #' object dependencies, including such things as downloading default datasets, e.g.,
 #' \code{downloadData('LCC2005', modulePath(sim))}.
-#' Nothing should be created here that does not create an named object in inputObjects.
+#' Nothing should be created here that does not create an named object in \code{inputObjects}.
 #' Any other initiation procedures should be put in the "init" eventType of the doEvent function.
 #' Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
 #' selectively skip unnecessary steps because the user has provided those inputObjects in the

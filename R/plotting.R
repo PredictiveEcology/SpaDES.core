@@ -46,9 +46,7 @@ setMethod(
         append(., list(env = sim@.xData))
       Plot(plotObjects)
     }
-  })
-
-
+})
 
 if (!isGeneric(".parseElems")) {
   setGeneric(".parseElems", function(object, objects,
@@ -86,5 +84,4 @@ setMethod(
       eval(parse(text=deparse(elems[[useElem]])), envir=tmp@.xData),
       error=function(x) eval(parse(text=deparse(elems[[useElem]])), envir=envir))
     return(out)
-
-  })
+})

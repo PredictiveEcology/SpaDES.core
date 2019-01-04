@@ -271,9 +271,9 @@ test_that("timeunits with child and parent modules work correctly", {
   )
   mm1 <- cleanMessage(mm1)
   fullMessage <- c(
-    "Using or creating cached copy of inputObjects for child6",
-    "child6: module code: b is declared in inputObjects, but is not used in the module",
-    "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
+    "Using or creating cached copy of .inputObjects for child6",
+    "child6: module code: b is declared in metadata inputObjects, but is not used in the module",
+    "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in metadata outputObjects"
   )
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
   expect_identical(mySim$b, asPath(normPath(theFile)))
