@@ -3,7 +3,7 @@ if (!isGeneric(".robustDigest")) {
     ".robustDigest",
     function(object, objects, length = Inf, algo = "xxhash64") {
       standardGeneric(".robustDigest")
-  })
+    })
 }
 
 #' \code{.robustDigest} for \code{simList} class objects
@@ -231,13 +231,14 @@ setMethod(
       })
 
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
+      if (is.na(fromMemoise)) fromMemoise <- FALSE
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
           cat(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
         } else if (!is.na(fromMemoise)){
           cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
-                           "adding to memoised copy"))
+                           "adding to memoised copy\n"))
         } else {
           cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
         }
@@ -248,7 +249,9 @@ setMethod(
 
         } else if (!is.na(fromMemoise)){
           cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
-                           cur$moduleName, "module. Adding to memoised copy.\n"))
+                           cur$moduleName, "module. ",
+                           if (fromMemoise) "Adding to memoised copy.",
+                           "\n"))
         } else {
           cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
@@ -304,7 +307,7 @@ setMethod(
       }
     }
     checkPath(path = cacheRepo, create = create)
-})
+  })
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
@@ -323,7 +326,7 @@ if (!isGeneric(".addChangedAttr")) {
 #'
 #' @seealso \code{\link[reproducible]{.addChangedAttr}}.
 #'
-#' @importFrom reproducible .addChangedAttr
+#' @importFrom reproducible .addChangedAttr .setSubAttrInList
 #' @importMethodsFrom reproducible .addChangedAttr
 #' @inheritParams reproducible::.addChangedAttr
 #' @include simList-class.R
@@ -337,8 +340,16 @@ setMethod(
   definition = function(object, preDigest, origArguments, ...) {
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
+
     # remove the "newCache" attribute, which is irrelevant for digest
-    if (!is.null(attr(object, ".Cache")$newCache)) attr(object, ".Cache")$newCache <- NULL
+    if (!is.null(attr(object, ".Cache")$newCache)) {
+
+      .setSubAttrInList(object, ".Cache", "newCache", NULL)
+      #attr(object, ".Cache")$newCache <- NULL
+
+      if (!identical(attr(object, ".Cache")$newCache, NULL))
+        stop("attributes on the cache object are not correct - 4")
+    }
     postDigest <-
       .robustDigest(object, objects = dots$objects,
                     length = dots$length,
@@ -367,7 +378,12 @@ setMethod(
     } else {
       character()
     }
-    attr(object, ".Cache")$changed <- changed
+
+    .setSubAttrInList(object, ".Cache", "changed", changed)
+    #attr(object, ".Cache")$changed <- changed
+    if (!identical(attr(object, ".Cache")$changed, changed))
+      stop("attributes on the cache object are not correct - 5")
+
     object
   })
 
@@ -521,13 +537,14 @@ setMethod(
 
       attrsToGrab <- setdiff(names(attributes(object)), names(attributes(object2)))
       for(atts in attrsToGrab) {
-        attr(object2, atts) <- attr(object, atts)
+        setattr(object2, atts, attr(object, atts))
+        #attr(object2, atts) <- attr(object, atts)
+        if (!identical(attr(object2, atts), attr(object, atts)))
+          stop("attributes on the cache object are not correct - 6")
+
+
       }
 
-      # attr(object2, "tags") <- attr(object, "tags")
-      # attr(object2, "call") <- attr(object, "call")
-      # attr(object2, "function") <- attr(object, "function")
-      #
       return(object2)
     } else {
       return(object)
@@ -590,10 +607,21 @@ setMethod(
       # Some objects are conditionally produced from a module's outputObject
       whExist <- outputObjects %in% ls(object@.xData, all.names = TRUE)
       list2env(mget(outputObjects[whExist], envir = object@.xData), envir = outputToSave@.xData)
-      attr(outputToSave, "tags") <- attr(object, "tags")
-      attr(outputToSave, "call") <- attr(object, "call")
-      if (isS4(FUN))
-        attr(outputToSave, "function") <- attr(object, "function")
+
+      setattr(outputToSave, "tags", attr(object, "tags"))
+      setattr(outputToSave, "call", attr(object, "call"))
+      #attr(outputToSave, "tags") <- attr(object, "tags")
+      #attr(outputToSave, "call") <- attr(object, "call")
+      if (isS4(FUN)) {
+        setattr(outputToSave, "function", attr(object, "function"))
+        # attr(outputToSave, "function") <- attr(object, "function")
+      }
+      if (!identical(attr(outputToSave, "tags"), attr(object, "tags")))
+        stop("attributes on the cache object are not correct - 1")
+      if (!identical(attr(outputToSave, "call"), attr(object, "call")))
+        stop("attributes on the cache object are not correct - 2")
+
+
     } else {
       outputToSave <- object
     }
@@ -726,8 +754,13 @@ unmakeMemoiseable.simList_ <- function(x) {
   keepAttrs <- setdiff(names(attributes(x)), names(attributes(y)))
   keepAttrs <- setdiff(keepAttrs, omitAttrs)
   keepAttrs <- keepAttrs[keepAttrs != "names"]
+
   for (att in keepAttrs) {
-    attr(y, att) <- attr(x, att)
+    setattr(y, att, attr(x, att))
+    if (!identical(attr(y, att), attr(x, att)))
+      stop("attributes on the cache object are not correct - 3")
+
+    #attr(y, att) <- attr(x, att)
   }
   return(y)
 }

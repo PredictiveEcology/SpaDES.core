@@ -721,14 +721,24 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
     #   in the environment of the parents of that call, and pass them to new
     #   environment.
     li$objects <- .findObjects(objects)
     names(li$objects) <- objects
-    sim <- do.call("simInit", args = li)
+
+    li <- .fillInSimInit(li, namesMatchCall)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
+
+    # sim <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -756,10 +766,19 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
     li$modules <- as.list(modules)
-    sim <- do.call("simInit", args = li)
+
+    li <- .fillInSimInit(li, namesMatchCall)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
 
     return(invisible(sim))
   }
@@ -788,17 +807,11 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
 
-    if (missing(times)) li$times <- list(start = 0, end = 10)
-    if (missing(params)) li$params <- list()
-    if (missing(modules)) li$modules <- list()
-    if (missing(objects)) li$objects <- list()
-    if (missing(paths)) li$paths <- suppressMessages(.paths())
-    if (missing(inputs)) li$inputs <- as.data.frame(NULL)
-    if (missing(outputs)) li$outputs <- as.data.frame(NULL)
-    if (missing(loadOrder)) li$loadOrder <- character(0)
+    li <- .fillInSimInit(li, namesMatchCall)
 
     expectedClasses <- c("list",
                          "list",
@@ -831,7 +844,14 @@ setMethod(
            c(" It is", " They are")[plural], " expected to be ",
            paste(expectedDF[!correctArgs], collapse = ", "))
     }
-    sim <- do.call("simInit", args = li)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
+
+    # sim2 <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -867,10 +887,19 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)
+
+  namesMatchCall <- names(match.call())
+  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
+
+  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+                 modules = objsSimInit$modules, objects = objsSimInit$objects,
+                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+                 notOlderThan = objsSimInit$notOlderThan)
+  #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
   sim <- do.call(spades, objsSpades)
 
 }
@@ -897,12 +926,22 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
+
+
+  namesMatchCall <- names(match.call())
+  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
+
+  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+                 modules = objsSimInit$modules, objects = objsSimInit$objects,
+                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+                 notOlderThan = objsSimInit$notOlderThan)
+  #sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
 
   experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
   objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
 
   # Because there are some arguments in BOTH simInit and Experiment, can't pass them
   #  through, because they have different meaning
@@ -1087,4 +1126,39 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
   sim@current <- list()
   return(sim)
+}
+
+
+.timesDefault <- function() list(start = 0, end = 10)
+.paramsDefault <- function() list()
+.modulesDefault <- function() list()
+.objectsDefault <- function() list()
+.pathsDefault <- function() suppressMessages(.paths())
+.inputsDefault <- function() as.data.frame(NULL)
+.outputsDefault <- function() as.data.frame(NULL)
+.loadOrderDefault <- function() character(0)
+.notOlderThanDefault <- function() NULL
+
+.fillInSimInit <- function(li, namesMatchCall) {
+
+  isMissing <- !formalArgs(simInit) %in% namesMatchCall[-1]
+  formalsTF <- formalArgs(simInit)
+
+  names(isMissing) <- formalsTF
+
+  if (any(isMissing))
+    li[names(isMissing)[isMissing]] <- Map(x = isMissing[isMissing], nam = names(isMissing)[isMissing],
+                         function(x, nam) {
+                           get(paste0(".", nam, "Default"))()}
+    )
+  # if (isTRUE(isMissing["times"])) li$times <- .timesDefault
+  # if (isTRUE(isMissing["params"])) li$params <- .paramsDefault
+  # if (isTRUE(isMissing["modules"])) li$modules <- .modulesDefault
+  # if (isTRUE(isMissing["objects"])) li$objects <- .objectsDefault
+  # if (isTRUE(isMissing["paths"])) li$paths <- suppressMessages(.paths())
+  # if (isTRUE(isMissing["inputs"])) li$inputs <- .inputsDefault
+  # if (isTRUE(isMissing["outputs"])) li$outputs <- .outputsDefault
+  # if (isTRUE(isMissing["loadOrder"])) li$loadOrder <- .loadOrderDefault
+
+  return(li)
 }

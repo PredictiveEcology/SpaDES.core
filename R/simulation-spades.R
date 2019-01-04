@@ -183,9 +183,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
           if (!exists(cur[["moduleName"]], envir = sim, inherits = FALSE))
             stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
-                           "name from from the simList. ",
-                           "Please remove the section of code that does this in the event named: ",
-                           cur[["eventType"]])
+                 "name from from the simList. ",
+                 "Please remove the section of code that does this in the event named: ",
+                 cur[["eventType"]])
 
           if (!is.environment(get(cur[["moduleName"]], envir = sim)))
             stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
@@ -335,18 +335,18 @@ scheduleEvent <- function(sim,
     if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
 
     if (!is.numeric(eventTime)) {
-    if (is.na(eventTime)) {
-      eventTime <- NA_real_
-    } else {
-      stop(paste(
-        "Invalid or missing eventTime. eventTime must be a numeric.",
-        "This is usually caused by an attempt to scheduleEvent at time NULL",
-        "or by using an undefined parameter."
-      ))
+      if (is.na(eventTime)) {
+        eventTime <- NA_real_
+      } else {
+        stop(paste(
+          "Invalid or missing eventTime. eventTime must be a numeric.",
+          "This is usually caused by an attempt to scheduleEvent at time NULL",
+          "or by using an undefined parameter."
+        ))
+      }
     }
-  }
-  if (!is.character(eventType)) stop("eventType must be a character")
-  if (!is.character(moduleName)) stop("moduleName must be a character")
+    if (!is.character(eventType)) stop("eventType must be a character")
+    if (!is.character(moduleName)) stop("moduleName must be a character")
     #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
     if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
@@ -453,12 +453,12 @@ scheduleEvent <- function(sim,
 #'                      #  scheduled at current time
 #'   events(sim)        # now scheduled in the normal event queue
 scheduleConditionalEvent <- function(sim,
-                          condition,
-                          moduleName,
-                          eventType,
-                          eventPriority = .pkgEnv$.normalVal,
-                          minEventTime = start(sim),
-                          maxEventTime = end(sim)) {
+                                     condition,
+                                     moduleName,
+                                     eventType,
+                                     eventPriority = .pkgEnv$.normalVal,
+                                     minEventTime = start(sim),
+                                     maxEventTime = end(sim)) {
   if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
 
   if (!is.numeric(minEventTime)) {
@@ -741,6 +741,7 @@ setMethod(
                         notOlderThan,
                         ...) {
 
+    .pkgEnv$.sim <- NULL # Clear anything that was here.
     # set the options("spades.xxxPath") to the values in the sim@paths
     oldGetPaths <- getPaths()
     do.call(setPaths, append(sim@paths, list(silent = TRUE)))
@@ -760,6 +761,15 @@ setMethod(
       if (!.pkgEnv[["skipNamespacing"]])
         .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
       rm(".timeunits", envir = sim@.xData)
+      if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
+        if (!isTRUE(.pkgEnv$.cleanEnd)) {
+          .pkgEnv$.sim <- sim
+          message(
+            crayon::magenta("Because of an interrupted spades call, the sim object at the time of interruption ",
+                            "was saved in \nSpaDES.core:::.pkgEnv$.sim . It will be deleted on next call to spades"))
+        }
+        .pkgEnv$.cleanEnd <- NULL
+      }
     }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {
@@ -846,6 +856,9 @@ setMethod(
       }
     }
     sim@simtimes[["current"]] <- sim@simtimes[["end"]]
+
+    # For determining if clean ending to spades call
+    .pkgEnv$.cleanEnd <- TRUE
     return(invisible(sim))
   })
 
@@ -878,7 +891,7 @@ setMethod(
 
     if (cache) {
       return(
-        do.call(Cache,
+        do.call(quote = TRUE, Cache,
                 args = append(list(
                   spades,
                   sim = sim,
@@ -923,16 +936,16 @@ setMethod(
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     expression(Cache(FUN = get(moduleCall, envir = fnEnv),
                 sim = sim,
-                eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                objects = moduleSpecificObjects,
-                notOlderThan = notOlderThan,
-                outputObjects = moduleSpecificOutputObjects,
-                classOptions = classOptions,
-                cacheRepo = sim@paths[["cachePath"]]))
+                     eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+                     objects = moduleSpecificObjects,
+                     notOlderThan = notOlderThan,
+                     outputObjects = moduleSpecificOutputObjects,
+                     classOptions = classOptions,
+                     cacheRepo = sim@paths[["cachePath"]]))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
-          envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
+                   envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
   if (.pkgEnv[["spades.browserOnError"]]) {
@@ -977,9 +990,9 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
       eventTime -
         convertTimeunit(sim@simtimes[["start"]],
                         sim@simtimes[["timeunit"]], sim@.xData,
-                          skipChecks = TRUE)
-      ),
-      "seconds",
+                        skipChecks = TRUE)
+    ),
+    "seconds",
     sim@.xData, skipChecks = TRUE) +
       sim@simtimes[["current"]])
   } else {
@@ -992,11 +1005,11 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
     }
   } #else eventTime
 
-#} else {
-    # when eventTime is NA... can't seem to get an example
-    #eventTimeInSeconds <-
-    #  as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
-    #                             skipChecks = TRUE))
+  #} else {
+  # when eventTime is NA... can't seem to get an example
+  #eventTimeInSeconds <-
+  #  as.numeric(convertTimeunit(eventTime, "seconds", sim@.xData,
+  #                             skipChecks = TRUE))
   #}
   eventTime
 }
