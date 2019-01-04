@@ -385,17 +385,13 @@ setMethod(
       stop("attributes on the cache object are not correct - 5")
 
     object
-  })
-
-
+})
 
 if (!isGeneric(".preDigestByClass")) {
   setGeneric(".preDigestByClass", function(object) {
     standardGeneric(".preDigestByClass")
   })
 }
-
-
 
 if (!isGeneric(".prepareOutput")) {
   setGeneric(".prepareOutput", function(object) {
@@ -408,14 +404,16 @@ if (!isGeneric(".prepareOutput")) {
 #'
 #' See \code{\link[reproducible]{.prepareOutput}}.
 #'
+#' @inheritParams reproducible::.prepareOutput
+#'
+#' @export
+#' @exportMethod .prepareOutput
+#' @include simList-class.R
+#' @importFrom data.table setattr
 #' @importFrom reproducible .prepareOutput
 #' @importMethodsFrom reproducible .prepareOutput
-#' @inheritParams reproducible::.prepareOutput
-#' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.prepareOutput}}
-#' @exportMethod .prepareOutput
-#' @export
 #' @rdname prepareOutput
+#' @seealso \code{\link[reproducible]{.prepareOutput}}
 setMethod(
   ".prepareOutput",
   signature = "simList",
@@ -541,15 +539,13 @@ setMethod(
         #attr(object2, atts) <- attr(object, atts)
         if (!identical(attr(object2, atts), attr(object, atts)))
           stop("attributes on the cache object are not correct - 6")
-
-
       }
 
       return(object2)
     } else {
       return(object)
     }
-  })
+})
 
 ################################################################################
 #' Pre-digesting method for \code{simList}
@@ -573,7 +569,7 @@ setMethod(
   definition = function(object) {
     obj <- ls(object@.xData, all.names = TRUE)
     return(obj)
-  })
+})
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -590,12 +586,12 @@ if (!isGeneric(".addTagsToOutput")) {
 #' @author Eliot McIntire
 #' @exportMethod .addTagsToOutput
 #' @export
+#' @importFrom data.table setattr
 #' @importFrom reproducible .addTagsToOutput
 #' @importMethodsFrom reproducible .addTagsToOutput
 #' @include simList-class.R
 #' @rdname addTagsToOutput
 #' @seealso \code{\link[reproducible]{.addTagsToOutput}}
-#'
 setMethod(
   ".addTagsToOutput",
   signature = "simList",
@@ -620,8 +616,6 @@ setMethod(
         stop("attributes on the cache object are not correct - 1")
       if (!identical(attr(outputToSave, "call"), attr(object, "call")))
         stop("attributes on the cache object are not correct - 2")
-
-
     } else {
       outputToSave <- object
     }
@@ -634,7 +628,7 @@ setMethod(
     }
 
     outputToSave
-  })
+})
 
 if (!isGeneric(".objSizeInclEnviros")) {
   setGeneric(".objSizeInclEnviros", function(object) {
@@ -646,22 +640,22 @@ if (!isGeneric(".objSizeInclEnviros")) {
 #'
 #' See \code{\link[reproducible]{.objSizeInclEnviros}}.
 #'
+#' @inheritParams reproducible::.objSizeInclEnviros
+#'
+#' @export
+#' @exportMethod .objSizeInclEnviros
 #' @importFrom reproducible .objSizeInclEnviros
 #' @importFrom utils object.size
 #' @importMethodsFrom reproducible .objSizeInclEnviros
-#' @inheritParams reproducible::.objSizeInclEnviros
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.objSizeInclEnviros}}
-#' @exportMethod .objSizeInclEnviros
-#' @export
 #' @rdname objSizeInclEnviros
+#' @seealso \code{\link[reproducible]{.objSizeInclEnviros}}
 setMethod(
   ".objSizeInclEnviros",
   signature = "simList",
   definition = function(object) {
     object.size(as.list(object@.xData, all.names = TRUE)) + object.size(object)
-  })
-
+})
 
 #' Find simList in a nested list
 #'
@@ -669,6 +663,7 @@ setMethod(
 #'
 #' @param x any object, used here only when it is a list with at least one
 #'        \code{simList} in it
+#'
 #' @rdname findSimList
 .findSimList <- function(x) {
   if (is.list(x)) {
@@ -690,15 +685,15 @@ if (!exists("objSize")) {
   objSize <- function(..., quick) UseMethod("objSize")
 }
 
-
 #' Object size for simLists
 #'
-#' Recursively, runs \code{object\.size} on the simList environment.
-#' Currently, this will not assess object.size of the other elements
+#' Recursively, runs \code{object.size} on the simList environment.
+#' Currently, this will not assess \code{object.size} of the other elements.
 #'
-#' @inheritParams reproducible::objSize
-#' @importFrom reproducible objSize
 #' @export
+#' @importFrom reproducible objSize
+#' @inheritParams reproducible::objSize
+#'
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
@@ -712,8 +707,6 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
   aa <- append(aa, bbOs)
   return(aa)
 }
-
-
 
 #' Make simList correctly work with memoise
 #'
@@ -746,9 +739,12 @@ unmakeMemoiseable.simList_ <- function(x) {
 #'
 #' This is an internal helper.
 #'
-#' @keywords internal
 #' @param x an object with attributes
 #' @param y an object with attributes
+#'
+#'
+#' @importFrom data.table setattr
+#' @keywords internal
 #' @rdname keepAttrs
 .keepAttrs <- function(x, y, omitAttrs = c(".envir", ".list", ".xData", ".Data")) {
   keepAttrs <- setdiff(names(attributes(x)), names(attributes(y)))

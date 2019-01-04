@@ -15,8 +15,8 @@
 used instead of \code{object.size}.}
 }
 \description{
-Recursively, runs \code{object\.size} on the simList environment.
-Currently, this will not assess object.size of the other elements
+Recursively, runs \code{object.size} on the simList environment.
+Currently, this will not assess \code{object.size} of the other elements.
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))
