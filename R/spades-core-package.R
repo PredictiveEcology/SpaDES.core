@@ -489,14 +489,7 @@
 #'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
 #' }
 #'
-#' @rdname SpaDES.core-package
-#'
-"_PACKAGE"
-
-################################################################################
-# package imports
-# See \url{http://r-pkgs.had.co.nz/namespace.html#imports}
-
 #' @import igraph
 #' @import methods
-NULL
+#' @rdname SpaDES.core-package
+"_PACKAGE"

@@ -124,7 +124,7 @@ checksums <- function(module, path, ...) {
 #' urls <- c("https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl",
 #'           "https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip",
 #'           "http://example.com/doesntexist.csv")
-#' try(remoteFileSize(urls))
+#' try(remoteFileSize(urls)) ## 5429, 3997384, 0
 #'
 remoteFileSize <- function(url) {
   contentLength <- vapply(url, function(u) {
