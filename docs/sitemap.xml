@@ -229,6 +229,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/objectDiagram.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/objectSynonyms.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/objects.html</loc>
   </url>
   <url>
@@ -293,6 +296,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/saveFiles.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/scheduleConditionalEvent.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/scheduleEvent.html</loc>

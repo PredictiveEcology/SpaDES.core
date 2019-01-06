@@ -1,11 +1,11 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.2.3.9000
+version 0.2.4
 =============
 
 ## package dependencies
 
-* lorem ipsum
+* no changes
 
 ## new features
 * New active binding, `mod` that works as a module-specific variable, similar to a private object, i.e., `mod$a` is a local object inside the module that persists across events. It is a pointer to `sim[[currentModule(sim)]]$a`
@@ -22,6 +22,7 @@ objects (this may have very little/no effect on simList objects)
 
 ## bug fixes
 
+* fix to work with latest `data.table` v1.12.0 (#85, @mattdowle)
 * several minor, including to `Copy` (error existed because function inheritance persisted even though the location of the function was moved)
 
 version 0.2.3
