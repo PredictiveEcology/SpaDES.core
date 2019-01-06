@@ -21,6 +21,8 @@ if (getRversion() >= "3.1.0") {
 #' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
 #'        Default is all three. Partial matching is used. See details.
+#' @param returnWhere Logical, default \code{FALSE}, whether the vector of length
+#'   3 logical should be returned, or a logical of length one
 #' @export
 #'
 #' @details
@@ -62,7 +64,8 @@ if (getRversion() >= "3.1.0") {
 #'                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
 #'                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
 #' }
-suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
+suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent"),
+                              returnWhere = FALSE) {
   partialMatching <- c("s", "i", "u")
   where <- partialMatching[which(!is.na(pmatch(partialMatching, where)))]
   if (length(where) == 0) stop("where must be either sim, user or initEvent")
@@ -115,5 +118,12 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     FALSE
   }
 
-  (inUserSupplied | inPrevDotInputObjects | inFutureInit)
+  out <- if (isTRUE(returnWhere)) {
+    c(userSupplied = inUserSupplied, prevDotInputObjects = inPrevDotInputObjects,
+             inFutureInit = inFutureInit)
+  } else {
+    (inUserSupplied | inPrevDotInputObjects | inFutureInit)
+  }
+  return(out)
+
 }
