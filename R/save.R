@@ -133,7 +133,7 @@ saveFiles <- function(sim) {
     # don't need to save exactly same thing more than once - use data.table here because distinct
     # from dplyr does not do as expected
     outputs(sim) <- data.table(outputs(sim)) %>%
-      unique(., by = c("objectName", "saveTime", "file", "fun", "package", "arguments")) %>%
+      unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
       data.frame()
   }
 
