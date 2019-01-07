@@ -59,9 +59,9 @@ outputPath(sim) <- value
 
 \S4method{outputPath}{simList}(sim) <- value
 
-modulePath(sim)
+modulePath(sim, module)
 
-\S4method{modulePath}{simList}(sim)
+\S4method{modulePath}{simList}(sim, module)
 
 modulePath(sim) <- value
 
@@ -76,6 +76,10 @@ dataPath(sim)
 in which to replace element(s).}
 
 \item{value}{The object to be stored at the slot.}
+
+\item{module}{The optional character string of the module(s) whose
+paths are desired. If omitted, will return all modulePaths,
+if more than one exist.}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.
@@ -99,7 +103,7 @@ Each has a function to get or set the value in a \code{simList} object.
 If no paths are specified, the defaults are as follows:
 
 \itemize{
-  \item \code{cachePath}: \code{getOption("spades.cachePath")};
+  \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 
 \item \code{inputPath}: \code{getOption("spades.modulePath")};
 

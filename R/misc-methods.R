@@ -135,7 +135,8 @@ setMethod("append_attr",
                 attributes(out[i]) <- attrs[[i]]
               }
             }
-            return(unique(out))
+            dups <- duplicated(out) # unique strips names ... out[!dups] does not
+            return(out[!dups])
 })
 
 ################################################################################
@@ -573,7 +574,7 @@ setMethod(
 #' \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
 #'
 #' @param cachePath   The default local directory in which to cache simulation outputs.
-#'                    If not specified, defaults to \code{getOption("spades.cachePath")}.
+#'                    If not specified, defaults to \code{getOption("reproducible.cachePath")}.
 #'
 #' @param inputPath   The default local directory in which to look for simulation inputs
 #'                    If not specified, defaults to \code{getOption("spades.inputPath")}.
@@ -611,8 +612,20 @@ setMethod(
 #' }
 #'
 .paths <- function() {
+  if (!is.null(.getOption("spades.cachePath"))) {
+    message("option('spades.cachePath') is being deprecated. Please use ",
+            "option('reproducible.cachePath').\n",
+            "Setting option('reproducible.cachePath' = getOption('spades.cachePath'))")
+  }
+  # message("Running:\n",
+  #         "  getOption('reproducible.cachePath')\n",
+  #         "  getOption('spades.inputPath')\n",
+  #         "  getOption('spades.outputPath')\n",
+  #         "  getOption('spades.modulePath')\n",
+  #         "  )")
+
   list(
-    cachePath = .getOption("spades.cachePath"),
+    cachePath = .getOption("reproducible.cachePath"),
     inputPath = getOption("spades.inputPath"),
     modulePath = getOption("spades.modulePath"),
     outputPath = getOption("spades.outputPath")
@@ -635,14 +648,76 @@ Paths <- .paths()
 #' @rdname setPaths
 #' @importFrom reproducible checkPath
 #' @importFrom R.utils getOption
-setPaths <- function(cachePath, inputPath, modulePath, outputPath) {
-  if (missing(cachePath)) cachePath <- .getOption("spades.cachePath")     # nolint
-  if (missing(inputPath)) inputPath <- getOption("spades.inputPath")    # nolint
-  if (missing(modulePath)) modulePath <- getOption("spades.modulePath") # nolint
-  if (missing(outputPath)) outputPath <- getOption("spades.outputPath") # nolint
+#' @param silent Logical. Should the messaging occur.
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALSE) {
+  defaults <- list(
+    CP = FALSE,
+    IP = FALSE,
+    MP = FALSE,
+    OP = FALSE
+  )
+  if (missing(cachePath)) {
+    cachePath <- .getOption("reproducible.cachePath")     # nolint
+    defaults$CP <- TRUE
+  }
+  if (missing(inputPath)) {
+    inputPath <- getOption("spades.inputPath")    # nolint
+    defaults$IP <- TRUE
+  }
+  if (missing(modulePath)) {
+    modulePath <- getOption("spades.modulePath") # nolint
+    defaults$MP <- TRUE
+  }
+  if (missing(outputPath)) {
+    outputPath <- getOption("spades.outputPath") # nolint
+    defaults$OP <- TRUE
+  }
 
-  options(spades.cachePath = cachePath, spades.inputPath = inputPath,
-          spades.modulePath = modulePath, spades.outputPath = outputPath)
+  allDefault <- all(unlist(defaults))
+
+  originalPaths <- .paths()
+  options(spades.inputPath = inputPath,
+          spades.modulePath = unlist(modulePath), spades.outputPath = outputPath,
+          reproducible.cachePath = cachePath)
+
+  modPaths <- if (length(modulePath) > 1) {
+    paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
+
+  } else {
+    normPath(modulePath)
+  }
+
+  if (!silent) {
+    if (!allDefault) {
+      message("Setting:\n",
+              "  options(\n",
+              if (!defaults$CP) paste0("    reproducible.cachePath = '",normPath(cachePath),"'\n"),
+              if (!defaults$IP) paste0("    spades.inputPath = '",normPath(inputPath),"'\n"),
+              if (!defaults$OP) paste0("    spades.outputPath = '",normPath(outputPath),"'\n"),
+              if (!defaults$MP) paste0("    spades.modulePath = '",modPaths,
+                                       "'\n"),
+              "  )")
+    }
+    if (any(unlist(defaults)))
+      message("Paths set to:\n",
+              "  options(\n",
+              "    reproducible.cachePath = '",normPath(cachePath),"'\n",
+              "    spades.inputPath = '",normPath(inputPath),"'\n",
+              "    spades.outputPath = '",normPath(outputPath),"'\n",
+              "    spades.modulePath = '",modPaths,"'\n",
+              "  )")
+  }
 
   lapply(.paths(), checkPath, create = TRUE)
+  return(invisible(originalPaths))
+
+}
+
+.basename <- function (x) {
+  if (is.null(x)) {
+    NULL
+  }
+  else {
+    basename(x)
+  }
 }

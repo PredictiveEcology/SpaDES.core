@@ -39,11 +39,56 @@ setMethod("Copy",
               sim_@events <- object@events
               sim_@current <- object@current
             }
+            #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
+            sim_@.xData <- new.env(parent = emptyenv())
+            attr(sim_@.xData, "name") <- "sim"
             if (objects) {
-              sim_@.xData <- Copy(sim_@.xData, filebackedDir = cachePath(object))
-            } else {
-              sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+              objNames <- ls(object, all.names = TRUE)
+              names(objNames) <- objNames
+              isEnv <- unlist(lapply(objNames,
+                                     function(obj) is.environment(get(obj, envir = object))))
+              list2env(mget(objNames[!isEnv], envir = object@.xData), envir = sim_@.xData)
+              list2env(lapply(objNames[isEnv], function(x) {
+                e <- new.env(parent = asNamespace("SpaDES.core"))
+                attr(e, "name") <- x
+                e
+              }
+              ),
+              envir = sim_@.xData)
+
+              lapply(objNames[isEnv], function(en) {
+                list2env(as.list(object@.xData[[en]], all.names = TRUE),
+                         envir = sim_@.xData[[en]])
+                isFn <- unlist(lapply(ls(sim_@.xData[[en]]), function(obj)
+                  if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
+                    environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
+                  }
+                ))
+              })
+
+              # Deal with activeBinding for mod
+              lapply(objNames[isEnv], function(en) {
+                if (exists("mod", object[[en]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object[[en]])) {
+                    rm(list = "mod", envir = sim_[[en]])
+                    makeActiveBinding(sym = "mod",
+                                      fun = function(value){
+                                        if (missing(value)) {
+                                          get(en, envir = sim_, inherits = FALSE)
+                                        } else {
+                                          stop("Can't overwrite mod")
+                                        }
+                                      },
+                                      env = sim_[[en]])
+                  }
+                }
+
+              })
+
             }
             sim_@.envir <- sim_@.xData
             return(sim_)
 })
+
+

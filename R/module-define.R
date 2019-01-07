@@ -225,7 +225,6 @@ setMethod(
       }
     }
 
-
     x$authors <- if (is.null(x$authors) || is.na(x$authors)) {
       moduleDefaults$authors
     } else {

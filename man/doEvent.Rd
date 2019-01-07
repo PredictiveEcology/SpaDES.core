@@ -4,7 +4,7 @@
 \alias{doEvent}
 \title{Process a simulation event}
 \usage{
-doEvent(sim, debug, notOlderThan)
+doEvent(sim, debug = FALSE, notOlderThan)
 }
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}

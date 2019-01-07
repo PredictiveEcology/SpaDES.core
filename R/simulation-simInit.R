@@ -7,11 +7,11 @@ if (getRversion() >= "3.1.0") {
 #'
 #' Create a new simulation object, the "sim" object. This object is implemented
 #' using an \code{environment} where all objects and functions are placed.
-#' Since environments in \code{R} are
-#' pass by reference, "putting" objects in the sim object does no actual copy. The
-#' \code{simList} also stores all parameters,
-#' and other important simulation information, such
-#' as times, paths, modules, and module load order. See more details below.
+#' Since environments in \code{R} are pass by reference, "putting" objects in
+#' the sim object does no actual copy.
+#' The \code{simList} also stores all parameters, and other important simulation
+#' information, such as times, paths, modules, and module load order.
+#' See more details below.
 #'
 #' \subsection{Calling this \code{simInit} function does the following:}{
 #'   \tabular{lll}{
@@ -64,7 +64,7 @@ if (getRversion() >= "3.1.0") {
 #' the defaults are as follows:
 #'
 #' \itemize{
-#'   \item \code{cachePath}: \code{getOption("spades.cachePath")};
+#'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 #'
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
 #'
@@ -98,7 +98,14 @@ if (getRversion() >= "3.1.0") {
 #'
 #' Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
 #' Please see the vignette dedicated to this topic.
-#' See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
+#' See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}.
+#'
+#' @note
+#' Since the objects in the \code{simList} are passed-by-reference, it is useful
+#' to create a copy of the initalizized \code{simList} object prior to running
+#' the simulation (e.g., \code{mySimOut <- spades(Copy(mySim))}).
+#' This ensures you retain access to the original objects, which would otherwise
+#' be overwritten/modified during the simulation.
 #'
 #' @note
 #' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
@@ -132,7 +139,9 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @param paths  An optional named list with up to 4 named elements,
 #' \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
-#' See details.
+#' See details. NOTE: Experimental feature now allows for multiple \code{modulePath}s
+#' to be specified in a character vector. The modules will be searched for sequentially
+#' in the first \code{modulePath}, then if it doesn't find it, in the second etc.
 #'
 #' @param inputs A \code{data.frame}. Can specify from 1 to 6
 #' columns with following column names: \code{objectName} (character, required),
@@ -291,7 +300,7 @@ setGeneric(
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
            notOlderThan = NULL) {
     standardGeneric("simInit")
-})
+  })
 
 #' @rdname simInit
 setMethod(
@@ -321,7 +330,9 @@ setMethod(
     # on.exit({
     #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
     # })
-    paths <- lapply(paths, checkPath, create = TRUE)
+    paths <- lapply(paths, function(p)
+        checkPath(p, create = TRUE)
+    )
 
     objNames <- names(objects)
     if (length(objNames) != length(objects)) {
@@ -336,22 +347,34 @@ setMethod(
     # create simList object for the simulation
     sim <- new("simList")
     # Make a temporary place to store parsed module files
-    sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
+    sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
+    #sim@.xData[[".parsedFiles"]] <- new.env(parent = as.environment("package:SpaDES.core"))
+    #  sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
+
+    # paths
+    oldGetPaths <- .paths()
+    do.call(setPaths, paths)
+    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
 
     # Check that modules exist in paths$modulePath
-    moduleDirsExist <- dir.exists(file.path(paths$modulePath, unlist(modules)))
-    if (!isTRUE(all(moduleDirsExist))) {
+    moduleDirsPoss <- lapply(modules, function(m) file.path(sim@paths$modulePath, m))
+    moduleDirsExist <- lapply(moduleDirsPoss, function(poss) dir.exists(poss))
+    # dir.exists(file.path(paths$modulePath, unlist(modules)))
+    if (!isTRUE(all(unlist(lapply(moduleDirsExist, any))))) {
       stop("These modules: ", unlist(modules)[!moduleDirsExist], " , don't exist in ", paths$modulePath)
     }
+    modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
+      poss[exist][1])
 
     # identify childModules, recursively
-    childModules <- .identifyChildModules(sim = sim, modules = modules)
+    childModules <- .identifyChildModules(sim = sim, modules = modulePaths)
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
     names(modules) <- unlist(modules)
+    modules <- lapply(modules, .basename)
 
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
@@ -369,7 +392,11 @@ setMethod(
 
     sim@modules <- modules  ## will be updated below
 
-    reqdPkgs <- packages(modules = unlist(modules), paths = paths(sim)$modulePath,
+    mBase <- .basename(unlist(modules))
+
+    reqdPkgs <- packages(modules = unlist(modulePaths),
+                         filenames = file.path(unlist(modulePaths), paste0(mBase, ".R")),
+                         paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
     if (length(unlist(reqdPkgs))) {
       allPkgs <- c(unique(unlist(reqdPkgs), "SpaDES.core"))
@@ -383,6 +410,13 @@ setMethod(
         loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
       }
     }
+
+    # if (which(search() %in% "package:SpaDES.core") != 2) {
+    #   # Must move it to 2nd position, because simList fns have this as parent
+    #   detach("package:SpaDES.core")
+    #   suppressMessages(attachNamespace(asNamespace("SpaDES.core")))
+    # }
+    #
 
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
@@ -400,7 +434,7 @@ setMethod(
       ## if none there, then inside grandparent etc.
       while (stillFinding && length(modsForTU)) {
         tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                envir = sim@.xData[[".parsedFiles"]])
+                                  envir = sim@.xData[[".parsedFiles"]])
         hasTU <- !is.na(tu)
         innerNames <- .findModuleName(childModules, recursive = recurseLevel)
         modsForTU <- innerNames[nzchar(names(innerNames))]
@@ -434,7 +468,7 @@ setMethod(
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
     parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
 
-    timeunits <- findSmallestTU(sim, modules(sim), childModules)
+    timeunits <- findSmallestTU(sim, modulePaths, childModules)
 
     if (length(timeunits) == 0) timeunits <- list(moduleDefaults$timeunit) # no timeunits or no modules at all
 
@@ -479,15 +513,15 @@ setMethod(
     ## add core module name to the loaded list (loaded with the package)
     modulesLoaded <- append(modulesLoaded, core)
 
-    ## source module metadata and code files
-    lapply(modules(sim), function(m) moduleVersion(m, sim = sim,
-                                                   envir = sim@.xData[[".parsedFiles"]]))
+    # ## source module metadata and code files
+    # lapply(names(modules(sim)), function(m) moduleVersion(m, sim = sim,
+    #                                                envir = sim@.xData[[".parsedFiles"]]))
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
     while (!all_parsed) {
       sim <- .parseModule(sim,
-                          sim@modules,
+                          as.list(modules),
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
                           envir = sim@.xData[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
@@ -539,8 +573,36 @@ setMethod(
       loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
     }
 
+    mBase <- .basename(unlist(modules))
+    loadOrderBase <- .basename(loadOrder)
+    names(loadOrder) <- names(unlist(modules))[na.omit(match(mBase, loadOrderBase))]
+    loadOrder[] <- loadOrderBase
+    loadOrderNames <- names(loadOrder)
+
+    # This is a quick override so that .runInputObjects has access to these
+    #   synonynms
+    if (!is.null(objects$objectSynonyms)) {
+      sim$objectSynonyms <- objects$objectSynonyms
+      sim <- .checkObjectSynonyms(sim)
+    }
+
+    # Make local activeBindings to mod
+    lapply(modules, function(mod) {
+      makeActiveBinding(sym = "mod",
+                        fun = function(value){
+                          if (missing(value)) {
+                            get(mod, envir = sim, inherits = FALSE)
+                          } else {
+                            stop("Can't overwrite mod")
+                          }
+                        },
+                        env = sim[[mod]])
+
+    })
+
     ## load user-defined modules
     for (m in loadOrder) {
+      mFullPath <- loadOrderNames[match(m, loadOrder)]
       ## run .inputObjects() for each module
       sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
 
@@ -548,7 +610,9 @@ setMethod(
       sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .normal())
 
       ### add module name to the loaded list
+      names(m) <- mFullPath
       modulesLoaded <- append(modulesLoaded, m)
+
 
       ### add NAs to any of the dotParams that are not specified by user
       # ensure the modules sublist exists by creating a tmp value in it
@@ -573,8 +637,8 @@ setMethod(
     }
 
     ## check that modules all loaded correctly and store result
-    if (all(append(core, loadOrder) %in% modulesLoaded)) {
-      modules(sim) <- append(core, loadOrder)
+    if (all(append(core, loadOrderBase) %in% .basename(unlist(modulesLoaded)))) {
+      modules(sim) <- modulesLoaded
     } else {
       stop("There was a problem loading some modules.")
     }
@@ -605,6 +669,9 @@ setMethod(
           .fillInputRows(startTime = start(sim))
         inputs(sim) <- newInputs
       }
+      # if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
+      #   sim <- .checkObjectSynonyms(sim)
+      # }
     }
 
     ## load files in the filelist
@@ -637,7 +704,7 @@ setMethod(
     }
 
     ## check the parameters supplied by the user
-    checkParams(sim, core, dotParams, sim@paths[["modulePath"]])
+    checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
 
     ## keep session info for debugging & checkpointing
     # sim$.sessionInfo <- sessionInfo() # commented out because it gives too much information
@@ -670,14 +737,24 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
     #   in the environment of the parents of that call, and pass them to new
     #   environment.
     li$objects <- .findObjects(objects)
     names(li$objects) <- objects
-    sim <- do.call("simInit", args = li)
+
+    li <- .fillInSimInit(li, namesMatchCall)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
+
+    # sim <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -705,10 +782,19 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
     li$modules <- as.list(modules)
-    sim <- do.call("simInit", args = li)
+
+    li <- .fillInSimInit(li, namesMatchCall)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
 
     return(invisible(sim))
   }
@@ -737,17 +823,11 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    li <- lapply(names(match.call()[-1]), function(x) eval(parse(text = x)))
-    names(li) <- names(match.call())[-1]
+    namesMatchCall <- names(match.call())
+    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    names(li) <- namesMatchCall[-1]
 
-    if (missing(times)) li$times <- list(start = 0, end = 10)
-    if (missing(params)) li$params <- list()
-    if (missing(modules)) li$modules <- list()
-    if (missing(objects)) li$objects <- list()
-    if (missing(paths)) li$paths <- .paths()
-    if (missing(inputs)) li$inputs <- as.data.frame(NULL)
-    if (missing(outputs)) li$outputs <- as.data.frame(NULL)
-    if (missing(loadOrder)) li$loadOrder <- character(0)
+    li <- .fillInSimInit(li, namesMatchCall)
 
     expectedClasses <- c("list",
                          "list",
@@ -780,7 +860,14 @@ setMethod(
            c(" It is", " They are")[plural], " expected to be ",
            paste(expectedDF[!correctArgs], collapse = ", "))
     }
-    sim <- do.call("simInit", args = li)
+
+    sim <- simInit(times = li$times, params = li$params,
+                   modules = li$modules, objects = li$objects,
+                   paths = li$paths, inputs = li$inputs,
+                   outputs = li$outputs, loadOrder = li$loadOrder,
+                   notOlderThan = li$notOlderThan)
+
+    # sim2 <- do.call("simInit", args = li, quote = TRUE)
 
     return(invisible(sim))
 })
@@ -811,15 +898,25 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                              .plotInitialTime, .saveInitialTime, ...) {
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
-  scalls <- sys.calls()
-  objsAll <- mget(ls(), envir = environment())
-  objsAll <- objsAll[!objsAll=="..."]
+  lsAllNames <- ls(all.names = TRUE)
+  lsAllNames <- lsAllNames[lsAllNames != "..."]
+
+  objsAll <- mget(lsAllNames, envir = environment())
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndSpades", ...)
+
+  namesMatchCall <- names(match.call())
+  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
+
+  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+                 modules = objsSimInit$modules, objects = objsSimInit$objects,
+                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+                 notOlderThan = objsSimInit$notOlderThan)
+  #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
-  sim <- do.call(spades, objsSpades)#AndX(scalls, "simInitAndSpades", ...)
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
+  sim <- do.call(spades, objsSpades)
 
 }
 
@@ -839,15 +936,28 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                  dirPrefix, substrLength, saveExperiment,
                                  experimentFile, clearSimEnv, cl, ...)  {
   list2env(list(...), envir = environment())
-  objsAll <- mget(ls(all.names = TRUE), envir = environment())
-  objsAll <- objsAll[!names(objsAll)=="..."]
+  lsAllNames <- ls(all.names = TRUE)
+  lsAllNames <- lsAllNames[lsAllNames != "..."]
+
+  objsAll <- mget(lsAllNames, envir = environment())
+
   objsSimInit <- objsAll[formalArgs(simInit)]
-  sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
+
+
+  namesMatchCall <- names(match.call())
+  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
+
+  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+                 modules = objsSimInit$modules, objects = objsSimInit$objects,
+                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+                 notOlderThan = objsSimInit$notOlderThan)
+  #sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
 
   experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
   objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = sim), objsAll[spadesFormals])
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
 
   # Because there are some arguments in BOTH simInit and Experiment, can't pass them
   #  through, because they have different meaning
@@ -882,7 +992,14 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                               as.list)
     isParent <- unlist(lapply(modulesToSearch, function(x) length(x)>1))
 
-    modulesToSearch[isParent] <- lapply(modulesToSearch[isParent], function(x) .identifyChildModules(sim = sim, modules = x))
+    modulesToSearch[isParent] <- Map(x = modulesToSearch[isParent],
+                                     nam = dirname(names(modulesToSearch[isParent])),
+                                     function(x, nam){
+                                       mods <- lapply(x, function(y) file.path(nam, y))
+                                       names(mods) <- unlist(lapply(mods, .basename))
+
+                                       .identifyChildModules(sim = sim, modules = mods)}
+    )
     modulesToSearch2 <- as.list(names(modulesToSearch[!isParent]))
     names(modulesToSearch2) <- names(modulesToSearch[!isParent])
     modulesToSearch[!isParent] <- modulesToSearch2
@@ -934,12 +1051,13 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   mnames <- vapply(seq_along(sim@depends@dependencies), function(k) {
     sim@depends@dependencies[[k]]@name
   }, character(1))
-  i <- which(mnames == m)
+  mBase <- .basename(m)
+  i <- which(mnames == mBase)
 
   ## temporarily assign current module
   sim@current <- newEventList <- list(
     eventTime = start(sim),
-    moduleName = m,
+    moduleName = mBase,
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
@@ -947,10 +1065,10 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
-    if (!is.null(sim@.xData[[m]][[".inputObjects"]])) {
+    if (!is.null(sim@.xData[[mBase]][[".inputObjects"]])) {
       list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
                envir = sim@.xData)
-      a <- P(sim, m, ".useCache")
+      a <- P(sim, mBase, ".useCache")
       if (!is.null(a)) {
         if (!identical(FALSE, a)) {
           if (isTRUE(a)) {
@@ -964,23 +1082,29 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
       }
 
       if (isTRUE(cacheIt)) {
-        message(crayon::green("Using or creating cached copy of .inputObjects for ", m, sep = ""))
+        message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+        moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
+        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
+
 
         # ensure backwards compatibility with non-namespaced modules
-        if (.isNamespaced(sim, m)) {
-          moduleSpecificObjs <- paste(m, ".inputObjects", sep = ":")
+        if (.isNamespaced(sim, mBase)) {
+          moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
         } else {
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
-                                                pattern = m, value = TRUE),
+                                                pattern = mBase, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))
         }
 
-        .inputObjects <- .getModuleInputObjects(sim, m)
+        .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
           args <- as.list(formals(.inputObjects))
           env <- environment()
+          if (!isTRUE(names(args) %in% "sim"))
+            stop("The .inputObjects can only have a single argument, specifically 'sim'. ",
+                 "Currently, ", mBase, " has others")
           args <- lapply(args[unlist(lapply(args, function(x) all(nzchar(x))))], eval, envir = env)
           args[["sim"]] <- sim
 
@@ -992,26 +1116,65 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                              moduleSpecificInputObjects[inSimList])
           }
 
-          sim <- Cache(FUN = do.call, .inputObjects, args,
+          #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
+          sim <- Cache(.inputObjects, sim,
                        objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
-                       userTags = c(paste0("module:", m),
+                       cacheRepo = sim@paths$cachePath,
+                       userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
                                     "function:.inputObjects"))
         }
       } else {
-        message(crayon::green("Running .inputObjects for ", m, sep = ""))
+        message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
         .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
-        .inputObjects <- .getModuleInputObjects(sim, m)
+        .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
           sim <- .inputObjects(sim)
         }
       }
     }
+  } else {
+    message("All requierd input Objects provided; skipping .inputObjects")
   }
 
   sim@current <- list()
   return(sim)
+}
+
+
+.timesDefault <- function() list(start = 0, end = 10)
+.paramsDefault <- function() list()
+.modulesDefault <- function() list()
+.objectsDefault <- function() list()
+.pathsDefault <- function() suppressMessages(.paths())
+.inputsDefault <- function() as.data.frame(NULL)
+.outputsDefault <- function() as.data.frame(NULL)
+.loadOrderDefault <- function() character(0)
+.notOlderThanDefault <- function() NULL
+
+.fillInSimInit <- function(li, namesMatchCall) {
+
+  isMissing <- !formalArgs(simInit) %in% namesMatchCall[-1]
+  formalsTF <- formalArgs(simInit)
+
+  names(isMissing) <- formalsTF
+
+  if (any(isMissing))
+    li[names(isMissing)[isMissing]] <- Map(x = isMissing[isMissing], nam = names(isMissing)[isMissing],
+                         function(x, nam) {
+                           get(paste0(".", nam, "Default"))()}
+    )
+  # if (isTRUE(isMissing["times"])) li$times <- .timesDefault
+  # if (isTRUE(isMissing["params"])) li$params <- .paramsDefault
+  # if (isTRUE(isMissing["modules"])) li$modules <- .modulesDefault
+  # if (isTRUE(isMissing["objects"])) li$objects <- .objectsDefault
+  # if (isTRUE(isMissing["paths"])) li$paths <- suppressMessages(.paths())
+  # if (isTRUE(isMissing["inputs"])) li$inputs <- .inputsDefault
+  # if (isTRUE(isMissing["outputs"])) li$outputs <- .outputsDefault
+  # if (isTRUE(isMissing["loadOrder"])) li$loadOrder <- .loadOrderDefault
+
+  return(li)
 }

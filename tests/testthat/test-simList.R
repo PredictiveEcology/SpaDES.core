@@ -89,8 +89,8 @@ test_that("simList object initializes correctly", {
   compList <- as.list(c(defaults, modules))
   attr(compList, "modulesGraph") <- data.frame(from = character(0), to = character(),
                                                stringsAsFactors = FALSE)
-  expect_equal(modules(mySim, hidden = TRUE), compList)
-  expect_equal(modules(mySim), as.list(modules))
+  expect_equivalent(modules(mySim, hidden = TRUE), compList)
+  expect_equal(unname(modules(mySim)), as.list(modules))
 
   ### SLOT params
   expect_is(params(mySim), "list")
@@ -260,6 +260,7 @@ test_that("simList test all signatures", {
     N <- 256L
     successes <- logical(N)
     argsTested <- vector("list", length = N)
+    #setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
     for (i in 1L:N) {
       li <- list(
         {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
@@ -284,7 +285,7 @@ test_that("simList test all signatures", {
     }
 
     # needs paths and params; many defaults are fine
-    expect_equal(sum(successes, na.rm = TRUE), 192)
+    expect_equal(sum(successes, na.rm = TRUE), 256)
 
   }
 })

@@ -1,5 +1,7 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".SD", "eventTime", "savetime", "exts", "eventType", "unit", "diffTime", "clockTime"))
+  utils::globalVariables(c(".SD", "eventTime", "savetime", "exts",
+                           "eventType", "unit", "diffTime", "clockTime",
+                           "minEventTime", "maxEventTime"))
 }
 
 ### `show` generic is already defined in the methods package
@@ -37,7 +39,7 @@ setMethod(
     out[[8]] <- capture.output(cat(">> Modules:\n"))
     ord <- match(unlist(modules(object)), names(timeunits(object))) %>% na.omit
     out[[9]] <- capture.output(print(
-      cbind(Name = modules(object),
+      cbind(Name = unname(modules(object)),
             #Timeunit = c(rep(NA_character_, 4), unname(timeunits(object))[ord])),
             Timeunit = unname(timeunits(object))[ord]),
       quote = FALSE, row.names = FALSE))
@@ -251,7 +253,6 @@ setReplaceMethod(
 #' @param value The object to be stored at the slot.
 #'
 #' @param hidden Logical. If TRUE, show the default core modules.
-#'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
 #' @family functions to access elements of a \code{simList} object
@@ -882,13 +883,12 @@ setReplaceMethod("progressType",
 #' @section \code{.inputObjects} function placed inside module:
 #'
 #' Any code placed inside a function called \code{.inputObjects} will be run during
-#' the simInit for the purpose of creating
-#' any objects required by this module, i.e., objects  identified in the \code{inputObjects}
-#' element of \code{defineModule}.
+#' \code{simInit()} for the purpose of creating any objects required by this module,
+#' i.e., objects  identified in the \code{inputObjects} element of \code{defineModule}.
 #' This is useful if there is something required before simulation to produce the module
 #' object dependencies, including such things as downloading default datasets, e.g.,
 #' \code{downloadData('LCC2005', modulePath(sim))}.
-#' Nothing should be created here that does not create an named object in inputObjects.
+#' Nothing should be created here that does not create an named object in \code{inputObjects}.
 #' Any other initiation procedures should be put in the "init" eventType of the doEvent function.
 #' Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
 #' selectively skip unnecessary steps because the user has provided those inputObjects in the
@@ -1464,7 +1464,7 @@ setReplaceMethod(
 #' If no paths are specified, the defaults are as follows:
 #'
 #' \itemize{
-#'   \item \code{cachePath}: \code{getOption("spades.cachePath")};
+#'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 #'
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
 #'
@@ -1694,11 +1694,14 @@ setReplaceMethod(
 
 ################################################################################
 #' @inheritParams paths
+#' @param module The optional character string of the module(s) whose
+#'               paths are desired. If omitted, will return all modulePaths,
+#'               if more than one exist.
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-paths
 #' @aliases simList-accessors-paths
-setGeneric("modulePath", function(sim) {
+setGeneric("modulePath", function(sim, module) {
   standardGeneric("modulePath")
 })
 
@@ -1707,8 +1710,14 @@ setGeneric("modulePath", function(sim) {
 #' @aliases simList-accessors-paths
 setMethod("modulePath",
           signature = "simList",
-          definition = function(sim) {
-            return(sim@paths$modulePath)
+          definition = function(sim, module) {
+            if (!missing(module)) {
+              mods <- unlist(lapply(sim@modules, function(x) x %in% module))
+              dirname(names(mods)[mods])
+            } else {
+              sim@paths$modulePath
+            }
+
 })
 
 #' @export
@@ -1757,7 +1766,7 @@ setGeneric("dataPath", function(sim) {
 setMethod("dataPath",
           signature = "simList",
           definition = function(sim) {
-            return(file.path(modulePath(sim), currentModule(sim), "data"))
+            return(file.path(modulePath(sim, currentModule(sim)), currentModule(sim), "data"))
           })
 
 ################################################################################
@@ -2238,17 +2247,10 @@ setMethod(
       # note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
-          #obj$eventTime <- convertTimeunit(obj$eventTime, unit, sim@.xData)
-          #obj
-          #obj <- copy(sim@events) # don't change original sim
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.xData)]
           obj[]
         }
        } #else {
-    #     sim@events
-    #   }
-    # } else {
-    #   sim@events
     }
     return(obj)
 })
@@ -2298,6 +2300,61 @@ setReplaceMethod(
      }
      return(sim)
 })
+
+
+#############################
+#' @rdname simList-accessors-events
+#' @aliases simList-accessors-events
+#'
+#' @export
+setGeneric("conditionalEvents", function(sim, unit) {
+  standardGeneric("conditionalEvents")
+})
+
+#' @export
+#' @rdname simList-accessors-events
+#' @aliases simList-accessors-events
+setMethod(
+  "conditionalEvents",
+  signature = c("simList", "character"),
+  definition = function(sim, unit) {
+    if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
+      conds <- sim$._conditionalEvents
+      conds <- lapply(conds, function(x) {
+        if (is.call(x$condition)) {
+          x$condition <- deparse(x$condition);
+        } else {
+          x$condition <- as.character(x$condition);
+        }
+        x
+      })
+      obj <- rbindlist(conds)
+      if (is.na(pmatch("second", unit)) &&
+          (length(conds) > 0)) {
+        # note the above line captures empty eventTime, whereas is.na does not
+        if (any(!is.na(obj$minEventTime)) && (any(!is.na(obj$maxEventTime)))) {
+          if (!is.null(obj$minEventTime) && !is.null(obj$maxEventTime)) {
+            obj[, minEventTime := convertTimeunit(minEventTime, unit, sim@.xData)]
+            obj[, maxEventTime := convertTimeunit(maxEventTime, unit, sim@.xData)]
+            obj[]
+          }
+        }
+      }
+      return(obj)
+    } else {
+      return(NULL)
+    }
+  })
+
+#' @export
+#' @rdname simList-accessors-events
+#' @aliases simList-accessors-events
+setMethod("conditionalEvents",
+          signature = c("simList", "missing"),
+          definition = function(sim, unit) {
+            res <- conditionalEvents(sim, sim@simtimes[["timeunit"]])
+            return(res)
+          })
 
 ################################################################################
 #' @inheritParams events
@@ -2562,16 +2619,23 @@ setMethod(
     } else {
       if (!missing(filenames))  {
         paths <- filenames
-        modules <- sub(basename(paths), replacement = "", pattern = ".R")
+        if (missing(modules)) {
+          modules <- sub(basename(paths), replacement = "", pattern = ".R")
+        }
       } else if (!missing("modules")) {
-        prefix <- if (!missing("paths")) {
-            paths
+        prefix <- if (!file.exists(modules)) {
+          if (!missing("paths")) {
+            pre <- paths
           } else {
-            getOption("spades.modulePath")
+            pre <- getOption("spades.modulePath")
           }
-        paths <- file.path(prefix, modules, paste0(modules, ".R"))
+          file.path(pre, modules)
+        } else {
+          modules
+        }
+        paths <- file.path(prefix, paste0(modules, ".R"))
       } else {
-        stop("one of sim, module, modules, or filename must be supplied.")
+        stop("one of sim, modules, or filename must be supplied.")
       }
 
       if (missing(envir)) {

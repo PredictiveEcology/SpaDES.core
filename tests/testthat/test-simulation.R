@@ -26,61 +26,61 @@ test_that("simulation runs with simInit and spades", {
 
   # sim results ## NOTE upcoming version of RandomFields completely changes the values!!!
   #if (utils::packageVersion("RandomFields") >= "3.1.20") {
-    burnedLast <- c(1725, 126, 816, 2136, 1836, 825, 1381, 1507, 1509, 1624)
+  burnedLast <- c(1725, 126, 816, 2136, 1836, 825, 1381, 1507, 1509, 1624)
 
-    pos_x <- c(1.05944046146596, 44.4530163547364, 45.8793618542196,
-               -1.31587161139159, 17.8640418602947, 48.4840937544703, 10.7535089382283,
-               -24.6253107925863, -48.5108426726095, -7.76764412474417, 34.7851382149642,
-               9.83572522829692, 41.9505922251921, -9.07555369460079, -39.676662136738,
-               21.6185984474158, 46.4701522375152, -0.883315154385187, 28.0911201823354,
-               -13.847369533562, -49.7727146829549, -16.2936810258016, -33.9335427084662,
-               -8.47926857699624, -17.5993028014645, -33.0461085829127, 24.8750808532409,
-               -43.5077879392023, -16.9752324398488, 16.7694485345211, -8.91563038316473,
-               -48.3650161814635, 27.0749755681643, 34.0994637648402, -49.1648592745971,
-               -29.9712621173336, 49.5667313041262, 21.3612681252904, -21.3445953954488,
-               24.8211683871312, 23.4173005016891, -29.9699855919438, -49.958594066106,
-               -17.825402853539, 30.0307948992073, 29.6380142083718, 49.6506417101735,
-               -44.1750870723644, -32.8472885698896, 12.7607439556149, -15.7741569225653,
-               -41.5405111886502, -34.8179542704289, -38.3885023832212, 4.60137973293355,
-               -22.6440580206797, -0.213427106250919, -2.29987838737896, -21.081170253662,
-               38.454598692853, 15.1416694346051, -43.728082307768, -13.0723350036922,
-               28.0846481560228, -27.3096141757915, 45.7054711281168, 9.16013996497286,
-               9.62565605939507, -16.0461041502597, -35.5546251289444, -24.9716699563686,
-               49.8465322556856, 10.8257847829093, -34.2753709391232, -10.4856247161767,
-               48.8397137324941, 16.7101178052949, -35.4992391966538, -49.0238384344422,
-               47.597755712123, -20.1128595601079, 44.2571096499243, -34.507735468028,
-               35.4557823272802, 49.5489237085567, 31.1401253978472, 25.3007340967458,
-               6.45953149953921, -46.7962501020211, 1.03386467153074, -24.1707710493782,
-               35.2616940703965, -1.12871674368546, 46.1499998989781, 30.4491021819093,
-               -26.5440703974598, -39.6645892713107, -28.1460804729089, -41.6606455063026,
-               -7.39377404125834)
+  pos_x <- c(1.05944046146596, 44.4530163547364, 45.8793618542196,
+             -1.31587161139159, 17.8640418602947, 48.4840937544703, 10.7535089382283,
+             -24.6253107925863, -48.5108426726095, -7.76764412474417, 34.7851382149642,
+             9.83572522829692, 41.9505922251921, -9.07555369460079, -39.676662136738,
+             21.6185984474158, 46.4701522375152, -0.883315154385187, 28.0911201823354,
+             -13.847369533562, -49.7727146829549, -16.2936810258016, -33.9335427084662,
+             -8.47926857699624, -17.5993028014645, -33.0461085829127, 24.8750808532409,
+             -43.5077879392023, -16.9752324398488, 16.7694485345211, -8.91563038316473,
+             -48.3650161814635, 27.0749755681643, 34.0994637648402, -49.1648592745971,
+             -29.9712621173336, 49.5667313041262, 21.3612681252904, -21.3445953954488,
+             24.8211683871312, 23.4173005016891, -29.9699855919438, -49.958594066106,
+             -17.825402853539, 30.0307948992073, 29.6380142083718, 49.6506417101735,
+             -44.1750870723644, -32.8472885698896, 12.7607439556149, -15.7741569225653,
+             -41.5405111886502, -34.8179542704289, -38.3885023832212, 4.60137973293355,
+             -22.6440580206797, -0.213427106250919, -2.29987838737896, -21.081170253662,
+             38.454598692853, 15.1416694346051, -43.728082307768, -13.0723350036922,
+             28.0846481560228, -27.3096141757915, 45.7054711281168, 9.16013996497286,
+             9.62565605939507, -16.0461041502597, -35.5546251289444, -24.9716699563686,
+             49.8465322556856, 10.8257847829093, -34.2753709391232, -10.4856247161767,
+             48.8397137324941, 16.7101178052949, -35.4992391966538, -49.0238384344422,
+             47.597755712123, -20.1128595601079, 44.2571096499243, -34.507735468028,
+             35.4557823272802, 49.5489237085567, 31.1401253978472, 25.3007340967458,
+             6.45953149953921, -46.7962501020211, 1.03386467153074, -24.1707710493782,
+             35.2616940703965, -1.12871674368546, 46.1499998989781, 30.4491021819093,
+             -26.5440703974598, -39.6645892713107, -28.1460804729089, -41.6606455063026,
+             -7.39377404125834)
 
-    pos_y <- c(-15.8993972461616, -8.96685346602316, 25.2653183350009,
-               -39.0714808439679, -32.9641113081288, 19.5922174069934, 14.8674025804159,
-               38.2616003081126, -8.16583605869974, 17.8252525894824, 8.21593603120944,
-               -36.3379915713033, 29.7329787318616, 42.0827238488804, -20.2386772454794,
-               35.7556518838588, 5.55152952583172, 27.7482179433487, 37.4124616940735,
-               -42.4068608457502, -22.1109081515469, 10.2089709119964, -3.45245440515526,
-               -12.0062733527654, 5.19230996990487, -27.1646572653389, -26.8632992341179,
-               12.4455696770408, 39.5029725546056, -40.8904798063864, 13.4903138848752,
-               -9.33150580154056, 12.266246498016, 27.8095419155339, 8.94181503604101,
-               24.4028888129788, -44.3392208269988, 36.7910379389471, -45.1228359607758,
-               -35.9317653139032, 6.31296435991845, 20.9073748145245, -16.3575394819696,
-               22.4740052505691, 36.7314942719821, -3.77070330422793, -30.2931909279016,
-               16.583785813993, 38.7946206773652, -12.6087368305901, -3.99514927265182,
-               15.0189478879167, 27.1011443151554, -19.4368853267691, -6.71379469116036,
-               18.2862630593746, -40.2802146105095, -15.6248800198687, 32.2775346771305,
-               31.4803155819967, 45.0553762113152, 25.7675846881672, -49.8075671509248,
-               -6.86962262435439, 14.4530466734969, -5.96936453527461, 3.86969432620594,
-               -35.3152672431326, -15.5041801097397, -36.2079856152726, -10.8110700378683,
-               -48.6952585997799, -30.7297095345783, -42.2974065446223, 7.53790808198442,
-               -9.89011549737592, 30.0073720455366, 48.1503933132591, -32.8646234493861,
-               -46.9746807507946, -21.8590265307828, -2.9748266389963, 2.86405420190562,
-               -43.7889401248308, 10.0365696344108, 44.4795579080847, -48.3616605982961,
-               1.2228017579147, 4.04249242242624, 33.1075803768298, 4.64441718295845,
-               -47.8216259071557, 33.265393363792, 40.0764181461184, 42.4561064648432,
-               20.6604237095649, -41.4412266891093, 9.96154914243285, 33.2776014337331,
-               12.9988550096717)
+  pos_y <- c(-15.8993972461616, -8.96685346602316, 25.2653183350009,
+             -39.0714808439679, -32.9641113081288, 19.5922174069934, 14.8674025804159,
+             38.2616003081126, -8.16583605869974, 17.8252525894824, 8.21593603120944,
+             -36.3379915713033, 29.7329787318616, 42.0827238488804, -20.2386772454794,
+             35.7556518838588, 5.55152952583172, 27.7482179433487, 37.4124616940735,
+             -42.4068608457502, -22.1109081515469, 10.2089709119964, -3.45245440515526,
+             -12.0062733527654, 5.19230996990487, -27.1646572653389, -26.8632992341179,
+             12.4455696770408, 39.5029725546056, -40.8904798063864, 13.4903138848752,
+             -9.33150580154056, 12.266246498016, 27.8095419155339, 8.94181503604101,
+             24.4028888129788, -44.3392208269988, 36.7910379389471, -45.1228359607758,
+             -35.9317653139032, 6.31296435991845, 20.9073748145245, -16.3575394819696,
+             22.4740052505691, 36.7314942719821, -3.77070330422793, -30.2931909279016,
+             16.583785813993, 38.7946206773652, -12.6087368305901, -3.99514927265182,
+             15.0189478879167, 27.1011443151554, -19.4368853267691, -6.71379469116036,
+             18.2862630593746, -40.2802146105095, -15.6248800198687, 32.2775346771305,
+             31.4803155819967, 45.0553762113152, 25.7675846881672, -49.8075671509248,
+             -6.86962262435439, 14.4530466734969, -5.96936453527461, 3.86969432620594,
+             -35.3152672431326, -15.5041801097397, -36.2079856152726, -10.8110700378683,
+             -48.6952585997799, -30.7297095345783, -42.2974065446223, 7.53790808198442,
+             -9.89011549737592, 30.0073720455366, 48.1503933132591, -32.8646234493861,
+             -46.9746807507946, -21.8590265307828, -2.9748266389963, 2.86405420190562,
+             -43.7889401248308, 10.0365696344108, 44.4795579080847, -48.3616605982961,
+             1.2228017579147, 4.04249242242624, 33.1075803768298, 4.64441718295845,
+             -47.8216259071557, 33.265393363792, 40.0764181461184, 42.4561064648432,
+             20.6604237095649, -41.4412266891093, 9.96154914243285, 33.2776014337331,
+             12.9988550096717)
 
   expect_equal(mySim$npixelsburned, burnedLast)
   expect_equivalent(mySim$caribou$x, pos_x)
@@ -157,14 +157,14 @@ test_that("simInit with R subfolder scripts", {
   newModule("child1", ".", open = FALSE)
   cat(file = file.path("child1", "R", "script.R"),
       "a <- function(poiuoiu) {
-          poiuoiu + 1
-      }", sep = "\n")
+      poiuoiu + 1
+}", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
   expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
     if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
   expect_true(mySim@.xData$child1$a(2) == 3) # Fns
-})
+  })
 
 test_that("simulation runs with simInit with duplicate modules named", {
   testInitOut <- testInit()
@@ -189,7 +189,6 @@ test_that("simulation runs with simInit with duplicate modules named", {
   expect_true(length(modules(mySim)) == length(unique(modules)))
 })
 
-
 test_that("simulation runs with simInit with duplicate modules named", {
   skip("benchmarking DES")
 
@@ -199,44 +198,80 @@ test_that("simulation runs with simInit with duplicate modules named", {
   }, add = TRUE)
 
   newModule("test", tmpdir, open = FALSE)
+  newModule("test2", tmpdir, open = FALSE)
 
   sim <- simInit()
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
   cat(file = file.path(tmpdir, "test", "test.R"),'
-  defineModule(sim, list(
-    name = "test",
-    description = "insert module description here",
-    keywords = c("insert key words here"),
-    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
-    childModules = character(0),
-    version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-    spatialExtent = raster::extent(rep(NA_real_, 4)),
-    timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = "second",
-    citation = list("citation.bib"),
-    documentation = list("README.txt", "test.Rmd"),
-    reqdPkgs = list(),
-    parameters = rbind(
-    ),
-    inputObjects = bind_rows(
-    ),
-    outputObjects = bind_rows(
-    )
-  ))
+      defineModule(sim, list(
+      name = "test",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "second",
+      citation = list("citation.bib"),
+      documentation = list("README.txt", "test.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+      ),
+      inputObjects = bind_rows(
+      ),
+      outputObjects = bind_rows(
+      )
+      ))
 
-  doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
-    switch(
+      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
       eventType,
       init = {
-        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       },
       event1 = {
-        sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       })
-    return(invisible(sim))
-  }
-  ', fill = TRUE)
+      return(invisible(sim))
+      }
+      ', fill = TRUE)
+
+  cat(file = file.path(tmpdir, "test2", "test2.R"),'
+      defineModule(sim, list(
+      name = "test2",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "second",
+      citation = list("citation.bib"),
+      documentation = list("README.txt", "test2.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+      ),
+      inputObjects = bind_rows(
+      ),
+      outputObjects = bind_rows(
+      )
+      ))
+
+      doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
+      },
+      event1 = {
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
+      })
+      return(invisible(sim))
+      }
+      ', fill = TRUE)
 
   N <- 5000
 
@@ -262,9 +297,15 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
   nTimes <- 20
 
-  # was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
-  # New with "seconds" -- Sept 218, 2018 is 492 seconds --> 98 microseconds/event
-  #system.time({spades(mySim, debug = FALSE)})
+  #######################
+  # Tested on laptop
+  #######################
+  # laptop was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
+  # laptop New with "seconds" -- Sept 21, 2018 is 0.492 seconds --> 98 microseconds/event
+  # laptop New with "seconds" -- Nov 26, 2018 is 0.458 seconds --> 92 microseconds/event!
+  # Windows Desktop -- slower -- Nov 26, 2018 0.730 Seconds --> 148 microseconds/event!
+  # Linux Server -- slower -- Nov 26, 2018 0.795 Seconds --> 159 microseconds/event!
+  # BorealCloud Server -- slower -- Nov 26, 2018 0.972 Seconds --> 194 microseconds/event!
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
@@ -273,9 +314,13 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
   #                         -- This is 161 microseconds per event
   # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
+  # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
+  # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
+  # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
+  # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
   options("spades.keepCompleted" = FALSE)
-  a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
-  #profvis::profvis({spades(mySim, debug = FALSE)})
+  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
 
   a <- 0
   a3 <- microbenchmark::microbenchmark(
@@ -285,8 +330,25 @@ test_that("simulation runs with simInit with duplicate modules named", {
   )
 
   summary(a2)[, "median"]/summary(a3)[, "median"]
-})
 
+  ########################################
+  # With 2 modules, therefore sorting
+  ########################################
+  modules <- list("test", "test2")
+  mySim <- simInit(times = times, params = parameters, modules = modules,
+                   objects = objects, paths = paths)
+
+  nTimes <- 10
+  # Turn off completed list
+  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
+  options("spades.keepCompleted" = FALSE)
+  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
+
+  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
+  options("spades.keepCompleted" = TRUE)
+  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+})
 
 test_that("conflicting function types", {
   testInitOut <- testInit(smcc = TRUE)
@@ -296,10 +358,9 @@ test_that("conflicting function types", {
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)
-  fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
+  fileName <- file.path(m, paste0(m, ".R")) # child4/child4.R"
   xxx <- readLines(fileName)
   lineWithInit <- grep(xxx, pattern = "^Init")
-
 
   xxx1 <- gsub(xxx, pattern = 'plotFun', replacement = 'Plot') # nolint
   cat(xxx1, file = fileName, sep = "\n")
@@ -317,7 +378,7 @@ test_that("conflicting function types", {
 
       levels(poiuoiu) <- rat
       ",
-              xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
@@ -351,7 +412,7 @@ test_that("conflicting function types", {
 
   cat(xxx[1:(lineWithInit - 1)], "
       a <- function(x) {
-         b <- b + 1
+      b <- b + 1
       }
       ",
       xxx[(lineWithInit):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
@@ -382,9 +443,9 @@ test_that("conflicting function types", {
                    "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
                    "defineParameter: 'saveInterval' is not of specified type 'numeric'",
                    "child4: module code: Init: local variable.*qwerqwer.*assigned but may not be used",
-                   "Running inputObjects for child4", "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used",
-                   "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in outputObjects",
-                   "child4: inputObjects: b, d, f, hi, d1, test are used from sim inside Init, but are not declared in inputObjects"
+                   "Running .inputObjects for child4", "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used",
+                   "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in metadata outputObjects",
+                   "child4: inputObjects: b, d, f, hi, d1, test are used from sim inside Init, but are not declared in metadata inputObjects"
   )
 
   mm <- cleanMessage(mm)
@@ -408,7 +469,7 @@ test_that("conflicting function types", {
   expect_error(simInit(paths = list(modulePath = tmpdir), modules = m),
                c(paste0(m, ": You have created an object")))
 
-  # declared in inputObjects
+  # declared in metadata inputObjects
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   cat(xxx[1:(lineWithInputObjects-1)], "
       expectsInput('a', 'numeric', '', '')
@@ -416,9 +477,9 @@ test_that("conflicting function types", {
       xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-               c(paste0(m, ": module code: a is declared in inputObjects")))
+                 c(paste0(m, ": module code: a is declared in metadata inputObjects")))
 
-  # declared in outputObjects
+  # declared in metadata outputObjects
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
   cat(xxx[1:(lineWithOutputObjects-1)], "
       createsOutput('b', 'numeric', '')
@@ -426,7 +487,7 @@ test_that("conflicting function types", {
       xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-               c(paste0(m, ": module code: b is declared in outputObjects")))
+                 c(paste0(m, ": module code: b is declared in metadata outputObjects")))
 
   cat(xxx[1:(lineWithInputObjects-1)], "
       expectsInput('a', 'numeric', '', '')
@@ -439,7 +500,11 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
-    pattern = c(paste0(m, ": module code: b is declared in outputObjects|child4: module code: a is declared in inputObjects|Running .input")))))
+                        pattern = c(paste0(m, ": module code: b is declared in metadata outputObjects|",
+                                           m, ": module code: a is declared in metadata inputObjects|",
+                                           "Running .inputObjects|",
+                                           "Setting:|Paths set to:|",
+                                           m, ": using dataPath")))))
 
   # assign to sim for functions like scheduleEvent
   lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
@@ -455,7 +520,7 @@ test_that("conflicting function types", {
   lineWithReturnSim <- grep(xxx, pattern = patt)[1]
   xxx1 <- xxx
   xxx1[lineWithReturnSim] <- sub(xxx[lineWithReturnSim], pattern = patt,
-                                     replacement = "return(invisible())")
+                                 replacement = "return(invisible())")
   cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
@@ -464,20 +529,20 @@ test_that("conflicting function types", {
 
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
-  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1]
   cat(xxx[1:(lineWithInputObjects-1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co2', 'numeric', ''),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx[(lineWithOutputObjects+1):lineWithInit], "
+      xxx[(lineWithOutputObjects + 1):lineWithInit], "
       a <- sim$b
       sim$g <- f
       holy(sim$co4) <- f
@@ -488,7 +553,7 @@ test_that("conflicting function types", {
       xx <- c(1,2)
       xx[sim$ei4] <- NA
       ",
-      xxx[(lineWithInit+1):lineWithDotInputObjects], "
+      xxx[(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
       sim$g <- 1
       sim$ei1 <- 4
@@ -497,20 +562,22 @@ test_that("conflicting function types", {
       sim$co1 <- 123
       aaa <- sim$.userSuppliedObjNames # in the ignoreObjects
       ",
-      xxx[(lineWithDotInputObjects+1):length(xxx)],
+      xxx[(lineWithDotInputObjects + 1):length(xxx)],
       sep = "\n", fill = FALSE, file = fileName)
 
-  fullMessage <- c("Running inputObjects for child4", "child4: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-                   "child4: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
-                   "child4: module code: ei3 is declared in inputObjects, but is not used in the module",
-                   "child4: module code: inputObjects: local variable.*a.*assigned but may not be used",
-                   "child4: module code: inputObjects: local variable.*fff.*assigned but may not be used",
-                   "child4: module code: Init: local variable.*a.*assigned but may not be used",
-                   "child4: module code: Init: local variable.*fff.*assigned but may not be used",
-                   "child4: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
-                   "child4: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
-                   "child4: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
-                   "child4: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects"
+  fullMessage <- c(
+    "Running .inputObjects for child4",
+    "child4: module code: co2, co3 are declared in metadata outputObjects, but are not assigned in the module",
+    "child4: module code: ei2, ei3, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
+    "child4: module code: ei3 is declared in metadata inputObjects, but is not used in the module",
+    "child4: module code: .inputObjects: local variable.*a.*assigned but may not be used",
+    "child4: module code: .inputObjects: local variable.*fff.*assigned but may not be used",
+    "child4: module code: Init: local variable.*a.*assigned but may not be used",
+    "child4: module code: Init: local variable.*fff.*assigned but may not be used",
+    "child4: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in metadata outputObjects",
+    "child4: inputObjects: g, co1 are assigned to sim inside .inputObjects, but are not declared in metadata inputObjects",
+    "child4: inputObjects: b, aaa are used from sim inside Init, but are not declared in metadata inputObjects",
+    "child4: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects"
   )
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
@@ -525,10 +592,7 @@ test_that("conflicting function types", {
   #   }
   #   expect_true(theGrep)
   # }
-
-
 })
-
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
   testInitOut <- testInit(smcc = TRUE)
@@ -551,7 +615,6 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(unlist(lapply(c("Running .inputObjects", "module code appears clean"),
                                 function(x) any(grepl(mm, pattern = x))))))
-
 })
 
 test_that("messaging with multiple modules", {
@@ -574,34 +637,33 @@ test_that("messaging with multiple modules", {
   xxx <- lapply(fileNames, readLines)
   set.seed(113)
 
-
   lineWithInit <- grep(xxx[[1]], pattern = "^Init")
   lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
-  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")[1]
 
   xxx1 <- list()
   #lapply(seq(m), function(yy) sample(c("character", "numeric", "logical"), size = 3, replace = TRUE))
   xxx1[[1]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
-                   "\\.plotInitialTime\", \"character\", 1", xxx[[1]])
+                    "\\.plotInitialTime\", \"character\", 1", xxx[[1]])
   xxx1[[1]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
-                   "\\.saveInitialTime\", \"character\", FALSE", xxx1[[1]])
+                    "\\.saveInitialTime\", \"character\", FALSE", xxx1[[1]])
   xxx1[[1]] <- gsub("\\.saveInterval\", \"numeric\", NA",
-                   "\\testtime\", \"logical\", NA_real_", xxx1[[1]])
+                    "\\testtime\", \"logical\", NA_real_", xxx1[[1]])
 
   xxx1[[2]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
-                   "\\.plotInitialTime\", \"character\", TRUE", xxx[[2]])
+                    "\\.plotInitialTime\", \"character\", TRUE", xxx[[2]])
   xxx1[[2]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
-                   "\\.saveInitialTime\", \"character\", 'c'", xxx1[[2]])
+                    "\\.saveInitialTime\", \"character\", 'c'", xxx1[[2]])
   xxx1[[2]] <- gsub("\\.saveInterval\", \"numeric\", NA",
-                   "\\testtime\", \"character\", NA_real_", xxx1[[2]])
+                    "\\testtime\", \"character\", NA_real_", xxx1[[2]])
 
   xxx1[[3]] <- gsub("\\.plotInitialTime\", \"numeric\", NA",
-                   "\\.plotInitialTime\", \"character\", 1", xxx[[3]])
+                    "\\.plotInitialTime\", \"character\", 1", xxx[[3]])
   xxx1[[3]] <- gsub("\\.saveInitialTime\", \"numeric\", NA",
-                   "\\hello\", \"character\", 1", xxx1[[3]])
+                    "\\hello\", \"character\", 1", xxx1[[3]])
   xxx1[[3]] <- gsub("\\.saveInterval\", \"numeric\", NA",
-                   "\\testtime\", \"logical\", NA_real_", xxx1[[3]])
+                    "\\testtime\", \"logical\", NA_real_", xxx1[[3]])
   xxx1[[4]] <- xxx[[4]] # clean one
 
   cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
@@ -659,32 +721,37 @@ test_that("messaging with multiple modules", {
       xxx1[[2]][(lineWithDotInputObjects+1):length(xxx1[[2]])],
       sep = "\n", fill = FALSE, file = fileNames[2])
 
-  fullMessage <- c("defineParameter: 'plotInitialTime' is not of specified type 'character'",
-                   "defineParameter: 'saveInitialTime' is not of specified type 'character'",
-                   "Running inputObjects for test", "test: module code: co2, co3 are declared in outputObjects, but are not assigned in the module",
-                   "test: module code: ei2, ei3, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
-                   "test: module code: ei3 is declared in inputObjects, but is not used in the module",
-                   "test: module code: inputObjects: local variable.*a.*assigned but may not be used",
-                   "test: module code: inputObjects: local variable.*fff.*assigned but may not be used",
-                   "test: module code: Init: local variable.*a.*assigned but may not be used",
-                   "test: module code: Init: local variable.*fff.*assigned but may not be used",
-                   "test: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in outputObjects",
-                   "test: inputObjects: g, co1 are assigned to sim inside inputObjects, but are not declared in inputObjects",
-                   "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in inputObjects",
-                   "test: inputObjects: b, co3 are used from sim inside inputObjects, but are not declared in inputObjects",
-                   "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-                   "Running inputObjects for test2", "test2: module code: co1, co4 are declared in outputObjects, but are not assigned in the module",
-                   "test2: module code: ei1, ei4 are declared in inputObjects, but no default\\(s\\) are provided in inputObjects",
-                   "test2: module code: ei1 is declared in inputObjects, but is not used in the module",
-                   "test2: module code: inputObjects: local variable.*a.*assigned but may not be used",
-                   "test2: module code: Init: local variable.*a.*assigned but may not be used",
-                   "test2: inputObjects: co1 is assigned to sim inside inputObjects, but is not declared in inputObjects",
-                   "test2: inputObjects: b is used from sim inside Init, but is not declared in inputObjects",
-                   "test2: inputObjects: b is used from sim inside inputObjects, but is not declared in inputObjects",
-                   "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-                   "defineParameter: 'hello' is not of specified type 'character'",
-                   "Running inputObjects for test3", "test3: module code appears clean",
-                   "Running inputObjects for test4", "test4: module code appears clean"
+  fullMessage <- c(
+    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+    "defineParameter: 'saveInitialTime' is not of specified type 'character'",
+    "Running .inputObjects for test",
+    "test: module code: co2, co3 are declared in metadata outputObjects, but are not assigned in the module",
+    "test: module code: ei2, ei3, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
+    "test: module code: ei3 is declared in metadata inputObjects, but is not used in the module",
+    "test: module code: .inputObjects: local variable.*a.*assigned but may not be used",
+    "test: module code: .inputObjects: local variable.*fff.*assigned but may not be used",
+    "test: module code: Init: local variable.*a.*assigned but may not be used",
+    "test: module code: Init: local variable.*fff.*assigned but may not be used",
+    "test: outputObjects: g, aaa are assigned to sim inside Init, but are not declared in metadata outputObjects",
+    "test: inputObjects: g, co1 are assigned to sim inside .inputObjects, but are not declared in metadata inputObjects",
+    "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in metadata inputObjects",
+    "test: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects",
+    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+    "Running .inputObjects for test2",
+    "test2: module code: co1, co4 are declared in metadata outputObjects, but are not assigned in the module",
+    "test2: module code: ei1, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
+    "test2: module code: ei1 is declared in metadata inputObjects, but is not used in the module",
+    "test2: module code: .inputObjects: local variable.*a.*assigned but may not be used",
+    "test2: module code: Init: local variable.*a.*assigned but may not be used",
+    "test2: inputObjects: co1 is assigned to sim inside .inputObjects, but is not declared in metadata inputObjects",
+    "test2: inputObjects: b is used from sim inside Init, but is not declared in metadata inputObjects",
+    "test2: inputObjects: b is used from sim inside .inputObjects, but is not declared in metadata inputObjects",
+    "defineParameter: 'plotInitialTime' is not of specified type 'character'",
+    "defineParameter: 'hello' is not of specified type 'character'",
+    "Running .inputObjects for test3",
+    "test3: module code appears clean",
+    "Running .inputObjects for test4",
+    "test4: module code appears clean"
   )
 
   for(y in 3:4) {
@@ -699,7 +766,6 @@ test_that("messaging with multiple modules", {
   mm <- cleanMessage(mm)
 })
 
-
 test_that("Module code checking -- pipe with matrix product with backtick & data.table", {
   testInitOut <- testInit(smcc = TRUE)
   on.exit({
@@ -713,50 +779,52 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   lineWithInit <- grep(xxx, pattern = "^Init")
   xxx1 <- xxx
   cat(xxx[1:lineWithInit], "
-    checksums1 <- structure(list(result = c('OK', 'OK'),
-                                           expectedFile = c('Land_Cover_2010_TIFF.zip','NA_LandCover_2010_25haMMU.tif'),
-                                           actualFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif'),
-                                           checksum.x = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
-                                           checksum.y = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
-                                           algorithm.x = c('xxhash64', 'xxhash64'),
-                                           algorithm.y = c('xxhash64', 'xxhash64'),
-                                           renamed = c(NA, NA),
-                                           module = c('simplifyLCCVeg',  'simplifyLCCVeg')),
-                                      .Names = c('result', 'expectedFile', 'actualFile',
-                                                 'checksum.x', 'checksum.y', 'algorithm.x', 'algorithm.y', 'renamed',
-                                                 'module'),
-                                      row.names = c(NA, -2L),
-                                      class = c('grouped_df', 'tbl_df', 'tbl', 'data.frame'),
-                                      vars = 'expectedFile',
-                                      indices = list(0L, 1L),
-                                      group_sizes = c(1L, 1L),
-                                      biggest_group_size = 1L,
-                                      labels = structure(list(expectedFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif')),
-                                                         .Names = 'expectedFile',
-                                                         row.names = c(NA, -2L),
-                                                         class = 'data.frame', vars = 'expectedFile'))
+      checksums1 <- structure(list(result = c('OK', 'OK'),
+      expectedFile = c('Land_Cover_2010_TIFF.zip','NA_LandCover_2010_25haMMU.tif'),
+      actualFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif'),
+      checksum.x = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+      checksum.y = c('f4f647d11f5ce109', '6b74878f59de5ea9'),
+      algorithm.x = c('xxhash64', 'xxhash64'),
+      algorithm.y = c('xxhash64', 'xxhash64'),
+      renamed = c(NA, NA),
+      module = c('simplifyLCCVeg',  'simplifyLCCVeg')),
+      .Names = c('result', 'expectedFile', 'actualFile',
+      'checksum.x', 'checksum.y', 'algorithm.x', 'algorithm.y', 'renamed',
+      'module'),
+      row.names = c(NA, -2L),
+      class = c('grouped_df', 'tbl_df', 'tbl', 'data.frame'),
+      vars = 'expectedFile',
+      indices = list(0L, 1L),
+      group_sizes = c(1L, 1L),
+      biggest_group_size = 1L,
+      labels = structure(list(expectedFile = c('Land_Cover_2010_TIFF.zip', 'NA_LandCover_2010_25haMMU.tif')),
+      .Names = 'expectedFile',
+      row.names = c(NA, -2L),
+      class = 'data.frame', vars = 'expectedFile'))
 
-    result1 <- checksums1[checksums1$expectedFile == 'NA_LandCover_2010_25haMMU.tif',]$result
+      result1 <- checksums1[checksums1$expectedFile == 'NA_LandCover_2010_25haMMU.tif',]$result
 
-    sim$bvcx <- matrix(1:2) %>% `%*%` (2:3)
-    sim$bvcx2 <- matrix(1:2) %>% \"%*%\" (2:3)
-    sim$b <- matrix(1:2) %>% t()
+      sim$bvcx <- matrix(1:2) %>% `%*%` (2:3)
+      sim$bvcx2 <- matrix(1:2) %>% \"%*%\" (2:3)
+      sim$b <- matrix(1:2) %>% t()
 
-    sim$a <- 1
-    ",
+      sim$a <- 1
+      ",
       xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   mm <- cleanMessage(mm)
 
-  fullMessage1 <- c("Running inputObjects for child4",
-                   "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
-                   "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in outputObjects")
-  fullMessageNonInteractive <- c("Running inputObjects for child4",
-                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx <- matrix.*",#possibly at .*147",
-                    "child4: module code: Init",cantCodeCheckMessage,"'sim\\$bvcx2 <- matrix.*",#possibly at .*148",
-                    "child4: module code: Init: local variable.*result1.*assigned but may not be used",
-                    "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in outputObjects"
+  fullMessage1 <- c(
+    "Running .inputObjects for child4",
+    "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
+    "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in metadata outputObjects")
+  fullMessageNonInteractive <- c(
+    "Running .inputObjects for child4",
+    "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx <- matrix.*",#possibly at .*147",
+    "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx2 <- matrix.*",#possibly at .*148",
+    "child4: module code: Init: local variable.*result1.*assigned but may not be used",
+    "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in metadata outputObjects"
   )
   test1 <- all(unlist(lapply(fullMessage1, function(x) any(grepl(mm, pattern = x)))))
   test2 <- all(unlist(lapply(fullMessageNonInteractive, function(x) any(grepl(mm, pattern = x)))))
@@ -775,5 +843,46 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   #   cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
   # }
   expect_true(test1 || test2)
+
+})
+
+test_that("simInitAndSpades", {
+  testInitOut <- testInit(opts = list("spades.moduleCodeChecks" = FALSE))
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  set.seed(42)
+
+  times <- list(start = 0.0, end = 0, timeunit = "year")
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+  )
+  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  set.seed(123)
+  mySim <- simInitAndSpades(times = times, params = params,
+                            modules = modules, objects = list(), paths = paths, debug = FALSE)
+
+  set.seed(123)
+  mySim2 <- simInit(times = times, params = params,
+                    modules = modules, objects = list(), paths = paths) %>%
+    spades(debug = FALSE)
+
+  expect_true(all.equal(mySim, mySim2))
+
+  set.seed(123)
+  mySim <- simInitAndExperiment(times = times, params = params,
+                                modules = modules, objects = list(), paths = paths, debug = FALSE)
+
+  set.seed(123)
+  mySim2 <- simInit(times = times, params = params,
+                    modules = modules, objects = list(), paths = paths) %>%
+    experiment(debug = FALSE)
+
+  expect_true(all.equal(mySim, mySim2))
 
 })

@@ -16,9 +16,12 @@ framework that facilitates modularity, and easily enables the user to
 include additional functionality by running user-built simulation modules.
 Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
-of the DES, with current benchmarking as low as 500 microseconds overhead for
-each event (including queuing, sorting, spawning event etc.) or 52 microseconds
-if there is no sorting
+of the DES, with current benchmarking as low as 56 microseconds overhead for
+each event (including scheduling, sorting event queue, spawning event etc.) or
+38 microseconds if there is no sorting (i.e., no sorting occurs under simple
+conditions). Under most event conditions, therefore, the DES itself will contribute
+very minimally compared to the content of the events, which may often be
+milliseconds to many seconds each event.
 
 Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 
@@ -49,6 +52,7 @@ A collection of top-level functions for doing spatial discrete event simulation.
 
   \tabular{ll}{
     \code{\link{scheduleEvent}} \tab Schedule a simulation event\cr
+    \code{\link{scheduleConditionalEvent}} \tab Schedule a conditional simulation event\cr
     \code{removeEvent} \tab Remove an event from the simulation queue (not yet implemented)\cr
   }
 }
@@ -463,7 +467,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   first time makes the error, the second time has \code{debugonce} and the third time
   is after the error is addressed. \code{TRUE} is likely somewhat slower.
 
-  \item \code{spades.cachePath}: The default local directory in which to
+  \item \code{reproducible.cachePath}: The default local directory in which to
   cache simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
 
@@ -533,7 +537,7 @@ Other contributors:
 \itemize{
   \item Yong Luo \email{yluo1@lakeheadu.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
-  \item Ceres Barros \email{cbarros@mail.ubc.ca} [contributor]
+  \item Ceres Barros \email{cbarros@mail.ubc.ca} (0000-0003-4036-977X) [contributor]
   \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
 

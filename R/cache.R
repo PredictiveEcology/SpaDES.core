@@ -3,7 +3,7 @@ if (!isGeneric(".robustDigest")) {
     ".robustDigest",
     function(object, objects, length = Inf, algo = "xxhash64") {
       standardGeneric(".robustDigest")
-  })
+    })
 }
 
 #' \code{.robustDigest} for \code{simList} class objects
@@ -37,7 +37,8 @@ setMethod(
                         quick, classOptions) {
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
-    moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))], envir = object@.xData)
+    moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))],
+                         envir = object@.xData)
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
     allObjsInSimList <- append(list(".xData" = outerObjs), moduleObjs)
     allEnvsInSimList <- append(list(object@.xData), moduleEnvirs)
@@ -45,6 +46,7 @@ setMethod(
     ord <- .orderDotsUnderscoreFirst(allObjsInSimList)
     allObjsInSimList <- allObjsInSimList[ord]
     allEnvsInSimList <- allEnvsInSimList[ord]
+    names(allEnvsInSimList) <- names(allObjsInSimList)
 
     isObjectEmpty <- if (!missing(objects)) {
       if (!is.null(objects)) {
@@ -70,15 +72,17 @@ setMethod(
     } else {
       objects <- allObjsInSimList
     }
-    envirHash <- lapply(seq(allObjsInSimList), function(objs) {
-      objectsToDigest <- sort(allObjsInSimList[[objs]], method = "radix")
-      objectsToDigest <- objectsToDigest[objectsToDigest %in%
-                                           objects[[names(allObjsInSimList)[objs]]]]
-      .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[objs]]),
-                    quick = quick,
-                    length = length)
-    })
-    names(envirHash) <- names(allObjsInSimList)
+    envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
+                     function(objs, name) {
+                       objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "mod")]
+                       objectsToDigest <- sort(objs, method = "radix")
+                       objectsToDigest <- objectsToDigest[objectsToDigest %in%
+                                                            objects[[name]]]
+                       .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[name]]),
+                                     quick = quick,
+                                     length = length)
+                     })
+    #names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
     envirHash <- envirHash[lens]
 
@@ -227,13 +231,14 @@ setMethod(
       })
 
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
+      if (is.na(fromMemoise)) fromMemoise <- FALSE
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
           cat(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
         } else if (!is.na(fromMemoise)){
           cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
-                           "adding to memoised copy"))
+                           "adding to memoised copy\n"))
         } else {
           cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
         }
@@ -244,7 +249,9 @@ setMethod(
 
         } else if (!is.na(fromMemoise)){
           cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
-                           cur$moduleName, "module. Adding to memoised copy.\n"))
+                           cur$moduleName, "module. ",
+                           if (fromMemoise) "Adding to memoised copy.",
+                           "\n"))
         } else {
           cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
@@ -295,12 +302,12 @@ setMethod(
         sim <- get("sim", envir = sys.frame(doEventFrameNum))
         cacheRepo <- sim@paths$cachePath
       } else {
-        cacheRepo <- .getOption("spades.cachePath")
+        cacheRepo <- .getOption("reproducible.cachePath")
         #checkPath(cacheRepo, create = TRUE) #SpaDES dependency
       }
     }
     checkPath(path = cacheRepo, create = create)
-})
+  })
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
@@ -319,7 +326,7 @@ if (!isGeneric(".addChangedAttr")) {
 #'
 #' @seealso \code{\link[reproducible]{.addChangedAttr}}.
 #'
-#' @importFrom reproducible .addChangedAttr
+#' @importFrom reproducible .addChangedAttr .setSubAttrInList
 #' @importMethodsFrom reproducible .addChangedAttr
 #' @inheritParams reproducible::.addChangedAttr
 #' @include simList-class.R
@@ -333,23 +340,34 @@ setMethod(
   definition = function(object, preDigest, origArguments, ...) {
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
+
     # remove the "newCache" attribute, which is irrelevant for digest
-    if (!is.null(attr(object, ".Cache")$newCache)) attr(object, ".Cache")$newCache <- NULL
+    if (!is.null(attr(object, ".Cache")$newCache)) {
+
+      .setSubAttrInList(object, ".Cache", "newCache", NULL)
+      #attr(object, ".Cache")$newCache <- NULL
+
+      if (!identical(attr(object, ".Cache")$newCache, NULL))
+        stop("attributes on the cache object are not correct - 4")
+    }
     postDigest <-
       .robustDigest(object, objects = dots$objects,
                     length = dots$length,
                     algo = dots$algo,
                     quick = dots$quick,
                     classOptions = dots$classOptions)
+
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
       whSimList2 <- if (is.null(internalSimList)) {
         1
       } else {
-        which(internalSimList)
+        which(internalSimList)[1] # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
       }
-      isNewObj <- !names(postDigest$.list[[whSimList2]]) %in% names(preDigest[[whSimList]]$.list[[whSimList2]])
+
+      isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
+        names(preDigest[[whSimList]]$.list[[whSimList2]])
       newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
       newObjs <- newObjs[!startsWith(newObjs, "._")]
       existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
@@ -360,19 +378,20 @@ setMethod(
     } else {
       character()
     }
-    attr(object, ".Cache")$changed <- changed
+
+    .setSubAttrInList(object, ".Cache", "changed", changed)
+    #attr(object, ".Cache")$changed <- changed
+    if (!identical(attr(object, ".Cache")$changed, changed))
+      stop("attributes on the cache object are not correct - 5")
+
     object
-  })
-
-
+})
 
 if (!isGeneric(".preDigestByClass")) {
   setGeneric(".preDigestByClass", function(object) {
     standardGeneric(".preDigestByClass")
   })
 }
-
-
 
 if (!isGeneric(".prepareOutput")) {
   setGeneric(".prepareOutput", function(object) {
@@ -385,14 +404,16 @@ if (!isGeneric(".prepareOutput")) {
 #'
 #' See \code{\link[reproducible]{.prepareOutput}}.
 #'
+#' @inheritParams reproducible::.prepareOutput
+#'
+#' @export
+#' @exportMethod .prepareOutput
+#' @include simList-class.R
+#' @importFrom data.table setattr
 #' @importFrom reproducible .prepareOutput
 #' @importMethodsFrom reproducible .prepareOutput
-#' @inheritParams reproducible::.prepareOutput
-#' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.prepareOutput}}
-#' @exportMethod .prepareOutput
-#' @export
 #' @rdname prepareOutput
+#' @seealso \code{\link[reproducible]{.prepareOutput}}
 setMethod(
   ".prepareOutput",
   signature = "simList",
@@ -436,9 +457,10 @@ setMethod(
         #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
         object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
 
-        hasCurrModule <- currentModule(tmpl[[whSimList]])
+        currModules <- currentModule(tmpl[[whSimList]])
         # Convert to numeric index, as some modules don't have names
-        hasCurrModule <- match(hasCurrModule, modules(tmpl[[whSimList]]))
+        hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
+        if (length(currModules) == 0) currModules <- modules(tmpl[[whSimList]])
 
         createOutputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
@@ -448,8 +470,9 @@ setMethod(
           unique(unlist(aa))
         }
         createOutputs <- na.omit(createOutputs)
+        createOutputs <- c(createOutputs, currModules) # add the environments for each module - allow local objects
         # take only the ones that the file changed, based on attr(object, ".Cache")$changed
-        createOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+        changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
         expectsInputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
@@ -461,14 +484,9 @@ setMethod(
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
         lsObjectEnv <- ls(object@.xData, all.names = TRUE)
-        list2env(mget(lsObjectEnv[lsObjectEnv %in% createOutputs | lsObjectEnv %in% expectsInputs],
+        list2env(mget(lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs],
                       envir = object@.xData), envir = object2@.xData)
         if (length(object2@current)==0) { # means it is not in a spades call
-          # numCompleted <- if (length(object2@completed)) {
-          #   length(unlist(object2@completed, recursive = FALSE))/(length(object2@completed[[1]]))
-          # } else {
-          #   0
-          # }
           object2@completed <- object@completed
         }
         if (NROW(current(object2)) == 0) {
@@ -517,18 +535,17 @@ setMethod(
 
       attrsToGrab <- setdiff(names(attributes(object)), names(attributes(object2)))
       for(atts in attrsToGrab) {
-        attr(object2, atts) <- attr(object, atts)
+        setattr(object2, atts, attr(object, atts))
+        #attr(object2, atts) <- attr(object, atts)
+        if (!identical(attr(object2, atts), attr(object, atts)))
+          stop("attributes on the cache object are not correct - 6")
       }
 
-      # attr(object2, "tags") <- attr(object, "tags")
-      # attr(object2, "call") <- attr(object, "call")
-      # attr(object2, "function") <- attr(object, "function")
-      #
       return(object2)
     } else {
       return(object)
     }
-  })
+})
 
 ################################################################################
 #' Pre-digesting method for \code{simList}
@@ -552,7 +569,7 @@ setMethod(
   definition = function(object) {
     obj <- ls(object@.xData, all.names = TRUE)
     return(obj)
-  })
+})
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -569,12 +586,12 @@ if (!isGeneric(".addTagsToOutput")) {
 #' @author Eliot McIntire
 #' @exportMethod .addTagsToOutput
 #' @export
+#' @importFrom data.table setattr
 #' @importFrom reproducible .addTagsToOutput
 #' @importMethodsFrom reproducible .addTagsToOutput
 #' @include simList-class.R
 #' @rdname addTagsToOutput
 #' @seealso \code{\link[reproducible]{.addTagsToOutput}}
-#'
 setMethod(
   ".addTagsToOutput",
   signature = "simList",
@@ -586,10 +603,19 @@ setMethod(
       # Some objects are conditionally produced from a module's outputObject
       whExist <- outputObjects %in% ls(object@.xData, all.names = TRUE)
       list2env(mget(outputObjects[whExist], envir = object@.xData), envir = outputToSave@.xData)
-      attr(outputToSave, "tags") <- attr(object, "tags")
-      attr(outputToSave, "call") <- attr(object, "call")
-      if (isS4(FUN))
-        attr(outputToSave, "function") <- attr(object, "function")
+
+      setattr(outputToSave, "tags", attr(object, "tags"))
+      setattr(outputToSave, "call", attr(object, "call"))
+      #attr(outputToSave, "tags") <- attr(object, "tags")
+      #attr(outputToSave, "call") <- attr(object, "call")
+      if (isS4(FUN)) {
+        setattr(outputToSave, "function", attr(object, "function"))
+        # attr(outputToSave, "function") <- attr(object, "function")
+      }
+      if (!identical(attr(outputToSave, "tags"), attr(object, "tags")))
+        stop("attributes on the cache object are not correct - 1")
+      if (!identical(attr(outputToSave, "call"), attr(object, "call")))
+        stop("attributes on the cache object are not correct - 2")
     } else {
       outputToSave <- object
     }
@@ -602,7 +628,7 @@ setMethod(
     }
 
     outputToSave
-  })
+})
 
 if (!isGeneric(".objSizeInclEnviros")) {
   setGeneric(".objSizeInclEnviros", function(object) {
@@ -614,22 +640,22 @@ if (!isGeneric(".objSizeInclEnviros")) {
 #'
 #' See \code{\link[reproducible]{.objSizeInclEnviros}}.
 #'
+#' @inheritParams reproducible::.objSizeInclEnviros
+#'
+#' @export
+#' @exportMethod .objSizeInclEnviros
 #' @importFrom reproducible .objSizeInclEnviros
 #' @importFrom utils object.size
 #' @importMethodsFrom reproducible .objSizeInclEnviros
-#' @inheritParams reproducible::.objSizeInclEnviros
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.objSizeInclEnviros}}
-#' @exportMethod .objSizeInclEnviros
-#' @export
 #' @rdname objSizeInclEnviros
+#' @seealso \code{\link[reproducible]{.objSizeInclEnviros}}
 setMethod(
   ".objSizeInclEnviros",
   signature = "simList",
   definition = function(object) {
     object.size(as.list(object@.xData, all.names = TRUE)) + object.size(object)
-  })
-
+})
 
 #' Find simList in a nested list
 #'
@@ -637,6 +663,7 @@ setMethod(
 #'
 #' @param x any object, used here only when it is a list with at least one
 #'        \code{simList} in it
+#'
 #' @rdname findSimList
 .findSimList <- function(x) {
   if (is.list(x)) {
@@ -658,15 +685,15 @@ if (!exists("objSize")) {
   objSize <- function(..., quick) UseMethod("objSize")
 }
 
-
 #' Object size for simLists
 #'
-#' Recursively, runs \code{object\.size} on the simList environment.
-#' Currently, this will not assess object.size of the other elements
+#' Recursively, runs \code{object.size} on the simList environment.
+#' Currently, this will not assess \code{object.size} of the other elements.
 #'
-#' @inheritParams reproducible::objSize
-#' @importFrom reproducible objSize
 #' @export
+#' @importFrom reproducible objSize
+#' @inheritParams reproducible::objSize
+#'
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
@@ -680,8 +707,6 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
   aa <- append(aa, bbOs)
   return(aa)
 }
-
-
 
 #' Make simList correctly work with memoise
 #'
@@ -714,16 +739,24 @@ unmakeMemoiseable.simList_ <- function(x) {
 #'
 #' This is an internal helper.
 #'
-#' @keywords internal
 #' @param x an object with attributes
 #' @param y an object with attributes
+#'
+#'
+#' @importFrom data.table setattr
+#' @keywords internal
 #' @rdname keepAttrs
 .keepAttrs <- function(x, y, omitAttrs = c(".envir", ".list", ".xData", ".Data")) {
   keepAttrs <- setdiff(names(attributes(x)), names(attributes(y)))
   keepAttrs <- setdiff(keepAttrs, omitAttrs)
   keepAttrs <- keepAttrs[keepAttrs != "names"]
+
   for (att in keepAttrs) {
-    attr(y, att) <- attr(x, att)
+    setattr(y, att, attr(x, att))
+    if (!identical(attr(y, att), attr(x, att)))
+      stop("attributes on the cache object are not correct - 3")
+
+    #attr(y, att) <- attr(x, att)
   }
   return(y)
 }

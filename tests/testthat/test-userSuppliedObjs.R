@@ -10,7 +10,7 @@ test_that("test userSuppliedObj", {
 
   xxx <- readLines(fileName)
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
-  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1] ## second line is false positive
   xxx1 <- xxx
 
   cat(xxx1[1:(lineWithInputObjects-1)], "
@@ -25,10 +25,10 @@ test_that("test userSuppliedObj", {
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c(
-    "Using or creating cached copy of inputObjects for test",
-    "test: module code: ei2 is declared in inputObjects, but no default\\(s\\) is provided in inputObjects",
-    "test: module code: ei1, ei2 are declared in inputObjects, but are not used in the module",
-    "test: inputObjects: ei3 is used from sim inside inputObjects, but is not declared in inputObjects"
+    "Using or creating cached copy of .inputObjects for test",
+    "test: module code: ei2 is declared in metadata inputObjects, but no default\\(s\\) is provided in .inputObjects",
+    "test: module code: ei1, ei2 are declared in metadata inputObjects, but are not used in the module",
+    "test: inputObjects: ei3 is used from sim inside .inputObjects, but is not declared in metadata inputObjects"
   )
 
   ei1 <- 10

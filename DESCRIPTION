@@ -4,12 +4,13 @@ Title: Core Utilities for Developing and Running Spatially Explicit Discrete Eve
 Description: Provide the core discrete event simulation (DES) framework for
     implementing spatially explicit simulation models. The core DES components 
     facilitate modularity, and easily enable the user to include additional
-    functionality by running user-built simulation modules.
+    functionality by running user-built simulation modules. Now includes (experimental)
+    conditional scheduling.
 URL:
     http://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2018-11-15
-Version: 0.2.3
+Date: 2019-01-07
+Version: 0.2.4
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -20,14 +21,14 @@ Authors@R: c(
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
     role = c("ctb")),
     person("Ceres", "Barros", email = "cbarros@mail.ubc.ca",
-    role = c("ctb")),
+    role = c("ctb"), comment = c(ORCID = "0000-0003-4036-977X")),
     person("Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada",
     role = "cph")
     )
 Depends:
-    R (>= 3.3.0),
+    R (>= 3.3),
     quickPlot (>= 0.1.4),
-    reproducible (>= 0.2.5)
+    reproducible (>= 0.2.5.9003)
 Imports:
     codetools,
     crayon,
@@ -96,6 +97,7 @@ Collate:
     'module-template.R'
     'moduleCoverage.R'
     'moduleMetadata.R'
+    'objectSynonyms.R'
     'times.R'
     'simList-accessors.R'
     'plotting-diagrams.R'

@@ -1,12 +1,47 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.4
+=============
+
+## package dependencies
+
+* no changes
+
+## new features
+
+* `simList` environment now has `emptyenv()` as its `parent.env`. The biggest user-facing changes are:
+  
+    - functions placed in the `envir(sim)` (unusual, but may occur) won't find objects in the `.GlobalEnv`;
+    - lighter memory footprint, as functions take RAM due to the objects in the `parent.env` in which they are defined (little know fact identified here: http://adv-r.had.co.nz/memory.html#gc identified as a possible source of memory leaks).
+
+* module's function environment in the simList now has its parent `asNamespace("SpaDES.core")` instead of the envir(sim) (as mentioned above), i.e,. `parent.env(sim[[currentModule(sim)]])` is `asNamespace("SpaDES.core")`. The main user-noticable changes of this are that module functions will not accidentally find objects in the `simList` unless they are actually passed in explicitly as arguments.
+* New active binding, `mod` that works as a module-specific variable, similar to a private object, *i.e.*, `mod$a` is a local object inside the module that persists across events. It is a pointer to `sim[[currentModule(sim)]]$a`
+* New function `scheduleConditionalEvent`, which allows an event to be scheduled based on a condition. Still experimental.
+* An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
+* User can now specify `modulePath` as a character vector, e.g., `simInit(..., paths = list(modulePath = c(".", "test")))`. This means that a user can organize the modules in different locations.
+* `modulePath` now has a new argument, `module`, where user can specify (a) specific module(s)'s path. Modifications were implemented to `dataPath` to utilize this new feature
+* `simInit` and `spades` now call `setPaths(paths)` or `setPaths(sim$paths)`, unsetting them `on.exit` internally to make the paths used for functions e.g., `reproducible::Cache` to use the correct path
+* under-the-hood speed improvements for the DES (about 20% faster) -- 38 microseconds per event under ideal conditions
+* improved default path settings in `.inputObjects` (#83)
+* following `reproducible` package updates, now uses `data.table::setattr` internally to avoid copying of
+objects (this may have very little/no effect on simList objects)
+* `suppliedElsewhere` has a new argument, `returnWhere`, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.
+
+## bug fixes
+
+* fix to work with latest `data.table` v1.12.0 (#85, @mattdowle)
+* several minor, including to `Copy` (error existed because function inheritance persisted even though the location of the function was moved)
+
 version 0.2.3
 =============
 
 ## package dependencies
+
 * add `RandomFields` to Suggests, as it is in the Suggests of `SpaDES.tools` and used in examples/tests.
 
 ## new features
+
+* new option and default setting: `options("spades.saveSimOnExit" = TRUE)`. This will save the state of the `simList` to an object as `SpaDES.core:::.pkgEnv$.sim`, with a message, if there is a hard exist. There is virtually no computational cost to this, as the object is already in RAM.
 * `simList` internals changed. It now inherits from `environment`. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the `simList`. Also, we removed several associated methods, `$`, `[[`, `ls`, `ls.str`, `objects`, as the defaults for environments work correctly with the `simList` now
 * `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
 * new function `elapsedTime` which gives a summary of the clock time used by each module or event
@@ -14,8 +49,10 @@ version 0.2.3
 * new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
 * improved messaging when GLPK not installed (*e.g.*, on macOS)
 * `downloadModule()` now prints the module version downloaded (#77)
+* 
 
-## bugfixes
+## bug fixes
+
 * resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
 * module `.inputObjects` evaluated based on module load order (#72)
 * `.robustDigest` fix for simLists -- needed to omit `._startClockTime` and `.timestamp`
@@ -24,12 +61,15 @@ version 0.2.2
 =============
 
 ## package dependencies
+
 * remove `sp` from imports
 
 ## new features
+
 * none
 
-## bugfixes
+## bug fixes
+
 * fix issues with failing tests on macOS
 
 version 0.2.1
@@ -48,7 +88,7 @@ version 0.2.1
 * `all.equal.simList` now removes all time dependent attributes, *e.g.*, `._startClockTime` and `.timestamp`
 * speed enhancements for Discrete Event Simulator; now overhead is 1.3 seconds for 5000 events or, per event, 260 microseconds (185 microseconds if `options("spades.keepCompleted" = FALSE)`
 
-## bugfixes
+## bug fixes
 
 * Improvements to caching of functions with `simList` objects:
 

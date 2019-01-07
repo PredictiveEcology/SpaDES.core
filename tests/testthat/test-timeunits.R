@@ -46,14 +46,6 @@ test_that("timeunit works correctly", {
   expect_message(timeunit(mySim) <- 1, "^unknown timeunit provided:")
   expect_message(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
 
-  # Test for user defined timeunits, in .GlobalEnv
-  expect_message(timeunit(mySim) <- "fortnight", "^unknown timeunit provided:")
-  assign("dfortnight", function(x) lubridate::duration(dday(14)),
-         envir = .GlobalEnv)
-  expect_match(timeunit(mySim) <- "fortnight", "")
-  expect_match(timeunit(mySim), "fortnight")
-  expect_equivalent(as.numeric(dfortnight(1)), 1209600)
-  rm(dfortnight, envir = .GlobalEnv)
 
   # check for new unit being put into simList
   assign("dfortnight", function(x) lubridate::duration(dday(14)),
@@ -235,6 +227,27 @@ test_that("timeunits with child and parent modules work correctly", {
 
   cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
+  expect_error(
+    mySim <- simInit(modules = list(modName),
+                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                     params = list("child6" = list(.useCache = ".inputObjects")))
+  )
+
+
+  xxx1 <- c(xxx[seq(lineOfInterest1 - 1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
+            xxx[seq(length(xxx) - lineOfInterest1) + lineOfInterest1])
+  cat(xxx1, file = fileName, sep = "\n")
+
+  lineOfInterest <- grep(xxx1, pattern = ".inputObjects <- ")
+  xxx1 <- c(xxx1[seq(lineOfInterest - 1)],
+            "  .inputObjects <- function(sim) {",
+            "  a = asPath(file.path(inputPath(sim), \"test\")) ",
+            "  sim$b <- a",
+            xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
+  cat(xxx1, file = fileName, sep = "\n")
+
+  cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
+  try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
   expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
@@ -250,9 +263,9 @@ test_that("timeunits with child and parent modules work correctly", {
   )
   mm1 <- cleanMessage(mm1)
   fullMessage <- c(
-    "Using or creating cached copy of inputObjects for child6",
-    "child6: module code: b is declared in inputObjects, but is not used in the module",
-    "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in outputObjects"
+    "Using or creating cached copy of .inputObjects for child6",
+    "child6: module code: b is declared in metadata inputObjects, but is not used in the module",
+    "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6, but are not declared in metadata outputObjects"
   )
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
   expect_identical(mySim$b, asPath(normPath(theFile)))

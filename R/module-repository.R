@@ -1,9 +1,7 @@
-### deal with spurious httr warnings
 if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("actualFile", "checksum.x", "checksum.y", "content",
                            "expectedFile", "filesize.x", "filesize.y", "result"))
 }
-
 
 #' Find the latest module version from a SpaDES module repository
 #'
@@ -220,14 +218,16 @@ setMethod(
 #'
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
 #'
-#' Currently only works with a public GitHub repository, where modules are in
+#' Currently only works with GitHub repositories where modules are located in
 #' a \code{modules} directory in the root tree on the \code{master} branch.
 #' Module .zip files' names should contain the version number and be inside their
 #' respective module folders (see \code{\link{zipModule}} for zip compression of modules).
 #'
 #' @note \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
 #' if a value is set. This alleviates 403 errors caused by too-frequent downloads.
-#' Generate a GitHub personal access token at \url{https://github.com/settings/tokens}.
+#' Generate a GitHub personal access token with no additional permissions at
+#' \url{https://github.com/settings/tokens}, and add this key to \file{.Renviron}
+#' as \code{GITHUB_PAT=<your-github-pat-here>}.
 #'
 #' @note The default is to overwrite any existing files in the case of a conflict.
 #'
@@ -399,5 +399,3 @@ setMethod(
     files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
 })
-
-

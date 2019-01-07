@@ -18,9 +18,12 @@
 #' include additional functionality by running user-built simulation modules.
 #' Included are numerous tools to visualize various spatial data formats,
 #' as well as non-spatial data. Much work has been done to speed up the core
-#' of the DES, with current benchmarking as low as 500 microseconds overhead for
-#' each event (including queuing, sorting, spawning event etc.) or 52 microseconds
-#' if there is no sorting
+#' of the DES, with current benchmarking as low as 56 microseconds overhead for
+#' each event (including scheduling, sorting event queue, spawning event etc.) or
+#' 38 microseconds if there is no sorting (i.e., no sorting occurs under simple
+#' conditions). Under most event conditions, therefore, the DES itself will contribute
+#' very minimally compared to the content of the events, which may often be
+#' milliseconds to many seconds each event.
 #'
 #' Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 #'
@@ -49,6 +52,7 @@
 #'
 #'   \tabular{ll}{
 #'     \code{\link{scheduleEvent}} \tab Schedule a simulation event\cr
+#'     \code{\link{scheduleConditionalEvent}} \tab Schedule a conditional simulation event\cr
 #'     \code{removeEvent} \tab Remove an event from the simulation queue (not yet implemented)\cr
 #'   }
 #' }
@@ -437,7 +441,7 @@
 #'   first time makes the error, the second time has \code{debugonce} and the third time
 #'   is after the error is addressed. \code{TRUE} is likely somewhat slower.
 #'
-#'   \item \code{spades.cachePath}: The default local directory in which to
+#'   \item \code{reproducible.cachePath}: The default local directory in which to
 #'   cache simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
 #'
@@ -485,14 +489,7 @@
 #'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
 #' }
 #'
-#' @rdname SpaDES.core-package
-#'
-"_PACKAGE"
-
-################################################################################
-# package imports
-# See \url{http://r-pkgs.had.co.nz/namespace.html#imports}
-
 #' @import igraph
 #' @import methods
-NULL
+#' @rdname SpaDES.core-package
+"_PACKAGE"

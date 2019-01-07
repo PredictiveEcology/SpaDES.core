@@ -54,7 +54,9 @@ from the simList as a normal list, e.g,. \code{mySim$obj}.}
 
 \item{paths}{An optional named list with up to 4 named elements,
 \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
-See details.}
+See details. NOTE: Experimental feature now allows for multiple \code{modulePath}s
+to be specified in a character vector. The modules will be searched for sequentially
+in the first \code{modulePath}, then if it doesn't find it, in the second etc.}
 
 \item{inputs}{A \code{data.frame}. Can specify from 1 to 6
 columns with following column names: \code{objectName} (character, required),
@@ -88,11 +90,11 @@ specified in the arguments supplied.
 \description{
 Create a new simulation object, the "sim" object. This object is implemented
 using an \code{environment} where all objects and functions are placed.
-Since environments in \code{R} are
-pass by reference, "putting" objects in the sim object does no actual copy. The
-\code{simList} also stores all parameters,
-and other important simulation information, such
-as times, paths, modules, and module load order. See more details below.
+Since environments in \code{R} are pass by reference, "putting" objects in
+the sim object does no actual copy.
+The \code{simList} also stores all parameters, and other important simulation
+information, such as times, paths, modules, and module load order.
+See more details below.
 }
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
@@ -146,7 +148,7 @@ the data input files, and the saving output files. If no paths are specified
 the defaults are as follows:
 
 \itemize{
-  \item \code{cachePath}: \code{getOption("spades.cachePath")};
+  \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 
 \item \code{inputPath}: \code{getOption("spades.modulePath")};
 
@@ -156,6 +158,12 @@ the defaults are as follows:
 }
 }
 \note{
+Since the objects in the \code{simList} are passed-by-reference, it is useful
+to create a copy of the initalizized \code{simList} object prior to running
+the simulation (e.g., \code{mySimOut <- spades(Copy(mySim))}).
+This ensures you retain access to the original objects, which would otherwise
+be overwritten/modified during the simulation.
+
 The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
 These can be added later with the accessor methods (See example).
 These are not required for initializing the simulation via simInit.
@@ -190,7 +198,7 @@ e.g., \code{options(spades.moduleCodeChecks = FALSE)}
 
 Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
 Please see the vignette dedicated to this topic.
-See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
+See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}.
 }
 
 \examples{

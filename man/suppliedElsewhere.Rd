@@ -4,15 +4,19 @@
 \alias{suppliedElsewhere}
 \title{Assess whether an object has or will be supplied from elsewhere}
 \usage{
-suppliedElsewhere(object, sim, where = c("sim", "user", "initEvent"))
+suppliedElsewhere(object, sim, where = c("sim", "user", "initEvent"),
+  returnWhere = FALSE)
 }
 \arguments{
-\item{object}{Character vector or sim object in the form sim$objName}
+\item{object}{Character vector}
 
 \item{sim}{A \code{simList} in which to evaluated whether the object is supplied elsewhere}
 
 \item{where}{Character vector with one to three of "sim", "user", or "initEvent".
 Default is all three. Partial matching is used. See details.}
+
+\item{returnWhere}{Logical, default \code{FALSE}, whether the vector of length
+3 logical should be returned, or a logical of length one}
 }
 \description{
 When loading objects into a \code{simList}, especially during the

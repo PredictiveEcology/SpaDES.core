@@ -1,5 +1,8 @@
 test_that("test cache", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
+                                      spades.useRequire = FALSE),
+                          setPaths = FALSE)
+
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -219,12 +222,11 @@ test_that("test .robustDigest for simLists", {
 
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
-  expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|module code",
-                 all = TRUE)
-  expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Using cached copy|module code")
+  mess1 <- capture_messages(do.call(simInit, args))
+  expect_true(all(grepl("Using or creating cached copy|module code|Setting|Paths|using dataPath", mess1)))
 
+  expect_message(do.call(simInit, args),
+                 regexp = "Using or creating cached copy|Using cached copy|module code|Setting|Paths")
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -235,10 +237,10 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|module code",
+                 regexp = "Using or creating cached copy|module code|Setting|Paths|dataPath",
                  all = TRUE)
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|loading cached result|module code",
+                 regexp = "Using or creating cached copy|loading cached result|module code|Setting|Paths",
                  all = TRUE)
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -280,7 +282,7 @@ test_that("test .robustDigest for simLists", {
                 all = TRUE)
 })
 
-test_that("test .checkCacheRepo with function as spades.cachePath", {
+test_that("test .checkCacheRepo with function as reproducible.cachePath", {
   testInitOut <- testInit("igraph", smcc = TRUE)
   on.exit({
     testOnExit(testInitOut)
@@ -288,7 +290,7 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
   #tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
 
   awesomeCacheFun <- function() tmpCache ;
-  options("spades.cachePath" = awesomeCacheFun)
+  options("reproducible.cachePath" = awesomeCacheFun)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
@@ -304,7 +306,7 @@ test_that("test .checkCacheRepo with function as spades.cachePath", {
   expect_equal(aa, tmpCache)
 
   justAPath <- tmpCache ;
-  options("spades.cachePath" = justAPath)
+  options("reproducible.cachePath" = justAPath)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
@@ -349,7 +351,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   lineWithDotUseCache <- grep(xxx[[1]], pattern = "\\.useCache")
   lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
-  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")[1]
 
   xxx1 <- list()
   xxx1[[1]] <- xxx[[1]]
@@ -370,6 +372,8 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
       sim$co1 <- 1
       sim$co2 <- 1
       sim$co3 <- 1
+      sim$test$hi <- 1
+      mod$hello <- 2
       ",
       xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
       aaa <- 1
@@ -382,23 +386,40 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
                    params = list(test = list(.useCache = "init")))
   mySim$co4 <- 5
   mySim$co5 <- 6
-  mySim2 <- spades(mySim)
+  mySim2 <- spades(Copy(mySim))
   expect_true(mySim2$co1 == 1)
   expect_true(mySim2$co2 == 1)
   expect_true(mySim2$co3 == 1)
   expect_true(mySim2$co4 == 5)
   expect_true(mySim2$co5 == 6)
 
+  # Test mod
+  expect_true(mySim2$test$hello == 2)
+
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
                      list(test = list(.useCache = "init")))
+
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
-  mySim2 <- spades(mySim)
+  expect_true(is.null(mySim$test$hi)) # will be changed by init
+  mySim2 <- spades(Copy(mySim))
+  expect_true(mySim2$test$hi == 1) # was affected
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
   expect_true(mySim2$co3 == 1) # was affected
   expect_false(mySim2$co4 == 5) # wasn't affected by init event
   expect_true(mySim2$co4 == 3) # wasn't affect by init event
   expect_true(is.null(mySim2$co5)) # wan't affected, and isn't there
+
+  # Try again, hi should be there
+  expect_true(is.null(mySim$test$hi)) # is not in the
+  mess1 <- capture_output(mySim2 <- spades(Copy(mySim)))
+  expect_true(mySim2$test$hi == 1) # recovered in Cache
+  expect_true(mySim2$test$hello == 2) # recovered in Cache
+  expect_true(grepl("Using cached copy", mess1))
+
 })
+
+
+

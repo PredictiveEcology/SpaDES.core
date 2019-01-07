@@ -241,8 +241,7 @@ cantCodeCheckMessage <- ": line could not be checked "
   } else if (is.pairlist(x)) {
     unique(unlist(lapply(x, .findElement, type = type)))
   } else {
-    stop("Don't know how to handle type ", typeof(x),
-         call. = FALSE)
+    stop("Don't know how to handle type ", typeof(x), call. = FALSE)
   }
 }
 
@@ -339,7 +338,6 @@ cantCodeCheckMessage <- ": line could not be checked "
       paste0(paste(names(returnsSim), collapse = ", "),
              " must return the sim, e.g., return(invisible(sim))")
     )
-
   }
 
   #############################################################
@@ -366,7 +364,7 @@ cantCodeCheckMessage <- ": line could not be checked "
       verb <- .verb(missingFrmMod)
       hadPrevMessage <- .parseMessage(m, "module code",
                                        paste0(paste(missingFrmMod, collapse = ", "),
-                                              " ",verb," declared in outputObjects, ",
+                                              " ",verb," declared in metadata outputObjects, ",
                                               "but ", verb, " not assigned in the module"
       ))
     }
@@ -382,7 +380,7 @@ cantCodeCheckMessage <- ": line could not be checked "
       hadPrevMessage <- .parseMessage(
         m, "module code",
         paste0(paste(missingFrmMod, collapse = ", "),
-               " ",verb," declared in inputObjects, ",
+               " ",verb," declared in metadata inputObjects, ",
                "but no default(s) ", verb, " provided in .inputObjects")
       )
     }
@@ -394,7 +392,7 @@ cantCodeCheckMessage <- ": line could not be checked "
       verb <- .verb(missingFrmMod)
       hadPrevMessage <- .parseMessage(m, "module code",
                                        paste0(paste(missingFrmMod, collapse = ", "), " ",verb,
-                                              " declared in inputObjects, ", "but ", verb,
+                                              " declared in metadata inputObjects, ", "but ", verb,
                                               " not used in the module"
                                        ))
     }
@@ -461,8 +459,8 @@ cantCodeCheckMessage <- ": line could not be checked "
           .parseMessage(
             m, "outputObjects",
             paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
-                   " ",verbs[[fn]]," assigned to sim inside ",
-                   fn, ", but ",verbs[[fn]]," not declared in outputObjects")
+                   " ", verbs[[fn]], " assigned to sim inside ",
+                   fn, ", but ", verbs[[fn]], " not declared in metadata outputObjects")
           )
         )
       ))
@@ -478,8 +476,8 @@ cantCodeCheckMessage <- ": line could not be checked "
           .parseMessage(
             m, "inputObjects",
             paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
-                   " ",verbs[[fn]]," assigned to sim inside ",
-                   fn, ", but ",verbs[[fn]]," not declared in inputObjects")
+                   " ", verbs[[fn]], " assigned to sim inside ",
+                   fn, ", but ", verbs[[fn]], " not declared in metadata inputObjects")
           )
         )
       ))
@@ -501,8 +499,8 @@ cantCodeCheckMessage <- ": line could not be checked "
           .parseMessage(
             m, "inputObjects",
             paste0(paste(missingInMetadataByFn[[fn]], collapse = ", "),
-                   " ",verbs[[fn]]," used from sim inside ",
-                   fn, ", but ",verbs[[fn]]," not declared in inputObjects")
+                   " ", verbs[[fn]], " used from sim inside ",
+                   fn, ", but ", verbs[[fn]], " not declared in metadata inputObjects")
           )
         )
       ))
@@ -512,16 +510,14 @@ cantCodeCheckMessage <- ": line could not be checked "
     missingInMetadata <- simGetsInDotInputObjects[!(simGetsInDotInputObjects %in% inputObjNames)]
     if (length(missingInMetadata)) {
       verb <- .verb(missingInMetadata)
-      hadPrevMessage <-
-        .parseMessage(m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
-        " ",verb," used from sim inside ",
-        paste(unique(names(missingInMetadata)), collapse = ", "),
-        ", but ",verb," not declared in inputObjects"
-      ))
+      hadPrevMessage <- .parseMessage(
+        m, "inputObjects", paste0(paste(missingInMetadata, collapse = ", "),
+                                  " ", verb, " used from sim inside ",
+                                  paste(unique(names(missingInMetadata)), collapse = ", "),
+                                  ", but ", verb, " not declared in metadata inputObjects")
+      )
     }
-
   }
-
 
   # search for conflicts in module function names with common problems, like quickPlot::Plot
   clashingFuns <- names(sim@.xData[[m]])[names(sim@.xData[[m]]) %in% clashingFnsSimple]
@@ -640,11 +636,9 @@ cantCodeCheckMessage <- ": line could not be checked "
   } else {
     xAsCall <- ""
   }
-
 }
 
-.lineNumbersInSrcFile <- function(sim, module, namedTxt,
-                                  pd) {
+.lineNumbersInSrcFile <- function(sim, module, namedTxt, pd) {
   if (!missing(sim)) {
     pd <- sim@.xData[[module]][["._parsedData"]]
   }
