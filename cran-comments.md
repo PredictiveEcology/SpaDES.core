@@ -21,9 +21,9 @@ This release includes various bug fixes and enhancements (see NEWS).
 
 ### Development R version
 * Ubuntu 14.04       (travis-ci), R 3.6.0 (2019-01-06 r75950)
-* Ubuntu 18.04           (local), R 3.6.0 ()
+* Ubuntu 18.04           (local), R 3.6.0 (2019-01-07 r75958)
 * Windows             (appveyor), R 3.6.0 (2019-01-06 r75950)
-* Windows          (win-builder), R 3.6.0 ()
+* Windows          (win-builder), R 3.6.0 (2019-01-07 r75956)
 
 ## R CMD check results
 
