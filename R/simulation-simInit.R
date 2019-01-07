@@ -7,11 +7,11 @@ if (getRversion() >= "3.1.0") {
 #'
 #' Create a new simulation object, the "sim" object. This object is implemented
 #' using an \code{environment} where all objects and functions are placed.
-#' Since environments in \code{R} are
-#' pass by reference, "putting" objects in the sim object does no actual copy. The
-#' \code{simList} also stores all parameters,
-#' and other important simulation information, such
-#' as times, paths, modules, and module load order. See more details below.
+#' Since environments in \code{R} are pass by reference, "putting" objects in
+#' the sim object does no actual copy.
+#' The \code{simList} also stores all parameters, and other important simulation
+#' information, such as times, paths, modules, and module load order.
+#' See more details below.
 #'
 #' \subsection{Calling this \code{simInit} function does the following:}{
 #'   \tabular{lll}{
@@ -98,7 +98,14 @@ if (getRversion() >= "3.1.0") {
 #'
 #' Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
 #' Please see the vignette dedicated to this topic.
-#' See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}
+#' See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}.
+#'
+#' @note
+#' Since the objects in the \code{simList} are passed-by-reference, it is useful
+#' to create a copy of the initalizized \code{simList} object prior to running
+#' the simulation (e.g., \code{mySimOut <- spades(Copy(mySim))}).
+#' This ensures you retain access to the original objects, which would otherwise
+#' be overwritten/modified during the simulation.
 #'
 #' @note
 #' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
