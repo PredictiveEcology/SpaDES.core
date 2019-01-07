@@ -213,7 +213,7 @@ Default <code>FALSE</code>.</p></td>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Currently only works with a public GitHub repository, where modules are in
+    <p>Currently only works with GitHub repositories where modules are located in
 a <code>modules</code> directory in the root tree on the <code>master</code> branch.
 Module .zip files' names should contain the version number and be inside their
 respective module folders (see <code><a href='zipModule.html'>zipModule</a></code> for zip compression of modules).</p>
@@ -222,7 +222,9 @@ respective module folders (see <code><a href='zipModule.html'>zipModule</a></cod
 
     <p><code>downloadModule</code> uses the <code>GITHUB_PAT</code> environment variable
 if a value is set. This alleviates 403 errors caused by too-frequent downloads.
-Generate a GitHub personal access token at <a href='https://github.com/settings/tokens'>https://github.com/settings/tokens</a>.</p>
+Generate a GitHub personal access token with no additional permissions at
+<a href='https://github.com/settings/tokens'>https://github.com/settings/tokens</a>, and add this key to <code class="file">.Renviron</code>
+as <code>GITHUB_PAT=&lt;your-github-pat-here&gt;</code>.</p>
 <p>The default is to overwrite any existing files in the case of a conflict.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

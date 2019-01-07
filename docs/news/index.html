@@ -143,7 +143,15 @@
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
-<li>New active binding, <code>mod</code> that works as a module-specific variable, similar to a private object, i.e., <code>mod$a</code> is a local object inside the module that persists across events. It is a pointer to <code>sim[[currentModule(sim)]]$a</code>
+<li>
+<p><code>simList</code> environment now has <code><a href="https://www.rdocumentation.org/packages/base/topics/environment">emptyenv()</a></code> as its <code>parent.env</code>. The biggest user-facing changes are:</p>
+<ul>
+<li>functions placed in the <code><a href="../reference/simList-accessors-envir.html">envir(sim)</a></code> (unusual, but may occur) won’t find objects in the <code>.GlobalEnv</code>;</li>
+<li>lighter memory footprint, as functions take RAM due to the objects in the <code>parent.env</code> in which they are defined (little know fact identified here: <a href="http://adv-r.had.co.nz/memory.html#gc" class="uri">http://adv-r.had.co.nz/memory.html#gc</a> identified as a possible source of memory leaks).</li>
+</ul>
+</li>
+<li>module’s function environment in the simList now has its parent <code><a href="https://www.rdocumentation.org/packages/base/topics/ns-internal">asNamespace("SpaDES.core")</a></code> instead of the envir(sim) (as mentioned above), i.e,. <code><a href="https://www.rdocumentation.org/packages/base/topics/environment">parent.env(sim[[currentModule(sim)]])</a></code> is <code><a href="https://www.rdocumentation.org/packages/base/topics/ns-internal">asNamespace("SpaDES.core")</a></code>. The main user-noticable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</li>
+<li>New active binding, <code>mod</code> that works as a module-specific variable, similar to a private object, <em>i.e.</em>, <code>mod$a</code> is a local object inside the module that persists across events. It is a pointer to <code>sim[[currentModule(sim)]]$a</code>
 </li>
 <li>New function <code>scheduleConditionalEvent</code>, which allows an event to be scheduled based on a condition. Still experimental.</li>
 <li>An experimental new function and feature, <code>objectSynonyms</code>, which will create active bindings of two names to a single object</li>
@@ -155,6 +163,7 @@
 <li>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</li>
 <li>improved default path settings in <code>.inputObjects</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/83'>#83</a>)</li>
 <li>following <code>reproducible</code> package updates, now uses <code><a href="https://www.rdocumentation.org/packages/data.table/topics/setattr">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on simList objects)</li>
+<li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">

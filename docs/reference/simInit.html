@@ -34,11 +34,11 @@
 
 <meta property="og:description" content="Create a new simulation object, the &quot;sim&quot; object. This object is implemented
 using an environment where all objects and functions are placed.
-Since environments in R are
-pass by reference, &quot;putting&quot; objects in the sim object does no actual copy. The
-simList also stores all parameters,
-and other important simulation information, such
-as times, paths, modules, and module load order. See more details below." />
+Since environments in R are pass by reference, &quot;putting&quot; objects in
+the sim object does no actual copy.
+The simList also stores all parameters, and other important simulation
+information, such as times, paths, modules, and module load order.
+See more details below." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -142,11 +142,11 @@ as times, paths, modules, and module load order. See more details below." />
     
     <p>Create a new simulation object, the "sim" object. This object is implemented
 using an <code>environment</code> where all objects and functions are placed.
-Since environments in <code>R</code> are
-pass by reference, "putting" objects in the sim object does no actual copy. The
-<code>simList</code> also stores all parameters,
-and other important simulation information, such
-as times, paths, modules, and module load order. See more details below.</p>
+Since environments in <code>R</code> are pass by reference, "putting" objects in
+the sim object does no actual copy.
+The <code>simList</code> also stores all parameters, and other important simulation
+information, such as times, paths, modules, and module load order.
+See more details below.</p>
     
     </div>
 
@@ -327,7 +327,12 @@ the defaults are as follows:</p>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The user can opt to run a simpler <code>simInit</code> call without inputs, outputs, and times.
+    <p>Since the objects in the <code>simList</code> are passed-by-reference, it is useful
+to create a copy of the initalizized <code>simList</code> object prior to running
+the simulation (e.g., <code>mySimOut &lt;- spades(Copy(mySim))</code>).
+This ensures you retain access to the original objects, which would otherwise
+be overwritten/modified during the simulation.</p>
+<p>The user can opt to run a simpler <code>simInit</code> call without inputs, outputs, and times.
 These can be added later with the accessor methods (See example).
 These are not required for initializing the simulation via simInit.
 All of <code>modules</code>, <code>paths</code>, <code>params</code>, and <code>objects</code> are needed
@@ -358,7 +363,7 @@ e.g., <code><a href='https://www.rdocumentation.org/packages/base/topics/options
     
     <p>Using caching with <code>SpaDES</code> is vital when building re-usable and reproducible content.
 Please see the vignette dedicated to this topic.
-See <a href='https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html</a></p>
+See <a href='https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html</a>.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
