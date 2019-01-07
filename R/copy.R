@@ -50,8 +50,7 @@ setMethod("Copy",
                                      function(obj) is.environment(get(obj, envir = object))))
               list2env(mget(objNames[!isEnv], envir = object@.xData), envir = sim_@.xData)
               list2env(lapply(objNames[isEnv], function(x) {
-                browser()
-                e <- new.env(parent = sim_@.xData)
+                e <- new.env(parent = asNamespace("SpaDES.core"))
                 attr(e, "name") <- x
                 e
               }
