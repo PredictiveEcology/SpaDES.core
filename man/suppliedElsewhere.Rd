@@ -8,7 +8,7 @@ suppliedElsewhere(object, sim, where = c("sim", "user", "initEvent"),
   returnWhere = FALSE)
 }
 \arguments{
-\item{object}{Character vector or sim object in the form sim$objName}
+\item{object}{Character vector}
 
 \item{sim}{A \code{simList} in which to evaluated whether the object is supplied elsewhere}
 

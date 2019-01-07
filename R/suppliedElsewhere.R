@@ -17,7 +17,7 @@ if (getRversion() >= "3.1.0") {
 #' This function can be used as a check to determine whether the module needs
 #' to proceed in getting and assigning its default value.
 #'
-#' @param object Character vector or sim object in the form sim$objName
+#' @param object Character vector
 #' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
 #'        Default is all three. Partial matching is used. See details.
@@ -41,6 +41,7 @@ if (getRversion() >= "3.1.0") {
 #' does not explicitly test that the object will be created in the "init" event, only that
 #' it is in the outputs of that module, and that it is a module that is loaded prior to
 #' this one.
+#'
 #' @examples
 #' mySim <- simInit()
 #' suppliedElsewhere("test", mySim) # FALSE
@@ -87,7 +88,6 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     } else {
       sim <- eval(theCall[[1]][isSimList][[1]], envir = env)
     }
-
   }
 
   # if object was actually a variable of character names of objects inside sim
@@ -116,8 +116,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
     #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
     isTRUE(depsEdgeList(sim, plot = FALSE)[!(from %in% c("_INPUT_", currentModule(sim))), ][
-      objName == objDeparsed][, all(from != to), by = from][V1==TRUE]$V1)
-
+      objName == objDeparsed][, all(from != to), by = from][V1 == TRUE]$V1)
   } else {
     FALSE
   }
@@ -129,5 +128,4 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     (inUserSupplied | inPrevDotInputObjects | inFutureInit)
   }
   return(out)
-
 }
