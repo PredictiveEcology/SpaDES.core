@@ -340,7 +340,9 @@ setMethod(
     # create simList object for the simulation
     sim <- new("simList")
     # Make a temporary place to store parsed module files
-    sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
+    sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
+    #sim@.xData[[".parsedFiles"]] <- new.env(parent = as.environment("package:SpaDES.core"))
+    #  sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
 
     # paths
@@ -401,6 +403,13 @@ setMethod(
         loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
       }
     }
+
+    # if (which(search() %in% "package:SpaDES.core") != 2) {
+    #   # Must move it to 2nd position, because simList fns have this as parent
+    #   detach("package:SpaDES.core")
+    #   suppressMessages(attachNamespace(asNamespace("SpaDES.core")))
+    # }
+    #
 
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.

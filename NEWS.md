@@ -18,6 +18,7 @@ version 0.2.4
 * improved default path settings in `.inputObjects` (#83)
 * following `reproducible` package updates, now uses `data.table::setattr` internally to avoid copying of
 objects (this may have very little/no effect on simList objects)
+* `suppliedElsewhere` has a new argument, `returnWhere`, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.
 
 ## bug fixes
 

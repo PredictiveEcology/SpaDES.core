@@ -317,9 +317,8 @@ setMethod(
         })
         if (!all(sapply(timesteps, is.na))) {
           return(timesteps[!is.na(timesteps)][[which.max(sapply(
-            timesteps[!sapply(timesteps, is.na)], function(ts) {
-              eval(parse(text = paste0("d", ts, "(1)")), envir = sim@.xData)
-          }))]])
+            timesteps[!sapply(timesteps, is.na)], function(x)
+              .getTU(x, envir(sim))))]])
         }
       }
     }
@@ -360,14 +359,22 @@ setMethod(
         })
         if (!all(sapply(timesteps, is.na))) {
           return(timesteps[!is.na(timesteps)][[which.min(sapply(
-            timesteps[!sapply(timesteps, is.na)], function(ts) {
-              eval(parse(text = paste0("d", ts, "(1)")), envir = sim@.xData)
-          }))]])
+            timesteps[!sapply(timesteps, is.na)], function(x)
+              .getTU(x, envir(sim))))]])
         }
       }
     }
     return("second")
 })
+
+.getTU <- function(ts, simEnv) {
+    tsFun <- paste0("d", ts)
+    if (exists(tsFun, envir = simEnv, inherits = FALSE))
+      get(tsFun, envir = simEnv)
+    else
+      get(tsFun)(1)
+}
+
 
 #' @export
 #' @rdname minTimeunit

@@ -21,6 +21,8 @@ if (getRversion() >= "3.1.0") {
 #' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
 #'        Default is all three. Partial matching is used. See details.
+#' @param returnWhere Logical, default \code{FALSE}, whether the vector of length
+#'   3 logical should be returned, or a logical of length one
 #' @export
 #'
 #' @details
@@ -62,10 +64,15 @@ if (getRversion() >= "3.1.0") {
 #'                     destinationPath = dataPath(sim), studyArea = sim$studyArea,
 #'                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
 #' }
-suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")) {
+suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent"),
+                              returnWhere = FALSE) {
+  mc <- as.list(match.call())[-1] # there is something weird about the argument "where"
+                     # on my windows system -- shows something similar to sys.calls()
+  forms <- formals()
+  forms[names(mc)] <- mc
   partialMatching <- c("s", "i", "u")
-  where <- partialMatching[which(!is.na(pmatch(partialMatching, where)))]
-  if (length(where) == 0) stop("where must be either sim, user or initEvent")
+  forms$where <- partialMatching[which(!is.na(pmatch(partialMatching, forms$where)))]
+  if (length(forms$where) == 0) stop("where must be either sim, user or initEvent")
   objDeparsed <- substitute(object)
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
@@ -89,14 +96,14 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   objDeparsed <- as.character(objDeparsed)
 
   # Equivalent to !is.null(sim$xxx)
-  inPrevDotInputObjects <- if ("s" %in% where) {
+  inPrevDotInputObjects <- if ("s" %in% forms$where) {
     match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
 
   } else {
     FALSE
   }
   # Equivalent to !(names(sim) %in% sim$.userSuppliedObjNames)
-  inUserSupplied <- if ("u" %in% where) {
+  inUserSupplied <- if ("u" %in% forms$where) {
     objDeparsed %in% sim$.userSuppliedObjNames
   } else {
     FALSE
@@ -104,7 +111,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- if ("i" %in% where) {
+  inFutureInit <- if ("i" %in% forms$where) {
     # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
     #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
     #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
@@ -115,5 +122,12 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     FALSE
   }
 
-  (inUserSupplied | inPrevDotInputObjects | inFutureInit)
+  out <- if (isTRUE(returnWhere)) {
+    c(userSupplied = inUserSupplied, prevDotInputObjects = inPrevDotInputObjects,
+             inFutureInit = inFutureInit)
+  } else {
+    (inUserSupplied | inPrevDotInputObjects | inFutureInit)
+  }
+  return(out)
+
 }
