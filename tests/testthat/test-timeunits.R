@@ -46,14 +46,6 @@ test_that("timeunit works correctly", {
   expect_message(timeunit(mySim) <- 1, "^unknown timeunit provided:")
   expect_message(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
 
-  # Test for user defined timeunits, in .GlobalEnv
-  expect_message(timeunit(mySim) <- "fortnight", "^unknown timeunit provided:")
-  assign("dfortnight", function(x) lubridate::duration(dday(14)),
-         envir = .GlobalEnv)
-  expect_match(timeunit(mySim) <- "fortnight", "")
-  expect_match(timeunit(mySim), "fortnight")
-  expect_equivalent(as.numeric(dfortnight(1)), 1209600)
-  rm(dfortnight, envir = .GlobalEnv)
 
   # check for new unit being put into simList
   assign("dfortnight", function(x) lubridate::duration(dday(14)),
