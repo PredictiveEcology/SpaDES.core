@@ -351,7 +351,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   lineWithDotUseCache <- grep(xxx[[1]], pattern = "\\.useCache")
   lineWithInputObjects <- grep(xxx[[1]], pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx[[1]], pattern = " createsOutput")
-  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")
+  lineWithDotInputObjects <- grep(xxx[[1]], pattern = "\\.inputObjects")[1]
 
   xxx1 <- list()
   xxx1[[1]] <- xxx[[1]]

@@ -169,7 +169,8 @@ setMethod("initialize",
             if (any(7==haves))
               .Object@paths = .paths()
 
-            .Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
             #
