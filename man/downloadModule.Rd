@@ -61,7 +61,7 @@ A list of length 2. The first element is a character vector containing
 Download a .zip file of the module and extract (unzip) it to a user-specified location.
 }
 \details{
-Currently only works with a public GitHub repository, where modules are in
+Currently only works with GitHub repositories where modules are located in
 a \code{modules} directory in the root tree on the \code{master} branch.
 Module .zip files' names should contain the version number and be inside their
 respective module folders (see \code{\link{zipModule}} for zip compression of modules).
@@ -69,7 +69,9 @@ respective module folders (see \code{\link{zipModule}} for zip compression of mo
 \note{
 \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
 if a value is set. This alleviates 403 errors caused by too-frequent downloads.
-Generate a GitHub personal access token at \url{https://github.com/settings/tokens}.
+Generate a GitHub personal access token with no additional permissions at
+\url{https://github.com/settings/tokens}, and add this key to \file{.Renviron}
+as \code{GITHUB_PAT=<your-github-pat-here>}.
 
 The default is to overwrite any existing files in the case of a conflict.
 }
