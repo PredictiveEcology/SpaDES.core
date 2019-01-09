@@ -125,7 +125,6 @@ matrix:
     env:
     - GLPK=false
     before_install:
-    before_install:
     - brew update
     - brew install libgit2
     - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
