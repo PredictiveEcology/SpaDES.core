@@ -190,7 +190,7 @@ setGeneric(
            sterr = FALSE, ..., objFnCompare = "MAD", optimControl = NULL,
            NaNRetries = NA, logObjFnVals = FALSE, weights, useLog = FALSE) {
     standardGeneric("POM")
-  })
+})
 
 #' @rdname POM
 setMethod(
@@ -222,7 +222,7 @@ setMethod(
 
     whParamsByMod <- unlist(lapply(whParams, na.omit))
     names(whParamsByMod) <- unlist(lapply(names(whModules), function(nam) {
-      rep(nam, sum(grepl(pattern = nam, names(whParamsByMod))))
+      rep(nam, sum(grepl(pattern = paste0("^", nam, "[0-9]"), names(whParamsByMod))))
     }))
 
     if (missing(objects)) {
