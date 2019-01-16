@@ -21,9 +21,10 @@ matrix:
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
-    before_install:
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
+    before_script:
+      - "export DISPLAY=:99.0"
+      - "sh -e /etc/init.d/xvfb start"
+      - sleep 3 # give xvfb some time to start
   - os: linux
     dist: trusty
     r: 3.4
@@ -55,9 +56,10 @@ matrix:
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
-    before_install:
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
+    before_script:
+      - "export DISPLAY=:99.0"
+      - "sh -e /etc/init.d/xvfb start"
+      - sleep 3 # give xvfb some time to start
   - os: linux
     dist: trusty
     r: release
@@ -75,11 +77,11 @@ matrix:
     r_github_packages:
       - jimhester/lintr
       - r-lib/covr
-    before_install:
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
     before_script:
-    - Rscript -e 'install.packages("devtools", type = "source")'
+      - "export DISPLAY=:99.0"
+      - "sh -e /etc/init.d/xvfb start"
+      - sleep 3 # give xvfb some time to start
+      - Rscript -e 'install.packages("devtools", type = "source")'
     after_failure:
     - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
@@ -101,9 +103,10 @@ matrix:
         - libnlopt-dev
         - libproj-dev
         - libudunits2-dev
-    before_install:
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
+    before_script:
+      - "export DISPLAY=:99.0"
+      - "sh -e /etc/init.d/xvfb start"
+      - sleep 3 # give xvfb some time to start
     r_packages:
     - devtools
   - os: osx
