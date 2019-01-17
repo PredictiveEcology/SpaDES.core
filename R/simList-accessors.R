@@ -233,7 +233,6 @@ setReplaceMethod(
     return(sim)
 })
 
-
 ################################################################################
 #' Simulation modules and dependencies
 #'
