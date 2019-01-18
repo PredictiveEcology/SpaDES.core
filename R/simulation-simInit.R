@@ -1081,8 +1081,9 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
         }
       }
 
+      message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
       if (isTRUE(cacheIt)) {
-        message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
+        # message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
@@ -1128,7 +1129,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                     "function:.inputObjects"))
         }
       } else {
-        message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
         .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
         .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
