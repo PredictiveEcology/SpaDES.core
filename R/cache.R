@@ -33,7 +33,7 @@ if (!isGeneric(".robustDigest")) {
 setMethod(
   ".robustDigest",
   signature = "simList",
-  definition = function(object, objects, length, algo,
+  definition = function(object, .objects, length, algo,
                         quick, classOptions) {
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -48,8 +48,8 @@ setMethod(
     allEnvsInSimList <- allEnvsInSimList[ord]
     names(allEnvsInSimList) <- names(allObjsInSimList)
 
-    isObjectEmpty <- if (!missing(objects)) {
-      if (!is.null(objects)) {
+    isObjectEmpty <- if (!missing(.objects)) {
+      if (!is.null(.objects)) {
         FALSE
       } else {
         TRUE
@@ -60,7 +60,7 @@ setMethod(
     if (!isObjectEmpty) {
       # objects may be provided in a namespaced format: modName:objName --
       # e.g., coming from .parseModule
-      objects1 <- strsplit(objects, split = ":")
+      objects1 <- strsplit(.objects, split = ":")
       lens <- unlist(lapply(objects1, length))
       objects1ByMod <- unlist(lapply(objects1[lens > 1], function(x) x[1]))
       mods <- unique(objects1ByMod)
@@ -68,16 +68,16 @@ setMethod(
         unlist(lapply(objects1[lens > 1][objects1ByMod == mod], function(x) x[[2]]))
       })
       names(objects2) <- mods
-      objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
+      .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
     } else {
-      objects <- allObjsInSimList
+      .objects <- allObjsInSimList
     }
     envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
                      function(objs, name) {
                        objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "mod")]
                        objectsToDigest <- sort(objs, method = "radix")
                        objectsToDigest <- objectsToDigest[objectsToDigest %in%
-                                                            objects[[name]]]
+                                                            .objects[[name]]]
                        .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[name]]),
                                      quick = quick,
                                      length = length)
@@ -351,7 +351,7 @@ setMethod(
         stop("attributes on the cache object are not correct - 4")
     }
     postDigest <-
-      .robustDigest(object, objects = dots$objects,
+      .robustDigest(object, .objects = dots$.objects,
                     length = dots$length,
                     algo = dots$algo,
                     quick = dots$quick,
