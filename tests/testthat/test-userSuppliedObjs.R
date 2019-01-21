@@ -25,7 +25,7 @@ test_that("test userSuppliedObj", {
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c(
-    "Running inputObjects for test",
+    "Running .inputObjects for test",
     "test: module code: ei2 is declared in metadata inputObjects, but no default\\(s\\) is provided in .inputObjects",
     "test: module code: ei1, ei2 are declared in metadata inputObjects, but are not used in the module",
     "test: inputObjects: ei3 is used from sim inside .inputObjects, but is not declared in metadata inputObjects"
