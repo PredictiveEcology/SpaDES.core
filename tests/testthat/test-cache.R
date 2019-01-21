@@ -223,12 +223,10 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
   mess1 <- capture_messages(do.call(simInit, args))
-  expect_true(all(grepl("Using or creating cached copy|module code|Setting|Paths|using dataPath", mess1)))
-  expect_true(all(grepl("Running .input|module code|Setting|Paths", mess1)))
+  expect_true(all(grepl("Running .input|module code|Setting|Paths|using dataPath", mess1)))
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|Using cached copy|module code|Setting|Paths")
-                 regexp = "Running .input|Using cached copy|module code")
+                 regexp = "Running .input|Using cached copy|module code|Setting|Paths")
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -239,11 +237,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   expect_message(do.call(simInit, args),
-                 regexp = "Using or creating cached copy|module code|Setting|Paths|dataPath",
-                 regexp = "Running .input|module code|Setting|Paths",
-                 all = TRUE)
-  expect_message(do.call(simInit, args),
-                 regexp = "Running .input|loading cached result|module code|Setting|Paths",
+                 regexp = "Running .input|module code|Setting|Paths|using dataPath",
                  all = TRUE)
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
