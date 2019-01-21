@@ -6,7 +6,7 @@
 \alias{Cache}
 \title{\code{.robustDigest} for \code{simList} class objects}
 \usage{
-\S4method{.robustDigest}{simList}(object, objects,
+\S4method{.robustDigest}{simList}(object, .objects,
   length = getOption("reproducible.length", Inf), algo = "xxhash64",
   quick = getOption("reproducible.quick", FALSE),
   classOptions = list())
@@ -14,11 +14,11 @@
 \arguments{
 \item{object}{an object to digest.}
 
-\item{objects}{Optional character vector indicating which objects are to
-be considered while making digestible. This argument is not used
-in the default cases; the only known method that uses this
-in the default cases; the only known method that uses this
-argument is the \code{simList} class from \code{SpaDES.core}.}
+\item{.objects}{Character vector of objects to be digested. This is only applicable
+if there is a list, environment (or similar) named objects
+within it. Only this/these objects will be considered for caching,
+i.e., only use a subset of
+the list, environment or similar objects.}
 
 \item{length}{Numeric. If the element passed to Cache is a \code{Path} class
 object (from e.g., \code{asPath(filename)}) or it is a \code{Raster} with
