@@ -1119,7 +1119,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
           sim <- Cache(.inputObjects, sim,
-                       objects = objectsToEvaluateForCaching,
+                       .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),

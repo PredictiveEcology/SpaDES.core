@@ -937,7 +937,7 @@ setMethod(
     expression(Cache(FUN = get(moduleCall, envir = fnEnv),
                 sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
-                     objects = moduleSpecificObjects,
+                     .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,

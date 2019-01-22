@@ -643,10 +643,16 @@ cantCodeCheckMessage <- ": line could not be checked "
     pd <- sim@.xData[[module]][["._parsedData"]]
   }
   lineNumbers <- lapply(seq(namedTxt), function(patternIndex) {
-    wh <- which(grepl(pattern = paste0("\\b", namedTxt[patternIndex], "\\b"), pd$text) &
+    patt <- gsub("\\(", "\\\\(", namedTxt[patternIndex])
+    patt <- gsub("\\)", "\\\\)", patt)
+    patt <- gsub("\\{", "\\\\{", patt)
+    patt <- gsub("\\}", "\\\\}", patt)
+    patt <- gsub("\\[", "\\\\[", patt)
+    patt <- gsub("\\]", "\\\\]", patt)
+    wh <- which(grepl(pattern = paste0("\\b", patt, "\\b"), pd$text) &
                   (pd$line1 == pd$line2) & (pd$token == "expr"))
     if (length(wh) == 0) {
-      wh <- which(agrepl(pattern = paste0(namedTxt[patternIndex]), pd$text) &
+      wh <- which(agrepl(pattern = paste0(patt), pd$text) &
                     (pd$line1 == pd$line2) & (pd$token == "expr"))
     }
 
@@ -660,8 +666,8 @@ cantCodeCheckMessage <- ": line could not be checked "
       whInner <- any((pd[outerWh,"line1"] < lwf) & (pd[outerWh,"line2"] > lwf) )
       if (isTRUE(whInner)) lwf else numeric()
     })
-    if (length(linesWithFail) == length(namedTxt[patternIndex]))
-      names(linesWithFail) <- namedTxt[patternIndex]
+    if (length(linesWithFail) == length(patt))
+      names(linesWithFail) <- patt
     unlist(linesWithFail)
   })
   unlist(lineNumbers)

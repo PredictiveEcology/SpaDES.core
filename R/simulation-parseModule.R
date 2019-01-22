@@ -237,8 +237,14 @@ setMethod(
 
         # evaluate the rest of the parsed file
         if (doesntUseNamespacing) {
+          message("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
+                  "It is now recommended to define functions that are not prefixed with the module name\n  ",
+                  "and to no longer call the functions with sim$functionName.\n  ",
+                  "Simply call functions in your module with their name: e.g.,\n  ",
+                  "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
           #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
-          eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData)
+          out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                             sim@.xData)
           #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
         }
 
