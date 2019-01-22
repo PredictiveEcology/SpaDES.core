@@ -1,7 +1,7 @@
 if (!isGeneric(".robustDigest")) {
   setGeneric(
     ".robustDigest",
-    function(object, objects, length = Inf, algo = "xxhash64") {
+    function(object, o.bjects, length = Inf, algo = "xxhash64", ...) {
       standardGeneric(".robustDigest")
     })
 }
@@ -29,12 +29,10 @@ if (!isGeneric(".robustDigest")) {
 #' @aliases Cache
 #' @rdname robustDigest
 #' @seealso \code{\link[reproducible]{robustDigest}}
-#'
 setMethod(
   ".robustDigest",
   signature = "simList",
-  definition = function(object, .objects, length, algo,
-                        quick, classOptions) {
+  definition = function(object, .objects, length, algo, quick, classOptions) {
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))],
@@ -146,7 +144,7 @@ setMethod(
       if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
 
     obj
-  })
+})
 
 if (!isGeneric(".tagsByClass")) {
   setGeneric(".tagsByClass", function(object) {
@@ -199,7 +197,7 @@ setMethod(
       }
     }
     userTags
-  })
+})
 
 if (!isGeneric(".cacheMessage")) {
   setGeneric(".cacheMessage", function(object, functionName, fromMemoise) {
@@ -261,7 +259,7 @@ setMethod(
     } else {
       .cacheMessage(NULL, functionName, fromMemoise = fromMemoise)
     }
-  })
+})
 
 #########################################################
 if (!isGeneric(".checkCacheRepo")) {
@@ -307,7 +305,7 @@ setMethod(
       }
     }
     checkPath(path = cacheRepo, create = create)
-  })
+})
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
