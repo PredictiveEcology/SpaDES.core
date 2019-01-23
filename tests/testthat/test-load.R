@@ -201,8 +201,8 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
       try(detach("package:data.table"), silent = TRUE)
       expect_error(simInit(times = times, params = parameters, modules = modules,
                            paths = paths, inputs = inputs), "'inputs' often requires")
-      library(data.table)
     }
+    require(data.table)
     mess <- capture_messages(simInit(times = times, params = parameters, modules = modules,
                          paths = paths, inputs = inputs))
 
