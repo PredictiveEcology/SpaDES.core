@@ -197,10 +197,12 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
       functions = "fread",
       stringsAsFactors = FALSE
     )
-    try(detach("package:data.table"), silent = TRUE)
-    expect_error(simInit(times = times, params = parameters, modules = modules,
-                    paths = paths, inputs = inputs), "'inputs' often requires")
-    library(data.table)
+    if (getRversion() < "3.5.2") {
+      try(detach("package:data.table"), silent = TRUE)
+      expect_error(simInit(times = times, params = parameters, modules = modules,
+                           paths = paths, inputs = inputs), "'inputs' often requires")
+      library(data.table)
+    }
     expect_message(simInit(times = times, params = parameters, modules = modules,
                          paths = paths, inputs = inputs), paste(basename(tmpFile)))
 
