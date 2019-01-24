@@ -324,7 +324,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 #' }
 scheduleEvent <- function(sim,
                           eventTime,
-                          moduleName = current(sim)$module,
+                          moduleName,
                           eventType,
                           eventPriority = .pkgEnv$.normalVal,
                           .skipChecks = FALSE) {
