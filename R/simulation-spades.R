@@ -286,7 +286,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 #' @param eventTime      A numeric specifying the time of the next event.
 #'
 #' @param moduleName     A character string specifying the module from which to
-#'                       call the event.
+#'                       call the event. If missing, it will use
+#'                       \code{currentModule(sim)}
 #'
 #' @param eventType      A character string specifying the type of event from
 #'                       within the module.
@@ -330,6 +331,8 @@ scheduleEvent <- function(sim,
                           .skipChecks = FALSE) {
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
+
+  if (missing(moduleName)) moduleName <- currentModule(sim)
 
   if (!.skipChecks) {
     if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`

@@ -6,8 +6,10 @@
 \alias{Cache}
 \title{\code{.robustDigest} for \code{simList} class objects}
 \usage{
-\S4method{.robustDigest}{simList}(object, .objects, length, algo, quick,
-  classOptions)
+\S4method{.robustDigest}{simList}(object, .objects,
+  length = getOption("reproducible.length", Inf), algo = "xxhash64",
+  quick = getOption("reproducible.quick", FALSE),
+  classOptions = list())
 }
 \arguments{
 \item{object}{an object to digest.}
