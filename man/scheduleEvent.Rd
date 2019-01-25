@@ -13,8 +13,7 @@ scheduleEvent(sim, eventTime, moduleName, eventType,
 \item{eventTime}{A numeric specifying the time of the next event.}
 
 \item{moduleName}{A character string specifying the module from which to
-call the event. If missing, it will use
-\code{currentModule(sim)}}
+call the event.}
 
 \item{eventType}{A character string specifying the type of event from
 within the module.}

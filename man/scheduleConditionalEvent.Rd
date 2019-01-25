@@ -17,8 +17,7 @@ It can access objects in the \code{simList} by using functions of \code{sim},
 e.g., \code{"sim$age > 1"}}
 
 \item{moduleName}{A character string specifying the module from which to
-call the event. If missing, it will use
-\code{currentModule(sim)}}
+call the event.}
 
 \item{eventType}{A character string specifying the type of event from
 within the module.}
