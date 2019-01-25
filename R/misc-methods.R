@@ -713,11 +713,3 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
 
 }
 
-.basename <- function (x) {
-  if (is.null(x)) {
-    NULL
-  }
-  else {
-    basename(x)
-  }
-}
