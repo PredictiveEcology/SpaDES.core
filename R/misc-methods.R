@@ -229,8 +229,7 @@ setMethod("loadPackages",
             return(invisible(character(0)))
 })
 
-
-###############################################################
+################################################################################
 #' Convert numeric to character with padding
 #'
 #' @param x numeric. Number to be converted to character with padding
@@ -241,7 +240,7 @@ setMethod("loadPackages",
 #' @param padR numeric. Desired number of digits on right side of decimal.
 #'              If not enough, \code{pad} will be used to pad.
 #'
-#' @param pad character to use as padding (\code{nchar(pad)==1} must be \code{TRUE}).
+#' @param pad character to use as padding (\code{nchar(pad) == 1} must be \code{TRUE}).
 #'            Passed to \code{\link[stringi]{stri_pad}}
 #'
 #' @return Character string representing the filename.
@@ -255,8 +254,6 @@ setMethod("loadPackages",
 #' @examples
 #' paddedFloatToChar(1.25)
 #' paddedFloatToChar(1.25, padL = 3, padR = 5)
-#'
-# igraph exports %>% from magrittr
 paddedFloatToChar <- function(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "0") {
   xIC <- x %/% 1 %>%
     format(., trim = TRUE, digits = 5, scientific = FALSE) %>%
@@ -505,7 +502,6 @@ setMethod(
     return(classFilter(x, include, exclude = NA_character_, envir = sys.frame(-1)))
 })
 
-
 ################################################################################
 #' Create empty fileTable for inputs and outputs
 #'
@@ -558,7 +554,7 @@ setMethod(
       arguments = I(list()), stringsAsFactors = FALSE
     )
     return(ft)
-  })
+})
 
 #' @rdname fileTable
 .fileTableOutCols <- colnames(.fileTableOut())
@@ -617,12 +613,6 @@ setMethod(
             "option('reproducible.cachePath').\n",
             "Setting option('reproducible.cachePath' = getOption('spades.cachePath'))")
   }
-  # message("Running:\n",
-  #         "  getOption('reproducible.cachePath')\n",
-  #         "  getOption('spades.inputPath')\n",
-  #         "  getOption('spades.outputPath')\n",
-  #         "  getOption('spades.modulePath')\n",
-  #         "  )")
 
   list(
     cachePath = .getOption("reproducible.cachePath"),
@@ -632,13 +622,11 @@ setMethod(
   )
 }
 
-
 #' @export
 #' @rdname setPaths
 getPaths <- function() {
   return(.paths())
 }
-
 
 #' @export
 #' @rdname setPaths
@@ -682,7 +670,6 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
-
   } else {
     normPath(modulePath)
   }
@@ -691,11 +678,10 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
     if (!allDefault) {
       message("Setting:\n",
               "  options(\n",
-              if (!defaults$CP) paste0("    reproducible.cachePath = '",normPath(cachePath),"'\n"),
-              if (!defaults$IP) paste0("    spades.inputPath = '",normPath(inputPath),"'\n"),
-              if (!defaults$OP) paste0("    spades.outputPath = '",normPath(outputPath),"'\n"),
-              if (!defaults$MP) paste0("    spades.modulePath = '",modPaths,
-                                       "'\n"),
+              if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"), #nolint
+              if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
+              if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
+              if (!defaults$MP) paste0("    spades.modulePath = '" ,modPaths, "'\n"),
               "  )")
     }
     if (any(unlist(defaults)))
@@ -710,14 +696,12 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
 
   lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
-
 }
 
 .basename <- function (x) {
   if (is.null(x)) {
     NULL
-  }
-  else {
+  } else {
     basename(x)
   }
 }
