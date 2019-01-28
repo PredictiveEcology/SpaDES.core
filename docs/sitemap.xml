@@ -172,7 +172,7 @@
     <loc>http://spades-core.predictiveecology.org//reference/loadPackages.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/makeMemoiseable.html</loc>
+    <loc>http://spades-core.predictiveecology.org//reference/makeMemoisable.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/maxTimeunit.html</loc>
@@ -389,5 +389,8 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//articles/ii-modules.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//articles/iii-cache.html</loc>
   </url>
 </urlset>

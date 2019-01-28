@@ -4,6 +4,7 @@ pkgdown_sha: ~
 articles:
   i-introduction: i-introduction.html
   ii-modules: ii-modules.html
+  iii-cache: iii-cache.html
 urls:
   reference: http://spades-core.predictiveecology.org//reference
   article: http://spades-core.predictiveecology.org//articles

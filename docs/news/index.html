@@ -98,6 +98,9 @@
     <li>
       <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -136,13 +139,16 @@
 <h2 class="hasAnchor">
 <a href="#package-dependencies" class="anchor"></a>package dependencies</h2>
 <ul>
-<li>no changes</li>
+<li>
+<code>archivist</code> and <code>devtools</code> added to Suggests because they are used in vignettes</li>
+<li>minimium <code>reproducible</code> version 0.2.6</li>
 </ul>
 </div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
+<li>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</li>
 <li>
 <p><code>simList</code> environment now has <code><a href="https://www.rdocumentation.org/packages/base/topics/environment">emptyenv()</a></code> as its <code>parent.env</code>. The biggest user-facing changes are:</p>
 <ul>

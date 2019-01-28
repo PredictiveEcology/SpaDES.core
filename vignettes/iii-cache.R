@@ -1,7 +1,7 @@
 ## ----examples, echo=TRUE, message=FALSE----------------------------------
-library(igraph) # for %>%
+library(magrittr)
 library(raster)
-library(SpaDES)
+library(SpaDES.core)
 
 mySim <- simInit(
   times = list(start = 0.0, end = 5.0),

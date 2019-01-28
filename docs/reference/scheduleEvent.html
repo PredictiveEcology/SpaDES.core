@@ -101,6 +101,9 @@
     <li>
       <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -155,7 +158,8 @@
     <tr>
       <th>moduleName</th>
       <td><p>A character string specifying the module from which to
-call the event.</p></td>
+call the event. If missing, it will use
+<code><a href='namespacing.html'>currentModule(sim)</a></code></p></td>
     </tr>
     <tr>
       <th>eventType</th>
