@@ -681,16 +681,16 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
               if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"), #nolint
               if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
               if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
-              if (!defaults$MP) paste0("    spades.modulePath = '" ,modPaths, "'\n"),
+              if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
               "  )")
     }
     if (any(unlist(defaults)))
       message("Paths set to:\n",
               "  options(\n",
-              "    reproducible.cachePath = '",normPath(cachePath),"'\n",
-              "    spades.inputPath = '",normPath(inputPath),"'\n",
-              "    spades.outputPath = '",normPath(outputPath),"'\n",
-              "    spades.modulePath = '",modPaths,"'\n",
+              "    reproducible.cachePath = '", normPath(cachePath), "'\n",
+              "    spades.inputPath = '", normPath(inputPath), "'\n",
+              "    spades.outputPath = '", normPath(outputPath), "'\n",
+              "    spades.modulePath = '", modPaths, "'\n",
               "  )")
   }
 
