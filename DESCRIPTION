@@ -53,7 +53,9 @@ Imports:
     tools,
     utils
 Suggests:
+    archivist,
     covr,
+    devtools,
     knitr,
     Matrix,
     magrittr,

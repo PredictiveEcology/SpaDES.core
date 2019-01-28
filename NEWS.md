@@ -5,10 +5,11 @@ version 0.2.4
 
 ## package dependencies
 
-* no changes
+* `archivist` and `devtools` added to Suggests because they are used in vignettes
 
 ## new features
 
+* new vignette on caching `SpaDES` simulations moved from `SpaDES` package.
 * `simList` environment now has `emptyenv()` as its `parent.env`. The biggest user-facing changes are:
   
     - functions placed in the `envir(sim)` (unusual, but may occur) won't find objects in the `.GlobalEnv`;
