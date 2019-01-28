@@ -713,23 +713,23 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
 #' \code{simList} converts the object to a \code{simList_} first.
 #'
 #' @return A \code{simList_} object or a \code{simList}, in the case
-#' of \code{unmakeMemoiseable}.
+#' of \code{unmakeMemoisable}.
 #'
-#' @importFrom reproducible makeMemoiseable
-#' @inheritParams reproducible::makeMemoiseable
-#' @rdname makeMemoiseable
+#' @importFrom reproducible makeMemoisable
+#' @inheritParams reproducible::makeMemoisable
+#' @rdname makeMemoisable
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{makeMemoiseable}}
+#' @seealso \code{\link[reproducible]{makeMemoisable}}
 #' @export
-makeMemoiseable.simList <- function(x) {
+makeMemoisable.simList <- function(x) {
   as(x, "simList_")
 }
 
-#' @importFrom reproducible unmakeMemoiseable
-#' @inheritParams reproducible::unmakeMemoiseable
+#' @importFrom reproducible unmakeMemoisable
+#' @inheritParams reproducible::unmakeMemoisable
 #' @export
-#' @rdname makeMemoiseable
-unmakeMemoiseable.simList_ <- function(x) {
+#' @rdname makeMemoisable
+unmakeMemoisable.simList_ <- function(x) {
   as(x, "simList")
 }
 
