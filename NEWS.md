@@ -6,6 +6,7 @@ version 0.2.4
 ## package dependencies
 
 * `archivist` and `devtools` added to Suggests because they are used in vignettes
+* minimium `reproducible` version 0.2.6
 
 ## new features
 
