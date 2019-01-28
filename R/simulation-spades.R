@@ -729,7 +729,7 @@ setGeneric(
   function(sim, debug = getOption("spades.debug"), progress = NA, cache,
            .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL, ...) {
     standardGeneric("spades")
-  })
+})
 
 #' @rdname spades
 setMethod(
@@ -863,7 +863,7 @@ setMethod(
     # For determining if clean ending to spades call
     .pkgEnv$.cleanEnd <- TRUE
     return(invisible(sim))
-  })
+})
 
 #' @rdname spades
 #' @importFrom reproducible Cache
