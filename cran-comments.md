@@ -11,7 +11,7 @@ This release includes various bug fixes and enhancements (see NEWS).
 * Windows              (appveyor), R 3.4.4
 
 ### Current R versions
-* macOS High Sierra  (travis-ci), R 3.5.2
+* macOS Mojave       (travis-ci), R 3.5.2
 * macOS Mojave           (local), R 3.5.2
 * Ubuntu 14.04       (travis-ci), R 3.5.2
 * Ubuntu 18.04           (local), R 3.5.2
