@@ -440,13 +440,21 @@ setMethod(
   "moduleGraph",
   signature(sim = "simList", plot = "logical"),
   definition = function(sim, plot, ...) {
-    if ((Sys.info()[['sysname']] == "Darwin") && (Sys.which("glpsol") == "")) {
-      stop("GLPK not found on this system.\n",
-           "igraph is used internally and requires a GLPK installation.\n",
-           "It can be installed using, e.g., `brew install glpk`, ",
-           "after which you should reinstall igraph from source using:\n",
-           "`install.packages('igraph', type = 'source')`\n",
-           "For more info see https://github.com/igraph/rigraph/issues/273.")
+    if (Sys.which("glpsol") == "") {
+      if (Sys.info()[['sysname']] == "Darwin") {
+        stop("GLPK not found on this system.\n",
+             "igraph is used internally and requires a GLPK installation.\n",
+             "It can be installed using, e.g., `brew install glpk`, ",
+             "after which you should reinstall igraph from source using:\n",
+             "`install.packages('igraph', type = 'source')`\n",
+             "For more info see https://github.com/igraph/rigraph/issues/273.")
+      } else if (Sys.info()[['sysname']] == "Linux") {
+        stop("GLPK not found on this system.\n",
+             "igraph is used internally and requires a GLPK installation.\n",
+             "It can be installed using, e.g., `apt install libglpk-dev`, ",
+             "after which you should reinstall igraph from source using:\n",
+             "`install.packages('igraph', type = 'source')`.")
+      }
     } else {
       mg <- attr(sim@modules, "modulesGraph")
       parents <- unique(mg[, "from"])
