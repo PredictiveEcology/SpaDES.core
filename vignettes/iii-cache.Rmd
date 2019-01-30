@@ -30,7 +30,7 @@ Some of the details of the `simList`-specific features of this `Cache` function 
 
 - The function converts all elements that have an environment as part of their attributes into a format that has no unique environment attribute, using `format` if a function, and `as.list` in the case of the `simList` environment.
 
-- When used within SpaDES modules, `Cache` (capital C) does not require that the argument `cacheRepo` be specified.
+- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cacheRepo` be specified.
 If called from inside a SpaDES module, `Cache` will use the `cacheRepo` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
 Similarly, if no `cacheRepo` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
 To persist between sessions, use `SpaDES::setPaths()` every session.
@@ -126,7 +126,7 @@ Only the objects inside the `simList` that correspond to the `inputObjects` or t
  
 For general use, module-level caching would be mostly useful for modules that have no stochasticity, such as data-preparation modules, GIS modules etc.
 
-In this example, we will use the cache on the randomLandscapes module.
+In this example, we will use the cache on the `randomLandscapes` module.
 This means that each subsequent call to spades will result in identical outputs from the `randomLandscapes` module (only!).
 This would be useful when only one random landscape is needed simply for trying something out, or putting into production code (*e.g.*, publication, decision support, etc.).
 
@@ -159,7 +159,7 @@ Only the objects inside the `simList` that correspond to the `inputObjects` or t
 The fact that all and only the named `inputObjects` and `outputObjects` are cached and returned may be inefficient (*i.e.*, it may cache more objects than are necessary) for individual events.
 
 Similar to module-level caching, event-level caching would be mostly useful for events that have no stochasticity, such as data-preparation events, GIS events etc.
-Here, we don't change the module-level caching for randomLandscapes, but we add to it a cache for only the "init" event for `fireSpread`.
+Here, we don't change the module-level caching for `randomLandscapes`, but we add to it a cache for only the "init" event for `fireSpread`.
 
 ```{r event-level, echo=TRUE}
 params(mySim)$fireSpread$.useCache <- "init"
@@ -212,7 +212,7 @@ if (requireNamespace("archivist")) {
 
 # Reproducible Workflow
 
-In general, we feel that a liberal use of `Cache` will make a re-useable and reproducible work flow.
+In general, we feel that a liberal use of `Cache` will make a reusable and reproducible work flow.
 `shiny` apps can be made, taking advantage of `Cache`. 
 Indeed, much of the difficulty in managing data sets and saving them for future use, can be accommodated by caching.
 
@@ -275,7 +275,7 @@ The messaging should indicate the caching is happening on every event in that mo
 
 ***Note: This option REQUIRES that the metadata in inputs and outputs be exactly correct, i.e., all inputObjects and outputObjects must be correctly identified and listed in the defineModule metadata***
 
-***If the module is cached, and there are errors when it is run, it almost is garanteed to be a problem with the `inputObjects` and `outputObjects` incorrectly specified.***
+***If the module is cached, and there are errors when it is run, it almost is guaranteed to be a problem with the `inputObjects` and `outputObjects` incorrectly specified.***
 
 #### Cache individual functions
 

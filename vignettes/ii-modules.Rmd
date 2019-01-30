@@ -739,7 +739,7 @@ See the `SpaDES` wiki ([https://github.com/PredictiveEcology/SpaDES/wiki](https:
 
 Use `system.file("sampleModules", package = "SpaDES.core")` to get the path to the `sampleModules` directory.
 To view the contents of a module, use the `openModules` function.
-Note that you shouldn't edit the sample modules directly, but save them as a copy in another location.
+Note that you should not edit the sample modules directly, but save them as a copy in another location.
 
 ```{r caribouMovement, echo=TRUE, eval=FALSE}
 openModules(system.file("sampleModules", package = "SpaDES.core"), "moduleName")
@@ -780,7 +780,7 @@ While it may be useful for modules to exhibit indirect dependence on each other 
 
 ## Using the module template
 
-Code for new modules can be developed quickly using the template generator function `newModule`(also available as an RStudio addin) which accepts as arguments the name of the new module, a directory path in which to create the new module, and a logical indicating whether to open the newly created module code file for editing.
+Code for new modules can be developed quickly using the template generator function `newModule`(also available as an RStudio add-in) which accepts as arguments the name of the new module, a directory path in which to create the new module, and a logical indicating whether to open the newly created module code file for editing.
 
 Module developers can set the `devtools.desc.author` option (*e.g.*, in their `.Rprofile` to automatically supply a default module author).
 See `package?devtools` for more details.

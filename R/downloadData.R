@@ -153,7 +153,7 @@ remoteFileSize <- function(url) {
 #'  build a checksums file.
 #'
 #' There is an experimental attempt to use the \pkg{googledrive} package to download
-#' data from a shared (publically or with individual users) file.
+#' data from a shared (publicly or with individual users) file.
 #' To try this, put the Google Drive URL in \code{sourceURL} argument of
 #' \code{expectsInputs} in the module metadata, and put the filename once downloaded
 #' in the \code{objectName} argument.

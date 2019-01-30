@@ -16,7 +16,7 @@ version 0.2.4
     - functions placed in the `envir(sim)` (unusual, but may occur) won't find objects in the `.GlobalEnv`;
     - lighter memory footprint, as functions take RAM due to the objects in the `parent.env` in which they are defined (little know fact identified here: http://adv-r.had.co.nz/memory.html#gc identified as a possible source of memory leaks).
 
-* module's function environment in the simList now has its parent `asNamespace("SpaDES.core")` instead of the envir(sim) (as mentioned above), i.e,. `parent.env(sim[[currentModule(sim)]])` is `asNamespace("SpaDES.core")`. The main user-noticable changes of this are that module functions will not accidentally find objects in the `simList` unless they are actually passed in explicitly as arguments.
+* module's function environment in the simList now has its parent `asNamespace("SpaDES.core")` instead of the `envir(sim)` (as mentioned above), i.e,. `parent.env(sim[[currentModule(sim)]])` is `asNamespace("SpaDES.core")`. The main user-noticeable changes of this are that module functions will not accidentally find objects in the `simList` unless they are actually passed in explicitly as arguments.
 * New active binding, `mod` that works as a module-specific variable, similar to a private object, *i.e.*, `mod$a` is a local object inside the module that persists across events. It is a pointer to `sim[[currentModule(sim)]]$a`
 * New function `scheduleConditionalEvent`, which allows an event to be scheduled based on a condition. Still experimental.
 * An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object

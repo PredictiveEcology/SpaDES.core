@@ -283,7 +283,7 @@ setMethod(
         # then a function with defineModule, sim, and then the list (the [[3]])
         pf[[1]][[3]] <- pf[[1]][[3]][!(inObjs | outObjs)]
 
-        # allows active code e.g., `startSim <- start(sim)` to be parsed, then useable
+        # allows active code e.g., `startSim <- start(sim)` to be parsed, then usable
         #  inside of the defineModule.
         #  First, load anything that is active code into an environment whose parent
         #  is here (and thus has access to sim), then move the depends (only) back to main sim
