@@ -20,10 +20,10 @@ This release includes various bug fixes and enhancements (see NEWS).
 * Windows 7              (local), R 3.5.2
 
 ### Development R version
-* Ubuntu 14.04       (travis-ci), R 3.6.0 (2019-01-06 r75950)
-* Ubuntu 18.04           (local), R 3.6.0 (2019-01-07 r75958)
-* Windows             (appveyor), R 3.6.0 (2019-01-06 r75950)
-* Windows          (win-builder), R 3.6.0 (2019-01-07 r75956)
+* Ubuntu 14.04       (travis-ci), R 3.6.0 (2019-01-29 r76025)
+* Ubuntu 18.04           (local), R 3.6.0 (2019-01-25 r76014)
+* Windows             (appveyor), R 3.6.0 (2019-01-26 r76018)
+* Windows          (win-builder), R 3.6.0 (2019-01-27 r76018)
 
 ## R CMD check results
 
