@@ -218,7 +218,7 @@ setMethod(
     x$childModules <- if (is.null(x$childModules)) {
       moduleDefaults$childModules
     } else {
-      if (isTRUE(is.na(x$childModules))) {
+      if (any(is.na(x$childModules))) {
         moduleDefaults$childModules
       } else {
         x$childModules %>% as.character() %>% na.omit() %>% as.character() # nolint

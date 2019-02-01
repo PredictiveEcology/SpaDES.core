@@ -203,7 +203,7 @@ setMethod(
     nestedPath <- file.path(path, name) %>% checkPath(create = TRUE)
     filenameR <- file.path(nestedPath, paste0(name, ".R"))
 
-    children_char <- if (is.na(children) || length(children) == 0L) {
+    children_char <- if (any(is.na(children)) || length(children) == 0L) {
       "character(0)"
     } else {
       capture.output(dput(children))
