@@ -1,28 +1,54 @@
-# Setup
+# SpaDES.addins
 
-## Platform
+Version: 0.1.1
 
-|setting  |value                        |
-|:--------|:----------------------------|
-|version  |R version 3.5.1 (2018-07-02) |
-|system   |x86_64, darwin15.6.0         |
-|ui       |RStudio (1.1.419)            |
-|language |(EN)                         |
-|collate  |en_CA.UTF-8                  |
-|tz       |America/Edmonton             |
-|date     |2018-11-09                   |
+## Newly broken
 
-## Packages
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespaces in Imports field not imported from:
+      ‘devtools’ ‘rstudioapi’
+      All declared Imports should be used.
+    ```
 
-|package      |*  |version    |date       |source                                          |
-|:------------|:--|:----------|:----------|:-----------------------------------------------|
-|SpaDES.core  |   |0.1.1      |2018-01-29 |cran (@0.1.1)                                   |
-|SpaDES.tools |   |0.3.0.9001 |2018-11-09 |Github (PredictiveEcology/SpaDES.tools@42a02a1) |
+## Newly fixed
 
-# Check results
+*   checking whether package ‘SpaDES.addins’ can be installed ... ERROR
+    ```
+    Installation failed.
+    See ‘/home/achubaty/Documents/GitHub/PredictiveEcology/SpaDES.core/revdep/checks/SpaDES.addins/old/SpaDES.addins.Rcheck/00install.out’ for details.
+    ```
 
-0 packages with problems
+## Installation
 
+### Devel
 
+```
+* installing *source* package ‘SpaDES.addins’ ...
+** package ‘SpaDES.addins’ successfully unpacked and MD5 sums checked
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+Warning in fun(libname, pkgname) : couldn't connect to display ":99"
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+Warning in fun(libname, pkgname) : couldn't connect to display ":99"
+* DONE (SpaDES.addins)
 
+```
+### CRAN
 
+```
+* installing *source* package ‘SpaDES.addins’ ...
+** package ‘SpaDES.addins’ successfully unpacked and MD5 sums checked
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+Error : object ‘makeMemoiseable’ is not exported by 'namespace:reproducible'
+ERROR: lazy loading failed for package ‘SpaDES.addins’
+* removing ‘/home/achubaty/Documents/GitHub/PredictiveEcology/SpaDES.core/revdep/checks/SpaDES.addins/old/SpaDES.addins.Rcheck/SpaDES.addins’
+
+```

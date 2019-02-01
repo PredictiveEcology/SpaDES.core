@@ -1,49 +1,37 @@
-# Setup
+# Platform
 
-## Platform
-
-|setting  |value                        |
+|field    |value                        |
 |:--------|:----------------------------|
-|version  |R version 3.5.1 (2018-07-02) |
-|system   |x86_64, darwin15.6.0         |
-|ui       |RStudio (1.1.419)            |
-|language |(EN)                         |
+|version  |R version 3.5.2 (2018-12-20) |
+|os       |Ubuntu 18.04.1 LTS           |
+|system   |x86_64, linux-gnu            |
+|ui       |X11                          |
+|language |en_CA                        |
 |collate  |en_CA.UTF-8                  |
+|ctype    |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2018-11-09                   |
+|date     |2019-02-01                   |
 
-## Packages
+# Dependencies
 
-|package      |*  |version    |date       |source                                          |
-|:------------|:--|:----------|:----------|:-----------------------------------------------|
-|SpaDES.core  |   |0.1.1      |2018-01-29 |cran (@0.1.1)                                   |
-|SpaDES.tools |   |0.3.0.9001 |2018-11-09 |Github (PredictiveEcology/SpaDES.tools@42a02a1) |
+|package     |old   |new   |Δ  |
+|:-----------|:-----|:-----|:--|
+|SpaDES.core |0.2.3 |0.2.4 |*  |
 
-# Check results
+# Revdeps
 
-3 packages
+## Couldn't check (2)
 
-|package       |version | errors| warnings| notes|
-|:-------------|:-------|------:|--------:|-----:|
-|NetLogoR      |0.3.4   |      0|        0|     0|
-|SpaDES.addins |0.1.1   |      0|        0|     0|
-|SpaDES        |2.0.2   |      0|        0|     0|
+|package                                   |version |error |warning |note   |
+|:-----------------------------------------|:-------|:-----|:-------|:------|
+|SpaDES                                    |2.0.2   |-1    |        |       |
+|[SpaDES.addins](problems.md#spadesaddins) |0.1.1   |-1    |        |__+1__ |
 
-## NetLogoR (0.3.4)
-Maintainer: Sarah Bauduin <sarahbauduin@hotmail.fr>  
-Bug reports: https://github.com/PredictiveEcology/NetLogoR/issues
+## All (3)
 
-0 errors | 0 warnings | 0 notes
-
-## SpaDES.addins (0.1.1)
-Maintainer: Alex M Chubaty <alex.chubaty@gmail.com>  
-Bug reports: https://github.com/PredictiveEcology/SpaDES.addins/issues
-
-0 errors | 0 warnings | 0 notes
-
-## SpaDES (2.0.2)
-Maintainer: Alex M Chubaty <alex.chubaty@gmail.com>  
-Bug reports: https://github.com/PredictiveEcology/SpaDES/issues
-
-0 errors | 0 warnings | 0 notes
+|package                                   |version |error |warning |note   |
+|:-----------------------------------------|:-------|:-----|:-------|:------|
+|NetLogoR                                  |0.3.5   |      |        |       |
+|SpaDES                                    |2.0.2   |-1    |        |       |
+|[SpaDES.addins](problems.md#spadesaddins) |0.1.1   |-1    |        |__+1__ |
 

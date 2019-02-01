@@ -31,6 +31,8 @@ There are no ERRORs nor WARNINGs.
 
 ## Downstream dependencies
 
-I have run R CMD check on downstream dependencies and all have passed.
+We have run R CMD check on downstream dependencies, and all have passed except those noted below.
+
+* Current CRAN versions of `SpaDES` and `SpaDES.addins` produce an ERROR due to a recent change in the dependency package `reproducible`, which has just been updated on CRAN (v0.2.6). These errors are fixed in this version of `SpaDES.core`.
 
 Summary at https://github.com/PredictiveEcology/SpaDES.core/blob/master/revdep/README.md.
