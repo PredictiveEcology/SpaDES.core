@@ -279,7 +279,7 @@ setMethod(
     #children <- moduleMetadata(module, path)$childModules
     if (!is.null(children)) {
       if (length(children)) {
-        if ( all( nzchar(children) & !is.na(children) ) ) {
+        if (all(nzchar(children) & !is.na(children))) {
           chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
                              quickCheck = quickCheck) %>%
             bind_rows()
