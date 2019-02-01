@@ -251,7 +251,7 @@ setMethod(
       }
     }
 
-    x$timeframe <- if (is.null(x$timeframe) || is.na(x$timeframe)) {
+    x$timeframe <- if (is.null(x$timeframe) || any(is.na(x$timeframe))) {
       eval(moduleDefaults$timeframe)
     } else if (!is.numeric.POSIXt(x$timeframe)) {
       as.POSIXlt(x$timeframe)
