@@ -191,8 +191,12 @@ test_that("3 levels of parent and child modules load and show correctly", {
   xxx1 <- gsub(xxx, pattern = "timeunit = 'year'", replacement = "timeunit = 'month'")
   cat(xxx1, file = fileName, sep = "\n")
 
-  if ((Sys.info()[['sysname']] == "Darwin") && (Sys.which("glpsol") == "")) {
-    skip("GLPK not available on macOS")
+  if (Sys.which("glpsol") == "") {
+    if (Sys.info()[['sysname']] == "Darwin") {
+      skip("GLPK not available on macOS")
+    } else if (Sys.info()[['sysname']] == "Linux") {
+      skip("GLPK not available on Linux")
+    }
   } else {
     mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
     mg <- moduleGraph(mySim, FALSE)

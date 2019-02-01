@@ -102,7 +102,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @note
 #' Since the objects in the \code{simList} are passed-by-reference, it is useful
-#' to create a copy of the initalizized \code{simList} object prior to running
+#' to create a copy of the initalized \code{simList} object prior to running
 #' the simulation (e.g., \code{mySimOut <- spades(Copy(mySim))}).
 #' This ensures you retain access to the original objects, which would otherwise
 #' be overwritten/modified during the simulation.
@@ -182,7 +182,7 @@ if (getRversion() >= "3.1.0") {
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
-#' @importFrom reproducible Require
+#' @importFrom reproducible Require basename2
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -374,7 +374,7 @@ setMethod(
     childModules <- .identifyChildModules(sim = sim, modules = modulePaths)
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
     names(modules) <- unlist(modules)
-    modules <- lapply(modules, .basename)
+    modules <- lapply(modules, basename2)
 
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
@@ -392,7 +392,7 @@ setMethod(
 
     sim@modules <- modules  ## will be updated below
 
-    mBase <- .basename(unlist(modules))
+    mBase <- basename2(unlist(modules))
 
     reqdPkgs <- packages(modules = unlist(modulePaths),
                          filenames = file.path(unlist(modulePaths), paste0(mBase, ".R")),
@@ -573,8 +573,8 @@ setMethod(
       loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
     }
 
-    mBase <- .basename(unlist(modules))
-    loadOrderBase <- .basename(loadOrder)
+    mBase <- basename2(unlist(modules))
+    loadOrderBase <- basename2(loadOrder)
     names(loadOrder) <- names(unlist(modules))[na.omit(match(mBase, loadOrderBase))]
     loadOrder[] <- loadOrderBase
     loadOrderNames <- names(loadOrder)
@@ -637,7 +637,7 @@ setMethod(
     }
 
     ## check that modules all loaded correctly and store result
-    if (all(append(core, loadOrderBase) %in% .basename(unlist(modulesLoaded)))) {
+    if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
       modules(sim) <- modulesLoaded
     } else {
       stop("There was a problem loading some modules.")
@@ -977,6 +977,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 #' @rdname identifyChildModules
 #' @param sim simList
 #' @param modules List of module names
+#' @importFrom reproducible basename2
 #' @keywords internal
 #' @return list of \code{modules} will flat named list of all module names (children, parents etc.) and
 #'         \code{childModules} a non flat named list of only the childModule names.
@@ -996,7 +997,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                      nam = dirname(names(modulesToSearch[isParent])),
                                      function(x, nam){
                                        mods <- lapply(x, function(y) file.path(nam, y))
-                                       names(mods) <- unlist(lapply(mods, .basename))
+                                       names(mods) <- unlist(lapply(mods, basename2))
 
                                        .identifyChildModules(sim = sim, modules = mods)}
     )
@@ -1042,6 +1043,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 #' and remove it from the \code{simList} so next module won't rerun it.
 #'
 #' @keywords internal
+#' @importFrom reproducible basename2
 #' @rdname runModuleInputsObjects
 .runModuleInputObjects <- function(sim, m, objects, notOlderThan) {
   # If user supplies the needed objects, then test whether all are supplied.
@@ -1051,7 +1053,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   mnames <- vapply(seq_along(sim@depends@dependencies), function(k) {
     sim@depends@dependencies[[k]]@name
   }, character(1))
-  mBase <- .basename(m)
+  mBase <- basename2(m)
   i <- which(mnames == mBase)
 
   ## temporarily assign current module
@@ -1081,8 +1083,9 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
         }
       }
 
+      message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
       if (isTRUE(cacheIt)) {
-        message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
+        # message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
@@ -1118,7 +1121,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
           sim <- Cache(.inputObjects, sim,
-                       objects = objectsToEvaluateForCaching,
+                       .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
@@ -1128,7 +1131,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                     "function:.inputObjects"))
         }
       } else {
-        message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
         .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
         .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {

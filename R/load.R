@@ -124,6 +124,15 @@ setMethod(
     if (NROW(inputs(sim)) != 0) {
       inputs(sim) <- .fillInputRows(inputs(sim), start(sim))
       filelist <- inputs(sim) # does not create a copy - because data.table ... this is a pointer
+      nonNAFileList <- filelist[!is.na(filelist$file),]
+      if (NROW(nonNAFileList)) {
+        doFilesExist <- file.exists(nonNAFileList$file)
+        if (any(!doFilesExist)) {
+          stop("These files in 'inputs' don't exist; please put them in the right place, ",
+             "or change `inputs`:\n    ",
+             paste0(nonNAFileList$file[!doFilesExist], collapse = "\n    "))
+        }
+      }
 
       curTime <- time(sim, timeunit(sim))
       arguments <- inputArgs(sim)

@@ -101,6 +101,9 @@
     <li>
       <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -160,7 +163,7 @@ If not enough, <code>pad</code> will be used to pad.</p></td>
     </tr>
     <tr>
       <th>pad</th>
-      <td><p>character to use as padding (<code>nchar(pad)==1</code> must be <code>TRUE</code>).
+      <td><p>character to use as padding (<code>nchar(pad) == 1</code> must be <code>TRUE</code>).
 Passed to <code><a href='https://www.rdocumentation.org/packages/stringi/topics/stri_pad'>stri_pad</a></code></p></td>
     </tr>
     </table>
@@ -171,8 +174,7 @@ Passed to <code><a href='https://www.rdocumentation.org/packages/stringi/topics/
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>)</div><div class='output co'>#&gt; [1] "1.250"</div><div class='input'><span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>, <span class='kw'>padL</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>padR</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] "001.25000"</div><div class='input'>
-</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>)</div><div class='output co'>#&gt; [1] "1.250"</div><div class='input'><span class='fu'>paddedFloatToChar</span>(<span class='fl'>1.25</span>, <span class='kw'>padL</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>padR</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] "001.25000"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

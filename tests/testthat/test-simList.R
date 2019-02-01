@@ -203,7 +203,7 @@ test_that("simList object initializes correctly", {
 })
 
 test_that("simList test all signatures", {
-  testInitOut <- testInit()
+  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)

@@ -16,7 +16,7 @@ If not enough, \code{pad} will be used to pad.}
 \item{padR}{numeric. Desired number of digits on right side of decimal.
 If not enough, \code{pad} will be used to pad.}
 
-\item{pad}{character to use as padding (\code{nchar(pad)==1} must be \code{TRUE}).
+\item{pad}{character to use as padding (\code{nchar(pad) == 1} must be \code{TRUE}).
 Passed to \code{\link[stringi]{stri_pad}}}
 }
 \value{
@@ -28,7 +28,6 @@ Convert numeric to character with padding
 \examples{
 paddedFloatToChar(1.25)
 paddedFloatToChar(1.25, padL = 3, padR = 5)
-
 }
 \author{
 Eliot McIntire and Alex Chubaty

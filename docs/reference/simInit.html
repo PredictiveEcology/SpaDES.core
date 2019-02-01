@@ -107,6 +107,9 @@ See more details below." />
     <li>
       <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -328,7 +331,7 @@ the defaults are as follows:</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Since the objects in the <code>simList</code> are passed-by-reference, it is useful
-to create a copy of the initalizized <code>simList</code> object prior to running
+to create a copy of the initalized <code>simList</code> object prior to running
 the simulation (e.g., <code>mySimOut &lt;- spades(Copy(mySim))</code>).
 This ensures you retain access to the original objects, which would otherwise
 be overwritten/modified during the simulation.</p>

@@ -233,7 +233,6 @@ setReplaceMethod(
     return(sim)
 })
 
-
 ################################################################################
 #' Simulation modules and dependencies
 #'
@@ -1122,8 +1121,8 @@ setReplaceMethod(
 #'
 #' \code{file} \tab optional, a character string indicating the file path to save to.
 #' The default is to concatenate \code{objectName} with the model timeunit and
-#' \code{saveTime}, separated by underscore, "_". So a default filename would be
-#' "Fires_year1.rds"\cr
+#' \code{saveTime}, separated by underscore, '\code{_}'. So a default filename would be
+#' \code{"Fires_year1.rds"}.\cr
 #'
 #' \code{fun} \tab optional, a character string indicating the function to use to
 #' save that file. The default is \code{\link{saveRDS}} \cr

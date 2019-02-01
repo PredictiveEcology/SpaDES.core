@@ -1,7 +1,7 @@
 if (!isGeneric(".robustDigest")) {
   setGeneric(
     ".robustDigest",
-    function(object, objects, length = Inf, algo = "xxhash64") {
+    function(object, .objects, length = Inf, algo = "xxhash64", ...) {
       standardGeneric(".robustDigest")
     })
 }
@@ -29,12 +29,10 @@ if (!isGeneric(".robustDigest")) {
 #' @aliases Cache
 #' @rdname robustDigest
 #' @seealso \code{\link[reproducible]{robustDigest}}
-#'
 setMethod(
   ".robustDigest",
   signature = "simList",
-  definition = function(object, objects, length, algo,
-                        quick, classOptions) {
+  definition = function(object, .objects, length, algo, quick, classOptions) {
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))],
@@ -48,8 +46,8 @@ setMethod(
     allEnvsInSimList <- allEnvsInSimList[ord]
     names(allEnvsInSimList) <- names(allObjsInSimList)
 
-    isObjectEmpty <- if (!missing(objects)) {
-      if (!is.null(objects)) {
+    isObjectEmpty <- if (!missing(.objects)) {
+      if (!is.null(.objects)) {
         FALSE
       } else {
         TRUE
@@ -60,7 +58,7 @@ setMethod(
     if (!isObjectEmpty) {
       # objects may be provided in a namespaced format: modName:objName --
       # e.g., coming from .parseModule
-      objects1 <- strsplit(objects, split = ":")
+      objects1 <- strsplit(.objects, split = ":")
       lens <- unlist(lapply(objects1, length))
       objects1ByMod <- unlist(lapply(objects1[lens > 1], function(x) x[1]))
       mods <- unique(objects1ByMod)
@@ -68,16 +66,16 @@ setMethod(
         unlist(lapply(objects1[lens > 1][objects1ByMod == mod], function(x) x[[2]]))
       })
       names(objects2) <- mods
-      objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
+      .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
     } else {
-      objects <- allObjsInSimList
+      .objects <- allObjsInSimList
     }
     envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
                      function(objs, name) {
                        objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "mod")]
                        objectsToDigest <- sort(objs, method = "radix")
                        objectsToDigest <- objectsToDigest[objectsToDigest %in%
-                                                            objects[[name]]]
+                                                            .objects[[name]]]
                        .robustDigest(mget(objectsToDigest, envir = allEnvsInSimList[[name]]),
                                      quick = quick,
                                      length = length)
@@ -146,7 +144,7 @@ setMethod(
       if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
 
     obj
-  })
+})
 
 if (!isGeneric(".tagsByClass")) {
   setGeneric(".tagsByClass", function(object) {
@@ -199,7 +197,7 @@ setMethod(
       }
     }
     userTags
-  })
+})
 
 if (!isGeneric(".cacheMessage")) {
   setGeneric(".cacheMessage", function(object, functionName, fromMemoise) {
@@ -261,7 +259,7 @@ setMethod(
     } else {
       .cacheMessage(NULL, functionName, fromMemoise = fromMemoise)
     }
-  })
+})
 
 #########################################################
 if (!isGeneric(".checkCacheRepo")) {
@@ -307,7 +305,7 @@ setMethod(
       }
     }
     checkPath(path = cacheRepo, create = create)
-  })
+})
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
@@ -351,7 +349,7 @@ setMethod(
         stop("attributes on the cache object are not correct - 4")
     }
     postDigest <-
-      .robustDigest(object, objects = dots$objects,
+      .robustDigest(object, .objects = dots$.objects,
                     length = dots$length,
                     algo = dots$algo,
                     quick = dots$quick,
@@ -715,23 +713,23 @@ objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
 #' \code{simList} converts the object to a \code{simList_} first.
 #'
 #' @return A \code{simList_} object or a \code{simList}, in the case
-#' of \code{unmakeMemoiseable}.
+#' of \code{unmakeMemoisable}.
 #'
-#' @importFrom reproducible makeMemoiseable
-#' @inheritParams reproducible::makeMemoiseable
-#' @rdname makeMemoiseable
+#' @importFrom reproducible makeMemoisable
+#' @inheritParams reproducible::makeMemoisable
+#' @rdname makeMemoisable
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{makeMemoiseable}}
+#' @seealso \code{\link[reproducible]{makeMemoisable}}
 #' @export
-makeMemoiseable.simList <- function(x) {
+makeMemoisable.simList <- function(x) {
   as(x, "simList_")
 }
 
-#' @importFrom reproducible unmakeMemoiseable
-#' @inheritParams reproducible::unmakeMemoiseable
+#' @importFrom reproducible unmakeMemoisable
+#' @inheritParams reproducible::unmakeMemoisable
 #' @export
-#' @rdname makeMemoiseable
-unmakeMemoiseable.simList_ <- function(x) {
+#' @rdname makeMemoisable
+unmakeMemoisable.simList_ <- function(x) {
   as(x, "simList")
 }
 
