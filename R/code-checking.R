@@ -591,8 +591,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 .parsingSim <- function(x, type) {
   if (length(x) > 1) {
     if (!is.pairlist(x[[2]])) {
-      grepForSim <- grepl("^sim|^sim@.envir|^sim@.xData", deparse(x[[2]], backtick = TRUE))
-      if (any(as.character(x)[1] %in% c("$", "[[")) &&
+      grepForSim <- grepl("^sim|^sim@.envir|^sim@.xData", deparse(x[[2]], backtick = TRUE))[1]
+      if (as.character(x)[1] %in% c("$", "[[") &&
           grepForSim &&
           is.name(x[[3]])) {
         out <- as.character(x[[3]])
