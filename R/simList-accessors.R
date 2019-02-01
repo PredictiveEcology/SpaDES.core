@@ -2241,8 +2241,8 @@ setMethod(
   signature = c("simList", "character"),
   definition = function(sim, unit) {
     obj <- rbindlist(sim@events)
-    if (is.na(pmatch("second", unit)) &&
-               (length(sim@events) > 0)) {
+    if (length(unit) != 1) stop("unit must be length 1")
+    if (is.na(pmatch("second", unit)) && (length(sim@events) > 0)) {
       # note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
@@ -2300,7 +2300,6 @@ setReplaceMethod(
      return(sim)
 })
 
-
 #############################
 #' @rdname simList-accessors-events
 #' @aliases simList-accessors-events
@@ -2317,6 +2316,7 @@ setMethod(
   "conditionalEvents",
   signature = c("simList", "character"),
   definition = function(sim, unit) {
+    if (length(unit) != 1) stop ("unit must be length 1")
     if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
       conds <- sim$._conditionalEvents
       conds <- lapply(conds, function(x) {
