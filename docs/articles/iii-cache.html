@@ -156,13 +156,13 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       burn      5            
 ## 5         fireSpread       stats     5</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.933   0.423   3.656</code></pre>
+##   2.417   0.295   2.864</code></pre>
 <p>Note that if there were any visualizations (here we turned them off with <code>.plotInitialTime = NA</code> above) they will happen the first time through, but not the cached times.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster 2nd time</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(outSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>))</code></pre></div>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.091   0.004   0.096</code></pre>
+##   0.083   0.000   0.082</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(outSim, outSimCached) </code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -211,13 +211,13 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       burn      5            
 ## 5         fireSpread       stats     5</code></pre>
 <pre><code>##    user  system elapsed 
-##   7.262   0.541   7.816</code></pre>
+##   3.087   0.544   3.652</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># internal -- second time faster</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(sims2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</code></pre></div>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy
 ##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.234   0.008   0.240</code></pre>
+##   0.109   0.020   0.128</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(sims1, sims2)</code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -288,13 +288,13 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
 <pre><code>##    user  system elapsed 
-##   7.566   0.268   7.889</code></pre>
+##   4.064   0.393   4.492</code></pre>
 <p>The second time is way faster. We see the output files in the same location.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(sims4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
                            <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</code></pre></div>
 <pre><code>##   loading cached result from previous experiment call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.101   0.008   0.109</code></pre>
+##   0.048   0.004   0.052</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># test they are all equal</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(sims3[[x]], sims4[[x]])) </code></pre></div>
 <pre><code>## [[1]]
@@ -303,8 +303,9 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## [[2]]
 ## [1] TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list.files">dir</a></span>(<span class="kw"><a href="../reference/simList-accessors-paths.html">outputPath</a></span>(mySim), <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] "experiment.RData"         "rep1/landscape_year5.rds"
-## [3] "rep2/landscape_year5.rds" "rep3/landscape_year5.rds"</code></pre>
+<pre><code>## [1] "experiment.RData"         "landscape_year5.rds"     
+## [3] "rep1/landscape_year5.rds" "rep2/landscape_year5.rds"
+## [5] "rep3/landscape_year5.rds"</code></pre>
 <p>Notice that speed up can be enormous; in this case ~100 times.</p>
 </div>
 </div>
@@ -338,7 +339,7 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.981   0.121   3.108</code></pre>
+##   1.447   0.168   1.630</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster the second time</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
                                       <span class="dt">debug =</span> <span class="ot">TRUE</span>))</code></pre></div>
@@ -364,7 +365,7 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.449   0.012   0.458</code></pre>
+##   0.250   0.024   0.276</code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are identical, not <code>fireSpread</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">layers &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span>)
 same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(layers, <span class="cf">function</span>(l) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/identical">identical</a></span>(randomSim<span class="op">$</span>landscape[[l]],
@@ -414,7 +415,7 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
 <pre><code>##    user  system elapsed 
-##   3.124   0.346   3.592</code></pre>
+##   1.795   0.210   2.016</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster the second time</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
                                       <span class="dt">debug =</span> <span class="ot">TRUE</span>))</code></pre></div>
@@ -441,7 +442,7 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.443   0.036   0.480</code></pre>
+##   0.274   0.016   0.292</code></pre>
 </div>
 <div id="function-level-caching" class="section level2">
 <h2 class="hasAnchor">
@@ -452,12 +453,12 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(map &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim),
                          <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.time">Sys.time</a></span>()))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##   4.193   0.291   4.497</code></pre>
+##   2.823   0.116   2.946</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster the second time</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(mapCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim)))</code></pre></div>
 <pre><code>##   loading cached result from previous gaussMap call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.395   0.008   0.404</code></pre>
+##   0.087   0.008   0.096</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(map, mapCached) </code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -468,18 +469,35 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># examine a part of the Cache</span>
 <span class="kw">showCache</span>(mySim)[tagKey <span class="op">==</span><span class="st"> "function"</span>, <span class="op">-</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"artifact"</span>)]</code></pre></div>
 <pre><code>## Cache size:</code></pre>
-<pre><code>##   Total (including Rasters): 2.7 Mb</code></pre>
-<pre><code>##   Selected objects (not including Rasters): 2.7 Mb</code></pre>
-<pre><code>##      tagKey   tagValue         createdDate
-## 1: function     spades 2019-02-01 08:02:59
-## 2: function experiment 2019-02-01 08:03:09
-## 3: function     spades 2019-02-01 08:03:21
-## 4: function        FUN 2019-02-01 08:03:21
-## 5: function     spades 2019-02-01 08:02:55
-## 6: function     spades 2019-02-01 08:03:22
-## 7: function        FUN 2019-02-01 08:03:22
-## 8: function     spades 2019-02-01 08:02:50
-## 9: function   gaussMap 2019-02-01 08:03:28</code></pre>
+<pre><code>##   Total (including Rasters): 4.2 Mb</code></pre>
+<pre><code>##   Selected objects (not including Rasters): 4.2 Mb</code></pre>
+<pre><code>##       tagKey   tagValue         createdDate
+##  1: function     spades 2019-02-01 10:23:47
+##  2: function        FUN 2019-02-01 10:23:47
+##  3: function experiment 2019-02-01 10:19:21
+##  4: function     spades 2019-02-01 10:23:33
+##  5: function     spades 2019-02-01 10:23:27
+##  6: function     spades 2019-02-01 10:23:46
+##  7: function        FUN 2019-02-01 10:23:46
+##  8: function     spades 2019-02-01 10:19:13
+##  9: function     spades 2019-02-01 10:19:28
+## 10: function        FUN 2019-02-01 10:19:28
+## 11: function     spades 2019-02-01 10:27:31
+## 12: function        FUN 2019-02-01 10:27:31
+## 13: function     spades 2019-02-01 10:23:31
+## 14: function     spades 2019-02-01 10:19:09
+## 15: function     spades 2019-02-01 10:19:28
+## 16: function        FUN 2019-02-01 10:19:28
+## 17: function     spades 2019-02-01 10:27:31
+## 18: function        FUN 2019-02-01 10:27:31
+## 19: function   gaussMap 2019-02-01 10:27:35
+## 20: function     spades 2019-02-01 10:27:15
+## 21: function     spades 2019-02-01 10:27:20
+## 22: function     spades 2019-02-01 10:27:18
+## 23: function     spades 2019-02-01 10:19:15
+## 24: function experiment 2019-02-01 10:27:26
+## 25: function experiment 2019-02-01 10:23:40
+##       tagKey   tagValue         createdDate</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ns-load">requireNamespace</a></span>(<span class="st">"archivist"</span>)) {
   <span class="co"># get the RasterLayer that was produced with the gaussMap function:</span>
   map &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(<span class="kw">showCache</span>(mySim, <span class="dt">userTags =</span> <span class="st">"gaussMap"</span>)<span class="op">$</span>artifact) <span class="op">%&gt;%</span>
@@ -488,7 +506,7 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
   <span class="kw">Plot</span>(map)
 }</code></pre></div>
 <pre><code>## Cache size:</code></pre>
-<pre><code>##   Total (including Rasters): 2.7 Mb</code></pre>
+<pre><code>##   Total (including Rasters): 4.2 Mb</code></pre>
 <pre><code>##   Selected objects (not including Rasters): 1.9 Mb</code></pre>
 <p><img src="iii-cache_files/figure-html/manual-cache-1.png" width="700"></p>
 </div>
