@@ -172,7 +172,6 @@ options(spades.moduleCodeChecks = FALSE)
 library(igraph) # for %>%
 library(SpaDES.core)
 if (require(SpaDES.tools) && require(RandomFields)) {
-
   parameters <- list(
     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
     .progress = list(NA),

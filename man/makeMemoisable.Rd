@@ -3,7 +3,7 @@
 \name{makeMemoisable.simList}
 \alias{makeMemoisable.simList}
 \alias{unmakeMemoisable.simList_}
-\title{Make simList correctly work with memoise}
+\title{Make \code{simList} correctly work with \code{memoise}}
 \usage{
 \method{makeMemoisable}{simList}(x)
 
@@ -18,9 +18,9 @@ A \code{simList_} object or a \code{simList}, in the case
 of \code{unmakeMemoisable}.
 }
 \description{
-Because of the environment slot, \code{simList} objects don't
-correctly memoise a \code{simList}. This method for
-\code{simList} converts the object to a \code{simList_} first.
+Because of the environment slot, \code{simList} objects don't correctly
+memoise a \code{simList}.
+This method for \code{simList} converts the object to a \code{simList_} first.
 }
 \seealso{
 \code{\link[reproducible]{makeMemoisable}}
