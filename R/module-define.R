@@ -257,7 +257,7 @@ setMethod(
       as.POSIXlt(x$timeframe)
     } %>% `[`(1:2) # nolint
 
-    if (is.null(x$timeunit) || is.na(x$timeunit)) {
+    if (is.null(x$timeunit) || any(is.na(x$timeunit))) {
       x$timeunit <- moduleDefaults$timeunit
     }
 
