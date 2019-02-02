@@ -144,7 +144,7 @@ test_that("test module-level cache", {
   mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   dev.off()
 
-  expect_true(file.info(tmpfile)$size < 20000) ## TODO: verify actual size on windows
+  expect_true(file.info(tmpfile)$size < 10000)
   unlink(tmpfile)
 
   expect_true(any(grepl(pattern = "Using cached copy of randomLandscapes module", mess1)))
@@ -155,6 +155,7 @@ test_that("test module-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
+
 })
 
 test_that("test .prepareOutput", {
