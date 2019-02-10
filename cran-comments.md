@@ -1,6 +1,6 @@
 ## Updated release
 
-This release includes various bug fixes and enhancements (see NEWS).
+This release attempts to fix GLPK errors when GLPK is installed but `igraph` hasn't been compiled with it.
 
 ## Test environments
 

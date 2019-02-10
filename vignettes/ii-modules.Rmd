@@ -489,10 +489,8 @@ depsEdgeList(mySim, FALSE)      # all object dependency relationships
 clearPlot()
 moduleDiagram(mySim)            # simplified visual representation of modules
 
-try({
-  clearPlot()
-  moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module grouping
-})
+clearPlot()
+moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module grouping
 
 # detailed visual representation of objects
 objectDiagram(mySim, width = 720)
