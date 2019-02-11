@@ -450,10 +450,11 @@ setMethod(
 
     if (Sys.which("glpsol") == "") {
       if (Sys.info()[['sysname']] == "Darwin") {
-        stop(msgMissingGLPK, msgInstallDarwin, msgReinstallIgraph)
+        message(msgMissingGLPK, msgInstallDarwin, msgReinstallIgraph)
       } else if (Sys.info()[['sysname']] == "Linux") {
-        stop(msgMissingGLPK, msgInstallLinux, msgReinstallIgraph)
+        message(msgMissingGLPK, msgInstallLinux, msgReinstallIgraph)
       }
+      return(invisible(NULL))
     } else {
       mg <- attr(sim@modules, "modulesGraph")
       parents <- unique(mg[, "from"])
