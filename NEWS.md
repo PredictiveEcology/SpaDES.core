@@ -3,7 +3,7 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.2.5
 =============
 
-* improved messaging and fixed test failures when GLPK installed by not used by `igraph`
+* improved messaging and fixed test failures when GLPK installed but not used by `igraph`
 
 version 0.2.4
 =============
