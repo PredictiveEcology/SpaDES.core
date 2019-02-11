@@ -440,21 +440,21 @@ setMethod(
   "moduleGraph",
   signature(sim = "simList", plot = "logical"),
   definition = function(sim, plot, ...) {
+    msgMissingGLPK <- paste("GLPK not found on this system.\n",
+                            "igraph is used internally and requires a GLPK installation.\n")
+    msgInstallDarwin <- paste("It can be installed using, e.g., `brew install glpk`.\n")
+    msgInstallLinux <- paste("It can be installed using, e.g., `apt install libglpk-dev`.\n")
+    msgReinstallIgraph <- paste("If GLPK is installed you should reinstall igraph from source using:\n",
+                                "`install.packages('igraph', type = 'source')`\n",
+                                "For more info see https://github.com/igraph/rigraph/issues/273.")
+
     if (Sys.which("glpsol") == "") {
       if (Sys.info()[['sysname']] == "Darwin") {
-        stop("GLPK not found on this system.\n",
-             "igraph is used internally and requires a GLPK installation.\n",
-             "It can be installed using, e.g., `brew install glpk`, ",
-             "after which you should reinstall igraph from source using:\n",
-             "`install.packages('igraph', type = 'source')`\n",
-             "For more info see https://github.com/igraph/rigraph/issues/273.")
+        message(msgMissingGLPK, msgInstallDarwin, msgReinstallIgraph)
       } else if (Sys.info()[['sysname']] == "Linux") {
-        stop("GLPK not found on this system.\n",
-             "igraph is used internally and requires a GLPK installation.\n",
-             "It can be installed using, e.g., `apt install libglpk-dev`, ",
-             "after which you should reinstall igraph from source using:\n",
-             "`install.packages('igraph', type = 'source')`.")
+        message(msgMissingGLPK, msgInstallLinux, msgReinstallIgraph)
       }
+      return(invisible(NULL))
     } else {
       mg <- attr(sim@modules, "modulesGraph")
       parents <- unique(mg[, "from"])
@@ -466,29 +466,36 @@ setMethod(
       if (NROW(deps) == 0) deps <- mg
 
       grph <- graph_from_data_frame(el, directed = TRUE)
-      grps <- cluster_optimal(grph)
+      grps <- try(cluster_optimal(grph))
 
-      membership <- as.numeric(as.factor(mg[match(names(V(grph)), mg[, 2]), 1]))
-      membership[is.na(membership)] <- 1
-      membership[which(names(V(grph)) == "_INPUT_")] <- max(membership, na.rm = TRUE) + 1
-      grps$membership <- membership
+      if (is(grps, "try-error")) {
+        msgIgraphNoGLPK <- paste("Unable to create moduleGraph.",
+                                 "Likely reason: igraph not compiled with GLPK support.\n")
+        message(msgIgraphNoGLPK, msgReinstallIgraph) ## avoid error for tests
+        return(invisible(NULL))
+      } else {
+        membership <- as.numeric(as.factor(mg[match(names(V(grph)), mg[, 2]), 1]))
+        membership[is.na(membership)] <- 1
+        membership[which(names(V(grph)) == "_INPUT_")] <- max(membership, na.rm = TRUE) + 1
+        grps$membership <- membership
 
-      el1 <- lapply(parents, function(par) data.frame(el[from == par]))
-      el1 <- rbindlist(el1)
-      e <- apply(el1, 1, paste, collapse = "|")
-      e <- edges(e)
+        el1 <- lapply(parents, function(par) data.frame(el[from == par]))
+        el1 <- rbindlist(el1)
+        e <- apply(el1, 1, paste, collapse = "|")
+        e <- edges(e)
 
-      if (plot) {
-        vs <- c(15, 0)[(names(V(grph)) %in% parents) + 1]
-        dots <- list(...)
-        if ("title" %in% names(dots)) {
-          Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE, ...)
-        } else {
-          Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE,
-               title = "Module Graph", ...)
+        if (plot) {
+          vs <- c(15, 0)[(names(V(grph)) %in% parents) + 1]
+          dots <- list(...)
+          if ("title" %in% names(dots)) {
+            Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE, ...)
+          } else {
+            Plot(grps, grph - e, vertex.size = vs, plotFn = "plot", axes = FALSE,
+                 title = "Module Graph", ...)
+          }
         }
+        return(invisible(list(graph = grph, communities = grps)))
       }
-      return(invisible(list(graph = grph, communities = grps)))
     }
 })
 

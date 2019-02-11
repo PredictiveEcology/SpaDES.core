@@ -198,7 +198,6 @@ e.g., \code{options(spades.moduleCodeChecks = FALSE)}
 
 Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
 Please see the vignette dedicated to this topic.
-See \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html}.
 }
 
 \examples{

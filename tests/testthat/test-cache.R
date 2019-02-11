@@ -104,6 +104,7 @@ test_that("test module-level cache", {
   }, add = TRUE)
 
   tmpfile <- tempfile(fileext = ".pdf")
+  tmpfile1 <- tempfile(fileext = ".pdf")
   expect_true(file.create(tmpfile))
   tmpfile <- normPath(tmpfile)
 
@@ -133,21 +134,21 @@ test_that("test module-level cache", {
   dev.off()
 
   expect_true(file.info(tmpfile)$size > 20000)
-  unlink(tmpfile)
+  unlink(tmpfile, force = TRUE)
 
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
 
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
-  pdf(tmpfile)
+  pdf(tmpfile1)
   mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
   dev.off()
 
-  if (!identical(Sys.info()[["sysname"]], "Windows")) ## TODO: TEMPORARY to avoid random CRAN fail
-    expect_true(file.info(tmpfile)$size < 10000)
+  if (!identical(Sys.info()[["sysname"]], "Windows") || interactive()) ## TODO: TEMPORARY to avoid random CRAN fail
+    expect_true(file.info(tmpfile1)$size < 10000)
 
-  unlink(tmpfile)
+  unlink(tmpfile1)
 
   expect_true(any(grepl(pattern = "Using cached copy of randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
