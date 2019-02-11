@@ -601,7 +601,7 @@ scheduleConditionalEvent <- function(sim,
 #' @seealso \code{\link{SpaDES.core-package}},
 #' \code{\link{experiment}} for using replication with \code{spades},
 #' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
-#' \url{https://CRAN.R-project.org/package=SpaDES/vignettes/iii-cache.html} which
+#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
 #' uses \code{\link[reproducible]{Cache}}.
 #'
 #'
