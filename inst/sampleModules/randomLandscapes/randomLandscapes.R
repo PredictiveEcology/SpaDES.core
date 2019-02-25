@@ -97,13 +97,13 @@ Init <- function(sim) {
                      ymn = -ny / 2, ymx = ny / 2)
   speedup <- max(1, nx / 5e2)
 
-    # Make dummy maps for testing of models
-    DEM <- gaussMap(template, scale = 300, var = 0.03, speedup = speedup, inMemory = inMemory)
-    DEM[] <- round(getValues(DEM), 1) * 1000
-    forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
-    forestAge[] <- round(getValues(forestAge), 1) * 20
-    percentPine <- gaussMap(template, scale = 50, var = 1, speedup = speedup, inMemory = inMemory)
-    percentPine[] <- round(getValues(percentPine), 1)
+  # Make dummy maps for testing of models
+  DEM <- gaussMap(template, scale = 300, var = 0.03, speedup = speedup, inMemory = inMemory)
+  DEM[] <- round(getValues(DEM), 1) * 1000
+  forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
+  forestAge[] <- round(getValues(forestAge), 1) * 20
+  percentPine <- gaussMap(template, scale = 50, var = 1, speedup = speedup, inMemory = inMemory)
+  percentPine[] <- round(getValues(percentPine), 1)
 
   # Scale them as needed
   forestAge <- forestAge / maxValue(forestAge) * 100
