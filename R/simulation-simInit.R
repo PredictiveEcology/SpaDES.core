@@ -1145,7 +1145,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   return(sim)
 }
 
-
 .timesDefault <- function() list(start = 0, end = 10)
 .paramsDefault <- function() list()
 .modulesDefault <- function() list()
