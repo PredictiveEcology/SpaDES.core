@@ -1,6 +1,7 @@
 ## Updated release
 
 This release attempts to fix GLPK errors when GLPK is installed but `igraph` hasn't been compiled with it.
+It also addresses compatibility with the forthcoming `RandomFields` v3.3.4.
 
 ## Test environments
 
