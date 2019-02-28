@@ -1138,13 +1138,12 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
       }
     }
   } else {
-    message("All requierd input Objects provided; skipping .inputObjects")
+    message("All required input Objects provided; skipping .inputObjects")
   }
 
   sim@current <- list()
   return(sim)
 }
-
 
 .timesDefault <- function() list(start = 0, end = 10)
 .paramsDefault <- function() list()
