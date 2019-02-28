@@ -248,11 +248,19 @@ test_that("timeunits with child and parent modules work correctly", {
 
   cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
-  expect_silent(expect_message(
+  msgGrep <- paste("Setting:", "Paths set to:", "Running .input",
+                   "child6: module code: b is declared",
+                   "child6: outputObjects: dp, cm are assigned",
+                   "There is no similar item in the cacheRepo",
+                   "child6: using dataPath",
+                   sep = "|")
+  warnGrep <- "no non-missing arguments to max; returning -Inf"
+  expect_warning(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects"))),
-    "Running .input|child6 -- outputObjects: dp, cm are assigned")
+    msgGrep),
+    warnGrep
   )
 
   # pulls cached value
