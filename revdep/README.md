@@ -5,12 +5,12 @@
 |version  |R version 3.5.2 (2018-12-20) |
 |os       |Ubuntu 18.04.2 LTS           |
 |system   |x86_64, linux-gnu            |
-|ui       |X11                          |
+|ui       |RStudio                      |
 |language |en_CA                        |
 |collate  |en_CA.UTF-8                  |
 |ctype    |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2019-02-11                   |
+|date     |2019-02-28                   |
 
 # Dependencies
 

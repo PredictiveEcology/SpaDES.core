@@ -21,10 +21,10 @@ It also addresses compatibility with the forthcoming `RandomFields` v3.3.4.
 * Windows 7              (local), R 3.5.2
 
 ### Development R version
-* Ubuntu 14.04       (travis-ci), R 3.6.0 (2019-02-11 r76084)
-* Ubuntu 18.04           (local), R 3.6.0 (2019-02-10 r76083)
-* Windows             (appveyor), R 3.6.0 (2019-02-10 r76083)
-* Windows          (win-builder), R 3.6.0 (2019-02-07 r76069)
+* Ubuntu 14.04       (travis-ci), R 3.6.0 (2019-02-28 r76173)
+* Ubuntu 18.04           (local), R 3.6.0 (2019-02-28 r76173)
+* Windows             (appveyor), R 3.6.0 (2019-02-27 r76167)
+* Windows          (win-builder), R 3.6.0 (2019-02-26 r76164)
 
 ## R CMD check results
 
