@@ -94,8 +94,6 @@ matrix:
     r_github_packages:
       - jimhester/lintr
       - r-lib/covr
-    r_packages:
-      - devtools
   - os: linux
     dist: trusty
     r: devel
@@ -116,8 +114,6 @@ matrix:
       - sleep 3 # give xvfb some time to start
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
-    r_packages:
-      - devtools
   - os: osx
     osx_image: xcode9.4
     latex: false
@@ -127,7 +123,7 @@ matrix:
       - GLPK=true
     before_install:
       - brew update
-      - brew install glpk libgit2
+      - brew install glpk libgit2  llvm
       - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
   - os: osx
     osx_image: xcode9.4
@@ -138,7 +134,7 @@ matrix:
       - GLPK=false
     before_install:
       - brew update
-      - brew install libgit2
+      - brew install libgit2 llvm
       - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
