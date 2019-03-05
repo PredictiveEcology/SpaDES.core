@@ -254,13 +254,11 @@ test_that("timeunits with child and parent modules work correctly", {
                    "There is no similar item in the cacheRepo",
                    "child6: using dataPath",
                    sep = "|")
-  warnGrep <- "no non-missing arguments to max; returning -Inf"
-  expect_warning(expect_message(
+  expect_silent(expect_message(
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects"))),
-    msgGrep),
-    warnGrep
+    msgGrep)
   )
 
   # pulls cached value
