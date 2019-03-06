@@ -293,7 +293,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 #'                       within the module.
 #'
 #' @param eventPriority  A numeric specifying the priority of the event.
-#'                       Lower number means higher priority.
+#'                       Lower number means higher priority. As a best practice, it is
+#'                       recommended that decimal values are conceptual
+#'                       grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
+#'                       similar).
 #'                       See \code{\link{priority}}.
 #' @param .skipChecks Logical. If \code{TRUE}, then internal checks that arguments match
 #'                    expected types are skipped. Should only be used if speed is critical.
