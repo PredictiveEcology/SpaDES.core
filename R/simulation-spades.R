@@ -14,6 +14,7 @@ if (getRversion() >= "3.1.0") {
 #' instead of `data.frame` to implement the event queue (because it is much faster).
 #'
 #' @param sim Character string for the \code{simList} simulation object.
+#' @param useFuture Experimental use of future::future package. Not fully implemented.
 #'
 #' @inheritParams spades
 #' @return Returns the modified \code{simList} object.
@@ -32,7 +33,7 @@ if (getRversion() >= "3.1.0") {
 #' @keywords internal
 #' @rdname doEvent
 #'
-doEvent <- function(sim, debug = FALSE, notOlderThan) {
+doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.useFuture", FALSE)) {
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
@@ -178,6 +179,26 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
                               removeOthers = FALSE)
 
+          if (useFuture) {
+            mods <- names(sim@depends@dependencies)
+            moduleNamesNotThisOne <- mods[!mods %in% cur[["moduleName"]]]
+            otherModsInputs <- na.omit(unique(unlist(lapply(
+              sim@depends@dependencies[moduleNamesNotThisOne],
+              function(modu)
+                modu@inputObjects$objectName
+            ))))
+            thisModOutputs <- na.omit(unique(unlist(lapply(
+              sim@depends@dependencies[cur[["moduleName"]]],
+              function(modu)
+                modu@outputObjects$objectName
+            ))))
+            # if all this module's outputs are NOT in any other modules' inputs, can use future::future
+            if (!any(thisModOutputs %in% otherModsInputs)) {
+              #a <- future::future(.runEvent(sim, cacheIt, debug,
+              #                         moduleCall, fnEnv, cur, notOlderThan))
+              stop("futures are not yet implemented")
+            }
+          }
           sim <- .runEvent(sim, cacheIt, debug,
                            moduleCall, fnEnv, cur, notOlderThan)
 
@@ -834,8 +855,9 @@ setMethod(
 
     sim@.xData[["._firstEventClockTime"]] <- Sys.time()
 
+    useFuture <- getOption("spades.useFuture", FALSE)
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
-      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan, useFuture = useFuture)  # process the next event
 
       # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
       if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
