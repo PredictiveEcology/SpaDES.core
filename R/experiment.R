@@ -174,7 +174,7 @@
 #'
 #' @author Eliot McIntire
 #' @export
-#' @importFrom parallel clusterApplyLB clusterEvalQ
+#' @importFrom parallel clusterApplyLB clusterEvalQ stopCluster
 #' @importFrom raster getCluster returnCluster
 #' @rdname experiment
 #'
@@ -187,7 +187,7 @@ setGeneric(
            experimentFile = "experiment.RData", clearSimEnv = FALSE, notOlderThan,
            cl, ...) {
     standardGeneric("experiment")
-})
+  })
 
 #' @rdname experiment
 setMethod(
@@ -262,185 +262,42 @@ setMethod(
       factorialExp$replicate <- rep(replicates, each = numExpLevels)
     }
 
-    FunDef <- function(ind, ...) { # nolint
-      mod <- strsplit(names(factorialExp), split = "\\.") %>%
-        sapply(function(x) x[1])
-      param <- strsplit(names(factorialExp), split = "\\.") %>%
-        sapply(function(x) x[2])
-      param[is.na(param)] <- ""
 
-      paramValues <- factorialExp[ind, ]
+    numToDo <- seq(NROW(factorialExp))
+    #cachePaths <- paste0(sim@paths$cachePath, "_", numToDo)
 
-      whNotExpLevel <- which(colnames(paramValues) != "expLevel")
-      if (length(whNotExpLevel) < length(paramValues)) {
-        mod <- mod[whNotExpLevel]
-        param <- param[whNotExpLevel]
-        paramValues <- paramValues[whNotExpLevel]
-      }
-
-      whNotRepl <- which(colnames(paramValues) != "replicate")
-      if (length(whNotRepl) < length(paramValues)) {
-        repl <- paramValues$replicate
-        mod <- mod[whNotRepl]
-        param <- param[whNotRepl]
-        paramValues <- paramValues[whNotRepl]
-      }
-
-      notNA <- which(!is.na(paramValues))
-
-      if (length(notNA) < length(mod)) {
-        mod <- mod[notNA]
-        param <- param[notNA]
-        paramValues <- paramValues[notNA]
-      }
-
-      sim_ <- Copy(sim) # nolint
-      experimentDF <- data.frame(module = character(0),
-                                 param = character(0),
-                                 val = I(list()),
-                                 modules = character(0),
-                                 input = data.frame(),
-                                 object = character(0),
-                                 expLevel = numeric(0),
-                                 stringsAsFactors = FALSE)
-
-      for (x in seq_along(mod)) {
-        if (any(mod != "modules")) {
-          y <- factorialExp[ind, names(paramValues)[x]]
-
-          if (!is.na(y) & (mod[x] != "modules")) {
-            val <- params[[mod[x]]][[param[[x]]]][[y]]
-            params(sim_)[[mod[x]]][[param[[x]]]] <- val #factorialExp[ind,x]
-            experimentDF <- rbindlist(
-              l = list(
-                experimentDF,
-                data.frame(
-                  module = if (!(mod[x] %in% c("input", "object"))) mod[x] else NA,
-                  param = if (!(mod[x] %in% c("input", "object"))) param[x] else NA,
-                  val = if (!(mod[x] %in% c("input", "object"))) I(list(val)) else list(NA),
-                  modules = paste0(unlist(modules[factorialExp[ind, "modules"]]), collapse = ","),
-                  input = if (mod[x] %in% c("input")) inputs[[factorialExp[ind, "input"]]] else NA,
-                  object = if (mod[x] %in% c("object")) names(objects)[[factorialExp[ind, "object"]]] else NA, # nolint
-                  expLevel = factorialExp[ind, "expLevel"],
-                  stringsAsFactors = FALSE
-                )),
-              use.names = TRUE,
-              fill = TRUE)
-          }
-        } else {
-          experimentDF <- rbindlist(
-            l = list(
-              experimentDF,
-              data.frame(modules = paste0(unlist(modules[factorialExp[ind, "modules"]]),
-                                          collapse = ","),
-                         expLevel = factorialExp[ind, "expLevel"],
-                         stringsAsFactors = FALSE
-              )),
-            use.names = TRUE,
-            fill = TRUE)
-        }
-
-        if (!any(unlist(lapply(modules, is.null)))) {
-          if ("modules" %in% names(factorialExp)) {
-            if (!identical(sort(unlist(modules[factorialExp[ind, "modules"]])),
-                           sort(unlist(SpaDES.core::modules(sim))))) {
-              # test if modules are different from sim; if yes, rerun simInit
-              sim_ <- simInit(params = params(sim_), # nolint
-                              modules = as.list(unlist(modules[factorialExp[ind, "modules"]])),
-                              times = append(lapply(times(sim_)[2:3], as.numeric), times(sim_)[4]),
-                              paths = paths(sim_),
-                              outputs = outputs(sim_))
-            }
-          }
-        } else {
-          sim_ <- sim
-        }
-      }
-
-      # Deal with directory structures
-      if (any(dirPrefix == "simNum")) {
-        exptNum <- paddedFloatToChar(factorialExp$expLevel[ind],
-                                     ceiling(log10(numExpLevels + 1)))
-      }
-      dirPrefixTmp <- paste0(dirPrefix, collapse = "")
-
-      if ((numExpLevels > 1) & (substrLength > 0)) {
-        dirName <- paste(collapse = "-", substr(mod, 1, substrLength),
-                         substr(param, 1, substrLength),
-                         paramValues, sep = "_")
-        dirName <- gsub(dirName, pattern = "__", replacement = "_")
-        if (any(dirPrefix == "simNum")) {
-          dirPrefix <- gsub(dirPrefixTmp, pattern = "simNum", replacement = exptNum)
-        }
-        if (any(dirPrefix != "")) {
-          dirName <- paste(paste(dirPrefix, collapse = ""), dirName, sep = "_")
-        }
-      } else if (substrLength == 0) {
-        if (any(dirPrefix != "")) {
-          simplePrefix <- if (any(dirPrefix == "simNum")) exptNum else ""
-          dirName <- gsub(dirPrefixTmp, pattern = "simNum", replacement = simplePrefix)
-        }
-      } else {
-        if (any(dirPrefix != "")) {
-          dirName <- gsub(dirPrefixTmp, pattern = "simNum", replacement = "")
-        }
-      }
-
-      if (exists("repl", inherits = FALSE)) {
-        nn <- paste0("rep", paddedFloatToChar(repl, ceiling(log10(length(replicates) + 1))))
-        dirName <- if (!is.null(dirName)) {
-          file.path(dirName, nn)
-        } else {
-          file.path(nn)
-        }
-      }
-      newOutputPath <- file.path(paths(sim_)$outputPath, dirName) %>%
-        gsub(pattern = "/$", replacement = "") %>%  # nolint
-        gsub(pattern = "//", replacement = "/")
-      if (!dir.exists(newOutputPath)) dir.create(newOutputPath, recursive = TRUE)
-      paths(sim_)$outputPath <- newOutputPath
-      if (NROW(outputs(sim_))) {
-        outputs(sim_)$file <- file.path(newOutputPath, basename(outputs(sim_)$file))
-      }
-      # Actually put inputs into simList
-      if (length(inputs) > 0) {
-        SpaDES.core::inputs(sim_) <- inputs[[factorialExp[ind, "input"]]]
-      }
-      # Actually put objects into simList
-      if (length(objects) > 0) {
-        replaceObjName <- strsplit(names(objects)[[factorialExp[ind, "object"]]],
-                                   split = "\\.")[[1]][1]
-        sim_[[replaceObjName]] <- objects[[factorialExp[ind, "object"]]]
-      }
-
-      dots <- list(...)
-      if (is.null(dots$cache)) dots$cache <- FALSE
-      sim3 <- spades(sim_, replicate = ind, ...)
-      return(list(sim3, experimentDF))
-    }
-
-    if (!is.null(cl)) {
+    parFun <- "lapply" # default unless a cluster is supplied or made
+    cl <- .setupCl(cl, numClus = length(replicates),
+                  outfile = file.path(outputPath(sim), "_parallel.log"),
+                  sim = sim)
+    if (is(cl, "cluster")) {
       parFun <- "clusterApplyLB"
-      args <- list(x = 1:NROW(factorialExp), fun = FunDef)
-      args <- append(list(cl = cl), args)
-      parallel::clusterEvalQ(cl, require("SpaDES.core", character.only = TRUE))
-      packagesToLoad <- SpaDES.core::packages(sim, clean = TRUE)
-      parallel::clusterExport(cl, "packagesToLoad", envir = environment())
-      b <- parallel::clusterEvalQ(cl, {
-        lapply(packagesToLoad, require, character.only = TRUE)
-      })
-    } else {
-      parFun <- "lapply"
-      args <- list(X = 1:NROW(factorialExp), FUN = FunDef)
+      message("Using a parallel cluster, turning calling setDTthreads(1)")
+      b <- data.table::setDTthreads(1)
+      on.exit({
+        message("Completed a parallel cluster, returning data.table to setDTthreads(",b,")")
+        data.table::setDTthreads(b)
+      }, add = TRUE)
     }
-    dots <- list(...)
-    args <- append(args, dots)
-    if (missing(notOlderThan)) notOlderThan <- NULL
-    li <- list(notOlderThan = notOlderThan)
-    args <- append(args, li)
+    on.exit({try(stopCluster(cl), silent = TRUE); message("shutting down parallel nodes")}, add = TRUE)
 
-    expOut <- do.call(get(parFun), args)
+    #dots <- list(...)
+    #args <- append(args, dots)
+    #args <- append(args, list(sim = sim))
+      #if (missing(notOlderThan)) notOlderThan <- NULL
+      #li <- list(notOlderThan = notOlderThan)
+      #args <- append(args, li)
+
+    expOut <- get(parFun)(cl = cl, numToDo, FunDef, sim = sim, factorialExp = factorialExp,
+                     modules = modules, dirPrefix = dirPrefix,
+                     numExpLevels = numExpLevels, substrLength = substrLength,
+                     replicates = replicates, inputs = inputs,
+                     objects = objects, #cachePaths = cachePaths,
+                     ...)
+    #expOut <- do.call(get(parFun), args)
     sims <- lapply(expOut, function(x) x[[1]])
+    #lapply(cachePaths, function(from) mergeCache(cachePath(sim), from))
+    #unlink(cachePaths, recursive = TRUE)
     expDFs <- lapply(expOut, function(x) x[[2]])
     experimentDF <- rbindlist(expDFs, fill = TRUE, use.names = TRUE) %>%
       data.frame(stringsAsFactors = FALSE)
@@ -468,4 +325,273 @@ setMethod(
       })
     }
     return(invisible(sims))
-})
+  })
+
+FunDef <- function(ind, sim, factorialExp, modules,
+                   dirPrefix, numExpLevels, substrLength,
+                   replicates, inputs, objects, #cachePaths,
+                   ...) { # nolint
+  dtOrig <- data.table::setDTthreads(2)
+  on.exit(data.table::setDTthreads(dtOrig), add = TRUE)
+  mod <- strsplit(names(factorialExp), split = "\\.") %>%
+    sapply(function(x) x[1])
+  param <- strsplit(names(factorialExp), split = "\\.") %>%
+    sapply(function(x) x[2])
+  param[is.na(param)] <- ""
+
+  paramValues <- factorialExp[ind, ]
+
+  whNotExpLevel <- which(colnames(paramValues) != "expLevel")
+  if (length(whNotExpLevel) < length(paramValues)) {
+    mod <- mod[whNotExpLevel]
+    param <- param[whNotExpLevel]
+    paramValues <- paramValues[whNotExpLevel]
+  }
+
+  whNotRepl <- which(colnames(paramValues) != "replicate")
+  if (length(whNotRepl) < length(paramValues)) {
+    repl <- paramValues$replicate
+    mod <- mod[whNotRepl]
+    param <- param[whNotRepl]
+    paramValues <- paramValues[whNotRepl]
+  }
+
+  notNA <- which(!is.na(paramValues))
+
+  if (length(notNA) < length(mod)) {
+    mod <- mod[notNA]
+    param <- param[notNA]
+    paramValues <- paramValues[notNA]
+  }
+
+  sim_ <- Copy(sim) # nolint
+  experimentDF <- data.frame(module = character(0),
+                             param = character(0),
+                             val = I(list()),
+                             modules = character(0),
+                             input = data.frame(),
+                             object = character(0),
+                             expLevel = numeric(0),
+                             stringsAsFactors = FALSE)
+
+  for (x in seq_along(mod)) {
+    if (any(mod != "modules")) {
+      y <- factorialExp[ind, names(paramValues)[x]]
+
+      if (!is.na(y) & (mod[x] != "modules")) {
+        val <- params[[mod[x]]][[param[[x]]]][[y]]
+        params(sim_)[[mod[x]]][[param[[x]]]] <- val #factorialExp[ind,x]
+        experimentDF <- rbindlist(
+          l = list(
+            experimentDF,
+            data.frame(
+              module = if (!(mod[x] %in% c("input", "object"))) mod[x] else NA,
+              param = if (!(mod[x] %in% c("input", "object"))) param[x] else NA,
+              val = if (!(mod[x] %in% c("input", "object"))) I(list(val)) else list(NA),
+              modules = paste0(unlist(modules[factorialExp[ind, "modules"]]), collapse = ","),
+              input = if (mod[x] %in% c("input")) inputs[[factorialExp[ind, "input"]]] else NA,
+              object = if (mod[x] %in% c("object")) names(objects)[[factorialExp[ind, "object"]]] else NA, # nolint
+              expLevel = factorialExp[ind, "expLevel"],
+              stringsAsFactors = FALSE
+            )),
+          use.names = TRUE,
+          fill = TRUE)
+      }
+    } else {
+      experimentDF <- rbindlist(
+        l = list(
+          experimentDF,
+          data.frame(modules = paste0(unlist(modules[factorialExp[ind, "modules"]]),
+                                      collapse = ","),
+                     expLevel = factorialExp[ind, "expLevel"],
+                     stringsAsFactors = FALSE
+          )),
+        use.names = TRUE,
+        fill = TRUE)
+    }
+
+    if (!any(unlist(lapply(modules, is.null)))) {
+      if ("modules" %in% names(factorialExp)) {
+        if (!identical(sort(unlist(modules[factorialExp[ind, "modules"]])),
+                       sort(unlist(SpaDES.core::modules(sim))))) {
+          # test if modules are different from sim; if yes, rerun simInit
+          sim_ <- simInit(params = params(sim_), # nolint
+                          modules = as.list(unlist(modules[factorialExp[ind, "modules"]])),
+                          times = append(lapply(times(sim_)[2:3], as.numeric), times(sim_)[4]),
+                          paths = paths(sim_),
+                          outputs = outputs(sim_))
+        }
+      }
+    } else {
+      sim_ <- sim
+    }
+  }
+
+  # Deal with directory structures
+  if (any(dirPrefix == "simNum")) {
+    exptNum <- paddedFloatToChar(factorialExp$expLevel[ind],
+                                 ceiling(log10(numExpLevels + 1)))
+  }
+  dirPrefixTmp <- paste0(dirPrefix, collapse = "")
+
+  if ((numExpLevels > 1) & (substrLength > 0)) {
+    dirName <- paste(collapse = "-", substr(mod, 1, substrLength),
+                     substr(param, 1, substrLength),
+                     paramValues, sep = "_")
+    dirName <- gsub(dirName, pattern = "__", replacement = "_")
+    if (any(dirPrefix == "simNum")) {
+      dirPrefix <- gsub(dirPrefixTmp, pattern = "simNum", replacement = exptNum)
+    }
+    if (any(dirPrefix != "")) {
+      dirName <- paste(paste(dirPrefix, collapse = ""), dirName, sep = "_")
+    }
+  } else if (substrLength == 0) {
+    if (any(dirPrefix != "")) {
+      simplePrefix <- if (any(dirPrefix == "simNum")) exptNum else ""
+      dirName <- gsub(dirPrefixTmp, pattern = "simNum", replacement = simplePrefix)
+    }
+  } else {
+    if (any(dirPrefix != "")) {
+      dirName <- gsub(dirPrefixTmp, pattern = "simNum", replacement = "")
+    }
+  }
+
+  if (exists("repl", inherits = FALSE)) {
+    nn <- paste0("rep", paddedFloatToChar(repl, ceiling(log10(length(replicates) + 1))))
+    dirName <- if (!is.null(dirName)) {
+      file.path(dirName, nn)
+    } else {
+      file.path(nn)
+    }
+  }
+  newOutputPath <- file.path(paths(sim_)$outputPath, dirName) %>%
+    gsub(pattern = "/$", replacement = "") %>%  # nolint
+    gsub(pattern = "//", replacement = "/")
+  if (!dir.exists(newOutputPath)) dir.create(newOutputPath, recursive = TRUE)
+  paths(sim_)$outputPath <- newOutputPath
+  if (NROW(outputs(sim_))) {
+    outputs(sim_)$file <- file.path(newOutputPath, basename(outputs(sim_)$file))
+  }
+  # Actually put inputs into simList
+  if (length(inputs) > 0) {
+    SpaDES.core::inputs(sim_) <- inputs[[factorialExp[ind, "input"]]]
+  }
+  # Actually put objects into simList
+  if (length(objects) > 0) {
+    replaceObjName <- strsplit(names(objects)[[factorialExp[ind, "object"]]],
+                               split = "\\.")[[1]][1]
+    sim_[[replaceObjName]] <- objects[[factorialExp[ind, "object"]]]
+  }
+
+  dots <- list(...)
+  if (is.null(dots$cache)) dots$cache <- FALSE
+  # use a temporary cachePaths
+  #sim_@paths$cachePath <- cachePaths[ind]#, sim_@paths$cachePath)
+  print(cachePath(sim_))
+  sim3 <- spades(sim_, replicate = ind, ...)
+  return(list(sim3, experimentDF))
+}
+
+#' @importFrom parallel detectCores
+.optimalClusterNum <- function (memRequiredMB = 500, maxNumClusters = 1) {
+  #if (.Platform$OS.type != "windows") {
+  detectedNumCores <- parallel::detectCores()
+  shouldUseCluster <- (maxNumClusters > 0)
+  if (shouldUseCluster) {
+    try(aa <- system("free -lm", intern = TRUE))
+    if (!is(aa, "try-error")) {
+      bb <- strsplit(aa[2], split = " ")
+      availMem <- as.numeric(bb[[1]][nzchar(bb[[1]])][7])
+      numClusters <- floor(min(detectedNumCores, availMem/memRequiredMB))
+    }
+    else {
+      message("The OS function, 'free' is not available. Returning 1 cluster")
+      numClusters <- 1
+    }
+    numClusters <- min(maxNumClusters, numClusters, detectedNumCores)
+  }
+  else {
+    numClusters <- 1
+  }
+  #}
+  #else {
+  #  message("This function returns 1 cluster on Windows.")
+  #  numClusters <- 1
+  #}
+  return(numClusters)
+}
+
+#' @importFrom parallel makeCluster clusterSetRNGStream
+.makeClusterRandom <- function (..., iseed = NULL) {
+  dots <- list(...)
+  if (!("outfile" %in% names(dots))) {
+    dots$outfile <- file.path(tempdir(), ".log.txt")
+  }
+  checkPath(dirname(dots$outfile), create = TRUE)
+  for (i in 1:4) cat(file = dots$outfile, "------------------------------------------------------------")
+  cl <- do.call(makeCluster, args = dots)
+  message("  Starting a cluster with ", length(cl), " threads")
+  message("    Log file is ", dots$outfile, ". To prevent log file, pass outfile = ''")
+  clusterSetRNGStream(cl, iseed = iseed)
+  cl
+}
+
+#' Start and/or setup a parallel cluster
+#'
+#' This is mostly a wrapper around several packages in parallel package:
+#' \code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}
+#' @param cl Either NULL, cluster, logical, or numeric. NULL returns NULL,
+#'   a \code{TRUE} logical or numeric will spawn a new SOCK cluster with
+#'   an "optimal" cluster number or \code{cl} cluster nodes respectively.
+#'   In the three latter cases, all necessary packages and objects will
+#'   be sent to each of the nodes.
+#' @param sim An optional simList object; this will be used to find the
+#'   packages required via setting
+#'   \code{packages = SpaDES.core::packages(sim, clean = TRUE)}
+#' @param outfile The location of the log file
+#' @importFrom parallel clusterEvalQ
+.setupCl <- function(cl, numClus = NULL, outfile,
+                    sim = NULL, packages = NULL) {
+  if (!is.null(cl)) {
+    if (isFALSE(cl)) {
+      cl <- NULL
+    } else {
+      if (!is(cl, "cluster")) {
+        numClus <- if (is.numeric(cl)) {
+          cl
+        } else {
+          .optimalClusterNum(maxNumClusters = length(numClus)) # pulled from pemisc
+        }
+        cl <- .makeClusterRandom(numClus, outfile = outfile) # pulled from pemisc
+        # DOesn't work because of data.table objects ... unsolved mystery March 10, 2019 Eliot
+        #cl <- pemisc::makeOptimalCluster(useParallel = TRUE, MBper = 5e3, maxNumClusters = 2,
+        #                                outfile = file.path(Paths$outputPath, "_parallel.log"))
+
+      } else {
+        if (is (cl[[1]], "forknode")) {
+          message("cl object is a forknode; if data.table is used in modules, this may not work.\n",
+                  "Please create non-fork cluster (e.g., PSOCK or SOCK or ...)")
+        }
+      }
+      parallel::clusterEvalQ(cl, require("SpaDES.core", character.only = TRUE))
+      packagesToLoad <-
+        if (is.null(sim)) {
+          if (!is.null(packages)) {
+            packages
+          } else {
+            NULL
+          }
+        } else {
+          SpaDES.core::packages(sim, clean = TRUE)
+        }
+      if (!is.null(packagesToLoad)) {
+        parallel::clusterExport(cl, "packagesToLoad", envir = environment())
+        b <- parallel::clusterEvalQ(cl, {
+          lapply(packagesToLoad, require, character.only = TRUE)
+        })
+      }
+
+    }
+  }
+  return(cl)
+}
