@@ -67,6 +67,13 @@ setMethod("Copy",
                 ))
               })
 
+              # Deal with data.table objects
+              anyDataTables <- unlist(lapply(objs(sim_), is.data.table))
+              anyDataTables <- anyDataTables[anyDataTables]
+              lapply(names(anyDataTables), function(dt) {
+                sim_@.xData[[dt]] <- data.table::copy(sim_@.xData[[dt]])
+              })
+
               # Deal with activeBinding for mod
               lapply(objNames[isEnv], function(en) {
                 if (exists("mod", object[[en]], inherits = FALSE)) {
