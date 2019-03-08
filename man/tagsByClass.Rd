@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.tagsByClass,simList-method}
 \alias{.tagsByClass,simList-method}
-\title{tagsByClass for simList class objects}
+\title{\code{.tagsByClass} for \code{simList} objects}
 \usage{
 \S4method{.tagsByClass}{simList}(object)
 }

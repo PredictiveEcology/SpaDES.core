@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.prepareOutput,simList-method}
 \alias{.prepareOutput,simList-method}
-\title{\code{.prepareOutput} for simList}
+\title{\code{.prepareOutput} for \code{simList} objects}
 \usage{
 \S4method{.prepareOutput}{simList}(object, cacheRepo, ...)
 }

@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.objSizeInclEnviros,simList-method}
 \alias{.objSizeInclEnviros,simList-method}
-\title{objSizeInclEnviros for simList class objects}
+\title{\code{.objSizeInclEnviros} for \code{simList} objects}
 \usage{
 \S4method{.objSizeInclEnviros}{simList}(object)
 }
