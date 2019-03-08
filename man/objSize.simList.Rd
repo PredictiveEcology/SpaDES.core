@@ -2,7 +2,7 @@
 % Please edit documentation in R/cache.R
 \name{objSize.simList}
 \alias{objSize.simList}
-\title{Object size for simLists}
+\title{Object size for \code{simList}}
 \usage{
 \method{objSize}{simList}(x, quick = getOption("reproducible.quick",
   FALSE))
@@ -15,7 +15,7 @@
 used instead of \code{object.size}.}
 }
 \description{
-Recursively, runs \code{object.size} on the simList environment.
+Recursively, runs \code{object.size} on the \code{simList} environment.
 Currently, this will not assess \code{object.size} of the other elements.
 }
 \examples{

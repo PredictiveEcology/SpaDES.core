@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.addChangedAttr,simList-method}
 \alias{.addChangedAttr,simList-method}
-\title{\code{.addChangedAttr} for simList class objects}
+\title{\code{.addChangedAttr} for \code{simList} objects}
 \usage{
 \S4method{.addChangedAttr}{simList}(object, preDigest, origArguments, ...)
 }
@@ -19,7 +19,7 @@ were the source for \code{preDigest}}
 \item{...}{Anything passed to methods.}
 }
 \description{
-This will evaluate which elements in the simList object changed following
+This will evaluate which elements in the \code{simList} object changed following
 this Cached function call. It will add a named character string as an
 attribute \code{attr(x, ".Cache")$changed}, indicating which ones changed.
 When this function is subsequently called again, only these changed objects
