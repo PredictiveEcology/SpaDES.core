@@ -13,13 +13,18 @@ an "optimal" cluster number or \code{cl} cluster nodes respectively.
 In the three latter cases, all necessary packages and objects will
 be sent to each of the nodes.}
 
+\item{numClus}{number of threads to start.}
+
 \item{outfile}{The location of the log file}
 
 \item{sim}{An optional simList object; this will be used to find the
 packages required via setting
 \code{packages = SpaDES.core::packages(sim, clean = TRUE)}}
+
+\item{packages}{character vector of packages to load}
 }
 \description{
-This is mostly a wrapper around several packages in parallel package:
-\code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}
+This is mostly a wrapper around several functions in the \pkg{parallel} package:
+\code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}.
 }
+\keyword{internal}

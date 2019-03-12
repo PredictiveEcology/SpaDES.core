@@ -538,20 +538,28 @@ FunDef <- function(ind, sim, factorialExp, modules,
 
 #' Start and/or setup a parallel cluster
 #'
-#' This is mostly a wrapper around several packages in parallel package:
-#' \code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}
+#' This is mostly a wrapper around several functions in the \pkg{parallel} package:
+#' \code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}.
+#'
 #' @param cl Either NULL, cluster, logical, or numeric. NULL returns NULL,
 #'   a \code{TRUE} logical or numeric will spawn a new SOCK cluster with
 #'   an "optimal" cluster number or \code{cl} cluster nodes respectively.
 #'   In the three latter cases, all necessary packages and objects will
 #'   be sent to each of the nodes.
+#'
+#' @param numClus number of threads to start.
+#'
+#' @param outfile The location of the log file
+#'
 #' @param sim An optional simList object; this will be used to find the
 #'   packages required via setting
 #'   \code{packages = SpaDES.core::packages(sim, clean = TRUE)}
-#' @param outfile The location of the log file
+#'
+#' @param packages character vector of packages to load
+#'
 #' @importFrom parallel clusterEvalQ
-.setupCl <- function(cl, numClus = NULL, outfile,
-                    sim = NULL, packages = NULL) {
+#' @keywords internal
+.setupCl <- function(cl, numClus = NULL, outfile, sim = NULL, packages = NULL) {
   if (!is.null(cl)) {
     if (isFALSE(cl)) {
       cl <- NULL
@@ -568,7 +576,7 @@ FunDef <- function(ind, sim, factorialExp, modules,
         #                                outfile = file.path(Paths$outputPath, "_parallel.log"))
 
       } else {
-        if (is (cl[[1]], "forknode")) {
+        if (is(cl[[1]], "forknode")) {
           message("cl object is a forknode; if data.table is used in modules, this may not work.\n",
                   "Please create non-fork cluster (e.g., PSOCK or SOCK or ...)")
         }
