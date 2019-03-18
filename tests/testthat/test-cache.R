@@ -36,8 +36,13 @@ test_that("test cache", {
   expect_output(print(out), "cacheId")
   expect_output(print(out), "simList")
   expect_true(NROW(out[!tagKey %in% c("preDigest", "otherFunctions")]) == 16) #
-  expect_true(NROW(out[tagKey %in% "preDigest"]) ==
-                     (length(slotNames(sims[[1]]))*2 + 2 * length(modules(mySim)) + 2 * 2)) # 2 args for Cache -- FUN & replicate
+
+  ## 3 modules; 12 simList slots (env as list); 3 args for Cache -- cl, FUN, replicate
+  ## two copies af each of these, because reps == 2
+  expect_true(NROW(out[tagKey %in% "preDigest"]) == 2 * (length(slotNames(sims[[1]])) +
+                                                           length(modules(mySim)) +
+                                                           3))
+
   expect_message(sims <- eval(expr),
                  "loading cached result from previous spades call")
 
