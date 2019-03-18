@@ -359,8 +359,16 @@ scheduleEvent <- function(sim,
   }
   if (length(eventTime)) {
     if (!is.na(eventTime)) {
+      if (eventTime < 0) {
+          stop("You have tried to schedule an event with negative time. You cannot do this. ",
+               " Reschedule event (",eventType," event in ", moduleName," module) with positive time.")
+      }
       eventTimeInSeconds <- calculateEventTimeInSeconds(sim, eventTime, moduleName)
       attr(eventTimeInSeconds, "unit") <- "second"
+
+      if (eventTimeInSeconds < sim@simtimes$start)
+        stop("You have tried to schedule an event before start(sim). You cannot do this.",
+             " Reschedule event (",eventType," event in ", moduleName," module) at or after start(sim).")
 
       newEventList <- list(list(
         eventTime = eventTimeInSeconds,

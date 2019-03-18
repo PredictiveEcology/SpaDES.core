@@ -884,3 +884,16 @@ test_that("simInitAndSpades", {
   expect_true(all.equal(mySim, mySim2))
 
 })
+
+test_that("scheduleEvent with invalid values for eventTime", {
+  testInitOut <- testInit()
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  s <- simInit(times = list(start = 1, end = 10))
+  expect_error(s <- scheduleEvent(s, eventTime = -1, eventType = "test1", moduleName = "test"))
+  expect_warning(s <- scheduleEvent(s, eventTime = numeric(), eventType = "test1", moduleName = "test"))
+  expect_error(s <- scheduleEvent(s, eventTime = 0, eventType = "test1", moduleName = "test"))
+
+
+})
