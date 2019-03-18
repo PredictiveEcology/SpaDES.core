@@ -289,7 +289,7 @@ setMethod(
       #args <- append(args, li)
 
     expOut <- get(parFun)(cl = cl, numToDo, FunDef, sim = sim, factorialExp = factorialExp,
-                     modules = modules, dirPrefix = dirPrefix,
+                     modules = modules, params = params, dirPrefix = dirPrefix,
                      numExpLevels = numExpLevels, substrLength = substrLength,
                      replicates = replicates, inputs = inputs,
                      objects = objects, #cachePaths = cachePaths,
@@ -327,7 +327,7 @@ setMethod(
     return(invisible(sims))
   })
 
-FunDef <- function(ind, sim, factorialExp, modules,
+FunDef <- function(ind, sim, factorialExp, modules, params,
                    dirPrefix, numExpLevels, substrLength,
                    replicates, inputs, objects, #cachePaths,
                    ...) { # nolint
