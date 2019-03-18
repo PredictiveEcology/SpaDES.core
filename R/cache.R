@@ -6,14 +6,14 @@ if (!isGeneric(".robustDigest")) {
     })
 }
 
-#' \code{.robustDigest} for \code{simList} class objects
+#' \code{.robustDigest} for \code{simList} objects
 #'
 #' This is intended to be used within the \code{Cache} function, but can be
 #' used to evaluate what a \code{simList} would look like once it is
 #' converted to a repeatably digestible object.
 #'
 #' See \code{\link[reproducible]{robustDigest}}. This method strips out stuff
-#' from a simList class object that would make it otherwise not
+#' from a \code{simList} class object that would make it otherwise not
 #' reproducibly digestible between sessions, operating systems,
 #' or machines. This will likely still not allow identical digest
 #' results across R versions.
@@ -152,7 +152,7 @@ if (!isGeneric(".tagsByClass")) {
   })
 }
 
-#' tagsByClass for simList class objects
+#' \code{.tagsByClass} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.tagsByClass}}. Adds current \code{moduleName},
 #' \code{eventType}, \code{eventTime}, and \code{function:spades} as userTags
@@ -181,7 +181,6 @@ setMethod(
         paste0("function:spades")
       ) # add this because it will be an outer function, if there are events occurring
     } else {
-
       scalls <- sys.calls()
       parseModuleFrameNum <- .grepSysCalls(scalls, "^.parseModule")[2]
       if (!is.na(parseModuleFrameNum)) {
@@ -205,7 +204,7 @@ if (!isGeneric(".cacheMessage")) {
   })
 }
 
-#' cacheMessage for simList class objects
+#' \code{.cacheMessage} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.cacheMessage}}.
 #'
@@ -261,14 +260,13 @@ setMethod(
     }
 })
 
-#########################################################
 if (!isGeneric(".checkCacheRepo")) {
   setGeneric(".checkCacheRepo", function(object, create = FALSE) {
     standardGeneric(".checkCacheRepo")
   })
 }
 
-#' checkCacheRepo for simList class objects
+#' \code{.checkCacheRepo} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.checkCacheRepo}}.
 #'
@@ -313,10 +311,9 @@ if (!isGeneric(".addChangedAttr")) {
   })
 }
 
-##########################################
-#' \code{.addChangedAttr} for simList class objects
+#' \code{.addChangedAttr} for \code{simList} objects
 #'
-#' This will evaluate which elements in the simList object changed following
+#' This will evaluate which elements in the \code{simList} object changed following
 #' this Cached function call. It will add a named character string as an
 #' attribute \code{attr(x, ".Cache")$changed}, indicating which ones changed.
 #' When this function is subsequently called again, only these changed objects
@@ -348,12 +345,12 @@ setMethod(
       if (!identical(attr(object, ".Cache")$newCache, NULL))
         stop("attributes on the cache object are not correct - 4")
     }
-    postDigest <-
-      .robustDigest(object, .objects = dots$.objects,
-                    length = dots$length,
-                    algo = dots$algo,
-                    quick = dots$quick,
-                    classOptions = dots$classOptions)
+
+    postDigest <- .robustDigest(object, .objects = dots$.objects,
+                                length = dots$length,
+                                algo = dots$algo,
+                                quick = dots$quick,
+                                classOptions = dots$classOptions)
 
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
@@ -361,7 +358,8 @@ setMethod(
       whSimList2 <- if (is.null(internalSimList)) {
         1
       } else {
-        which(internalSimList)[1] # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
+        # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
+        which(internalSimList)[1]
       }
 
       isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
@@ -397,8 +395,7 @@ if (!isGeneric(".prepareOutput")) {
   })
 }
 
-##########################################
-#' \code{.prepareOutput} for simList
+#' \code{.prepareOutput} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.prepareOutput}}.
 #'
@@ -545,10 +542,9 @@ setMethod(
     }
 })
 
-################################################################################
 #' Pre-digesting method for \code{simList}
 #'
-#' Takes a snapshot of simList objects.
+#' Takes a snapshot of \code{simList} objects.
 #'
 #' See \code{\link[reproducible]{.preDigestByClass}}.
 #'
@@ -575,7 +571,7 @@ if (!isGeneric(".addTagsToOutput")) {
   })
 }
 
-#' addTagsToOutput for simList class objects
+#' \code{.addTagsToOutput} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.addTagsToOutput}}.
 #'
@@ -634,7 +630,7 @@ if (!isGeneric(".objSizeInclEnviros")) {
   })
 }
 
-#' objSizeInclEnviros for simList class objects
+#' \code{.objSizeInclEnviros} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.objSizeInclEnviros}}.
 #'
@@ -655,9 +651,9 @@ setMethod(
     object.size(as.list(object@.xData, all.names = TRUE)) + object.size(object)
 })
 
-#' Find simList in a nested list
+#' Find \code{simList} in a nested list
 #'
-#' This is recursive, so it will find the all simLists even if they are deeply nested.
+#' This is recursive, so it will find the all \code{simList}s even if they are deeply nested.
 #'
 #' @param x any object, used here only when it is a list with at least one
 #'        \code{simList} in it
@@ -683,9 +679,9 @@ if (!exists("objSize")) {
   objSize <- function(..., quick) UseMethod("objSize")
 }
 
-#' Object size for simLists
+#' Object size for \code{simList}
 #'
-#' Recursively, runs \code{object.size} on the simList environment.
+#' Recursively, runs \code{object.size} on the \code{simList} environment.
 #' Currently, this will not assess \code{object.size} of the other elements.
 #'
 #' @export

@@ -11,7 +11,7 @@
 \item{object}{Any R object.}
 }
 \description{
-Takes a snapshot of simList objects.
+Takes a snapshot of \code{simList} objects.
 }
 \details{
 See \code{\link[reproducible]{.preDigestByClass}}.

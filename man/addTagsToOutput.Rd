@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.addTagsToOutput,simList-method}
 \alias{.addTagsToOutput,simList-method}
-\title{addTagsToOutput for simList class objects}
+\title{\code{.addTagsToOutput} for \code{simList} objects}
 \usage{
 \S4method{.addTagsToOutput}{simList}(object, outputObjects, FUN,
   preDigestByClass)

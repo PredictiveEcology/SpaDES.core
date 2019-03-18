@@ -293,7 +293,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 #'                       within the module.
 #'
 #' @param eventPriority  A numeric specifying the priority of the event.
-#'                       Lower number means higher priority.
+#'                       Lower number means higher priority. As a best practice, it is
+#'                       recommended that decimal values are conceptual
+#'                       grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
+#'                       similar).
 #'                       See \code{\link{priority}}.
 #' @param .skipChecks Logical. If \code{TRUE}, then internal checks that arguments match
 #'                    expected types are skipped. Should only be used if speed is critical.
@@ -356,8 +359,16 @@ scheduleEvent <- function(sim,
   }
   if (length(eventTime)) {
     if (!is.na(eventTime)) {
+      if (eventTime < 0) {
+          stop("You have tried to schedule an event with negative time. You cannot do this. ",
+               " Reschedule event (",eventType," event in ", moduleName," module) with positive time.")
+      }
       eventTimeInSeconds <- calculateEventTimeInSeconds(sim, eventTime, moduleName)
       attr(eventTimeInSeconds, "unit") <- "second"
+
+      if (eventTimeInSeconds < sim@simtimes$start)
+        stop("You have tried to schedule an event before start(sim). You cannot do this.",
+             " Reschedule event (",eventType," event in ", moduleName," module) at or after start(sim).")
 
       newEventList <- list(list(
         eventTime = eventTimeInSeconds,
@@ -886,7 +897,7 @@ setMethod(
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     dots <- list(...)
-    omitArgs <- "notOlderThan"
+    omitArgs <- c("cl", "notOlderThan")
     if (isTRUE("omitArgs" %in% names(dots))) {
       omitArgs <- c(dots$omitArgs, omitArgs)
       dots$omitArgs <- NULL

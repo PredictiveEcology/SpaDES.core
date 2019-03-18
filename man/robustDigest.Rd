@@ -4,7 +4,7 @@
 \name{.robustDigest,simList-method}
 \alias{.robustDigest,simList-method}
 \alias{Cache}
-\title{\code{.robustDigest} for \code{simList} class objects}
+\title{\code{.robustDigest} for \code{simList} objects}
 \usage{
 \S4method{.robustDigest}{simList}(object, .objects, length, algo, quick,
   classOptions)
@@ -59,7 +59,7 @@ converted to a repeatably digestible object.
 }
 \details{
 See \code{\link[reproducible]{robustDigest}}. This method strips out stuff
-from a simList class object that would make it otherwise not
+from a \code{simList} class object that would make it otherwise not
 reproducibly digestible between sessions, operating systems,
 or machines. This will likely still not allow identical digest
 results across R versions.

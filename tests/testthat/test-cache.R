@@ -259,8 +259,7 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
-  warnGrep <- "no non-missing arguments to max; returning -Inf"
-  expect_warning(spades(bbb, debug = FALSE), warnGrep)
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 
   # make a change in Init function
@@ -275,8 +274,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
-  warnGrep <- "no non-missing arguments to max; returning -Inf"
-  expect_warning(spades(bbb, debug = FALSE), warnGrep)
+  expect_silent(spades(bbb, debug = FALSE))
   expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 })
 

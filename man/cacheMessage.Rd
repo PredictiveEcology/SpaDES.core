@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.cacheMessage,simList-method}
 \alias{.cacheMessage,simList-method}
-\title{cacheMessage for simList class objects}
+\title{\code{.cacheMessage} for \code{simList} objects}
 \usage{
 \S4method{.cacheMessage}{simList}(object, functionName,
   fromMemoise = getOption("reproducible.useMemoise", TRUE))

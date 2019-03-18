@@ -3,6 +3,7 @@ library(magrittr)
 library(raster)
 library(SpaDES.core)
 
+opts <- options("spades.moduleCodeChecks" = FALSE) # turns off syntactic checking of modules
 mySim <- simInit(
   times = list(start = 0.0, end = 5.0),
   params = list(
@@ -12,6 +13,7 @@ mySim <- simInit(
   ),
   modules = list("randomLandscapes", "fireSpread"),
   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
+options(opts)
 
 ## ----spades--------------------------------------------------------------
 # compare caching ... run once to create cache

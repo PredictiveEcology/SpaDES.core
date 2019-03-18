@@ -3,7 +3,7 @@
 \docType{methods}
 \name{.checkCacheRepo,list-method}
 \alias{.checkCacheRepo,list-method}
-\title{checkCacheRepo for simList class objects}
+\title{\code{.checkCacheRepo} for \code{simList} objects}
 \usage{
 \S4method{.checkCacheRepo}{list}(object, create = FALSE)
 }
