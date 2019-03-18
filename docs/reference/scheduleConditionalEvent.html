@@ -75,7 +75,7 @@ sim$._conditionalEvents. This is very experimental. Use with caution." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -177,7 +177,10 @@ within the module.</p></td>
     <tr>
       <th>eventPriority</th>
       <td><p>A numeric specifying the priority of the event.
-Lower number means higher priority.
+Lower number means higher priority. As a best practice, it is
+recommended that decimal values are conceptual
+grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
+similar).
 See <code><a href='priority.html'>priority</a></code>.</p></td>
     </tr>
     <tr>
@@ -218,10 +221,10 @@ very low or even negative to ensure it gets inserted at the top of the event que
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>  <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpKY0VeJ/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpKY0VeJ/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpKY0VeJ/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>  <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='st'>"sim$age &gt; 1"</span> <span class='co'># provide as string</span>
   <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/substitute'>quote</a></span>(<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&gt;</span> <span class='fl'>1</span>) <span class='co'># provide as a call</span>
   <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/expression'>expression</a></span>(<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&gt;</span> <span class='fl'>1</span>) <span class='co'># provide as an expression</span>

@@ -289,11 +289,11 @@ setMethod(
       #args <- append(args, li)
 
     expOut <- get(parFun)(cl = cl, numToDo, FunDef, sim = sim, factorialExp = factorialExp,
-                     modules = modules, params = params, dirPrefix = dirPrefix,
-                     numExpLevels = numExpLevels, substrLength = substrLength,
-                     replicates = replicates, inputs = inputs,
-                     objects = objects, #cachePaths = cachePaths,
-                     ...)
+                          modules = modules, params = params, dirPrefix = dirPrefix,
+                          numExpLevels = numExpLevels, substrLength = substrLength,
+                          replicates = replicates, inputs = inputs,
+                          objects = objects, #cachePaths = cachePaths,
+                          ...)
     #expOut <- do.call(get(parFun), args)
     sims <- lapply(expOut, function(x) x[[1]])
     #lapply(cachePaths, function(from) mergeCache(cachePath(sim), from))
@@ -325,7 +325,7 @@ setMethod(
       })
     }
     return(invisible(sims))
-  })
+})
 
 FunDef <- function(ind, sim, factorialExp, modules, params,
                    dirPrefix, numExpLevels, substrLength,
