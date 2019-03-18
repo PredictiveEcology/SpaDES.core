@@ -13,11 +13,18 @@ an "optimal" cluster number or \code{cl} cluster nodes respectively.
 In the three latter cases, all necessary packages and objects will
 be sent to each of the nodes.}
 
+\item{numClus}{The desired number of child clusters, passed to
+\code{.optimalClusterNum} via \code{maxNumClusters}. If not provided,
+\code{cl} must be provided.}
+
 \item{outfile}{The location of the log file}
 
 \item{sim}{An optional simList object; this will be used to find the
 packages required via setting
 \code{packages = SpaDES.core::packages(sim, clean = TRUE)}}
+
+\item{packages}{a character vector indicating which packages to load in the
+cluster. Will ignore this if the \code{sim} is provided.}
 }
 \description{
 This is mostly a wrapper around several packages in parallel package:
