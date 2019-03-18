@@ -31,8 +31,6 @@ test_that("Fork cluster does not work correctly for data.table", {
     on.exit({
       testOnExit(testInitOut)
     }, add = TRUE)
-    library(parallel)
-    library(data.table)
     cl <- SpaDES.core:::.makeClusterRandom(5)
     on.exit(stopCluster(cl))
 
