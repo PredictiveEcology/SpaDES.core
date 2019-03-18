@@ -70,7 +70,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -131,22 +131,58 @@
       <small>Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-0-2-4" class="section level1">
+    <div id="version-0-2-5-9000" class="section level1">
 <h1 class="page-header">
-<a href="#version-0-2-4" class="anchor"></a>version 0.2.4<small> Unreleased </small>
+<a href="#version-0-2-5-9000" class="anchor"></a>version 0.2.5.9000<small> Unreleased </small>
 </h1>
 <div id="package-dependencies" class="section level2">
 <h2 class="hasAnchor">
 <a href="#package-dependencies" class="anchor"></a>package dependencies</h2>
+<ul>
+<li>lorem ipsum</li>
+</ul>
+</div>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>new features</h2>
+<ul>
+<li>lorem ipsum</li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>lorem ipsum</li>
+</ul>
+</div>
+</div>
+    <div id="version-0-2-5" class="section level1">
+<h1 class="page-header">
+<a href="#version-0-2-5" class="anchor"></a>version 0.2.5<small> Unreleased </small>
+</h1>
+<ul>
+<li>improved messaging and fixed test failures when GLPK installed but not used by <code>igraph</code>
+</li>
+<li>compatibility with forthcoming <code>RandomFields</code> v3.3.4</li>
+</ul>
+</div>
+    <div id="version-0-2-4" class="section level1">
+<h1 class="page-header">
+<a href="#version-0-2-4" class="anchor"></a>version 0.2.4<small> 2019-02-03 </small>
+</h1>
+<div id="package-dependencies-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#package-dependencies-1" class="anchor"></a>package dependencies</h2>
 <ul>
 <li>
 <code>archivist</code> and <code>devtools</code> added to Suggests because they are used in vignettes</li>
 <li>minimium <code>reproducible</code> version 0.2.6</li>
 </ul>
 </div>
-<div id="new-features" class="section level2">
+<div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>new features</h2>
+<a href="#new-features-1" class="anchor"></a>new features</h2>
 <ul>
 <li>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</li>
 <li>
@@ -156,7 +192,7 @@
 <li>lighter memory footprint, as functions take RAM due to the objects in the <code>parent.env</code> in which they are defined (little know fact identified here: <a href="http://adv-r.had.co.nz/memory.html#gc" class="uri">http://adv-r.had.co.nz/memory.html#gc</a> identified as a possible source of memory leaks).</li>
 </ul>
 </li>
-<li>module’s function environment in the simList now has its parent <code><a href="https://www.rdocumentation.org/packages/base/topics/ns-internal">asNamespace("SpaDES.core")</a></code> instead of the envir(sim) (as mentioned above), i.e,. <code><a href="https://www.rdocumentation.org/packages/base/topics/environment">parent.env(sim[[currentModule(sim)]])</a></code> is <code><a href="https://www.rdocumentation.org/packages/base/topics/ns-internal">asNamespace("SpaDES.core")</a></code>. The main user-noticable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</li>
+<li>module’s function environment in the simList now has its parent <code><a href="https://www.rdocumentation.org/packages/base/topics/ns-internal">asNamespace("SpaDES.core")</a></code> instead of the <code><a href="../reference/simList-accessors-envir.html">envir(sim)</a></code> (as mentioned above), i.e,. <code><a href="https://www.rdocumentation.org/packages/base/topics/environment">parent.env(sim[[currentModule(sim)]])</a></code> is <code><a href="https://www.rdocumentation.org/packages/base/topics/ns-internal">asNamespace("SpaDES.core")</a></code>. The main user-noticeable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</li>
 <li>New active binding, <code>mod</code> that works as a module-specific variable, similar to a private object, <em>i.e.</em>, <code>mod$a</code> is a local object inside the module that persists across events. It is a pointer to <code>sim[[currentModule(sim)]]$a</code>
 </li>
 <li>New function <code>scheduleConditionalEvent</code>, which allows an event to be scheduled based on a condition. Still experimental.</li>
@@ -172,9 +208,9 @@
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix to work with latest <code>data.table</code> v1.12.0 (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/85'>#85</a>, <a href='https://github.com/mattdowle'>@mattdowle</a>)</li>
 <li>several minor, including to <code>Copy</code> (error existed because function inheritance persisted even though the location of the function was moved)</li>
@@ -185,16 +221,16 @@
 <h1 class="page-header">
 <a href="#version-0-2-3" class="anchor"></a>version 0.2.3<small> 2018-11-18 </small>
 </h1>
-<div id="package-dependencies-1" class="section level2">
+<div id="package-dependencies-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#package-dependencies-1" class="anchor"></a>package dependencies</h2>
+<a href="#package-dependencies-2" class="anchor"></a>package dependencies</h2>
 <ul>
 <li>add <code>RandomFields</code> to Suggests, as it is in the Suggests of <code>SpaDES.tools</code> and used in examples/tests.</li>
 </ul>
 </div>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>new features</h2>
+<a href="#new-features-2" class="anchor"></a>new features</h2>
 <ul>
 <li>new option and default setting: <code><a href="https://www.rdocumentation.org/packages/base/topics/options">options("spades.saveSimOnExit" = TRUE)</a></code>. This will save the state of the <code>simList</code> to an object as <code>SpaDES.core:::.pkgEnv$.sim</code>, with a message, if there is a hard exist. There is virtually no computational cost to this, as the object is already in RAM.</li>
 <li>
@@ -211,9 +247,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>resolved <code>.inputObjects()</code> name conflict (internal <code>.inputObjects</code> renamed to <code>._inputObjectsDF</code>; <code>.outputObjects</code> renamed to <code>._outputObjectsDF</code>)</li>
 <li>module <code>.inputObjects</code> evaluated based on module load order (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/72'>#72</a>)</li>
@@ -227,23 +263,23 @@
 <h1 class="page-header">
 <a href="#version-0-2-2" class="anchor"></a>version 0.2.2<small> 2018-08-13 </small>
 </h1>
-<div id="package-dependencies-2" class="section level2">
+<div id="package-dependencies-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#package-dependencies-2" class="anchor"></a>package dependencies</h2>
+<a href="#package-dependencies-3" class="anchor"></a>package dependencies</h2>
 <ul>
 <li>remove <code>sp</code> from imports</li>
 </ul>
 </div>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>new features</h2>
+<a href="#new-features-3" class="anchor"></a>new features</h2>
 <ul>
 <li>none</li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix issues with failing tests on macOS</li>
 </ul>
@@ -253,16 +289,16 @@
 <h1 class="page-header">
 <a href="#version-0-2-1" class="anchor"></a>version 0.2.1<small> 2018-08-09 </small>
 </h1>
-<div id="package-dependencies-3" class="section level2">
+<div id="package-dependencies-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#package-dependencies-3" class="anchor"></a>package dependencies</h2>
+<a href="#package-dependencies-4" class="anchor"></a>package dependencies</h2>
 <ul>
 <li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
 </ul>
 </div>
-<div id="new-features-3" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>new features</h2>
+<a href="#new-features-4" class="anchor"></a>new features</h2>
 <ul>
 <li>new option <code>spades.useRequire</code>: a logical which causes <code>simInit</code> to load packages with <code>Require</code> or <code>require</code>. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.</li>
 <li><ul>
@@ -279,9 +315,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <p>Improvements to caching of functions with <code>simList</code> objects:</p>
@@ -298,9 +334,9 @@
 <h1 class="page-header">
 <a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
 </h1>
-<div id="new-features-4" class="section level2">
+<div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-4" class="anchor"></a>new features</h2>
+<a href="#new-features-5" class="anchor"></a>new features</h2>
 <ul>
 <li>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code>
 </li>
@@ -335,9 +371,9 @@
 <li>remove <code>fileExt</code> – use <code><a href="https://www.rdocumentation.org/packages/tools/topics/fileutils">tools::file_ext</a></code> instead</li>
 </ul>
 </div>
-<div id="bug-fixes-4" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix tests based on <code>data.table</code> changes (<a href='https://github.com/mattdowle'>@mattdowle</a>, <a href='https://github.com/PredictiveEcology/SpaDES.core/issues/64'>#64</a>).</li>
 <li>re-export <code>start</code> and <code>end</code>.</li>
@@ -442,6 +478,8 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#version-0-2-5-9000">0.2.5.9000</a></li>
+        <li><a href="#version-0-2-5">0.2.5</a></li>
         <li><a href="#version-0-2-4">0.2.4</a></li>
         <li><a href="#version-0-2-3">0.2.3</a></li>
         <li><a href="#version-0-2-2">0.2.2</a></li>

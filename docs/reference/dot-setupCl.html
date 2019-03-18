@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Read raster to memory — rasterToMemory • SpaDES.core</title>
+<title>Start and/or setup a parallel cluster — .setupCl • SpaDES.core</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,10 @@
 
 
 
-<meta property="og:title" content="Read raster to memory — rasterToMemory" />
+<meta property="og:title" content="Start and/or setup a parallel cluster — .setupCl" />
 
-<meta property="og:description" content="Wrapper to the raster function, that creates the raster object in
-memory, even if it was read in from file." />
+<meta property="og:description" content="This is mostly a wrapper around several packages in parallel package:
+makeCluster, clusterSetRNGStream, detectCores" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -131,43 +131,53 @@ memory, even if it was read in from file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Read raster to memory</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/load.R'><code>R/load.R</code></a></small>
-    <div class="hidden name"><code>rasterToMemory.Rd</code></div>
+    <h1>Start and/or setup a parallel cluster</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/experiment.R'><code>R/experiment.R</code></a></small>
+    <div class="hidden name"><code>dot-setupCl.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Wrapper to the <code>raster</code> function, that creates the raster object in
-memory, even if it was read in from file.</p>
+    <p>This is mostly a wrapper around several packages in parallel package:
+<code>makeCluster</code>, <code>clusterSetRNGStream</code>, <code>detectCores</code></p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>rasterToMemory</span>(<span class='no'>x</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for ANY</span>
-<span class='fu'>rasterToMemory</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>.setupCl</span>(<span class='no'>cl</span>, <span class='kw'>numClus</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>outfile</span>, <span class='kw'>sim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>An object passed directly to the function raster (e.g., character string of a filename).</p></td>
+      <th>cl</th>
+      <td><p>Either NULL, cluster, logical, or numeric. NULL returns NULL,
+a <code>TRUE</code> logical or numeric will spawn a new SOCK cluster with
+an "optimal" cluster number or <code>cl</code> cluster nodes respectively.
+In the three latter cases, all necessary packages and objects will
+be sent to each of the nodes.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Additional arguments to <code>raster</code>.</p></td>
+      <th>numClus</th>
+      <td><p>The desired number of child clusters, passed to
+<code>.optimalClusterNum</code> via <code>maxNumClusters</code>. If not provided,
+<code>cl</code> must be provided.</p></td>
+    </tr>
+    <tr>
+      <th>outfile</th>
+      <td><p>The location of the log file</p></td>
+    </tr>
+    <tr>
+      <th>sim</th>
+      <td><p>An optional simList object; this will be used to find the
+packages required via setting
+<code>packages = SpaDES.core::packages(sim, clean = TRUE)</code></p></td>
+    </tr>
+    <tr>
+      <th>packages</th>
+      <td><p>a character vector indicating which packages to load in the
+cluster. Will ignore this if the <code>sim</code> is provided.</p></td>
     </tr>
     </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A raster object whose values are stored in memory.</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code>raster</code>.</p></div>
     
 
   </div>
@@ -175,14 +185,8 @@ memory, even if it was read in from file.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
+                </ul>
 
-      <li><a href="#see-also">See also</a></li>
-          </ul>
-
-    <h2>Author</h2>
-    <p>Eliot McIntire and Alex Chubaty</p>
   </div>
 </div>
 
