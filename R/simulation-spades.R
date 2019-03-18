@@ -889,7 +889,7 @@ setMethod(
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     dots <- list(...)
-    omitArgs <- "notOlderThan"
+    omitArgs <- c("cl", "notOlderThan")
     if (isTRUE("omitArgs" %in% names(dots))) {
       omitArgs <- c(dots$omitArgs, omitArgs)
       dots$omitArgs <- NULL
