@@ -1,6 +1,6 @@
 ## Updated release
 
-This is a maintenance release to address probems identified during CRAN checks.
+This is a maintenance release to address problems identified during CRAN checks.
 See NEWS.md for a full list of changes.
 
 ## Test environments
