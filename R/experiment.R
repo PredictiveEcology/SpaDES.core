@@ -289,11 +289,11 @@ setMethod(
       #args <- append(args, li)
 
     expOut <- get(parFun)(cl = cl, numToDo, FunDef, sim = sim, factorialExp = factorialExp,
-                     modules = modules, dirPrefix = dirPrefix,
-                     numExpLevels = numExpLevels, substrLength = substrLength,
-                     replicates = replicates, inputs = inputs,
-                     objects = objects, #cachePaths = cachePaths,
-                     ...)
+                          modules = modules, params = params, dirPrefix = dirPrefix,
+                          numExpLevels = numExpLevels, substrLength = substrLength,
+                          replicates = replicates, inputs = inputs,
+                          objects = objects, #cachePaths = cachePaths,
+                          ...)
     #expOut <- do.call(get(parFun), args)
     sims <- lapply(expOut, function(x) x[[1]])
     #lapply(cachePaths, function(from) mergeCache(cachePath(sim), from))
@@ -325,9 +325,9 @@ setMethod(
       })
     }
     return(invisible(sims))
-  })
+})
 
-FunDef <- function(ind, sim, factorialExp, modules,
+FunDef <- function(ind, sim, factorialExp, modules, params,
                    dirPrefix, numExpLevels, substrLength,
                    replicates, inputs, objects, #cachePaths,
                    ...) { # nolint
@@ -546,17 +546,15 @@ FunDef <- function(ind, sim, factorialExp, modules,
 #'   an "optimal" cluster number or \code{cl} cluster nodes respectively.
 #'   In the three latter cases, all necessary packages and objects will
 #'   be sent to each of the nodes.
-#'
-#' @param numClus number of threads to start.
-#'
-#' @param outfile The location of the log file
-#'
+#' @param numClus The desired number of child clusters, passed to
+#'   \code{.optimalClusterNum} via \code{maxNumClusters}. If not provided,
+#'   \code{cl} must be provided.
 #' @param sim An optional simList object; this will be used to find the
 #'   packages required via setting
 #'   \code{packages = SpaDES.core::packages(sim, clean = TRUE)}
-#'
-#' @param packages character vector of packages to load
-#'
+#' @param packages a character vector indicating which packages to load in the
+#'   cluster. Will ignore this if the \code{sim} is provided.
+#' @param outfile The location of the log file
 #' @importFrom parallel clusterEvalQ
 #' @keywords internal
 .setupCl <- function(cl, numClus = NULL, outfile, sim = NULL, packages = NULL) {
@@ -568,7 +566,7 @@ FunDef <- function(ind, sim, factorialExp, modules,
         numClus <- if (is.numeric(cl)) {
           cl
         } else {
-          .optimalClusterNum(maxNumClusters = length(numClus)) # pulled from pemisc
+          .optimalClusterNum(maxNumClusters = numClus) # pulled from pemisc
         }
         cl <- .makeClusterRandom(numClus, outfile = outfile) # pulled from pemisc
         # DOesn't work because of data.table objects ... unsolved mystery March 10, 2019 Eliot

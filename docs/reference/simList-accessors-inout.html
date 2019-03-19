@@ -80,7 +80,7 @@ default data sets for your model. See below for more details." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -313,30 +313,31 @@ with up to 6 columns.</p>
 <tr><td></td><td>optional, a character string indicating the file path to save to.</td></tr>
 <tr><td>The default is to concatenate</td><td><code>objectName</code></td></tr>
 <tr><td>with the model timeunit and</td><td><code>saveTime</code></td></tr>
-<tr><td>, separated by underscore, "_". So a default filename would be</td><td>"Fires_year1.rds"</td></tr>
+<tr><td>, separated by underscore, '</td><td><code>_</code></td></tr>
+<tr><td>'. So a default filename would be</td><td><code>"Fires_year1.rds"</code></td></tr>
+<tr><td>.</td><td></td></tr>
+<tr><td></td><td><code>fun</code></td></tr>
+<tr><td></td><td>optional, a character string indicating the function to use to</td></tr>
+<tr><td>save that file. The default is</td><td><code><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>saveRDS</a></code></td></tr>
 <tr><td></td><td></td></tr>
-<tr><td><code>fun</code></td><td></td></tr>
-<tr><td>optional, a character string indicating the function to use to</td><td>save that file. The default is</td></tr>
-<tr><td><code><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>saveRDS</a></code></td><td></td></tr>
+<tr><td></td><td><code>package</code></td></tr>
+<tr><td></td><td>optional character string indicating the package in</td></tr>
+<tr><td>which to find the</td><td><code>fun</code></td></tr>
+<tr><td>);</td><td></td></tr>
+<tr><td></td><td><code>saveTime</code></td></tr>
+<tr><td></td><td>optional numeric, indicating when in simulation time the file</td></tr>
+<tr><td>should be saved. The default is the lowest priority at</td><td><code><a href='simList-accessors-times.html'>end(sim)</a></code></td></tr>
+<tr><td>,</td><td>i.e., at the very end.</td></tr>
 <tr><td></td><td></td></tr>
-<tr><td><code>package</code></td><td></td></tr>
-<tr><td>optional character string indicating the package in</td><td>which to find the</td></tr>
-<tr><td><code>fun</code></td><td>);</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>saveTime</code></td><td></td></tr>
-<tr><td>optional numeric, indicating when in simulation time the file</td><td>should be saved. The default is the lowest priority at</td></tr>
-<tr><td><code><a href='simList-accessors-times.html'>end(sim)</a></code></td><td>,</td></tr>
-<tr><td>i.e., at the very end.</td><td></td></tr>
-<tr><td></td><td><code>arguments</code></td></tr>
-<tr><td></td><td>is a list of lists of named arguments, one list for each</td></tr>
-<tr><td><code>fun</code></td><td>. For example, if</td></tr>
-<tr><td><code>fun = "write.csv"</code></td><td>,</td></tr>
-<tr><td><code>arguments = list(row.names = TRUE)</code></td><td>will pass the argument</td></tr>
-<tr><td><code>row.names = TRUE</code></td><td>to</td></tr>
-<tr><td><code>write.csv</code></td><td>If there is only one list,</td></tr>
-<tr><td>then it is assumed to apply to all files and will be recycled as per normal R</td><td>rules of recycling for each</td></tr>
-<tr><td><code>fun</code></td><td>.</td></tr>
-<tr><td></td><td></td></tr>
+<tr><td><code>arguments</code></td><td></td></tr>
+<tr><td>is a list of lists of named arguments, one list for each</td><td><code>fun</code></td></tr>
+<tr><td>. For example, if</td><td><code>fun = "write.csv"</code></td></tr>
+<tr><td>,</td><td><code>arguments = list(row.names = TRUE)</code></td></tr>
+<tr><td>will pass the argument</td><td><code>row.names = TRUE</code></td></tr>
+<tr><td>to</td><td><code>write.csv</code></td></tr>
+<tr><td>If there is only one list,</td><td>then it is assumed to apply to all files and will be recycled as per normal R</td></tr>
+<tr><td>rules of recycling for each</td><td><code>fun</code></td></tr>
+<tr><td>.</td><td></td></tr>
 </table>
     <p>See the modules vignette for more details (<code><a href='https://www.rdocumentation.org/packages/utils/topics/browseVignettes'>browseVignettes("SpaDES.core")</a></code>).</p>
     
@@ -360,10 +361,10 @@ with up to 6 columns.</p>
 <span class='co'># Start with a basic empty simList</span>
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>
 <span class='no'>test</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for %&gt;%</span>
@@ -373,15 +374,15 @@ with up to 6 columns.</p>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>saveRDS</a></span>(<span class='no'>test</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>)
 <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>) <span class='co'># using only required column, "file"</span>
 <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='co'># see that it is not yet loaded, but when it is scheduled to be loaded</span></div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
-#&gt; 1 /tmp/Rtmpo1pYtG/inputs/test.rds readRDS    base       test        0     NA
+#&gt; 1 /tmp/RtmpcF0Bd2/inputs/test.rds readRDS    base       test        0     NA
 #&gt;   arguments intervals
 #&gt; 1        NA        NA</div><div class='input'><span class='no'>simOut</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
-#&gt; 0         load       inputs    1            </div><div class='output co'>#&gt; <span class='message'>test read from /tmp/Rtmpo1pYtG/inputs/test.rds using readRDS</span></div><div class='output co'>#&gt; 0         checkpoint init      5            
+#&gt; 0         load       inputs    1            </div><div class='output co'>#&gt; <span class='message'>test read from /tmp/RtmpcF0Bd2/inputs/test.rds using readRDS</span></div><div class='output co'>#&gt; 0         checkpoint init      5            
 #&gt; 0         save       init      5            
 #&gt; 0         progress   init      5            
 #&gt; 0         load       init      5            </div><div class='input'><span class='fu'>inputs</span>(<span class='no'>simOut</span>) <span class='co'># confirm it was loaded</span></div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
-#&gt; 1 /tmp/Rtmpo1pYtG/inputs/test.rds readRDS    base       test        0   TRUE
+#&gt; 1 /tmp/RtmpcF0Bd2/inputs/test.rds readRDS    base       test        0   TRUE
 #&gt;   arguments intervals
 #&gt; 1        NA        NA</div><div class='input'><span class='no'>simOut</span>$<span class='no'>test</span></div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'>
 <span class='co'># can put data.frame for inputs directly inside simInit call</span>
@@ -418,7 +419,7 @@ with up to 6 columns.</p>
   )
   <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>filelist</span>
   <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-}</div><div class='output co'>#&gt; <span class='message'>rgdal: version: 1.3-6, (SVN revision 773)</span>
+}</div><div class='output co'>#&gt; <span class='message'>rgdal: version: 1.4-3, (SVN revision 828)</span>
 #&gt; <span class='message'> Geospatial Data Abstraction Library extensions to R successfully loaded</span>
 #&gt; <span class='message'> Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20</span>
 #&gt; <span class='message'> Path to GDAL shared files: /usr/share/gdal/2.2</span>
@@ -427,10 +428,10 @@ with up to 6 columns.</p>
 #&gt; <span class='message'> Path to PROJ.4 shared files: (autodetected)</span>
 #&gt; <span class='message'> Linking to sp version: 1.3-1 </span></div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>DEM read from /usr/local/lib/R/site-library/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestAge read from /usr/local/lib/R/site-library/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestCover read from /usr/local/lib/R/site-library/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>habitatQuality read from /usr/local/lib/R/site-library/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>percentPine read from /usr/local/lib/R/site-library/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
 #&gt; 0         load       inputs    1            </div><div class='output co'>#&gt; <span class='message'>Maps1 read from /usr/local/lib/R/site-library/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps2 read from /usr/local/lib/R/site-library/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps3 read from /usr/local/lib/R/site-library/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps4 read from /usr/local/lib/R/site-library/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>Maps5 read from /usr/local/lib/R/site-library/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; 0         checkpoint init      5            
@@ -453,10 +454,10 @@ with up to 6 columns.</p>
   <span class='no'>inputs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"a"</span>, <span class='kw'>loadTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>2</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"base::get"</span>, <span class='kw'>arguments</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/AsIs'>I</a></span>(<span class='no'>args</span>))
   <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>inputs</span> <span class='kw'>=</span> <span class='no'>inputs</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>1</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>  <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
 #&gt; 0         checkpoint init      5            
@@ -485,15 +486,15 @@ with up to 6 columns.</p>
                <span class='kw'>outputs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"tempObj"</span>),
                <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see what will be saved, when, what filename</span></div><div class='output co'>#&gt;   objectName                                       file     fun package
-#&gt; 1    tempObj /tmp/Rtmpo1pYtG/outputs/tempObj_year10.rds saveRDS    base
+#&gt; 1    tempObj /tmp/RtmpcF0Bd2/outputs/tempObj_year10.rds saveRDS    base
 #&gt;   saveTime saved arguments
 #&gt; 1       10    NA        NA</div><div class='input'><span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
@@ -502,19 +503,19 @@ with up to 6 columns.</p>
 #&gt; 0         progress   init      5            
 #&gt; 0         load       init      5            
 #&gt; 10        save       spades    10           </div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename</span></div><div class='output co'>#&gt;   objectName                                       file     fun package
-#&gt; 1    tempObj /tmp/Rtmpo1pYtG/outputs/tempObj_year10.rds saveRDS    base
+#&gt; 1    tempObj /tmp/RtmpcF0Bd2/outputs/tempObj_year10.rds saveRDS    base
 #&gt;   saveTime saved arguments
 #&gt; 1       10  TRUE        NA</div><div class='input'>
 <span class='co'># Also can add using assignment after a simList object has been made</span>
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"tempObj"</span>), <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"tempObj"</span>, <span class='kw'>saveTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>)
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
@@ -532,16 +533,16 @@ with up to 6 columns.</p>
 #&gt; 8         save       later     10           
 #&gt; 9         save       later     10           
 #&gt; 10        save       later     10           </div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='co'># To see that it was saved, when, what filename.</span></div><div class='output co'>#&gt;    objectName saveTime                                       file     fun
-#&gt; 1     tempObj        1 /tmp/Rtmpo1pYtG/outputs/tempObj_year01.rds saveRDS
-#&gt; 2     tempObj        2 /tmp/Rtmpo1pYtG/outputs/tempObj_year02.rds saveRDS
-#&gt; 3     tempObj        3 /tmp/Rtmpo1pYtG/outputs/tempObj_year03.rds saveRDS
-#&gt; 4     tempObj        4 /tmp/Rtmpo1pYtG/outputs/tempObj_year04.rds saveRDS
-#&gt; 5     tempObj        5 /tmp/Rtmpo1pYtG/outputs/tempObj_year05.rds saveRDS
-#&gt; 6     tempObj        6 /tmp/Rtmpo1pYtG/outputs/tempObj_year06.rds saveRDS
-#&gt; 7     tempObj        7 /tmp/Rtmpo1pYtG/outputs/tempObj_year07.rds saveRDS
-#&gt; 8     tempObj        8 /tmp/Rtmpo1pYtG/outputs/tempObj_year08.rds saveRDS
-#&gt; 9     tempObj        9 /tmp/Rtmpo1pYtG/outputs/tempObj_year09.rds saveRDS
-#&gt; 10    tempObj       10 /tmp/Rtmpo1pYtG/outputs/tempObj_year10.rds saveRDS
+#&gt; 1     tempObj        1 /tmp/RtmpcF0Bd2/outputs/tempObj_year01.rds saveRDS
+#&gt; 2     tempObj        2 /tmp/RtmpcF0Bd2/outputs/tempObj_year02.rds saveRDS
+#&gt; 3     tempObj        3 /tmp/RtmpcF0Bd2/outputs/tempObj_year03.rds saveRDS
+#&gt; 4     tempObj        4 /tmp/RtmpcF0Bd2/outputs/tempObj_year04.rds saveRDS
+#&gt; 5     tempObj        5 /tmp/RtmpcF0Bd2/outputs/tempObj_year05.rds saveRDS
+#&gt; 6     tempObj        6 /tmp/RtmpcF0Bd2/outputs/tempObj_year06.rds saveRDS
+#&gt; 7     tempObj        7 /tmp/RtmpcF0Bd2/outputs/tempObj_year07.rds saveRDS
+#&gt; 8     tempObj        8 /tmp/RtmpcF0Bd2/outputs/tempObj_year08.rds saveRDS
+#&gt; 9     tempObj        9 /tmp/RtmpcF0Bd2/outputs/tempObj_year09.rds saveRDS
+#&gt; 10    tempObj       10 /tmp/RtmpcF0Bd2/outputs/tempObj_year10.rds saveRDS
 #&gt;    package saved arguments
 #&gt; 1     base  TRUE        NA
 #&gt; 2     base  TRUE        NA
@@ -559,13 +560,13 @@ with up to 6 columns.</p>
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"tempObj"</span>, <span class='st'>"tempObj2"</span>, <span class='st'>"df1"</span>),
   <span class='kw'>paths</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>tmpdir</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>outputs</span>(<span class='no'>sim</span>) <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(
      <span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='st'>"tempObj"</span>, <span class='fl'>2</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='st'>"tempObj2"</span>, <span class='fl'>3</span>), <span class='st'>"df1"</span>),
      <span class='kw'>saveTime</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>4</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>,<span class='fl'>6</span>,<span class='fl'>7</span>), <span class='fu'><a href='simList-accessors-times.html'>end</a></span>(<span class='no'>sim</span>)),
@@ -594,12 +595,12 @@ with up to 6 columns.</p>
 #&gt; 5   tempObj2        7   saveRDS    base
 #&gt; 6        df1       10 write.csv   utils
 #&gt;                                          file saved arguments
-#&gt; 1  /tmp/Rtmpo1pYtG/outputs/tempObj_year01.rds  TRUE        NA
-#&gt; 2  /tmp/Rtmpo1pYtG/outputs/tempObj_year04.rds  TRUE        NA
-#&gt; 3 /tmp/Rtmpo1pYtG/outputs/tempObj2_year02.rds  TRUE        NA
-#&gt; 4 /tmp/Rtmpo1pYtG/outputs/tempObj2_year06.rds  TRUE        NA
-#&gt; 5 /tmp/Rtmpo1pYtG/outputs/tempObj2_year07.rds  TRUE        NA
-#&gt; 6      /tmp/Rtmpo1pYtG/outputs/df1_year10.csv  TRUE     FALSE</div><div class='input'>
+#&gt; 1  /tmp/RtmpcF0Bd2/outputs/tempObj_year01.rds  TRUE        NA
+#&gt; 2  /tmp/RtmpcF0Bd2/outputs/tempObj_year04.rds  TRUE        NA
+#&gt; 3 /tmp/RtmpcF0Bd2/outputs/tempObj2_year02.rds  TRUE        NA
+#&gt; 4 /tmp/RtmpcF0Bd2/outputs/tempObj2_year06.rds  TRUE        NA
+#&gt; 5 /tmp/RtmpcF0Bd2/outputs/tempObj2_year07.rds  TRUE        NA
+#&gt; 6      /tmp/RtmpcF0Bd2/outputs/df1_year10.csv  TRUE     FALSE</div><div class='input'>
 <span class='co'># read one back in just to test it all worked as planned</span>
 <span class='no'>newObj</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/read.table'>read.csv</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list.files'>dir</a></span>(<span class='no'>tmpdir</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"year10.csv"</span>, <span class='kw'>full.name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
 <span class='no'>newObj</span></div><div class='output co'>#&gt;    col1   col2
@@ -640,13 +641,13 @@ with up to 6 columns.</p>
   <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/all.equal'>all.equal</a></span>(<span class='no'>newRas</span>, <span class='no'>ras</span>) <span class='co'># Should be TRUE</span>
 }</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; This is the current event, printed as it is happening:
 #&gt; eventTime moduleName eventType eventPriority
 #&gt; 0         checkpoint init      5            

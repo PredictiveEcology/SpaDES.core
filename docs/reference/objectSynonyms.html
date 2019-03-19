@@ -82,7 +82,7 @@ deletes the object, it will &quot;come back&quot;. This may not always be desire
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -198,10 +198,10 @@ are synonyms, then age and timeSinceFire must be synonyms.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>
 <span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>;
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='no'>sim</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>)))
@@ -214,19 +214,19 @@ are synonyms, then age and timeSinceFire must be synonyms.</p>
 <span class='no'>objectSynonyms</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>))
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objectSynonyms</span> <span class='kw'>=</span> <span class='no'>objectSynonyms</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/identical'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>) <span class='co'># they are NULL at this point</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/identical'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>) <span class='co'># they are not NULL at this point</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'>## More complicated, with 'updating' i.e., you can add new synonyms to previous</span>
 <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpS3V2mO/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpo1pYtG/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpo1pYtG/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpo1pYtG/SpaDES/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcF0Bd2/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcF0Bd2/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcF0Bd2/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='no'>os</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"vegMap"</span>, <span class='st'>"veg"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"studyArea"</span>, <span class='st'>"studyArea2"</span>))
 <span class='no'>os2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"ageMap"</span>, <span class='st'>"timeSinceFire"</span>, <span class='st'>"tsf"</span>),
             <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"systime"</span>, <span class='st'>"systime2"</span>),
