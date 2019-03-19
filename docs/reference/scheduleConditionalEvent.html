@@ -222,9 +222,9 @@ very low or even negative to ensure it gets inserted at the top of the event que
     <pre class="examples"><div class='input'>  <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
 #&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpo4gO2E/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp1QsGcR/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp1QsGcR/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp1QsGcR/SpaDES/modules'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBMw59P/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBMw59P/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBMw59P/SpaDES/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>  <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='st'>"sim$age &gt; 1"</span> <span class='co'># provide as string</span>
   <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/substitute'>quote</a></span>(<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&gt;</span> <span class='fl'>1</span>) <span class='co'># provide as a call</span>
   <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/expression'>expression</a></span>(<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&gt;</span> <span class='fl'>1</span>) <span class='co'># provide as an expression</span>
