@@ -4,7 +4,7 @@ version 0.2.5
 =============
 
 * improved messaging and fixed test failures when GLPK installed but not used by `igraph`
-* compatibility with forthcoming `RandomFields` v3.3.4
+* compatibility with `RandomFields` >= 3.3.4
 
 version 0.2.4
 =============

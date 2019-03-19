@@ -27,6 +27,7 @@ packages required via setting
 cluster. Will ignore this if the \code{sim} is provided.}
 }
 \description{
-This is mostly a wrapper around several packages in parallel package:
-\code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}
+This is mostly a wrapper around several functions in the \pkg{parallel} package:
+\code{makeCluster}, \code{clusterSetRNGStream}, \code{detectCores}.
 }
+\keyword{internal}
