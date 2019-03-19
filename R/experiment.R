@@ -549,12 +549,16 @@ FunDef <- function(ind, sim, factorialExp, modules, params,
 #' @param numClus The desired number of child clusters, passed to
 #'   \code{.optimalClusterNum} via \code{maxNumClusters}. If not provided,
 #'   \code{cl} must be provided.
+#'
 #' @param sim An optional simList object; this will be used to find the
 #'   packages required via setting
 #'   \code{packages = SpaDES.core::packages(sim, clean = TRUE)}
+#'
 #' @param packages a character vector indicating which packages to load in the
 #'   cluster. Will ignore this if the \code{sim} is provided.
+#'
 #' @param outfile The location of the log file
+#'
 #' @importFrom parallel clusterEvalQ
 #' @keywords internal
 .setupCl <- function(cl, numClus = NULL, outfile, sim = NULL, packages = NULL) {
@@ -569,7 +573,7 @@ FunDef <- function(ind, sim, factorialExp, modules, params,
           .optimalClusterNum(maxNumClusters = numClus) # pulled from pemisc
         }
         cl <- .makeClusterRandom(numClus, outfile = outfile) # pulled from pemisc
-        # DOesn't work because of data.table objects ... unsolved mystery March 10, 2019 Eliot
+        # Doesn't work because of data.table objects ... unsolved mystery March 10, 2019 Eliot
         #cl <- pemisc::makeOptimalCluster(useParallel = TRUE, MBper = 5e3, maxNumClusters = 2,
         #                                outfile = file.path(Paths$outputPath, "_parallel.log"))
 
