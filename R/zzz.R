@@ -52,6 +52,9 @@
                     env = pkgEnv
   )
 
+  ## import functions using backports:
+  backports::import(pkgname, "isFALSE")
+
   invisible()
 }
 
@@ -67,6 +70,7 @@
       "To change these, use setPaths(...); see ?setPaths"
     )
   }
+
   #unlockBinding("Paths", as.environment("package:SpaDES.core"))
   # rm("Paths", envir = as.environment("package:SpaDES.core"))
   # makeActiveBinding(sym = "Paths",

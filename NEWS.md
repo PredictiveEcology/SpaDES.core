@@ -1,5 +1,20 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.5.9000
+=============
+
+## package dependencies
+
+* added `backports` to Imports for R-oldrel support
+
+## new features
+
+* lorem ipsum
+
+## bug fixes
+
+* lorem ipsum
+
 version 0.2.5
 =============
 
