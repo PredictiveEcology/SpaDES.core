@@ -315,3 +315,24 @@ test_that("simList object initializes correctly", {
 
 })
 
+test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
+  # Test resulting from bug found by Greg Paradis April 7, 2019
+  testInitOut <- testInit("raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  setPaths(modulePath = tmpdir)
+  childModName <- "child_module"
+  newModule(childModName, tmpdir, type='child')
+  newModule('parent_module', tmpdir, type='parent', children=c('child_module'))
+  paths <- getPaths()
+  modules <- list("parent_module")
+  times <- list(start = 1, end = 10)
+  expect_is(mySim <- simInit(paths=paths,
+                   modules=modules,
+                   times=times), "simList")
+  # test some child related stuff
+  expect_true(all(modules(mySim) %in% childModName))
+  expect_true(dirname(names(modules(mySim))) %in% modulePath(mySim))
+
+})
