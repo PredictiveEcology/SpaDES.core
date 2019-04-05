@@ -397,8 +397,15 @@ setMethod(
                          filenames = file.path(unlist(modulePaths), paste0(mBase, ".R")),
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
-    if (length(unlist(reqdPkgs))) {
-      allPkgs <- c(unique(unlist(reqdPkgs), "SpaDES.core"))
+
+    # Load only needed packages -- compare to current search path
+    loadedPkgs <- search();
+    uniqueReqdPkgs <- unique(unlist(reqdPkgs))
+    neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
+    names(neededPkgs) <- uniqueReqdPkgs
+
+    if (sum(!neededPkgs) > 0) {
+      allPkgs <- c(unique(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
       if (getOption("spades.useRequire")) {
         Require(allPkgs)
       } else {
