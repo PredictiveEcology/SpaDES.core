@@ -286,11 +286,8 @@ test_that("simList test all signatures", {
 
     # needs paths and params; many defaults are fine
     expect_equal(sum(successes, na.rm = TRUE), 256)
-
   }
 })
-
-
 
 test_that("simList object initializes correctly", {
   testInitOut <- testInit("raster")
@@ -298,41 +295,36 @@ test_that("simList object initializes correctly", {
     testOnExit(testInitOut)
   }, add = TRUE)
   ## test with outputs
-  ras = raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
+  ras <- raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
   abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
 
   tmpdir <- tempdir()
   newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
-  obj = list(abundRasters = abundRasters)#,
-             #tempRasters = tempRasters)
-  paths = list(modulePath = file.path(tmpdir, "modules"))
-  #If start is set to 1.0, there is a warning message and spades doesn???t seem to run.
+  obj <- list(abundRasters = abundRasters)#, tempRasters = tempRasters)
+  paths <- list(modulePath = file.path(tmpdir, "modules"))
+
+  ## If start is set to 1.0, there is a warning message and spades doesn't seem to run
   aa <- (capture_warnings(mySim <- simInit(times = list(start = 1.0, end = 2.0),
-                   modules = list("test"), paths = paths,
-                   objects = obj)))
+                                           modules = list("test"), paths = paths,
+                                           objects = obj)))
   expect_length(aa, 0)
-
-
 })
 
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
-  # Test resulting from bug found by Greg Paradis April 7, 2019
+  ## Test resulting from bug found by Greg Paradis April 7, 2019
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
-  newModule(childModName, tmpdir, type='child')
-  newModule('parent_module', tmpdir, type='parent', children=c('child_module'))
+  newModule(childModName, tmpdir, type = "child")
+  newModule("parent_module", tmpdir, type = "parent", children = c("child_module"))
   paths <- getPaths()
   modules <- list("parent_module")
   times <- list(start = 1, end = 10)
-  expect_is(mySim <- simInit(paths=paths,
-                   modules=modules,
-                   times=times), "simList")
-  # test some child related stuff
+  expect_is(mySim <- simInit(paths = paths, modules = modules, times = times), "simList")
+  ## test some child related stuff
   expect_true(all(modules(mySim) %in% childModName))
   expect_true(dirname(names(modules(mySim))) %in% modulePath(mySim))
-
 })
