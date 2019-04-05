@@ -368,6 +368,7 @@ setMethod(
         # add child modules to list of all child modules, to be parsed later
         children <- as.list(sim@depends@dependencies[[i]]@childModules) %>%
           lapply(., `attributes<-`, list(parsed = FALSE))
+        names(children) <- file.path(dirname(m), children)
         all_children <- append_attr(all_children, children)
 
         # remove parent module from the list
@@ -397,6 +398,7 @@ setMethod(
         if (any(alreadyIn)) {
           children <- as.list(sim@depends@dependencies[[which(alreadyIn)]]@childModules) %>%
             lapply(., `attributes<-`, list(parsed = FALSE))
+          names(children) <- file.path(dirname(m), children)
           all_children <- append_attr(all_children, children)
         }
         # remove parent module from the list
