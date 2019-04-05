@@ -527,7 +527,7 @@ setMethod(
     all_parsed <- FALSE
     while (!all_parsed) {
       sim <- .parseModule(sim,
-                          as.list(modules),
+                          as.list(sim@modules),
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
                           envir = sim@.xData[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
@@ -579,9 +579,9 @@ setMethod(
       loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
     }
 
-    mBase <- basename2(unlist(modules))
+    mBase <- basename2(unlist(sim@modules))
     loadOrderBase <- basename2(loadOrder)
-    names(loadOrder) <- names(unlist(modules))[na.omit(match(mBase, loadOrderBase))]
+    names(loadOrder) <- names(unlist(sim@modules))[na.omit(match(mBase, loadOrderBase))]
     loadOrder[] <- loadOrderBase
     loadOrderNames <- names(loadOrder)
 
@@ -593,7 +593,7 @@ setMethod(
     }
 
     # Make local activeBindings to mod
-    lapply(modules, function(mod) {
+    lapply(sim@modules, function(mod) {
       makeActiveBinding(sym = "mod",
                         fun = function(value){
                           if (missing(value)) {
