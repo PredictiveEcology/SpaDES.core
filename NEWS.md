@@ -13,7 +13,7 @@ version 0.2.5.9000
 
 ## bug fixes
 
-* lorem ipsum
+* Now gives better errors if modules are missing main .R file or if they are missing entirely
 
 version 0.2.5
 =============
