@@ -469,14 +469,20 @@ setMethod(
     # recursive function to extract parent and child structures
     buildParentChildGraph <- function(sim, mods, childModules) {
       out <- childModules
-      isParent <- unlist(lapply(out, function(x) length(x) > 1))
-      from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
-      to <- unlist(lapply(out, function(x) names(x)))
-      if (is.null(to)) to <- character(0)
-      outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
-      aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
-      aa <- rbindlist(aa)
-      outDF <- rbind(outDF, aa)
+
+      # A child module will be a list inside a list of parent modules
+      isParent <- sapply(out, function(x) is.list(x))
+      if (length(isParent)) {
+        from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
+        to <- unlist(lapply(out, function(x) names(x)))
+        if (is.null(to)) to <- character(0)
+        outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
+        aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
+        aa <- rbindlist(aa)
+        outDF <- rbind(outDF, aa)
+      } else {
+        outDF <- data.frame(from = character(0), to = character(0), stringsAsFactors = FALSE)
+      }
       outDF
     }
 
