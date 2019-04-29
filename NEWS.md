@@ -9,11 +9,12 @@ version 0.2.5.9000
 
 ## new features
 
-* lorem ipsum
+* Now gives better errors if modules are missing main .R file or if they are missing entirely
+* More silent tests
 
 ## bug fixes
 
-* Now gives better errors if modules are missing main .R file or if they are missing entirely
+* Internal bugs suring `simInit` especially in some weird cases of `childModules`
 
 version 0.2.5
 =============

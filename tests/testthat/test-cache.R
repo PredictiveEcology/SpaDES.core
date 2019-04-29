@@ -230,7 +230,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(all(grepl(msgGrep, mess1)))
 
   msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
-  expect_message(do.call(simInit, args), regexp = msgGrep)
+  a <- capture.output(expect_message(do.call(simInit, args), regexp = msgGrep))
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
