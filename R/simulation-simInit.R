@@ -402,8 +402,8 @@ setMethod(
 
     mBase <- basename2(unlist(modules))
 
-    reqdPkgs <- packages(modules = unlist(modulePaths),
-                         filenames = file.path(unlist(modulePaths), paste0(mBase, ".R")),
+    reqdPkgs <- packages(modules = sim@modules,
+                         filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
 
