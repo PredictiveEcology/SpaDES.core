@@ -15,7 +15,7 @@ version 0.2.5.9000
 ## bug fixes
 
 * Internal bugs during `simInit` especially in some weird cases of `childModules`
-* packages listed in reqdPkgs not being loaded when only listed in child modules. Fixed a1934a9c08184fc6ef5bf6c0a97e099ac25d59ab
+* packages listed in reqdPkgs not being loaded when only listed in child modules. Fixed 5cd79ac95bc8d190e954313f125928458b0108d2
 
 version 0.2.5
 =============
