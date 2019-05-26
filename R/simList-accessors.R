@@ -2443,36 +2443,33 @@ setGeneric("completed", function(sim, unit, times = TRUE) {
 #' @rdname simList-accessors-events
 #' @export
 #' @aliases simList-accessors-events
+#' @importFrom data.table rbindlist setkeyv :=
 setMethod(
   "completed",
   signature = c("simList", "character"),
   definition = function(sim, unit, times = TRUE) {
-    obj <- rbindlist(sim@completed)
+
+    obj <- as.list(sim@completed)
+    obj <- rbindlist(obj, idcol = if (length(sim@completed)) "eventNumber" else NULL)
+
     if (length(sim@completed)) {
+      obj[, eventNumber := as.numeric(eventNumber)]
+      setkeyv(obj, "eventNumber")
       if (!isTRUE(times)) {
         set(obj, , "._clockTime", NULL)
       }
       if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
-        #compl <- rbindlist(sim@completed)
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
-            #if (any(!is.na(obj$eventTime))) {
-          #if (!is.null(obj$eventTime)) {
-            #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.xData)
-            #sim@completed
             if (!is.null(obj$._clockTime))
               obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.xData),
                          clockTime=obj$._clockTime,
                          ._clockTime=NULL)]
-            obj[]
           }
-        } #else {
-          #sim@completed
-        #}
-      } #else {
-        #sim@completed
-      #}
+        }
+      }
+      obj[]
     }
     return(obj)
 })
