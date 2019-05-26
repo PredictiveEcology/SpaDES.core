@@ -60,6 +60,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <- sim@current
+  curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
     # Test replacement for speed
     #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
@@ -70,7 +71,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
-      fnEnv <- sim@.xData[[cur[["moduleName"]]]]
+      fnEnv <- sim@.xData[[curModuleName]]
       # update current simulated time
       # Test replacement for speed
       #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
@@ -79,7 +80,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
       slot(sim, "simtimes", check = FALSE) <- st
 
       # call the module responsible for processing this event
-      moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
+      moduleCall <- paste("doEvent", curModuleName, sep = ".")
 
       # if debug is TRUE
       if (is.null(attr(sim, "needDebug"))) {
@@ -134,8 +135,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
             if(is.environment(fnEnv)) {
               if (all(debug %in% cur[c("moduleName", "eventType")])) {
-                debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
-                on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+                debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+                on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
               }
             }
           } else if (!any(debug[[i]] == c("browser"))) {
@@ -146,15 +147,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      if (cur[["moduleName"]] %in% sim@modules) {
-        if (cur[["moduleName"]] %in% core) {
+      if (curModuleName %in% sim@modules) {
+        if (curModuleName %in% core) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]])
         } else {
 
           # for future caching of modules
           cacheIt <- FALSE
-          a <- sim@params[[cur[["moduleName"]]]][[".useCache"]]
+          a <- sim@params[[curModuleName]][[".useCache"]]
           if (!is.null(a)) {
             #.useCache is a parameter
             if (!identical(FALSE, a)) {
@@ -175,27 +176,27 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
           # This is to create a namespaced module call
           if (!.pkgEnv[["skipNamespacing"]])
-            .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
+            .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
                               removeOthers = FALSE)
 
           sim <- .runEvent(sim, cacheIt, debug,
                            moduleCall, fnEnv, cur, notOlderThan)
 
-          if (!exists(cur[["moduleName"]], envir = sim, inherits = FALSE))
-            stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
+          if (!exists(curModuleName, envir = sim, inherits = FALSE))
+            stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!is.environment(get(cur[["moduleName"]], envir = sim)))
-            stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
+          if (!is.environment(get(curModuleName, envir = sim)))
+            stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!exists("mod", envir = sim[[cur[["moduleName"]]]], inherits = FALSE))
-            stop("The module named ", cur[["moduleName"]], " just deleted the object named 'mod' from sim$",
-                 cur[["moduleName"]],". ",
+          if (!exists("mod", envir = sim@.envir[[curModuleName]], inherits = FALSE))
+            stop("The module named ", curModuleName, " just deleted the object named 'mod' from sim$",
+                 curModuleName,". ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
@@ -204,7 +205,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
         stop(
           paste(
             "Invalid module call. The module `",
-            cur[["moduleName"]],
+            curModuleName,
             "` wasn't specified to be loaded."
           )
         )
