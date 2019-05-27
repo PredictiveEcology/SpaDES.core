@@ -2471,6 +2471,7 @@ setMethod(
       }
       obj[]
     }
+    set(obj, NULL, "eventNumber", NULL) # remove the eventNumber column to match other event queues
     return(obj)
 })
 
@@ -2506,10 +2507,13 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
+    sim@completed <- new.env(parent = emptyenv())
     if (NROW(value)) {
-      sim@completed <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x, ]))
-    } else {
-      sim@completed <- new.env(parent = emptyenv())
+      integerVals <- seq(NROW(value))
+      outList <- lapply(integerVals,
+                      function(x) as.list(value[x, ]))
+      names(outList) <- as.character(integerVals)
+      list2env(outList, envir = sim@completed)
     }
     return(sim)
 })

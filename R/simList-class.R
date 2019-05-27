@@ -210,7 +210,7 @@ setClass("simList_",
          slots = list(
            modules = "list", params = "list", events = "list",#data.table",
            current = "list", #"data.table",
-           completed = "environment", depends = ".simDeps",
+           completed = "list", depends = ".simDeps",
            simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
            .list = "list"
          )
@@ -222,7 +222,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
            params = from@params,
            events = from@events,
            current = from@current,
-           completed = from@completed,
+           completed = new.env(parent = emptyenv()),
            depends = from@depends,
            simtimes = from@simtimes,
            inputs = from@inputs,
@@ -231,6 +231,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   x@.xData <- new.env(new.env(parent = emptyenv()))
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)
+  list2env(from@completed, envir = x@completed)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
 })
@@ -243,7 +244,7 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
            params = from@params,
            events = from@events,
            current = from@current,
-           completed = from@completed,
+           completed = as.list(from@completed, all.names = TRUE, sorted = TRUE),
            depends = from@depends,
            simtimes = from@simtimes,
            inputs = from@inputs,

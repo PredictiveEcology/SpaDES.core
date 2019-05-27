@@ -35,9 +35,11 @@ setMethod("Copy",
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object
+            sim_@completed <- new.env(parent = emptyenv())
             if (queues) {
               sim_@events <- object@events
               sim_@current <- object@current
+              list2env(as.list(object@completed), envir = sim_@completed)
             }
             #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
