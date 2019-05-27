@@ -223,6 +223,7 @@ setMethod(
         #sim@.xData[[mBase]] <- new.env(parent = sim@.xData)
         sim@.xData[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         attr(sim@.xData[[mBase]], "name") <- mBase
+        sim@.xData[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         # load all code into simList@.xData[[moduleName]]
         # The simpler line commented below will not allow actual code to be put into module,

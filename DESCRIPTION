@@ -98,6 +98,7 @@ Collate:
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'
+    'modActiveBinding.R'
     'module-define.R'
     'module-dependencies-methods.R'
     'module-repository.R'
