@@ -174,6 +174,8 @@ setMethod("initialize",
             if (any(7==haves))
               .Object@paths = .paths()
 
+            .Object@completed <- new.env(parent = emptyenv())
+
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData

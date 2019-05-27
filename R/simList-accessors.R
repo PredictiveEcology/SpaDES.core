@@ -2509,7 +2509,7 @@ setReplaceMethod(
     if (NROW(value)) {
       sim@completed <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x, ]))
     } else {
-      sim@completed <- list()
+      sim@completed <- new.env(parent = emptyenv())
     }
     return(sim)
 })

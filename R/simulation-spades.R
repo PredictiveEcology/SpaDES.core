@@ -854,7 +854,7 @@ setMethod(
       prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
       prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
       if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]])
-        sim@completed <- new.env()
+        sim@completed <- new.env(parent = emptyenv())
     }
 
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
