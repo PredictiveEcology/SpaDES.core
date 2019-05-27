@@ -3,6 +3,7 @@ test_that("test cache", {
                                       spades.useRequire = FALSE),
                           setPaths = FALSE)
 
+  try(clearCache(tmpdir), silent = TRUE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
