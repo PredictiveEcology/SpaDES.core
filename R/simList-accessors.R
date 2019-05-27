@@ -1322,8 +1322,9 @@ setReplaceMethod(
        # file extension stuff
        fileExts <- .saveFileExtensions()
        fe <- setDT(fileExts)[setDT(sim@outputs[,c("fun", "package")]), on = c("fun","package")]$exts
-       #fe <- suppressMessages(inner_join(sim@outputs, fileExts)$exts)
-       wh <- !stri_detect_fixed(str = sim@outputs$file, pattern = ".") &
+
+       # grep allows for file extensions from 1 to 5 characters
+       wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) &
          (nzchar(fe, keepNA = TRUE))
        sim@outputs[wh, "file"] <- paste0(sim@outputs[wh, "file"], ".", fe[wh])
 

@@ -56,6 +56,33 @@ test_that("saving files does not work correctly", {
   expect_true(file.exists(file.path(tmpdir, "caribou_month7.rds")))
   expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
   rm(mySim)
+
+
+  # test when filename has a dot
+  tmpdir <- paste0(tmpdir, ".sdfd.lkjlll")
+
+  outputs <- data.frame(
+    expand.grid(objectName = c("caribou", "landscape")),
+    stringsAsFactors = FALSE
+  )
+  paths$outputPath <- tmpdir
+
+  times <- list(start = 0, end = 7, "month")
+  parameters <- list(
+    .globals = list(stackName = "landscape"),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
+  mySim <- simInit(times = times, params = parameters, modules = modules,
+                   paths = paths, outputs = outputs)
+
+  mySim <- spades(mySim)
+
+  # test that if no save times are stated, then it is at end time
+  expect_true(file.exists(file.path(tmpdir, "caribou_month7.rds")))
+  expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
+  rm(mySim)
+
 })
 
 test_that("saving csv files does not work correctly", {
