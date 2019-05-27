@@ -193,6 +193,7 @@ setMethod(
       mBase <- basename(m)
 
       ## temporarily assign current module
+      browser(expr = exists("aaaa"))
       sim@current <- list(
         eventTime = start(sim),
         moduleName = mBase,
@@ -212,6 +213,7 @@ setMethod(
         #  for (pathPoss in sim@paths[["modulePath"]]) {
         filename <- paste(m, "/", mBase, ".R", sep = "")
 
+        browser(expr = exists("aaaa"))
         tmp <- .parseConditional(envir = envir, filename = filename)
 
         # duplicate -- put in namespaces location
@@ -232,7 +234,8 @@ setMethod(
         # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData[[mBase]])
         activeCode <- list()
         activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                                                   sim@.xData[[mBase]])
+                                                   sim@.xData[[mBase]],
+                                                   sim = sim)
 
         doesntUseNamespacing <- !.isNamespaced(sim, mBase)
 
@@ -245,7 +248,8 @@ setMethod(
                   "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
           #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
           out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                             sim@.xData)
+                             sim@.xData,
+                             sim = sim)
           #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
         }
 
@@ -264,12 +268,14 @@ setMethod(
             parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
             if (doesntUseNamespacing) {
               #eval(parsedFile1, envir = sim@.xData)
-              evalWithActiveCode(parsedFile1, sim@.xData)
+              evalWithActiveCode(parsedFile1, sim@.xData,
+                                 sim = sim)
             }
 
             # duplicate -- put in namespaces location
             #eval(parsedFile1, envir = sim@.xData[[mBase]])
-            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData[[mBase]])
+            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData[[mBase]],
+                                                       sim = sim)
           }
         }
 
@@ -476,9 +482,12 @@ setMethod(
 }
 
 #' @keywords internal
-evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame()) {
+evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
+                               sim) {
+  browser(expr = exists("aaaa"))
   ll <- lapply(parsedModuleNoDefineModule,
-               function(x) tryCatch(eval(x, envir = envir), error = function(y) "ERROR"))
+               function(x) tryCatch(eval(x, envir = parentFrame),
+                                    error = "ERROR"))#function(y) tryCatch(eval(x, envir = sim@.xData))))
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
   if (any(activeCode)) {

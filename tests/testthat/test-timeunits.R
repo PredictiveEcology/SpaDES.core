@@ -199,6 +199,8 @@ test_that("timeunits with child and parent modules work correctly", {
             "  sim$cm <- currentModule(sim)", xxx[seq(length(xxx) - initLine) + initLine],
             "  cm1 <- currentModule(sim)", "  dp1 <- dataPath(sim)")
   cat(xxx1, file = fileName, sep = "\n")
+  aaaa <<- 1
+  browser()
   mySim <- simInit(modules = list(modName), paths = list(modulePath = tmpdir))
   expect_true(mySim[[modName]]$cm1 == file.path(modName))
   expect_true(mySim[[modName]]$dp1 == normPath(file.path(dirname(fileName), "data")))

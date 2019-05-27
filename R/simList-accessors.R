@@ -395,6 +395,7 @@ setMethod(
   "currentModule",
   signature = c("simList"),
   definition = function(sim) {
+    browser(expr = exists("aaaa"))
     ret <- sim@current$moduleName
     if (length(ret))
       return(ret)
@@ -2471,8 +2472,8 @@ setMethod(
         }
       }
       obj[]
+      set(obj, NULL, "eventNumber", NULL) # remove the eventNumber column to match other event queues
     }
-    set(obj, NULL, "eventNumber", NULL) # remove the eventNumber column to match other event queues
     return(obj)
 })
 
