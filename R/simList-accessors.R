@@ -395,7 +395,6 @@ setMethod(
   "currentModule",
   signature = c("simList"),
   definition = function(sim) {
-    browser(expr = exists("aaaa"))
     ret <- sim@current$moduleName
     if (length(ret))
       return(ret)

@@ -193,7 +193,6 @@ setMethod(
       mBase <- basename(m)
 
       ## temporarily assign current module
-      browser(expr = exists("aaaa"))
       sim@current <- list(
         eventTime = start(sim),
         moduleName = mBase,
@@ -213,7 +212,6 @@ setMethod(
         #  for (pathPoss in sim@paths[["modulePath"]]) {
         filename <- paste(m, "/", mBase, ".R", sep = "")
 
-        browser(expr = exists("aaaa"))
         tmp <- .parseConditional(envir = envir, filename = filename)
 
         # duplicate -- put in namespaces location
@@ -233,6 +231,7 @@ setMethod(
         #  The more complex one following will allow that.
         # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData[[mBase]])
         activeCode <- list()
+        browser(expr = exists("aaaa"))
         activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                    sim@.xData[[mBase]],
                                                    sim = sim)
@@ -484,11 +483,20 @@ setMethod(
 #' @keywords internal
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
                                sim) {
-  browser(expr = exists("aaaa"))
+
+  # Create a temporary environment to source into, adding the sim object so that
+  #   code can be evaluated with the sim, e.g., currentModule(sim)
+  tmpEnvir <- new.env(parent = envir)
+  tmpEnvir$sim <- sim
+
   ll <- lapply(parsedModuleNoDefineModule,
-               function(x) tryCatch(eval(x, envir = parentFrame),
-                                    error = "ERROR"))#function(y) tryCatch(eval(x, envir = sim@.xData))))
+               function(x) tryCatch(eval(x, envir = tmpEnvir),
+                                    error = function(x) "ERROR"))
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
+
+  rm("sim", envir = tmpEnvir)
+  list2env(as.list(tmpEnvir, all.names = TRUE), envir = envir)
+  rm(tmpEnvir)
 
   if (any(activeCode)) {
     env <- new.env(parent = parentFrame);
