@@ -378,7 +378,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
   # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
   # With many new "exists"
-  # laptop -- May 25, 2019 0.305 Seconds --> 61 microseconds/event!
+  # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
   options("spades.keepCompleted" = FALSE)
   (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
   #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
