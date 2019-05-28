@@ -231,7 +231,6 @@ setMethod(
         #  The more complex one following will allow that.
         # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData[[mBase]])
         activeCode <- list()
-        browser(expr = exists("aaaa"))
         activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                    sim@.xData[[mBase]],
                                                    sim = sim)
@@ -457,7 +456,8 @@ setMethod(
 .parseConditional <- function(envir = NULL, filename = character()) {
   if (!is.null(envir)) {
     if (is.null(envir[[filename]])) {
-      envir[[filename]] <- new.env(parent = envir)
+      #envir[[filename]] <- new.env(parent = envir)
+      envir[[filename]] <- new.env(parent = emptyenv())
       needParse <- TRUE
     } else {
       needParse <- FALSE
