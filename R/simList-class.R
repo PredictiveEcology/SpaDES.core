@@ -236,8 +236,6 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   return(x)
 })
 
-
-
 setAs(from = "simList", to = "simList_", def = function(from, to) {
   x <- new(to,
            modules = from@modules,
