@@ -26,14 +26,14 @@ matrix:
       - "sh -e /etc/init.d/xvfb start"
       - sleep 3 # give xvfb some time to start
   - os: linux
-    dist: trusty
+    dist: xenial
     r: 3.4
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
@@ -44,14 +44,14 @@ matrix:
       - "sh -e /etc/init.d/xvfb start"
       - sleep 3 # give xvfb some time to start
   - os: linux
-    dist: trusty
+    dist: xenial
     r: oldrel
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
@@ -62,14 +62,14 @@ matrix:
       - "sh -e /etc/init.d/xvfb start"
       - sleep 3 # give xvfb some time to start
   - os: linux
-    dist: trusty
+    dist: xenial
     r: release
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
@@ -89,14 +89,14 @@ matrix:
       - jimhester/lintr
       - r-lib/covr
   - os: linux
-    dist: trusty
+    dist: xenial
     r: devel
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
