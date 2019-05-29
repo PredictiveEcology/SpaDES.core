@@ -609,16 +609,7 @@ setMethod(
 
     # Make local activeBindings to mod
     lapply(sim@modules, function(mod) {
-      makeActiveBinding(sym = "mod",
-                        fun = function(value){
-                          if (missing(value)) {
-                            get(mod, envir = sim, inherits = FALSE)
-                          } else {
-                            stop("Can't overwrite mod")
-                          }
-                        },
-                        env = sim[[mod]])
-
+      makeModActiveBinding(sim = sim, mod = mod)
     })
 
     ## load user-defined modules
@@ -1229,3 +1220,4 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])
 }
+

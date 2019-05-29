@@ -11,6 +11,10 @@ version 0.2.5.9000
 
 * Now gives better errors if modules are missing main .R file or if they are missing entirely
 * More silent tests
+* `mod` is now an active binding to `sim[[currentModule(sim)]]$.objects` and its parent environment is `emptyenv()`. This should cause no changes to users who use `mod$...`, but
+it will cause a change if user was calling objects directly via `sim[[currentModule(sim)]]$...`. This change is to separate the function enclosing environments and object enclosing environments, which should be different.
+* `sim@completed` is now an environment instead of a list. Of the three event queues, this one can become the largest. The `list` would get increasingly slow as the number of completed events increased. There should be no user visible changes when using `completed(sim)`
+
 
 ## bug fixes
 

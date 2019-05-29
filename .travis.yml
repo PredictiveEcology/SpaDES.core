@@ -8,14 +8,14 @@ env:
 matrix:
   include:
   - os: linux
-    dist: trusty
+    dist: xenial
     r: 3.3
     addons:
       apt:
         sources:
          - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev

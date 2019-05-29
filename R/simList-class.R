@@ -27,15 +27,20 @@
 #' @slot params     Named list of potentially other lists specifying simulation
 #'                  parameters.
 #'
-#' @slot events     The list of scheduled events (i.e., event queue), as a
-#'                  \code{data.table}. See 'Event Lists' for more information.
+#' @slot events     The list of scheduled events (i.e., event queue), which can
+#'                  be converted to a sorted \code{data.table} with \code{events(sim)}.
+#'                  See 'Event Lists' for more information.
 #'
 #' @slot current    The current event, as a \code{data.table}.
 #'                  See 'Event Lists' for more information..
 #'
-#' @slot completed  The list of completed events, as a \code{list}.
+#' @slot completed  An environment consisting of completed events, with
+#'                  each object named a character representation of the order
+#'                  of events. This was converted from a previous version which
+#'                  was a list. This was changed because the list became
+#'                  slow as number of events increased.
 #'                  See 'Event Lists' for more information. It is kept
-#'                  as a list of individual events for speed. The \code{completed}
+#'                  as an environment of individual events for speed. The \code{completed}
 #'                  method converts it to a sorted \code{data.table}.
 #'
 #' @slot depends    A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
@@ -107,7 +112,7 @@ setClass(
   slots = list(
     modules = "list", params = "list", events = "list",#data.table",
     current = "list", #"data.table",
-    completed = "list", depends = ".simDeps",
+    completed = "environment", depends = ".simDeps",
     simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
     .envir = "environment"
   ),
@@ -169,6 +174,8 @@ setMethod("initialize",
             if (any(7==haves))
               .Object@paths = .paths()
 
+            .Object@completed <- new.env(parent = emptyenv())
+
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
@@ -215,7 +222,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
            params = from@params,
            events = from@events,
            current = from@current,
-           completed = from@completed,
+           completed = new.env(parent = emptyenv()),
            depends = from@depends,
            simtimes = from@simtimes,
            inputs = from@inputs,
@@ -224,6 +231,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   x@.xData <- new.env(new.env(parent = emptyenv()))
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)
+  list2env(from@completed, envir = x@completed)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   return(x)
 })
@@ -236,7 +244,7 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
            params = from@params,
            events = from@events,
            current = from@current,
-           completed = from@completed,
+           completed = as.list(from@completed, all.names = TRUE, sorted = TRUE),
            depends = from@depends,
            simtimes = from@simtimes,
            inputs = from@inputs,

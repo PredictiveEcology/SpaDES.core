@@ -225,25 +225,28 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           attr(sim, "completedCounter") <- attr(sim, "completedCounter") + 1
 
           # increase length of list by doubling as it grows
-          if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
-            lenCompl <- length(sim@completed)
-            if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
-              if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
-                keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
-                sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
-                attr(sim, "completedSize") <- length(sim@completed)
-                attr(sim, "completedCounter") <- attr(sim, "completedSize")
-              }
-            }
-            attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
-            length(sim@completed) <- attr(sim, "completedSize")
-          }
-          sim@completed[attr(sim, "completedCounter")] <- list(cur)
+          # if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
+          #   lenCompl <- length(sim@completed)
+          #   if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
+          #     if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
+          #       keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
+          #       sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
+          #       attr(sim, "completedSize") <- length(sim@completed)
+          #       attr(sim, "completedCounter") <- attr(sim, "completedSize")
+          #     }
+          #   }
+          #   attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
+          #   #length(sim@completed) <- attr(sim, "completedSize")
+          # }
+
+          # faster to use assign
+          assign(as.character(attr(sim, "completedCounter")), value = cur, envir = sim@completed)
+          #sim@completed[[as.character(attr(sim, "completedCounter"))]] <- cur
 
         } else {
           attr(sim, "completedCounter") <- 1
           attr(sim, "completedSize") <- 2
-          sim@completed <- list(cur)
+          sim@completed[["1"]] <- cur
         }
       }
 
@@ -842,6 +845,17 @@ setMethod(
     }
 
     sim@.xData[["._firstEventClockTime"]] <- Sys.time()
+
+    # This was introduced when sim@completed became an environment for speed purposes (list got slow as size increased)
+    # This is an attempt to deal with the expected behaviour of a list -- i.e., delete it if this appears to be
+    #   the original sim object again passed in
+    if (length(sim@completed)) {
+      existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
+      prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
+      prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
+      if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]])
+        sim@completed <- new.env(parent = emptyenv())
+    }
 
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event

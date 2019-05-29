@@ -221,6 +221,7 @@ test_that("timeunits with child and parent modules work correctly", {
   lineOfInterest <- grep(xxx1, pattern = ".inputObjects <- ")
   xxx1 <- c(xxx1[seq(lineOfInterest - 1)],
             "  .inputObjects <- function(sim, a = asPath(file.path(inputPath(sim), \"test\"))) {",
+            "browser()",
             "  sim$b <- a",
             xxx1[seq(length(xxx1) - lineOfInterest) + lineOfInterest])
   cat(xxx1, file = fileName, sep = "\n")
