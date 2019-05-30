@@ -123,7 +123,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) || attr(sim, "completedCounter")==1) {
               sim@.xData$._startClockTime
             } else {
-              .POSIXct(sim@completed[[attr(sim, "completedCounter")-1]]$._clockTime)
+              .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter")-1)]]$._clockTime)
             }
             print(paste0(format(Sys.time(), format = "%H:%M:%S"),
                          " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
