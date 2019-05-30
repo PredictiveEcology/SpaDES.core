@@ -1210,7 +1210,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
       moduleTxt1 <- "This module"
       moduleTxt2 <- "doesn't"
     }
-    stop(moduleTxt1, ":\n    ", unlist(modules)[!unlist(moduleDirsExist)], ",\n  ",
+    stop(moduleTxt1, ":\n    ", paste(unlist(modules)[!unlist(moduleDirsExist)], collapse = ", "), ",\n  ",
          moduleTxt2," exist in:\n    ", modulePath)
   }
   if (!isTRUE(all(unlist(lapply(moduleFilesExist, any))))) {
