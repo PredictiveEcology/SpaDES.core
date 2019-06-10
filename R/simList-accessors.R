@@ -1,7 +1,7 @@
 if (getRversion() >= "3.1.0") {
   utils::globalVariables(c(".SD", "eventTime", "savetime", "exts",
                            "eventType", "unit", "diffTime", "clockTime",
-                           "minEventTime", "maxEventTime"))
+                           "minEventTime", "maxEventTime", "eventNumber"))
 }
 
 ### `show` generic is already defined in the methods package
