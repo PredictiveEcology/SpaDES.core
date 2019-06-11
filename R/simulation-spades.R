@@ -878,8 +878,16 @@ setMethod(
     }
 
     recoverMode <- getOption("spades.recoverMode", FALSE)
-    if (recoverMode > 0)
-      allObjNames <- lapply(outputObjects(sim), function(x) x$objectName)
+    if (recoverMode > 0) {
+      outObjs <- outputObjects(sim)
+      if (is(outObjs, "list")) {
+        allObjNames <- lapply(outObjs, function(x) x$objectName)
+      } else {
+        allObjNames <- list(outObjs$objectName)
+      }
+
+    }
+
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       if (recoverMode > 0) {
         if (!exists("recoverModeTiming")) recoverModeTiming <- 0
