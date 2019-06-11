@@ -210,7 +210,7 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE)
+  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoverMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -331,7 +331,7 @@ test_that("test objSize", {
 })
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
-  testInitOut <- testInit(smcc = FALSE, debug = FALSE)
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoverMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
