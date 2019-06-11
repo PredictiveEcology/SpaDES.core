@@ -794,8 +794,8 @@ setMethod(
             sim@.xData$.addedEvents <- addedEvents
             sim@.xData$.randomSeed <- randomSeed
             message(crayon::magenta(paste0("Setting options('spades.recoverMode' = ",recoverMode,") used ",
-                                    format(recoverModeTiming, units = "auto", digits = 3),
-                                    " and ", format(recoverableObjsSize, units = "auto"))))
+                                           format(recoverModeTiming, units = "auto", digits = 3),
+                                           " and ", format(recoverableObjsSize, units = "auto"))))
             message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
                                     "in the simList located at SpaDES.core:::.pkgEnv$.sim,",
                                     "as sim$.recoverableObjs, with the most recent event",
