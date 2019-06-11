@@ -804,8 +804,10 @@ setMethod(
                                     "changed, according to the metadata for each module. To recover, use:\n",
                                     "restartSpades()"))
           }
-          .pkgEnv$.sim <- sim
+        } else {
+          message(crayon::magenta("simList saved in SpaDES.core:::.pkgEnv$.sim . It will be deleted at next spades call"))
         }
+        .pkgEnv$.sim <- sim
         .pkgEnv$.cleanEnd <- NULL
       }
     }, add = TRUE)
@@ -879,13 +881,17 @@ setMethod(
 
     recoverMode <- getOption("spades.recoverMode", FALSE)
     if (recoverMode > 0) {
-      outObjs <- outputObjects(sim)
-      if (is(outObjs, "list")) {
-        allObjNames <- lapply(outObjs, function(x) x$objectName)
+      allObjNames <- if (NROW(modules(sim)) > 0) {
+        outObjs <- outputObjects(sim)
+        if (is(outObjs, "list")) {
+          allObjNames <- lapply(outObjs, function(x) x$objectName)
+        } else {
+          list(outObjs$objectName)
+        }
       } else {
-        allObjNames <- list(outObjs$objectName)
+        NULL
       }
-
+      if (is.null(allObjNames)) recoverMode <- 0
     }
 
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
