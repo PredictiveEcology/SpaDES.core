@@ -17,6 +17,10 @@ if (getRversion() >= "3.1.0") {
 #' This will only parse the source code from the named module. It will not affect any
 #' objects that are in the \code{mod} or \code{sim}.
 #'
+#' The random number seed will be reset to the state it was at the start of the
+#' earliest event recovered, thereby returning to the exact stochastic simulation
+#' trajectory.
+#'
 #' @note
 #' This will only work reliably
 #' \emph{if the simList was not modified yet during the event which caused the error}.
@@ -97,9 +101,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
       fd1 <- fd1[fd1 != fd2]
       list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
     }
-    message(crayon::blue("Reversing", paste(collapse = ", ",
-                                            paste(names(eventsToReplayDT),
-                                                  unname(eventsToReplayDT[eventIndicesRev[event]])))))
+    message(crayon::blue("Reversing event: ", paste(collapse = " ",
+                                            paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
     invisible()
   })
 
@@ -136,6 +139,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 
   # Remove all added events that occurred during the events, i.e., via scheduleEvent
   sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
+
+  assign(".Random.seed", sim@.xData$.randomSeed[[numMods]], envir = .GlobalEnv)
 
   if (restart)
     sim <- spades(sim, ...)

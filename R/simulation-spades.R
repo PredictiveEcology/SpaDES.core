@@ -787,12 +787,16 @@ setMethod(
                             "was saved in \nSpaDES.core:::.pkgEnv$.sim . It will be deleted on next call to spades"))
           if (recoverMode > 0) {
             sim@.xData$.recoverableObjs <- recoverableObjs
+            recoverableObjsSize <- sum(unlist(objSize(recoverableObjs)))
+            class(recoverableObjsSize) <- "object_size"
             postEvents <- sim@events
             addedEvents <- append(list(setdiff(postEvents, preEvents)), addedEvents)
             sim@.xData$.addedEvents <- addedEvents
-            message(crayon::magenta("Setting options('spades.recoverMode' = ",recoverMode,") used",
-                                    format(recoverModeTiming, units = "auto")))
-            message(crayon::magenta("The last", as.numeric(recoverMode), "events are cached and saved",
+            sim@.xData$.randomSeed <- randomSeed
+            message(crayon::magenta(paste0("Setting options('spades.recoverMode' = ",recoverMode,") used ",
+                                           format(recoverModeTiming, units = "auto", digits = 3),
+                                           " and ", format(recoverableObjsSize, units = "auto"))))
+            message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
                                     "in the simList located at SpaDES.core:::.pkgEnv$.sim,",
                                     "as sim$.recoverableObjs, with the most recent event",
                                     "the first element in the list, 2nd most recent event = the second most recent event, etc.",
@@ -874,14 +878,26 @@ setMethod(
     }
 
     recoverMode <- getOption("spades.recoverMode", FALSE)
-    if (recoverMode > 0)
-      allObjNames <- lapply(outputObjects(sim), function(x) x$objectName)
+    if (recoverMode > 0) {
+      outObjs <- outputObjects(sim)
+      if (is(outObjs, "list")) {
+        allObjNames <- lapply(outObjs, function(x) x$objectName)
+      } else {
+        allObjNames <- list(outObjs$objectName)
+      }
+
+    }
+
     while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
       if (recoverMode > 0) {
         if (!exists("recoverModeTiming")) recoverModeTiming <- 0
         if (!exists("recoverableObjs")) recoverableObjs <- list()
         if (!exists("addedEvents")) addedEvents <- list(list())
+        if (!exists("randomSeed")) randomSeed <- list(list())
+
+        # Remove the tail entry in each of the lists
         if (length(addedEvents) > (recoverMode - 1)) addedEvents <- addedEvents[seq_len(recoverMode - 1)]
+        if (length(randomSeed) > (recoverMode - 1)) randomSeed <- randomSeed[seq_len(recoverMode - 1)]
         startTime <- Sys.time()
         if (length(recoverableObjs) > (recoverMode - 1)) recoverableObjs <- recoverableObjs[seq_len(recoverMode - 1)]
         objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
@@ -892,6 +908,7 @@ setMethod(
         }), recoverableObjs)
         endTime <- Sys.time()
         preEvents <- sim@events
+        randomSeed <- append(list(.Random.seed), randomSeed)
 
         recoverModeTiming <- recoverModeTiming + (endTime - startTime)
       }
