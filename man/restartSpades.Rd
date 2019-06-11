@@ -54,8 +54,10 @@ The \code{simList} will be in the state it was at the time of the error.
 }
 \examples{
 \dontrun{
+# options("spades.recoveryMode" = 1) # now the default
 s <- simInit()
-s <- spades(s, debug = 1)
-s <- restartSpades(s, debug = 1)
+s <- spades(s) # this this is interrupted or fails
+s <- restartSpades() # don't need to put simList
+                     # will take from SpaDES.core:::.pkgEnv$.sim automatically
 }
 }
