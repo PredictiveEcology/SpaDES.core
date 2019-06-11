@@ -8,7 +8,7 @@
   opts.spades <- list( # nolint
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
-    spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
+    spades.debug = 1, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
     spades.moduleCodeChecks = list(
