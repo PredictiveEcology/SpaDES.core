@@ -42,6 +42,10 @@ not do anything if the event queue is empty.
 \details{
 This will only parse the source code from the named module. It will not affect any
 objects that are in the \code{mod} or \code{sim}.
+
+The random number seed will be reset to the state it was at the start of the
+earliest event recovered, thereby returning to the exact stochastic simulation
+trajectory.
 }
 \note{
 This will only work reliably
