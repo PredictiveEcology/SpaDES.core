@@ -947,9 +947,10 @@ setMethod(
   "zipModule",
   signature = c(name = "character", path = "character", version = "character"),
   definition = function(name, path, version, data, ...) {
-    if (all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
-      stop("External zip command paths missing.\nPlease try installing Rtools and adding it to system path, e.g.:
-      Sys.setenv(PATH = paste('~/Rtools/bin', Sys.getenv('PATH'), sep=';'))")
+    dots <- list(...)
+    if (is.null(dots$zip) &
+        all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
+      stop("External zip command paths missing.\nAdd 'zip = <path>/.zip.exe' specifying path to zip.exe")
 
     path <- checkPath(path, create = FALSE)
     callingWd <- getwd()
@@ -969,7 +970,7 @@ setMethod(
       allFiles <- sort(c(allFiles, file.path(name, "data", "CHECKSUMS.txt")))
     }
 
-    zip(zipFileName, files = allFiles, flags = "-r9xT")
+    zip(zipFileName, files = allFiles, ...)
     file.copy(zipFileName, to = paste0(name, "/", zipFileName), overwrite = TRUE)
     file.remove(zipFileName)
 })
