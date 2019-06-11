@@ -35,9 +35,11 @@ setMethod("Copy",
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object
+            sim_@completed <- new.env(parent = emptyenv())
             if (queues) {
               sim_@events <- object@events
               sim_@current <- object@current
+              list2env(as.list(object@completed), envir = sim_@completed)
             }
             #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
@@ -75,19 +77,16 @@ setMethod("Copy",
               })
 
               # Deal with activeBinding for mod
-              lapply(objNames[isEnv], function(en) {
-                if (exists("mod", object[[en]], inherits = FALSE)) {
-                  if (bindingIsActive("mod", object[[en]])) {
-                    rm(list = "mod", envir = sim_[[en]])
-                    makeActiveBinding(sym = "mod",
-                                      fun = function(value){
-                                        if (missing(value)) {
-                                          get(en, envir = sim_, inherits = FALSE)
-                                        } else {
-                                          stop("Can't overwrite mod")
-                                        }
-                                      },
-                                      env = sim_[[en]])
+              lapply(objNames[isEnv], function(mod) {
+                if (exists("mod", object[[mod]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object[[mod]])) {
+                    rm(list = "mod", envir = sim_[[mod]], inherits = FALSE)
+                    rm(list = ".objects", envir = sim_[[mod]], inherits = FALSE)
+                    sim_[[mod]]$.objects <- new.env(parent = emptyenv())
+                    list2env(as.list(object@.xData[[mod]]$.objects, all.names = TRUE),
+                             envir = sim_@.xData[[mod]]$.objects)
+
+                    makeModActiveBinding(sim = sim_, mod = mod)
                   }
                 }
 

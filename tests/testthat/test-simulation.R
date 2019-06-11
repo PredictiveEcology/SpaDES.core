@@ -363,6 +363,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Windows Desktop -- slower -- Nov 26, 2018 0.730 Seconds --> 148 microseconds/event!
   # Linux Server -- slower -- Nov 26, 2018 0.795 Seconds --> 159 microseconds/event!
   # BorealCloud Server -- slower -- Nov 26, 2018 0.972 Seconds --> 194 microseconds/event!
+  # laptop -- May 25, 2019 0.603 Seconds --> 120 microseconds/event!
+  # laptop with new completed as environment -- May 25, 2019 0.357 Seconds --> 71 microseconds/event!
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
@@ -375,6 +377,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
   # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
   # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
+  # With many new "exists"
+  # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
   options("spades.keepCompleted" = FALSE)
   (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
   #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})

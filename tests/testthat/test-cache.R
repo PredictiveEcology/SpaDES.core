@@ -3,6 +3,7 @@ test_that("test cache", {
                                       spades.useRequire = FALSE),
                           setPaths = FALSE)
 
+  try(clearCache(tmpdir), silent = TRUE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -230,7 +231,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(all(grepl(msgGrep, mess1)))
 
   msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
-  expect_message(do.call(simInit, args), regexp = msgGrep)
+  a <- capture.output(expect_message(do.call(simInit, args), regexp = msgGrep))
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -390,7 +391,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_true(mySim2$co5 == 6)
 
   # Test mod
-  expect_true(mySim2$test$hello == 2)
+  expect_true(mySim2$test$.objects$hello == 2)
 
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
@@ -412,7 +413,8 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_true(is.null(mySim$test$hi)) # is not in the
   mess1 <- capture_output(mySim2 <- spades(Copy(mySim)))
   expect_true(mySim2$test$hi == 1) # recovered in Cache
-  expect_true(mySim2$test$hello == 2) # recovered in Cache
+  # Test mod
+  expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
   expect_true(grepl("Using cached copy", mess1))
 
 })

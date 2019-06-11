@@ -200,8 +200,6 @@ if (require(SpaDES.tools) && require(RandomFields)) {
 
 ## ----eventDiagram, eval=TRUE, fig.height=10, fig.width=7-----------------
 if (require(SpaDES.tools) && require(RandomFields))  {
-  mySim <- spades(mySim) # runs the simulation
-  
   # overview of the events in the simulation
   eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 }

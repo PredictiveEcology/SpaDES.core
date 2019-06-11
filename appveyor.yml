@@ -20,6 +20,7 @@ version: 1.0.{build}-{branch}
 environment:
   global:
     R_ARCH: x64
+    R_REMOTES_STANDALONE: true
     USE_RTOOLS: true
     WARNINGS_ARE_ERRORS: 1
 
@@ -29,7 +30,7 @@ environment:
   - R_VERSION: release
 
   - R_VERSION: oldrel
-    RTOOLS_VERSION: 34
+    RTOOLS_VERSION: 35
 
   - R_VERSION: 3.4.4
     RTOOLS_VERSION: 34

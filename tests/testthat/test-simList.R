@@ -328,3 +328,35 @@ test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   expect_true(all(modules(mySim) %in% childModName))
   expect_true(dirname(names(modules(mySim))) %in% modulePath(mySim))
 })
+
+test_that("test that module directory exists, but not files", {
+  ## Test resulting from bug found by Eliot McIntire April 28, 2019
+  testInitOut <- testInit("raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  setPaths(modulePath = tmpdir)
+  childModName <- "child_module"
+  parentModName <- "parent_module"
+  newModule(childModName, tmpdir, type = "child")
+  newModule(parentModName, tmpdir, type = "parent", children = childModName)
+  paths <- getPaths()
+  modules <- list(parentModName)
+  times <- list(start = 1, end = 10)
+  mainChildModuleFile <- file.path(paths$modulePath, childModName, paste0(childModName, ".R") )
+  mainParentModuleFile <- file.path(paths$modulePath, parentModName, paste0(parentModName, ".R") )
+  expect_true(file.exists(mainChildModuleFile))
+  file.remove(mainChildModuleFile)
+  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist"))
+
+  unlink(dirname(mainChildModuleFile), recursive = TRUE)
+  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist"))
+
+  file.remove(mainParentModuleFile)
+  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "are missing"))
+
+  unlink(dirname(mainParentModuleFile), recursive = TRUE)
+  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "exist in"))
+
+  unlink(paths$modulePath, recursive = TRUE)
+})

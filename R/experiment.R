@@ -487,7 +487,6 @@ FunDef <- function(ind, sim, factorialExp, modules, params,
   if (is.null(dots$cache)) dots$cache <- FALSE
   # use a temporary cachePaths
   #sim_@paths$cachePath <- cachePaths[ind]#, sim_@paths$cachePath)
-  print(cachePath(sim_))
   sim3 <- spades(sim_, replicate = ind, ...)
   return(list(sim3, experimentDF))
 }
