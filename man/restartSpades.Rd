@@ -4,7 +4,8 @@
 \alias{restartSpades}
 \title{Restart an interrupted simulation}
 \usage{
-restartSpades(sim = NULL, module = NULL, restart = TRUE, ...)
+restartSpades(sim = NULL, module = NULL, numEvents = Inf,
+  restart = TRUE, ...)
 }
 \arguments{
 \item{sim}{A simList. If not supplied (the default), this will take the sim from
@@ -12,6 +13,12 @@ restartSpades(sim = NULL, module = NULL, restart = TRUE, ...)
 
 \item{module}{A character string length one naming the module that caused the error and
 whose source code was fixed. This module will be reparsed and placed into the simList}
+
+\item{numEvents}{Numeric. Default is Inf (i.e., all available). In the simList, if
+\code{options('spades.recoverMode')} is set to \code{TRUE} or a numeric, then
+there will be a list in the \code{simList} called .recoverableObjs. These will be
+replayed backwards in time to reproduce the initial state of the simList before
+the event that is \code{numEvents} back from the first event in \code{events(sim)}.}
 
 \item{restart}{Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
 restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
