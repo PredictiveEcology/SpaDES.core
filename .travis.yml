@@ -43,6 +43,9 @@ matrix:
     services:
       - xvfb
     r: oldrel
+    r_binary_packages:
+      - BH
+      - dplyr
     addons:
       apt:
         sources:
@@ -59,6 +62,9 @@ matrix:
     services:
       - xvfb
     r: release
+    r_binary_packages:
+      - BH
+      - dplyr
     addons:
       apt:
         sources:
@@ -85,6 +91,9 @@ matrix:
     services:
       - xvfb
     r: devel
+    r_binary_packages:
+      - BH
+      - dplyr
     addons:
       apt:
         sources:
