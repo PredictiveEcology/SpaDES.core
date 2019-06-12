@@ -1,7 +1,6 @@
 sudo: required
 language: r
-cache: packages
-cran: https://cran.rstudio.com/
+cran: https://cloud.r-project.org
 env:
   global:
     secure: IhM9205qcY6H6Bld28reqoNjyWOc0DSS+XqHt3xW8vRmtCG2bH0OCQvt4P2xrKFT2spHy04DvRGICrTxg9xs7Fkm57Zk8r4N7bx0Nboa6mxyizuZAd5Y9litFoJ3lryB2j8Ovz6V/vC36gyn+N5RYT7z3f036FAg0+w84jy1yu8U6d/OQPnY2n6/hv1nTVLpkMwjIBFrWUBoz9HLr5MM7oukVAeRJ8Yk5nE3fAHjHsr434RTP3bID3EsDNLLOHJjccmlm++KNg0UFuxowAVFkQhIVP0xmdeWZVoR8eeUjg6Buo6KPkE+feiYtWz5ox5fLJd7P3EpQFfpBh75xOTho9lJt4Q8O+FcUv8AY+GEqiFMAAqQ8cB1OEnS1qP7m4nMn8/G/ZXLFum1T/covfKBFM4ZFD8e5d0FJOOxorXVr/lVk8ClVMm8/Doqtl+ja3wc0BUpsc5wWVBPBw0K/QV9Umi2qNcgZljCEiUvD1R8DMFtywMjapqaj9Sk14+fF8DnpCeHMJoRMbCmWOKRu/GtUKrdLT5fAJQdC1PONiUjYhy2PIP5kkK9Gln3m/FJhY087OUgbmSYfEBOn1xhn5KSEzpq5K+TCO2mGfBwbjKgZGYdcPMNWQk+bZ2Eu0W4epgpANRXADBn5FOqT2fvxKl4Lu/34nJU4q1qz8uLb0aYv6I=
@@ -12,6 +11,8 @@ matrix:
     services:
       - xvfb
     r: 3.3
+    r_build_args: "--no-build-vignettes"
+    r_check_args: "--as-cran --ignore-vignettes --no-examples"
     addons:
       apt:
         sources:
@@ -28,6 +29,8 @@ matrix:
     services:
       - xvfb
     r: 3.4
+    r_build_args: "--no-build-vignettes"
+    r_check_args: "--as-cran --ignore-vignettes --no-examples"
     addons:
       apt:
         sources:
@@ -44,6 +47,9 @@ matrix:
     services:
       - xvfb
     r: oldrel
+    r_binary_packages:
+      - BH
+      - dplyr
     addons:
       apt:
         sources:
@@ -60,6 +66,9 @@ matrix:
     services:
       - xvfb
     r: release
+    r_binary_packages:
+      - BH
+      - dplyr
     addons:
       apt:
         sources:
@@ -71,6 +80,7 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
+    before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
@@ -85,6 +95,9 @@ matrix:
     services:
       - xvfb
     r: devel
+    r_binary_packages:
+      - BH
+      - dplyr
     addons:
       apt:
         sources:
