@@ -10,42 +10,6 @@ matrix:
     dist: xenial
     services:
       - xvfb
-    r: 3.3
-    r_build_args: "--no-build-vignettes"
-    r_check_args: "--as-cran --ignore-vignettes --no-examples"
-    addons:
-      apt:
-        sources:
-         - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
-        packages:
-          - libgdal-dev
-          - libgeos-dev
-          - libglpk-dev
-          - libnlopt-dev
-          - libproj-dev
-          - libudunits2-dev
-  - os: linux
-    dist: xenial
-    services:
-      - xvfb
-    r: 3.4
-    r_build_args: "--no-build-vignettes"
-    r_check_args: "--as-cran --ignore-vignettes --no-examples"
-    addons:
-      apt:
-        sources:
-          - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
-        packages:
-          - libgdal-dev
-          - libgeos-dev
-          - libglpk-dev
-          - libnlopt-dev
-          - libproj-dev
-          - libudunits2-dev
-  - os: linux
-    dist: xenial
-    services:
-      - xvfb
     r: oldrel
     r_binary_packages:
       - BH

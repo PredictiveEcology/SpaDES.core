@@ -3,8 +3,9 @@ Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 version 0.2.5.9000
 =============
 
-## package dependencies
+## dependencies
 
+* R 3.5.0 is the minimum version required for `SpaDES.core`. Too many depedent packages are not maintaining their backwards compatibility.
 * added `backports` to Imports for R-oldrel support
 
 ## new features
