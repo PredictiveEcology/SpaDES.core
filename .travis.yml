@@ -49,7 +49,7 @@ matrix:
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
-      - travis_wait 20 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
+      - travis_wait 15 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
       - Rscript -e 'lintr::lint_package()'
     r_github_packages:
       - jimhester/lintr
