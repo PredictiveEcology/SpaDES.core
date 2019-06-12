@@ -1,6 +1,5 @@
 sudo: required
 language: r
-cache: packages
 cran: https://cran.rstudio.com/
 env:
   global:
@@ -71,6 +70,7 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
+    before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
