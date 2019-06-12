@@ -9,6 +9,8 @@ matrix:
   include:
   - os: linux
     dist: xenial
+    services:
+      - xvfb
     r: 3.3
     addons:
       apt:
@@ -21,12 +23,10 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
   - os: linux
     dist: xenial
+    services:
+      - xvfb
     r: 3.4
     addons:
       apt:
@@ -39,12 +39,10 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
   - os: linux
     dist: xenial
+    services:
+      - xvfb
     r: oldrel
     addons:
       apt:
@@ -57,12 +55,10 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
   - os: linux
     dist: xenial
+    services:
+      - xvfb
     r: release
     addons:
       apt:
@@ -75,10 +71,6 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
       - Rscript -e 'install.packages("devtools", type = "source")'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
@@ -90,6 +82,8 @@ matrix:
       - r-lib/covr
   - os: linux
     dist: xenial
+    services:
+      - xvfb
     r: devel
     addons:
       apt:
@@ -102,10 +96,6 @@ matrix:
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
   - os: osx
     osx_image: xcode9.4
     latex: false
