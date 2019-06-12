@@ -34,7 +34,7 @@ if (getRversion() >= "3.1.0") {
 #'   restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
 #'   with the module code parsed into the \code{simList}
 #' @param numEvents Numeric. Default is Inf (i.e., all available). In the simList, if
-#'   \code{options('spades.recoverMode')} is set to \code{TRUE} or a numeric, then
+#'   \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
 #'   there will be a list in the \code{simList} called .recoverableObjs. These will be
 #'   replayed backwards in time to reproduce the initial state of the simList before
 #'   the event that is \code{numEvents} back from the first event in \code{events(sim)}.

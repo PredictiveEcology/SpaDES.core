@@ -793,7 +793,7 @@ setMethod(
             addedEvents <- append(list(setdiff(postEvents, preEvents)), addedEvents)
             sim@.xData$.addedEvents <- addedEvents
             sim@.xData$.randomSeed <- randomSeed
-            message(crayon::magenta(paste0("Setting options('spades.recoverMode' = ",recoverMode,") used ",
+            message(crayon::magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
                                            format(recoverModeTiming, units = "auto", digits = 3),
                                            " and ", format(recoverableObjsSize, units = "auto"))))
             message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
@@ -879,7 +879,11 @@ setMethod(
         sim@completed <- new.env(parent = emptyenv())
     }
 
-    recoverMode <- getOption("spades.recoverMode", FALSE)
+
+    recoverModeWrong <- getOption("spades.recoverMode")
+    if (!is.null(recoverModeWrong)) warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+    recoverMode <- getOption("spades.recoveryMode", FALSE)
+
     if (recoverMode > 0) {
       allObjNames <- if (NROW(modules(sim)) > 0) {
         outObjs <- outputObjects(sim)
