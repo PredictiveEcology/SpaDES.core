@@ -502,6 +502,16 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   save simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
 
+  \item \code{spades.recoveryMode}: If this a numeric > 0 or TRUE, then every event
+  will take a snapshot of the starting state of the \code{simList} so that the
+  user can recover in case of an error. If this is numeric, a copy of that number of "most
+  recent events" will be maintained so that the user can recover and restart
+  > 1 event in the past, i.e., redo some of the "completed" events. Default is
+  \code{TRUE}, i.e., it will keep the state of the \code{simList}
+  at the start of the current event. This can be recovered with \code{restartSpades}
+  and the differences can be seen in a hidden object in the stashed simList.
+  There is a message which describes how to find that.
+
   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
     to ensure a module's required packages are listed first?
     Default \code{FALSE} to keep computational overhead down. If \code{TRUE},

@@ -781,11 +781,33 @@ setMethod(
       rm(".timeunits", envir = sim@.xData)
       if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
         if (!isTRUE(.pkgEnv$.cleanEnd)) {
-          .pkgEnv$.sim <- sim
           message(
-            crayon::magenta("Because of an interrupted spades call, the sim object at the time of interruption ",
+            crayon::magenta("Because of an interrupted spades call, the sim object ",
+                            c("at the time of interruption ", "at the start of the interrupted event ")[(recoverMode > 0) + 1],
                             "was saved in \nSpaDES.core:::.pkgEnv$.sim . It will be deleted on next call to spades"))
+          if (recoverMode > 0) {
+            sim@.xData$.recoverableObjs <- recoverableObjs
+            recoverableObjsSize <- sum(unlist(objSize(recoverableObjs)))
+            class(recoverableObjsSize) <- "object_size"
+            postEvents <- sim@events
+            addedEvents <- append(list(setdiff(postEvents, preEvents)), addedEvents)
+            sim@.xData$.addedEvents <- addedEvents
+            sim@.xData$.randomSeed <- randomSeed
+            message(crayon::magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
+                                           format(recoverModeTiming, units = "auto", digits = 3),
+                                           " and ", format(recoverableObjsSize, units = "auto"))))
+            message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
+                                    "in the simList located at SpaDES.core:::.pkgEnv$.sim,",
+                                    "as sim$.recoverableObjs, with the most recent event",
+                                    "the first element in the list, 2nd most recent event = the second most recent event, etc.",
+                                    " The objects contained in each of those are only the objects that may have",
+                                    "changed, according to the metadata for each module. To recover, use:\n",
+                                    "restartSpades()"))
+          }
+        } else {
+          message(crayon::magenta("simList saved in SpaDES.core:::.pkgEnv$.sim . It will be deleted at next spades call"))
         }
+        .pkgEnv$.sim <- sim
         .pkgEnv$.cleanEnd <- NULL
       }
     }, add = TRUE)
@@ -857,9 +879,54 @@ setMethod(
         sim@completed <- new.env(parent = emptyenv())
     }
 
-    while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
-      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
 
+    recoverModeWrong <- getOption("spades.recoverMode")
+    if (!is.null(recoverModeWrong)) warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+    recoverMode <- getOption("spades.recoveryMode", FALSE)
+
+    if (recoverMode > 0) {
+      allObjNames <- if (NROW(modules(sim)) > 0) {
+        outObjs <- outputObjects(sim)
+        if (is(outObjs, "list")) {
+          allObjNames <- lapply(outObjs, function(x) x$objectName)
+        } else {
+          list(outObjs$objectName)
+        }
+      } else {
+        NULL
+      }
+      if (is.null(allObjNames)) recoverMode <- 0
+    }
+
+    while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
+      if (recoverMode > 0) {
+        if (!exists("recoverModeTiming")) recoverModeTiming <- 0
+        if (!exists("recoverableObjs")) recoverableObjs <- list()
+        if (!exists("addedEvents")) addedEvents <- list(list())
+        if (!exists("randomSeed")) randomSeed <- list(list())
+
+        # Remove the tail entry in each of the lists
+        if (length(addedEvents) > (recoverMode - 1)) addedEvents <- addedEvents[seq_len(recoverMode - 1)]
+        if (length(randomSeed) > (recoverMode - 1)) randomSeed <- randomSeed[seq_len(recoverMode - 1)]
+        startTime <- Sys.time()
+        if (length(recoverableObjs) > (recoverMode - 1)) recoverableObjs <- recoverableObjs[seq_len(recoverMode - 1)]
+        objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
+        recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
+          Copy(mget(ls(sim)[objsInSimListAndModule ], envir = sim@.xData))
+        } else {
+          list()
+        }), recoverableObjs)
+        endTime <- Sys.time()
+        preEvents <- sim@events
+        randomSeed <- append(list(.Random.seed), randomSeed)
+
+        recoverModeTiming <- recoverModeTiming + (endTime - startTime)
+      }
+      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+      if (recoverMode > 0) {
+        postEvents <- sim@events
+        addedEvents <- append(list(setdiff(postEvents, preEvents)), addedEvents)
+      }
       # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
       if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
         condEventsToOmit <- integer()
