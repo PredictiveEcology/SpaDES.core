@@ -502,9 +502,12 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   save simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
 
-  \item \code{spades.recoveryMode}: If this a numeric > 0 or TRUE, then every event
-  will take a snapshot of the starting state of the \code{simList} so that the
-  user can recover in case of an error. If this is numeric, a copy of that number of "most
+  \item \code{spades.recoveryMode}: If this a numeric > 0 or TRUE, then the
+  discrete event simulator will take a snapshot of the objects in the simList
+  that might change (based on metadata \code{outputObjects} for that module), prior to
+  initiating every event. This will allow the
+  user to be able to recover in case of an error or manual interruption (e.g., ESC).
+  If this is numeric, a copy of that number of "most
   recent events" will be maintained so that the user can recover and restart
   > 1 event in the past, i.e., redo some of the "completed" events. Default is
   \code{TRUE}, i.e., it will keep the state of the \code{simList}
