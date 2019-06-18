@@ -71,7 +71,6 @@ Suggests:
     rmarkdown,
     testthat (>= 1.0.2)
 Remotes:
-    PredictiveEcology/quickPlot@development,
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
