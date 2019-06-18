@@ -17,7 +17,6 @@ matrix:
       - RSQlite
       - igraph
       - archivist
-      - quickPlot
     addons:
       apt:
         sources:
