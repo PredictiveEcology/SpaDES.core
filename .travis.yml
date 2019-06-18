@@ -83,27 +83,35 @@ matrix:
           - libudunits2-dev
   - os: osx
     osx_image: xcode9.4
+    addons:
+      homebrew:
+        packages:
+        - glpk
+        - libgit2
+        - llvm
+        update: true
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     env:
       - GLPK=true
     before_install:
-      - brew update
-      - brew install glpk libgit2 llvm
-      - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
+      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
   - os: osx
     osx_image: xcode9.4
+    addons:
+      homebrew:
+        packages:
+        - libgit2
+        - llvm
+        update: true
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     env:
       - GLPK=false
-    before_install:
-      - brew update
-      - brew install libgit2 llvm
     before_script:
-      - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
+      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true
