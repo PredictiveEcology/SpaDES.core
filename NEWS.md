@@ -10,6 +10,7 @@ version 0.2.5.9000
 
 ## new features
 
+* New function `outputObjectNames` will extract just the object names of all 
 * New function `restartSpades` and its associated `options(spades.recoveryMode = 1)`, the new default, which is still experimental. Its purpose is to be able to restart a simulation in the case of an error or interruption. 
 * Now gives better errors if modules are missing main .R file or if they are missing entirely 
 * More silent tests

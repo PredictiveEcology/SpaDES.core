@@ -2741,6 +2741,40 @@ setMethod("outputObjects",
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 #'
+setGeneric("outputObjectNames", function(sim, module) {
+  standardGeneric("outputObjectNames")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("outputObjectNames",
+          signature = "simList",
+          definition = function(sim, module) {
+            out <- if (NROW(modules(sim)) > 0) {
+              outObjs <- outputObjects(sim)
+              allObjNames <- if (is(outObjs, "list")) {
+                allObjNames <- lapply(outObjs, function(x) x$objectName)
+                if (!missing(module)) {
+                  allObjNames <- allObjNames[[module]]
+                }
+                allObjNames
+              } else {
+                list(outObjs$objectName)
+              }
+            } else {
+              NULL
+            }
+            return(out)
+          })
+
+################################################################################
+#' @inheritParams P
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+#'
 setGeneric("reqdPkgs", function(sim, module) {
   standardGeneric("reqdPkgs")
 })
