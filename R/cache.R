@@ -34,6 +34,8 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
+    curMod <- currentModule(object)
+
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))],
                          envir = object@.xData)
@@ -121,6 +123,9 @@ setMethod(
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+    }
+    if (length(curMod) > 0) { # if this call is within a single module, only keep module-specific params
+      object@params <- object@params[curMod]
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
