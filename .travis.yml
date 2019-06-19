@@ -12,11 +12,6 @@ matrix:
     services:
       - xvfb
     r: oldrel
-    r_binary_packages:
-      - BH
-      - RSQlite
-      - igraph
-      - archivist
     addons:
       apt:
         sources:
