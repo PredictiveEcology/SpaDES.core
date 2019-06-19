@@ -65,7 +65,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
     module <- events(sim)[["moduleName"]][1]
   }
 
-  if (exists("aaa")) browser()
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   simCompletedList <- as.list(sim@completed)

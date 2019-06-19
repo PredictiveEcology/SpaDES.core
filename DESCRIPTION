@@ -28,7 +28,7 @@ Authors@R: c(
 Depends:
     R (>= 3.5),
     quickPlot (>= 0.1.4),
-    reproducible (>= 0.2.7)
+    reproducible (>= 0.2.8.9004)
 Imports:
     backports,
     codetools,
