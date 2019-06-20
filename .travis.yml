@@ -14,7 +14,7 @@ matrix:
     r: oldrel
     r_binary_packages:
       - BH
-      - RSQlite
+      - dplyr
     addons:
       apt:
         sources:
