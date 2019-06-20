@@ -12,6 +12,8 @@ matrix:
     services:
       - xvfb
     r: oldrel
+    r_binary_packages:
+      - BH
     addons:
       apt:
         sources:
