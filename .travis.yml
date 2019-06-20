@@ -33,9 +33,9 @@ matrix:
     r_binary_packages:
       - BH
       - dplyr
-      - stringi
-      - RSQlite
       - igraph
+      - RSQlite
+      - stringi
     addons:
       apt:
         sources:
@@ -65,9 +65,9 @@ matrix:
     r_binary_packages:
       - BH
       - dplyr
-      - stringi
-      - RSQlite
       - igraph
+      - RSQlite
+      - stringi
     addons:
       apt:
         sources:
