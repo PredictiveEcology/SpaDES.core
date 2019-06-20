@@ -16,7 +16,7 @@ cleanMessage <- function(mm) {
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
-                     opts = list(reproducible.inputPaths = NULL)) {
+                     opts = list(reproducible.inputPaths = NULL), tmpFileExt = "") {
   opts1 <- if (smcc)
     list(spades.moduleCodeChecks = smcc)
   else
@@ -56,9 +56,18 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
 
+  if (!is.null(tmpFileExt)) {
+    ranfiles <- unlist(lapply(tmpFileExt, function(x) paste0(rndstr(1, 7), ".", x)))
+    tmpfile <- file.path(tmpdir, ranfiles)
+    tmpfile <- gsub(pattern = "\\.\\.", tmpfile, replacement = "\\.")
+    file.create(tmpfile)
+    tmpfile <- normPath(tmpfile)
+  }
+
   outList <- list(opts = opts1, optsDebug = optsDebug, tmpdir = tmpdir,
                   origDir = origDir, libs = libraries,
-                  tmpCache = tmpCache, optsAsk = optsAsk)
+                  tmpCache = tmpCache, optsAsk = optsAsk,
+                  tmpfile = tmpfile)
   list2env(outList, envir = parent.frame())
   return(outList)
 }
