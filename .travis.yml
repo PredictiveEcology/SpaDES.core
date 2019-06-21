@@ -1,139 +1,115 @@
 sudo: required
 language: r
 cache: packages
-cran: https://cran.rstudio.com/
+cran: https://cloud.r-project.org
 env:
   global:
-    secure: IhM9205qcY6H6Bld28reqoNjyWOc0DSS+XqHt3xW8vRmtCG2bH0OCQvt4P2xrKFT2spHy04DvRGICrTxg9xs7Fkm57Zk8r4N7bx0Nboa6mxyizuZAd5Y9litFoJ3lryB2j8Ovz6V/vC36gyn+N5RYT7z3f036FAg0+w84jy1yu8U6d/OQPnY2n6/hv1nTVLpkMwjIBFrWUBoz9HLr5MM7oukVAeRJ8Yk5nE3fAHjHsr434RTP3bID3EsDNLLOHJjccmlm++KNg0UFuxowAVFkQhIVP0xmdeWZVoR8eeUjg6Buo6KPkE+feiYtWz5ox5fLJd7P3EpQFfpBh75xOTho9lJt4Q8O+FcUv8AY+GEqiFMAAqQ8cB1OEnS1qP7m4nMn8/G/ZXLFum1T/covfKBFM4ZFD8e5d0FJOOxorXVr/lVk8ClVMm8/Doqtl+ja3wc0BUpsc5wWVBPBw0K/QV9Umi2qNcgZljCEiUvD1R8DMFtywMjapqaj9Sk14+fF8DnpCeHMJoRMbCmWOKRu/GtUKrdLT5fAJQdC1PONiUjYhy2PIP5kkK9Gln3m/FJhY087OUgbmSYfEBOn1xhn5KSEzpq5K+TCO2mGfBwbjKgZGYdcPMNWQk+bZ2Eu0W4epgpANRXADBn5FOqT2fvxKl4Lu/34nJU4q1qz8uLb0aYv6I=
+    - CRAN_REPO=https://cloud.r-project.org
 matrix:
   include:
   - os: linux
-    dist: trusty
-    r: 3.3
-    addons:
-      apt:
-        sources:
-         - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
-        packages:
-          - libgdal1-dev
-          - libgeos-dev
-          - libglpk-dev
-          - libnlopt-dev
-          - libproj-dev
-          - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
-    r_build_args: "--no-build-vignettes"
-    r_check_args: "--as-cran --ignore-vignettes --no-examples"
-  - os: linux
-    dist: trusty
-    r: 3.4
-    addons:
-      apt:
-        sources:
-          - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
-        packages:
-          - libgdal1-dev
-          - libgeos-dev
-          - libglpk-dev
-          - libnlopt-dev
-          - libproj-dev
-          - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
-    r_build_args: "--no-build-vignettes"
-    r_check_args: "--as-cran --ignore-vignettes --no-examples"
-  - os: linux
-    dist: trusty
+    dist: xenial
     r: oldrel
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
-    r_build_args: "--no-build-vignettes"
-    r_check_args: "--as-cran --ignore-vignettes --no-examples"
+    services:
+      - xvfb
+    r_binary_packages:
+      - BH
   - os: linux
-    dist: trusty
+    dist: xenial
     r: release
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
+    services:
+      - xvfb
     before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
       - Rscript -e 'install.packages("devtools", type = "source")'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
-      - travis_wait 20 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
+      - travis_wait 15 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
       - Rscript -e 'lintr::lint_package()'
+    r_binary_packages:
+      - BH
+      - dplyr
+      - igraph
+      - RSQlite
+      - stringi
     r_github_packages:
       - jimhester/lintr
       - r-lib/covr
   - os: linux
-    dist: trusty
+    dist: xenial
     r: devel
     addons:
       apt:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
-          - libgdal1-dev
+          - libgdal-dev
           - libgeos-dev
           - libglpk-dev
           - libnlopt-dev
           - libproj-dev
           - libudunits2-dev
-    before_script:
-      - "export DISPLAY=:99.0"
-      - "sh -e /etc/init.d/xvfb start"
-      - sleep 3 # give xvfb some time to start
+    services:
+      - xvfb
+    r_binary_packages:
+      - BH
+      - dplyr
+      - igraph
+      - RSQlite
+      - stringi
   - os: osx
     osx_image: xcode9.4
+    addons:
+      homebrew:
+        packages:
+        - glpk
+        - libgit2
+        - llvm
+        update: true
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     env:
       - GLPK=true
     before_install:
-      - brew update
-      - brew install glpk libgit2 llvm
-      - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
+      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
   - os: osx
     osx_image: xcode9.4
+    addons:
+      homebrew:
+        packages:
+        - libgit2
+        - llvm
+        update: true
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     env:
       - GLPK=false
-    before_install:
-      - brew update
-      - brew install libgit2 llvm
-      - Rscript -e 'install.packages(c("digest", "igraph"), type = "source")'
+    before_script:
+      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true
