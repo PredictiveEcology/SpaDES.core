@@ -1080,12 +1080,15 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
   if (length(rmo$randomSeed) > (recoverMode - 1)) rmo$randomSeed <- rmo$randomSeed[seq_len(recoverMode - 1)]
   startTime <- Sys.time()
   if (length(rmo$recoverableObjs) > (recoverMode - 1)) rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
-  objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
-  rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
-    Copy(mget(ls(sim)[objsInSimListAndModule ], envir = sim@.xData))
-  } else {
-    list()
-  }), rmo$recoverableObjs)
+
+  if (length(sim@events) > 0) {
+    objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
+    rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
+      Copy(mget(ls(sim)[objsInSimListAndModule ], envir = sim@.xData))
+    } else {
+      list()
+    }), rmo$recoverableObjs)
+  }
   endTime <- Sys.time()
   rmo$preEvents <- sim@events
   rmo$randomSeed <- append(list(.Random.seed), rmo$randomSeed)
