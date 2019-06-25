@@ -112,7 +112,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 
   out <- lapply(modules, function(module) {
     pp <- list()
-    moduleFolder <- file.path(modulePath(sim), module)
+    moduleFolder <- file.path(modulePath(sim, module = module))
     if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
       pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
       subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
