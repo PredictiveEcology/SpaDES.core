@@ -587,6 +587,9 @@ setReplaceMethod("G",
 })
 
 ################################################################################
+#' @details
+#' \code{parameters} will extract only the metadata with the metadata defaults,
+#' NOT the current values that may be overwritten by a user. See examples.
 #' @inheritParams params
 #' @param asDF Logical. For \code{parameters}, if TRUE, this will produce a single
 #'                 data.frame of all model parameters. If FALSE, then it will return
@@ -601,8 +604,26 @@ setReplaceMethod("G",
 #' paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' mySim <- simInit(modules = modules, paths = paths,
 #'                  params = list(.globals = list(stackName = "landscape")))
-#' parameters(mySim)
 #'
+#' # update some parameters using assignment -- currently only params will work
+#' params(mySim)$randomLandscapes$nx <- 200
+#' params(mySim)$randomLandscapes$ny <- 200
+#'
+#' parameters(mySim) # Does not contain these user overridden values
+#'
+#' # These next 2 are same here because they are not within a module
+#' P(mySim)          # Does contain the user overridden values
+#' params(mySim)     # Does contain the user overridden values
+#'
+#' # NOTE -- deleting a parameter will affect params and P, not parameters
+#' params(mySim)$randomLandscapes$nx <- NULL
+#' params(mySim)$randomLandscapes$ny <- NULL
+#'
+#' parameters(mySim) # Shows nx and ny
+#'
+#' # These next 2 are same here because they are not within a module
+#' P(mySim)          # nx and ny are Gone
+#' params(mySim)     # nx and ny are Gone
 setGeneric("parameters", function(sim, asDF = FALSE) {
   standardGeneric("parameters")
 })

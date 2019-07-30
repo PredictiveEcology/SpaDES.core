@@ -8,6 +8,10 @@ version 0.2.5.9000
 * R 3.5.0 is the minimum version required for `SpaDES.core`. Too many depedent packages are not maintaining their backwards compatibility.
 * added `backports` to Imports for R-oldrel support
 
+## documentation
+
+* improved documentation for `P`, `params`, and `parameters`, thanks to Louis-Etienne Robert.
+
 ## new features
 
 * `.robustDigest` method for `simList` class objects now does only includes parameters that are listed within the module metadata, if `Cache` or `.robustDigest` is called within a module. This means that changes to parameter values in "other" modules will not affect the Caching of "the current" module.
