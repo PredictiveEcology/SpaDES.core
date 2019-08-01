@@ -299,7 +299,7 @@ setGeneric(
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
            notOlderThan = NULL) {
     standardGeneric("simInit")
-  })
+})
 
 #' @rdname simInit
 setMethod(
@@ -382,7 +382,6 @@ setMethod(
            "- git submodule not initiated?\n  ",
            "- the module was not created using 'newModule(...)' so is missing key files")
     }
-
 
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
@@ -884,7 +883,6 @@ setMethod(
     return(invisible(sim))
 })
 
-
 #' Call \code{simInit} and \code{spades} or \code{experiment} together
 #'
 #' These functions are convenience wrappers that may allow for
@@ -929,9 +927,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
   sim <- do.call(spades, objsSpades)
-
 }
-
 
 #' @export
 #' @aliases simInitAndExperiment
@@ -954,7 +950,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-
 
   namesMatchCall <- names(match.call())
   objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
@@ -1004,7 +999,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                                   envir = sim@.xData[[".parsedFiles"]]),
                               as.list)
     if (length(modulesToSearch3) > 0) {
-      isParent <- unlist(lapply(modulesToSearch3, function(x) length(x)>0))
+      isParent <- unlist(lapply(modulesToSearch3, function(x) length(x) > 0))
 
       modulesToSearch3[isParent] <- Map(x = modulesToSearch3[isParent],
                                        nam = dirname(names(modulesToSearch3[isParent])),
@@ -1220,4 +1215,3 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])
 }
-

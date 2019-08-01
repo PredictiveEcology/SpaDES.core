@@ -13,8 +13,10 @@
   list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load")
 }
 
+#' @keywords internal
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
+#' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
 
 ################################################################################
@@ -73,7 +75,7 @@ setMethod(
     set(eeldt, NULL, "eventType", eventType)
     set(eeldt, NULL, "eventPriority", eventPriority)
     eeldt # don't set key because it is set later when used
-  })
+})
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -83,13 +85,11 @@ setMethod(
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
     copy(.emptyEventListDT)
-  })
+})
 
 #' @keywords internal
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
-
-
 
 #' Default (empty) metadata
 #'
@@ -103,7 +103,6 @@ setMethod(
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname emptyMetadata
-#'
 setGeneric(".emptyMetadata", function(x) {
   standardGeneric(".emptyMetadata")
 })
@@ -148,7 +147,6 @@ setMethod(
 #' @keywords internal
 #' @name findObjects
 #' @rdname findObjects
-#'
 .findObjects <- function(objects, functionCall = "simInit") {
   scalls <- sys.calls()
   grep1 <- .grepSysCalls(scalls, functionCall)
@@ -225,6 +223,7 @@ setMethod(
   }
 }
 
+#' @keywords internal
 .pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats" # nolint
 
 .pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
