@@ -977,7 +977,7 @@ setMethod(
     #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
     #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
     moduleSpecificOutputObjects <- c(createsOutputs, cur[["moduleName"]])
-    classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
+    classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])
   }
@@ -1063,16 +1063,16 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
 }
 
 recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
-
   if (is.null(allObjNames)) {
     allObjNames <- outputObjectNames(sim)
   }
+
   if (is.null(rmo))
     rmo <- list(
-      recoverModeTiming <- 0,
-      recoverableObjs <- list(),
-      addedEvents <- list(list()),
-      randomSeed <- list(list())
+      recoverModeTiming = 0,
+      recoverableObjs = list(),
+      addedEvents = list(list()),
+      randomSeed = list(list())
     )
 
   # Remove the tail entry in each of the lists
@@ -1103,7 +1103,6 @@ recoverModePost <- function(sim, rmo, recoverMode) {
   rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
   rmo
 }
-
 
 recoverModeOnExit <- function(sim, rmo, recoverMode) {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
