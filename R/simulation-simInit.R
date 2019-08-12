@@ -1078,7 +1078,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
     if (!is.null(sim@.xData[[mBase]][[".inputObjects"]])) {
-      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
+      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
       a <- P(sim, mBase, ".useCache")
       if (!is.null(a)) {
@@ -1095,11 +1095,9 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
       if (isTRUE(cacheIt)) {
-        # message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
-
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
