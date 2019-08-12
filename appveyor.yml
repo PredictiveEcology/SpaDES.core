@@ -36,7 +36,6 @@ clone_depth: 5
 
 build_script:
   - Rscript -e "install.packages(c('igraph', 'RandomFields', 'RCurl'), repos = 'https://cran.rstudio.com')"
-  - Rscript -e "install.packages(c('data.table', 'DEoptim', 'devtools', 'quickPlot', 'reproducible'), repos = 'https://cran.rstudio.com', type = 'source')"
   - travis-tool.sh install_deps
 
 test_script:
