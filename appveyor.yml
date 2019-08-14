@@ -35,7 +35,6 @@ environment:
 clone_depth: 5
 
 build_script:
-  - Rscript -e "install.packages(c('igraph', 'RandomFields', 'RCurl'), repos = 'https://cran.rstudio.com')"
   - travis-tool.sh install_deps
 
 test_script:
