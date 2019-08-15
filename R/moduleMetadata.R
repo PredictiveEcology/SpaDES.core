@@ -1,11 +1,11 @@
 #' Parse and extract module metadata
 #'
+#' @inheritParams spades
+#'
 #' @param module Character string. Your module's name.
 #'
 #' @param path   Character string specifying the file path to modules directory.
 #'               Default is to use the \code{spades.modulePath} option.
-#'
-#' @inheritParams spades
 #'
 #' @return A list of module metadata, matching the structure in
 #'         \code{\link{defineModule}}.
@@ -64,7 +64,7 @@ setMethod(
 
         out2 <- as.call(inner2)
       }
-      aa <- capture.output(type = "message", bb <- eval(out2))
+      aa <- capture.output(type = "message", {bb <- eval(out2)})
       return(bb)
     })
 
