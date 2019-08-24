@@ -87,6 +87,7 @@ matrix:
         - glpk
         - libgit2
         - llvm
+        - udunits
         update: true
     latex: false
     r_build_args: "--no-build-vignettes"
@@ -102,6 +103,7 @@ matrix:
         packages:
         - libgit2
         - llvm
+        - udunits
         update: true
     latex: false
     r_build_args: "--no-build-vignettes"
