@@ -30,8 +30,9 @@ version 0.2.6
 
 ## bug fixes
 
-* Internal bugs during `simInit` especially in some weird cases of `childModules`
-* packages listed in reqdPkgs not being loaded when only listed in child modules. Fixed 5cd79ac95bc8d190e954313f125928458b0108d2
+* Internal bugs during `simInit` especially in some weird cases of `childModules`.
+* packages listed in `reqdPkgs` not being loaded when only listed in child modules. Fixed in `5cd79ac95bc8d190e954313f125928458b0108d2`.
+* fixed issue with saving simulation outputs at simulation end time.
 
 version 0.2.5
 =============
