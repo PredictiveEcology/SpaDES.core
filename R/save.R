@@ -12,7 +12,6 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
       #sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
     }
     checkPath(sim@paths$outputPath, create = TRUE)
-
   } else if (eventType == "spades") {
     sim <- saveFiles(sim)
   } else if (eventType == "later") {
@@ -76,8 +75,8 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @param sim A \code{simList} simulation object.
 #'
-#' @importFrom dplyr bind_rows
 #' @importFrom data.table data.table
+#' @importFrom dplyr bind_rows
 #' @export
 #' @rdname saveFiles
 #'
