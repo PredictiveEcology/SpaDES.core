@@ -5,7 +5,7 @@ version 0.2.6
 
 ## dependencies
 
-* R 3.5.0 is the minimum version required for `SpaDES.core`. Too many depedent packages are not maintaining their backwards compatibility.
+* R 3.5.0 is the minimum version required for `SpaDES.core`. Too many dependency packages are not maintaining their backwards compatibility.
 * added `backports` to Imports for R-oldrel support
 * removed `googledrive` dependency (this functionality moved to `reproducible`)
 
