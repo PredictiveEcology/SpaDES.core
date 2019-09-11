@@ -14,9 +14,9 @@ restartSpades(sim = NULL, module = NULL, numEvents = Inf,
 \item{module}{A character string length one naming the module that caused the error and
 whose source code was fixed. This module will be reparsed and placed into the simList}
 
-\item{numEvents}{Numeric. Default is Inf (i.e., all available). In the simList, if
+\item{numEvents}{Numeric. Default is Inf (i.e., all available). In the \code{simList}, if
 \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
-there will be a list in the \code{simList} called .recoverableObjs. These will be
+there will be a list in the \code{simList} called \code{.recoverableObjs}. These will be
 replayed backwards in time to reproduce the initial state of the simList before
 the event that is \code{numEvents} back from the first event in \code{events(sim)}.}
 
@@ -30,12 +30,12 @@ with the module code parsed into the \code{simList}}
 A simList as if \code{spades} had been called on a simList.
 }
 \description{
-This is very experimental and hasn't been tested. Use with caution.
+This is very experimental and has not been thoroughly tested. Use with caution.
 This function will reparse a single module (currently) into the \code{simList}
-where its source code should reside, and then optionally restart
-a simulation that stopped on an error, presumably
-after the developer has modified the sourcde code of the module that caused the
-break. This will restart the simulation at the next event in the event queue
+where its source code should reside, and then optionally restart a simulation
+that stopped on an error, presumably after the developer has modified the
+source code of the module that caused the break.
+This will restart the simulation at the next event in the event queue
 (i.e., returned by \code{events(sim)}). Because of this, this function will
 not do anything if the event queue is empty.
 }

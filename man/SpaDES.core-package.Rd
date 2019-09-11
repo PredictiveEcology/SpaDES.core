@@ -506,7 +506,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   discrete event simulator will take a snapshot of the objects in the simList
   that might change (based on metadata \code{outputObjects} for that module), prior to
   initiating every event. This will allow the
-  user to be able to recover in case of an error or manual interruption (e.g., ESC).
+  user to be able to recover in case of an error or manual interruption (e.g., \code{Esc}).
   If this is numeric, a copy of that number of "most
   recent events" will be maintained so that the user can recover and restart
   > 1 event in the past, i.e., redo some of the "completed" events. Default is
