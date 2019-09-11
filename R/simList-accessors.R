@@ -1,7 +1,7 @@
 if (getRversion() >= "3.1.0") {
   utils::globalVariables(c(".SD", "eventTime", "savetime", "exts",
                            "eventType", "unit", "diffTime", "clockTime",
-                           "minEventTime", "maxEventTime"))
+                           "minEventTime", "maxEventTime", "eventNumber"))
 }
 
 ### `show` generic is already defined in the methods package
@@ -587,6 +587,9 @@ setReplaceMethod("G",
 })
 
 ################################################################################
+#' @details
+#' \code{parameters} will extract only the metadata with the metadata defaults,
+#' NOT the current values that may be overwritten by a user. See examples.
 #' @inheritParams params
 #' @param asDF Logical. For \code{parameters}, if TRUE, this will produce a single
 #'                 data.frame of all model parameters. If FALSE, then it will return
@@ -601,8 +604,26 @@ setReplaceMethod("G",
 #' paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' mySim <- simInit(modules = modules, paths = paths,
 #'                  params = list(.globals = list(stackName = "landscape")))
-#' parameters(mySim)
 #'
+#' # update some parameters using assignment -- currently only params will work
+#' params(mySim)$randomLandscapes$nx <- 200
+#' params(mySim)$randomLandscapes$ny <- 200
+#'
+#' parameters(mySim) # Does not contain these user overridden values
+#'
+#' # These next 2 are same here because they are not within a module
+#' P(mySim)          # Does contain the user overridden values
+#' params(mySim)     # Does contain the user overridden values
+#'
+#' # NOTE -- deleting a parameter will affect params and P, not parameters
+#' params(mySim)$randomLandscapes$nx <- NULL
+#' params(mySim)$randomLandscapes$ny <- NULL
+#'
+#' parameters(mySim) # Shows nx and ny
+#'
+#' # These next 2 are same here because they are not within a module
+#' P(mySim)          # nx and ny are Gone
+#' params(mySim)     # nx and ny are Gone
 setGeneric("parameters", function(sim, asDF = FALSE) {
   standardGeneric("parameters")
 })
@@ -1322,8 +1343,9 @@ setReplaceMethod(
        # file extension stuff
        fileExts <- .saveFileExtensions()
        fe <- setDT(fileExts)[setDT(sim@outputs[,c("fun", "package")]), on = c("fun","package")]$exts
-       #fe <- suppressMessages(inner_join(sim@outputs, fileExts)$exts)
-       wh <- !stri_detect_fixed(str = sim@outputs$file, pattern = ".") &
+
+       # grep allows for file extensions from 1 to 5 characters
+       wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) &
          (nzchar(fe, keepNA = TRUE))
        sim@outputs[wh, "file"] <- paste0(sim@outputs[wh, "file"], ".", fe[wh])
 
@@ -2443,36 +2465,34 @@ setGeneric("completed", function(sim, unit, times = TRUE) {
 #' @rdname simList-accessors-events
 #' @export
 #' @aliases simList-accessors-events
+#' @importFrom data.table rbindlist setkeyv :=
 setMethod(
   "completed",
   signature = c("simList", "character"),
   definition = function(sim, unit, times = TRUE) {
-    obj <- rbindlist(sim@completed)
+
+    obj <- as.list(sim@completed)
+    obj <- rbindlist(obj, idcol = if (length(sim@completed)) "eventNumber" else NULL)
+
     if (length(sim@completed)) {
+      obj[, eventNumber := as.numeric(eventNumber)]
+      setkeyv(obj, "eventNumber")
       if (!isTRUE(times)) {
         set(obj, , "._clockTime", NULL)
       }
       if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
-        #compl <- rbindlist(sim@completed)
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
-            #if (any(!is.na(obj$eventTime))) {
-          #if (!is.null(obj$eventTime)) {
-            #sim@completed$eventTime <- convertTimeunit(sim@completed$eventTime, unit, sim@.xData)
-            #sim@completed
             if (!is.null(obj$._clockTime))
               obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.xData),
                          clockTime=obj$._clockTime,
                          ._clockTime=NULL)]
-            obj[]
           }
-        } #else {
-          #sim@completed
-        #}
-      } #else {
-        #sim@completed
-      #}
+        }
+      }
+      obj[]
+      set(obj, NULL, "eventNumber", NULL) # remove the eventNumber column to match other event queues
     }
     return(obj)
 })
@@ -2509,10 +2529,13 @@ setReplaceMethod(
       stop("Event queue must be a data.table with columns, ",
         paste(.emptyEventListCols, collapse = ", "), ".")
     }
+    sim@completed <- new.env(parent = emptyenv())
     if (NROW(value)) {
-      sim@completed <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x, ]))
-    } else {
-      sim@completed <- list()
+      integerVals <- seq(NROW(value))
+      outList <- lapply(integerVals,
+                      function(x) as.list(value[x, ]))
+      names(outList) <- as.character(integerVals)
+      list2env(outList, envir = sim@completed)
     }
     return(sim)
 })
@@ -2731,6 +2754,40 @@ setMethod("outputObjects",
             return(out)
           })
 
+
+################################################################################
+#' @inheritParams P
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+#'
+setGeneric("outputObjectNames", function(sim, module) {
+  standardGeneric("outputObjectNames")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("outputObjectNames",
+          signature = "simList",
+          definition = function(sim, module) {
+            out <- if (NROW(modules(sim)) > 0) {
+              outObjs <- outputObjects(sim)
+              allObjNames <- if (is(outObjs, "list")) {
+                allObjNames <- lapply(outObjs, function(x) x$objectName)
+                if (!missing(module)) {
+                  allObjNames <- allObjNames[[module]]
+                }
+                allObjNames
+              } else {
+                list(outObjs$objectName)
+              }
+            } else {
+              NULL
+            }
+            return(out)
+          })
 
 ################################################################################
 #' @inheritParams P

@@ -197,7 +197,7 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
                 #  from switch fn above if it does not appear. So search through SpaDES
                 # functions first above, then check user defined units
                 #attributes(out)$unit = "second"
-                if(checkTimeunit(unit, envir)) {
+                if (checkTimeunit(unit, envir)) {
                   as.numeric(get(paste0("d", unit), envir = envir)(1))
                   } else {
                     NULL
@@ -205,6 +205,7 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 
   return(out)
 }
+
 ################################################################################
 #' Convert time units
 #'
@@ -256,7 +257,6 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
       # if timeUnit is same as unit, skip calculations
   if (is.null(timeUnit)) timeUnit <- "NA" # for next line
   if (unit != timeUnit) {
-
     # For bypassing calculation -- use table of knowns
     if (timeUnit != "NA") {
       if (!startsWith(timeUnit, prefix = "second")) {
@@ -286,6 +286,7 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   }
   return(time)
 }
+
 ################################################################################
 #' Determine the largest timestep unit in a simulation
 #'
@@ -367,6 +368,7 @@ setMethod(
     return("second")
 })
 
+#' @keywords internal
 .getTU <- function(ts, simEnv) {
     tsFun <- paste0("d", ts)
     if (exists(tsFun, envir = simEnv, inherits = FALSE))
@@ -374,7 +376,6 @@ setMethod(
     else
       get(tsFun)(1)
 }
-
 
 #' @export
 #' @rdname minTimeunit
@@ -395,7 +396,6 @@ setMethod(
 #' @rdname timeConversion
 .spadesTimes <- c("year", "month", "week", "day", "hour", "second")
 .spadesTimes <- c(.spadesTimes, paste0(.spadesTimes, "s"))
-
 
 #' @export
 #' @rdname timeConversion

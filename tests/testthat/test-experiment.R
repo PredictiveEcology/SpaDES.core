@@ -63,7 +63,7 @@ test_that("experiment does not work correctly", {
     expect_equal(outputs(sims[[x]])$saved, c(TRUE, TRUE))
     expect_equal(
       outputs(sims[[x]])$file,
-      file.path(tmpdir, paste0("rep", x),
+      file.path(normPath(tmpdir), paste0("rep", x),
                 paste0(c("landscape", "caribou"), "_year2.rds")) %>%
         normPath()
     )

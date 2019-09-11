@@ -8,7 +8,7 @@
   opts.spades <- list( # nolint
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
-    spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
+    spades.debug = 1, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
     spades.moduleCodeChecks = list(
@@ -22,6 +22,7 @@
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
+    spades.recoveryMode = 1,
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
@@ -52,6 +53,9 @@
                     env = pkgEnv
   )
 
+  ## import functions using backports:
+  backports::import(pkgname, "isFALSE")
+
   invisible()
 }
 
@@ -67,6 +71,7 @@
       "To change these, use setPaths(...); see ?setPaths"
     )
   }
+
   #unlockBinding("Paths", as.environment("package:SpaDES.core"))
   # rm("Paths", envir = as.environment("package:SpaDES.core"))
   # makeActiveBinding(sym = "Paths",

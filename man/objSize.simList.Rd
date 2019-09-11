@@ -5,7 +5,7 @@
 \title{Object size for \code{simList}}
 \usage{
 \method{objSize}{simList}(x, quick = getOption("reproducible.quick",
-  FALSE))
+  FALSE), ...)
 }
 \arguments{
 \item{x}{An object}
@@ -13,6 +13,9 @@
 \item{quick}{Logical. Only some methods use this. e.g.,
 \code{Path} class objects. In which case, \code{file.size} will be
 used instead of \code{object.size}.}
+
+\item{...}{Other arguments passed to methods, e.g., \code{objSize.function}
+has \code{enclosingEnvs}}
 }
 \description{
 Recursively, runs \code{object.size} on the \code{simList} environment.

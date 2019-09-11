@@ -3,6 +3,7 @@ test_that("test cache", {
                                       spades.useRequire = FALSE),
                           setPaths = FALSE)
 
+  try(clearCache(tmpdir), silent = TRUE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -209,7 +210,7 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE)
+  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -230,7 +231,7 @@ test_that("test .robustDigest for simLists", {
   expect_true(all(grepl(msgGrep, mess1)))
 
   msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
-  expect_message(do.call(simInit, args), regexp = msgGrep)
+  a <- capture.output(expect_message(do.call(simInit, args), regexp = msgGrep))
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -259,7 +260,9 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
+  options(opts)
   expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 
   # make a change in Init function
@@ -274,7 +277,9 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
+  options(opts)
   expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 })
 
@@ -330,7 +335,7 @@ test_that("test objSize", {
 })
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
-  testInitOut <- testInit(smcc = FALSE, debug = FALSE)
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -390,7 +395,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_true(mySim2$co5 == 6)
 
   # Test mod
-  expect_true(mySim2$test$hello == 2)
+  expect_true(mySim2$test$.objects$hello == 2)
 
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
@@ -412,7 +417,8 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_true(is.null(mySim$test$hi)) # is not in the
   mess1 <- capture_output(mySim2 <- spades(Copy(mySim)))
   expect_true(mySim2$test$hi == 1) # recovered in Cache
-  expect_true(mySim2$test$hello == 2) # recovered in Cache
+  # Test mod
+  expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
   expect_true(grepl("Using cached copy", mess1))
 
 })

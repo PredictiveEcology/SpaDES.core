@@ -152,10 +152,12 @@ test_that("spades calls with different signatures don't work", {
 
   a <- simInit()
   a1 <- Copy(a)
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_output(spades(a, debug = TRUE), "eventTime")
   expect_silent(spades(a, debug = FALSE))
   expect_silent(spades(a, debug = FALSE, .plotInitialTime = NA))
   expect_silent(spades(a, debug = FALSE, .saveInitialTime = NA))
+  opts <- options(opts)
   expect_output(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
   expect_output(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
@@ -173,8 +175,10 @@ test_that("spades calls with different signatures don't work", {
     expect_output(spades(a, progress = "text", debug = TRUE), "20%")
     expect_output(spades(a, progress = "text"), "..........| 100%")
   }
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(a, debug = FALSE, progress = FALSE))
   expect_silent(spades(a, debug = FALSE, progress = "rr"))
+  opts <- options(opts)
 
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
   a <- Copy(a1)
@@ -363,6 +367,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Windows Desktop -- slower -- Nov 26, 2018 0.730 Seconds --> 148 microseconds/event!
   # Linux Server -- slower -- Nov 26, 2018 0.795 Seconds --> 159 microseconds/event!
   # BorealCloud Server -- slower -- Nov 26, 2018 0.972 Seconds --> 194 microseconds/event!
+  # laptop -- May 25, 2019 0.603 Seconds --> 120 microseconds/event!
+  # laptop with new completed as environment -- May 25, 2019 0.357 Seconds --> 71 microseconds/event!
   options("spades.keepCompleted" = TRUE)
   microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
@@ -375,6 +381,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
   # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
   # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
+  # With many new "exists"
+  # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
   options("spades.keepCompleted" = FALSE)
   (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
   #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})

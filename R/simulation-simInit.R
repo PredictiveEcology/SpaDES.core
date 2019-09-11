@@ -299,7 +299,7 @@ setGeneric(
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
            notOlderThan = NULL) {
     standardGeneric("simInit")
-  })
+})
 
 #' @rdname simInit
 setMethod(
@@ -360,20 +360,28 @@ setMethod(
     names(modules) <- unlist(modules)
 
     # Check that modules exist in paths$modulePath
-    moduleDirsPoss <- lapply(modules, function(m) file.path(sim@paths$modulePath, m))
-    moduleDirsExist <- lapply(moduleDirsPoss, function(poss) dir.exists(poss))
-    # dir.exists(file.path(paths$modulePath, unlist(modules)))
-    if (!isTRUE(all(unlist(lapply(moduleDirsExist, any))))) {
-      stop("These modules: ", unlist(modules)[!moduleDirsExist], " , don't exist in ", paths$modulePath)
-    }
-    modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
-      poss[exist][1])
+    modulePaths <- .checkModuleDirsAndFiles(modules = modules, modulePath = sim@paths$modulePath)
 
     # identify childModules, recursively
     childModules <- .identifyChildModules(sim = sim, modules = modulePaths)
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
     names(modules) <- unlist(modules)
     modules <- lapply(modules, basename2)
+
+    moduleNames <- names(modules)
+    names(moduleNames) <- moduleNames
+
+    # Test that all child module files and dirs exist
+    childModDirsExist <- lapply(moduleNames, dir.exists)
+    childModMainFiles <- file.path(moduleNames, paste0(basename2(moduleNames), ".R"))
+    names(childModMainFiles) <- basename2(moduleNames)
+    childModFilesExist <- file.exists(childModMainFiles)
+    if (any(!childModFilesExist)) {
+      stop(childModMainFiles[!childModFilesExist], " does not exist; please create one or diagnose. ",
+           "  Some possible causes:\n  ",
+           "- git submodule not initiated?\n  ",
+           "- the module was not created using 'newModule(...)' so is missing key files")
+    }
 
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
@@ -393,12 +401,19 @@ setMethod(
 
     mBase <- basename2(unlist(modules))
 
-    reqdPkgs <- packages(modules = unlist(modulePaths),
-                         filenames = file.path(unlist(modulePaths), paste0(mBase, ".R")),
+    reqdPkgs <- packages(modules = sim@modules,
+                         filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
-    if (length(unlist(reqdPkgs))) {
-      allPkgs <- c(unique(unlist(reqdPkgs), "SpaDES.core"))
+
+    # Load only needed packages -- compare to current search path
+    loadedPkgs <- search();
+    uniqueReqdPkgs <- unique(unlist(reqdPkgs))
+    neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
+    names(neededPkgs) <- uniqueReqdPkgs
+
+    if (sum(!neededPkgs) > 0) {
+      allPkgs <- c(unique(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
       if (getOption("spades.useRequire")) {
         Require(allPkgs)
       } else {
@@ -453,14 +468,20 @@ setMethod(
     # recursive function to extract parent and child structures
     buildParentChildGraph <- function(sim, mods, childModules) {
       out <- childModules
-      isParent <- unlist(lapply(out, function(x) length(x) > 1))
-      from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
-      to <- unlist(lapply(out, function(x) names(x)))
-      if (is.null(to)) to <- character(0)
-      outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
-      aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
-      aa <- rbindlist(aa)
-      outDF <- rbind(outDF, aa)
+
+      # A child module will be a list inside a list of parent modules
+      isParent <- sapply(out, function(x) is.list(x))
+      if (length(isParent)) {
+        from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
+        to <- unlist(lapply(out, function(x) names(x)))
+        if (is.null(to)) to <- character(0)
+        outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
+        aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
+        aa <- rbindlist(aa)
+        outDF <- rbind(outDF, aa)
+      } else {
+        outDF <- data.frame(from = character(0), to = character(0), stringsAsFactors = FALSE)
+      }
       outDF
     }
 
@@ -520,7 +541,7 @@ setMethod(
     all_parsed <- FALSE
     while (!all_parsed) {
       sim <- .parseModule(sim,
-                          as.list(modules),
+                          as.list(sim@modules),
                           userSuppliedObjNames = sim$.userSuppliedObjNames,
                           envir = sim@.xData[[".parsedFiles"]],
                           notOlderThan = notOlderThan, params = params,
@@ -572,9 +593,9 @@ setMethod(
       loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
     }
 
-    mBase <- basename2(unlist(modules))
+    mBase <- basename2(unlist(sim@modules))
     loadOrderBase <- basename2(loadOrder)
-    names(loadOrder) <- names(unlist(modules))[na.omit(match(mBase, loadOrderBase))]
+    names(loadOrder) <- names(unlist(sim@modules))[na.omit(match(mBase, loadOrderBase))]
     loadOrder[] <- loadOrderBase
     loadOrderNames <- names(loadOrder)
 
@@ -586,17 +607,8 @@ setMethod(
     }
 
     # Make local activeBindings to mod
-    lapply(modules, function(mod) {
-      makeActiveBinding(sym = "mod",
-                        fun = function(value){
-                          if (missing(value)) {
-                            get(mod, envir = sim, inherits = FALSE)
-                          } else {
-                            stop("Can't overwrite mod")
-                          }
-                        },
-                        env = sim[[mod]])
-
+    lapply(sim@modules, function(mod) {
+      makeModActiveBinding(sim = sim, mod = mod)
     })
 
     ## load user-defined modules
@@ -871,7 +883,6 @@ setMethod(
     return(invisible(sim))
 })
 
-
 #' Call \code{simInit} and \code{spades} or \code{experiment} together
 #'
 #' These functions are convenience wrappers that may allow for
@@ -916,9 +927,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
   sim <- do.call(spades, objsSpades)
-
 }
-
 
 #' @export
 #' @aliases simInitAndExperiment
@@ -941,7 +950,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-
 
   namesMatchCall <- names(match.call())
   objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
@@ -986,23 +994,26 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
     message("Duplicate module, ", modules[duplicated(modules)], ", specified. Skipping loading it twice.")
   }
   if (length(modules) > 0) {
-    modulesToSearch <- lapply(.parseModulePartial(sim, modulesToSearch,
+    modulesToSearch3 <- lapply(.parseModulePartial(sim, modulesToSearch,
                                                   defineModuleElement = "childModules",
                                                   envir = sim@.xData[[".parsedFiles"]]),
                               as.list)
-    isParent <- unlist(lapply(modulesToSearch, function(x) length(x)>1))
+    if (length(modulesToSearch3) > 0) {
+      isParent <- unlist(lapply(modulesToSearch3, function(x) length(x) > 0))
 
-    modulesToSearch[isParent] <- Map(x = modulesToSearch[isParent],
-                                     nam = dirname(names(modulesToSearch[isParent])),
-                                     function(x, nam){
-                                       mods <- lapply(x, function(y) file.path(nam, y))
-                                       names(mods) <- unlist(lapply(mods, basename2))
+      modulesToSearch3[isParent] <- Map(x = modulesToSearch3[isParent],
+                                       nam = dirname(names(modulesToSearch3[isParent])),
+                                       function(x, nam){
+                                         mods <- lapply(x, function(y) file.path(nam, y))
+                                         names(mods) <- unlist(lapply(mods, basename2))
 
-                                       .identifyChildModules(sim = sim, modules = mods)}
-    )
-    modulesToSearch2 <- as.list(names(modulesToSearch[!isParent]))
-    names(modulesToSearch2) <- names(modulesToSearch[!isParent])
-    modulesToSearch[!isParent] <- modulesToSearch2
+                                         .identifyChildModules(sim = sim, modules = mods)}
+      )
+      modulesToSearch2 <- as.list(names(modulesToSearch3[!isParent]))
+      names(modulesToSearch2) <- names(modulesToSearch3[!isParent])
+      modulesToSearch3[!isParent] <- modulesToSearch2
+      modulesToSearch <- modulesToSearch3
+    }
   }
   return(modulesToSearch)
 }
@@ -1067,7 +1078,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
     if (!is.null(sim@.xData[[mBase]][[".inputObjects"]])) {
-      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
+      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
       a <- P(sim, mBase, ".useCache")
       if (!is.null(a)) {
@@ -1084,11 +1095,9 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
       if (isTRUE(cacheIt)) {
-        # message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
-
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1177,4 +1186,30 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   # if (isTRUE(isMissing["loadOrder"])) li$loadOrder <- .loadOrderDefault
 
   return(li)
+}
+
+.checkModuleDirsAndFiles <- function(modules, modulePath) {
+  moduleDirsPoss <- lapply(modules, function(m) file.path(modulePath, m))
+  moduleDirsExist <- lapply(moduleDirsPoss, function(poss) dir.exists(poss))
+  moduleFilesPoss <- lapply(moduleDirsPoss, function(poss) file.path(file.path(poss,
+                                                                               paste0(basename(poss), ".R"))))
+  moduleFilesExist <- lapply(moduleFilesPoss, function(poss) file.exists(poss))
+  # dir.exists(file.path(paths$modulePath, unlist(modules)))
+  if (!isTRUE(all(unlist(lapply(moduleDirsExist, any))))) {
+    if (sum(!unlist(moduleDirsExist)) > 1) {
+      moduleTxt1 <- "These modules"
+      moduleTxt2 <- "don't"
+    } else {
+      moduleTxt1 <- "This module"
+      moduleTxt2 <- "doesn't"
+    }
+    stop(moduleTxt1, ":\n    ", paste(unlist(modules)[!unlist(moduleDirsExist)], collapse = ", "), ",\n  ",
+         moduleTxt2," exist in:\n    ", modulePath)
+  }
+  if (!isTRUE(all(unlist(lapply(moduleFilesExist, any))))) {
+    stop("These main module file(s) are missing:\n    ",
+         paste(unlist(moduleFilesPoss)[!unlist(moduleFilesExist)], sep = "\n  "))
+  }
+  modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
+    poss[exist][1])
 }

@@ -7,6 +7,8 @@
 \alias{inputObjects,simList-method}
 \alias{outputObjects}
 \alias{outputObjects,simList-method}
+\alias{outputObjectNames}
+\alias{outputObjectNames,simList-method}
 \alias{reqdPkgs}
 \alias{reqdPkgs,simList-method}
 \alias{documentation}
@@ -23,6 +25,10 @@ inputObjects(sim, module)
 outputObjects(sim, module)
 
 \S4method{outputObjects}{simList}(sim, module)
+
+outputObjectNames(sim, module)
+
+\S4method{outputObjectNames}{simList}(sim, module)
 
 reqdPkgs(sim, module)
 

@@ -34,6 +34,8 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
+    curMod <- currentModule(object)
+
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleEnvirs <- mget(outerObjs[outerObjs %in% unlist(modules(object))],
                          envir = object@.xData)
@@ -121,6 +123,9 @@ setMethod(
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+    }
+    if (length(curMod) > 0) { # if this call is within a single module, only keep module-specific params
+      object@params <- object@params[curMod]
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
@@ -692,9 +697,9 @@ if (!exists("objSize")) {
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' object.size(a)
-objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE)) {
+objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE), ...) {
   xObjName <- deparse(substitute(x))
-  aa <- objSize(x@.xData, quick = quick)
+  aa <- objSize(x@.xData, quick = quick, ...)
   bb <- as(x, "simList_")
   bb@.Data <- list()
   bbOs <- list(simList = object.size(bb))

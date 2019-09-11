@@ -26,15 +26,20 @@ more efficient).
 \item{\code{params}}{Named list of potentially other lists specifying simulation
 parameters.}
 
-\item{\code{events}}{The list of scheduled events (i.e., event queue), as a
-\code{data.table}. See 'Event Lists' for more information.}
+\item{\code{events}}{The list of scheduled events (i.e., event queue), which can
+be converted to a sorted \code{data.table} with \code{events(sim)}.
+See 'Event Lists' for more information.}
 
 \item{\code{current}}{The current event, as a \code{data.table}.
 See 'Event Lists' for more information..}
 
-\item{\code{completed}}{The list of completed events, as a \code{list}.
+\item{\code{completed}}{An environment consisting of completed events, with
+each object named a character representation of the order
+of events. This was converted from a previous version which
+was a list. This was changed because the list became
+slow as number of events increased.
 See 'Event Lists' for more information. It is kept
-as a list of individual events for speed. The \code{completed}
+as an environment of individual events for speed. The \code{completed}
 method converts it to a sorted \code{data.table}.}
 
 \item{\code{depends}}{A \code{.simDeps} list of \code{\link{.moduleDeps}} objects

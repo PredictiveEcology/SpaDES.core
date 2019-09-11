@@ -1,5 +1,5 @@
 test_that("test checkpointing", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -45,7 +45,7 @@ test_that("test checkpointing", {
 })
 
 test_that("test checkpointing with disk-backed raster", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)

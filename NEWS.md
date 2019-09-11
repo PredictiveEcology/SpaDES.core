@@ -1,5 +1,39 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.6
+=============
+
+## dependencies
+
+* R 3.5.0 is the minimum version required for `SpaDES.core`. Too many depedent packages are not maintaining their backwards compatibility.
+* added `backports` to Imports for R-oldrel support
+* removed `googledrive` dependency (this functionality moved to `reproducible`)
+
+## documentation
+
+* improved documentation for `P`, `params`, and `parameters`, thanks to Louis-Etienne Robert.
+
+## new features
+
+* `.robustDigest` method for `simList` class objects now does only includes parameters that are listed within the module metadata, if `Cache` or `.robustDigest` is called within a module. This means that changes to parameter values in "other" modules will not affect the Caching of "the current" module.
+* New function `outputObjectNames` will extract just the object names of all `outputObjects` across modules
+* New function `restartSpades` and its associated `options(spades.recoveryMode = 1)`, the new default, which is still experimental. Its purpose is to be able to restart a simulation in the case of an error or interruption. 
+* Now gives better errors if modules are missing main .R file or if they are missing entirely 
+* More silent tests
+* `mod` is now an active binding to `sim[[currentModule(sim)]]$.objects` (move from `sim[[currentModule(sim)]]`) and its parent environment is `emptyenv()`. This should cause no changes to users who use `mod$...`, but it will cause a change if user was calling objects directly via `sim[[currentModule(sim)]]$...`. This change is to separate the function enclosing environments and object enclosing environments, which should be different.
+* `sim@completed` is now an environment instead of a list. Of the three event queues, this one can become the largest. The `list` would get increasingly slow as the number of completed events increased. There should be no user visible changes when using `completed(sim)`
+
+## User visible changes to default options
+
+`spades.debug` is now set to 1
+`spades.recoveryMode` is new and set to 1 (i.e., the current event will be kept at its initial state)
+
+## bug fixes
+
+* Internal bugs during `simInit` especially in some weird cases of `childModules`.
+* packages listed in `reqdPkgs` not being loaded when only listed in child modules. Fixed in `5cd79ac95bc8d190e954313f125928458b0108d2`.
+* fixed issue with saving simulation outputs at simulation end time.
+
 version 0.2.5
 =============
 

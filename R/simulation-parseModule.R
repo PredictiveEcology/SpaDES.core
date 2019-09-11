@@ -223,6 +223,7 @@ setMethod(
         #sim@.xData[[mBase]] <- new.env(parent = sim@.xData)
         sim@.xData[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         attr(sim@.xData[[mBase]], "name") <- mBase
+        sim@.xData[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         # load all code into simList@.xData[[moduleName]]
         # The simpler line commented below will not allow actual code to be put into module,
@@ -231,7 +232,8 @@ setMethod(
         # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData[[mBase]])
         activeCode <- list()
         activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                                                   sim@.xData[[mBase]])
+                                                   sim@.xData[[mBase]],
+                                                   sim = sim)
 
         doesntUseNamespacing <- !.isNamespaced(sim, mBase)
 
@@ -244,7 +246,8 @@ setMethod(
                   "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
           #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
           out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                             sim@.xData)
+                             sim@.xData,
+                             sim = sim)
           #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
         }
 
@@ -263,12 +266,14 @@ setMethod(
             parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
             if (doesntUseNamespacing) {
               #eval(parsedFile1, envir = sim@.xData)
-              evalWithActiveCode(parsedFile1, sim@.xData)
+              evalWithActiveCode(parsedFile1, sim@.xData,
+                                 sim = sim)
             }
 
             # duplicate -- put in namespaces location
             #eval(parsedFile1, envir = sim@.xData[[mBase]])
-            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData[[mBase]])
+            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData[[mBase]],
+                                                       sim = sim)
           }
         }
 
@@ -368,6 +373,7 @@ setMethod(
         # add child modules to list of all child modules, to be parsed later
         children <- as.list(sim@depends@dependencies[[i]]@childModules) %>%
           lapply(., `attributes<-`, list(parsed = FALSE))
+        names(children) <- file.path(dirname(m), children)
         all_children <- append_attr(all_children, children)
 
         # remove parent module from the list
@@ -397,6 +403,7 @@ setMethod(
         if (any(alreadyIn)) {
           children <- as.list(sim@depends@dependencies[[which(alreadyIn)]]@childModules) %>%
             lapply(., `attributes<-`, list(parsed = FALSE))
+          names(children) <- file.path(dirname(m), children)
           all_children <- append_attr(all_children, children)
         }
         # remove parent module from the list
@@ -449,7 +456,8 @@ setMethod(
 .parseConditional <- function(envir = NULL, filename = character()) {
   if (!is.null(envir)) {
     if (is.null(envir[[filename]])) {
-      envir[[filename]] <- new.env(parent = envir)
+      #envir[[filename]] <- new.env(parent = envir)
+      envir[[filename]] <- new.env(parent = emptyenv())
       needParse <- TRUE
     } else {
       needParse <- FALSE
@@ -473,10 +481,22 @@ setMethod(
 }
 
 #' @keywords internal
-evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame()) {
+evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
+                               sim) {
+
+  # Create a temporary environment to source into, adding the sim object so that
+  #   code can be evaluated with the sim, e.g., currentModule(sim)
+  tmpEnvir <- new.env(parent = envir)
+  tmpEnvir$sim <- sim
+
   ll <- lapply(parsedModuleNoDefineModule,
-               function(x) tryCatch(eval(x, envir = envir), error = function(y) "ERROR"))
+               function(x) tryCatch(eval(x, envir = tmpEnvir),
+                                    error = function(x) "ERROR"))
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
+
+  rm("sim", envir = tmpEnvir)
+  list2env(as.list(tmpEnvir, all.names = TRUE), envir = envir)
+  rm(tmpEnvir)
 
   if (any(activeCode)) {
     env <- new.env(parent = parentFrame);

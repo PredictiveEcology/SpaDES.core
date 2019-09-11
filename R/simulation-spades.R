@@ -60,6 +60,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <- sim@current
+  curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
     # Test replacement for speed
     #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
@@ -70,7 +71,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
-      fnEnv <- sim@.xData[[cur[["moduleName"]]]]
+      fnEnv <- sim@.xData[[curModuleName]]
       # update current simulated time
       # Test replacement for speed
       #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
@@ -79,7 +80,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
       slot(sim, "simtimes", check = FALSE) <- st
 
       # call the module responsible for processing this event
-      moduleCall <- paste("doEvent", cur[["moduleName"]], sep = ".")
+      moduleCall <- paste("doEvent", curModuleName, sep = ".")
 
       # if debug is TRUE
       if (is.null(attr(sim, "needDebug"))) {
@@ -122,7 +123,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) || attr(sim, "completedCounter")==1) {
               sim@.xData$._startClockTime
             } else {
-              .POSIXct(sim@completed[[attr(sim, "completedCounter")-1]]$._clockTime)
+              .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter")-1)]]$._clockTime)
             }
             print(paste0(format(Sys.time(), format = "%H:%M:%S"),
                          " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
@@ -134,8 +135,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
             if(is.environment(fnEnv)) {
               if (all(debug %in% cur[c("moduleName", "eventType")])) {
-                debugonce(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
-                on.exit(get(paste0("doEvent.", cur[["moduleName"]]), envir = fnEnv))
+                debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+                on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
               }
             }
           } else if (!any(debug[[i]] == c("browser"))) {
@@ -146,15 +147,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      if (cur[["moduleName"]] %in% sim@modules) {
-        if (cur[["moduleName"]] %in% core) {
+      if (curModuleName %in% sim@modules) {
+        if (curModuleName %in% core) {
           sim <- get(moduleCall)(sim, cur[["eventTime"]],
                                  cur[["eventType"]])
         } else {
 
           # for future caching of modules
           cacheIt <- FALSE
-          a <- sim@params[[cur[["moduleName"]]]][[".useCache"]]
+          a <- sim@params[[curModuleName]][[".useCache"]]
           if (!is.null(a)) {
             #.useCache is a parameter
             if (!identical(FALSE, a)) {
@@ -175,27 +176,27 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
           # This is to create a namespaced module call
           if (!.pkgEnv[["skipNamespacing"]])
-            .modifySearchPath(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs,
+            .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
                               removeOthers = FALSE)
 
           sim <- .runEvent(sim, cacheIt, debug,
                            moduleCall, fnEnv, cur, notOlderThan)
 
-          if (!exists(cur[["moduleName"]], envir = sim, inherits = FALSE))
-            stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
+          if (!exists(curModuleName, envir = sim, inherits = FALSE))
+            stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!is.environment(get(cur[["moduleName"]], envir = sim)))
-            stop("The module named ", cur[["moduleName"]], " just corrupted the object with that ",
+          if (!is.environment(get(curModuleName, envir = sim)))
+            stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!exists("mod", envir = sim[[cur[["moduleName"]]]], inherits = FALSE))
-            stop("The module named ", cur[["moduleName"]], " just deleted the object named 'mod' from sim$",
-                 cur[["moduleName"]],". ",
+          if (!exists("mod", envir = sim@.envir[[curModuleName]], inherits = FALSE))
+            stop("The module named ", curModuleName, " just deleted the object named 'mod' from sim$",
+                 curModuleName,". ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
@@ -204,7 +205,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
         stop(
           paste(
             "Invalid module call. The module `",
-            cur[["moduleName"]],
+            curModuleName,
             "` wasn't specified to be loaded."
           )
         )
@@ -224,25 +225,28 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           attr(sim, "completedCounter") <- attr(sim, "completedCounter") + 1
 
           # increase length of list by doubling as it grows
-          if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
-            lenCompl <- length(sim@completed)
-            if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
-              if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
-                keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
-                sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
-                attr(sim, "completedSize") <- length(sim@completed)
-                attr(sim, "completedCounter") <- attr(sim, "completedSize")
-              }
-            }
-            attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
-            length(sim@completed) <- attr(sim, "completedSize")
-          }
-          sim@completed[attr(sim, "completedCounter")] <- list(cur)
+          # if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
+          #   lenCompl <- length(sim@completed)
+          #   if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
+          #     if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
+          #       keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
+          #       sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
+          #       attr(sim, "completedSize") <- length(sim@completed)
+          #       attr(sim, "completedCounter") <- attr(sim, "completedSize")
+          #     }
+          #   }
+          #   attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
+          #   #length(sim@completed) <- attr(sim, "completedSize")
+          # }
+
+          # faster to use assign
+          assign(as.character(attr(sim, "completedCounter")), value = cur, envir = sim@completed)
+          #sim@completed[[as.character(attr(sim, "completedCounter"))]] <- cur
 
         } else {
           attr(sim, "completedCounter") <- 1
           attr(sim, "completedSize") <- 2
-          sim@completed <- list(cur)
+          sim@completed[["1"]] <- cur
         }
       }
 
@@ -777,11 +781,15 @@ setMethod(
       rm(".timeunits", envir = sim@.xData)
       if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
         if (!isTRUE(.pkgEnv$.cleanEnd)) {
-          .pkgEnv$.sim <- sim
-          message(
-            crayon::magenta("Because of an interrupted spades call, the sim object at the time of interruption ",
-                            "was saved in \nSpaDES.core:::.pkgEnv$.sim . It will be deleted on next call to spades"))
+          if (recoverMode > 0) {
+            sim <- recoverModeOnExit(sim, rmo, recoverMode)
+          }
+          messageInterrupt1(recoverMode)
+        } else {
+          message(crayon::magenta("simList saved in\n",crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
+                                  "\nIt will be deleted at next spades call"))
         }
+        .pkgEnv$.sim <- sim
         .pkgEnv$.cleanEnd <- NULL
       }
     }, add = TRUE)
@@ -842,13 +850,39 @@ setMethod(
 
     sim@.xData[["._firstEventClockTime"]] <- Sys.time()
 
-    while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
-      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+    # This was introduced when sim@completed became an environment for speed purposes (list got slow as size increased)
+    # This is an attempt to deal with the expected behaviour of a list -- i.e., delete it if this appears to be
+    #   the original sim object again passed in
+    if (length(sim@completed)) {
+      existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
+      prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
+      prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
+      if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]])
+        sim@completed <- new.env(parent = emptyenv())
+    }
 
+    recoverModeWrong <- getOption("spades.recoverMode")
+    if (!is.null(recoverModeWrong)) warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+    recoverMode <- getOption("spades.recoveryMode", FALSE)
+
+    if (recoverMode > 0) {
+      rmo <- NULL # The recovery mode object
+      allObjNames <- outputObjectNames(sim)
+      if (is.null(allObjNames)) recoverMode <- 0
+    }
+
+    while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
+      if (recoverMode > 0) {
+        rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
+      }
+      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+      if (recoverMode > 0) {
+        rmo <- recoverModePost(sim, rmo, recoverMode)
+      }
       # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
       if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
         condEventsToOmit <- integer()
-        for(condNum in seq(sim$._conditionalEvents)) {
+        for (condNum in seq(sim$._conditionalEvents)) {
           cond <- sim$._conditionalEvents[[condNum]]
           if (isTRUE(eval(cond$condition))) {
             curTime <- time(sim)
@@ -889,7 +923,6 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan = NULL,
                         ...) {
-
     stopifnot(class(sim) == "simList")
 
     oldGetPaths <- getPaths()
@@ -928,11 +961,10 @@ setMethod(
         )
       )
     }
-  })
+})
 
-
-.runEvent <- function(sim, cacheIt, debug,
-                      moduleCall, fnEnv, cur, notOlderThan) {
+#' @keywords internal
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
@@ -943,7 +975,7 @@ setMethod(
     #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
     #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
     moduleSpecificOutputObjects <- c(createsOutputs, cur[["moduleName"]])
-    classOptions <- list(events = FALSE, current=FALSE, completed=FALSE, simtimes=FALSE,
+    classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])
   }
@@ -970,10 +1002,11 @@ setMethod(
   }
 }
 
+#' @keywords internal
 .runEventWithBrowser <- function(sim, fnCallAsExpr, moduleCall, fnEnv, cur) {
   canContinue <- TRUE
   numTries <- 0
-  while(canContinue) {
+  while (canContinue) {
     out <- try(eval(fnCallAsExpr))
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
@@ -995,6 +1028,7 @@ setMethod(
   sim <- out
 }
 
+#' @keywords internal
 calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
   #if (!is.null(sim@depends@dependencies[[1]])) {
   unitAttr <- attr(eventTime, "unit")
@@ -1026,4 +1060,82 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
   #                             skipChecks = TRUE))
   #}
   eventTime
+}
+
+#' @keywords internal
+recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
+  if (is.null(allObjNames)) {
+    allObjNames <- outputObjectNames(sim)
+  }
+
+  if (is.null(rmo))
+    rmo <- list(
+      recoverModeTiming = 0,
+      recoverableObjs = list(),
+      addedEvents = list(list()),
+      randomSeed = list(list())
+    )
+
+  # Remove the tail entry in each of the lists
+  if (length(rmo$addedEvents) > (recoverMode - 1))
+    rmo$addedEvents <- rmo$addedEvents[seq_len(recoverMode - 1)]
+  if (length(rmo$randomSeed) > (recoverMode - 1))
+    rmo$randomSeed <- rmo$randomSeed[seq_len(recoverMode - 1)]
+  startTime <- Sys.time()
+  if (length(rmo$recoverableObjs) > (recoverMode - 1))
+    rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
+
+  if (length(sim@events) > 0) {
+    objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
+    rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
+      Copy(mget(ls(sim)[objsInSimListAndModule ], envir = sim@.xData))
+    } else {
+      list()
+    }), rmo$recoverableObjs)
+  }
+  endTime <- Sys.time()
+  rmo$preEvents <- sim@events
+  rmo$randomSeed <- append(list(.Random.seed), rmo$randomSeed)
+
+  rmo$recoverModeTiming <- rmo$recoverModeTiming + (endTime - startTime)
+
+  rmo
+}
+
+#' @keywords internal
+recoverModePost <- function(sim, rmo, recoverMode) {
+  rmo$postEvents <- sim@events
+  rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
+  rmo
+}
+
+#' @keywords internal
+recoverModeOnExit <- function(sim, rmo, recoverMode) {
+  sim@.xData$.recoverableObjs <- rmo$recoverableObjs
+  recoverableObjsSize <- sum(unlist(objSize(rmo$recoverableObjs)))
+  class(recoverableObjsSize) <- "object_size"
+  rmo$postEvents <- sim@events
+  rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
+  sim@.xData$.addedEvents <- rmo$addedEvents
+  sim@.xData$.randomSeed <- rmo$randomSeed
+  message(crayon::magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
+                                 format(rmo$recoverModeTiming, units = "auto", digits = 3),
+                                 " and ", format(recoverableObjsSize, units = "auto"))))
+  message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
+                          "in the simList located at SpaDES.core:::.pkgEnv$.sim,",
+                          "as sim$.recoverableObjs, with the most recent event",
+                          "the first element in the list, 2nd most recent event = the second most recent event, etc.",
+                          " The objects contained in each of those are only the objects that may have",
+                          "changed, according to the metadata for each module. To recover, use:\n",
+                          "restartSpades()"))
+  return(sim)
+}
+
+#' @keywords internal
+messageInterrupt1 <- function(recoverMode) {
+  message(
+    crayon::magenta("Because of an interrupted spades call, the sim object ",
+                    c("at the time of interruption ", "at the start of the interrupted event ")[(recoverMode > 0) + 1],
+                    "was saved in \n", crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
+                    "\nIt will be deleted on next call to spades"))
 }
