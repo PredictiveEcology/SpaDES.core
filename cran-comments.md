@@ -1,7 +1,7 @@
 ## Updated release
 
-This is a maintenance release to address problems identified during CRAN checks.
-See NEWS.md for a full list of changes.
+This is a maintenance release with several package improvments and bug fixes.
+See `NEWS.md` for a full list of changes.
 
 ## Test environments
 
@@ -20,10 +20,10 @@ See NEWS.md for a full list of changes.
 * Windows 7              (local), R 3.6.1
 
 ### Development R version
-* Ubuntu 16.04       (travis-ci), R 3.7.0 (2019-07-29 r76904)
-* Ubuntu 18.04           (local), R 3.7.0 (2019-08-02 r76911)
-* Windows             (appveyor), R 3.7.0 (2019-07-26 r76894)
-* Windows          (win-builder), R 3.7.0 (2019-07-05 r76784)
+* Ubuntu 16.04       (travis-ci), R 3.7.0 (2019-09-05 r77152)
+* Ubuntu 18.04           (local), R 3.7.0 (2019-09-05 r77152)
+* Windows             (appveyor), R 3.7.0 (2019-09-04 r77145)
+* Windows          (win-builder), R 3.7.0 (2019-09-02 r77130)
 
 ## R CMD check results
 
