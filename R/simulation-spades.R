@@ -789,7 +789,7 @@ setMethod(
           message(crayon::magenta("simList saved in\n",crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
                                   "\nIt will be deleted at next spades call"))
         }
-        .pkgEnv$.sim <- sim
+        .pkgEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
         .pkgEnv$.cleanEnd <- NULL
       }
     }, add = TRUE)

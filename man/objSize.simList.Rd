@@ -5,7 +5,7 @@
 \title{Object size for \code{simList}}
 \usage{
 \method{objSize}{simList}(x, quick = getOption("reproducible.quick",
-  FALSE), ...)
+  FALSE), enclosingEnvs = TRUE, .prevEnvirs = list(), ...)
 }
 \arguments{
 \item{x}{An object}
@@ -14,8 +14,12 @@
 \code{Path} class objects. In which case, \code{file.size} will be
 used instead of \code{object.size}.}
 
-\item{...}{Other arguments passed to methods, e.g., \code{objSize.function}
-has \code{enclosingEnvs}}
+\item{enclosingEnvs}{Logical indicating whether to include enclosing environments.
+Default \code{TRUE}.}
+
+\item{.prevEnvirs}{For internal account keeping to identify and prevent duplicate counting}
+
+\item{...}{Additional arguments (currently unused)}
 }
 \description{
 Recursively, runs \code{object.size} on the \code{simList} environment.

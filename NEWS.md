@@ -15,6 +15,7 @@ version 0.2.6
 
 ## new features
 
+* update `objSize.simList` method with 2 new arguments from `reproducible` package
 * `.robustDigest` method for `simList` class objects now does only includes parameters that are listed within the module metadata, if `Cache` or `.robustDigest` is called within a module. This means that changes to parameter values in "other" modules will not affect the Caching of "the current" module.
 * New function `outputObjectNames` will extract just the object names of all `outputObjects` across modules
 * New function `restartSpades` and its associated `options(spades.recoveryMode = 1)`, the new default, which is still experimental. Its purpose is to be able to restart a simulation in the case of an error or interruption. 

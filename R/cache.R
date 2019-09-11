@@ -697,7 +697,8 @@ if (!exists("objSize")) {
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' object.size(a)
-objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE), ...) {
+objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE),
+                            enclosingEnvs = TRUE, .prevEnvirs = list(), ...) {
   xObjName <- deparse(substitute(x))
   aa <- objSize(x@.xData, quick = quick, ...)
   bb <- as(x, "simList_")
