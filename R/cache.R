@@ -681,15 +681,13 @@ setMethod(
 }
 
 if (!exists("objSize")) {
-  objSize <- function(..., quick) UseMethod("objSize")
+  objSize <- function(x, quick, enclosingEnvs, .prevEnvs, ...) UseMethod("objSize")
 }
 
 #' Object size for \code{simList}
 #'
 #' Recursively, runs \code{object.size} on the \code{simList} environment and
-#' all other elements of the \code{simList}, e.g.,
-#' \code{object.size(completed(sim))}.
-#'
+#' all other elements of the \code{simList}, e.g., \code{object.size(completed(sim))}.
 #'
 #' @export
 #' @importFrom reproducible objSize

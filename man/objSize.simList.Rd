@@ -14,17 +14,12 @@
 \code{Path} class objects. In which case, \code{file.size} will be
 used instead of \code{object.size}.}
 
-\item{enclosingEnvs}{Logical indicating whether to include enclosing environments.
-Default \code{TRUE}.}
-
-\item{.prevEnvirs}{For internal account keeping to identify and prevent duplicate counting}
-
-\item{...}{Additional arguments (currently unused)}
+\item{...}{Other arguments passed to methods, e.g., \code{objSize.function}
+has \code{enclosingEnvs}}
 }
 \description{
 Recursively, runs \code{object.size} on the \code{simList} environment and
-all other elements of the \code{simList}, e.g.,
-\code{object.size(completed(sim))}.
+all other elements of the \code{simList}, e.g., \code{object.size(completed(sim))}.
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))
