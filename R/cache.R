@@ -9,25 +9,23 @@ if (!isGeneric(".robustDigest")) {
 
 #' \code{.robustDigest} for \code{simList} objects
 #'
-#' This is intended to be used within the \code{Cache} function, but can be
-#' used to evaluate what a \code{simList} would look like once it is
-#' converted to a repeatably digestible object.
+#' This is intended to be used within the \code{Cache} function, but can be used to evaluate what
+#' a \code{simList} would look like once it is converted to a repeatably digestible object.
 #'
-#' See \code{\link[reproducible]{robustDigest}}. This method strips out stuff
-#' from a \code{simList} class object that would make it otherwise not
-#' reproducibly digestible between sessions, operating systems,
-#' or machines. This will likely still not allow identical digest
-#' results across R versions.
+#' See \code{\link[reproducible]{robustDigest}}.
+#' This method strips out stuff from a \code{simList} class object that would make it otherwise not
+#' reproducibly digestible between sessions, operating systems, or machines.
+#' This will likely still not allow identical digest results across R versions.
 #'
 #' @inheritParams reproducible::.robustDigest
 #'
+#' @aliases Cache
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
 #' @importFrom reproducible asPath  .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
-#' @aliases Cache
 #' @rdname robustDigest
 #' @seealso \code{\link[reproducible]{robustDigest}}
 setMethod(
@@ -161,7 +159,7 @@ if (!isGeneric(".tagsByClass")) {
 #' \code{.tagsByClass} for \code{simList} objects
 #'
 #' See \code{\link[reproducible]{.tagsByClass}}. Adds current \code{moduleName},
-#' \code{eventType}, \code{eventTime}, and \code{function:spades} as userTags
+#' \code{eventType}, \code{eventTime}, and \code{function:spades} as \code{userTags}.
 #'
 #' @inheritParams reproducible::.tagsByClass
 #'
@@ -173,7 +171,6 @@ if (!isGeneric(".tagsByClass")) {
 #' @include simList-class.R
 #' @seealso \code{\link[reproducible]{.tagsByClass}}
 #' @rdname tagsByClass
-#'
 setMethod(
   ".tagsByClass",
   signature = "simList",
@@ -214,14 +211,14 @@ if (!isGeneric(".cacheMessage")) {
 #'
 #' See \code{\link[reproducible]{.cacheMessage}}.
 #'
+#' @exportMethod .cacheMessage
 #' @importFrom crayon blue
 #' @importFrom reproducible .cacheMessage
 #' @importMethodsFrom reproducible .cacheMessage
 #' @inheritParams reproducible::.cacheMessage
-#' @rdname cacheMessage
 #' @include simList-class.R
+#' @rdname cacheMessage
 #' @seealso \code{\link[reproducible]{.cacheMessage}}
-#' @exportMethod .cacheMessage
 setMethod(
   ".cacheMessage",
   signature = "simList",
@@ -277,20 +274,19 @@ if (!isGeneric(".checkCacheRepo")) {
 #'
 #' See \code{\link[reproducible]{.checkCacheRepo}}.
 #'
+#' @inheritParams reproducible::.checkCacheRepo
+#'
 #' @export
 #' @exportMethod .checkCacheRepo
-#' @importFrom reproducible .checkCacheRepo
-#' @importFrom reproducible .grepSysCalls
+#' @importFrom reproducible .checkCacheRepo .grepSysCalls
 #' @importMethodsFrom reproducible .checkCacheRepo
 #' @include simList-class.R
-#' @inheritParams reproducible::.checkCacheRepo
 #' @rdname checkCacheRepo
 #' @seealso \code{\link[reproducible]{.checkCacheRepo}}
 setMethod(
   ".checkCacheRepo",
   signature = "list",
   definition = function(object, create) {
-
     object <- .findSimList(object)
     whSimList <- unlist(lapply(object, is, "simList"))
 
@@ -298,7 +294,6 @@ setMethod(
       # just take the first simList, if there are >1
       cacheRepo <- object[whSimList][[1]]@paths$cachePath
     } else {
-
       doEventFrameNum <- .grepSysCalls(sys.calls(), "(^doEvent)|(^.parseModule)")[2]
 
       if (!is.na(doEventFrameNum)) {
@@ -326,16 +321,17 @@ if (!isGeneric(".addChangedAttr")) {
 #' When this function is subsequently called again, only these changed objects
 #' will be returned. All other \code{simList} objects will remain unchanged.
 #'
+#' @inheritParams reproducible::.addChangedAttr
+#'
 #' @seealso \code{\link[reproducible]{.addChangedAttr}}.
 #'
+#' @export
+#' @exportMethod .addChangedAttr
 #' @importFrom reproducible .addChangedAttr .setSubAttrInList
 #' @importMethodsFrom reproducible .addChangedAttr
-#' @inheritParams reproducible::.addChangedAttr
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.addChangedAttr}}
-#' @exportMethod .addChangedAttr
-#' @export
 #' @rdname addChangedAttr
+#' @seealso \code{\link[reproducible]{.addChangedAttr}}
 setMethod(
   ".addChangedAttr",
   signature = "simList",
@@ -345,7 +341,6 @@ setMethod(
 
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
-
       .setSubAttrInList(object, ".Cache", "newCache", NULL)
       #attr(object, ".Cache")$newCache <- NULL
 
@@ -559,15 +554,16 @@ setMethod(
 #'
 #' See \code{\link[reproducible]{.preDigestByClass}}.
 #'
+#' @inheritParams reproducible::.preDigestByClass
+#'
 #' @author Eliot McIntire
 #' @export
 #' @exportMethod .preDigestByClass
 #' @importFrom reproducible .preDigestByClass
 #' @importMethodsFrom reproducible .preDigestByClass
-#' @inheritParams reproducible::.preDigestByClass
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.preDigestByClass}}
 #' @rdname preDigestByClass
+#' @seealso \code{\link[reproducible]{.preDigestByClass}}
 setMethod(
   ".preDigestByClass",
   signature = "simList",
@@ -692,7 +688,7 @@ if (!exists("objSize")) {
 
 #' Object size for \code{simList}
 #'
-#' Recursively, runs \code{\link[reproducible]{{objSize}} on the \code{simList} environment,
+#' Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
 #' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
 #' \code{object.size(completed(sim))}.

@@ -12,7 +12,7 @@
 }
 \description{
 See \code{\link[reproducible]{.tagsByClass}}. Adds current \code{moduleName},
-\code{eventType}, \code{eventTime}, and \code{function:spades} as userTags
+\code{eventType}, \code{eventTime}, and \code{function:spades} as \code{userTags}.
 }
 \seealso{
 \code{\link[reproducible]{.tagsByClass}}

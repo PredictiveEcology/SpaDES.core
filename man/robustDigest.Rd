@@ -53,16 +53,14 @@ specific classes. Should be options that the \code{.robustDigest} knows what
 to do with.}
 }
 \description{
-This is intended to be used within the \code{Cache} function, but can be
-used to evaluate what a \code{simList} would look like once it is
-converted to a repeatably digestible object.
+This is intended to be used within the \code{Cache} function, but can be used to evaluate what
+a \code{simList} would look like once it is converted to a repeatably digestible object.
 }
 \details{
-See \code{\link[reproducible]{robustDigest}}. This method strips out stuff
-from a \code{simList} class object that would make it otherwise not
-reproducibly digestible between sessions, operating systems,
-or machines. This will likely still not allow identical digest
-results across R versions.
+See \code{\link[reproducible]{robustDigest}}.
+This method strips out stuff from a \code{simList} class object that would make it otherwise not
+reproducibly digestible between sessions, operating systems, or machines.
+This will likely still not allow identical digest results across R versions.
 }
 \seealso{
 \code{\link[reproducible]{robustDigest}}
