@@ -139,7 +139,7 @@ moduleDefaults <- list(
 #' @examples
 #' \dontrun{
 #'   ## a default version of the defineModule is created with a call to newModule
-#'   newModule("test", path = tempdir())
+#'   newModule("test", path = tempdir(), open = FALSE)
 #'
 #'   ## view the resulting module file
 #'   if (interactive()) file.edit(file.path(tempdir(), "test", "test.R"))
@@ -397,10 +397,10 @@ setMethod(
 #' checkPath(tmpdir, create = TRUE)
 #'
 #' # creates a  new, "empty" module -- it has defaults for everything that is required
-#' newModule("testModule", tmpdir)
+#' newModule("testModule", tmpdir, open = FALSE)
 #'
 #' # Look at new module code -- see defineParameter
-#' file.edit(file.path(tmpdir, "testModule", "testModule.R"))
+#' if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 #'
 #' # initialize the simList
 #' mySim <- simInit(modules = "testModule",
@@ -410,9 +410,7 @@ setMethod(
 #' #  function, we must specify the module name. If used within a module,
 #' #  we can omit the module name
 #' P(mySim, "testModule")$.useCache
-#'
 #' }
-#'
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc) {
   standardGeneric("defineParameter")
