@@ -18,8 +18,7 @@ used instead of \code{object.size}.}
 has \code{enclosingEnvs}}
 }
 \description{
-Recursively, runs \code{object.size} on the \code{simList} environment and
-all other elements of the \code{simList}, e.g., \code{object.size(completed(sim))}.
+Object size for \code{simList}
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))

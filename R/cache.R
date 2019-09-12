@@ -692,8 +692,10 @@ if (!exists("objSize")) {
 
 #' Object size for \code{simList}
 #'
-#' Recursively, runs \code{object.size} on the \code{simList} environment and
-#' all other elements of the \code{simList}, e.g., \code{object.size(completed(sim))}.
+#' Recursively, runs \code{\link[reproducible]{{objSize}} on the \code{simList} environment,
+#' so it estimates the correct size of functions stored there (e.g., with their enclosing
+#' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
+#' \code{object.size(completed(sim))}.
 #'
 #' @export
 #' @importFrom reproducible objSize
