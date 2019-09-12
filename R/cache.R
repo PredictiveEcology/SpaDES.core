@@ -687,7 +687,8 @@ if (!exists("objSize")) {
 #' Object size for \code{simList}
 #'
 #' Recursively, runs \code{object.size} on the \code{simList} environment and
-#' all other elements of the \code{simList}, e.g., `object.size(completed(sim))`.
+#' all other elements of the \code{simList}, e.g.,
+#' \code{object.size(completed(sim))}.
 #'
 #'
 #' @export
