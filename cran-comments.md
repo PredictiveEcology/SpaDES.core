@@ -17,13 +17,12 @@ See `NEWS.md` for a full list of changes.
 * Ubuntu 18.04           (local), R 3.6.1
 * Windows             (appveyor), R 3.6.1
 * Windows          (win-builder), R 3.6.1
-* Windows 7              (local), R 3.6.1
 
 ### Development R version
-* Ubuntu 16.04       (travis-ci), R 3.7.0 (2019-09-05 r77152)
-* Ubuntu 18.04           (local), R 3.7.0 (2019-09-05 r77152)
-* Windows             (appveyor), R 3.7.0 (2019-09-04 r77145)
-* Windows          (win-builder), R 3.7.0 (2019-09-02 r77130)
+* Ubuntu 16.04       (travis-ci), R 3.7.0 (2019-09-12 r77181)
+* Ubuntu 18.04           (local), R 3.7.0 (2019-09-12 r77181)
+* Windows             (appveyor), R 3.7.0 (2019-09-11 r77179)
+* Windows          (win-builder), R 3.7.0 (2019-09-11 r77179)
 
 ## R CMD check results
 
@@ -31,6 +30,7 @@ There are no ERRORs nor WARNINGs.
 
 ## Downstream dependencies
 
-I have run R CMD check on downstream dependencies and all have passed.
+We checked 3 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
-Summary at https://github.com/PredictiveEcology/SpaDES.core/blob/master/revdep/README.md.
+ * We saw 0 new problems
+ * We failed to check 0 packages
