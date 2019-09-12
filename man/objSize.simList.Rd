@@ -22,8 +22,8 @@ Default \code{TRUE}.}
 \item{...}{Additional arguments (currently unused)}
 }
 \description{
-Recursively, runs \code{object.size} on the \code{simList} environment.
-Currently, this will not assess \code{object.size} of the other elements.
+Recursively, runs \code{object.size} on the \code{simList} environment and
+all other elements of the \code{simList}, e.g., `object.size(completed(sim))`.
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))
