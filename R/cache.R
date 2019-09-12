@@ -3,7 +3,8 @@ if (!isGeneric(".robustDigest")) {
     ".robustDigest",
     function(object, .objects, length = Inf, algo = "xxhash64", ...) {
       standardGeneric(".robustDigest")
-    })
+    }
+  )
 }
 
 #' \code{.robustDigest} for \code{simList} objects
@@ -100,9 +101,7 @@ setMethod(
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
     if (NROW(object@inputs))
-      object@inputs$file <- unlist(.robustDigest(object@inputs$file,
-                                                 quick = quick,
-                                                 length = length))
+      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
@@ -124,7 +123,9 @@ setMethod(
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
     }
-    if (length(curMod) > 0) { # if this call is within a single module, only keep module-specific params
+
+    # if this call is within a single module, only keep module-specific params
+    if (length(curMod) > 0) {
       object@params <- object@params[curMod]
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
@@ -213,6 +214,7 @@ if (!isGeneric(".cacheMessage")) {
 #'
 #' See \code{\link[reproducible]{.cacheMessage}}.
 #'
+#' @importFrom crayon blue
 #' @importFrom reproducible .cacheMessage
 #' @importMethodsFrom reproducible .cacheMessage
 #' @inheritParams reproducible::.cacheMessage
@@ -238,7 +240,7 @@ setMethod(
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
           cat(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
-        } else if (!is.na(fromMemoise)){
+        } else if (!is.na(fromMemoise)) {
           cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
                            "adding to memoised copy\n"))
         } else {
@@ -249,7 +251,7 @@ setMethod(
           cat(crayon::blue("  Using memoised copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
 
-        } else if (!is.na(fromMemoise)){
+        } else if (!is.na(fromMemoise)) {
           cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
                            cur$moduleName, "module. ",
                            if (fromMemoise) "Adding to memoised copy.",
@@ -470,7 +472,10 @@ setMethod(
           unique(unlist(aa))
         }
         createOutputs <- na.omit(createOutputs)
-        createOutputs <- c(createOutputs, currModules) # add the environments for each module - allow local objects
+
+        # add the environments for each module - allow local objects
+        createOutputs <- c(createOutputs, currModules)
+
         # take only the ones that the file changed, based on attr(object, ".Cache")$changed
         changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
@@ -486,7 +491,8 @@ setMethod(
         lsObjectEnv <- ls(object@.xData, all.names = TRUE)
         list2env(mget(lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs],
                       envir = object@.xData), envir = object2@.xData)
-        if (length(object2@current)==0) { # means it is not in a spades call
+        if (length(object2@current) == 0) {
+          ## means it is not in a spades call
           object2@completed <- object@completed
         }
         if (NROW(current(object2)) == 0) {
@@ -495,7 +501,7 @@ setMethod(
           object2@simtimes <- object@simtimes
         } else {
           # if this is FALSE, it means that events were added by the event
-          eventsAddedByThisModule <- events(object)$moduleName==current(object2)$moduleName
+          eventsAddedByThisModule <- events(object)$moduleName == current(object2)$moduleName
           if (isTRUE(any(eventsAddedByThisModule))) {
             if (!isTRUE(all.equal(object@events, object2@events))) {
               b <- object@events
@@ -534,7 +540,7 @@ setMethod(
       }
 
       attrsToGrab <- setdiff(names(attributes(object)), names(attributes(object2)))
-      for(atts in attrsToGrab) {
+      for (atts in attrsToGrab) {
         setattr(object2, atts, attr(object, atts))
         #attr(object2, atts) <- attr(object, atts)
         if (!identical(attr(object2, atts), attr(object, atts)))
