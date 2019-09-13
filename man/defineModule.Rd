@@ -125,7 +125,7 @@ values set to defaults
 \examples{
 \dontrun{
   ## a default version of the defineModule is created with a call to newModule
-  newModule("test", path = tempdir())
+  newModule("test", path = tempdir(), open = FALSE)
 
   ## view the resulting module file
   if (interactive()) file.edit(file.path(tempdir(), "test", "test.R"))

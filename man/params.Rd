@@ -90,7 +90,7 @@ params(mySim)     # nx and ny are Gone
 \seealso{
 \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
 
-Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
+Other functions to access elements of a 'simList' object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
   \code{\link{inputs}}, \code{\link{modules}},
@@ -98,4 +98,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
   \code{\link{paths}}, \code{\link{progressInterval}},
   \code{\link{times}}
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}
