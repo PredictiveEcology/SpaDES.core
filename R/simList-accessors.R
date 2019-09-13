@@ -1,7 +1,6 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".SD", "eventTime", "savetime", "exts",
-                           "eventType", "unit", "diffTime", "clockTime",
-                           "minEventTime", "maxEventTime", "eventNumber"))
+  utils::globalVariables(c(".SD", "clockTime", "diffTime", "eventNumber", "eventTime", "eventType",
+                           "exts", "minEventTime", "maxEventTime", "savetime", "unit"))
 }
 
 ### `show` generic is already defined in the methods package
@@ -2365,7 +2364,7 @@ setMethod(
     } else {
       return(NULL)
     }
-  })
+})
 
 #' @export
 #' @rdname simList-accessors-events
@@ -2918,7 +2917,6 @@ elapsedTime.simList <- function(x, byEvent = TRUE, ...) {
     ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy]
   } else {
     ret <- NULL
-
   }
   return(ret)
 }
