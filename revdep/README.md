@@ -10,14 +10,14 @@
 |collate  |en_CA.UTF-8                  |
 |ctype    |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2019-09-11                   |
+|date     |2019-09-12                   |
 
 # Dependencies
 
-|package      |old   |new    |Δ  |
-|:------------|:-----|:------|:--|
-|SpaDES.core  |0.2.5 |0.2.6  |*  |
-|reproducible |NA    |0.2.10 |*  |
+|package     |old   |new   |Δ  |
+|:-----------|:-----|:-----|:--|
+|SpaDES.core |0.2.5 |0.2.6 |*  |
+|tidyr       |NA    |1.0.0 |*  |
 
 # Revdeps
 

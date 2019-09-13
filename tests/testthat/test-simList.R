@@ -32,8 +32,6 @@ test_that("simList object initializes correctly", {
   expect_true(length(reqdPkgs(mySim)) == 3)
   expect_true(NROW(reqdPkgs(mySim, "fireSpread")) == 4)
 
-
-  #
   expect_is(mySim, "simList")
 
   w <- getOption("width")
@@ -50,8 +48,7 @@ test_that("simList object initializes correctly", {
   ### SLOT .xData
   expect_is(envir(mySim), "environment")
   expect_is(objs(mySim), "list")
-  expect_equal(sort(names(objs(mySim, all.names = TRUE))),
-               sort(names(as(mySim, "simList_"))))
+  expect_equal(sort(names(objs(mySim, all.names = TRUE))), sort(names(as(mySim, "simList_"))))
   expect_equivalent(mySim, as(as(mySim, "simList_"), "simList"))
   expect_equal(ls(mySim), objects(mySim))
   expect_equal(ls(mySim), sort(names(objs(mySim))))
@@ -304,9 +301,11 @@ test_that("simList object initializes correctly", {
   paths <- list(modulePath = file.path(tmpdir, "modules"))
 
   ## If start is set to 1.0, there is a warning message and spades doesn't seem to run
-  aa <- (capture_warnings(mySim <- simInit(times = list(start = 1.0, end = 2.0),
-                                           modules = list("test"), paths = paths,
-                                           objects = obj)))
+  aa <- (capture_warnings({
+    mySim <- simInit(times = list(start = 1.0, end = 2.0),
+                     modules = list("test"), paths = paths,
+                     objects = obj)
+    }))
   expect_length(aa, 0)
 })
 
@@ -323,7 +322,7 @@ test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   paths <- getPaths()
   modules <- list("parent_module")
   times <- list(start = 1, end = 10)
-  expect_is(mySim <- simInit(paths = paths, modules = modules, times = times), "simList")
+  expect_is({mySim <- simInit(paths = paths, modules = modules, times = times)}, "simList")
   ## test some child related stuff
   expect_true(all(modules(mySim) %in% childModName))
   expect_true(dirname(names(modules(mySim))) %in% modulePath(mySim))
@@ -338,25 +337,34 @@ test_that("test that module directory exists, but not files", {
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   parentModName <- "parent_module"
-  newModule(childModName, tmpdir, type = "child")
-  newModule(parentModName, tmpdir, type = "parent", children = childModName)
+  newModule(childModName, tmpdir, type = "child", open = FALSE)
+  newModule(parentModName, tmpdir, type = "parent", children = childModName, open = FALSE)
   paths <- getPaths()
   modules <- list(parentModName)
   times <- list(start = 1, end = 10)
   mainChildModuleFile <- file.path(paths$modulePath, childModName, paste0(childModName, ".R") )
   mainParentModuleFile <- file.path(paths$modulePath, parentModName, paste0(parentModName, ".R") )
   expect_true(file.exists(mainChildModuleFile))
+
   file.remove(mainChildModuleFile)
-  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist"))
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist")
+  })
 
   unlink(dirname(mainChildModuleFile), recursive = TRUE)
-  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist"))
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist")
+  })
 
   file.remove(mainParentModuleFile)
-  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "are missing"))
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "are missing")
+  })
 
   unlink(dirname(mainParentModuleFile), recursive = TRUE)
-  a <- capture_messages(expect_error(simInit(paths = paths, modules = modules, times = times), "exist in"))
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "doesn't exist in")
+  })
 
   unlink(paths$modulePath, recursive = TRUE)
 })
