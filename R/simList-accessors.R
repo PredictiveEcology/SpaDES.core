@@ -122,7 +122,7 @@ setMethod(
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @include simList-class.R
 #' @rdname simList-accessors-envir
 #'
@@ -175,7 +175,7 @@ setReplaceMethod("envir",
 #'
 #' @return Returns or sets a list of objects in the \code{simList} environment.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
@@ -254,7 +254,7 @@ setReplaceMethod(
 #' @param hidden Logical. If TRUE, show the default core modules.
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @export
@@ -426,7 +426,7 @@ setMethod(
 #' part for speed (e.g., 2-4x faster) is specifying the moduleName.
 #' Specifying the parameter name is <5% faster.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @export
@@ -519,7 +519,7 @@ P <- function(sim, module, param) {
 #' @export
 #' @rdname globals
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
 #'
 setGeneric("globals", function(sim) {
@@ -658,7 +658,7 @@ setMethod("parameters",
 #' @export
 #' @include simList-class.R
 #' @rdname checkpoint
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #'
 setGeneric("checkpointFile", function(sim) {
   standardGeneric("checkpointFile")
@@ -745,7 +745,7 @@ setReplaceMethod("checkpointInterval",
 #' @inheritParams params
 #' @include simList-class.R
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @rdname progress
 #'
 #' @examples
@@ -928,7 +928,7 @@ setReplaceMethod("progressType",
 #' @return Returns or sets the value(s) of the \code{input} or \code{output} slots
 #' in the \code{simList} object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
@@ -1498,7 +1498,7 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
@@ -1830,7 +1830,7 @@ setMethod("dataPath",
 #'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
 #'
 #' @export
@@ -2244,7 +2244,7 @@ setMethod(
 #'
 #' @aliases simList-accessors-events
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @importFrom data.table := copy data.table
 #' @importFrom stats setNames
 #' @include simList-class.R
@@ -2315,7 +2315,7 @@ setReplaceMethod(
      }
 
      if (NROW(value)) {
-       sim@events <- lapply(seq_along(1:NROW(value)), function (x) as.list(value[x,]))
+       sim@events <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x,]))
      } else {
        sim@events <- list()
      }
@@ -2338,7 +2338,7 @@ setMethod(
   "conditionalEvents",
   signature = c("simList", "character"),
   definition = function(sim, unit) {
-    if (length(unit) != 1) stop ("unit must be length 1")
+    if (length(unit) != 1) stop("unit must be length 1")
     if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
       conds <- sim$._conditionalEvents
       conds <- lapply(conds, function(x) {
@@ -2375,7 +2375,7 @@ setMethod("conditionalEvents",
           definition = function(sim, unit) {
             res <- conditionalEvents(sim, sim@simtimes[["timeunit"]])
             return(res)
-          })
+})
 
 ################################################################################
 #' @inheritParams events
@@ -2465,7 +2465,7 @@ setGeneric("completed", function(sim, unit, times = TRUE) {
 #' @rdname simList-accessors-events
 #' @export
 #' @aliases simList-accessors-events
-#' @importFrom data.table rbindlist setkeyv :=
+#' @importFrom data.table rbindlist set setkeyv :=
 setMethod(
   "completed",
   signature = c("simList", "character"),
@@ -2478,16 +2478,16 @@ setMethod(
       obj[, eventNumber := as.numeric(eventNumber)]
       setkeyv(obj, "eventNumber")
       if (!isTRUE(times)) {
-        set(obj, , "._clockTime", NULL)
+        set(obj, NULL, "._clockTime", NULL)
       }
       if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
             if (!is.null(obj$._clockTime))
-              obj[, `:=`(eventTime=convertTimeunit(eventTime, unit, sim@.xData),
-                         clockTime=obj$._clockTime,
-                         ._clockTime=NULL)]
+              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData),
+                         clockTime = obj$._clockTime,
+                         ._clockTime = NULL)]
           }
         }
       }
@@ -2554,7 +2554,7 @@ setReplaceMethod(
 #' @return A \code{simList} object.
 #'
 #' @include simList-class.R
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @keywords internal
 #' @rdname addDepends
 #'
@@ -2605,7 +2605,7 @@ setMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @rdname packages
 #'
 #' @author Alex Chubaty & Eliot McIntire
@@ -2686,7 +2686,6 @@ setMethod(
     return(pkgs)
 })
 
-
 ################################################################################
 #' Metadata accessors
 #'
@@ -2721,7 +2720,7 @@ setMethod("inputObjects",
               sim@depends@dependencies[[module]]@inputObjects
             }
             return(out)
-          })
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2752,8 +2751,7 @@ setMethod("outputObjects",
               sim@depends@dependencies[[module]]@outputObjects
             }
             return(out)
-          })
-
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2787,7 +2785,7 @@ setMethod("outputObjectNames",
               NULL
             }
             return(out)
-          })
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2818,8 +2816,7 @@ setMethod("reqdPkgs",
               unlist(sim@depends@dependencies[[module]]@reqdPkgs)
             }
             return(out)
-          })
-
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2850,8 +2847,7 @@ setMethod("documentation",
               sim@depends@dependencies[[module]]@documentation
             }
             return(out)
-          })
-
+})
 
 ################################################################################
 #' @param package For compatibility with \code{\link[utils]{citation}}. This can be
@@ -2885,7 +2881,7 @@ setMethod("citation",
               package@depends@dependencies[[module]]@citation
             }
             return(out)
-          })
+})
 
 #' @export
 #' @rdname simList-accessors-metadata
@@ -2894,9 +2890,7 @@ setMethod("citation",
           signature = "character",
           definition = function(package, lib.loc, auto, module) {
             utils::citation(package = package, lib.loc = lib.loc, auto = auto)
-          })
-
-
+})
 
 ################################################################################
 #' @inheritParams times

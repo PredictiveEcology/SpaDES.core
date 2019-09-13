@@ -70,10 +70,10 @@ tmpdir <- file.path(tempdir(), "test")
 checkPath(tmpdir, create = TRUE)
 
 # creates a  new, "empty" module -- it has defaults for everything that is required
-newModule("testModule", tmpdir)
+newModule("testModule", tmpdir, open = FALSE)
 
 # Look at new module code -- see defineParameter
-file.edit(file.path(tmpdir, "testModule", "testModule.R"))
+if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 
 # initialize the simList
 mySim <- simInit(modules = "testModule",
@@ -83,9 +83,7 @@ mySim <- simInit(modules = "testModule",
 #  function, we must specify the module name. If used within a module,
 #  we can omit the module name
 P(mySim, "testModule")$.useCache
-
 }
-
 
 }
 \seealso{
