@@ -8,21 +8,25 @@
 
 <title>The <code>.moduleDeps</code> class — .moduleDeps-class • SpaDES.core</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,10 +34,11 @@
 
 
 
-<meta property="og:title" content="The <code>.moduleDeps</code> class — .moduleDeps-class" />
 
+<meta property="og:title" content="The <code>.moduleDeps</code> class — .moduleDeps-class" />
 <meta property="og:description" content="Descriptor object for specifying SpaDES module dependencies." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -57,6 +62,7 @@
   gtag('config', 'UA-58633549-6');
 </script>
 
+
   </head>
 
   <body>
@@ -73,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
       </span>
     </div>
 
@@ -81,7 +87,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -110,11 +116,10 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,6 +130,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -136,75 +142,87 @@
     </div>
 
     <div class="ref-description">
-    
     <p>Descriptor object for specifying SpaDES module dependencies.</p>
-    
     </div>
 
-        
+
+
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
-    <dl class='dl-horizontal'>
+
+<dl class='dl-horizontal'>
 <dt><code>name</code></dt><dd><p>Name of the module as a character string.</p></dd>
-    <dt><code>description</code></dt><dd><p>Description of the module as a character string.</p></dd>
-    <dt><code>keywords</code></dt><dd><p>Character vector containing a module's keywords.</p></dd>
-    <dt><code>authors</code></dt><dd><p>The author(s) of the module as a <code><a href='https://www.rdocumentation.org/packages/utils/topics/person'>person</a></code> object.</p></dd>
-    <dt><code>childModules</code></dt><dd><p>A character vector of child module names.
+
+<dt><code>description</code></dt><dd><p>Description of the module as a character string.</p></dd>
+
+<dt><code>keywords</code></dt><dd><p>Character vector containing a module's keywords.</p></dd>
+
+<dt><code>authors</code></dt><dd><p>The author(s) of the module as a <code><a href='https://rdrr.io/r/utils/person.html'>person</a></code> object.</p></dd>
+
+<dt><code>childModules</code></dt><dd><p>A character vector of child module names.
 Modules listed here will be loaded with this module.</p></dd>
-    <dt><code>version</code></dt><dd><p>The module version as a <code>numeric_version</code>.
+
+<dt><code>version</code></dt><dd><p>The module version as a <code>numeric_version</code>.
 Semantic versioning is assumed <a href='http://semver.org/'>http://semver.org/</a>.</p></dd>
-    <dt><code>spatialExtent</code></dt><dd><p>Specifies the module's spatial extent as an
+
+<dt><code>spatialExtent</code></dt><dd><p>Specifies the module's spatial extent as an
 <code>Extent</code> object. Default is <code>NA</code>.</p></dd>
-    <dt><code>timeframe</code></dt><dd><p>Specifies the valid timeframe for which the module was
-designed to simulate. Must be a <code><a href='https://www.rdocumentation.org/packages/base/topics/DateTimeClasses'>POSIXt</a></code>
+
+<dt><code>timeframe</code></dt><dd><p>Specifies the valid timeframe for which the module was
+designed to simulate. Must be a <code><a href='https://rdrr.io/r/base/DateTimeClasses.html'>POSIXt</a></code>
 object of length 2, specifying the start and end times
-(e.g., <code><a href='https://www.rdocumentation.org/packages/base/topics/as.POSIXlt'>as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))</a></code>).
-Can be specified as <code>NA</code> using <code><a href='https://www.rdocumentation.org/packages/base/topics/as.POSIXlt'>as.POSIXlt(c(NA, NA))</a></code>.</p></dd>
-    <dt><code>timeunit</code></dt><dd><p>Describes the time (in seconds) corresponding to 1.0
+(e.g., <code><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))</a></code>).
+Can be specified as <code>NA</code> using <code><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXlt(c(NA, NA))</a></code>.</p></dd>
+
+<dt><code>timeunit</code></dt><dd><p>Describes the time (in seconds) corresponding to 1.0
 simulation time units. Default is <code>NA</code>.</p></dd>
-    <dt><code>citation</code></dt><dd><p>A list of citations for the module, each as character strings.
+
+<dt><code>citation</code></dt><dd><p>A list of citations for the module, each as character strings.
 Alternatively, list of filenames of <code>.bib</code> or similar files.
 Defaults to <code>NA_character_</code>.</p></dd>
-    <dt><code>documentation</code></dt><dd><p>List of filenames referring to module documentation sources.</p></dd>
-    <dt><code>reqdPkgs</code></dt><dd><p>Character vector of R package names to be loaded.
+
+<dt><code>documentation</code></dt><dd><p>List of filenames referring to module documentation sources.</p></dd>
+
+<dt><code>reqdPkgs</code></dt><dd><p>Character vector of R package names to be loaded.
 Defaults to <code>NA_character_</code>.</p></dd>
-    <dt><code>parameters</code></dt><dd><p>A <code>data.frame</code> specifying the object dependencies
+
+<dt><code>parameters</code></dt><dd><p>A <code>data.frame</code> specifying the object dependencies
 of the module, with columns <code>paramName</code>,
 <code>paramClass</code>, and <code>default</code>, whose values are
 of type <code>character</code>, <code>character</code>, and
 <code>ANY</code>, respectively. Default values may be
 overridden by the user by passing a list of parameters
 to <code><a href='simInit.html'>simInit</a></code>.</p></dd>
-    <dt><code>inputObjects</code></dt><dd><p>A <code>data.frame</code> specifying the object dependencies of
+
+<dt><code>inputObjects</code></dt><dd><p>A <code>data.frame</code> specifying the object dependencies of
 the module, with columns <code>objectName</code>,
 <code>objectClass</code>, and <code>other</code>.
 For objects that are used within the module as both an
 input and an output, add the object to each of these
 <code>data.frame</code>s.</p></dd>
-    <dt><code>outputObjects</code></dt><dd><p>A <code>data.frame</code> specifying the objects output by the
+
+<dt><code>outputObjects</code></dt><dd><p>A <code>data.frame</code> specifying the objects output by the
 module, following the format of <code>inputObjects</code>.</p></dd>
+
 </dl>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>.simDeps</code>, <code><a href='spades-classes.html'>spadesClasses</a></code></p></div>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      
       <li><a href="#slots">Slots</a></li>
-
       <li><a href="#see-also">See also</a></li>
-          </ul>
+    </ul>
 
     <h2>Author</h2>
     <p>Alex Chubaty</p>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -212,13 +230,16 @@ module, following the format of <code>inputObjects</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

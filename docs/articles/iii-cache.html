@@ -5,11 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>03 Using <code>Cache</code> with <code>SpaDES</code> • SpaDES.core</title>
+<title>03 Using `Cache` with `SpaDES` • SpaDES.core</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="03 Using &lt;code&gt;Cache&lt;/code&gt; with &lt;code&gt;SpaDES&lt;/code&gt;">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script><meta property="og:title" content="03 Using `Cache` with `SpaDES`">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -36,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
       </span>
     </div>
 
@@ -44,7 +45,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -76,7 +77,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -89,6 +90,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -96,7 +98,7 @@
 </h1>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">March 18 2019</h4>
+            <h4 class="date">September 12 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/iii-cache.Rmd"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -113,59 +115,60 @@
 <p>Some of the details of the <code>simList</code>-specific features of this <code>Cache</code> function include:</p>
 <ul>
 <li><p>The function converts all elements that have an environment as part of their attributes into a format that has no unique environment attribute, using <code>format</code> if a function, and <code>as.list</code> in the case of the <code>simList</code> environment.</p></li>
-<li><p>When used within <code>SpaDES</code> modules, <code>Cache</code> (capital C) does not require that the argument <code>cacheRepo</code> be specified. If called from inside a SpaDES module, <code>Cache</code> will use the <code>cacheRepo</code> argument from a call to <code><a href="../reference/simList-accessors-paths.html">cachePath(sim)</a></code>, taking the <code>sim</code> from the call stack. Similarly, if no <code>cacheRepo</code> argument is specified, then it will use <code><a href="https://www.rdocumentation.org/packages/base/topics/options">getOption("spades.cachePath")</a></code>, which will, by default, be a temporary location with no persistence between R sessions! To persist between sessions, use <code>SpaDES::setPaths()</code> every session.</p></li>
+<li><p>When used within <code>SpaDES</code> modules, <code>Cache</code> (capital C) does not require that the argument <code>cacheRepo</code> be specified. If called from inside a SpaDES module, <code>Cache</code> will use the <code>cacheRepo</code> argument from a call to <code><a href="../reference/simList-accessors-paths.html">cachePath(sim)</a></code>, taking the <code>sim</code> from the call stack. Similarly, if no <code>cacheRepo</code> argument is specified, then it will use <code><a href="https://rdrr.io/r/base/options.html">getOption("spades.cachePath")</a></code>, which will, by default, be a temporary location with no persistence between R sessions! To persist between sessions, use <code>SpaDES::setPaths()</code> every session.</p></li>
 </ul>
 <p>In a <code>SpaDES</code> context, there are several levels of caching that can be used as part of a reproducible workflow. Each level can be used to a modeler’s advantage; and, all can be – and are often – used concurrently.</p>
 <div id="at-the-spades-level" class="section level2">
 <h2 class="hasAnchor">
 <a href="#at-the-spades-level" class="anchor"></a>At the <code>spades</code> level</h2>
 <p>And entire call to <code>spades</code> or <code>experiment</code> can be cached. This will have the effect of eliminating any stochasticity in the model as the output will simply be the cached version of the <code>simList</code>. This is likely most useful in situations where reproducibility is more important than “new” stochasticity (<em>e.g.</em>, building decision support systems, apps, final version of a manuscript).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(magrittr)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(SpaDES.core)
-
-opts &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"spades.moduleCodeChecks"</span> =<span class="st"> </span><span class="ot">FALSE</span>) <span class="co"># turns off syntactic checking of modules</span>
-mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(
-  <span class="dt">times =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">5.0</span>),
-  <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(
-    <span class="dt">.globals =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"testStats"</span>),
-    <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>),
-    <span class="dt">fireSpread =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>)
-  ),
-  <span class="dt">modules =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>),
-  <span class="dt">paths =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(opts)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(magrittr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(raster)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(SpaDES.core)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">opts &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="st">"spades.moduleCodeChecks"</span> =<span class="st"> </span><span class="ot">FALSE</span>) <span class="co"># turns off syntactic checking of modules</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">  <span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">5.0</span>),</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">  <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">    <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"testStats"</span>),</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">    <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>),</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">    <span class="dt">fireSpread =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">  ),</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">  <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>),</a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">  <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)))</a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(opts)</a></code></pre></div>
 <p>This functionality can be achieved within a <code>spades</code> call.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># compare caching ... run once to create cache</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(outSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>, <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.time">Sys.time</a></span>()))</code></pre></div>
-<pre><code>## This is the current event, printed as it is happening:
-## eventTime moduleName eventType eventPriority
-## 0         checkpoint init      5            
-## 0         save       init      5            
-## 0         progress   init      5            
-## 0         load       init      5            
-## 0         randomLandscapes init      5</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># compare caching ... run once to create cache</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(outSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>, <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>()))</a></code></pre></div>
+<pre><code>## [1] "2019-09-12 21:03:04 | total elpsd: 0.0034 secs | 0 checkpoint init 5"
+## [1] "2019-09-12 21:03:04 | total elpsd: 0.007 secs | 0 save init 5"
+## [1] "2019-09-12 21:03:04 | total elpsd: 0.011 secs | 0 progress init 5"
+## [1] "2019-09-12 21:03:04 | total elpsd: 0.013 secs | 0 load init 5"
+## [1] "2019-09-12 21:03:04 | total elpsd: 0.015 secs | 0 randomLandscapes init 5"</code></pre>
 <pre><code>## Loading required namespace: RandomFields</code></pre>
-<pre><code>## 0         fireSpread       init      5            
-## 1         fireSpread       burn      5            
-## 1         fireSpread       stats     5            
-## 2         fireSpread       burn      5            
-## 2         fireSpread       stats     5            
-## 3         fireSpread       burn      5            
-## 3         fireSpread       stats     5            
-## 4         fireSpread       burn      5            
-## 4         fireSpread       stats     5            
-## 5         fireSpread       burn      5            
-## 5         fireSpread       stats     5</code></pre>
+<pre><code>## [1] "2019-09-12 21:03:06 | total elpsd: 1.7 secs | 0 fireSpread init 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.1 secs | 1 fireSpread burn 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.2 secs | 1 fireSpread stats 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.2 secs | 2 fireSpread burn 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 2 fireSpread stats 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 3 fireSpread burn 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 3 fireSpread stats 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 4 fireSpread burn 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 4 fireSpread stats 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 5 fireSpread burn 5"
+## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 5 fireSpread stats 5"</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   1.915   0.225   2.308</code></pre>
+##   2.717   0.479   3.271</code></pre>
 <p>Note that if there were any visualizations (here we turned them off with <code>.plotInitialTime = NA</code> above) they will happen the first time through, but not the cached times.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster 2nd time</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(outSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># vastly faster 2nd time</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(outSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.070   0.000   0.071</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(outSim, outSimCached) </code></pre></div>
+##   0.066   0.000   0.068</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(outSim, outSimCached) </a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="at-the-experiment-level" class="section level2">
@@ -175,24 +178,56 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 <div id="using-cache-argument" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-cache-argument" class="anchor"></a>Using cache argument</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(sims1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</code></pre></div>
-<pre><code>## [1] "/tmp/Rtmpo4gO2E/reproducible/cache"</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<pre><code>## [1] "2019-09-12 21:03:08 | total elpsd: 0.0019 secs | 0 checkpoint init 5"
+## [1] "2019-09-12 21:03:08 | total elpsd: 0.0049 secs | 0 save init 5"
+## [1] "2019-09-12 21:03:08 | total elpsd: 0.0075 secs | 0 progress init 5"
+## [1] "2019-09-12 21:03:08 | total elpsd: 0.0088 secs | 0 load init 5"
+## [1] "2019-09-12 21:03:08 | total elpsd: 0.0098 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.1 secs | 0 fireSpread init 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.1 secs | 1 fireSpread burn 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 1 fireSpread stats 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 2 fireSpread burn 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 2 fireSpread stats 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 3 fireSpread burn 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 3 fireSpread stats 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 4 fireSpread burn 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.3 secs | 4 fireSpread stats 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.3 secs | 5 fireSpread burn 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 1.3 secs | 5 fireSpread stats 5"</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
+<pre><code>## [1] "2019-09-12 21:03:09 | total elpsd: 0.001 secs | 0 checkpoint init 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 0.0024 secs | 0 save init 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 0.0045 secs | 0 progress init 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 0.0058 secs | 0 load init 5"
+## [1] "2019-09-12 21:03:09 | total elpsd: 0.0068 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 0.95 secs | 0 fireSpread init 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 0.97 secs | 1 fireSpread burn 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 1 fireSpread stats 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 2 fireSpread burn 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 2 fireSpread stats 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 3 fireSpread burn 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 1.1 secs | 3 fireSpread stats 5"
+## [1] "2019-09-12 21:03:10 | total elpsd: 1.1 secs | 4 fireSpread burn 5"
+## [1] "2019-09-12 21:03:11 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-12 21:03:11 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-12 21:03:11 | total elpsd: 1.1 secs | 5 fireSpread stats 5"</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
+<pre><code>## shutting down parallel nodes</code></pre>
+<pre><code>##    user  system elapsed 
+##   2.651   0.282   2.986</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># internal -- second time faster</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
-<pre><code>## [1] "/tmp/Rtmpo4gO2E/reproducible/cache"</code></pre>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>## shutting down parallel nodes</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.150   0.003   0.155</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># internal -- second time faster</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(sims2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</code></pre></div>
-<pre><code>## [1] "/tmp/Rtmpo4gO2E/reproducible/cache"</code></pre>
-<pre><code>##   loading memoised result from previous spades call.</code></pre>
-<pre><code>## [1] "/tmp/Rtmpo4gO2E/reproducible/cache"</code></pre>
-<pre><code>##   loading memoised result from previous spades call.
-## shutting down parallel nodes</code></pre>
-<pre><code>##    user  system elapsed 
-##   0.089   0.010   0.100</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(sims1, sims2)</code></pre></div>
+##   0.128   0.007   0.137</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(sims1, sims2)</a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="wrapping-experiment-with-cache" class="section level3">
@@ -200,38 +235,89 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 <a href="#wrapping-experiment-with-cache" class="anchor"></a>Wrapping <code>experiment</code> with <code>Cache</code>
 </h3>
 <p>Here, the <code>simList</code> (and other arguments to experiment) is hashed once, and if it is found to be the same as previous, then the returned list of <code>simList</code> objects is recovered. This means that even a very large experiment, with many replicates and combinations of parameters and modules can be recovered very quickly. Here we show that you can output objects to disk, so the list of <code>simList</code> objects doesn’t get too big. Then, when we recover it in the Cached version, all the files are still there, the list of <code>simList</code> objects is small, so very fast to recover.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># External</span>
-<span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">objectName =</span> <span class="st">"landscape"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(sims3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
-                           <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="co"># External</span></a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">objectName =</span> <span class="st">"landscape"</span>)</a>
+<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb27-4" data-line-number="4">                           <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<pre><code>## [1] "2019-09-12 21:03:12 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
+## [1] "2019-09-12 21:03:12 | total elpsd: 0.0026 secs | 0 save init 5"
+## [1] "2019-09-12 21:03:12 | total elpsd: 0.0049 secs | 0 progress init 5"
+## [1] "2019-09-12 21:03:12 | total elpsd: 0.0063 secs | 0 load init 5"
+## [1] "2019-09-12 21:03:12 | total elpsd: 0.0074 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.95 secs | 0 fireSpread init 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.97 secs | 1 fireSpread burn 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.98 secs | 1 fireSpread stats 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.99 secs | 2 fireSpread burn 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 2 fireSpread stats 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 3 fireSpread burn 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 3 fireSpread stats 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 4 fireSpread burn 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
+<pre><code>## [1] "2019-09-12 21:03:13 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.0027 secs | 0 save init 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.0068 secs | 0 progress init 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.0097 secs | 0 load init 5"
+## [1] "2019-09-12 21:03:13 | total elpsd: 0.012 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.94 secs | 0 fireSpread init 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.96 secs | 1 fireSpread burn 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.98 secs | 1 fireSpread stats 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.99 secs | 2 fireSpread burn 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1 secs | 2 fireSpread stats 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1 secs | 3 fireSpread burn 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1 secs | 3 fireSpread stats 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 4 fireSpread burn 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
+<pre><code>## [1] "2019-09-12 21:03:14 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.0026 secs | 0 save init 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.0049 secs | 0 progress init 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.0063 secs | 0 load init 5"
+## [1] "2019-09-12 21:03:14 | total elpsd: 0.0074 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 0.92 secs | 0 fireSpread init 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 0.94 secs | 1 fireSpread burn 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 0.96 secs | 1 fireSpread stats 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 0.97 secs | 2 fireSpread burn 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 0.99 secs | 2 fireSpread stats 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 3 fireSpread burn 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 3 fireSpread stats 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 4 fireSpread burn 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
+## [1] "2019-09-12 21:03:15 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
+<pre><code>## shutting down parallel nodes</code></pre>
+<pre><code>##    user  system elapsed 
+##   3.559   0.410   3.976</code></pre>
+<p>The second time is way faster. We see the output files in the same location.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">                           <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>##   loading cached result from previous experiment call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.025   0.007   0.033</code></pre>
-<p>The second time is way faster. We see the output files in the same location.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(sims4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
-                           <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</code></pre></div>
-<pre><code>##   loading memoised result from previous experiment call.</code></pre>
-<pre><code>##    user  system elapsed 
-##   0.026   0.002   0.029</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># test they are all equal</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(sims3[[x]], sims4[[x]])) </code></pre></div>
-<pre><code>## Warning in rm(list = objsCurrent, envir = envir(current)): object
-## '._firstEventClockTime' not found</code></pre>
-<pre><code>## Warning in rm(list = objsCurrent, envir = envir(current)): object
-## '._startClockTime' not found</code></pre>
-<pre><code>## Warning in rm(list = objsCurrent, envir = envir(current)): object
-## '._firstEventClockTime' not found</code></pre>
-<pre><code>## Warning in rm(list = objsCurrent, envir = envir(current)): object
-## '._startClockTime' not found</code></pre>
+##   0.035   0.014   0.050</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="co"># test they are all equal</span></a>
+<a class="sourceLine" id="cb39-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(sims3[[x]], sims4[[x]])) </a></code></pre></div>
 <pre><code>## [[1]]
 ## [1] TRUE
 ## 
 ## [[2]]
 ## [1] TRUE</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list.files">dir</a></span>(<span class="kw"><a href="../reference/simList-accessors-paths.html">outputPath</a></span>(mySim), <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] "experiment.RData"         "landscape_year5.rds"     
-## [3] "rep1/landscape_year5.rds" "rep2/landscape_year5.rds"
-## [5] "rep3/landscape_year5.rds"</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/list.files.html">dir</a></span>(<span class="kw"><a href="../reference/simList-accessors-paths.html">outputPath</a></span>(mySim), <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## [1] "experiment.RData"         "rep1/landscape_year5.rds"
+## [3] "rep2/landscape_year5.rds" "rep3/landscape_year5.rds"</code></pre>
 <p>Notice that speed up can be enormous; in this case ~100 times.</p>
 </div>
 </div>
@@ -241,10 +327,10 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 <p>If the parameter <code>.useCache</code> in the module’s metadata is set to <code>TRUE</code>, then <em>every</em> event in the module will be cached. That means that every time that module is called from within a spades or experiment call, <code>Cache</code> will be called. Only the objects inside the <code>simList</code> that correspond to the <code>inputObjects</code> or the <code>outputObjects</code> from the module metadata will be assessed for caching.</p>
 <p>For general use, module-level caching would be mostly useful for modules that have no stochasticity, such as data-preparation modules, GIS modules etc.</p>
 <p>In this example, we will use the cache on the <code>randomLandscapes</code> module. This means that each subsequent call to spades will result in identical outputs from the <code>randomLandscapes</code> module (only!). This would be useful when only one random landscape is needed simply for trying something out, or putting into production code (<em>e.g.</em>, publication, decision support, etc.).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Module-level</span>
-<span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.useCache &lt;-<span class="st"> </span><span class="ot">TRUE</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(randomSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
-                                <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.time">Sys.time</a></span>(), <span class="dt">debug =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="co"># Module-level</span></a>
+<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.useCache &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb43-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(randomSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb43-4" data-line-number="4">                                <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>(), <span class="dt">debug =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>## This is the current event, printed as it is happening:
 ## eventTime moduleName eventType eventPriority
 ## 0         checkpoint init      5            
@@ -264,11 +350,14 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       burn      5            
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   1.281   0.108   1.395</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster the second time</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
-                                      <span class="dt">debug =</span> <span class="ot">TRUE</span>))</code></pre></div>
+##   1.577   0.185   1.443</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="co"># vastly faster the second time</span></a>
+<a class="sourceLine" id="cb47-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb47-3" data-line-number="3">                                      <span class="dt">debug =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>## This is the current event, printed as it is happening:
 ## eventTime moduleName eventType eventPriority
 ## 0         checkpoint init      5            
@@ -290,14 +379,17 @@ mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simIn
 ## 5         fireSpread       burn      5            
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.336   0.033   0.373</code></pre>
+##   0.404   0.045   0.301</code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are identical, not <code>fireSpread</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">layers &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span>)
-same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(layers, <span class="cf">function</span>(l) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/identical">identical</a></span>(randomSim<span class="op">$</span>landscape[[l]],
-                                             randomSimCached<span class="op">$</span>landscape[[l]]))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(same) &lt;-<span class="st"> </span>layers
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(same) <span class="co"># Fires is not same because all non-init events in fireSpread are not cached</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">layers &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span>)</a>
+<a class="sourceLine" id="cb51-2" data-line-number="2">same &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(layers, <span class="cf">function</span>(l) <span class="kw"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(randomSim<span class="op">$</span>landscape[[l]],</a>
+<a class="sourceLine" id="cb51-3" data-line-number="3">                                             randomSimCached<span class="op">$</span>landscape[[l]]))</a>
+<a class="sourceLine" id="cb51-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/names.html">names</a></span>(same) &lt;-<span class="st"> </span>layers</a>
+<a class="sourceLine" id="cb51-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(same) <span class="co"># Fires is not same because all non-init events in fireSpread are not cached</span></a></code></pre></div>
 <pre><code>## $DEM
 ## [1] TRUE
 ## 
@@ -318,9 +410,9 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 <a href="#event-level-caching" class="anchor"></a>Event-level caching</h2>
 <p>If the parameter <code>.useCache</code> in the module’s metadata is set to a <em>character or character vector</em>, then that or those event(s), identified by their name, will be cached. That means that every time the event is called from within a <code>spades</code> or <code>experiment</code> call, <code>Cache</code> will be called. Only the objects inside the <code>simList</code> that correspond to the <code>inputObjects</code> or the <code>outputObjects</code> as defined in the module metadata will be assessed for caching inputs or outputs, respectively. The fact that all and only the named <code>inputObjects</code> and <code>outputObjects</code> are cached and returned may be inefficient (<em>i.e.</em>, it may cache more objects than are necessary) for individual events.</p>
 <p>Similar to module-level caching, event-level caching would be mostly useful for events that have no stochasticity, such as data-preparation events, GIS events etc. Here, we don’t change the module-level caching for <code>randomLandscapes</code>, but we add to it a cache for only the “init” event for <code>fireSpread</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>fireSpread<span class="op">$</span>.useCache &lt;-<span class="st"> "init"</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(randomSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
-                                <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.time">Sys.time</a></span>(), <span class="dt">debug =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>fireSpread<span class="op">$</span>.useCache &lt;-<span class="st"> "init"</span></a>
+<a class="sourceLine" id="cb53-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(randomSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb53-3" data-line-number="3">                                <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>(), <span class="dt">debug =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>## This is the current event, printed as it is happening:
 ## eventTime moduleName eventType eventPriority
 ## 0         checkpoint init      5            
@@ -340,11 +432,14 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 ## 5         fireSpread       burn      5            
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   1.440   0.070   1.518</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster the second time</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,
-                                      <span class="dt">debug =</span> <span class="ot">TRUE</span>))</code></pre></div>
+##   2.406   0.186   1.807</code></pre>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="co"># vastly faster the second time</span></a>
+<a class="sourceLine" id="cb57-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb57-3" data-line-number="3">                                      <span class="dt">debug =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>## This is the current event, printed as it is happening:
 ## eventTime moduleName eventType eventPriority
 ## 0         checkpoint init      5            
@@ -367,126 +462,59 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 ## 5         fireSpread       burn      5            
 ## 5         fireSpread       stats     5            
 ## 5         save             spades    10</code></pre>
+<pre><code>## simList saved in
+##  SpaDES.core:::.pkgEnv$.sim 
+## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.225   0.009   0.236</code></pre>
+##   0.801   0.065   0.383</code></pre>
 </div>
 <div id="function-level-caching" class="section level2">
 <h2 class="hasAnchor">
 <a href="#function-level-caching" class="anchor"></a>Function-level caching</h2>
 <p>Any function can be cached using: <code><a href="../reference/robustDigest.html">Cache(FUN = functionName, ...)</a></code>.</p>
-<p>This will be a slight change to a function call, such as: <code><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster(raster, crs = crs(newRaster))</a></code> to <code><a href="../reference/robustDigest.html">Cache(projectRaster, raster, crs = crs(newRaster))</a></code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ras &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/raster">raster</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extent">extent</a></span>(<span class="dv">0</span>, <span class="fl">1e3</span>, <span class="dv">0</span>, <span class="fl">1e3</span>), <span class="dt">res =</span> <span class="dv">1</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(map &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim),
-                         <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.time">Sys.time</a></span>()))</code></pre></div>
+<p>This will be a slight change to a function call, such as: <code><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster(raster, crs = crs(newRaster))</a></code> to <code><a href="../reference/robustDigest.html">Cache(projectRaster, raster, crs = crs(newRaster))</a></code>.</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">ras &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/raster/man/raster.html">raster</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/extent.html">extent</a></span>(<span class="dv">0</span>, <span class="fl">1e3</span>, <span class="dv">0</span>, <span class="fl">1e3</span>), <span class="dt">res =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb61-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(map &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim),</a>
+<a class="sourceLine" id="cb61-3" data-line-number="3">                         <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>()))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   2.422   0.038   2.463</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vastly faster the second time</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.time">system.time</a></span>(mapCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim)))</code></pre></div>
+##   2.517   0.104   2.624</code></pre>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># vastly faster the second time</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(mapCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim)))</a></code></pre></div>
+<pre><code>##   ...(Object to retrieve is large: 7.1 Mb)</code></pre>
 <pre><code>##   loading cached result from previous gaussMap call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.086   0.003   0.089</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all.equal">all.equal</a></span>(map, mapCached) </code></pre></div>
+##   0.089   0.000   0.089</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(map, mapCached) </a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="working-with-the-cache-manually" class="section level2">
 <h2 class="hasAnchor">
 <a href="#working-with-the-cache-manually" class="anchor"></a>Working with the Cache manually</h2>
 <p>Since the cache is simply an <code>archivist</code> repository, all <code>archivist</code> functions will work as is. In addition, there are several helpers in the <code>reproducible</code> package, including <code>showCache</code>, <code>keepCache</code> and <code>clearCache</code> that may be useful. Also, one can access cached items manually (rather than simply rerunning the same <code>Cache</code> function again).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># examine a part of the Cache</span>
-<span class="kw">showCache</span>(mySim)[tagKey <span class="op">==</span><span class="st"> "function"</span>, <span class="op">-</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"artifact"</span>)]</code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1"><span class="co"># examine a part of the Cache</span></a>
+<a class="sourceLine" id="cb69-2" data-line-number="2"><span class="kw">showCache</span>(mySim)[tagKey <span class="op">==</span><span class="st"> "function"</span>, <span class="op">-</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"artifact"</span>)]</a></code></pre></div>
 <pre><code>## Cache size:</code></pre>
-<pre><code>##   Total (including Rasters): 9.6 Mb</code></pre>
-<pre><code>##   Selected objects (not including Rasters): 9.6 Mb</code></pre>
-<pre><code>##       tagKey   tagValue         createdDate
-##  1: function     spades 2019-03-18 20:12:15
-##  2: function        FUN 2019-03-18 20:12:15
-##  3: function experiment 2019-03-18 15:05:57
-##  4: function     spades 2019-03-18 19:26:50
-##  5: function     spades 2019-03-18 17:35:30
-##  6: function     spades 2019-03-18 17:34:24
-##  7: function        FUN 2019-03-18 17:34:24
-##  8: function     spades 2019-03-18 15:09:31
-##  9: function     spades 2019-03-18 17:31:45
-## 10: function        FUN 2019-03-18 17:31:45
-## 11: function     spades 2019-03-18 10:15:51
-## 12: function     spades 2019-03-18 15:05:52
-## 13: function     spades 2019-03-18 19:28:16
-## 14: function        FUN 2019-03-18 19:28:16
-## 15: function     spades 2019-03-18 19:28:16
-## 16: function        FUN 2019-03-18 19:28:16
-## 17: function     spades 2019-03-18 15:06:01
-## 18: function        FUN 2019-03-18 15:06:01
-## 19: function     spades 2019-03-18 15:43:16
-## 20: function experiment 2019-03-18 10:15:59
-## 21: function     spades 2019-03-18 15:09:30
-## 22: function     spades 2019-03-18 15:10:41
-## 23: function     spades 2019-03-18 10:20:43
-## 24: function        FUN 2019-03-18 10:20:43
-## 25: function     spades 2019-03-18 10:20:32
-## 26: function experiment 2019-03-18 19:28:12
-## 27: function     spades 2019-03-18 19:26:49
-## 28: function     spades 2019-03-18 17:31:33
-## 29: function     spades 2019-03-18 17:35:32
-## 30: function     spades 2019-03-18 17:34:14
-## 31: function     spades 2019-03-18 19:26:59
-## 32: function        FUN 2019-03-18 19:26:59
-## 33: function     spades 2019-03-18 15:09:40
-## 34: function        FUN 2019-03-18 15:09:40
-## 35: function experiment 2019-03-18 17:31:41
-## 36: function     spades 2019-03-18 15:10:39
-## 37: function   gaussMap 2019-03-18 20:12:18
-## 38: function     spades 2019-03-18 10:20:34
-## 39: function     spades 2019-03-18 15:43:17
-## 40: function     spades 2019-03-18 15:05:53
-## 41: function     spades 2019-03-18 17:34:15
-## 42: function experiment 2019-03-18 10:20:38
-## 43: function     spades 2019-03-18 17:37:02
-## 44: function        FUN 2019-03-18 17:37:02
-## 45: function     spades 2019-03-18 15:48:04
-## 46: function        FUN 2019-03-18 15:48:04
-## 47: function experiment 2019-03-18 15:09:36
-## 48: function     spades 2019-03-18 20:12:15
-## 49: function        FUN 2019-03-18 20:12:15
-## 50: function     spades 2019-03-18 17:35:41
-## 51: function        FUN 2019-03-18 17:35:41
-## 52: function     spades 2019-03-18 15:43:14
-## 53: function     spades 2019-03-18 19:28:08
-## 54: function     spades 2019-03-18 15:05:50
-## 55: function     spades 2019-03-18 19:26:47
-## 56: function     spades 2019-03-18 10:15:54
-## 57: function experiment 2019-03-18 17:35:37
-## 58: function     spades 2019-03-18 17:34:12
-## 59: function     spades 2019-03-18 17:35:33
-## 60: function     spades 2019-03-18 17:31:36
-## 61: function     spades 2019-03-18 19:28:07
-## 62: function     spades 2019-03-18 17:36:56
-## 63: function     spades 2019-03-18 15:43:26
-## 64: function        FUN 2019-03-18 15:43:26
-## 65: function     spades 2019-03-18 19:28:04
-## 66: function     spades 2019-03-18 10:15:53
-## 67: function     spades 2019-03-18 10:16:03
-## 68: function        FUN 2019-03-18 10:16:03
-## 69: function experiment 2019-03-18 15:43:21
-## 70: function experiment 2019-03-18 19:26:54
-## 71: function     spades 2019-03-18 15:10:46
-## 72: function        FUN 2019-03-18 15:10:46
-## 73: function     spades 2019-03-18 17:31:35
-## 74: function     spades 2019-03-18 17:32:28
-## 75: function        FUN 2019-03-18 17:32:28
-## 76: function experiment 2019-03-18 17:34:20
-## 77: function     spades 2019-03-18 17:46:05
-## 78: function        FUN 2019-03-18 17:46:05
-## 79: function     spades 2019-03-18 20:12:09
-##       tagKey   tagValue         createdDate</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ns-load">requireNamespace</a></span>(<span class="st">"archivist"</span>)) {
-  <span class="co"># get the RasterLayer that was produced with the gaussMap function:</span>
-  map &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(<span class="kw">showCache</span>(mySim, <span class="dt">userTags =</span> <span class="st">"gaussMap"</span>)<span class="op">$</span>artifact) <span class="op">%&gt;%</span>
-<span class="st">    </span>archivist<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/archivist/topics/loadFromRepo">loadFromLocalRepo</a></span>(<span class="dt">repoDir =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim), <span class="dt">value =</span> <span class="ot">TRUE</span>)
-  <span class="kw">clearPlot</span>()
-  <span class="kw">Plot</span>(map)
-}</code></pre></div>
+<pre><code>##   Total (including Rasters): 2.6 Mb</code></pre>
+<pre><code>##   Selected objects (not including Rasters): 2.6 Mb</code></pre>
+<pre><code>##      tagKey   tagValue         createdDate
+## 1: function     spades 2019-09-12 21:03:07
+## 2: function   gaussMap 2019-09-12 21:03:24
+## 3: function     spades 2019-09-12 21:03:11
+## 4: function     spades 2019-09-12 21:03:20
+## 5: function        FUN 2019-09-12 21:03:20
+## 6: function     spades 2019-09-12 21:03:09
+## 7: function experiment 2019-09-12 21:03:15
+## 8: function     spades 2019-09-12 21:03:20
+## 9: function        FUN 2019-09-12 21:03:20</code></pre>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"archivist"</span>)) {</a>
+<a class="sourceLine" id="cb74-2" data-line-number="2">  <span class="co"># get the RasterLayer that was produced with the gaussMap function:</span></a>
+<a class="sourceLine" id="cb74-3" data-line-number="3">  map &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/raster/man/unique.html">unique</a></span>(<span class="kw">showCache</span>(mySim, <span class="dt">userTags =</span> <span class="st">"gaussMap"</span>)<span class="op">$</span>artifact) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb74-4" data-line-number="4"><span class="st">    </span>archivist<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/archivist/man/loadFromRepo.html">loadFromLocalRepo</a></span>(<span class="dt">repoDir =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim), <span class="dt">value =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb74-5" data-line-number="5">  <span class="kw">clearPlot</span>()</a>
+<a class="sourceLine" id="cb74-6" data-line-number="6">  <span class="kw">Plot</span>(map)</a>
+<a class="sourceLine" id="cb74-7" data-line-number="7">}</a></code></pre></div>
 <pre><code>## Cache size:</code></pre>
-<pre><code>##   Total (including Rasters): 9.6 Mb</code></pre>
+<pre><code>##   Total (including Rasters): 2.6 Mb</code></pre>
 <pre><code>##   Selected objects (not including Rasters): 1.9 Mb</code></pre>
 <p><img src="iii-cache_files/figure-html/manual-cache-1.png" width="700"></p>
 </div>
@@ -502,10 +530,10 @@ same &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
 <li>Imagine we have large model, with many modules, with replication and alternative module collections (e.g., alternative fire models)</li>
 <li>To run this would have a nested structure with the following functions:</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">simInit <span class="op">-</span>-&gt;<span class="st"> </span>many .inputObjects calls
-
-experiment <span class="op">-</span>-&gt;<span class="st"> </span>many spades calls <span class="op">-</span>-&gt;<span class="st"> </span>many module calls <span class="op">-</span>-&gt;<span class="st"> </span>many event calls <span class="op">-</span>-&gt;<span class="st"> </span>many <span class="cf">function</span> calls</code></pre></div>
-<p>Lets say we start to introduce caching to this structure. We start from the “inner” most functions that we could imaging Caching would be useful. Lets say there are some GIS operations, like <code><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">raster::projectRaster</a></code>, which operates on an input shapefile. We can Cache the <code>projectRaster</code> call to make this much faster, since it will always be the same result for a given input raster.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1">simInit <span class="op">-</span>-&gt;<span class="st"> </span>many .inputObjects calls</a>
+<a class="sourceLine" id="cb78-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb78-3" data-line-number="3">experiment <span class="op">-</span>-&gt;<span class="st"> </span>many spades calls <span class="op">-</span>-&gt;<span class="st"> </span>many module calls <span class="op">-</span>-&gt;<span class="st"> </span>many event calls <span class="op">-</span>-&gt;<span class="st"> </span>many <span class="cf">function</span> calls</a></code></pre></div>
+<p>Lets say we start to introduce caching to this structure. We start from the “inner” most functions that we could imaging Caching would be useful. Lets say there are some GIS operations, like <code><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">raster::projectRaster</a></code>, which operates on an input shapefile. We can Cache the <code>projectRaster</code> call to make this much faster, since it will always be the same result for a given input raster.</p>
 <p>If we look back at our structure above, we see that we still have LOTS of places that are not Cached. That means that the experiment call will still spawn many spades calls, which will still spawn many module calls, and many event calls, just to get to the one <code><a href="../reference/robustDigest.html">Cache(projectRaster)</a></code> call which is Cached. This function will likely be called hundreds of times (because <code>experiment</code> runs the <code>spades</code> call 100 times due to replication). This is good, but <strong>Cache does take some time</strong>. So, even if <code><a href="../reference/robustDigest.html">Cache(projectRaster)</a></code> takes only 0.02 seconds, calling it hundreds of times means maybe 4 seconds. If we are doing this for many functions, then this will be too slow.</p>
 <p>We can start putting <code>Cache</code> all up the sequence of calls. Unfortunately, the way we use Cache at each of these levels is a bit different, so we need a slightly different approach for each.</p>
 <div id="cache-the-experiment-call" class="section level4">
@@ -531,11 +559,11 @@ experiment <span class="op">-</span>-&gt;<span class="st"> </span>many spades ca
 <a href="#cache-a-whole-module" class="anchor"></a>Cache a whole module</h4>
 <p>Pass <code>.useCache = TRUE</code> as a parameter to the module, during the <code>simInit</code></p>
 <p>Some modules are inherently non-random, such as GIS modules, or parameter fitting statistical modules. We expect these to be identical results each time, so we can safely cache the entire module.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameters =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(
-  <span class="dt">FireModule =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">.useCache =</span> <span class="ot">TRUE</span>)
-)
-mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(..., <span class="dt">params =</span> parameters)
-mySimOut &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">parameters =<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb79-2" data-line-number="2">  <span class="dt">FireModule =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.useCache =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb79-3" data-line-number="3">)</a>
+<a class="sourceLine" id="cb79-4" data-line-number="4">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(..., <span class="dt">params =</span> parameters)</a>
+<a class="sourceLine" id="cb79-5" data-line-number="5">mySimOut &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a></code></pre></div>
 <p>The messaging should indicate the caching is happening on every event in that module.</p>
 <p><strong><em>Note: This option REQUIRES that the metadata in inputs and outputs be exactly correct, i.e., all inputObjects and outputObjects must be correctly identified and listed in the defineModule metadata</em></strong></p>
 <p><strong><em>If the module is cached, and there are errors when it is run, it almost is guaranteed to be a problem with the <code>inputObjects</code> and <code>outputObjects</code> incorrectly specified.</em></strong></p>
@@ -557,6 +585,7 @@ mySimOut &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sp
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -584,17 +613,20 @@ mySimOut &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sp
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Alex M Chubaty, Eliot J B McIntire.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
