@@ -232,10 +232,10 @@ tell a module user what values the module expects.</p></td>
 <span class='fu'>checkPath</span>(<span class='no'>tmpdir</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># creates a  new, "empty" module -- it has defaults for everything that is required</span>
-<span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"testModule"</span>, <span class='no'>tmpdir</span>)
+<span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"testModule"</span>, <span class='no'>tmpdir</span>, <span class='kw'>open</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># Look at new module code -- see defineParameter</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"testModule"</span>, <span class='st'>"testModule.R"</span>))
+<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"testModule"</span>, <span class='st'>"testModule.R"</span>))
 
 <span class='co'># initialize the simList</span>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='st'>"testModule"</span>,
@@ -245,7 +245,6 @@ tell a module user what values the module expects.</p></td>
 <span class='co'>#  function, we must specify the module name. If used within a module,</span>
 <span class='co'>#  we can omit the module name</span>
 <span class='fu'><a href='params.html'>P</a></span>(<span class='no'>mySim</span>, <span class='st'>"testModule"</span>)$<span class='no'>.useCache</span>
-
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

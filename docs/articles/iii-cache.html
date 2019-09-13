@@ -98,7 +98,7 @@
 </h1>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">September 12 2019</h4>
+            <h4 class="date">September 13 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/iii-cache.Rmd"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -140,34 +140,34 @@
 <p>This functionality can be achieved within a <code>spades</code> call.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># compare caching ... run once to create cache</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(outSim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>, <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>()))</a></code></pre></div>
-<pre><code>## [1] "2019-09-12 21:03:04 | total elpsd: 0.0034 secs | 0 checkpoint init 5"
-## [1] "2019-09-12 21:03:04 | total elpsd: 0.007 secs | 0 save init 5"
-## [1] "2019-09-12 21:03:04 | total elpsd: 0.011 secs | 0 progress init 5"
-## [1] "2019-09-12 21:03:04 | total elpsd: 0.013 secs | 0 load init 5"
-## [1] "2019-09-12 21:03:04 | total elpsd: 0.015 secs | 0 randomLandscapes init 5"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:49 | total elpsd: 0.0028 secs | 0 checkpoint init 5"
+## [1] "2019-09-13 07:36:49 | total elpsd: 0.0057 secs | 0 save init 5"
+## [1] "2019-09-13 07:36:49 | total elpsd: 0.0085 secs | 0 progress init 5"
+## [1] "2019-09-13 07:36:49 | total elpsd: 0.01 secs | 0 load init 5"
+## [1] "2019-09-13 07:36:49 | total elpsd: 0.012 secs | 0 randomLandscapes init 5"</code></pre>
 <pre><code>## Loading required namespace: RandomFields</code></pre>
-<pre><code>## [1] "2019-09-12 21:03:06 | total elpsd: 1.7 secs | 0 fireSpread init 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.1 secs | 1 fireSpread burn 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.2 secs | 1 fireSpread stats 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.2 secs | 2 fireSpread burn 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 2 fireSpread stats 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 3 fireSpread burn 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 3 fireSpread stats 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 4 fireSpread burn 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 4 fireSpread stats 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 5 fireSpread burn 5"
-## [1] "2019-09-12 21:03:07 | total elpsd: 2.3 secs | 5 fireSpread stats 5"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:50 | total elpsd: 1.5 secs | 0 fireSpread init 5"
+## [1] "2019-09-13 07:36:50 | total elpsd: 1.8 secs | 1 fireSpread burn 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 1.9 secs | 1 fireSpread stats 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 1.9 secs | 2 fireSpread burn 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 1.9 secs | 2 fireSpread stats 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 1.9 secs | 3 fireSpread burn 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 1.9 secs | 3 fireSpread stats 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 1.9 secs | 4 fireSpread burn 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 2 secs | 4 fireSpread stats 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 2 secs | 5 fireSpread burn 5"
+## [1] "2019-09-13 07:36:51 | total elpsd: 2 secs | 5 fireSpread stats 5"</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.717   0.479   3.271</code></pre>
+##   2.362   0.387   2.780</code></pre>
 <p>Note that if there were any visualizations (here we turned them off with <code>.plotInitialTime = NA</code> above) they will happen the first time through, but not the cached times.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># vastly faster 2nd time</span></a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(outSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">cache =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.066   0.000   0.068</code></pre>
+##   0.059   0.002   0.060</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(outSim, outSimCached) </a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -179,54 +179,54 @@
 <h3 class="hasAnchor">
 <a href="#using-cache-argument" class="anchor"></a>Using cache argument</h3>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
-<pre><code>## [1] "2019-09-12 21:03:08 | total elpsd: 0.0019 secs | 0 checkpoint init 5"
-## [1] "2019-09-12 21:03:08 | total elpsd: 0.0049 secs | 0 save init 5"
-## [1] "2019-09-12 21:03:08 | total elpsd: 0.0075 secs | 0 progress init 5"
-## [1] "2019-09-12 21:03:08 | total elpsd: 0.0088 secs | 0 load init 5"
-## [1] "2019-09-12 21:03:08 | total elpsd: 0.0098 secs | 0 randomLandscapes init 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.1 secs | 0 fireSpread init 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.1 secs | 1 fireSpread burn 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 1 fireSpread stats 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 2 fireSpread burn 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 2 fireSpread stats 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 3 fireSpread burn 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 3 fireSpread stats 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.2 secs | 4 fireSpread burn 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.3 secs | 4 fireSpread stats 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.3 secs | 5 fireSpread burn 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 1.3 secs | 5 fireSpread stats 5"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:52 | total elpsd: 0.00094 secs | 0 checkpoint init 5"
+## [1] "2019-09-13 07:36:52 | total elpsd: 0.0023 secs | 0 save init 5"
+## [1] "2019-09-13 07:36:52 | total elpsd: 0.0043 secs | 0 progress init 5"
+## [1] "2019-09-13 07:36:52 | total elpsd: 0.0054 secs | 0 load init 5"
+## [1] "2019-09-13 07:36:52 | total elpsd: 0.0063 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 0.99 secs | 0 fireSpread init 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1 secs | 1 fireSpread burn 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1 secs | 1 fireSpread stats 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1 secs | 2 fireSpread burn 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1 secs | 2 fireSpread stats 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1.1 secs | 3 fireSpread burn 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1.1 secs | 3 fireSpread stats 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1.1 secs | 4 fireSpread burn 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 1.1 secs | 5 fireSpread stats 5"</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
-<pre><code>## [1] "2019-09-12 21:03:09 | total elpsd: 0.001 secs | 0 checkpoint init 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 0.0024 secs | 0 save init 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 0.0045 secs | 0 progress init 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 0.0058 secs | 0 load init 5"
-## [1] "2019-09-12 21:03:09 | total elpsd: 0.0068 secs | 0 randomLandscapes init 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 0.95 secs | 0 fireSpread init 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 0.97 secs | 1 fireSpread burn 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 1 fireSpread stats 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 2 fireSpread burn 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 2 fireSpread stats 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 1 secs | 3 fireSpread burn 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 1.1 secs | 3 fireSpread stats 5"
-## [1] "2019-09-12 21:03:10 | total elpsd: 1.1 secs | 4 fireSpread burn 5"
-## [1] "2019-09-12 21:03:11 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
-## [1] "2019-09-12 21:03:11 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
-## [1] "2019-09-12 21:03:11 | total elpsd: 1.1 secs | 5 fireSpread stats 5"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:53 | total elpsd: 0.0017 secs | 0 checkpoint init 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 0.0037 secs | 0 save init 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 0.006 secs | 0 progress init 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 0.0074 secs | 0 load init 5"
+## [1] "2019-09-13 07:36:53 | total elpsd: 0.0084 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.85 secs | 0 fireSpread init 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.87 secs | 1 fireSpread burn 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.89 secs | 1 fireSpread stats 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.9 secs | 2 fireSpread burn 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.93 secs | 2 fireSpread stats 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.93 secs | 3 fireSpread burn 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.95 secs | 3 fireSpread stats 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.96 secs | 4 fireSpread burn 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.97 secs | 4 fireSpread stats 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 0.98 secs | 5 fireSpread burn 5"
+## [1] "2019-09-13 07:36:54 | total elpsd: 1 secs | 5 fireSpread stats 5"</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>## shutting down parallel nodes</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.651   0.282   2.986</code></pre>
+##   2.420   0.245   2.618</code></pre>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># internal -- second time faster</span></a>
 <a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>, <span class="dt">cache =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>##   loading cached result from previous spades call, adding to memoised copy</code></pre>
 <pre><code>## shutting down parallel nodes</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.128   0.007   0.137</code></pre>
+##   0.117   0.011   0.126</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(sims1, sims2)</a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -239,75 +239,75 @@
 <a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">objectName =</span> <span class="st">"landscape"</span>)</a>
 <a class="sourceLine" id="cb27-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
 <a class="sourceLine" id="cb27-4" data-line-number="4">                           <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
-<pre><code>## [1] "2019-09-12 21:03:12 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
-## [1] "2019-09-12 21:03:12 | total elpsd: 0.0026 secs | 0 save init 5"
-## [1] "2019-09-12 21:03:12 | total elpsd: 0.0049 secs | 0 progress init 5"
-## [1] "2019-09-12 21:03:12 | total elpsd: 0.0063 secs | 0 load init 5"
-## [1] "2019-09-12 21:03:12 | total elpsd: 0.0074 secs | 0 randomLandscapes init 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.95 secs | 0 fireSpread init 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.97 secs | 1 fireSpread burn 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.98 secs | 1 fireSpread stats 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.99 secs | 2 fireSpread burn 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 2 fireSpread stats 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 3 fireSpread burn 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 3 fireSpread stats 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1 secs | 4 fireSpread burn 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:55 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
+## [1] "2019-09-13 07:36:55 | total elpsd: 0.0026 secs | 0 save init 5"
+## [1] "2019-09-13 07:36:55 | total elpsd: 0.0049 secs | 0 progress init 5"
+## [1] "2019-09-13 07:36:55 | total elpsd: 0.0063 secs | 0 load init 5"
+## [1] "2019-09-13 07:36:55 | total elpsd: 0.0074 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.89 secs | 0 fireSpread init 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.91 secs | 1 fireSpread burn 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.92 secs | 1 fireSpread stats 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.93 secs | 2 fireSpread burn 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.95 secs | 2 fireSpread stats 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.95 secs | 3 fireSpread burn 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.98 secs | 3 fireSpread stats 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.99 secs | 4 fireSpread burn 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 1 secs | 5 fireSpread stats 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 1 secs | 5 save spades 10"</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
-<pre><code>## [1] "2019-09-12 21:03:13 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.0027 secs | 0 save init 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.0068 secs | 0 progress init 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.0097 secs | 0 load init 5"
-## [1] "2019-09-12 21:03:13 | total elpsd: 0.012 secs | 0 randomLandscapes init 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.94 secs | 0 fireSpread init 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.96 secs | 1 fireSpread burn 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.98 secs | 1 fireSpread stats 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.99 secs | 2 fireSpread burn 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1 secs | 2 fireSpread stats 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1 secs | 3 fireSpread burn 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1 secs | 3 fireSpread stats 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 4 fireSpread burn 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 4 fireSpread stats 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:56 | total elpsd: 0.0014 secs | 0 checkpoint init 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.0031 secs | 0 save init 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.0056 secs | 0 progress init 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.0069 secs | 0 load init 5"
+## [1] "2019-09-13 07:36:56 | total elpsd: 0.0084 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.82 secs | 0 fireSpread init 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.84 secs | 1 fireSpread burn 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.86 secs | 1 fireSpread stats 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.86 secs | 2 fireSpread burn 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.88 secs | 2 fireSpread stats 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.88 secs | 3 fireSpread burn 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.9 secs | 3 fireSpread stats 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.91 secs | 4 fireSpread burn 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.93 secs | 4 fireSpread stats 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.93 secs | 5 fireSpread burn 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.97 secs | 5 fireSpread stats 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.98 secs | 5 save spades 10"</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
-<pre><code>## [1] "2019-09-12 21:03:14 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.0026 secs | 0 save init 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.0049 secs | 0 progress init 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.0063 secs | 0 load init 5"
-## [1] "2019-09-12 21:03:14 | total elpsd: 0.0074 secs | 0 randomLandscapes init 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 0.92 secs | 0 fireSpread init 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 0.94 secs | 1 fireSpread burn 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 0.96 secs | 1 fireSpread stats 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 0.97 secs | 2 fireSpread burn 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 0.99 secs | 2 fireSpread stats 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 3 fireSpread burn 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 3 fireSpread stats 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 4 fireSpread burn 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1 secs | 4 fireSpread stats 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1.1 secs | 5 fireSpread burn 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
-## [1] "2019-09-12 21:03:15 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
+<pre><code>## [1] "2019-09-13 07:36:57 | total elpsd: 0.0011 secs | 0 checkpoint init 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.0025 secs | 0 save init 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.0046 secs | 0 progress init 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.0059 secs | 0 load init 5"
+## [1] "2019-09-13 07:36:57 | total elpsd: 0.0069 secs | 0 randomLandscapes init 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 0.93 secs | 0 fireSpread init 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 0.94 secs | 1 fireSpread burn 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 0.96 secs | 1 fireSpread stats 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 0.96 secs | 2 fireSpread burn 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 0.98 secs | 2 fireSpread stats 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 0.99 secs | 3 fireSpread burn 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 1 secs | 3 fireSpread stats 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 1 secs | 4 fireSpread burn 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 1 secs | 4 fireSpread stats 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 1 secs | 5 fireSpread burn 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 1.1 secs | 5 fireSpread stats 5"
+## [1] "2019-09-13 07:36:58 | total elpsd: 1.1 secs | 5 save spades 10"</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>## shutting down parallel nodes</code></pre>
 <pre><code>##    user  system elapsed 
-##   3.559   0.410   3.976</code></pre>
+##   3.420   0.321   3.663</code></pre>
 <p>The second time is way faster. We see the output files in the same location.</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(sims4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(experiment, mySim, <span class="dt">replicates =</span> <span class="dv">3</span>, <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
 <a class="sourceLine" id="cb36-2" data-line-number="2">                           <span class="dt">clearSimEnv =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>##   loading cached result from previous experiment call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.035   0.014   0.050</code></pre>
+##   0.036   0.000   0.035</code></pre>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="co"># test they are all equal</span></a>
 <a class="sourceLine" id="cb39-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(sims3[[x]], sims4[[x]])) </a></code></pre></div>
 <pre><code>## [[1]]
@@ -354,7 +354,7 @@
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   1.577   0.185   1.443</code></pre>
+##   1.435   0.090   1.329</code></pre>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="co"># vastly faster the second time</span></a>
 <a class="sourceLine" id="cb47-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
 <a class="sourceLine" id="cb47-3" data-line-number="3">                                      <span class="dt">debug =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
@@ -383,7 +383,7 @@
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.404   0.045   0.301</code></pre>
+##   0.507   0.057   0.268</code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are identical, not <code>fireSpread</code>.</p>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">layers &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span>)</a>
 <a class="sourceLine" id="cb51-2" data-line-number="2">same &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(layers, <span class="cf">function</span>(l) <span class="kw"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(randomSim<span class="op">$</span>landscape[[l]],</a>
@@ -436,7 +436,7 @@
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.406   0.186   1.807</code></pre>
+##   1.719   0.142   1.434</code></pre>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="co"># vastly faster the second time</span></a>
 <a class="sourceLine" id="cb57-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(randomSimCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(<span class="kw">Copy</span>(mySim), <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>,</a>
 <a class="sourceLine" id="cb57-3" data-line-number="3">                                      <span class="dt">debug =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
@@ -466,7 +466,7 @@
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades call</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.801   0.065   0.383</code></pre>
+##   0.445   0.033   0.326</code></pre>
 </div>
 <div id="function-level-caching" class="section level2">
 <h2 class="hasAnchor">
@@ -477,13 +477,13 @@
 <a class="sourceLine" id="cb61-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(map &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim),</a>
 <a class="sourceLine" id="cb61-3" data-line-number="3">                         <span class="dt">notOlderThan =</span> <span class="kw"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>()))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   2.517   0.104   2.624</code></pre>
+##   2.349   0.108   2.459</code></pre>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># vastly faster the second time</span></a>
 <a class="sourceLine" id="cb63-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>(mapCached &lt;-<span class="st"> </span><span class="kw"><a href="../reference/robustDigest.html">Cache</a></span>(gaussMap, ras, <span class="dt">cacheRepo =</span> <span class="kw"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(mySim)))</a></code></pre></div>
 <pre><code>##   ...(Object to retrieve is large: 7.1 Mb)</code></pre>
 <pre><code>##   loading cached result from previous gaussMap call, adding to memoised copy</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.089   0.000   0.089</code></pre>
+##   0.074   0.012   0.085</code></pre>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(map, mapCached) </a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -497,15 +497,15 @@
 <pre><code>##   Total (including Rasters): 2.6 Mb</code></pre>
 <pre><code>##   Selected objects (not including Rasters): 2.6 Mb</code></pre>
 <pre><code>##      tagKey   tagValue         createdDate
-## 1: function     spades 2019-09-12 21:03:07
-## 2: function   gaussMap 2019-09-12 21:03:24
-## 3: function     spades 2019-09-12 21:03:11
-## 4: function     spades 2019-09-12 21:03:20
-## 5: function        FUN 2019-09-12 21:03:20
-## 6: function     spades 2019-09-12 21:03:09
-## 7: function experiment 2019-09-12 21:03:15
-## 8: function     spades 2019-09-12 21:03:20
-## 9: function        FUN 2019-09-12 21:03:20</code></pre>
+## 1: function experiment 2019-09-13 07:36:58
+## 2: function     spades 2019-09-13 07:36:51
+## 3: function   gaussMap 2019-09-13 07:37:06
+## 4: function     spades 2019-09-13 07:36:54
+## 5: function     spades 2019-09-13 07:37:02
+## 6: function        FUN 2019-09-13 07:37:02
+## 7: function     spades 2019-09-13 07:37:02
+## 8: function        FUN 2019-09-13 07:37:02
+## 9: function     spades 2019-09-13 07:36:53</code></pre>
 <div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"archivist"</span>)) {</a>
 <a class="sourceLine" id="cb74-2" data-line-number="2">  <span class="co"># get the RasterLayer that was produced with the gaussMap function:</span></a>
 <a class="sourceLine" id="cb74-3" data-line-number="3">  map &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/raster/man/unique.html">unique</a></span>(<span class="kw">showCache</span>(mySim, <span class="dt">userTags =</span> <span class="st">"gaussMap"</span>)<span class="op">$</span>artifact) <span class="op">%&gt;%</span></a>

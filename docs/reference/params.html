@@ -212,7 +212,7 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.1 on Simulation parameters.</p>
-<p>Other functions to access elements of a <code>simList</code> object: <code><a href='addDepends.html'>.addDepends</a></code>,
+<p>Other functions to access elements of a 'simList' object: <code><a href='addDepends.html'>.addDepends</a></code>,
   <code><a href='checkpoint.html'>doEvent.checkpoint</a></code>, <code><a href='simList-accessors-envir.html'>envir</a></code>,
   <code><a href='simList-accessors-events.html'>events</a></code>, <code><a href='globals.html'>globals</a></code>,
   <code><a href='simList-accessors-inout.html'>inputs</a></code>, <code><a href='simList-accessors-modules.html'>modules</a></code>,
@@ -226,13 +226,13 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='no'>modules</span>, <span class='kw'>paths</span> <span class='kw'>=</span> <span class='no'>paths</span>,
                  <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpQhPJsi/temp_libpath65fb7dfeca1e/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpDIhvFY/temp_libpath16fe211a72ecd/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpO9DoHN/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpvC7nrB/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpvC7nrB/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpQhPJsi/temp_libpath65fb7dfeca1e/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpB1vzV8/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpde3UfN/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpde3UfN/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpDIhvFY/temp_libpath16fe211a72ecd/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='output co'>#&gt; <span class='message'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></div><div class='input'>
 <span class='co'># update some parameters using assignment -- currently only params will work</span>
 <span class='fu'>params</span>(<span class='no'>mySim</span>)$<span class='no'>randomLandscapes</span>$<span class='no'>nx</span> <span class='kw'>&lt;-</span> <span class='fl'>200</span>

@@ -279,7 +279,7 @@ in which to replace element(s).</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
   <span class='co'>## a default version of the defineModule is created with a call to newModule</span>
-  <span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"test"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>())
+  <span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"test"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>open</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
   <span class='co'>## view the resulting module file</span>
   <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test"</span>, <span class='st'>"test.R"</span>))
