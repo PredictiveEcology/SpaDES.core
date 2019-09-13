@@ -5,10 +5,15 @@
 \alias{Copy,simList-method}
 \title{Copy for simList class objects}
 \usage{
-\S4method{Copy}{simList}(object, objects, queues)
+\S4method{Copy}{simList}(object, filebackedDir = tempdir(), objects,
+  queues)
 }
 \arguments{
 \item{object}{An R object (likely containing environments) or an environment.}
+
+\item{filebackedDir}{A directory to copy any files that are backing R objects,
+currently only valid for \code{Raster} classes. Defaults
+to \code{tempdir()}, which is unlikely to be very useful.}
 
 \item{objects}{Whether the objects contained within the simList environment
 should be copied. Default \code{TRUE}, which may be slow.}

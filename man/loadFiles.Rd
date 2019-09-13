@@ -23,7 +23,8 @@ loadFiles(sim, filelist, ...)
 
 .saveFileExtensions()
 
-saveSimList(sim, filename, keepFileBackedAsIs, envir = parent.frame())
+saveSimList(sim, filename, fileBackendToMem = TRUE,
+  filebackedDir = NULL, ...)
 }
 \arguments{
 \item{sim}{\code{simList} object.}
@@ -35,13 +36,17 @@ saveSimList(sim, filename, keepFileBackedAsIs, envir = parent.frame())
 
 \item{filename}{Character string with the path for saving \code{simList}}
 
-\item{keepFileBackedAsIs}{Logical. If there are file-backed \code{Raster}
-objects, should they be kept in their file-backed format,
+\item{fileBackendToMem}{Logical. If there are file-backed \code{Raster}
+objects, should they be converted to memory objects, or should
+they be kept as file-backed rasters w.
 or loaded into RAM and saved within the \code{.RData} file.
 If \code{TRUE} (default), then the files will be copied to
 \code{file.path(dirname(filename), "rasters")}.}
 
-\item{envir}{environment to search for objects to be saved.}
+\item{filebackedDir}{Character string, indicating a path to save
+the files to in file-backed objects (currently, only Raster* objects)}
+
+\item{...}{Passed to \code{save}, e.g., \code{compression}}
 }
 \value{
 A saved \code{.RData} file in \code{filename} location.
@@ -104,6 +109,8 @@ sim2 <- spades(sim2) # loads the percentPine map 2 more times, once at 10, once 
 }
 \seealso{
 \code{\link{inputs}}
+
+zipSimList
 }
 \author{
 Eliot McIntire and Alex Chubaty

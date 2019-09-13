@@ -205,38 +205,105 @@ saveFiles <- function(sim) {
 #' Because of the environment slot, this is not quite as straightforward as
 #' just saving the object. This also has option for file-backed Rasters.
 #'
-#' @inheritParams base::save
-#'
 #' @inheritParams spades
-#' @importFrom reproducible .prepareFileBackedRaster
 #'
 #' @param filename Character string with the path for saving \code{simList}
 #'
-#' @param keepFileBackedAsIs Logical. If there are file-backed \code{Raster}
-#'        objects, should they be kept in their file-backed format,
+#' @param fileBackendToMem Logical. If there are file-backed \code{Raster}
+#'        objects, should they be converted to memory objects, or should
+#'        they be kept as file-backed rasters w.
 #'        or loaded into RAM and saved within the \code{.RData} file.
 #'        If \code{TRUE} (default), then the files will be copied to
 #'        \code{file.path(dirname(filename), "rasters")}.
+#' @param filebackedDir Character string, indicating a path to save
+#'        the files to in file-backed objects (currently, only Raster* objects)
+#' @param ... Passed to \code{save}, e.g., \code{compression}
 #'
 #' @return A saved \code{.RData} file in \code{filename} location.
 #'
 #' @export
 #' @rdname loadFiles
+#' @seealso zipSimList
 #'
-saveSimList <- function(sim, filename, keepFileBackedAsIs, envir = parent.frame()) {
-  simName <- sim
-  sim <- get(sim, envir = envir)
-
+saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = NULL, ...) {
   isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
   if (any(isRaster)) {
-    if (keepFileBackedAsIs) {
-      for (x in names(isRaster)[isRaster])
-        sim[[x]] <- .prepareFileBackedRaster(sim[[x]], repoDir = dirname(filename))
-    } else {
-      for (x in names(isRaster)[isRaster])
-        sim[[x]][] <- sim[[x]][]
+    InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = envir(sim)), function(x) inMemory(x)))
+    needModifying <- isTRUE(fileBackendToMem || ( (!all(InMem)) && !is.null(filebackedDir)))
+    if (needModifying) {
+      sim <- Copy(sim, filebackedDir = filebackedDir)
+      if (fileBackendToMem) {
+        # Need to copy it because the moving to memory affects the original simList
+        for (x in names(isRaster)[isRaster][!InMem])
+          sim[[x]][] <- sim[[x]][]
+      } else {
+        rasterNamesNotInMem <- names(isRaster)[isRaster][!InMem]
+        list2env(Copy(mget(rasterNamesNotInMem, envir = sim@.xData),
+                      filebackedDir = filebackedDir),
+                 envir = sim@.xData)# don't want to mess with rasters that are on disk for original
+      }
+
+    }
+
+  }
+  save(sim, file = filename, ...)
+}
+
+#' Zip many of the files in a simList
+#'
+#'
+#' @inheritParams saveSimList
+#' @param ... passed to \code{saveSimList}, including important ones
+#'    such as \code{filename}.
+#' @param zipfile A character string indicating the filename for the
+#'    zipfile. Passed to \code{zip}
+#' @param outputs Logical. If \code{TRUE}, all files identified in
+#'    \code{outputs(sim)} will be included in the zip.
+#' @param inputs Logical. If \code{TRUE}, all files identified in
+#'    \code{inputs(sim)} will be included in the zip.
+#' @param cache Logical. If \code{TRUE}, all files in
+#'    \code{cachePath(sim)} will be included in the zip. Defaults to
+#'    \code{FALSE} as this could be large, and may include many
+#'    out of date elements. See Details. Not yet implemented.
+#'
+#' @details
+#' If \code{cache} is used, it is likely that it should be trimmed before
+#' zipping, to include only cache elements that are relevant.
+zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
+                       cache = FALSE) {
+  dots <- list(...)
+  if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".Rdata")
+  tmpDir <- file.path(tempdir(), rndstr(1, 6))
+  tmpRdata <- file.path(tmpDir, basename(dots$filename))
+  if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("rasters")
+  if (is.null(dots$fileBackendToMem)) dots$fileBackendToMem <- formals(saveSimList)$fileBackendToMem
+  tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
+  saveSimList(sim, filename = tmpRdata, filebackedDir = tmpRasters, fileBackendToMem = dots$fileBackendToMem)
+
+  newnamesOutputs <- NULL
+  if (isTRUE(outputs)) {
+    if (NROW(outputs(sim)) > 0) {
+      tmpOutputs <- file.path(tmpDir, "outputs")
+      checkPath(tmpOutputs, create = TRUE)
+      newnamesOutputs <- file.path(tmpOutputs, gsub(outputPath(sim), "", outputs(sim)$file))
+      newnamesOutputs <- gsub("//", "/", newnamesOutputs)
+      newnamesOutputs <- gsub("\\\\\\\\", "\\\\", newnamesOutputs)
+      file.symlink(outputs(sim)$file, newnamesOutputs)
     }
   }
-  assign(simName, sim, envir = envir)
-  save(list = simName, file = filename, envir = envir)
+  newnamesInputs <- NULL
+  if (isTRUE(inputs)) {
+    if (NROW(inputs(sim)) > 0) {
+      tmpInputs <- file.path(tmpDir, "inputs")
+      checkPath(tmpInputs, create = TRUE)
+      newnamesInputs <- file.path(tmpInputs, gsub(inputPath(sim), "", inputs(sim)$file))
+      newnamesInputs <- gsub("//", "/", newnamesInputs)
+      newnamesInputs <- gsub("\\\\\\\\", "\\\\", newnamesInputs)
+      file.symlink(inputs(sim)$file, newnamesInputs)
+    }
+  }
+  zip(zipfile = zipfile, files = c(tmpRdata, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
+                                   newnamesOutputs, newnamesInputs))
+
+
 }
