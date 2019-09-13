@@ -307,7 +307,7 @@ To view available vignettes use `browseVignettes(package = "SpaDES.core")` (this
 
 1. `introduction`: Introduction to `SpaDES`. This vignette.
 2. [`modules`](ii-modules.html): Building modules in `SpaDES`. A detailed guide to module design, modifying existing modules, and creating new modules.
-3. [`caching`](iii-caching.html): Caching `SpaDES` simulations. A closer look at caching for a reproducible workflow.
+3. [`caching`](iii-cache.html): Caching `SpaDES` simulations. A closer look at caching for a reproducible workflow.
 
 ### Website
 
