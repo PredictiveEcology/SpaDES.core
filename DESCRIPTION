@@ -65,6 +65,7 @@ Suggests:
     RColorBrewer (>= 1.1-2),
     rgdal,
     rgenoud,
+    rstudioapi,
     sf, 
     SpaDES.tools (>= 0.2.0),
     rmarkdown,

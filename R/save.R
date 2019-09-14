@@ -310,3 +310,62 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 
 
 }
+
+#' Restart R programmatically
+#'
+#' This will attempt to restart the R session, reloading all packages.
+#' The main purpose for doing this is to clear memory leaks that are not
+#' yet diagnosed.
+#'
+#' @export
+#' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
+#'   as they were in previous session, in the same order. If \code{FALSE}, it will
+#'   load no packages beyond normal R startup. Default \code{TRUE}
+#'
+restartR <- function(reloadPkgs = TRUE) {
+  isRStudio <- Sys.getenv("RSTUDIO") == "1"
+
+  vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
+                   "package:grDevices", "package:utils", "package:datasets", "package:methods",
+                   "Autoloads", "package:base", "devtools_shims")
+  srch <- search()
+  attached <- srch
+  attached <- grep("package:", attached, value = TRUE)
+  attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
+  save(file = file.path('~', '.toLoad.Rdata'), attached)
+  .First <- function() {
+    try(source(file.path('~', '.resume.R')))
+    load(file.path('~', '.toLoad.Rdata'))
+    lapply(rev(attached), function(x) require(x, character.only = TRUE))
+    unlink('.RData');
+    rm(.First, envir = .GlobalEnv)
+  }
+
+  if (isTRUE(reloadPkgs))
+    save(file = ".RData", .First)
+  #   cat("x <- 1:10", file = file.path("~", ".resume.R"))
+  #   cat("
+  # #$#$#$#$#$#$#$#$#$#$#$
+  # .First <- function() {
+  # try(source(file.path('~', '.resume.R')))
+  # load(file.path('~', '.toLoad.Rdata'))
+  #
+  # options('defaultPackages' = attached)
+  # lapply(rev(attached), function(x) require(x, character.only = TRUE))
+  # }
+  # ", file = file.path("~", ".Rprofile"),
+  #       append = TRUE)
+
+  if (isTRUE(isRStudio)) {
+    if (requireNamespace("rstudioapi")) {
+      lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
+      rstudioapi::restartSession(if (reloadPkgs) "{load('.RData'); .First()}" else "")
+    } else {
+      message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
+    }
+  } else {
+    .Last <<- function() system("R")
+    q("no")
+  }
+
+}
