@@ -28,7 +28,9 @@ such as \code{filename}.}
 out of date elements. See Details. Not yet implemented.}
 }
 \description{
-Zip many of the files in a simList
+Currently, this will save the raster-backed files, outputs(sim), inputs(sim).
+It will add these to a temp file, using \code{Copy}, where appropriate
+to not affect the original \code{simList}.
 }
 \details{
 If \code{cache} is used, it is likely that it should be trimmed before
