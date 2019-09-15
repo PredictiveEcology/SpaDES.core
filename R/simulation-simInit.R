@@ -388,6 +388,11 @@ setMethod(
 
     # core modules
     core <- .pkgEnv$.coreModules
+    if (getOption("spades.restartRInterval", 0) > 0) {
+      core <- c(core, "restartR")
+      .pkgEnv$.coreModules <- core
+    }
+
 
     # parameters for core modules
     dotParamsReal <- list(".saveInterval",

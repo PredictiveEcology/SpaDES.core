@@ -23,6 +23,7 @@
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
     spades.recoveryMode = 1,
+    spades.restartRInterval = 0,
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,

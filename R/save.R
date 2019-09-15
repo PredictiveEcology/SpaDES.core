@@ -24,6 +24,23 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   return(invisible(sim))
 }
 
+doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
+  if (eventType == "init") {
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
+
+  } else if (eventType == "restartR") {
+    simFilename <- "sim.RData"
+    saveSimList(sim, simFilename, fileBackendToMem = FALSE, filebackedDir = NULL)
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
+    on.exit({
+      restartR(reloadPkgs = TRUE, .First = NULL, .RdataFile = simFilename)
+    })
+    stop("Restarting R")
+  }
+
+  return(invisible(sim))
+}
+
 ##############################################################
 #' Save objects using \code{.saveObjects} in \code{params} slot of \code{simInit}
 #'
@@ -322,7 +339,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #'   as they were in previous session, in the same order. If \code{FALSE}, it will
 #'   load no packages beyond normal R startup. Default \code{TRUE}
 #'
-restartR <- function(reloadPkgs = TRUE) {
+restartR <- function(reloadPkgs = TRUE, .First = NULL, .RdataFile = ".toLoad.RData") {
   isRStudio <- Sys.getenv("RSTUDIO") == "1"
 
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
@@ -333,12 +350,8 @@ restartR <- function(reloadPkgs = TRUE) {
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
   save(file = file.path('~', '.toLoad.Rdata'), attached)
-  .First <- function() {
-    try(source(file.path('~', '.resume.R')))
-    load(file.path('~', '.toLoad.Rdata'))
-    lapply(rev(attached), function(x) require(x, character.only = TRUE))
-    unlink('.RData');
-    rm(.First, envir = .GlobalEnv)
+  if (is.null(.First)) {
+    .First <- SpaDES.core:::.First
   }
 
   if (isTRUE(reloadPkgs))
@@ -368,4 +381,13 @@ restartR <- function(reloadPkgs = TRUE) {
     q("no")
   }
 
+}
+
+.First <- function() {
+  browser()
+  try(source(file.path('~', '.resume.R')))
+  load(file.path('~', '.toLoad.Rdata'))
+  lapply(rev(attached), function(x) require(x, character.only = TRUE))
+  unlink('.RData');
+  rm(.First, envir = .GlobalEnv)
 }
