@@ -193,5 +193,10 @@ test_that("saveSimList does not work correctly", {
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
   zipSimList(sim, zipfile = tmpZip, filebackedDir = tmpdir)
 
+  options("spades.restartRInterval" = 1)
+  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
+  mySim <- spades(mySim)
+
 
 })

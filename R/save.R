@@ -29,7 +29,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
     sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    simFilename <- "sim.RData"
+    simFilename <- "~/sim.Rdata"
     saveSimList(sim, simFilename, fileBackendToMem = FALSE, filebackedDir = NULL)
     sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
     on.exit({
@@ -377,16 +377,16 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RdataFile = ".toLoad.RDa
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
-    .Last <<- function() system("R")
+    .Last <<- function() system("R --no-save")
     q("no")
   }
 
 }
 
 .First <- function() {
-  browser()
   try(source(file.path('~', '.resume.R')))
-  load(file.path('~', '.toLoad.Rdata'))
+  load(file.path('~', 'sim.Rdata'), envir = .GlobalEnv)
+  load(file.path('~', '.toLoad.Rdata')) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
   unlink('.RData');
   rm(.First, envir = .GlobalEnv)
