@@ -29,13 +29,15 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
     sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    simFilename <- "~/sim.Rdata"
-    saveSimList(sim, simFilename, fileBackendToMem = FALSE, filebackedDir = NULL)
+    sim$.restartRList <- list()
+    sim$.restartRList$simFilename <- "~/.sim.RData"
+    sim$.restartRList$endOrig <- end(sim)
+    sim$.restartRList$startOrig <- start(sim)
+    sim$.restartRList$wd <- asPath(getwd())
+
+    saveSimList(sim, sim$.restartRList$simFilename, fileBackendToMem = FALSE, filebackedDir = NULL)
     sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
-    on.exit({
-      restartR(reloadPkgs = TRUE, .First = NULL, .RdataFile = simFilename)
-    })
-    stop("Restarting R")
+    stop("Exiting spades call to restart R")
   }
 
   return(invisible(sim))
@@ -292,13 +294,13 @@ saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = 
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
                        cache = FALSE) {
   dots <- list(...)
-  if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".Rdata")
+  if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".RData")
   tmpDir <- file.path(tempdir(), rndstr(1, 6))
-  tmpRdata <- file.path(tmpDir, basename(dots$filename))
+  tmpRData <- file.path(tmpDir, basename(dots$filename))
   if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("rasters")
   if (is.null(dots$fileBackendToMem)) dots$fileBackendToMem <- formals(saveSimList)$fileBackendToMem
   tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
-  saveSimList(sim, filename = tmpRdata, filebackedDir = tmpRasters, fileBackendToMem = dots$fileBackendToMem)
+  saveSimList(sim, filename = tmpRData, filebackedDir = tmpRasters, fileBackendToMem = dots$fileBackendToMem)
 
   newnamesOutputs <- NULL
   if (isTRUE(outputs)) {
@@ -322,7 +324,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
       file.symlink(inputs(sim)$file, newnamesInputs)
     }
   }
-  zip(zipfile = zipfile, files = c(tmpRdata, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
+  zip(zipfile = zipfile, files = c(tmpRData, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
                                    newnamesOutputs, newnamesInputs))
 
 
@@ -338,8 +340,10 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
 #'   as they were in previous session, in the same order. If \code{FALSE}, it will
 #'   load no packages beyond normal R startup. Default \code{TRUE}
+#' @param ... Optional objects, e.g., a \code{sim = simList} used by \code{.First}
 #'
-restartR <- function(reloadPkgs = TRUE, .First = NULL, .RdataFile = ".toLoad.RData") {
+restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RData",
+                     restartDir = NULL, ...) {
   isRStudio <- Sys.getenv("RSTUDIO") == "1"
 
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
@@ -349,19 +353,30 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RdataFile = ".toLoad.RDa
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
-  save(file = file.path('~', '.toLoad.Rdata'), attached)
+  save(file = file.path('~', '.attachedPkgs.RData'), attached)
   if (is.null(.First)) {
     .First <- SpaDES.core:::.First
   }
 
+  browser()
+  .oldWd <- getwd()
+  if (is.null(restartDir)) {
+    restartDir <- if (grepl(tempdir(), getwd())) {
+      "~"
+    } else {
+      getwd()
+    }
+  }
+  setwd(restartDir)
+
   if (isTRUE(reloadPkgs))
-    save(file = ".RData", .First)
+    save(file = "~/.RData", .First, .oldWd)
   #   cat("x <- 1:10", file = file.path("~", ".resume.R"))
   #   cat("
   # #$#$#$#$#$#$#$#$#$#$#$
   # .First <- function() {
   # try(source(file.path('~', '.resume.R')))
-  # load(file.path('~', '.toLoad.Rdata'))
+  # load(file.path('~', '.attachedPkgs.RData'))
   #
   # options('defaultPackages' = attached)
   # lapply(rev(attached), function(x) require(x, character.only = TRUE))
@@ -372,7 +387,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RdataFile = ".toLoad.RDa
   if (isTRUE(isRStudio)) {
     if (requireNamespace("rstudioapi")) {
       lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
-      rstudioapi::restartSession(if (reloadPkgs) "{load('.RData'); .First()}" else "")
+      rstudioapi::restartSession(if (reloadPkgs) "{load('~/.RData'); .First(); mySimOut <- spades(sim)}" else "")
     } else {
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
@@ -383,11 +398,10 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RdataFile = ".toLoad.RDa
 
 }
 
-.First <- function() {
-  try(source(file.path('~', '.resume.R')))
-  load(file.path('~', 'sim.Rdata'), envir = .GlobalEnv)
-  load(file.path('~', '.toLoad.Rdata')) # for "attached" object
+First <- function(...) {
+  load(file.path('~', '.sim.RData'), envir = .GlobalEnv)
+  load(file.path('~', '.attachedPkgs.RData')) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  unlink('.RData');
+  unlink('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData");
   rm(.First, envir = .GlobalEnv)
 }

@@ -792,6 +792,12 @@ setMethod(
         .pkgEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
         .pkgEnv$.cleanEnd <- NULL
       }
+      if (!is.null(sim$.restartRList)) {
+        browser()
+        restartR(reloadPkgs = TRUE, .First = NULL, .RdataFile = sim$.restartRList$simFilename,
+                 sim = sim)
+      }
+
     }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {

@@ -4,12 +4,15 @@
 \alias{restartR}
 \title{Restart R programmatically}
 \usage{
-restartR(reloadPkgs = TRUE)
+restartR(reloadPkgs = TRUE, .First = NULL,
+  .RDataFile = ".toLoad.RData", restartDir = NULL, ...)
 }
 \arguments{
 \item{reloadPkgs}{Logical. If \code{TRUE}, it will attempt to reload all the packages
 as they were in previous session, in the same order. If \code{FALSE}, it will
 load no packages beyond normal R startup. Default \code{TRUE}}
+
+\item{...}{Optional objects, e.g., a \code{sim = simList} used by \code{.First}}
 }
 \description{
 This will attempt to restart the R session, reloading all packages.
