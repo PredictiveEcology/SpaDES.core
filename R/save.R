@@ -35,6 +35,14 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
     sim$.restartRList$endOrig <- end(sim)
     sim$.restartRList$startOrig <- start(sim)
     sim$.restartRList$wd <- asPath(getwd())
+    withTmpPaths <- grepl(tempdir(), paths(sim))
+    if (any(withTmpPaths)) {
+      message("Some paths in the simList, ",
+              paste(names(paths(sim))[withTmpPaths], collapse = ", "),
+              ", are in temporary locations. These will not",
+              " persist after restart as these locations disappear.")
+    }
+
 
     if (nextTime < end(sim, timeunit(sim))) {
       sim <- scheduleEvent(sim, nextTime, "restartR", "restartR", .last())
@@ -371,20 +379,9 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
   }
   setwd(restartDir)
 
+  # save .First function and the .oldWd
   if (isTRUE(reloadPkgs))
     save(file = "~/.RData", .First, .oldWd)
-  #   cat("x <- 1:10", file = file.path("~", ".resume.R"))
-  #   cat("
-  # #$#$#$#$#$#$#$#$#$#$#$
-  # .First <- function() {
-  # try(source(file.path('~', '.resume.R')))
-  # load(file.path('~', '.attachedPkgs.RData'))
-  #
-  # options('defaultPackages' = attached)
-  # lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  # }
-  # ", file = file.path("~", ".Rprofile"),
-  #       append = TRUE)
 
   if (isTRUE(isRStudio)) {
     if (requireNamespace("rstudioapi")) {
@@ -404,9 +401,21 @@ First <- function(...) {
   load(file.path('~', '.sim.RData')) # load "sim" here
   load(file.path('~', '.attachedPkgs.RData')) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  file.remove('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData");
-  end(sim) <- sim$.restartRList$endOrig
+  sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
+      if (!dir.exists(p)) {
+        newPath <- file.path(tempdir(), n)
+        checkPath(newPath, create = TRUE)
+        sim@paths[[n]] <- newPath
+      } else {
+        p
+      }
+  })
+
   rm(".restartRList", envir = envir(sim))
-  rm(.First, envir = .GlobalEnv)
+  on.exit({
+    rm(.First, .oldWd, envir = .GlobalEnv)
+    file.remove('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData")
+  })
+  end(sim) <- sim$.restartRList$endOrig
   sim
 }
