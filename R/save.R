@@ -29,15 +29,18 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
     sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
+    nextTime <- time(sim, timeunit(sim)) + getOption("spades.restartRInterval")
     sim$.restartRList <- list()
     sim$.restartRList$simFilename <- "~/.sim.RData"
     sim$.restartRList$endOrig <- end(sim)
     sim$.restartRList$startOrig <- start(sim)
     sim$.restartRList$wd <- asPath(getwd())
 
-    saveSimList(sim, sim$.restartRList$simFilename, fileBackendToMem = FALSE, filebackedDir = NULL)
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
-    stop("Exiting spades call to restart R")
+    if (nextTime < end(sim, timeunit(sim))) {
+      sim <- scheduleEvent(sim, nextTime, "restartR", "restartR", .last())
+    }
+    end(sim) <- time(sim)
+    # stop("Exiting spades call to restart R")
   }
 
   return(invisible(sim))
@@ -355,10 +358,9 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
   save(file = file.path('~', '.attachedPkgs.RData'), attached)
   if (is.null(.First)) {
-    .First <- SpaDES.core:::.First
+    .First <- SpaDES.core:::First
   }
 
-  browser()
   .oldWd <- getwd()
   if (is.null(restartDir)) {
     restartDir <- if (grepl(tempdir(), getwd())) {
@@ -387,7 +389,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
   if (isTRUE(isRStudio)) {
     if (requireNamespace("rstudioapi")) {
       lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
-      rstudioapi::restartSession(if (reloadPkgs) "{load('~/.RData'); .First(); mySimOut <- spades(sim)}" else "")
+      rstudioapi::restartSession(if (reloadPkgs) "{load('~/.RData'); sim <- .First(); sim <- spades(sim)}" else "")
     } else {
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
@@ -399,9 +401,12 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
 }
 
 First <- function(...) {
-  load(file.path('~', '.sim.RData'), envir = .GlobalEnv)
+  load(file.path('~', '.sim.RData')) # load "sim" here
   load(file.path('~', '.attachedPkgs.RData')) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  unlink('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData");
+  file.remove('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData");
+  end(sim) <- sim$.restartRList$endOrig
+  rm(".restartRList", envir = envir(sim))
   rm(.First, envir = .GlobalEnv)
+  sim
 }

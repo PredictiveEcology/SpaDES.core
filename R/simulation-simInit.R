@@ -388,8 +388,11 @@ setMethod(
 
     # core modules
     core <- .pkgEnv$.coreModules
-    if (getOption("spades.restartRInterval", 0) > 0) {
-      core <- c(core, "restartR")
+    # remove the restartR module if it is not used. This is easier than adding it because
+    #   the simInit is not run again during restarts, so it won't hit this again. That
+    #   is problematic for restartR situation, but not for "normal" situation.
+    if (getOption("spades.restartRInterval", 0) == 0) {
+      core <- setdiff(core, "restartR")
       .pkgEnv$.coreModules <- core
     }
 

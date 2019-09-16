@@ -793,7 +793,8 @@ setMethod(
         .pkgEnv$.cleanEnd <- NULL
       }
       if (!is.null(sim$.restartRList)) {
-        browser()
+        sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
+        saveSimList(sim, sim$.restartRList$simFilename, fileBackendToMem = FALSE, filebackedDir = NULL)
         restartR(reloadPkgs = TRUE, .First = NULL, .RdataFile = sim$.restartRList$simFilename,
                  sim = sim)
       }
@@ -863,7 +864,9 @@ setMethod(
       existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
       prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
       prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
-      if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]])
+      if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]] &&
+        (time(sim, unit = attr(prevStart[["eventTime"]], "unit")) ==
+           start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
         sim@completed <- new.env(parent = emptyenv())
     }
 

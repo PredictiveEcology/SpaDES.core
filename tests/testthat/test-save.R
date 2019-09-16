@@ -197,7 +197,7 @@ test_that("saveSimList does not work correctly", {
 
   if (interactive()) {
     options("spades.restartRInterval" = 1)
-    times <- list(start = 0, end = 2)
+    times <- list(start = 0, end = 3)
     mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                      outputs = data.frame(objectName = "landscape", saveTime = times$end))
     mySim <- spades(mySim)
