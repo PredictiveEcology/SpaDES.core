@@ -794,6 +794,7 @@ setMethod(
       }
       # For restarting R -- a few extra pieces, including saving the simList as the last thing
       if (!is.null(sim$.restartRList)) {
+        browser()
         sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
         sim$.restartRList$.spadesCall <- match.call()
         saveSimListFormals <- formals(saveSimList)

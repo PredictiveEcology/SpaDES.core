@@ -396,6 +396,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
   }
   setwd(restartDir)
 
+  browser()
   .spadesCall <- sim$.restartRList$.spadesCall
   .spadesCall$sim <- as.name("sim") # user may not have called the object "sim" ... now it is for restarting
   # save .First function and the .oldWd
@@ -437,7 +438,9 @@ First <- function(...) {
     file.remove('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData")
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
+    browser()
     sim <- eval(.spadesCall)
+    browser()
   }
   return(sim)
 }
