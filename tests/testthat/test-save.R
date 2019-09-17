@@ -192,54 +192,53 @@
 # })
 
 test_that("restart does not work correctly", {
-  if (interactive()) {
-    skip()
-    testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
-                            opts = list("spades.restartRInterval" = 1))
-    on.exit({
-      testOnExit(testInitOut)
-    }, add = TRUE)
-    options("spades.restartRInterval" = 0)
-    mapPath <- system.file("maps", package = "quickPlot")
+  skip()
+  testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
+                          opts = list("spades.restartRInterval" = 1))
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  options("spades.restartRInterval" = 0)
+  mapPath <- system.file("maps", package = "quickPlot")
 
-    times <- list(start = 0, end = 1)
-    parameters <- list(
-      .globals = list(stackName = "landscape"),
+  times <- list(start = 0, end = 1)
+  parameters <- list(
+    .globals = list(stackName = "landscape"),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
+  modules <- list("randomLandscapes", "caribouMovement")
+  paths <- list(
+    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    inputPath = mapPath,
+    outputPath = tmpdir
+  )
+
+  options("spades.restartRInterval" = 1)
+  times <- list(start = 0, end = 3)
+  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
+  mySim <- spades(mySim, debug = 1)
+
+
+  options("spades.restartRInterval" = 10)
+  mySim <- mySim <- simInit(
+    times = list(start = 0.0, end = 30.0, timeunit = "year"),
+    params = list(
+      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+      # Turn off interactive plotting
+      fireSpread = list(.plotInitialTime = NA),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-    )
-    modules <- list("randomLandscapes", "caribouMovement")
-    paths <- list(
-      modulePath = system.file("sampleModules", package = "SpaDES.core"),
-      inputPath = mapPath,
-      outputPath = tmpdir
-    )
-
-    # times <- list(start = 0, end = 3)
-    # mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-    #                  outputs = data.frame(objectName = "landscape", saveTime = times$end))
-    # mySim <- spades(mySim)
-    #
-
-    options("spades.restartRInterval" = 10)
-    mySim <- mySim <- simInit(
-      times = list(start = 0.0, end = 30.0, timeunit = "year"),
-      params = list(
-        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-        # Turn off interactive plotting
-        fireSpread = list(.plotInitialTime = NA),
-        caribouMovement = list(.plotInitialTime = NA),
-        randomLandscapes = list(.plotInitialTime = NA)
-      ),
-      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                   outputPath = tmpdir,
-                   cachePath = tmpdir),
-      # Save final state of landscape and caribou
-      outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
-                           stringsAsFactors = FALSE,
-                          saveTime = 1:30))
-    )
-    mySim <- spades(mySim, debug = 1)
-  }
+      randomLandscapes = list(.plotInitialTime = NA)
+    ),
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    # Save final state of landscape and caribou
+    outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
+                                     stringsAsFactors = FALSE,
+                                     saveTime = 1:30))
+  )
+  mySim <- spades(mySim, debug = 1)
 })
