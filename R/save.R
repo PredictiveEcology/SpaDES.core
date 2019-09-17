@@ -410,6 +410,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
+    browser()
     .Last <<- function() system("R --no-save")
     q("no")
   }
