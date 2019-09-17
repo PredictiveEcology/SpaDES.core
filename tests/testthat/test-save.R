@@ -123,85 +123,123 @@
 #    expect_false(identical(df1, newObj))
 #
 # })
+#
+# test_that("saveSimList does not work correctly", {
+#   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
+#                           opts = list("spades.restartRInterval" = 1))
+#   on.exit({
+#     testOnExit(testInitOut)
+#   }, add = TRUE)
+#   options("spades.restartRInterval" = 0)
+#   mapPath <- system.file("maps", package = "quickPlot")
+#
+#   times <- list(start = 0, end = 1)
+#   parameters <- list(
+#     .globals = list(stackName = "landscape"),
+#     caribouMovement = list(.plotInitialTime = NA),
+#     randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+#   )
+#   modules <- list("randomLandscapes", "caribouMovement")
+#   paths <- list(
+#     modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#     inputPath = mapPath,
+#     outputPath = tmpdir
+#   )
+#
+#   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+#                    outputs = data.frame(objectName = "landscape", saveTime = times$end))
+#   mySim <- spades(mySim)
+#   mySim$landscape[] <- round(mySim$landscape[], 4) # after saving, these come back different, unless rounded
+#   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
+#   # removes the file-backing, loading it into R as an inMemory object
+#   saveSimList(mySim, filename = tmpfile[2], fileBackendToMem = TRUE)
+#   load(file = tmpfile[2], envir = environment())
+#   # on the saved/loaded one, it is there because it is not file-backed
+#   expect_true(is.numeric(sim$landscape$DEM[]))
+#
+#   # Now put it back to disk for subsequent test
+#   sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1], overwrite = TRUE)
+#
+#   expect_true(all.equal(mySim, sim))
+#
+#   # Now try to keep filename intact
+#   saveSimList(mySim, filename = tmpfile[3], fileBackendToMem = FALSE, filebackedDir = NULL)
+#
+#   load(file = tmpfile[3], envir = environment())
+#   expect_true(identical(filename(sim$landscape), tmpfile[1]))
+#   expect_true(bindingIsActive("mod", sim$caribouMovement))
+#
+#   # Now keep as file-backed, but change name
+#   saveSimList(mySim, filename = tmpfile[3], fileBackendToMem = FALSE, filebackedDir = tmpCache)
+#
+#   load(file = tmpfile[3], envir = environment())
+#   expect_false(identical(filename(sim$landscape), tmpfile[1]))
+#
+#   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
+#   # rm(mySim)
+#
+#   assign("a", 1, envir = mySim$caribouMovement$mod)
+#   assign("a", 2, envir = sim$caribouMovement$mod)
+#
+#   expect_true(bindingIsActive("mod", sim$caribouMovement))
+#   # test file-backed raster is gone
+#   expect_warning(expect_error(mySim$landscape$DEM[]))
+#
+#   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
+#   zipSimList(sim, zipfile = tmpZip, filebackedDir = tmpdir)
+#
+#
+# })
 
-test_that("saveSimList does not work correctly", {
-  testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
-                          opts = list("spades.restartRInterval" = 1))
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-  options("spades.restartRInterval" = 0)
-  mapPath <- system.file("maps", package = "quickPlot")
-
-  filelist <- data.frame(
-    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-    functions = "raster",
-    package = "raster",
-    stringsAsFactors = FALSE
-  )
-
-  times <- list(start = 0, end = 1)
-  parameters <- list(
-    .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-  )
-  modules <- list("randomLandscapes", "caribouMovement")
-  paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
-    inputPath = mapPath,
-    outputPath = tmpdir
-  )
-
-  # mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-  #                  outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  # mySim <- spades(mySim)
-  # mySim$landscape[] <- round(mySim$landscape[], 4) # after saving, these come back different, unless rounded
-  # mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
-  # # removes the file-backing, loading it into R as an inMemory object
-  # saveSimList(mySim, filename = tmpfile[2], fileBackendToMem = TRUE)
-  # load(file = tmpfile[2], envir = environment())
-  # # on the saved/loaded one, it is there because it is not file-backed
-  # expect_true(is.numeric(sim$landscape$DEM[]))
-  #
-  # # Now put it back to disk for subsequent test
-  # sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1], overwrite = TRUE)
-  #
-  # expect_true(all.equal(mySim, sim))
-  #
-  # # Now try to keep filename intact
-  # saveSimList(mySim, filename = tmpfile[3], fileBackendToMem = FALSE, filebackedDir = NULL)
-  #
-  # load(file = tmpfile[3], envir = environment())
-  # expect_true(identical(filename(sim$landscape), tmpfile[1]))
-  # expect_true(bindingIsActive("mod", sim$caribouMovement))
-  #
-  # # Now keep as file-backed, but change name
-  # saveSimList(mySim, filename = tmpfile[3], fileBackendToMem = FALSE, filebackedDir = tmpCache)
-  #
-  # load(file = tmpfile[3], envir = environment())
-  # expect_false(identical(filename(sim$landscape), tmpfile[1]))
-  #
-  # file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
-  # # rm(mySim)
-  #
-  # assign("a", 1, envir = mySim$caribouMovement$mod)
-  # assign("a", 2, envir = sim$caribouMovement$mod)
-  #
-  # expect_true(bindingIsActive("mod", sim$caribouMovement))
-  # # test file-backed raster is gone
-  # expect_warning(expect_error(mySim$landscape$DEM[]))
-  #
-  # tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
-  # zipSimList(sim, zipfile = tmpZip, filebackedDir = tmpdir)
-
+test_that("restart does not work correctly", {
   if (interactive()) {
-    options("spades.restartRInterval" = 1)
-    times <- list(start = 0, end = 3)
-    mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-                     outputs = data.frame(objectName = "landscape", saveTime = times$end))
-    mySim <- spades(mySim)
+    skip()
+    testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
+                            opts = list("spades.restartRInterval" = 1))
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
+    options("spades.restartRInterval" = 0)
+    mapPath <- system.file("maps", package = "quickPlot")
 
+    times <- list(start = 0, end = 1)
+    parameters <- list(
+      .globals = list(stackName = "landscape"),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    )
+    modules <- list("randomLandscapes", "caribouMovement")
+    paths <- list(
+      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      inputPath = mapPath,
+      outputPath = tmpdir
+    )
+
+    # times <- list(start = 0, end = 3)
+    # mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+    #                  outputs = data.frame(objectName = "landscape", saveTime = times$end))
+    # mySim <- spades(mySim)
+    #
+
+    options("spades.restartRInterval" = 10)
+    mySim <- mySim <- simInit(
+      times = list(start = 0.0, end = 30.0, timeunit = "year"),
+      params = list(
+        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+        # Turn off interactive plotting
+        fireSpread = list(.plotInitialTime = NA),
+        caribouMovement = list(.plotInitialTime = NA),
+        randomLandscapes = list(.plotInitialTime = NA)
+      ),
+      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                   outputPath = tmpdir,
+                   cachePath = tmpdir),
+      # Save final state of landscape and caribou
+      outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
+                           stringsAsFactors = FALSE,
+                          saveTime = 1:30))
+    )
+    mySim <- spades(mySim, debug = 1)
   }
-
 })

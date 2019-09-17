@@ -5,17 +5,35 @@
 \title{Restart R programmatically}
 \usage{
 restartR(reloadPkgs = TRUE, .First = NULL,
-  .RDataFile = ".toLoad.RData", restartDir = NULL, ...)
+  .RDataFile = ".toLoad.RData", restartDir = NULL, sim)
 }
 \arguments{
 \item{reloadPkgs}{Logical. If \code{TRUE}, it will attempt to reload all the packages
 as they were in previous session, in the same order. If \code{FALSE}, it will
 load no packages beyond normal R startup. Default \code{TRUE}}
 
-\item{...}{Optional objects, e.g., a \code{sim = simList} used by \code{.First}}
+\item{sim}{A \code{simList} to be retained through the restart}
 }
 \description{
 This will attempt to restart the R session, reloading all packages.
 The main purpose for doing this is to clear memory leaks that are not
-yet diagnosed.
+yet diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
+should only be used if there are RAM limitations being hit with long running
+simulations.
+}
+\details{
+The process responds to several user-supplied options. These are of 3 types: \code{restartRInterval}
+the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
+using a dot to separate the function name and its argument,
+e.g., \code{options("spades.restartR.restartDir" = "~"} and
+\code{options("spades.saveSimList.fileBackendToMem" = FALSE)}. See specific functions for
+defaults and argument meanings. The only difference from the default function values
+is with \code{saveSimList} argument \code{fileBackendToMem = FALSE} during \code{restartR}
+by default, because it is assumed that the file backends will still be intact after a
+restart, so no need to move them all to memory.
+}
+\note{
+Because of the restarting, the object name of the original assignment of the
+\code{spades} call can not be preserved. The \code{spades} call will be
+assigned to \code{sim} in the \code{.GlobalEnv}.
 }
