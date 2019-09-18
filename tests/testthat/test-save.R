@@ -185,7 +185,7 @@ test_that("saveSimList does not work correctly", {
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 
-  skip()
+  skip(message = "zipSimList not yet testable")
   # zipSimList not tested yet
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
   zipSimList(sim, zipfile = tmpZip, filebackedDir = tmpdir)
@@ -194,7 +194,7 @@ test_that("saveSimList does not work correctly", {
 })
 
 test_that("restart does not work correctly", {
-  skip()
+  skip("restartR not possible in automated tests")
   setwd("~/GitHub/SpaDES.core")
   devtools::load_all()
   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),

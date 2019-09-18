@@ -270,7 +270,7 @@ saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = 
   }
   isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
   if (any(isRaster)) {
-    InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = envir(sim)), function(x) inMemory(x)))
+    InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
     needModifying <- isTRUE(fileBackendToMem || ( (!all(InMem)) && !is.null(filebackedDir)))
     if (needModifying) {
       sim <- Copy(sim, filebackedDir = filebackedDir)
