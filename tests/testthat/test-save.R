@@ -256,7 +256,6 @@ test_that("restart does not work correctly", {
     mySim <- spades(mySim, debug = 1)
   } else if (testNum == 3) {
     interval = 1
-    set.seed(123)
     mapPath <- system.file("maps", package = "quickPlot")
 
     times <- list(start = 0, end = 1)

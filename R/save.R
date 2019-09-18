@@ -380,7 +380,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #'    meaning it will use the nonexported \code{SpaDES.core:::First}. If a
 #'    user wants to make a custom \code{.First} file, it should build off that one.
 #' @param .RDataFile A filename for temporary storage of simList. Defaults to
-#'     \code{getOption("spades.restartR.RDataFilename")}
+#' \code{getOption("spades.restartR.RDataFilename")}, but with a random string
+#' added to the base filename to prevent collisions from parallel processes.
 #' @param restartDir A character string indicating which working directory to
 #'     use during restart. Defaults to \code{getwd()}, unless it is a
 #'     directory in \code{tempdir()}, which may not exist through a restart.
@@ -388,7 +389,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' @param sim Required. A \code{simList} to be retained through the restart
 #'
 #' @details
-#' The process responds to several user-supplied options. Though under most cases,
+#' The process responds to several options. Though under most cases,
 #' the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 #' the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 #' using a dot to separate the function name and its argument,
@@ -413,6 +414,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 restartR <- function(reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
                      restartDir = NULL, sim) {
+  .rndString <- rndstr(1, 9)
 
   if (missing(sim)) stop("sim is currently a required argument")
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
@@ -422,7 +424,10 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
-  save(file = file.path('~', '.attachedPkgs.RData'), attached)
+  .newDir <- file.path("~", paste0(".", .rndString))
+  checkPath(.newDir, create = TRUE)
+  .attachedPkgsFilename <- file.path(.newDir, '.attachedPkgs.RData')
+  save(file = .attachedPkgsFilename, attached)
   if (is.null(.First)) {
     .First <- getFromNamespace("First", "SpaDES.core")
   }
@@ -439,7 +444,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
 
 
   if (is.null(sim$.restartRList)) sim$.restartRList <- list()
-  sim$.restartRList$simFilename <- getOption("spades.restartR.RDataFilename")
+  sim$.restartRList$simFilename <- file.path(.newDir, basename(getOption("spades.restartR.RDataFilename")))
   # sim$.restartRList$endOrig <- end(sim)
   sim$.restartRList$startOrig <- start(sim)
   sim$.restartRList$wd <- asPath(getwd())
@@ -462,34 +467,58 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   }
 
   .spadesCall <- sim$.restartRList$.spadesCall
+  .spades.simFilename <- sim$.restartRList$simFilename
   .spadesCall$sim <- as.name("sim") # user may not have called the object "sim" ... now it is for restarting
   .spades.restartRInterval <- getOption("spades.restartRInterval")
   # save .First function and the .oldWd
-  if (isTRUE(reloadPkgs))
-    save(file = "~/.RData", .First, .oldWd, .spadesCall, .spades.restartRInterval)
+  #if (isTRUE(reloadPkgs))
+  .reloadPkgs <- reloadPkgs
+  .RDataFile <- file.path(.newDir, ".RData")
+  save(file = .RDataFile, .First, .oldWd, .spadesCall, .spades.restartRInterval, .spades.simFilename,
+       .reloadPkgs, .rndString, .attachedPkgsFilename, eval.promises = TRUE)
 
   if (isTRUE(Sys.getenv("RSTUDIO") == "1")) {
     if (requireNamespace("rstudioapi")) {
       lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
       rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
-      rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First(); sim <- eval(.spadesCall)}") else "") #
-      #rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First()}") else "") #; sim <- eval(.spadesCall)
+
+      # Need load to get custom .First fn
+      rstudioapi::restartSession(paste0("{load('",.RDataFile,"'); sim <- .First(); sim <- eval(.spadesCall)}")) #
+      #rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First(); sim <- eval(.spadesCall)}") else ""}")
     } else {
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
     #reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
-    out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system("R --no-save"), TRUE)
+    # R cmd line loads .RData first, then .First, if there is one.
+    .First <- SpaDES.core:::FirstFromR
+    save(file = "~/.RData", .First)
+    out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
     q("no")
   }
 
 }
 
+FirstFromR <- function(...) {
+  .rndString <- commandArgs()[4]
+  SpaDES.core:::First(.rndString = .rndString)
+}
 First <- function(...) {
-  attachedPkgsFilename <- file.path('~', '.attachedPkgs.RData')
-  load(attachedPkgsFilename) # for "attached" object
+  # From Rstudio, it gets all the correct, session-specific files.
+  #   From R, it does not. Only has the commandArgs -- must rebuild objects
+  fromRCmd <- FALSE
+  if (!exists(".attachedPkgsFilename")) {
+    fromRCmd <- TRUE
+    .rndString <- list(...)$.rndString
+    .newDir <- file.path("~", paste0(".", .rndString))
+    load(file.path(.newDir, ".RData"))
+  }
+
+  #attachedPkgsFilename <- file.path("~", paste0(".", .rndString), '.attachedPkgs.RData')
+  load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  load(getOption('spades.restartR.RDataFilename', "~/.restartR.RData")) # load "sim" here
+  load(.spades.simFilename)
+  #load(getOption('spades.restartR.RDataFilename', "~/.restartR.RData")) # load "sim" here
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
       if (!dir.exists(p)) {
         newPath <- file.path(tempdir(), n)
@@ -506,9 +535,15 @@ First <- function(...) {
 
   rm(".restartRList", envir = envir(sim))
   on.exit({
-    rm(.First, .oldWd, envir = .GlobalEnv)
-    file.remove('~/.RData', attachedPkgsFilename,
-                getOption("spades.restartR.RDataFilename"))
+    if (fromRCmd)
+      try(file.remove('~/.RData') )
+    unlink(dirname(.attachedPkgsFilename), recursive = TRUE, force = TRUE)
+                #getOption("spades.restartR.RDataFilename"))
+    if (!fromRCmd) {
+      objsToDelete <- c(".First", ".oldWd", ".spades.restartRInterval", ".spades.simFilename",
+                        ".reloadPkgs", ".rndString", ".attachedPkgsFilename")
+      try(rm(list = objsToDelete, envir = .GlobalEnv))
+    }
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
