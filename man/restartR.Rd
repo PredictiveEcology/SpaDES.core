@@ -5,12 +5,26 @@
 \title{Restart R programmatically}
 \usage{
 restartR(reloadPkgs = TRUE, .First = NULL,
-  .RDataFile = ".toLoad.RData", restartDir = NULL, sim)
+  .RDataFile = getOption("spades.restartR.RDataFilename"),
+  restartDir = NULL, sim)
 }
 \arguments{
 \item{reloadPkgs}{Logical. If \code{TRUE}, it will attempt to reload all the packages
 as they were in previous session, in the same order. If \code{FALSE}, it will
 load no packages beyond normal R startup. Default \code{TRUE}}
+
+\item{.First}{A function to save to \code{~/.RData} which will
+be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
+meaning it will use the nonexported \code{SpaDES.core:::First}. If a
+user wants to make a custom \code{.First} file, it should build off that one.}
+
+\item{.RDataFile}{A filename for temporary storage of simList. Defaults to
+\code{getOption("spades.restartR.RDataFilename")}}
+
+\item{restartDir}{A character string indicating which working directory to
+use during restart. Defaults to \code{getwd()}, unless it is a
+directory in \code{tempdir()}, which may not exist through a restart.
+In that case, it will default to \code{"~"}.}
 
 \item{sim}{A \code{simList} to be retained through the restart}
 }

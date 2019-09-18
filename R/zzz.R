@@ -24,6 +24,7 @@
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
     spades.recoveryMode = 1,
     spades.restartRInterval = 0,
+    spades.restartR.RDataFilename = "~/.restartR.RData",
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,

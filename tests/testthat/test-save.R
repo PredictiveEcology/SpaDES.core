@@ -195,6 +195,8 @@ test_that("saveSimList does not work correctly", {
 
 test_that("restart does not work correctly", {
   skip("restartR not possible in automated tests")
+
+  # Must be run manually
   setwd("~/GitHub/SpaDES.core")
   devtools::load_all()
   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
@@ -245,4 +247,5 @@ test_that("restart does not work correctly", {
                                      saveTime = 1:30))
   )
   mySim <- spades(mySim, debug = 1)
+  options("spades.restartRInterval" = 0)
 })

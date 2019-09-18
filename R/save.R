@@ -1,5 +1,6 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("saved", "saveTime", "fun", "package"))
+  utils::globalVariables(c("saved", "saveTime", "fun", "package", "attached",
+                           ".spades.restartRInterval", ".First", ".oldWd", ".spadesCall"))
 }
 
 # Just checks for paths, creates them if they do not exist
@@ -31,7 +32,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   } else if (eventType == "restartR") {
     nextTime <- time(sim, timeunit(sim)) + getOption("spades.restartRInterval")
     sim$.restartRList <- list()
-    sim$.restartRList$simFilename <- "~/.sim.RData"
+    sim$.restartRList$simFilename <- getOption("spades.restartR.RDataFilename")
     sim$.restartRList$endOrig <- end(sim)
     sim$.restartRList$startOrig <- start(sim)
     sim$.restartRList$wd <- asPath(getwd())
@@ -374,6 +375,16 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
 #'   as they were in previous session, in the same order. If \code{FALSE}, it will
 #'   load no packages beyond normal R startup. Default \code{TRUE}
+#' @param .First A function to save to \code{~/.RData} which will
+#'    be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
+#'    meaning it will use the nonexported \code{SpaDES.core:::First}. If a
+#'    user wants to make a custom \code{.First} file, it should build off that one.
+#' @param .RDataFile A filename for temporary storage of simList. Defaults to
+#'     \code{getOption("spades.restartR.RDataFilename")}
+#' @param restartDir A character string indicating which working directory to
+#'     use during restart. Defaults to \code{getwd()}, unless it is a
+#'     directory in \code{tempdir()}, which may not exist through a restart.
+#'     In that case, it will default to \code{"~"}.
 #' @param sim A \code{simList} to be retained through the restart
 #'
 #' @details
@@ -392,7 +403,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' \code{spades} call can not be preserved. The \code{spades} call will be
 #' assigned to \code{sim} in the \code{.GlobalEnv}.
 #'
-restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RData",
+restartR <- function(reloadPkgs = TRUE, .First = NULL,
+                     .RDataFile = getOption("spades.restartR.RDataFilename"),
                      restartDir = NULL, sim) {
 
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
@@ -404,7 +416,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
   save(file = file.path('~', '.attachedPkgs.RData'), attached)
   if (is.null(.First)) {
-    .First <- SpaDES.core:::First
+    .First <- getFromNamespace("First", "SpaDES.core")
   }
 
   .oldWd <- getwd()
@@ -432,7 +444,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
-    .Last <<- function() system("R --no-save")
+    assign(".Last", function() system("R --no-save"), .GlobalEnv)
     q("no")
   }
 
@@ -457,7 +469,7 @@ First <- function(...) {
   rm(".restartRList", envir = envir(sim))
   on.exit({
     rm(.First, .oldWd, envir = .GlobalEnv)
-    file.remove('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData")
+    file.remove('~/.RData', '~/.attachedPkgs.RData', getOption("spades.restartR.RDataFilename"))
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
