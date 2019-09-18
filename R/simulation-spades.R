@@ -796,16 +796,16 @@ setMethod(
       if (!is.null(sim$.restartRList)) {
         sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
         sim$.restartRList$.spadesCall <- match.call()
-        saveSimListFormals <- formals(saveSimList)
-        saveSimList(sim,
-                    filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
-                    fileBackendToMem = getOption("spades.saveSimList.fileBackendToMem", FALSE),
-                    filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
-        if (requireNamespace("pryr")) {
-          mu <- getFromNamespace("mem_used", "pryr")()
-          class(mu) <- "object_size"
-          message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
-        }
+        # saveSimListFormals <- formals(saveSimList)
+        # saveSimList(sim,
+        #             filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
+        #             fileBackendToMem = getOption("spades.saveSimList.fileBackendToMem", FALSE),
+        #             filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
+        # if (requireNamespace("pryr")) {
+        #   mu <- getFromNamespace("mem_used", "pryr")()
+        #   class(mu) <- "object_size"
+        #   message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
+        # }
         restartFormals <- formals(restartR)
         restartR(reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
                  .First = getOption("spades.restartR..First", restartFormals$.First),

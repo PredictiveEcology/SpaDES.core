@@ -32,17 +32,17 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   } else if (eventType == "restartR") {
     nextTime <- time(sim, timeunit(sim)) + getOption("spades.restartRInterval")
     sim$.restartRList <- list()
-    sim$.restartRList$simFilename <- getOption("spades.restartR.RDataFilename")
     sim$.restartRList$endOrig <- end(sim)
-    sim$.restartRList$startOrig <- start(sim)
-    sim$.restartRList$wd <- asPath(getwd())
-    withTmpPaths <- grepl(tempdir(), paths(sim))
-    if (any(withTmpPaths)) {
-      message("Some paths in the simList, ",
-              paste(names(paths(sim))[withTmpPaths], collapse = ", "),
-              ", are in temporary locations. These will not",
-              " persist after restart as these locations disappear.")
-    }
+    # sim$.restartRList$simFilename <- getOption("spades.restartR.RDataFilename")
+    # sim$.restartRList$startOrig <- start(sim)
+    # sim$.restartRList$wd <- asPath(getwd())
+    # withTmpPaths <- grepl(tempdir(), paths(sim))
+    # if (any(withTmpPaths)) {
+    #   message("Some paths in the simList, ",
+    #           paste(names(paths(sim))[withTmpPaths], collapse = ", "),
+    #           ", are in temporary locations. These will not",
+    #           " persist after restart as these locations disappear.")
+    # }
 
     if (nextTime < end(sim, timeunit(sim))) {
       sim <- scheduleEvent(sim, nextTime, "restartR", "restartR", .last())
@@ -385,7 +385,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #'     use during restart. Defaults to \code{getwd()}, unless it is a
 #'     directory in \code{tempdir()}, which may not exist through a restart.
 #'     In that case, it will default to \code{"~"}.
-#' @param sim A \code{simList} to be retained through the restart
+#' @param sim Required. A \code{simList} to be retained through the restart
 #'
 #' @details
 #' The process responds to several user-supplied options. These are of 3 types: \code{restartRInterval}
@@ -407,6 +407,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
                      restartDir = NULL, sim) {
 
+  if (missing(sim)) stop("sim is currently a required argument")
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
                    "package:grDevices", "package:utils", "package:datasets", "package:methods",
                    "Autoloads", "package:base", "devtools_shims")
@@ -429,6 +430,30 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   }
   setwd(restartDir)
 
+
+  if (is.null(sim$.restartRList)) sim$.restartRList <- list()
+  sim$.restartRList$simFilename <- getOption("spades.restartR.RDataFilename")
+  # sim$.restartRList$endOrig <- end(sim)
+  sim$.restartRList$startOrig <- start(sim)
+  sim$.restartRList$wd <- asPath(getwd())
+  withTmpPaths <- grepl(tempdir(), paths(sim))
+  if (any(withTmpPaths)) {
+    message("Some paths in the simList, ",
+            paste(names(paths(sim))[withTmpPaths], collapse = ", "),
+            ", are in temporary locations. These will not",
+            " persist after restart as these locations disappear.")
+  }
+  saveSimListFormals <- formals(saveSimList)
+  saveSimList(sim,
+              filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
+              fileBackendToMem = getOption("spades.saveSimList.fileBackendToMem", FALSE),
+              filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
+  if (requireNamespace("pryr")) {
+    mu <- getFromNamespace("mem_used", "pryr")()
+    class(mu) <- "object_size"
+    message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
+  }
+
   .spadesCall <- sim$.restartRList$.spadesCall
   .spadesCall$sim <- as.name("sim") # user may not have called the object "sim" ... now it is for restarting
   .spades.restartRInterval <- getOption("spades.restartRInterval")
@@ -440,12 +465,13 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
     if (requireNamespace("rstudioapi")) {
       lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
       rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First(); sim <- eval(.spadesCall)}") else "") #
+      #rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First()}") else "") #; sim <- eval(.spadesCall)
     } else {
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
-    reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
-    # assign(".Last", function() system("R --no-save"), .GlobalEnv)
+    #reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
+    out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system("R --no-save"), TRUE)
     q("no")
   }
 
@@ -455,8 +481,7 @@ First <- function(...) {
   attachedPkgsFilename <- file.path('~', '.attachedPkgs.RData')
   load(attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  browser()
-  load(file.path('~', getOption('spades.restartR.RDataFilename', "~/.restartR.RData"))) # load "sim" here
+  load(getOption('spades.restartR.RDataFilename', "~/.restartR.RData")) # load "sim" here
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
       if (!dir.exists(p)) {
         newPath <- file.path(tempdir(), n)
@@ -477,8 +502,12 @@ First <- function(...) {
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
-    message(crayon::magenta("Because restartR was used, the simList is located in the location above.",
-                            " It should be assigned to an object immediately"))
+    message(crayon::green("Because restartR was used, the simList is located in the location above.",
+                            " It should be assigned to an object immediately: e.g.,\n",
+                            "sim <- SpaDES.core:::.pkgEnv$.sim"))
+  } else {
+    message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
+                            " named 'sim' (which may not be the same as the original assignment)"))
   }
   return(sim)
 }
