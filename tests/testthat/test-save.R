@@ -198,7 +198,7 @@ test_that("restart does not work correctly", {
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
-  #devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
+  # devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
   devtools::load_all() # need the testInit function
   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
                           opts = list("spades.restartRInterval" = 1))
@@ -206,47 +206,83 @@ test_that("restart does not work correctly", {
     testOnExit(testInitOut)
   }, add = TRUE)
   options("spades.restartRInterval" = 0)
-  # mapPath <- system.file("maps", package = "quickPlot")
-  #
-  # times <- list(start = 0, end = 1)
-  # parameters <- list(
-  #   .globals = list(stackName = "landscape"),
-  #   caribouMovement = list(.plotInitialTime = NA),
-  #   randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-  # )
-  # modules <- list("randomLandscapes", "caribouMovement")
-  # paths <- list(
-  #   modulePath = system.file("sampleModules", package = "SpaDES.core"),
-  #   inputPath = mapPath,
-  #   outputPath = tmpdir
-  # )
-  #
-  # options("spades.restartRInterval" = 1)
-  # times <- list(start = 0, end = 3)
-  # mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-  #                  outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  # mySim <- spades(mySim, debug = 1)
-  #
 
-  #options("spades.restartRInterval" = 10)
-  mySim <- mySim <- simInit(
-    times = list(start = 0.0, end = 30.0, timeunit = "year"),
-    params = list(
-      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-      # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
+  testNum = 3
+  if (testNum == 1) {
+    interval = 0
+    set.seed(123)
+    mapPath <- system.file("maps", package = "quickPlot")
+
+    times <- list(start = 0, end = 1)
+    parameters <- list(
+      .globals = list(stackName = "landscape"),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA)
-    ),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tmpdir,
-                 cachePath = tmpdir),
-    # Save final state of landscape and caribou
-    outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
-                                     stringsAsFactors = FALSE,
-                                     saveTime = 1:30))
-  )
-  mySim <- spades(mySim, debug = 1)
+      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    )
+    modules <- list("randomLandscapes", "caribouMovement")
+    paths <- list(
+      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      inputPath = mapPath,
+      outputPath = tmpdir
+    )
+
+    options("spades.restartRInterval" = interval)
+    times <- list(start = 0, end = 3)
+    mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+                     outputs = data.frame(objectName = "landscape", saveTime = times$end))
+    mySim <- spades(mySim, debug = 1)
+
+
+  } else if (testNum == 2) {
+    options("spades.restartRInterval" = 10)
+    mySim <- mySim <- simInit(
+      times = list(start = 0.0, end = 30.0, timeunit = "year"),
+      params = list(
+        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+        # Turn off interactive plotting
+        fireSpread = list(.plotInitialTime = NA),
+        caribouMovement = list(.plotInitialTime = NA),
+        randomLandscapes = list(.plotInitialTime = NA)
+      ),
+      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                   outputPath = tmpdir,
+                   cachePath = tmpdir),
+      # Save final state of landscape and caribou
+      outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
+                                       stringsAsFactors = FALSE,
+                                       saveTime = 1:30))
+    )
+    mySim <- spades(mySim, debug = 1)
+  } else if (testNum == 3) {
+    interval = 1
+    set.seed(123)
+    mapPath <- system.file("maps", package = "quickPlot")
+
+    times <- list(start = 0, end = 1)
+    parameters <- list(
+      .globals = list(stackName = "landscape"),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    )
+    modules <- list("randomLandscapes", "caribouMovement")
+    paths <- list(
+      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      inputPath = mapPath,
+      outputPath = tmpdir
+    )
+
+    options("spades.restartRInterval" = interval)
+    times <- list(start = 0, end = 3)
+    mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+                     outputs = data.frame(objectName = "landscape", saveTime = times$end))
+    mySim$tesRas <- raster(extent(0,10,0,10), vals = 1, res = 1)
+    tmpFilename <- "~/tmpRas.tif"
+    mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+    mySim <- spades(mySim, debug = 1)
+    sim$tesRas + 1
+    file.exists(tmpFilename)
+  }
+
   options("spades.restartRInterval" = 0)
 })

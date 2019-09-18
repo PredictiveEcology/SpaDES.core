@@ -50,4 +50,10 @@ restart, so no need to move them all to memory.
 Because of the restarting, the object name of the original assignment of the
 \code{spades} call can not be preserved. The \code{spades} call will be
 assigned to \code{sim} in the \code{.GlobalEnv}.
+
+Because this function is focused on restarting during a \code{spades} call,
+it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.
+If the user wants to keep those objects, then they should be saved to disk
+immediately before the \code{spades} call. This can then be recovered immediately
+after the return from the \code{spades} call.
 }

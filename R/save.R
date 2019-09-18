@@ -388,7 +388,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' @param sim Required. A \code{simList} to be retained through the restart
 #'
 #' @details
-#' The process responds to several user-supplied options. These are of 3 types: \code{restartRInterval}
+#' The process responds to several user-supplied options. Though under most cases,
+#' the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 #' the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 #' using a dot to separate the function name and its argument,
 #' e.g., \code{options("spades.restartR.restartDir" = "~"} and
@@ -402,6 +403,12 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' Because of the restarting, the object name of the original assignment of the
 #' \code{spades} call can not be preserved. The \code{spades} call will be
 #' assigned to \code{sim} in the \code{.GlobalEnv}.
+#'
+#' Because this function is focused on restarting during a \code{spades} call,
+#' it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.
+#' If the user wants to keep those objects, then they should be saved to disk
+#' immediately before the \code{spades} call. This can then be recovered immediately
+#' after the return from the \code{spades} call.
 #'
 restartR <- function(reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
@@ -464,6 +471,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   if (isTRUE(Sys.getenv("RSTUDIO") == "1")) {
     if (requireNamespace("rstudioapi")) {
       lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
+      rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
       rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First(); sim <- eval(.spadesCall)}") else "") #
       #rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First()}") else "") #; sim <- eval(.spadesCall)
     } else {
@@ -494,6 +502,8 @@ First <- function(...) {
   options("spades.restartRInterval" = .spades.restartRInterval)
 
   end(sim) <- sim$.restartRList$endOrig
+  assign(".Random.seed", sim$.restartRList$.randomSeed, envir = .GlobalEnv)
+
   rm(".restartRList", envir = envir(sim))
   on.exit({
     rm(.First, .oldWd, envir = .GlobalEnv)

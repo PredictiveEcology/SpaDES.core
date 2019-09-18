@@ -796,6 +796,8 @@ setMethod(
       if (!is.null(sim$.restartRList)) {
         sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
         sim$.restartRList$.spadesCall <- match.call()
+        sim$.restartRList$.randomSeed <- .Random.seed
+
         # saveSimListFormals <- formals(saveSimList)
         # saveSimList(sim,
         #             filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
