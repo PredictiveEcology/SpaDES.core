@@ -452,9 +452,11 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
 }
 
 First <- function(...) {
-  load(file.path('~', '.sim.RData')) # load "sim" here
-  load(file.path('~', '.attachedPkgs.RData')) # for "attached" object
+  attachedPkgsFilename <- file.path('~', '.attachedPkgs.RData')
+  load(attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
+  browser()
+  load(file.path('~', getOption('spades.restartR.RDataFilename', "~/.restartR.RData"))) # load "sim" here
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
       if (!dir.exists(p)) {
         newPath <- file.path(tempdir(), n)
@@ -470,7 +472,8 @@ First <- function(...) {
   rm(".restartRList", envir = envir(sim))
   on.exit({
     rm(.First, .oldWd, envir = .GlobalEnv)
-    file.remove('~/.RData', '~/.attachedPkgs.RData', getOption("spades.restartR.RDataFilename"))
+    file.remove('~/.RData', attachedPkgsFilename,
+                getOption("spades.restartR.RDataFilename"))
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
@@ -479,4 +482,5 @@ First <- function(...) {
   }
   return(sim)
 }
+
 
