@@ -211,7 +211,6 @@ test_that("restart does not work correctly", {
   testNum = 1
   if (testNum == 1) {
     interval = 1
-    set.seed(123)
     mapPath <- system.file("maps", package = "quickPlot")
 
     times <- list(start = 0, end = 1)
