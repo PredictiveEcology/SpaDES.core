@@ -70,9 +70,8 @@
   ## import functions using backports:
   backports::import(pkgname, "isFALSE")
 
-  parent <- parent.env(environment())
-  print(str(parent))
-
+  # parent <- parent.env(environment())
+  # print(str(parent))
   #reg.finalizer(parent, finalize, onexit= TRUE)
 
   invisible()

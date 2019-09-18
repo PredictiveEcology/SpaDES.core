@@ -206,29 +206,29 @@ test_that("restart does not work correctly", {
     testOnExit(testInitOut)
   }, add = TRUE)
   options("spades.restartRInterval" = 0)
-  mapPath <- system.file("maps", package = "quickPlot")
+  # mapPath <- system.file("maps", package = "quickPlot")
+  #
+  # times <- list(start = 0, end = 1)
+  # parameters <- list(
+  #   .globals = list(stackName = "landscape"),
+  #   caribouMovement = list(.plotInitialTime = NA),
+  #   randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  # )
+  # modules <- list("randomLandscapes", "caribouMovement")
+  # paths <- list(
+  #   modulePath = system.file("sampleModules", package = "SpaDES.core"),
+  #   inputPath = mapPath,
+  #   outputPath = tmpdir
+  # )
+  #
+  # options("spades.restartRInterval" = 1)
+  # times <- list(start = 0, end = 3)
+  # mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+  #                  outputs = data.frame(objectName = "landscape", saveTime = times$end))
+  # mySim <- spades(mySim, debug = 1)
+  #
 
-  times <- list(start = 0, end = 1)
-  parameters <- list(
-    .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-  )
-  modules <- list("randomLandscapes", "caribouMovement")
-  paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
-    inputPath = mapPath,
-    outputPath = tmpdir
-  )
-
-  options("spades.restartRInterval" = 1)
-  times <- list(start = 0, end = 3)
-  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  mySim <- spades(mySim, debug = 1)
-
-
-  options("spades.restartRInterval" = 10)
+  #options("spades.restartRInterval" = 10)
   mySim <- mySim <- simInit(
     times = list(start = 0.0, end = 30.0, timeunit = "year"),
     params = list(
