@@ -492,6 +492,10 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
     #reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
     # R cmd line loads .RData first, then .First, if there is one.
     .First <- SpaDES.core:::FirstFromR
+
+    # if there is an .RData file, keep it -- will be put back later.
+    if (file.exists(file.path("~", ".RData")))
+      file.link(file.path("~",".RData"), paste0(file.path("~",".RData"), .rndString))
     save(file = "~/.RData", .First)
     out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
     q("no")
@@ -510,6 +514,9 @@ First <- function(...) {
   if (!exists(".attachedPkgsFilename")) {
     fromRCmd <- TRUE
     .rndString <- list(...)$.rndString
+    # if there was an .RData file, move it back
+    if (file.exists(paste0(file.path("~",".RData"), .rndString)))
+      file.link(paste0(file.path("~",".RData"), .rndString), file.path("~",".RData"))
     .newDir <- file.path("~", paste0(".", .rndString))
     load(file.path(.newDir, ".RData"))
   }
