@@ -236,6 +236,15 @@ saveFiles <- function(sim) {
 #'
 #' @inheritParams spades
 #'
+#' @param sim Either a \code{simList} or a character string of the name
+#'        of a \code{simList} that can be found in \code{envir}. Using
+#'        a character string will assign that object name to the saved
+#'        \code{simList}, so when it is recovered it will be given that
+#'        name.
+#' @param envir If \code{sim} is a character string, then this must be provided.
+#'        It is the environment where the object named \code{sim} can
+#'        be found.
+#'
 #' @param filename Character string with the path for saving \code{simList}
 #'
 #' @param fileBackendToMem Logical. If there are file-backed \code{Raster}
@@ -251,10 +260,14 @@ saveFiles <- function(sim) {
 #' @return A saved \code{.RData} file in \code{filename} location.
 #'
 #' @export
-#' @rdname loadFiles
+#' @rdname saveSimList
 #' @seealso zipSimList
 #'
-saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = NULL, ...) {
+saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = NULL, envir, ...) {
+  if (is.character(sim)) {
+    simName <- sim
+    sim <- get(simName, envir = envir)
+  }
   isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
   if (any(isRaster)) {
     InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = envir(sim)), function(x) inMemory(x)))
@@ -275,7 +288,14 @@ saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = 
     }
 
   }
-  save(sim, file = filename, ...)
+  if (exists("simName", inherits = FALSE)) {
+    tmpEnv <- new.env(parent = emptyenv())
+    assign(simName, sim, envir = tmpEnv)
+    save(list = simName, envir = tmpEnv, file = filename, ...)
+  } else {
+    save(sim, file = filename, ...)
+  }
+  return(invisible())
 }
 
 #' Zip many of the files in a simList
