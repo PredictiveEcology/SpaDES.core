@@ -439,8 +439,8 @@ First <- function(...) {
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
-    assign("sim", sim, envir = .GlobalEnv) # .First can't be run with an assignment
-    return(invisible())
+    message(crayon::magenta("Because restartR was used, the simList is located in the location above.",
+                            " It should be assigned to an object immediately"))
   }
   return(sim)
 }
