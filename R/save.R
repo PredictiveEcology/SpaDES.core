@@ -444,7 +444,8 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
-    assign(".Last", function() system("R --no-save"), .GlobalEnv)
+    reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
+    # assign(".Last", function() system("R --no-save"), .GlobalEnv)
     q("no")
   }
 
