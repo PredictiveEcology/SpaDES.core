@@ -77,7 +77,23 @@ setMethod("Copy",
               # lapply(names(anyDataTables), function(dt) {
               #   sim_@.xData[[dt]] <- data.table::copy(sim_@.xData[[dt]])
               # })
+
+              # Copy the whole environment, recursively through environments
               sim_@.xData <- Copy(object@.xData, filebackedDir = filebackedDir)
+
+              # This chunk makes the environment of each function in a module,
+              #   the module itself. This is unique to functions in `simList` objs
+              #   i.e., can't rely on generic reproducible::Copy
+              lapply(objNames[isEnv], function(en) {
+                list2env(as.list(object@.xData[[en]], all.names = TRUE),
+                         envir = sim_@.xData[[en]])
+                isFn <- unlist(lapply(ls(sim_@.xData[[en]]), function(obj) {
+                  if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
+                    environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
+                  }
+                }
+                ))
+              })
 
               # Deal with activeBinding for mod
               lapply(objNames[isEnv], function(mod) {

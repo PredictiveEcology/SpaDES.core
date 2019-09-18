@@ -19,7 +19,7 @@ This will attempt to restart the R session, reloading all packages.
 The main purpose for doing this is to clear memory leaks that are not
 yet diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
 should only be used if there are RAM limitations being hit with long running
-simulations.
+simulations. Currently only works within Rstudio.
 }
 \details{
 The process responds to several user-supplied options. These are of 3 types: \code{restartRInterval}
