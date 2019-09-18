@@ -302,9 +302,11 @@ saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = 
 #'
 #' Currently, this will save the raster-backed files, outputs(sim), inputs(sim).
 #' It will add these to a temp file, using \code{Copy}, where appropriate
-#' to not affect the original \code{simList}.
+#' to not affect the original \code{simList}. VERY experimental. Unlikely
+#' to work at the moment.
 #'
 #' @inheritParams saveSimList
+#' @param sim A simList at the core of the zipping.
 #' @param ... passed to \code{saveSimList}, including important ones
 #'    such as \code{filename}.
 #' @param zipfile A character string indicating the filename for the

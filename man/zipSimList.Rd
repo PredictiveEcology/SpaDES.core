@@ -8,7 +8,7 @@ zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
   cache = FALSE)
 }
 \arguments{
-\item{sim}{\code{simList} object.}
+\item{sim}{A simList at the core of the zipping.}
 
 \item{zipfile}{A character string indicating the filename for the
 zipfile. Passed to \code{zip}}
@@ -30,7 +30,8 @@ out of date elements. See Details. Not yet implemented.}
 \description{
 Currently, this will save the raster-backed files, outputs(sim), inputs(sim).
 It will add these to a temp file, using \code{Copy}, where appropriate
-to not affect the original \code{simList}.
+to not affect the original \code{simList}. VERY experimental. Unlikely
+to work at the moment.
 }
 \details{
 If \code{cache} is used, it is likely that it should be trimmed before
