@@ -61,6 +61,7 @@ Suggests:
     magrittr,
     microbenchmark,
     png,
+    pryr,
     RandomFields (>= 3.3.4),
     RColorBrewer (>= 1.1-2),
     rgdal,
