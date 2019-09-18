@@ -43,7 +43,6 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
               " persist after restart as these locations disappear.")
     }
 
-
     if (nextTime < end(sim, timeunit(sim))) {
       sim <- scheduleEvent(sim, nextTime, "restartR", "restartR", .last())
     }
@@ -396,12 +395,12 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
   }
   setwd(restartDir)
 
-  browser()
   .spadesCall <- sim$.restartRList$.spadesCall
   .spadesCall$sim <- as.name("sim") # user may not have called the object "sim" ... now it is for restarting
+  .spades.restartRInterval <- getOption("spades.restartRInterval")
   # save .First function and the .oldWd
   if (isTRUE(reloadPkgs))
-    save(file = "~/.RData", .First, .oldWd, .spadesCall)
+    save(file = "~/.RData", .First, .oldWd, .spadesCall, .spades.restartRInterval)
 
   if (isTRUE(Sys.getenv("RSTUDIO") == "1")) {
     if (requireNamespace("rstudioapi")) {
@@ -411,7 +410,6 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL, .RDataFile = ".toLoad.RDa
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
   } else {
-    browser()
     .Last <<- function() system("R --no-save")
     q("no")
   }
@@ -431,6 +429,7 @@ First <- function(...) {
         p
       }
   })
+  options("spades.restartRInterval" = .spades.restartRInterval)
 
   end(sim) <- sim$.restartRList$endOrig
   rm(".restartRList", envir = envir(sim))
@@ -439,9 +438,9 @@ First <- function(...) {
     file.remove('~/.RData', '~/.attachedPkgs.RData', "~/.sim.RData")
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
-    browser()
     sim <- eval(.spadesCall)
-    browser()
+    assign("sim", sim, envir = .GlobalEnv) # .First can't be run with an assignment
+    return(invisible())
   }
   return(sim)
 }

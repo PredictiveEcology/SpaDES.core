@@ -193,6 +193,8 @@
 
 test_that("restart does not work correctly", {
   skip()
+  setwd("~/GitHub/SpaDES.core")
+  devtools::load_all()
   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
                           opts = list("spades.restartRInterval" = 1))
   on.exit({
