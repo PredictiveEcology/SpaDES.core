@@ -366,10 +366,21 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' Restart R programmatically
 #'
 #' This will attempt to restart the R session, reloading all packages.
-#' The main purpose for doing this is to clear memory leaks that are not
-#' yet diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
+#' Currently, this is not intended for general use: it has many specialized
+#' pieces for using inside a \code)(spades) call.
+#' The main purpose for doing this is to clear memory leaks (possibly deep
+#' in R \url{https://github.com/r-lib/fastmap}) that are not
+#' fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
 #' should only be used if there are RAM limitations being hit with long running
-#' simulations. Currently only works within Rstudio.
+#' simulations. Currently only works within Rstudio. The way to initiate
+#' restarting of R is simply setting the \code{spades.restartRInterval}
+#' greater than 0, which is the default,
+#' e.g., \code{options("spades.restartRInterval" = 100)}. This is only intended
+#' to restart a simulation in exactly the same place as it was (i.e., can't change
+#' machines), and because of the restart, the output of the \code{spades} call
+#' will be either to \code{sim} or the user must make such an assignment
+#' manually, e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}. This is stated in
+#' a message.
 #'
 #' @export
 #' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
@@ -507,6 +518,7 @@ FirstFromR <- function(...) {
   .rndString <- commandArgs()[4]
   SpaDES.core:::First(.rndString = .rndString)
 }
+
 First <- function(...) {
   # From Rstudio, it gets all the correct, session-specific files.
   #   From R, it does not. Only has the commandArgs -- must rebuild objects

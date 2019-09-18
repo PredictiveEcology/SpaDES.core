@@ -19,7 +19,8 @@ meaning it will use the nonexported \code{SpaDES.core:::First}. If a
 user wants to make a custom \code{.First} file, it should build off that one.}
 
 \item{.RDataFile}{A filename for temporary storage of simList. Defaults to
-\code{getOption("spades.restartR.RDataFilename")}}
+\code{getOption("spades.restartR.RDataFilename")}, but with a random string
+added to the base filename to prevent collisions from parallel processes.}
 
 \item{restartDir}{A character string indicating which working directory to
 use during restart. Defaults to \code{getwd()}, unless it is a
@@ -30,13 +31,25 @@ In that case, it will default to \code{"~"}.}
 }
 \description{
 This will attempt to restart the R session, reloading all packages.
-The main purpose for doing this is to clear memory leaks that are not
-yet diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
+Currently, this is not intended for general use: it has many specialized
+pieces for using inside a \code)(spades) call.
+The main purpose for doing this is to clear memory leaks (possibly deep
+in R \url{https://github.com/r-lib/fastmap}) that are not
+fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
 should only be used if there are RAM limitations being hit with long running
-simulations. Currently only works within Rstudio.
+simulations. Currently only works within Rstudio. The way to initiate
+restarting of R is simply setting the \code{spades.restartRInterval}
+greater than 0, which is the default,
+e.g., \code{options("spades.restartRInterval" = 100)}. This is only intended
+to restart a simulation in exactly the same place as it was (i.e., can't change
+machines), and because of the restart, the output of the \code{spades} call
+will be either to \code{sim} or the user must make such an assignment
+manually, e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}. This is stated in
+a message.
 }
 \details{
-The process responds to several user-supplied options. These are of 3 types: \code{restartRInterval}
+The process responds to several options. Though under most cases,
+the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 using a dot to separate the function name and its argument,
 e.g., \code{options("spades.restartR.restartDir" = "~"} and
