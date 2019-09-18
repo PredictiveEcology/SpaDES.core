@@ -26,7 +26,7 @@ use during restart. Defaults to \code{getwd()}, unless it is a
 directory in \code{tempdir()}, which may not exist through a restart.
 In that case, it will default to \code{"~"}.}
 
-\item{sim}{A \code{simList} to be retained through the restart}
+\item{sim}{Required. A \code{simList} to be retained through the restart}
 }
 \description{
 This will attempt to restart the R session, reloading all packages.
