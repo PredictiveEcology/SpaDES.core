@@ -208,9 +208,9 @@ test_that("restart does not work correctly", {
   }, add = TRUE)
   options("spades.restartRInterval" = 0)
 
-  testNum = 3
+  testNum = 1
   if (testNum == 1) {
-    interval = 0
+    interval = 1
     set.seed(123)
     mapPath <- system.file("maps", package = "quickPlot")
 

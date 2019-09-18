@@ -32,7 +32,7 @@ In that case, it will default to \code{"~"}.}
 \description{
 This will attempt to restart the R session, reloading all packages.
 Currently, this is not intended for general use: it has many specialized
-pieces for using inside a \code)(spades) call.
+pieces for using inside a \code{spades} call.
 The main purpose for doing this is to clear memory leaks (possibly deep
 in R \url{https://github.com/r-lib/fastmap}) that are not
 fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This

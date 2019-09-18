@@ -367,7 +367,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #'
 #' This will attempt to restart the R session, reloading all packages.
 #' Currently, this is not intended for general use: it has many specialized
-#' pieces for using inside a \code)(spades) call.
+#' pieces for using inside a \code{spades} call.
 #' The main purpose for doing this is to clear memory leaks (possibly deep
 #' in R \url{https://github.com/r-lib/fastmap}) that are not
 #' fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
@@ -527,8 +527,12 @@ First <- function(...) {
     fromRCmd <- TRUE
     .rndString <- list(...)$.rndString
     # if there was an .RData file, move it back
-    if (file.exists(paste0(file.path("~",".RData"), .rndString)))
-      file.link(paste0(file.path("~",".RData"), .rndString), file.path("~",".RData"))
+    if (file.exists(paste0(file.path("~",".RData"), .rndString))) {
+      rdataPath <- file.path("~",".RData")
+      file.remove(rdataPath)
+      file.link(paste0(file.path("~",".RData"), .rndString), rdataPath)
+    }
+
     .newDir <- file.path("~", paste0(".", .rndString))
     load(file.path(.newDir, ".RData"))
   }
@@ -573,6 +577,7 @@ First <- function(...) {
     message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
                             " named 'sim' (which may not be the same as the original assignment)"))
   }
+  setwd(.oldWd)
   return(sim)
 }
 
