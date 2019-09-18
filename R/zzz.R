@@ -1,6 +1,18 @@
 ## be sure to update the 'Package Options' section of the package help file
 ##   in R/spades-core-package.R
 ##
+e = new.env()
+
+reg.finalizer(e, function(e) {
+  message('Object Bye!')
+}, onexit = TRUE)
+
+
+finalize <- function(env) {
+  print(ls(env))
+  message("Bye from Name space Finalizer")
+}
+
 .onLoad <- function(libname, pkgname) {
   ## set options using the approach used by devtools
   opts <- options()
@@ -57,6 +69,10 @@
 
   ## import functions using backports:
   backports::import(pkgname, "isFALSE")
+
+  parent <- parent.env(environment())
+  print(str(parent))
+  reg.finalizer(parent, finalize, onexit= TRUE)
 
   invisible()
 }
