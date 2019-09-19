@@ -766,6 +766,7 @@ setMethod(
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     sim@.xData[["._startClockTime"]] <- Sys.time()
+    sim@.xData[["._simRndString"]] <- rndstr(1, 8, characterFirst = TRUE)
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))

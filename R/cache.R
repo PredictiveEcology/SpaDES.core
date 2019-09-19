@@ -73,7 +73,7 @@ setMethod(
     }
     envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
                      function(objs, name) {
-                       objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "mod")]
+                       objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "._simRndString", "mod")]
                        objectsToDigest <- sort(objs, method = "radix")
                        objectsToDigest <- objectsToDigest[objectsToDigest %in%
                                                             .objects[[name]]]
@@ -135,6 +135,7 @@ setMethod(
     if (length(obj$.list)) {
       obj$.list[[1]]$._startClockTime <- NULL
       obj$.list[[1]]$._timestamp <- NULL
+      obj$.list[[1]]$._simRndString <- NULL
     }
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
