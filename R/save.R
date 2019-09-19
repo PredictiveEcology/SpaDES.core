@@ -276,7 +276,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
   if (any(isRaster)) {
     InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
-    needModifying <- isTRUE(fileBackend || ( (!all(InMem)) && !is.null(filebackedDir)))
+    needModifying <- isTRUE(identical(fileBackend, 1) || ( (!all(InMem)) && !is.null(filebackedDir)))
     if (needModifying) {
       # Need to copy it because the moving to memory affects the original simList
       sim <- Copy(sim, filebackedDir = filebackedDir)
@@ -473,7 +473,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   saveSimListFormals <- formals(saveSimList)
   saveSimList(sim,
               filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
-              fileBackend = getOption("spades.saveSimList.fileBackend", FALSE),
+              fileBackend = getOption("spades.saveSimList.fileBackend", 0),
               filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
   if (requireNamespace("pryr")) {
     mu <- getFromNamespace("mem_used", "pryr")()
@@ -590,32 +590,34 @@ restartR.restartDir.mess <- paste0("Please provide a directory location that wil
           " or \n",
           " dirname(tempdir())\n")
 
-checkAndSetRestartDir <- function(restartDir = getOption("spades.restartRTmpDir", NULL), sim) {
-  if (is.null(restartDir)) {
-    if (interactive()) {
-      tries <- 0
-      while(tries < 2) {
-        restartDir <- outputs(sim)
-        if (!dir.exists(restartDir)) {
-          message("That directory does not exist. Please set the option to a directory that exists")
-          tries <- tries + 1
-        } else {
-          break
-        }
-        if (grepl(tempdir(), restartDir)) {
-          message("That is a temporary directory that will disappear at restart; please supply another")
-          tries <- tries + 1
-        } else {
-          break
-        }
-      }
-      if (tries >= 2) stop("Please restart")
-      options("spades.restartR.restartDir" = restartDir)
 
-    } else {
-      stop(restartR.restartDir.mess)
-    }
+checkAndSetRestartDir <- function(sim, restartDir = outputPath(sim)) {
+  usingSimPaths <- identical(restartDir, outputPath(sim))
+  if (grepl(dirname(tempdir()), restartDir)) {
+    restartDir <- outputPath(sim)
+    usingSimPaths <- TRUE
   }
 
-  return(invisible())
+  if (grepl(dirname(tempdir()), restartDir)) {
+    restartDir <- modulePath(sim)
+    usingSimPaths <- TRUE
+  }
+
+  if (grepl(dirname(tempdir()), restartDir)) {
+    restartDir <- inputPath(sim)
+    usingSimPaths <- TRUE
+  }
+
+  if (grepl(dirname(tempdir()), restartDir)) {
+    restartDir <- cachePath(sim)
+    usingSimPaths <- TRUE
+  }
+
+  if (grepl(dirname(tempdir()), restartDir)) {
+    if (usingSimPaths)
+      stop("The supplied restartDir is in a temporary directory, as are all paths in the sim. ",
+           " These will disappear at restart; please try again with a non-temporary path")
+  }
+  checkPath(restartDir, create = TRUE)
+  return(restartDir)
 }

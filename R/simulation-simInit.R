@@ -395,6 +395,7 @@ setMethod(
       core <- setdiff(core, "restartR")
       .pkgEnv$.coreModules <- core
     } else {
+      browser()
       restartDir <- checkAndSetRestartDir(sim = sim)
     }
 
