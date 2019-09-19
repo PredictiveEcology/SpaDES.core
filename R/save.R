@@ -1,6 +1,7 @@
 if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("saved", "saveTime", "fun", "package", "attached",
-                           ".spades.restartRInterval", ".First", ".oldWd", ".spadesCall"))
+                           ".spades.restartRInterval", ".First", ".oldWd", ".spadesCall",
+                           ".attachedPkgsFilename", ".spades.simFilename"))
 }
 
 # Just checks for paths, creates them if they do not exist
@@ -502,7 +503,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   } else {
     #reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
     # R cmd line loads .RData first, then .First, if there is one.
-    .First <- SpaDES.core:::FirstFromR
+    .First <- FirstFromR
 
     # if there is an .RData file, keep it -- will be put back later.
     if (file.exists(file.path("~", ".RData")))
@@ -516,7 +517,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
 
 FirstFromR <- function(...) {
   .rndString <- commandArgs()[4]
-  SpaDES.core:::First(.rndString = .rndString)
+  First(.rndString = .rndString)
 }
 
 First <- function(...) {
