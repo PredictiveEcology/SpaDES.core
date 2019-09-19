@@ -208,7 +208,7 @@ test_that("restart does not work correctly", {
   }, add = TRUE)
   options("spades.restartRInterval" = 0)
 
-  testNum = 1
+  testNum = 2
   if (testNum == 1) {
     interval = 1
     mapPath <- system.file("maps", package = "quickPlot")
@@ -246,7 +246,7 @@ test_that("restart does not work correctly", {
       ),
       modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
       paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                   outputPath = tmpdir,
+                   outputPath = file.path("~", basename(tmpdir)),
                    cachePath = tmpdir),
       # Save final state of landscape and caribou
       outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
@@ -283,5 +283,6 @@ test_that("restart does not work correctly", {
     file.exists(tmpFilename)
   }
 
+  unlink(unique(dirname(outputs(sim)$file)), recursive = TRUE, force = TRUE)
   options("spades.restartRInterval" = 0)
 })
