@@ -394,6 +394,8 @@ setMethod(
     if (getOption("spades.restartRInterval", 0) == 0) {
       core <- setdiff(core, "restartR")
       .pkgEnv$.coreModules <- core
+    } else {
+      restartDir <- checkAndSetRestartDir(sim = sim)
     }
 
 

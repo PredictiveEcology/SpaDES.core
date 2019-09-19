@@ -249,14 +249,17 @@ saveFiles <- function(sim) {
 #'
 #' @param filename Character string with the path for saving \code{simList}
 #'
-#' @param fileBackendToMem Logical. If there are file-backed \code{Raster}
-#'        objects, should they be converted to memory objects, or should
-#'        they be kept as file-backed rasters w.
-#'        or loaded into RAM and saved within the \code{.RData} file.
-#'        If \code{TRUE} (default), then the files will be copied to
-#'        \code{file.path(dirname(filename), "rasters")}.
-#' @param filebackedDir Character string, indicating a path to save
-#'        the files to in file-backed objects (currently, only Raster* objects)
+#' @param fileBackend Numeric. \code{0} means don't do anything with
+#'        file backed rasters. Leave their file intact as is, in its place.
+#'        \code{1} means save a copy of the file backed rasters in \code{fileBackedDir}.
+#'        \code{2} means move all data in file-backed rasters to memory. This
+#'        means that the objects will be part of the main \code{RData} file
+#'        of the \code{simList}. Default is \code{0}.
+#' @param filebackedDir Only used if \code{fileBackend} is 1.
+#'        \code{NULL} or Character string. If \code{NULL}, and
+#'        , then then the files will be copied to
+#'        \code{file.path(dirname(filename), "rasters")}. A character string
+#'        will be interpretted as a path to copy all rasters to.
 #' @param ... Passed to \code{save}, e.g., \code{compression}
 #'
 #' @return A saved \code{.RData} file in \code{filename} location.
@@ -265,7 +268,7 @@ saveFiles <- function(sim) {
 #' @rdname saveSimList
 #' @seealso zipSimList
 #'
-saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = NULL, envir, ...) {
+saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   if (is.character(sim)) {
     simName <- sim
     sim <- get(simName, envir = envir)
@@ -273,11 +276,11 @@ saveSimList <- function(sim, filename, fileBackendToMem = TRUE, filebackedDir = 
   isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
   if (any(isRaster)) {
     InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
-    needModifying <- isTRUE(fileBackendToMem || ( (!all(InMem)) && !is.null(filebackedDir)))
+    needModifying <- isTRUE(fileBackend || ( (!all(InMem)) && !is.null(filebackedDir)))
     if (needModifying) {
+      # Need to copy it because the moving to memory affects the original simList
       sim <- Copy(sim, filebackedDir = filebackedDir)
-      if (fileBackendToMem) {
-        # Need to copy it because the moving to memory affects the original simList
+      if (fileBackend) {
         for (x in names(isRaster)[isRaster][!InMem])
           sim[[x]][] <- sim[[x]][]
       } else {
@@ -332,9 +335,9 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
   tmpDir <- file.path(tempdir(), rndstr(1, 6))
   tmpRData <- file.path(tmpDir, basename(dots$filename))
   if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("rasters")
-  if (is.null(dots$fileBackendToMem)) dots$fileBackendToMem <- formals(saveSimList)$fileBackendToMem
+  if (is.null(dots$fileBackend)) dots$fileBackend <- formals(saveSimList)$fileBackend
   tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
-  saveSimList(sim, filename = tmpRData, filebackedDir = tmpRasters, fileBackendToMem = dots$fileBackendToMem)
+  saveSimList(sim, filename = tmpRData, filebackedDir = tmpRasters, fileBackend = dots$fileBackend)
 
   newnamesOutputs <- NULL
   if (isTRUE(outputs)) {
@@ -406,9 +409,9 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 #' using a dot to separate the function name and its argument,
 #' e.g., \code{options("spades.restartR.restartDir" = "~"} and
-#' \code{options("spades.saveSimList.fileBackendToMem" = FALSE)}. See specific functions for
+#' \code{options("spades.saveSimList.fileBackend" = FALSE)}. See specific functions for
 #' defaults and argument meanings. The only difference from the default function values
-#' is with \code{saveSimList} argument \code{fileBackendToMem = FALSE} during \code{restartR}
+#' is with \code{saveSimList} argument \code{fileBackend = FALSE} during \code{restartR}
 #' by default, because it is assumed that the file backends will still be intact after a
 #' restart, so no need to move them all to memory.
 #'
@@ -425,10 +428,12 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #'
 restartR <- function(reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
-                     restartDir = NULL, sim) {
-  .rndString <- rndstr(1, 9)
-
+                     restartDir = getOption("spades.restartR.restartDir", NULL), sim) {
   if (missing(sim)) stop("sim is currently a required argument")
+  restartDir <- checkAndSetRestartDir(restartDir, sim = sim)
+
+  .rndString <- sim@.xData[["._simRndString"]] # rndstr(1, 9)
+
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
                    "package:grDevices", "package:utils", "package:datasets", "package:methods",
                    "Autoloads", "package:base", "devtools_shims")
@@ -436,7 +441,8 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
-  .newDir <- file.path("~", paste0(".", .rndString))
+  .newDir <- file.path(restartDir, paste0(".", .rndString))
+  browser()
   checkPath(.newDir, create = TRUE)
   .attachedPkgsFilename <- file.path(.newDir, '.attachedPkgs.RData')
   save(file = .attachedPkgsFilename, attached)
@@ -445,18 +451,15 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   }
 
   .oldWd <- getwd()
-  if (is.null(restartDir)) {
-    restartDir <- if (grepl(tempdir(), getwd())) {
-      "~"
-    } else {
-      getwd()
-    }
-  }
+  # if (is.null(restartDir)) {
+  # }
   setwd(restartDir)
 
 
   if (is.null(sim$.restartRList)) sim$.restartRList <- list()
-  sim$.restartRList$simFilename <- file.path(.newDir, basename(getOption("spades.restartR.RDataFilename")))
+  browser()
+  sim$.restartRList$simFilename <- file.path(.newDir, paste0(basename(getOption("spades.restartR.RDataFilename")),
+                                                             as.character(end(sim))))
   # sim$.restartRList$endOrig <- end(sim)
   sim$.restartRList$startOrig <- start(sim)
   sim$.restartRList$wd <- asPath(getwd())
@@ -470,7 +473,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   saveSimListFormals <- formals(saveSimList)
   saveSimList(sim,
               filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
-              fileBackendToMem = getOption("spades.saveSimList.fileBackendToMem", FALSE),
+              fileBackend = getOption("spades.saveSimList.fileBackend", FALSE),
               filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
   if (requireNamespace("pryr")) {
     mu <- getFromNamespace("mem_used", "pryr")()
@@ -496,7 +499,6 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
 
       # Need load to get custom .First fn
       rstudioapi::restartSession(paste0("{load('",.RDataFile,"'); sim <- .First(); sim <- eval(.spadesCall)}")) #
-      #rstudioapi::restartSession(if (reloadPkgs) paste0("{load('~/.RData'); sim <- .First(); sim <- eval(.spadesCall)}") else ""}")
     } else {
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
@@ -582,4 +584,38 @@ First <- function(...) {
   return(sim)
 }
 
+restartR.restartDir.mess <- paste0("Please provide a directory location that will persist through an R restart.",
+          " Good options would be:\n",
+          " ~\n",
+          " or \n",
+          " dirname(tempdir())\n")
 
+checkAndSetRestartDir <- function(restartDir = getOption("spades.restartRTmpDir", NULL), sim) {
+  if (is.null(restartDir)) {
+    if (interactive()) {
+      tries <- 0
+      while(tries < 2) {
+        restartDir <- outputs(sim)
+        if (!dir.exists(restartDir)) {
+          message("That directory does not exist. Please set the option to a directory that exists")
+          tries <- tries + 1
+        } else {
+          break
+        }
+        if (grepl(tempdir(), restartDir)) {
+          message("That is a temporary directory that will disappear at restart; please supply another")
+          tries <- tries + 1
+        } else {
+          break
+        }
+      }
+      if (tries >= 2) stop("Please restart")
+      options("spades.restartR.restartDir" = restartDir)
+
+    } else {
+      stop(restartR.restartDir.mess)
+    }
+  }
+
+  return(invisible())
+}
