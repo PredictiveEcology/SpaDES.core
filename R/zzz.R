@@ -36,7 +36,7 @@
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
     spades.recoveryMode = 1,
     spades.restartRInterval = 0,
-    spades.restartR.clearFiles = FALSE,
+    spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim.restartR.RData",
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
