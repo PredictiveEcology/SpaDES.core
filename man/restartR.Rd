@@ -4,11 +4,13 @@
 \alias{restartR}
 \title{Restart R programmatically}
 \usage{
-restartR(reloadPkgs = TRUE, .First = NULL,
+restartR(sim, reloadPkgs = TRUE, .First = NULL,
   .RDataFile = getOption("spades.restartR.RDataFilename"),
-  restartDir = NULL, sim)
+  restartDir = getOption("spades.restartR.restartDir", NULL))
 }
 \arguments{
+\item{sim}{Required. A \code{simList} to be retained through the restart}
+
 \item{reloadPkgs}{Logical. If \code{TRUE}, it will attempt to reload all the packages
 as they were in previous session, in the same order. If \code{FALSE}, it will
 load no packages beyond normal R startup. Default \code{TRUE}}
@@ -16,33 +18,43 @@ load no packages beyond normal R startup. Default \code{TRUE}}
 \item{.First}{A function to save to \code{~/.RData} which will
 be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
 meaning it will use the nonexported \code{SpaDES.core:::First}. If a
-user wants to make a custom \code{.First} file, it should build off that one.}
+user wants to make a custom \code{First} file, it should built off that one.}
 
-\item{.RDataFile}{A filename for temporary storage of simList. Defaults to
-\code{getOption("spades.restartR.RDataFilename")}, but with a random string
-added to the base filename to prevent collisions from parallel processes.}
+\item{.RDataFile}{A filename for saving simList. Defaults to
+\code{getOption("spades.restartR.RDataFilename")}, and the directory will
+    be in \code{restartDir}. The simulation time will be mid-pended to this
+    name, as in: \code{basename(.RDataFile), "_time",}
+    \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
 
-\item{restartDir}{A character string indicating which working directory to
-use during restart. Defaults to \code{getwd()}, unless it is a
-directory in \code{tempdir()}, which may not exist through a restart.
-In that case, it will default to \code{"~"}.}
-
-\item{sim}{Required. A \code{simList} to be retained through the restart}
+\item{restartDir}{A character string indicating root directory to
+    save \code{simList} and other ancilliary files during restart.
+    Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
+    If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
+    \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},
+    taking the first one that is not inside the \code{tempdir()}, which will
+    disappear during restart of R.
+    The actual directory for a given \code{spades} call that is restarting will
+    be:
+\code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
+    The random string is to prevent parallel processes that started at the same clock
+    time from colliding.}
 }
 \description{
-This will attempt to restart the R session, reloading all packages.
+This will attempt to restart the R session, reloading all packages, and
+saving and reloading the \code{simList}.
 Currently, this is not intended for general use: it has many specialized
 pieces for using inside a \code{spades} call.
 The main purpose for doing this is to clear memory leaks (possibly deep
 in R \url{https://github.com/r-lib/fastmap}) that are not
 fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
 should only be used if there are RAM limitations being hit with long running
-simulations. Currently only works within Rstudio. The way to initiate
+simulations. It has been tested to work Linux within Rstudio and at a
+terminal R session. The way to initiate
 restarting of R is simply setting the \code{spades.restartRInterval}
 greater than 0, which is the default,
 e.g., \code{options("spades.restartRInterval" = 100)}. This is only intended
 to restart a simulation in exactly the same place as it was (i.e., can\'t change
-machines), and because of the restart, the output of the \code{spades} call
+machines), and because of the restart, the assignment of the \code{spades} call
 will be either to \code{sim} or the user must make such an assignment
 manually, e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}. This is stated in
 a message.
@@ -51,11 +63,13 @@ a message.
 The process responds to several options. Though under most cases,
 the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
-using a dot to separate the function name and its argument,
-e.g., \code{options("spades.restartR.restartDir" = "~"} and
-\code{options("spades.saveSimList.fileBackendToMem" = FALSE)}. See specific functions for
+using a dot to separate the function name and its argument. The defaults for
+two key options are:\code{options("spades.restartR.restartDir" = NULL}, meaning
+use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
+and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
+with raster-backed files. See specific functions for
 defaults and argument meanings. The only difference from the default function values
-is with \code{saveSimList} argument \code{fileBackendToMem = FALSE} during \code{restartR}
+is with \code{saveSimList} argument \code{fileBackend = FALSE} during \code{restartR}
 by default, because it is assumed that the file backends will still be intact after a
 restart, so no need to move them all to memory.
 }
@@ -69,4 +83,8 @@ it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.
 If the user wants to keep those objects, then they should be saved to disk
 immediately before the \code{spades} call. This can then be recovered immediately
 after the return from the \code{spades} call.
+
+To keep the saved \code{simList}, use
+\code{options("spades.restartR.clearFiles" = TRUE)}. The default is to treat these files
+as temporary files and so will be removed.
 }

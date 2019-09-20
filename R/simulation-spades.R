@@ -796,27 +796,16 @@ setMethod(
         .pkgEnv$.cleanEnd <- NULL
       }
       # For restarting R -- a few extra pieces, including saving the simList as the last thing
-      if (!is.null(sim$.restartRList)) {
+      if (!is.null(sim$._restartRList)) {
         sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
-        sim$.restartRList$.spadesCall <- match.call()
-        sim$.restartRList$.randomSeed <- .Random.seed
+        sim$._restartRList$.spadesCall <- match.call()
 
-        # saveSimListFormals <- formals(saveSimList)
-        # saveSimList(sim,
-        #             filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
-        #             fileBackendToMem = getOption("spades.saveSimList.fileBackendToMem", FALSE),
-        #             filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
-        # if (requireNamespace("pryr")) {
-        #   mu <- getFromNamespace("mem_used", "pryr")()
-        #   class(mu) <- "object_size"
-        #   message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
-        # }
         restartFormals <- formals(restartR)
-        restartR(reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
+        restartR(sim = sim,
+                 reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
                  .First = getOption("spades.restartR..First", restartFormals$.First),
-                 .RDataFile = getOption("spades.restartR..RDataFile", sim$.restartRList$simFilename),
-                 restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir),
-                 sim = sim)
+                 .RDataFile = getOption("spades.restartR.RDataFilename", sim$._restartRList$simFilename),
+                 restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir))
       }
 
     }, add = TRUE)
@@ -1146,7 +1135,7 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   rmo$postEvents <- sim@events
   rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
   sim@.xData$.addedEvents <- rmo$addedEvents
-  sim@.xData$.randomSeed <- rmo$randomSeed
+  sim@.xData$._randomSeed <- rmo$randomSeed
   message(crayon::magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
                                  format(rmo$recoverModeTiming, units = "auto", digits = 3),
                                  " and ", format(recoverableObjsSize, units = "auto"))))

@@ -32,24 +32,18 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 
   } else if (eventType == "restartR") {
     nextTime <- time(sim, timeunit(sim)) + getOption("spades.restartRInterval")
-    sim$.restartRList <- list()
-    sim$.restartRList$endOrig <- end(sim)
-    # sim$.restartRList$simFilename <- getOption("spades.restartR.RDataFilename")
-    # sim$.restartRList$startOrig <- start(sim)
-    # sim$.restartRList$wd <- asPath(getwd())
-    # withTmpPaths <- grepl(tempdir(), paths(sim))
-    # if (any(withTmpPaths)) {
-    #   message("Some paths in the simList, ",
-    #           paste(names(paths(sim))[withTmpPaths], collapse = ", "),
-    #           ", are in temporary locations. These will not",
-    #           " persist after restart as these locations disappear.")
-    # }
+
+    # This next step of creating this list is critical -- it is the trigger for the on.exit in spades
+    sim$._restartRList <- list()
+    sim$._restartRList$endOrig <- end(sim)
 
     if (nextTime < end(sim, timeunit(sim))) {
-      sim <- scheduleEvent(sim, nextTime, "restartR", "restartR", .last())
+      sim <- scheduleEvent(sim, nextTime, "restartR", "restartR", .last() + 10) # very last
     }
+
+    # This triggers the end of the spades call
     end(sim) <- time(sim)
-    # stop("Exiting spades call to restart R")
+
   }
 
   return(invisible(sim))
@@ -256,8 +250,8 @@ saveFiles <- function(sim) {
 #'        means that the objects will be part of the main \code{RData} file
 #'        of the \code{simList}. Default is \code{0}.
 #' @param filebackedDir Only used if \code{fileBackend} is 1.
-#'        \code{NULL} or Character string. If \code{NULL}, and
-#'        , then then the files will be copied to
+#'        \code{NULL}, the default, or Character string. If \code{NULL}, then then the
+#'        files will be copied to the directory:
 #'        \code{file.path(dirname(filename), "rasters")}. A character string
 #'        will be interpretted as a path to copy all rasters to.
 #' @param ... Passed to \code{save}, e.g., \code{compression}
@@ -277,12 +271,13 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
     if (any(isRaster)) {
       InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
-      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) || (identical(fileBackend, 2) &&
+      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1) && !all(InMem)) || (identical(fileBackend, 2) &&
                                                               (!all(InMem)) &&
                                                               !is.null(filebackedDir)))
       if (needModifying) {
         if (is.null(filebackedDir)) {
           filebackedDir <- file.path(dirname(filename), "rasters")
+          checkPath(filebackedDir, create = TRUE)
         }
         # Need to copy it because the moving to memory affects the original simList
         sim <- Copy(sim, filebackedDir = filebackedDir)
@@ -300,6 +295,8 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 
     }
   }
+  sim@.xData$._randomSeed <- .Random.seed
+  sim@.xData$._rng.kind <- RNGkind()
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
     assign(simName, sim, envir = tmpEnv)
@@ -376,47 +373,62 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 
 #' Restart R programmatically
 #'
-#' This will attempt to restart the R session, reloading all packages.
+#' This will attempt to restart the R session, reloading all packages, and
+#' saving and reloading the \code{simList}.
 #' Currently, this is not intended for general use: it has many specialized
 #' pieces for using inside a \code{spades} call.
 #' The main purpose for doing this is to clear memory leaks (possibly deep
 #' in R \url{https://github.com/r-lib/fastmap}) that are not
 #' fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
 #' should only be used if there are RAM limitations being hit with long running
-#' simulations. Currently only works within Rstudio. The way to initiate
+#' simulations. It has been tested to work Linux within Rstudio and at a
+#' terminal R session. The way to initiate
 #' restarting of R is simply setting the \code{spades.restartRInterval}
 #' greater than 0, which is the default,
 #' e.g., \code{options("spades.restartRInterval" = 100)}. This is only intended
 #' to restart a simulation in exactly the same place as it was (i.e., can\'t change
-#' machines), and because of the restart, the output of the \code{spades} call
+#' machines), and because of the restart, the assignment of the \code{spades} call
 #' will be either to \code{sim} or the user must make such an assignment
 #' manually, e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}. This is stated in
 #' a message.
 #'
 #' @export
+#' @param sim Required. A \code{simList} to be retained through the restart
 #' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
 #'   as they were in previous session, in the same order. If \code{FALSE}, it will
 #'   load no packages beyond normal R startup. Default \code{TRUE}
 #' @param .First A function to save to \code{~/.RData} which will
 #'    be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
 #'    meaning it will use the nonexported \code{SpaDES.core:::First}. If a
-#'    user wants to make a custom \code{.First} file, it should build off that one.
-#' @param .RDataFile A filename for temporary storage of simList. Defaults to
-#' \code{getOption("spades.restartR.RDataFilename")}, but with a random string
-#' added to the base filename to prevent collisions from parallel processes.
-#' @param restartDir A character string indicating which working directory to
-#'     use during restart. Defaults to \code{getwd()}, unless it is a
-#'     directory in \code{tempdir()}, which may not exist through a restart.
-#'     In that case, it will default to \code{"~"}.
-#' @param sim Required. A \code{simList} to be retained through the restart
+#'    user wants to make a custom \code{First} file, it should built off that one.
+#' @param .RDataFile A filename for saving simList. Defaults to
+#' \code{getOption("spades.restartR.RDataFilename")}, and the directory will
+#'     be in \code{restartDir}. The simulation time will be mid-pended to this
+#'     name, as in: \code{basename(.RDataFile), "_time",}
+#'     \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}
+#'
+#' @param restartDir A character string indicating root directory to
+#'     save \code{simList} and other ancilliary files during restart.
+#'     Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
+#'     If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
+#'     \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},
+#'     taking the first one that is not inside the \code{tempdir()}, which will
+#'     disappear during restart of R.
+#'     The actual directory for a given \code{spades} call that is restarting will
+#'     be:
+#' \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
+#'     The random string is to prevent parallel processes that started at the same clock
+#'     time from colliding.
 #'
 #' @details
 #' The process responds to several options. Though under most cases,
 #' the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 #' the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
-#' using a dot to separate the function name and its argument,
-#' e.g., \code{options("spades.restartR.restartDir" = "~"} and
-#' \code{options("spades.saveSimList.fileBackend" = FALSE)}. See specific functions for
+#' using a dot to separate the function name and its argument. The defaults for
+#' two key options are:\code{options("spades.restartR.restartDir" = NULL}, meaning
+#' use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
+#' and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
+#' with raster-backed files. See specific functions for
 #' defaults and argument meanings. The only difference from the default function values
 #' is with \code{saveSimList} argument \code{fileBackend = FALSE} during \code{restartR}
 #' by default, because it is assumed that the file backends will still be intact after a
@@ -433,13 +445,17 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' immediately before the \code{spades} call. This can then be recovered immediately
 #' after the return from the \code{spades} call.
 #'
-restartR <- function(reloadPkgs = TRUE, .First = NULL,
+#' To keep the saved \code{simList}, use
+#' \code{options("spades.restartR.clearFiles" = TRUE)}. The default is to treat these files
+#' as temporary files and so will be removed.
+#'
+restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
-                     restartDir = getOption("spades.restartR.restartDir", NULL), sim) {
+                     restartDir = getOption("spades.restartR.restartDir", NULL)) {
   if (missing(sim)) stop("sim is currently a required argument")
   restartDir <- checkAndSetRestartDir(restartDir, sim = sim)
 
-  .rndString <- sim@.xData[["._simRndString"]] # rndstr(1, 9)
+  .rndString <- sim@.xData[["._simRndString"]]
 
   vanillaPkgs <- c(".GlobalEnv", "tools:rstudio", "package:stats", "package:graphics",
                    "package:grDevices", "package:utils", "package:datasets", "package:methods",
@@ -462,13 +478,15 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   setwd(restartDir)
 
 
-  if (is.null(sim$.restartRList)) sim$.restartRList <- list()
-  sim$.restartRList$simFilename <- file.path(.newDir, paste0(
-    basename(getOption("spades.restartR.RDataFilename")), "_time",
-    paddedFloatToChar(end(sim), padL = nchar(as.character(end(sim))))))
-  # sim$.restartRList$endOrig <- end(sim)
-  sim$.restartRList$startOrig <- start(sim)
-  sim$.restartRList$wd <- asPath(getwd())
+  if (is.null(sim$._restartRList)) sim$._restartRList <- list()
+  sim$._restartRList$simFilename <- file.path(.newDir, paste0(
+    basename(.RDataFile), "_time",
+    paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
+  sim$._restartRList$simFilename <- gsub(".RData", "", sim$._restartRList$simFilename)
+  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename,".RData")
+  # sim$._restartRList$endOrig <- end(sim)
+  sim$._restartRList$startOrig <- start(sim)
+  sim$._restartRList$wd <- asPath(getwd())
   withTmpPaths <- grepl(tempdir(), paths(sim))
   if (any(withTmpPaths)) {
     message("Some paths in the simList, ",
@@ -478,7 +496,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   }
   saveSimListFormals <- formals(saveSimList)
   saveSimList(sim,
-              filename = getOption("spades.saveSimList.filename", sim$.restartRList$simFilename),
+              filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename),
               fileBackend = getOption("spades.saveSimList.fileBackend", 0),
               filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
   if (requireNamespace("pryr")) {
@@ -487,8 +505,8 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
     message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
   }
 
-  .spadesCall <- sim$.restartRList$.spadesCall
-  .spades.simFilename <- sim$.restartRList$simFilename
+  .spadesCall <- sim$._restartRList$.spadesCall
+  .spades.simFilename <- sim$._restartRList$simFilename
   .spadesCall$sim <- as.name("sim") # user may not have called the object "sim" ... now it is for restarting
   .spades.restartRInterval <- getOption("spades.restartRInterval")
   # save .First function and the .oldWd
@@ -549,8 +567,7 @@ First <- function(...) {
   #attachedPkgsFilename <- file.path("~", paste0(".", .rndString), '.attachedPkgs.RData')
   load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  load(.spades.simFilename)
-  #load(getOption('spades.restartR.RDataFilename', "~/.restartR.RData")) # load "sim" here
+  load(.spades.simFilename)  # load "sim" here
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
       if (!dir.exists(p)) {
         newPath <- file.path(tempdir(), n)
@@ -562,15 +579,16 @@ First <- function(...) {
   })
   options("spades.restartRInterval" = .spades.restartRInterval)
 
-  end(sim) <- sim$.restartRList$endOrig
-  assign(".Random.seed", sim$.restartRList$.randomSeed, envir = .GlobalEnv)
+  end(sim) <- sim$._restartRList$endOrig
+  assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
+  do.call("RNGkind", as.list(sim$._rng.kind))
 
-  rm(".restartRList", envir = envir(sim))
+  rm("._restartRList", envir = envir(sim))
   on.exit({
     if (fromRCmd)
       try(file.remove('~/.RData') )
     if (getOption("spades.restartR.clearFiles", TRUE))
-      unlink(dirname(.attachedPkgsFilename), recursive = TRUE, force = TRUE)
+      unlink(dirname(dirname(.attachedPkgsFilename)), recursive = TRUE, force = TRUE)
                 #getOption("spades.restartR.RDataFilename"))
     if (!fromRCmd) {
       objsToDelete <- c(".First", ".oldWd", ".spades.restartRInterval", ".spades.simFilename",
@@ -590,12 +608,6 @@ First <- function(...) {
   setwd(.oldWd)
   return(sim)
 }
-
-restartR.restartDir.mess <- paste0("Please provide a directory location that will persist through an R restart.",
-          " Good options would be:\n",
-          " ~\n",
-          " or \n",
-          " dirname(tempdir())\n")
 
 
 checkAndSetRestartDir <- function(sim, restartDir = outputPath(sim)) {
@@ -628,7 +640,7 @@ checkAndSetRestartDir <- function(sim, restartDir = outputPath(sim)) {
 
   if (grepl(dirname(tempdir()), restartDir)) {
     if (usingSimPaths)
-      stop("The supplied restartDir is in a temporary directory, as are all paths in the sim. ",
+      warning("The supplied restartDir is in a temporary directory, as are all paths in the sim. ",
            " These will disappear at restart; please try again with a non-temporary path")
   }
   checkPath(restartDir, create = TRUE)

@@ -4,8 +4,8 @@
 \alias{saveSimList}
 \title{Save a whole \code{simList} object to disk}
 \usage{
-saveSimList(sim, filename, fileBackendToMem = TRUE,
-  filebackedDir = NULL, envir, ...)
+saveSimList(sim, filename, fileBackend = 0, filebackedDir = NULL,
+  envir, ...)
 }
 \arguments{
 \item{sim}{Either a \code{simList} or a character string of the name
@@ -16,15 +16,18 @@ name.}
 
 \item{filename}{Character string with the path for saving \code{simList}}
 
-\item{fileBackendToMem}{Logical. If there are file-backed \code{Raster}
-objects, should they be converted to memory objects, or should
-they be kept as file-backed rasters w.
-or loaded into RAM and saved within the \code{.RData} file.
-If \code{TRUE} (default), then the files will be copied to
-\code{file.path(dirname(filename), "rasters")}.}
+\item{fileBackend}{Numeric. \code{0} means don't do anything with
+file backed rasters. Leave their file intact as is, in its place.
+\code{1} means save a copy of the file backed rasters in \code{fileBackedDir}.
+\code{2} means move all data in file-backed rasters to memory. This
+means that the objects will be part of the main \code{RData} file
+of the \code{simList}. Default is \code{0}.}
 
-\item{filebackedDir}{Character string, indicating a path to save
-the files to in file-backed objects (currently, only Raster* objects)}
+\item{filebackedDir}{Only used if \code{fileBackend} is 1.
+\code{NULL}, the default, or Character string. If \code{NULL}, then then the
+files will be copied to the directory:
+\code{file.path(dirname(filename), "rasters")}. A character string
+will be interpretted as a path to copy all rasters to.}
 
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can

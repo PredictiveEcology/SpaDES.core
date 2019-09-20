@@ -247,7 +247,7 @@ test_that("restart does not work correctly", {
       ),
       modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
       paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                   outputPath = file.path("~", basename(tmpdir)),
+                   outputPath = file.path("~", "outputs"),
                    cachePath = tmpdir),
       # Save final state of landscape and caribou
       outputs = data.frame(expand.grid(objectName = c("landscape", "caribou"),
