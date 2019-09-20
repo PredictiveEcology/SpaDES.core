@@ -579,10 +579,12 @@ First <- function(...) {
         p
       }
   })
-  options("spades.restartRInterval" = .spades.restartRInterval)
+  # Removed -- now in params(sim)$restartR$.restartRInterval
+  # options("spades.restartRInterval" = .spades.restartRInterval)
 
-  assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
-  do.call("RNGkind", as.list(sim$._rng.kind))
+  # Moved -- now in spades call
+  # assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
+  # do.call("RNGkind", as.list(sim$._rng.kind))
 
   rm("._restartRList", envir = envir(sim))
   on.exit({

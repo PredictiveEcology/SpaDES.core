@@ -765,6 +765,12 @@ setMethod(
     do.call(setPaths, append(sim@paths, list(silent = TRUE)))
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
+    if (!is.null(sim@.xData[["._randomSeed"]])) {
+      assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
+      do.call("RNGkind", as.list(sim$._rng.kind))
+      sim@.xData[["._randomSeed"]] <- NULL
+      sim@.xData[["._rng.kind"]] <- NULL
+    }
     if (is.null(sim@.xData[["._startClockTime"]]))
       sim@.xData[["._startClockTime"]] <- Sys.time()
     if (is.null(sim@.xData[["._simRndString"]]))
