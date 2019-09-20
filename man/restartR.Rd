@@ -50,7 +50,9 @@ fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
 should only be used if there are RAM limitations being hit with long running
 simulations. It has been tested to work Linux within Rstudio and at a
 terminal R session. The way to initiate
-restarting of R is simply setting the \code{spades.restartRInterval}
+restarting of R is simply setting the \code{spades.restartRInterval} or
+setting the equivalent parameter in the \code{restartR} core module via:
+\code{simInit(..., params = list(restartR = list(.restartRInterval = 1)), ...)}
 greater than 0, which is the default,
 e.g., \code{options("spades.restartRInterval" = 100)}. This is only intended
 to restart a simulation in exactly the same place as it was (i.e., can\'t change

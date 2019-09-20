@@ -28,10 +28,12 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + getOption("spades.restartRInterval"), "restartR", "restartR", .last())
+    if (is.null(P(sim, "restartR")$.restartRInterval))
+      params(sim)$restartR$.restartRInterval <- getOption("spades.restartRInterval")
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval, "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    nextTime <- time(sim, timeunit(sim)) + getOption("spades.restartRInterval")
+    nextTime <- time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval
 
     # This next step of creating this list is critical -- it is the trigger for the on.exit in spades
     sim$._restartRList <- list()
@@ -272,8 +274,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     if (any(isRaster)) {
       InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
       needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) && !all(InMem)) || (identical(fileBackend, 2) &&
-                                                              (!all(InMem)) &&
-                                                              !is.null(filebackedDir))
+                                                              (!all(InMem)) )
       if (needModifying) {
         if (is.null(filebackedDir)) {
           filebackedDir <- file.path(dirname(filename), "rasters")
@@ -300,9 +301,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
     assign(simName, sim, envir = tmpEnv)
-    save(list = simName, envir = tmpEnv, file = filename, ...)
+    save(list = simName, envir = tmpEnv, file = filename)
   } else {
-    save(sim, file = filename, ...)
+    save(sim, file = filename)
   }
   return(invisible())
 }
@@ -383,7 +384,9 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' should only be used if there are RAM limitations being hit with long running
 #' simulations. It has been tested to work Linux within Rstudio and at a
 #' terminal R session. The way to initiate
-#' restarting of R is simply setting the \code{spades.restartRInterval}
+#' restarting of R is simply setting the \code{spades.restartRInterval} or
+#' setting the equivalent parameter in the \code{restartR} core module via:
+#' \code{simInit(..., params = list(restartR = list(.restartRInterval = 1)), ...)}
 #' greater than 0, which is the default,
 #' e.g., \code{options("spades.restartRInterval" = 100)}. This is only intended
 #' to restart a simulation in exactly the same place as it was (i.e., can\'t change

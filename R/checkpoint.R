@@ -109,7 +109,7 @@ checkpointLoad <- function(file, envir = parent.frame()) {
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
-              filename = file, fileBackendToMem = FALSE, envir = tmpEnv)
+              filename = file, fileBackend = 1, envir = tmpEnv)
 
   invisible(TRUE) # return "success" invisibly
 }
