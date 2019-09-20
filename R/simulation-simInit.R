@@ -299,7 +299,7 @@ setGeneric(
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
            notOlderThan = NULL) {
     standardGeneric("simInit")
-  })
+})
 
 #' @rdname simInit
 setMethod(
@@ -383,12 +383,8 @@ setMethod(
            "- the module was not created using 'newModule(...)' so is missing key files")
     }
 
-
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
-
-    # core modules
-    core <- .pkgEnv$.coreModules
 
     # parameters for core modules
     dotParamsReal <- list(".saveInterval",
@@ -530,6 +526,18 @@ setMethod(
 
     ## for now, assign only some core & global params
     sim@params$.globals <- params$.globals
+
+    # core modules
+    core <- .pkgEnv$.coreModules
+    # remove the restartR module if it is not used. This is easier than adding it because
+    #   the simInit is not run again during restarts, so it won't hit this again. That
+    #   is problematic for restartR situation, but not for "normal" situation.
+    if (is.null(params$.restartR$.restartRInterval) && getOption("spades.restartRInterval", 0) == 0) {
+      core <- setdiff(core, "restartR")
+      # .pkgEnv$.coreModules <- core
+    } else {
+      restartDir <- checkAndSetRestartDir(sim = sim)
+    }
 
     ## add core module name to the loaded list (loaded with the package)
     modulesLoaded <- append(modulesLoaded, core)
@@ -884,7 +892,6 @@ setMethod(
     return(invisible(sim))
 })
 
-
 #' Call \code{simInit} and \code{spades} or \code{experiment} together
 #'
 #' These functions are convenience wrappers that may allow for
@@ -929,9 +936,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
   sim <- do.call(spades, objsSpades)
-
 }
-
 
 #' @export
 #' @aliases simInitAndExperiment
@@ -954,7 +959,6 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   objsAll <- mget(lsAllNames, envir = environment())
 
   objsSimInit <- objsAll[formalArgs(simInit)]
-
 
   namesMatchCall <- names(match.call())
   objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
@@ -1004,7 +1008,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
                                                   envir = sim@.xData[[".parsedFiles"]]),
                               as.list)
     if (length(modulesToSearch3) > 0) {
-      isParent <- unlist(lapply(modulesToSearch3, function(x) length(x)>0))
+      isParent <- unlist(lapply(modulesToSearch3, function(x) length(x) > 0))
 
       modulesToSearch3[isParent] <- Map(x = modulesToSearch3[isParent],
                                        nam = dirname(names(modulesToSearch3[isParent])),
@@ -1083,7 +1087,7 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
     if (!is.null(sim@.xData[[mBase]][[".inputObjects"]])) {
-      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]], # nolint
+      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
       a <- P(sim, mBase, ".useCache")
       if (!is.null(a)) {
@@ -1100,11 +1104,9 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
       if (isTRUE(cacheIt)) {
-        # message(crayon::green("Using or creating cached copy of .inputObjects for ", mBase, sep = ""))
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
-
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1220,4 +1222,3 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])
 }
-

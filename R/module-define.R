@@ -139,7 +139,7 @@ moduleDefaults <- list(
 #' @examples
 #' \dontrun{
 #'   ## a default version of the defineModule is created with a call to newModule
-#'   newModule("test", path = tempdir())
+#'   newModule("test", path = tempdir(), open = FALSE)
 #'
 #'   ## view the resulting module file
 #'   if (interactive()) file.edit(file.path(tempdir(), "test", "test.R"))
@@ -351,7 +351,11 @@ setMethod(
 ################################################################################
 #' Define a parameter used in a module
 #'
-#' Used to specify a parameter's name, value, and set a default.
+#' Used to specify a parameter's name, value, and set a default. The \code{min} and
+#' \code{max} arguments are ignored by \code{simInit} or \code{spades}; they
+#' are for human use only. To ensure that a user cannot set parameters outside of
+#' a range of values, the module developer should use assertions in their module
+#' code.
 #'
 #' @note Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
 #'       real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
@@ -363,8 +367,14 @@ setMethod(
 #'                  Non-standard evaluation is used for the expression.
 #' @param min       With \code{max}, used to define a suitable range of values.
 #'                  Non-standard evaluation is used for the expression.
+#'                  \emph{These are not tested by} \code{simInit} \emph{or}
+#'                  \code{spades}. These are primarily for human use, i.e., to
+#'                  tell a module user what values the module expects.
 #' @param max       With \code{min}, used to define a suitable range of values.
 #'                  Non-standard evaluation is used for the expression.
+#'                  \emph{These are not tested by} \code{simInit} \emph{or}
+#'                  \code{spades}. These are primarily for human use, i.e., to
+#'                  tell a module user what values the module expects.
 #' @param desc      Text string providing a brief description of the parameter.
 #'
 #' @return data.frame
@@ -387,10 +397,10 @@ setMethod(
 #' checkPath(tmpdir, create = TRUE)
 #'
 #' # creates a  new, "empty" module -- it has defaults for everything that is required
-#' newModule("testModule", tmpdir)
+#' newModule("testModule", tmpdir, open = FALSE)
 #'
 #' # Look at new module code -- see defineParameter
-#' file.edit(file.path(tmpdir, "testModule", "testModule.R"))
+#' if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 #'
 #' # initialize the simList
 #' mySim <- simInit(modules = "testModule",
@@ -400,9 +410,7 @@ setMethod(
 #' #  function, we must specify the module name. If used within a module,
 #' #  we can omit the module name
 #' P(mySim, "testModule")$.useCache
-#'
 #' }
-#'
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc) {
   standardGeneric("defineParameter")

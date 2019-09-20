@@ -210,7 +210,7 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE)
+  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -260,7 +260,9 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
+  options(opts)
   expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 
   # make a change in Init function
@@ -275,7 +277,9 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
+  options(opts)
   expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 })
 
@@ -331,7 +335,7 @@ test_that("test objSize", {
 })
 
 test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
-  testInitOut <- testInit(smcc = FALSE, debug = FALSE)
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)

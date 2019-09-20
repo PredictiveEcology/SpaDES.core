@@ -1,5 +1,5 @@
 test_that("test checkpointing", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -45,7 +45,7 @@ test_that("test checkpointing", {
 })
 
 test_that("test checkpointing with disk-backed raster", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -89,8 +89,12 @@ test_that("test checkpointing with disk-backed raster", {
   simB <- simInit(times = times, params = parameters, modules = modules,
                   paths = paths)
   simB$ras <- raster(extent(0,10,0,10), vals = 1)
-  #tmpRasFilename <- tempfile("tmpRas", fileext = ".tif")
   expect_error(simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename))
+
+  # Eliot uncommented this next line Sept 17, 2019
+  # b/c writeRaster next line newly failed
+  # filenames of source and target should be different
+  tmpRasFilename <- tempfile("tmpRas", fileext = ".tif")
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
   end(simB) <- 1
   simB <- spades(simB)
@@ -105,6 +109,8 @@ test_that("test checkpointing with disk-backed raster", {
   #  names are the same -- next line will move from disk to memory
   simA$ras[] <- simA$ras[]
   simB$ras[] <- simB$ras[]
+  # Because they did have different file-backed file names, their "names" attribute is different
+  names(simA$ras) <- names(simB$ras) <- "tmp"
   ## both versions above should yield identical results
   expect_true(all.equal(simA, simB))
 })

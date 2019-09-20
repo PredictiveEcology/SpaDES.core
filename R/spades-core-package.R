@@ -1,6 +1,6 @@
 #
 #  SpaDES.core/R/SpaDES-core-package.R by Alex M Chubaty and Eliot J B McIntire
-#  Copyright (C) 2015-2018 Her Majesty the Queen in Right of Canada,
+#  Copyright (C) 2015-2019 Her Majesty the Queen in Right of Canada,
 #   as represented by the Minister of Natural Resources Canada
 #
 
@@ -475,6 +475,19 @@
 #'   \item \code{spades.outputPath}: The default local directory in which to
 #'   save simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
+#'
+#'   \item \code{spades.recoveryMode}: If this a numeric > 0 or TRUE, then the
+#'   discrete event simulator will take a snapshot of the objects in the simList
+#'   that might change (based on metadata \code{outputObjects} for that module), prior to
+#'   initiating every event. This will allow the
+#'   user to be able to recover in case of an error or manual interruption (e.g., \code{Esc}).
+#'   If this is numeric, a copy of that number of "most
+#'   recent events" will be maintained so that the user can recover and restart
+#'   > 1 event in the past, i.e., redo some of the "completed" events. Default is
+#'   \code{TRUE}, i.e., it will keep the state of the \code{simList}
+#'   at the start of the current event. This can be recovered with \code{restartSpades}
+#'   and the differences can be seen in a hidden object in the stashed simList.
+#'   There is a message which describes how to find that.
 #'
 #'   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
 #'     to ensure a module's required packages are listed first?

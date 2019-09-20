@@ -153,7 +153,7 @@ of the simulation:
 \seealso{
 \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
 
-Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
+Other functions to access elements of a 'simList' object: \code{\link{.addDepends}},
   \code{\link{doEvent.checkpoint}}, \code{\link{envir}},
   \code{\link{events}}, \code{\link{globals}},
   \code{\link{inputs}}, \code{\link{modules}},
@@ -164,4 +164,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty and Eliot McIntire
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}

@@ -1,6 +1,18 @@
 ## be sure to update the 'Package Options' section of the package help file
 ##   in R/spades-core-package.R
 ##
+# e = new.env()
+#
+# reg.finalizer(e, function(e) {
+#   message('Object Bye!')
+# }, onexit = TRUE)
+#
+#
+# finalize <- function(env) {
+#   print(ls(env))
+#   message("Bye from Name space Finalizer")
+# }
+
 .onLoad <- function(libname, pkgname) {
   ## set options using the approach used by devtools
   opts <- options()
@@ -8,7 +20,7 @@
   opts.spades <- list( # nolint
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
-    spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
+    spades.debug = 1, # TODO: is this the best default? see discussion in #5
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
     spades.moduleCodeChecks = list(
@@ -22,6 +34,10 @@
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir, "outputs"),
+    spades.recoveryMode = 1,
+    spades.restartRInterval = 0,
+    spades.restartR.clearFiles = TRUE,
+    spades.restartR.RDataFilename = "sim.restartR.RData",
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
@@ -54,6 +70,10 @@
 
   ## import functions using backports:
   backports::import(pkgname, "isFALSE")
+
+  # parent <- parent.env(environment())
+  # print(str(parent))
+  #reg.finalizer(parent, finalize, onexit= TRUE)
 
   invisible()
 }

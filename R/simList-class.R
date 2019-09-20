@@ -253,7 +253,6 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
   return(x)
 })
 
-
 ### `initialize` generic is already defined in the methods package
 #' Generate a \code{simList} object
 #'
@@ -276,4 +275,4 @@ setMethod("initialize",
             #.Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
             #attr(.Object@.envir, "name") <- "sim"
             return(.Object)
-          })
+})

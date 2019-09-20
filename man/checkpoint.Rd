@@ -17,7 +17,7 @@
 \usage{
 doEvent.checkpoint(sim, eventTime, eventType, debug = FALSE)
 
-checkpointLoad(file)
+checkpointLoad(file, envir = parent.frame())
 
 .checkpointSave(sim, file)
 
@@ -50,6 +50,8 @@ will be printed (default \code{debug = FALSE}).}
 
 \item{file}{The checkpoint file.}
 
+\item{envir}{the environment where the data should be loaded.}
+
 \item{value}{The object to be stored at the slot.}
 }
 \value{
@@ -68,7 +70,7 @@ and \url{https://stackoverflow.com/questions/13997444/}
 \seealso{
 \code{\link{.Random.seed}}.
 
-Other functions to access elements of a \code{simList} object: \code{\link{.addDepends}},
+Other functions to access elements of a 'simList' object: \code{\link{.addDepends}},
   \code{\link{envir}}, \code{\link{events}},
   \code{\link{globals}}, \code{\link{inputs}},
   \code{\link{modules}}, \code{\link{objs}},
@@ -79,4 +81,4 @@ Other functions to access elements of a \code{simList} object: \code{\link{.addD
 \author{
 Alex Chubaty
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}
