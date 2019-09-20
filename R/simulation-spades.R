@@ -766,6 +766,8 @@ setMethod(
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
     if (!is.null(sim@.xData[["._randomSeed"]])) {
+      message("Resetting .Random.seed of session because sim$._randomSeed is not NULL. ",
+              "To get a different seed, run: sim$._randomSeed <- NULL to clear it.")
       assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
       do.call("RNGkind", as.list(sim$._rng.kind))
       sim@.xData[["._randomSeed"]] <- NULL
