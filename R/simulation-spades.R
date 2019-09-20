@@ -801,6 +801,8 @@ setMethod(
         sim$._restartRList$.spadesCall <- match.call()
 
         restartFormals <- formals(restartR)
+        # can change end(sim) back to original now because we are already ending
+        end(sim) <- sim$._restartRList$endOrig
         restartR(sim = sim,
                  reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
                  .First = getOption("spades.restartR..First", restartFormals$.First),

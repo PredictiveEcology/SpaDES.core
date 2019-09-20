@@ -536,14 +536,19 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     #   file.link(file.path("~",".RData"), paste0(file.path("~",".RData"), .rndString))
     save(file = ".RData", .First)
     #out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
-    out <- reg.finalizer(.GlobalEnv, function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
+    .spades.simFilename <- gsub("\ ", "\\ ", .spades.simFilename, fixed = TRUE)
+    # instead of .Last
+    out <- reg.finalizer(.GlobalEnv, function(e)
+      system(paste0("R --no-save --args ", .rndString, " ", .spades.simFilename)), TRUE)
     q("no")
   }
 
 }
 
 FirstFromR <- function(...) {
-  .rndString <- commandArgs()[4]
+  ca <- commandArgs()
+  .rndString <- ca[4]
+  .spades.simFilename <- ca[5]
   First(.rndString = .rndString)
 }
 
@@ -573,7 +578,6 @@ First <- function(...) {
   })
   options("spades.restartRInterval" = .spades.restartRInterval)
 
-  end(sim) <- sim$._restartRList$endOrig
   assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
   do.call("RNGkind", as.list(sim$._rng.kind))
 
