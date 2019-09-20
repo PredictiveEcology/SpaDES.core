@@ -582,7 +582,7 @@ First <- function(...) {
     if (fromRCmd)
       try(file.remove('~/.RData') )
     if (getOption("spades.restartR.clearFiles", TRUE))
-      unlink(dirname(dirname(.attachedPkgsFilename)), recursive = TRUE, force = TRUE)
+      unlink(dirname(.attachedPkgsFilename), recursive = TRUE, force = TRUE)
                 #getOption("spades.restartR.RDataFilename"))
     if (!fromRCmd) {
       objsToDelete <- c(".First", ".oldWd", ".spades.restartRInterval", ".spades.simFilename",

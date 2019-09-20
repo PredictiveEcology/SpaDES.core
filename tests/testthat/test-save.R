@@ -209,7 +209,7 @@ test_that("restart does not work correctly", {
   options("spades.restartRInterval" = 0, "spades.saveSimList.fileBackend" = )
 
   tmpdir <- "~"
-  testNum = 1
+  testNum = 3
   if (testNum == 1) {
     interval = 1
     mapPath <- system.file("maps", package = "quickPlot")
