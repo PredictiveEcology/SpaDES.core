@@ -271,9 +271,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
     if (any(isRaster)) {
       InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
-      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1) && !all(InMem)) || (identical(fileBackend, 2) &&
+      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) && !all(InMem)) || (identical(fileBackend, 2) &&
                                                               (!all(InMem)) &&
-                                                              !is.null(filebackedDir)))
+                                                              !is.null(filebackedDir))
       if (needModifying) {
         if (is.null(filebackedDir)) {
           filebackedDir <- file.path(dirname(filename), "rasters")
@@ -531,11 +531,12 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     # R cmd line loads .RData first, then .First, if there is one.
     .First <- FirstFromR
 
-    # if there is an .RData file, keep it -- will be put back later.
-    if (file.exists(file.path("~", ".RData")))
-      file.link(file.path("~",".RData"), paste0(file.path("~",".RData"), .rndString))
-    save(file = "~/.RData", .First)
-    out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
+    # # if there is an .RData file, keep it -- will be put back later.
+    # if (file.exists(file.path("~", ".RData")))
+    #   file.link(file.path("~",".RData"), paste0(file.path("~",".RData"), .rndString))
+    save(file = ".RData", .First)
+    #out <- reg.finalizer(as.environment("package:SpaDES.core"), function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
+    out <- reg.finalizer(.GlobalEnv, function(e) system(paste0("R --no-save --args ", .rndString)), TRUE)
     q("no")
   }
 
@@ -553,14 +554,7 @@ First <- function(...) {
   if (!exists(".attachedPkgsFilename")) {
     fromRCmd <- TRUE
     .rndString <- list(...)$.rndString
-    # if there was an .RData file, move it back
-    if (file.exists(paste0(file.path("~",".RData"), .rndString))) {
-      rdataPath <- file.path("~",".RData")
-      file.remove(rdataPath)
-      file.link(paste0(file.path("~",".RData"), .rndString), rdataPath)
-    }
-
-    .newDir <- file.path("~", paste0(".", .rndString))
+    .newDir <- tail(sort(dir("restartR", pattern = .rndString, full.names = TRUE)))
     load(file.path(.newDir, ".RData"))
   }
 
