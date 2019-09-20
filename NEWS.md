@@ -9,7 +9,7 @@ version 0.2.6.9000
 
 ## new features
 
-* ??
+* new function and capacity: `restartR`. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: https://github.com/r-lib/fastmap). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See `?restartR` for instructions.
 
 ## bug fixes
 

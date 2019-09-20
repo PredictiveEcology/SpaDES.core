@@ -765,7 +765,18 @@ setMethod(
     do.call(setPaths, append(sim@paths, list(silent = TRUE)))
     on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
 
-    sim@.xData[["._startClockTime"]] <- Sys.time()
+    if (!is.null(sim@.xData[["._randomSeed"]])) {
+      message("Resetting .Random.seed of session because sim$._randomSeed is not NULL. ",
+              "To get a different seed, run: sim$._randomSeed <- NULL to clear it.")
+      assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
+      do.call("RNGkind", as.list(sim$._rng.kind))
+      sim@.xData[["._randomSeed"]] <- NULL
+      sim@.xData[["._rng.kind"]] <- NULL
+    }
+    if (is.null(sim@.xData[["._startClockTime"]]))
+      sim@.xData[["._startClockTime"]] <- Sys.time()
+    if (is.null(sim@.xData[["._simRndString"]]))
+      sim@.xData[["._simRndString"]] <- rndstr(1, 8, characterFirst = TRUE)
     .pkgEnv$searchPath <- search()
     .pkgEnv[["spades.browserOnError"]] <-
       (interactive() & !identical(debug, FALSE) & getOption("spades.browserOnError"))
@@ -792,6 +803,21 @@ setMethod(
         .pkgEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
         .pkgEnv$.cleanEnd <- NULL
       }
+      # For restarting R -- a few extra pieces, including saving the simList as the last thing
+      if (!is.null(sim$._restartRList)) {
+        sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
+        sim$._restartRList$.spadesCall <- match.call()
+
+        restartFormals <- formals(restartR)
+        # can change end(sim) back to original now because we are already ending
+        end(sim) <- sim$._restartRList$endOrig
+        restartR(sim = sim,
+                 reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
+                 .First = getOption("spades.restartR..First", restartFormals$.First),
+                 .RDataFile = getOption("spades.restartR.RDataFilename", sim$._restartRList$simFilename),
+                 restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir))
+      }
+
     }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {
@@ -857,7 +883,9 @@ setMethod(
       existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
       prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
       prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
-      if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]])
+      if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]] &&
+        (time(sim, unit = attr(prevStart[["eventTime"]], "unit")) ==
+           start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
         sim@completed <- new.env(parent = emptyenv())
     }
 
@@ -1117,7 +1145,7 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   rmo$postEvents <- sim@events
   rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
   sim@.xData$.addedEvents <- rmo$addedEvents
-  sim@.xData$.randomSeed <- rmo$randomSeed
+  sim@.xData$._randomSeed <- rmo$randomSeed
   message(crayon::magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
                                  format(rmo$recoverModeTiming, units = "auto", digits = 3),
                                  " and ", format(recoverableObjsSize, units = "auto"))))

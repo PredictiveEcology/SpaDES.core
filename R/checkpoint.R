@@ -81,13 +81,14 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 #' @param file The checkpoint file.
+#' @inheritParams base::load
 #' @rdname checkpoint
 #' @export
-checkpointLoad <- function(file) {
+checkpointLoad <- function(file, envir = parent.frame()) {
   # check for previous checkpoint files
   if (file.exists(file)) {
-    simListName <- load(file, envir = .GlobalEnv)
-    sim <- get(simListName, envir = .GlobalEnv)
+    simListName <- load(file, envir = envir)
+    sim <- get(simListName, envir = envir)
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
@@ -108,7 +109,7 @@ checkpointLoad <- function(file) {
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
-              filename = file, keepFileBackedAsIs = TRUE, envir = tmpEnv)
+              filename = file, fileBackend = 1, envir = tmpEnv)
 
   invisible(TRUE) # return "success" invisibly
 }
