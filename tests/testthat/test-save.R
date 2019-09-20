@@ -199,15 +199,16 @@ test_that("restart does not work correctly", {
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
-  devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
+  #devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
   devtools::load_all() # need the testInit function
   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
                           opts = list("spades.restartRInterval" = 1))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
-  options("spades.restartRInterval" = 0)
+  options("spades.restartRInterval" = 0, "spades.saveSimList.fileBackend" = 1)
 
+  tmpdir <- "~"
   testNum = 1
   if (testNum == 1) {
     interval = 1

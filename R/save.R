@@ -273,25 +273,32 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     simName <- sim
     sim <- get(simName, envir = envir)
   }
-  isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
-  if (any(isRaster)) {
-    InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
-    needModifying <- isTRUE(identical(fileBackend, 1) || ( (!all(InMem)) && !is.null(filebackedDir)))
-    if (needModifying) {
-      # Need to copy it because the moving to memory affects the original simList
-      sim <- Copy(sim, filebackedDir = filebackedDir)
-      if (fileBackend) {
-        for (x in names(isRaster)[isRaster][!InMem])
-          sim[[x]][] <- sim[[x]][]
-      } else {
-        rasterNamesNotInMem <- names(isRaster)[isRaster][!InMem]
-        list2env(Copy(mget(rasterNamesNotInMem, envir = sim@.xData),
-                      filebackedDir = filebackedDir),
-                 envir = sim@.xData)# don't want to mess with rasters that are on disk for original
+  if (!isTRUE(all.equal(fileBackend, 0))) { # identical gets it wrong if 0L
+    isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
+    if (any(isRaster)) {
+      InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
+      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) || (identical(fileBackend, 2) &&
+                                                              (!all(InMem)) &&
+                                                              !is.null(filebackedDir)))
+      if (needModifying) {
+        if (is.null(filebackedDir)) {
+          filebackedDir <- file.path(dirname(filename), "rasters")
+        }
+        # Need to copy it because the moving to memory affects the original simList
+        sim <- Copy(sim, filebackedDir = filebackedDir)
+        if (isTRUE(all.equal(fileBackend, 1))) {
+          for (x in names(isRaster)[isRaster][!InMem])
+            sim[[x]][] <- sim[[x]][]
+        } else {
+          rasterNamesNotInMem <- names(isRaster)[isRaster][!InMem]
+          list2env(Copy(mget(rasterNamesNotInMem, envir = sim@.xData),
+                        filebackedDir = filebackedDir),
+                   envir = sim@.xData)# don't want to mess with rasters that are on disk for original
+        }
+
       }
 
     }
-
   }
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
@@ -441,8 +448,7 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
-  .newDir <- file.path(restartDir, paste0(".", .rndString))
-  browser()
+  .newDir <- file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))
   checkPath(.newDir, create = TRUE)
   .attachedPkgsFilename <- file.path(.newDir, '.attachedPkgs.RData')
   save(file = .attachedPkgsFilename, attached)
@@ -457,9 +463,9 @@ restartR <- function(reloadPkgs = TRUE, .First = NULL,
 
 
   if (is.null(sim$.restartRList)) sim$.restartRList <- list()
-  browser()
-  sim$.restartRList$simFilename <- file.path(.newDir, paste0(basename(getOption("spades.restartR.RDataFilename")),
-                                                             as.character(end(sim))))
+  sim$.restartRList$simFilename <- file.path(.newDir, paste0(
+    basename(getOption("spades.restartR.RDataFilename")), "_time",
+    paddedFloatToChar(end(sim), padL = nchar(as.character(end(sim))))))
   # sim$.restartRList$endOrig <- end(sim)
   sim$.restartRList$startOrig <- start(sim)
   sim$.restartRList$wd <- asPath(getwd())
@@ -563,7 +569,8 @@ First <- function(...) {
   on.exit({
     if (fromRCmd)
       try(file.remove('~/.RData') )
-    unlink(dirname(.attachedPkgsFilename), recursive = TRUE, force = TRUE)
+    if (getOption("spades.restartR.clearFiles", TRUE))
+      unlink(dirname(.attachedPkgsFilename), recursive = TRUE, force = TRUE)
                 #getOption("spades.restartR.RDataFilename"))
     if (!fromRCmd) {
       objsToDelete <- c(".First", ".oldWd", ".spades.restartRInterval", ".spades.simFilename",
@@ -592,6 +599,12 @@ restartR.restartDir.mess <- paste0("Please provide a directory location that wil
 
 
 checkAndSetRestartDir <- function(sim, restartDir = outputPath(sim)) {
+  if (is.call(restartDir)) {
+    restartDir <- eval(restartDir)
+  }
+  if (is.null(restartDir)) {
+    restartDir <- outputPath(sim)
+  }
   usingSimPaths <- identical(restartDir, outputPath(sim))
   if (grepl(dirname(tempdir()), restartDir)) {
     restartDir <- outputPath(sim)
