@@ -67,6 +67,7 @@ notifications:
  - provider: Email
    to:
      - alex.chubaty@gmail.com
+     - '{{commitAuthorEmail}}'
    subject: 'SpaDES.core: r-appveyor build {{status}}'
    message: "https://ci.appveyor.com/project/achubaty/SpaDES-core"
    on_build_success: false
