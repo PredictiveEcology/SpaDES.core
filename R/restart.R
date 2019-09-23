@@ -141,7 +141,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   # Remove all added events that occurred during the events, i.e., via scheduleEvent
   sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
 
-  assign(".Random.seed", sim@.xData$.randomSeed[[numMods]], envir = .GlobalEnv)
+  assign(".Random.seed", sim@.xData$._randomSeed[[numMods]], envir = .GlobalEnv)
 
   if (restart)
     sim <- spades(sim, ...)

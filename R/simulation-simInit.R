@@ -386,9 +386,6 @@ setMethod(
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
 
-    # core modules
-    core <- .pkgEnv$.coreModules
-
     # parameters for core modules
     dotParamsReal <- list(".saveInterval",
                           ".saveInitialTime",
@@ -529,6 +526,18 @@ setMethod(
 
     ## for now, assign only some core & global params
     sim@params$.globals <- params$.globals
+
+    # core modules
+    core <- .pkgEnv$.coreModules
+    # remove the restartR module if it is not used. This is easier than adding it because
+    #   the simInit is not run again during restarts, so it won't hit this again. That
+    #   is problematic for restartR situation, but not for "normal" situation.
+    if (is.null(params$.restartR$.restartRInterval) && getOption("spades.restartRInterval", 0) == 0) {
+      core <- setdiff(core, "restartR")
+      # .pkgEnv$.coreModules <- core
+    } else {
+      restartDir <- checkAndSetRestartDir(sim = sim)
+    }
 
     ## add core module name to the loaded list (loaded with the package)
     modulesLoaded <- append(modulesLoaded, core)

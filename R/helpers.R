@@ -10,7 +10,8 @@
 #' @name .coreModules
 #' @rdname coreModules
 .coreModules <- function() {
-  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load")
+  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load",
+       restartR = "restartR")
 }
 
 #' @keywords internal
