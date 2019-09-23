@@ -2,17 +2,17 @@ Package: SpaDES.core
 Type: Package
 Title: Core Utilities for Developing and Running Spatially Explicit Discrete Event Models
 Description: Provide the core framework for a discrete event system (DES) to 
-    implement a complete data-to-decisions, reproducible workflow. The core DES components 
-    facilitate modularity, and easily enable the user to include additional
-    functionality by running user-built modules. Includes
-    conditional scheduling, restart after interruption, packaging of reuseable modules, 
-    tools for developing arbitrary automated workflows, automated interweaving of
-    modules of different temporal resolution,
+    implement a complete data-to-decisions, reproducible workflow.
+    The core DES components facilitate modularity, and easily enable the user
+    to include additional functionality by running user-built modules.
+    Includes conditional scheduling, restart after interruption, packaging of
+    reuseable modules, tools for developing arbitrary automated workflows,
+    automated interweaving of modules of different temporal resolution,
     and tools for visualizing and understanding the DES project.
 URL:
     http://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2019-09-20
+Date: 2019-09-23
 Version: 0.2.6.9001
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
