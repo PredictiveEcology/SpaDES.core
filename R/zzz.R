@@ -111,6 +111,3 @@
 }
 
 .spadesTempDir <- file.path(tempdir(), "SpaDES")
-
-
-
