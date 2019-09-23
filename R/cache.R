@@ -368,13 +368,18 @@ setMethod(
 
       isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
         names(preDigest[[whSimList]]$.list[[whSimList2]])
-      newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
-      newObjs <- newObjs[!startsWith(newObjs, "._")]
-      existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-      post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
-      pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
-      changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
-      c(newObjs, changedObjs)
+      if (length(isNewObj)) {
+        newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
+        newObjs <- newObjs[!startsWith(newObjs, "._")]
+        existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
+        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+        changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
+        changed <- c(newObjs, changedObjs)
+      } else {
+        changed <- character()
+      }
+      changed
     } else {
       character()
     }
