@@ -497,13 +497,16 @@ FunDef <- function(ind, sim, factorialExp, modules, params,
   detectedNumCores <- parallel::detectCores()
   shouldUseCluster <- (maxNumClusters > 0)
   if (shouldUseCluster) {
-    try(aa <- system("free -lm", intern = TRUE))
-    if (!is(aa, "try-error")) {
-      bb <- strsplit(aa[2], split = " ")
-      availMem <- as.numeric(bb[[1]][nzchar(bb[[1]])][7])
-      numClusters <- floor(min(detectedNumCores, availMem/memRequiredMB))
-    }
-    else {
+    free <- Sys.which("free") ## Linux only
+    if (nzchar(free)) {
+      aa <- try(system(paste(free, "-lm"), intern = TRUE), silent = TRUE)
+      if (!is(aa, "try-error")) {
+        bb <- strsplit(aa[2], split = " ")
+        availMem <- as.numeric(bb[[1]][nzchar(bb[[1]])][7])
+        numClusters <- floor(min(detectedNumCores, availMem/memRequiredMB))
+      }
+    } else {
+      ## TODO: add macOS support using vmstat (see pemisc::availableMemory)
       message("The OS function, 'free' is not available. Returning 1 cluster")
       numClusters <- 1
     }
