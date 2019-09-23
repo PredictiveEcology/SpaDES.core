@@ -49,6 +49,7 @@ This is likely most useful in situations where reproducibility is more important
 ```{r examples, echo=TRUE, message=FALSE}
 library(magrittr)
 library(raster)
+library(reproducible)
 library(SpaDES.core)
 
 opts <- options("spades.moduleCodeChecks" = FALSE) # turns off syntactic checking of modules
@@ -68,14 +69,18 @@ This functionality can be achieved within a `spades` call.
 
 ```{r spades}
 # compare caching ... run once to create cache
-system.time(outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time()))
+system.time({
+  outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
+})
 ```
 
 Note that if there were any visualizations (here we turned them off with `.plotInitialTime = NA` above) they will happen the first time through, but not the cached times.
 
 ```{r spades-cached}
 # vastly faster 2nd time
-system.time(outSimCached <- spades(Copy(mySim), cache = TRUE))
+system.time({
+  outSimCached <- spades(Copy(mySim), cache = TRUE)
+})
 all.equal(outSim, outSimCached) 
 ```
 
@@ -88,10 +93,14 @@ If there are lots of `spades` calls, then the former will be slow as the `simLis
 ### Using cache argument
 
 ```{r experiment-cache}
-system.time(sims1 <- experiment(mySim, replicates = 2, cache = TRUE))
+system.time({
+  sims1 <- experiment(mySim, replicates = 2, cache = TRUE)
+})
 
 # internal -- second time faster
-system.time(sims2 <- experiment(mySim, replicates = 2, cache = TRUE))
+system.time({
+  sims2 <- experiment(mySim, replicates = 2, cache = TRUE)
+})
 all.equal(sims1, sims2)
 ```
 
@@ -105,29 +114,32 @@ Then, when we recover it in the Cached version, all the files are still there, t
 ```{r Cache-experiment}
 # External
 outputs(mySim) <- data.frame(objectName = "landscape")
-system.time(sims3 <- Cache(experiment, mySim, replicates = 3, .plotInitialTime = NA,
-                           clearSimEnv = TRUE))
+system.time({
+  sims3 <- Cache(experiment, mySim, replicates = 3, .plotInitialTime = NA,
+                 clearSimEnv = TRUE)
+})
 ```
 
 The second time is way faster. We see the output files in the same location.
 
 ```{r Cache-experiment-2}
-system.time(sims4 <- Cache(experiment, mySim, replicates = 3, .plotInitialTime = NA,
-                           clearSimEnv = TRUE))
+system.time({
+  sims4 <- Cache(experiment, mySim, replicates = 3, .plotInitialTime = NA,
+                 clearSimEnv = TRUE)
+})
 # test they are all equal
 lapply(1:2, function(x) all.equal(sims3[[x]], sims4[[x]])) 
 
 dir(outputPath(mySim), recursive = TRUE)
 ```
 
-Notice that speed up can be enormous; in this case ~100 times.
+Notice that speed up can be enormous; in this case ~100 times faster.
 
 ## Module-level caching
 
 If the parameter `.useCache` in the module's metadata is set to `TRUE`, then *every* event in the module will be cached. 
 That means that every time that module is called from within a spades or experiment call, `Cache` will be called. 
 Only the objects inside the `simList` that correspond to the `inputObjects` or the `outputObjects` from the module metadata will be assessed for caching. 
- 
 For general use, module-level caching would be mostly useful for modules that have no stochasticity, such as data-preparation modules, GIS modules etc.
 
 In this example, we will use the cache on the `randomLandscapes` module.
@@ -137,20 +149,23 @@ This would be useful when only one random landscape is needed simply for trying 
 ```{r module-level, echo=TRUE}
 # Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
-system.time(randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
-                                notOlderThan = Sys.time(), debug = TRUE))
+system.time({
+  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
+                      notOlderThan = Sys.time(), debug = TRUE)
+})
 
 # vastly faster the second time
-system.time(randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA,
-                                      debug = TRUE))
+system.time({
+  randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
+})
 ```
 
 Test that only layers produced in `randomLandscapes` are identical, not `fireSpread`.
 
 ```{r test-module-level}
 layers <- list("DEM", "forestAge", "habitatQuality", "percentPine", "Fires")
-same <- lapply(layers, function(l) identical(randomSim$landscape[[l]],
-                                             randomSimCached$landscape[[l]]))
+same <- lapply(layers, function(l)
+  identical(randomSim$landscape[[l]], randomSimCached$landscape[[l]]))
 names(same) <- layers
 print(same) # Fires is not same because all non-init events in fireSpread are not cached
 ```
@@ -167,12 +182,15 @@ Here, we don't change the module-level caching for `randomLandscapes`, but we ad
 
 ```{r event-level, echo=TRUE}
 params(mySim)$fireSpread$.useCache <- "init"
-system.time(randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
-                                notOlderThan = Sys.time(), debug = TRUE))
+system.time({
+  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
+                      notOlderThan = Sys.time(), debug = TRUE)
+})
 
 # vastly faster the second time
-system.time(randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA,
-                                      debug = TRUE))
+system.time({
+  randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
+})
 ```
 
 ## Function-level caching
@@ -186,11 +204,15 @@ to
 
 ```{r function-level, echo=TRUE}
 ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
-system.time(map <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim),
-                         notOlderThan = Sys.time()))
+system.time({
+  map <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim),
+               notOlderThan = Sys.time())
+})
 
 # vastly faster the second time
-system.time(mapCached <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim)))
+system.time({
+  mapCached <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim))
+})
 
 all.equal(map, mapCached) 
 ```
@@ -232,17 +254,28 @@ experiment --> many spades calls --> many module calls --> many event calls --> 
 
 ```
 
-Lets say we start to introduce caching to this structure. We start from the "inner" most functions that we could imaging Caching would be useful. Lets say there are some GIS operations, like `raster::projectRaster`, which operates on an input shapefile. We can Cache the `projectRaster` call to make this much faster, since it will always be the same result for a given input raster. 
+Lets say we start to introduce caching to this structure.
+We start from the "inner" most functions that we could imaging Caching would be useful. Lets say there are some GIS operations, like `raster::projectRaster`, which operates on an input shapefile.
+We can Cache the `projectRaster` call to make this much faster, since it will always be the same result for a given input raster. 
 
-If we look back at our structure above, we see that we still have LOTS of places that are not Cached. That means that the experiment call will still spawn many spades calls, which will still spawn many module calls, and many event calls, just to get to the one `Cache(projectRaster)` call which is Cached. This function will likely be called hundreds of times (because `experiment` runs the `spades` call 100 times due to replication). This is good, but **Cache does take some time**. So, even if `Cache(projectRaster)` takes only 0.02 seconds, calling it hundreds of times means maybe 4 seconds. If we are doing this for many functions, then this will be too slow. 
+If we look back at our structure above, we see that we still have LOTS of places that are not Cached.
+That means that the experiment call will still spawn many spades calls, which will still spawn many module calls, and many event calls, just to get to the one `Cache(projectRaster)` call which is Cached.
+This function will likely be called hundreds of times (because `experiment` runs the `spades` call 100 times due to replication).
+This is good, but **`Cache` does take some time**.
+So, even if `Cache(projectRaster)` takes only 0.02 seconds, calling it hundreds of times means maybe 4 seconds.
+If we are doing this for many functions, then this will be too slow. 
 
-We can start putting `Cache` all up the sequence of calls. Unfortunately, the way we use Cache at each of these levels is a bit different, so we need a slightly different approach for each. 
+We can start putting `Cache` all up the sequence of calls.
+Unfortunately, the way we use Cache at each of these levels is a bit different, so we need a slightly different approach for each. 
 
 #### Cache the `experiment` call
 
 `Cache(experiment)`
 
-This will assess the `simList` (the objects, times, modules, etc.) and if they are all the same, it will return the final list of `simList`s that came from the first `experiment` call. NOTE: because this can be large, it is likely that you want `clearSimEnv = TRUE`, and have all objects that are needed after the experiment call saved to disk. Any stochasticity/randomness inside modules will be frozen. This is likely ok if the objective is to show results in a web app (via shiny or otherwise) or another visualization about the experiment outputs, e.g., comparing treatments, once sufficient stochasticity has been achieved.
+This will assess the `simList` (the objects, times, modules, etc.) and if they are all the same, it will return the final list of `simList`s that came from the first `experiment` call.
+**NOTE:** because this can be large, it is likely that you want `clearSimEnv = TRUE`, and have all objects that are needed after the experiment call saved to disk.
+Any stochasticity/randomness inside modules will be frozen.
+This is likely ok if the objective is to show results in a web app (via shiny or otherwise) or another visualization about the experiment outputs, e.g., comparing treatments, once sufficient stochasticity has been achieved.
 
 `mySimListOut <- Cache(experiment, mySim, clearSimEnv = TRUE)`
 
@@ -250,11 +283,15 @@ This will assess the `simList` (the objects, times, modules, etc.) and if they a
 
 `experiment(cache = TRUE)`
 
-This will cache each of the `spades` calls inside the `experiment` call. That means that there are as many cache events as there are replicates and experimental treatments, which, again could be a lot. Like caching the `experiment` call, stochasticity/randomness will be frozen. Note, one good use of this is when you are making iterative, incremental replication, e.g., 
+This will cache each of the `spades` calls inside the `experiment` call.
+That means that there are as many cache events as there are replicates and experimental treatments, which, again could be a lot.
+Like caching the `experiment` call, stochasticity/randomness will be frozen.
+Note, one good use of this is when you are making iterative, incremental replication, e.g., 
 
 `mySimOut <- experiment(mySim, replicates = 5, cache = TRUE)`
 
-You decide after waiting 10 minutes for it to finish, that you need more replication. Rather than start from zero replicates, you can just pick up where you left off:
+You decide after waiting 10 minutes for it to finish, that you need more replication.
+Rather than start from zero replicates, you can just pick up where you left off:
 
 `mySimOut <- experiment(mySim, replicates = 10, cache = TRUE)`
 
@@ -264,7 +301,8 @@ This will only add 5 more replicates.
 
 Pass `.useCache = TRUE` as a parameter to the module, during the `simInit`
 
-Some modules are inherently non-random, such as GIS modules, or parameter fitting statistical modules. We expect these to be identical results each time, so we can safely cache the entire module.
+Some modules are inherently non-random, such as GIS modules, or parameter fitting statistical modules.
+We expect these to be identical results each time, so we can safely cache the entire module.
 
 ```{r, eval=FALSE, echo=TRUE}
 parameters = list(
@@ -272,12 +310,11 @@ parameters = list(
 )
 mySim <- simInit(..., params = parameters)
 mySimOut <- spades(mySim)
-
 ```
 
 The messaging should indicate the caching is happening on every event in that module.
 
-***Note: This option REQUIRES that the metadata in inputs and outputs be exactly correct, i.e., all inputObjects and outputObjects must be correctly identified and listed in the defineModule metadata***
+***Note: This option REQUIRES that the metadata in inputs and outputs be exactly correct, i.e., all `inputObjects` and `outputObjects` must be correctly identified and listed in the `defineModule` metadata***
 
 ***If the module is cached, and there are errors when it is run, it almost is guaranteed to be a problem with the `inputObjects` and `outputObjects` incorrectly specified.***
 
@@ -289,6 +326,6 @@ This will allow fine scale control of individual function calls.
 
 ## Data-to-decisions
 
-Once nested Caching is used all the way up to the `experiment` level and even further up (e.g., if there is a shiny module), then even very complex models can be put into a complete workflow. 
+Once nested Caching is used all the way up to the `experiment` level and even further up (e.g., if there is a `shiny` module), then even very complex models can be put into a complete workflow. 
 
 The current vision for `SpaDES` is that it will allow this type of "data to decisions" complete workflow that allows for deep, robust models, across disciplines, with easily accessible front ends, that are quick and responsive to users, yet can handle data changes, module changes, etc.

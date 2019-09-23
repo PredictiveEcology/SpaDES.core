@@ -30,12 +30,13 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (is.null(P(sim, "restartR")$.restartRInterval))
       params(sim)$restartR$.restartRInterval <- getOption("spades.restartRInterval")
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval, "restartR", "restartR", .last())
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval,
+                         "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
     nextTime <- time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval
 
-    # This next step of creating this list is critical -- it is the trigger for the on.exit in spades
+    # This next step of creating this list is critical -- it is the trigger for on.exit in spades
     sim$._restartRList <- list()
     sim$._restartRList$endOrig <- end(sim)
 
@@ -226,7 +227,6 @@ saveFiles <- function(sim) {
   return(.sFE)
 }
 
-
 #' Save a whole \code{simList} object to disk
 #'
 #' Because of the environment slot, this is not quite as straightforward as
@@ -272,9 +272,10 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   if (!isTRUE(all.equal(fileBackend, 0))) { # identical gets it wrong if 0L
     isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
     if (any(isRaster)) {
-      InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)), function(x) inMemory(x)))
-      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) && !all(InMem)) || (identical(fileBackend, 2) &&
-                                                              (!all(InMem)) )
+      InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)),
+                             function(x) inMemory(x)))
+      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) && !all(InMem)) ||
+        (identical(fileBackend, 2) && (!all(InMem)))
       if (needModifying) {
         if (is.null(filebackedDir)) {
           filebackedDir <- file.path(dirname(filename), "rasters")
@@ -289,11 +290,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
           rasterNamesNotInMem <- names(isRaster)[isRaster][!InMem]
           list2env(Copy(mget(rasterNamesNotInMem, envir = sim@.xData),
                         filebackedDir = filebackedDir),
-                   envir = sim@.xData)# don't want to mess with rasters that are on disk for original
+                   envir = sim@.xData) # don't want to mess with rasters on disk for original
         }
-
       }
-
     }
   }
   sim@.xData$._randomSeed <- .Random.seed
@@ -308,33 +307,29 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   return(invisible())
 }
 
-#' Zip many of the files in a simList
+#' Zip many of the files in a \code{simList}
 #'
-#' Currently, this will save the raster-backed files, outputs(sim), inputs(sim).
+#' Currently, this will save the raster-backed files, \code{outputs(sim)}, \code{inputs(sim)}.
 #' It will add these to a temp file, using \code{Copy}, where appropriate
-#' to not affect the original \code{simList}. VERY experimental. Unlikely
-#' to work at the moment.
+#' to not affect the original \code{simList}.
+#' VERY experimental; unlikely to work perfectly at the moment.
 #'
 #' @inheritParams saveSimList
 #' @param sim A simList at the core of the zipping.
-#' @param ... passed to \code{saveSimList}, including important ones
-#'    such as \code{filename}.
-#' @param zipfile A character string indicating the filename for the
-#'    zipfile. Passed to \code{zip}
+#' @param ... passed to \code{saveSimList}, including important ones such as \code{filename}.
+#' @param zipfile A character string indicating the filename for the zipfile. Passed to \code{zip}.
 #' @param outputs Logical. If \code{TRUE}, all files identified in
 #'    \code{outputs(sim)} will be included in the zip.
 #' @param inputs Logical. If \code{TRUE}, all files identified in
 #'    \code{inputs(sim)} will be included in the zip.
-#' @param cache Logical. If \code{TRUE}, all files in
-#'    \code{cachePath(sim)} will be included in the zip. Defaults to
-#'    \code{FALSE} as this could be large, and may include many
+#' @param cache Logical. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
+#'    zip archive. Defaults to \code{FALSE} as this could be large, and may include many
 #'    out of date elements. See Details. Not yet implemented.
 #'
 #' @details
 #' If \code{cache} is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
-zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
-                       cache = FALSE) {
+zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   dots <- list(...)
   if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".RData")
   tmpDir <- file.path(tempdir(), rndstr(1, 6))
@@ -368,8 +363,6 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
   }
   zip(zipfile = zipfile, files = c(tmpRData, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
                                    newnamesOutputs, newnamesInputs))
-
-
 }
 
 #' Restart R programmatically
@@ -417,9 +410,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #'     \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},
 #'     taking the first one that is not inside the \code{tempdir()}, which will
 #'     disappear during restart of R.
-#'     The actual directory for a given \code{spades} call that is restarting will
-#'     be:
-#' \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
+#'     The actual directory for a given \code{spades} call that is restarting will be:
+#'     \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
 #'     The random string is to prevent parallel processes that started at the same clock
 #'     time from colliding.
 #'
@@ -428,14 +420,14 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 #' the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 #' using a dot to separate the function name and its argument. The defaults for
-#' two key options are:\code{options("spades.restartR.restartDir" = NULL}, meaning
+#' two key options are: \code{options("spades.restartR.restartDir" = NULL}, meaning
 #' use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
 #' and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
-#' with raster-backed files. See specific functions for
-#' defaults and argument meanings. The only difference from the default function values
-#' is with \code{saveSimList} argument \code{fileBackend = FALSE} during \code{restartR}
-#' by default, because it is assumed that the file backends will still be intact after a
-#' restart, so no need to move them all to memory.
+#' with raster-backed files.
+#' See specific functions for defaults and argument meanings.
+#' The only difference from the default function values is with \code{saveSimList} argument
+#' \code{fileBackend = FALSE} during \code{restartR} by default, because it is assumed that
+#' the file backends will still be intact after a restart, so no need to move them all to memory.
 #'
 #' @note
 #' Because of the restarting, the object name of the original assignment of the
@@ -445,12 +437,11 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 #' Because this function is focused on restarting during a \code{spades} call,
 #' it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.
 #' If the user wants to keep those objects, then they should be saved to disk
-#' immediately before the \code{spades} call. This can then be recovered immediately
-#' after the return from the \code{spades} call.
+#' immediately before the \code{spades} call.
+#' This can then be recovered immediately after the return from the \code{spades} call.
 #'
-#' To keep the saved \code{simList}, use
-#' \code{options("spades.restartR.clearFiles" = TRUE)}. The default is to treat these files
-#' as temporary files and so will be removed.
+#' To keep the saved \code{simList}, use \code{options("spades.restartR.clearFiles" = TRUE)}.
+#' The default is to treat these files as temporary files and so will be removed.
 #'
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
@@ -479,7 +470,6 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   # if (is.null(restartDir)) {
   # }
   setwd(restartDir)
-
 
   if (is.null(sim$._restartRList)) sim$._restartRList <- list()
   sim$._restartRList$simFilename <- file.path(.newDir, paste0(
@@ -521,11 +511,14 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
 
   if (isTRUE(Sys.getenv("RSTUDIO") == "1")) {
     if (requireNamespace("rstudioapi")) {
-      lapply(setdiff(srch, vanillaPkgs), function(pkg) detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
+      lapply(setdiff(srch, vanillaPkgs), function(pkg)
+        detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
       rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
 
       # Need load to get custom .First fn
-      rstudioapi::restartSession(paste0("{load('",.RDataFile,"'); sim <- .First(); sim <- eval(.spadesCall)}")) #
+      rstudioapi::restartSession(paste0("{load('", .RDataFile, "'); ",
+                                        "sim <- .First(); ",
+                                        "sim <- eval(.spadesCall)}"))
     } else {
       message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
     }
@@ -602,16 +595,15 @@ First <- function(...) {
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
     message(crayon::green("Because restartR was used, the simList is located in the location above.",
-                            " It should be assigned to an object immediately: e.g.,\n",
-                            "sim <- SpaDES.core:::.pkgEnv$.sim"))
+                          " It should be assigned to an object immediately: e.g.,\n",
+                          "sim <- SpaDES.core:::.pkgEnv$.sim"))
   } else {
     message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
-                            " named 'sim' (which may not be the same as the original assignment)"))
+                          " named 'sim' (which may not be the same as the original assignment)"))
   }
   setwd(.oldWd)
   return(sim)
 }
-
 
 checkAndSetRestartDir <- function(sim, restartDir = outputPath(sim)) {
   if (is.call(restartDir)) {
@@ -644,7 +636,7 @@ checkAndSetRestartDir <- function(sim, restartDir = outputPath(sim)) {
   if (grepl(dirname(tempdir()), restartDir)) {
     if (usingSimPaths)
       warning("The supplied restartDir is in a temporary directory, as are all paths in the sim. ",
-           " These will disappear at restart; please try again with a non-temporary path")
+              " These will disappear at restart; please try again with a non-temporary path")
   }
   checkPath(restartDir, create = TRUE)
   return(restartDir)

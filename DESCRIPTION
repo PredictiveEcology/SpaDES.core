@@ -70,7 +70,7 @@ Suggests:
     rgdal,
     rgenoud,
     rstudioapi,
-    sf, 
+    sf,
     SpaDES.tools (>= 0.2.0),
     rmarkdown,
     testthat (>= 1.0.2)
