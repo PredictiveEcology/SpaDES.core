@@ -121,7 +121,7 @@ setMethod(
     children <- args$children
 
     # define defaults for ... args
-    if (is.null(open)) open <- TRUE
+    if (is.null(open)) open <- interactive()
     if (is.null(unitTests)) unitTests <- TRUE
     if (is.null(type)) type <- "child"
     if (is.null(children)) children <- NA_character_
