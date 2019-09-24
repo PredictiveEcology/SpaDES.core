@@ -2,7 +2,7 @@
 % Please edit documentation in R/save.R
 \name{zipSimList}
 \alias{zipSimList}
-\title{Zip many of the files in a simList}
+\title{Zip many of the files in a \code{simList}}
 \usage{
 zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
   cache = FALSE)
@@ -10,11 +10,9 @@ zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
 \arguments{
 \item{sim}{A simList at the core of the zipping.}
 
-\item{zipfile}{A character string indicating the filename for the
-zipfile. Passed to \code{zip}}
+\item{zipfile}{A character string indicating the filename for the zipfile. Passed to \code{zip}.}
 
-\item{...}{passed to \code{saveSimList}, including important ones
-such as \code{filename}.}
+\item{...}{passed to \code{saveSimList}, including important ones such as \code{filename}.}
 
 \item{outputs}{Logical. If \code{TRUE}, all files identified in
 \code{outputs(sim)} will be included in the zip.}
@@ -22,16 +20,15 @@ such as \code{filename}.}
 \item{inputs}{Logical. If \code{TRUE}, all files identified in
 \code{inputs(sim)} will be included in the zip.}
 
-\item{cache}{Logical. If \code{TRUE}, all files in
-\code{cachePath(sim)} will be included in the zip. Defaults to
-\code{FALSE} as this could be large, and may include many
+\item{cache}{Logical. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
+zip archive. Defaults to \code{FALSE} as this could be large, and may include many
 out of date elements. See Details. Not yet implemented.}
 }
 \description{
-Currently, this will save the raster-backed files, outputs(sim), inputs(sim).
+Currently, this will save the raster-backed files, \code{outputs(sim)}, \code{inputs(sim)}.
 It will add these to a temp file, using \code{Copy}, where appropriate
-to not affect the original \code{simList}. VERY experimental. Unlikely
-to work at the moment.
+to not affect the original \code{simList}.
+VERY experimental; unlikely to work perfectly at the moment.
 }
 \details{
 If \code{cache} is used, it is likely that it should be trimmed before

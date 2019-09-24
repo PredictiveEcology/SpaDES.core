@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 3.5),
     quickPlot (>= 0.1.4),
-    reproducible (>= 0.2.10)
+    reproducible (>= 0.2.10.9000)
 Imports:
     backports,
     codetools,
@@ -70,7 +70,7 @@ Suggests:
     rgdal,
     rgenoud,
     rstudioapi,
-    sf, 
+    sf,
     SpaDES.tools (>= 0.2.0),
     rmarkdown,
     testthat (>= 1.0.2)

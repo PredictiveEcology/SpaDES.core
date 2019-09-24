@@ -27,17 +27,16 @@ user wants to make a custom \code{First} file, it should built off that one.}
     \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
 
 \item{restartDir}{A character string indicating root directory to
-    save \code{simList} and other ancilliary files during restart.
-    Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
-    If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
-    \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},
-    taking the first one that is not inside the \code{tempdir()}, which will
-    disappear during restart of R.
-    The actual directory for a given \code{spades} call that is restarting will
-    be:
+save \code{simList} and other ancilliary files during restart.
+Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
+If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
+\code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},
+taking the first one that is not inside the \code{tempdir()}, which will
+disappear during restart of R.
+The actual directory for a given \code{spades} call that is restarting will be:
 \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
-    The random string is to prevent parallel processes that started at the same clock
-    time from colliding.}
+The random string is to prevent parallel processes that started at the same clock
+time from colliding.}
 }
 \description{
 This will attempt to restart the R session, reloading all packages, and
@@ -66,14 +65,14 @@ The process responds to several options. Though under most cases,
 the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 using a dot to separate the function name and its argument. The defaults for
-two key options are:\code{options("spades.restartR.restartDir" = NULL}, meaning
+two key options are: \code{options("spades.restartR.restartDir" = NULL}, meaning
 use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
 and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
-with raster-backed files. See specific functions for
-defaults and argument meanings. The only difference from the default function values
-is with \code{saveSimList} argument \code{fileBackend = FALSE} during \code{restartR}
-by default, because it is assumed that the file backends will still be intact after a
-restart, so no need to move them all to memory.
+with raster-backed files.
+See specific functions for defaults and argument meanings.
+The only difference from the default function values is with \code{saveSimList} argument
+\code{fileBackend = FALSE} during \code{restartR} by default, because it is assumed that
+the file backends will still be intact after a restart, so no need to move them all to memory.
 }
 \note{
 Because of the restarting, the object name of the original assignment of the
@@ -83,10 +82,9 @@ assigned to \code{sim} in the \code{.GlobalEnv}.
 Because this function is focused on restarting during a \code{spades} call,
 it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.
 If the user wants to keep those objects, then they should be saved to disk
-immediately before the \code{spades} call. This can then be recovered immediately
-after the return from the \code{spades} call.
+immediately before the \code{spades} call.
+This can then be recovered immediately after the return from the \code{spades} call.
 
-To keep the saved \code{simList}, use
-\code{options("spades.restartR.clearFiles" = TRUE)}. The default is to treat these files
-as temporary files and so will be removed.
+To keep the saved \code{simList}, use \code{options("spades.restartR.clearFiles" = TRUE)}.
+The default is to treat these files as temporary files and so will be removed.
 }

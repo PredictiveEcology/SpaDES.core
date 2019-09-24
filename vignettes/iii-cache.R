@@ -1,6 +1,7 @@
 ## ----examples, echo=TRUE, message=FALSE----------------------------------
 library(magrittr)
 library(raster)
+library(reproducible)
 library(SpaDES.core)
 
 opts <- options("spades.moduleCodeChecks" = FALSE) # turns off syntactic checking of modules
