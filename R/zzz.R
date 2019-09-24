@@ -13,6 +13,8 @@
 #   message("Bye from Name space Finalizer")
 # }
 
+.spadesTempDir <- file.path(tempdir(), "SpaDES")
+
 .onLoad <- function(libname, pkgname) {
   ## set options using the approach used by devtools
   opts <- options()
@@ -110,7 +112,6 @@
   #                   env = as.environment("package:SpaDES.core")
   # )
   # lockBinding("Paths", as.environment("package:SpaDES.core"))
-
 }
 
 .onUnload <- function(libpath) {
@@ -128,5 +129,3 @@
     options(spades.outputPath = NULL)
   }
 }
-
-.spadesTempDir <- file.path(tempdir(), "SpaDES")

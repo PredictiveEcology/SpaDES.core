@@ -1470,27 +1470,23 @@ setReplaceMethod(
    return(sim)
 })
 
-
-
 ################################################################################
-#' Specify paths for modules, inputs, and outputs
+#' Specify paths for modules, inputs, outputs, and temporary rasters
 #'
 #' Accessor functions for the \code{paths} slot in a \code{simList} object.
 #'
 #' These are ways to add or access the file paths used by \code{\link{spades}}.
-#' There are four file paths: \code{cachePath}, \code{modulePath},
-#' \code{inputPath}, and \code{outputPath}.
+#' There are five file paths: \code{cachePath}, \code{modulePath},
+#' \code{inputPath}, \code{outputPath}, and \code{rasterPath}.
 #' Each has a function to get or set the value in a \code{simList} object.
 #' If no paths are specified, the defaults are as follows:
 #'
 #' \itemize{
 #'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
-#'
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
-#'
 #'   \item \code{modulePath}: \code{getOption("spades.inputPath")};
-#'
-#'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
+#'   \item \code{outputPath}: \code{getOption("spades.outputPath")};
+#'   \item \code{rasterPath}: \code{raster::tmpDir()}
 #' }
 #'
 #' @inheritParams params
@@ -1737,7 +1733,6 @@ setMethod("modulePath",
             } else {
               sim@paths$modulePath
             }
-
 })
 
 #' @export
@@ -1761,6 +1756,47 @@ setReplaceMethod(
     return(sim)
 })
 
+################################################################################
+#' @inheritParams paths
+#'
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setGeneric("rasterPath", function(sim) {
+  standardGeneric("rasterPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("rasterPath",
+          signature = "simList",
+          definition = function(sim) {
+            sim@paths$rasterPath
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("rasterPath<-",
+           function(sim, value) {
+             standardGeneric("rasterPath<-")
+})
+
+#' @name rasterPath<-
+#' @aliases rasterPath<-,simList-method
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#' @export
+setReplaceMethod(
+  "rasterPath",
+  signature = "simList",
+  function(sim, value) {
+    sim@paths$rasterPath <- unname(unlist(value))
+    checkPath(sim@paths$rasterPath, create = TRUE)
+    validObject(sim)
+    return(sim)
+})
 
 #' @description
 #' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
