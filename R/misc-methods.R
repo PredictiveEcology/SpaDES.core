@@ -645,11 +645,11 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
     OP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath")     # nolint
+    cachePath <- .getOption("reproducible.cachePath") # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {
-    inputPath <- getOption("spades.inputPath")    # nolint
+    inputPath <- getOption("spades.inputPath") # nolint
     defaults$IP <- TRUE
   }
   if (missing(modulePath)) {
@@ -664,9 +664,10 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
-  options(spades.inputPath = inputPath,
-          spades.modulePath = unlist(modulePath), spades.outputPath = outputPath,
-          reproducible.cachePath = cachePath)
+  options(reproducible.cachePath = cachePath,
+          spades.inputPath = inputPath,
+          spades.modulePath = unlist(modulePath),
+          spades.outputPath = outputPath)
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
