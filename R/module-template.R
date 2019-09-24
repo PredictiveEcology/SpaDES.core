@@ -948,9 +948,11 @@ setMethod(
   signature = c(name = "character", path = "character", version = "character"),
   definition = function(name, path, version, data, ...) {
     dots <- list(...)
-    if (is.null(dots$zip) &
-        all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
-      stop("External zip command paths missing.\nAdd 'zip = <path>/.zip.exe' specifying path to zip.exe")
+    if (Sys.info()["sysname"] == "Windows") {
+      if (is.null(dots$zip) &
+          all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
+        stop("External zip command paths missing.\nAdd 'zip = <full_path>/.zip.exe' specifying path to zip.exe")
+    }
 
     path <- checkPath(path, create = FALSE)
     callingWd <- getwd()
