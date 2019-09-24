@@ -81,6 +81,9 @@
 #' @importFrom reproducible normPath
 #' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
+  # module template path
+  .pkgEnv[["templatePath"]] <- system.file("templates", package = "SpaDES.core")
+
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     a <- capture.output(setPaths(), type = "message")

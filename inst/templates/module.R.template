@@ -1,0 +1,21 @@
+## Everything in this file gets sourced during `simInit()`,
+## and all functions and objects are put into the `simList`.
+## To use objects, use `sim$xxx` (they are globally available to all modules).
+## Functions can be used without `sim$` as they are namespaced to the module,
+## just like functions in R packages.
+## If exact location is required, functions will be: `sim$<moduleName>$FunctionName`.
+defineModule(sim, list(
+  name = {{{name}}},
+  description = {{{description}}},
+  keywords = {{{keywords}}},
+  authors = {{{authors}}},
+  childModules = {{{children}}},
+  version = {{{versions}}},
+  timeframe = {{{timeframe}}},
+  timeunit = {{{timeunit}}},
+  citation = {{citation}},
+  documentation = deparse(list("README.txt", "{{{name}}}.Rmd")),
+{{{otherMetadata}}}
+))
+
+{{{events}}}

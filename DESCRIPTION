@@ -54,7 +54,8 @@ Imports:
     stringi (>= 1.1.3),
     tcltk,
     tools,
-    utils
+    utils,
+    whisker
 Suggests:
     archivist,
     covr,
