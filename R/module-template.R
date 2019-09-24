@@ -951,7 +951,7 @@ setMethod(
     if (Sys.info()["sysname"] == "Windows") {
       if (is.null(dots$zip) &
           all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
-        stop("External zip command paths missing.\nAdd 'zip = <full_path>/.zip.exe' specifying path to zip.exe")
+        stop("External zip command paths missing.\nAdd 'zip = "path/to/zip.exe"' specifying path to zip.exe")
     }
 
     path <- checkPath(path, create = FALSE)
