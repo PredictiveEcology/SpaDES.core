@@ -13,7 +13,11 @@
 
 \item{filebackedDir}{A directory to copy any files that are backing R objects,
 currently only valid for \code{Raster} classes. Defaults
-to \code{tempdir()}, which is unlikely to be very useful.}
+to \code{tempdir()}, which is unlikely to be very useful.
+Can be \code{NULL}, which means that the file will not be
+copied and could therefore cause a collision as the
+pre-copied object and post-copied object would have the same
+file backing them.}
 
 \item{objects}{Whether the objects contained within the simList environment
 should be copied. Default \code{TRUE}, which may be slow.}
