@@ -772,3 +772,34 @@ unmakeMemoisable.simList_ <- function(x) {
   }
   return(y)
 }
+
+
+if (!isGeneric("clearCache")) {
+  setGeneric(
+    "clearCache",
+    function(object, .objects, length = Inf, algo = "xxhash64", ...) {
+      standardGeneric("clearCache")
+    }
+  )
+}
+
+#' clearCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @importFrom reproducible clearCache
+#' @importMethodsFrom reproducible clearCache
+#' @rdname clearCache
+setMethod(
+  "clearCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ask, useCloud = FALSE,
+                        cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
+                        ...) {
+    x <- x@paths$cachePath
+    clearCache(x = x, userTags = userTags, after = after, before = before,
+               ask = ask, useCloud = useCloud,
+               cloudFolderID = cloudFolderID,
+               ...)
+  })
