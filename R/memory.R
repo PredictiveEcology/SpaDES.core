@@ -1,4 +1,4 @@
-ongoingMemoryThisPid <- function(seconds = Inf, interval = getOption("spades.memoryUseInterval", 0.5),
+ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
                                  thisPid, outputFile) {
   numTimes = 1
   if (missing(thisPid)) thisPid <- Sys.getpid()
@@ -42,12 +42,18 @@ memoryUseThisSession <- function (thisPid)
   return(aa3)
 }
 
-futureOngoingMemoryThisPid <- function(outputFile = NULL) {
+futureOngoingMemoryThisPid <- function(outputFile = NULL,
+                                       seconds = Inf,
+                                       interval = getOption("spades.memoryUseInterval", 0.5)) {
   thisPid <- Sys.getpid()
   if (is.null(outputFile))
     outputFile <- paste0("..memAvail", "_", thisPid, ".txt")
   message("Writing memory to ", outputFile)
-  a <- future::future(SpaDES.core:::ongoingMemoryThisPid(thisPid = thisPid, outputFile = outputFile), #packages="SpaDES.core",
+  a <- future::future(
+    SpaDES.core:::ongoingMemoryThisPid(seconds = seconds,
+                                       interval = interval,
+                                       thisPid = thisPid,
+                                       outputFile = outputFile),
                       globals = list(memoryUseThisSession = SpaDES.core:::memoryUseThisSession,
                                      outputFile = outputFile, thisPid = thisPid))
 }

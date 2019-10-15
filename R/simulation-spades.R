@@ -794,7 +794,10 @@ setMethod(
           # Set up element in simList for recording the memory use stuff
           sim@.xData$.memoryUse <- list()
           sim@.xData$.memoryUse$filename <- file.path(cachePath(sim), paste0("._memoryUseFilename", Sys.getpid(),".txt"))
-          sim@.xData$.memoryUse$futureObj <- futureOngoingMemoryThisPid(outputFile = sim@.xData$.memoryUse$filename)
+          sim@.xData$.memoryUse$futureObj <-
+            futureOngoingMemoryThisPid(seconds = Inf,
+                                       interval = getOption("spades.memoryUseInterval", 0.2),
+                                       outputFile = sim@.xData$.memoryUse$filename)
 
           # Do the on.exit stuff
           on.exit({
