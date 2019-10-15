@@ -1,7 +1,7 @@
 test_that("testing memoryUse", {
   if (!interactive()) skip("This memoryUse is still very experimental")
   testInitOut <- testInit(c("raster", "future.callr", "future"), opts = list("spades.moduleCodeChecks" = FALSE,
-                                      "spades.memoryUse" = 1,
+                                      "spades.memoryUseInterval" = 0.2,
                                       "spades.futurePlan" = "callr"))
   oldPlan <- future::plan()
   on.exit({

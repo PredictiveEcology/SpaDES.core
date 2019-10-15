@@ -15,5 +15,7 @@ the raw memory used during each event will be shown.}
 }
 \description{
 This will only work if the user has specified before running
-the \code{spades} call, \code{options("spades.memoryUse" = 1)}
+the \code{spades} call, set the interval, in seconds, that ps is
+run with \code{options("spades.memoryUseInterval" = 1)}. The default
+is 0, meaning no interval, "off".
 }

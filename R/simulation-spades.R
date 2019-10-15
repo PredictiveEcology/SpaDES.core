@@ -773,7 +773,7 @@ setMethod(
 
     # Memory Use
     # memory estimation of each event/sim
-    if (getOption("spades.memoryUse", 0) > 0 && !isWindows()) {
+    if (getOption("spades.memoryUseInterval", 0) > 0 && !isWindows()) {
       psExists <- length(Sys.which("ps")) > 0
       if (psExists) {
         if (requireNamespace("future") && requireNamespace("future.callr")) {
@@ -782,7 +782,7 @@ setMethod(
           currentPlan <- future::plan()
           if (!is(currentPlan, "sequential") && !identical(thePlan, "sequential") &&
               !is.null(thePlan) && !is(currentPlan, thePlan))
-            stop("To use options('spades.memoryUse' = 1), you must set a future::plan(...) to something other than sequential")
+            stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...) to something other than sequential")
           if (!is(currentPlan, thePlan)) {
             if (grepl("callr", thePlan)) {
               future::plan(future.callr::callr)
@@ -798,9 +798,9 @@ setMethod(
 
           # Do the on.exit stuff
           on.exit({
-            if (!future::resolved(sim@.xData$.memoryUse$futureObj)) {
-              #sim@.xData$.memoryUse$futureObj$process$kill()
-            }
+            future::plan("sequential") # kill all processes
+            future::plan(currentPlan) # reset to original
+
             if (file.exists(sim@.xData$.memoryUse$filename)) {
               sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
               file.remove(sim@.xData$.memoryUse$filename)
@@ -808,7 +808,7 @@ setMethod(
             }
           }, add = TRUE)
         } else {
-          message("Can't use spades.memoryUse in a system without ps executable, e.g., linux")
+          message("Can't use spades.memoryUseInterval in a system without ps executable, e.g., linux")
         }
       }
     }

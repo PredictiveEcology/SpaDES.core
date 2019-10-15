@@ -1,4 +1,5 @@
-ongoingMemoryThisPid <- function(thisPid, outputFile) {
+ongoingMemoryThisPid <- function(seconds = Inf, interval = getOption("spades.memoryUseInterval", 0.5),
+                                 thisPid, outputFile) {
   numTimes = 1
   if (missing(thisPid)) thisPid <- Sys.getpid()
   if (missing(outputFile))
@@ -8,8 +9,8 @@ ongoingMemoryThisPid <- function(thisPid, outputFile) {
   #data.table::fwrite(list(a, Sys.time()), dateTimeAs = "ISO", append = FALSE, file = outputFile)
   #data.table::fwrite(list("mem", "time"), append = FALSE, file = outputFile)
   op <- options(digits.secs = 5)
-  while(numTimes < 100) {
-    Sys.sleep(0.1)
+  while(numTimes < (seconds/interval)) { # will go infinitely long!
+    Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
     a <- memoryUseThisSession(thisPid)
     #cat(a, ", ", format(Sys.time()), "\n", file = outputFile, append = TRUE)
     data.table::fwrite(list(memory = a, time = Sys.time()),
@@ -46,7 +47,7 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL) {
   if (is.null(outputFile))
     outputFile <- paste0("..memAvail", "_", thisPid, ".txt")
   message("Writing memory to ", outputFile)
-  a <- future::future(SpaDES.core:::ongoingMemoryThisPid(thisPid, outputFile), #packages="SpaDES.core",
+  a <- future::future(SpaDES.core:::ongoingMemoryThisPid(thisPid = thisPid, outputFile = outputFile), #packages="SpaDES.core",
                       globals = list(memoryUseThisSession = SpaDES.core:::memoryUseThisSession,
                                      outputFile = outputFile, thisPid = thisPid))
 }
@@ -58,7 +59,9 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL) {
 #' Show memory use
 #'
 #' This will only work if the user has specified before running
-#' the \code{spades} call, \code{options("spades.memoryUse" = 1)}
+#' the \code{spades} call, set the interval, in seconds, that ps is
+#' run with \code{options("spades.memoryUseInterval" = 1)}. The default
+#' is 0, meaning no interval, "off".
 #'
 #' @export
 #' @param sim A completed simList
