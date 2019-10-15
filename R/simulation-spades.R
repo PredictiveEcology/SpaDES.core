@@ -771,6 +771,48 @@ setMethod(
     .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
     .pkgEnv[["spades.keepCompleted"]] <- getOption("spades.keepCompleted", TRUE)
 
+    # Memory Use
+    # memory estimation of each event/sim
+    if (getOption("spades.memoryUse", 0) > 0 && !isWindows()) {
+      psExists <- length(Sys.which("ps")) > 0
+      if (psExists) {
+        if (requireNamespace("future") && requireNamespace("future.callr")) {
+
+          thePlan <- getOption("spades.futurePlan", NULL)
+          currentPlan <- future::plan()
+          if (!is(currentPlan, "sequential") && !identical(thePlan, "sequential") &&
+              !is.null(thePlan) && !is(currentPlan, thePlan))
+            stop("To use options('spades.memoryUse' = 1), you must set a future::plan(...) to something other than sequential")
+          if (!is(currentPlan, thePlan)) {
+            if (grepl("callr", thePlan)) {
+              future::plan(future.callr::callr)
+            } else {
+              future::plan(thePlan)
+            }
+          }
+
+          # Set up element in simList for recording the memory use stuff
+          sim@.xData$.memoryUse <- list()
+          sim@.xData$.memoryUse$filename <- file.path(cachePath(sim), paste0("._memoryUseFilename", Sys.getpid(),".txt"))
+          sim@.xData$.memoryUse$futureObj <- futureOngoingMemoryThisPid(outputFile = sim@.xData$.memoryUse$filename)
+
+          # Do the on.exit stuff
+          on.exit({
+            if (!future::resolved(sim@.xData$.memoryUse$futureObj)) {
+              #sim@.xData$.memoryUse$futureObj$process$kill()
+            }
+            if (file.exists(sim@.xData$.memoryUse$filename)) {
+              sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
+              file.remove(sim@.xData$.memoryUse$filename)
+              message("Memory use saved in simList; see memoryUsed(sim)")
+            }
+          }, add = TRUE)
+        } else {
+          message("Can't use spades.memoryUse in a system without ps executable, e.g., linux")
+        }
+      }
+    }
+
     # timeunits gets accessed every event -- this should only be needed once per simList
     sim@.xData$.timeunits <- timeunits(sim)
     on.exit({
