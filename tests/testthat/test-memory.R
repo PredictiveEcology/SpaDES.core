@@ -32,5 +32,6 @@ test_that("testing memoryUse", {
   expect_true(is(memUse, "data.table"))
   expect_true(is.numeric(memUse$maxMemory))
   expect_true(sum(!is.na(memUse$maxMemory))>0)
+  suppressWarnings(memUse <- memoryUse(mySim3, max = FALSE))
 
 })

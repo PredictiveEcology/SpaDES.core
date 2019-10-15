@@ -46,7 +46,7 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL) {
   if (is.null(outputFile))
     outputFile <- paste0("..memAvail", "_", thisPid, ".txt")
   message("Writing memory to ", outputFile)
-  a <- future::future(SpaDES.core:::ongoingMemoryThisPid(thisPid, outputFile), packages="SpaDES.core",
+  a <- future::future(SpaDES.core:::ongoingMemoryThisPid(thisPid, outputFile), #packages="SpaDES.core",
                       globals = list(memoryUseThisSession = SpaDES.core:::memoryUseThisSession,
                                      outputFile = outputFile, thisPid = thisPid))
 }
