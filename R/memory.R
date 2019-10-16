@@ -1,3 +1,7 @@
+if (getRversion() >= "3.1.0") {
+  utils::globalVariables(c("memory", "maxMemory"))
+}
+
 ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
                                  thisPid, outputFile) {
   numTimes = 1
@@ -79,18 +83,22 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 memoryUse <- function(sim, max = TRUE) {
   compl <- completed(sim)
   mem <- sim@.xData$.memoryUse$obj
-  if (is.character(mem$time))
-    mem[, time := as.POSIXct(time)]
-  if (any(grepl("^time$", names(mem))))
-    setnames(mem, old = "time", new = "clockTime")
-  a <- mem[compl, on = c("clockTime"), roll = TRUE, allow.cartesian = TRUE]
-  if (isTRUE(max)) {
-    a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
+  if (is.null(mem)) {
+    message("There are no data in the sim@.xData$.memoryUse$obj ... try running spades again?")
   } else {
-    a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType", "eventTime")]
+    if (is.character(mem$time))
+      mem[, time := as.POSIXct(time)]
+    if (any(grepl("^time$", names(mem))))
+      setnames(mem, old = "time", new = "clockTime")
+    a <- mem[compl, on = c("clockTime"), roll = TRUE, allow.cartesian = TRUE]
+    if (isTRUE(max)) {
+      a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
+    } else {
+      a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType", "eventTime")]
+    }
+    a[is.infinite(maxMemory), maxMemory:=NA]
+    return(a)
   }
-  a[is.infinite(maxMemory), maxMemory:=NA]
-  return(a)
 }
 
 isWindows <- function() identical(.Platform$OS.type, "windows")
