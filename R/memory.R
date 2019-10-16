@@ -32,6 +32,10 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
 #' which uses \code{gc()} internally. The purpose of this function is
 #' to allow continuous monitoring, external to the R session. Normally,
 #' this is run in a different session.
+#' @param thisPid Numeric or Integer, the PID of the process. If omitted, it will
+#'   be found with \code{Sys.getpid()}
+#' @export
+#' @rdname memoryUse
 memoryUseThisSession <- function (thisPid)
 {
   ps <- Sys.which("ps")
