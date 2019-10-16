@@ -21,6 +21,7 @@
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
+    spades.futurePlan = "callr",
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
     spades.memoryUseInterval = 0,

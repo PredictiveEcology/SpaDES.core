@@ -66,7 +66,8 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #'
 #' This will only work if the user has specified before running
 #' the \code{spades} call, set the interval, in seconds, that ps is
-#' run with \code{options("spades.memoryUseInterval" = 1)}. The default
+#' run with \code{options("spades.memoryUseInterval" = 0.5)}, will assess
+#' memory use every 0.5 seconds. The default
 #' is 0, meaning no interval, "off".
 #'
 #' @export
@@ -74,6 +75,7 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #' @param max Logical. If TRUE, then it the return value will be summarized by
 #'   module/event, showing the maximum memory used. If \code{FALSE}, then
 #'   the raw memory used during each event will be shown.
+#' @seealso The \code{vignette("iv-modules")}
 memoryUse <- function(sim, max = TRUE) {
   compl <- completed(sim)
   mem <- sim@.xData$.memoryUse$obj
