@@ -102,7 +102,7 @@ memoryUse <- function(sim, max = TRUE) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType", "eventTime")]
     }
     a[is.infinite(maxMemory), maxMemory:=NA]
-    return(a)
+    return(a[])
   }
 }
 
