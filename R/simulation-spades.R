@@ -807,7 +807,7 @@ setMethod(
             if (file.exists(sim@.xData$.memoryUse$filename)) {
               sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
               file.remove(sim@.xData$.memoryUse$filename)
-              message("Memory use saved in simList; see memoryUsed(sim)")
+              message("Memory use saved in simList; see print(memoryUse(sim))")
             }
           }, add = TRUE)
         } else {
