@@ -1,6 +1,7 @@
 test_that("testing memoryUse", {
   if (!interactive()) skip("This memoryUse is still very experimental")
-  testInitOut <- testInit(c("raster", "future.callr", "future"), opts = list("spades.moduleCodeChecks" = FALSE,
+  testInitOut <- testInit(c("raster", "future.callr", "future"),
+                          opts = list("spades.moduleCodeChecks" = FALSE,
                                       "spades.memoryUseInterval" = 0.2,
                                       "spades.futurePlan" = "callr"))
   oldPlan <- future::plan()
@@ -15,7 +16,7 @@ test_that("testing memoryUse", {
 
   #set.seed(42)
 
-  times <- list(start = 0.0, end = 30, timeunit = "year")
+  times <- list(start = 0.0, end = if (isWindows()) 60 else 30, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),

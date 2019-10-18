@@ -39,14 +39,19 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
 memoryUseThisSession <- function (thisPid)
 {
   ps <- Sys.which("ps")
+  if (missing(thisPid)) thisPid <- Sys.getpid()
   if (nzchar(ps)) {
-    if (missing(thisPid)) thisPid <- Sys.getpid()
     #aa <- try(system(paste("ps -eo rss,pid --sort -rss | grep", thisPid), intern = TRUE), silent = TRUE)
     aa <- try(system(paste("ps -eo rss,pid | grep", thisPid), intern = TRUE), silent = TRUE)
     aa2 <- strsplit(aa, split = " +")[[1]][1]
-    aa3 <- as.numeric(aa2) * 1024
-    class(aa3) <- "object_size"
+  } else {
+    aa <- try(system(paste0('tasklist /fi "pid eq ', thisPid, '"'), inter = TRUE), silent = TRUE)
+    aa2 <- strsplit(aa[grepl(thisPid, aa)], split = " +")[[1]][5] # pull out 5th item in character string
+    aa2 <- gsub(",", "", aa2) # comes with human readable comma -- must remove
   }
+
+  aa3 <- as.numeric(aa2) * 1024
+  class(aa3) <- "object_size"
   return(aa3)
 }
 
@@ -107,3 +112,46 @@ memoryUse <- function(sim, max = TRUE) {
 }
 
 isWindows <- function() identical(.Platform$OS.type, "windows")
+
+memoryUseSetup <- function(sim, originalFuturePlan) {
+  if (requireNamespace("future") && requireNamespace("future.callr")) {
+
+    thePlan <- getOption("spades.futurePlan", NULL)
+    # originalFuturePlan <- future::plan()
+    if (!is(originalFuturePlan, "sequential") && !identical(thePlan, "sequential") &&
+        !is.null(thePlan) && !is(originalFuturePlan, thePlan))
+      stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...) to something other than sequential")
+    if (!is(originalFuturePlan, thePlan)) {
+      if (grepl("callr", thePlan)) {
+        future::plan(future.callr::callr)
+      } else {
+        future::plan(thePlan)
+      }
+    }
+
+    # Set up element in simList for recording the memory use stuff
+    sim@.xData$.memoryUse <- list()
+    sim@.xData$.memoryUse$filename <- file.path(cachePath(sim), paste0("._memoryUseFilename", Sys.getpid(),".txt"))
+    sim@.xData$.memoryUse$futureObj <-
+      futureOngoingMemoryThisPid(seconds = Inf,
+                                 interval = getOption("spades.memoryUseInterval", 0.2),
+                                 outputFile = sim@.xData$.memoryUse$filename)
+  } else {
+    message("Can't use spades.memoryUseInterval without future (and optionally future.callr) packages")
+  }
+
+  return(sim)
+}
+
+memoryUseOnExit <- function(sim, originalFuturePlan) {
+  future::plan("sequential") # kill all processes
+  future::plan(originalFuturePlan) # reset to original
+
+  if (file.exists(sim@.xData$.memoryUse$filename)) {
+    sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
+    file.remove(sim@.xData$.memoryUse$filename)
+    message("Memory use saved in simList; see memoryUse(sim)")
+  }
+  return(sim)
+
+}

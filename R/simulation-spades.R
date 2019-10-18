@@ -24,7 +24,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table data.table rbindlist setkey
+#' @importFrom data.table data.table rbindlist setkey fread
 #' @importFrom stringi stri_pad_right stri_pad stri_length
 #' @importFrom reproducible Cache
 #' @importFrom utils write.table
@@ -773,47 +773,13 @@ setMethod(
 
     # Memory Use
     # memory estimation of each event/sim
-    if (getOption("spades.memoryUseInterval", 0) > 0 && !isWindows()) {
-      psExists <- length(Sys.which("ps")) > 0
-      if (psExists) {
-        if (requireNamespace("future") && requireNamespace("future.callr")) {
-
-          thePlan <- getOption("spades.futurePlan", NULL)
-          currentPlan <- future::plan()
-          if (!is(currentPlan, "sequential") && !identical(thePlan, "sequential") &&
-              !is.null(thePlan) && !is(currentPlan, thePlan))
-            stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...) to something other than sequential")
-          if (!is(currentPlan, thePlan)) {
-            if (grepl("callr", thePlan)) {
-              future::plan(future.callr::callr)
-            } else {
-              future::plan(thePlan)
-            }
-          }
-
-          # Set up element in simList for recording the memory use stuff
-          sim@.xData$.memoryUse <- list()
-          sim@.xData$.memoryUse$filename <- file.path(cachePath(sim), paste0("._memoryUseFilename", Sys.getpid(),".txt"))
-          sim@.xData$.memoryUse$futureObj <-
-            futureOngoingMemoryThisPid(seconds = Inf,
-                                       interval = getOption("spades.memoryUseInterval", 0.2),
-                                       outputFile = sim@.xData$.memoryUse$filename)
-
-          # Do the on.exit stuff
-          on.exit({
-            future::plan("sequential") # kill all processes
-            future::plan(currentPlan) # reset to original
-
-            if (file.exists(sim@.xData$.memoryUse$filename)) {
-              sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
-              file.remove(sim@.xData$.memoryUse$filename)
-              message("Memory use saved in simList; see memoryUse(sim)")
-            }
-          }, add = TRUE)
-        } else {
-          message("Can't use spades.memoryUseInterval in a system without ps executable, e.g., linux")
-        }
-      }
+    if (getOption("spades.memoryUseInterval", 0) > 0) {
+      originalPlan <- future::plan()
+      sim <- memoryUseSetup(sim, originalPlan)
+      # Do the on.exit stuff
+      on.exit({
+        sim <- memoryUseOnExit(sim, originalPlan)
+      }, add = TRUE)
     }
 
     # timeunits gets accessed every event -- this should only be needed once per simList
