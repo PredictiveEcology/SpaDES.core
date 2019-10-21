@@ -46,7 +46,6 @@ setClass(
   }
 )
 
-### `initialize` generic is already defined in the methods package
 #' Generate a \code{simLists} object
 #'
 #' Given the name or the definition of a class, plus optionally data to be

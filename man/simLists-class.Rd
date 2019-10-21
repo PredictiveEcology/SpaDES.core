@@ -15,7 +15,7 @@ This is a grouping of \code{simList} objects
 and \code{outputPath} paths. Partial matching is performed. These
 will be prepended to the relative paths of each \code{simList}}
 
-\item{\code{.simLists}}{Environment holding the \code{simLists}.}
+\item{\code{.xData}}{Environment holding the \code{simLists}.}
 }}
 
 \note{

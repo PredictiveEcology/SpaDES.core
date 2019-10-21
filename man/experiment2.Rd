@@ -4,7 +4,8 @@
 \alias{experiment2}
 \title{Run experiment, algorithm 2, using \code{\link{spades}}}
 \usage{
-experiment2(..., replicates = 1, clearSimEnv = FALSE, cl)
+experiment2(..., replicates = 1, clearSimEnv = FALSE,
+  createUniquePaths = c("outputPath"))
 }
 \arguments{
 \item{...}{Passed to \code{spades}. Specifically, \code{debug}, \code{.plotInitialTime},
@@ -18,11 +19,6 @@ See details and examples.}
 \item{clearSimEnv}{Logical. If TRUE, then the envir(sim) of each simList in the return list
 is emptied. This is to reduce RAM load of large return object.
 Default FALSE.}
-
-\item{cl}{A cluster object. Optional. This would generally be created using
-parallel::makeCluster or equivalent. This is an alternative way, instead
-of \code{beginCluster()}, to use parallelism for this function, allowing for
-more control over cluster use.}
 }
 \value{
 Invisibly returns a \code{simLists} object.

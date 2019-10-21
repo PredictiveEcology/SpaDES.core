@@ -84,8 +84,6 @@
 #' @importFrom raster getCluster returnCluster
 #' @rdname experiment2
 #'
-#' # @example inst/examples/example_experiment2.R
-#'
 setGeneric(
   "experiment2",
   signature = "...",
