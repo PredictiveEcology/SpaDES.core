@@ -147,3 +147,50 @@ experiment2Inner <- function(X, ll, clearSimEnv, createUniquePaths,
     rm(ls(s), envir = envir(s))
   s
 }
+
+#' @param object  \code{simList}
+#'
+#' @author Alex Chubaty
+#' @export
+setMethod(
+  "show",
+  signature = "simLists",
+  definition = function(object) {
+    out <- list()
+    out[[1]] <- capture.output(
+      cat(rep("=", getOption("width"), sep = ""), "\n", sep = "")
+    )
+
+    simListsBySimList <- .objNamesBySimList(object)
+    simLists <- unlist(simListsBySimList)
+    simLists <- gsub("_.*", "", simLists)
+    #objs <- ls(object)
+    #
+    #simListsBySimList <- split(objs, f = simLists)
+    #simListsBySimList <- lapply(simListsBySimList, sort)
+
+    lengths <- lapply(simListsBySimList, length)
+    uniqueLengths <- unique(unlist(lengths))
+    out2 <- paste(">> ",length(unique(simLists)),"simLists;")
+    out3 <- if (length(uniqueLengths) == 1) {
+      paste("with", uniqueLengths, "replicates each")
+    } else if (isTRUE(uniqueLengths) == 1) {
+      paste0("with only 1 replicate each")
+    } else {
+      paste("with", paste(uniqueLengths, collapse = ", "), "replicates respectively")
+    }
+    out[[2]] <- capture.output(cat(out2, out3))
+    ll <- lapply(simListsBySimList, function(s) {
+      paste0(s[1], ", ..., ", tail(s,1))
+    })
+    simListChStr <- paste0(names(ll), ": ", ll)
+    simListEntries <- (seq_along(unique(simLists))-1)*2 + length(out) + 1
+    out[simListEntries] <- lapply(simListChStr, function(x) x)
+    out[simListEntries + 1] <- lapply(simListsBySimList, function(x) {
+      paste("  ", capture.output(ls.str(object[[x[1]]])))
+      })
+
+    out[[length(out) + 1]] <- capture.output(cat("\n"))
+    ### print result
+    cat(unlist(out), fill = FALSE, sep = "\n")
+  })
