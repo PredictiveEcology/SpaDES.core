@@ -18,7 +18,7 @@ experiment(sim, replicates = 1, params, modules, objects = list(),
   clearSimEnv = FALSE, notOlderThan, cl, ...)
 
 \S4method{experiment2}{simList}(..., replicates = 1,
-  clearSimEnv = FALSE, cl)
+  clearSimEnv = FALSE, createUniquePaths = c("outputPath"))
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}

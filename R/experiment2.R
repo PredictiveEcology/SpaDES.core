@@ -90,7 +90,7 @@ setGeneric(
   "experiment2",
   signature = "...",
   function(..., replicates = 1, clearSimEnv = FALSE,
-           cl) {
+           createUniquePaths = c("outputPath")) {
     standardGeneric("experiment2")
   })
 
@@ -99,12 +99,51 @@ setGeneric(
 setMethod(
   "experiment2",
   signature("simList"),
-  definition = function(..., replicates, clearSimEnv, cl) {
+  definition = function(..., replicates, clearSimEnv,
+                        createUniquePaths = c("outputPath")) {
     pkg <- unique(unlist(lapply(list(...), packages)))
     outSimLists <- new("simLists")
     ll <- list(...)
-    names(ll) <- as.character(seq_along(list(...)))
-    list2env(future_lapply(X = ll, FUN = function(sim) spades(sim),
-                         future.packages = pkg), envir = outSimLists@.xData)
+    simNames <- as.character(seq_along(list(...)))
+    names(ll) <- simNames
+
+    if (!missing(replicates)) {
+      if (length(replicates) == 1) replicates <- rep(replicates, length(ll))
+
+      simNames <- unlist(Map(x = simNames, each = replicates, rep))
+      repNums <- unlist(lapply(replicates, seq_len))
+      namsExpanded <- paste(simNames, paddedFloatToChar(repNums, padL = max(nchar(repNums))),
+                     sep = "_rep")
+      names(simNames) <- namsExpanded
+
+    } else {
+      namsExpanded <- simNames
+    }
+
+      # do copy of sim inside workers, so there is only 1 copy per worker,
+      # rather than 1 copy per sim
+    iters <- seq_along(namsExpanded)
+    names(iters) <- namsExpanded
+    list2env(future_lapply(X = iters, ll = ll, clearSimEnv = clearSimEnv,
+                           createUniquePaths = createUniquePaths,
+                           names = namsExpanded,
+                           simNames = simNames,
+
+                           FUN = experiment2Inner,
+                           future.packages = pkg
+    ),
+    envir = outSimLists@.xData)
     return(outSimLists)
   })
+
+experiment2Inner <- function(X, ll, clearSimEnv, createUniquePaths,
+                             simNames, names) {
+  simName <- simNames[X]
+  name <- names[X]
+  outputPath(ll[[simName]]) <- checkPath(file.path(outputPath(ll[[simName]]), name),
+                                   create = TRUE)
+  s <- spades(Copy(ll[[simName]]))
+  if (isTRUE(clearSimEnv))
+    rm(ls(s), envir = envir(s))
+  s
+}
