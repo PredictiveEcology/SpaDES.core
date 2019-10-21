@@ -194,3 +194,140 @@ setMethod(
     ### print result
     cat(unlist(out), fill = FALSE, sep = "\n")
   })
+
+
+#' Coerce elements of a simLists object to a data.table
+#'
+#' This is particularly useful to build plots using the tidyverse,
+#' e.g., \code{ggplot2}
+#' @importFrom purrr transpose
+#' @param vals A character vector or list of object names to extract from each
+#'   simList, or a list of quoted expressions to calculate for each \code{simList},
+#'   or a mix of character and quoted expressions.
+#' @param byRep Should the data.table have a column labelled "rep", indicating replicate
+#'   number/label. Currently, only \code{TRUE} is accepted.
+#' @param ... Currently unused.
+#' @examples
+#' \dontrun {
+#' endTime <- 5
+#' # Example of changing parameter values
+#' mySim1 <- simInit(
+#'   times = list(start = 0.0, end = endTime, timeunit = "year"),
+#'   params = list(
+#'     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+#'     # Turn off interactive plotting
+#'     fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(10)),
+#'     caribouMovement = list(.plotInitialTime = NA),
+#'     randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+#'   ),
+#'   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'                outputPath = tmpdir,
+#'                cachePath = tmpCache),
+#' # Save final state of landscape and caribou
+#'   outputs = data.frame(objectName = c("landscape", "caribou"),
+#'                        stringsAsFactors = FALSE)
+#' )
+#'
+#' mySim2 <- simInit(
+#'   times = list(start = 0.0, end = endTime, timeunit = "year"),
+#'   params = list(
+#' .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+#'     # Turn off interactive plotting
+#'     fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(20)),
+#'     caribouMovement = list(.plotInitialTime = NA),
+#'     randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+#'   ),
+#'   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'                outputPath = tmpdir,
+#'                cachePath = tmpCache),
+#'   # Save final state of landscape and caribou
+#'   outputs = data.frame(objectName = c("landscape", "caribou"),
+#'                        stringsAsFactors = FALSE)
+#' )
+#'
+#' # Run experiment
+#' sims <- experiment2(mySim1, mySim2, replicates = c(5,5))
+#'
+#'
+#'   df1 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned"))
+#'
+#'   measure.cols <- grep("nPixelsBurned", names(df1), value = TRUE)
+#'   df1Short <- data.table::melt(df1, measure.vars = measure.cols, variable.name = "year")
+#'   df1Short[, year := as.numeric(gsub(".*V([[:digit:]])", "\\1", df1Short$year))]
+#'   p<- ggplot(df1Short, aes(x=year, y=value, group=simList, color=simList)) +
+#'     stat_summary(geom = "point", fun.y = mean) +
+#'     stat_summary(geom = "line", fun.y = mean) +
+#' stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
+#'
+#'   print(p)
+#'
+#' # Simple, single variable output, quoted -- next two lines are identical
+#' df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = quote(length(caribou$x1))))
+#' df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = "length(caribou$x1)"))
+#'
+#'   p<- ggplot(df1, aes(x=simList, y=NCaribou.V1, group=simList, color=simList)) +
+#'     stat_summary(geom = "point", fun.y = mean, position = "dodge") +
+#'     stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
+#'   print(p)
+#'
+#' }
+#' } # end /dontrun
+#'
+as.data.table.simLists <- function(x, byRep = TRUE, vals, ...) {
+  if (!isTRUE(byRep)) stop("byRep must be TRUE, currently")
+  objs <- ls(x)
+  names(objs) <- objs
+  simLists <- gsub("_.*", "", objs)
+  if (!is.list(vals)) {
+    vals <- if (is.character(vals)) {
+      as.list(vals)
+    } else {
+      list(vals)
+    }
+  }
+  namesVals <- names(vals)
+  emptyChar <- nchar(namesVals) == 0
+  if (is.null(namesVals) || any(emptyChar)) {
+    valNames <- unlist(lapply(vals, function(x) format(x)))
+    if (any(emptyChar)) {
+      namesVals[emptyChar] <- valNames[emptyChar]
+      valNames <- namesVals
+    }
+    names(vals) <- valNames
+  }
+  reps <- gsub(".*_", "", objs)
+  ll <- lapply(objs, vals = vals, function(sName, vals) {
+    n <- new.env(parent = .GlobalEnv)
+    list2env(mget(ls(x[[sName]]), envir = envir(x[[sName]])), envir = n)
+    lapply(vals, n = n, function(o, n) {
+      if (is.call(o)) {
+        eval(o, envir = n)
+      } else {
+        eval(parse(text = o), envir = n)
+      }
+    })
+  })
+  ll2 <- purrr::transpose(ll)
+  labels <- seq_along(ll2)
+  names(labels) <- names(ll2)
+  ll3 <- lapply(labels, ll2 = ll2, function(n, ll2)  t(rbindlist(ll2[n])))
+  dt <- as.data.table(ll3)
+  varNameOnly <- gsub(".V[[:digit:]]+", "", names(dt))
+  counts <- table(varNameOnly)
+  whichSingleton <- which(counts == 1)
+  out <- lapply(names(whichSingleton), dt = dt, function(n, dt) {
+    setnames(dt, old = grep(n, names(dt), value = TRUE), new = n)
+  })
+  dt <- data.table(simList = simLists, reps = reps, dt)
+  dt[]
+
+}
+.objNamesBySimList <- function(simLists) {
+  objs <- ls(simLists)
+  simLists <- gsub("_.*", "", objs)
+  simListsBySimList <- split(objs, f = simLists)
+  simListsBySimList <- lapply(simListsBySimList, sort)
+
+}
