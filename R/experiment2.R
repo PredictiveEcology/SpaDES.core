@@ -104,6 +104,9 @@ setMethod(
     ll <- list(...)
     simNames <- as.character(seq_along(list(...)))
     names(ll) <- simNames
+    if (length(simNames) != length(replicates) && length(replicates) != 1) {
+      stop("replicates argument must be length 1 or the same length as the number of simLists")
+    }
 
     if (!missing(replicates)) {
       if (length(replicates) == 1) replicates <- rep(replicates, length(ll))

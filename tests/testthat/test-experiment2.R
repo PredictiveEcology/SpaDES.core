@@ -44,6 +44,24 @@ test_that("experiment2 does not work correctly", {
                          stringsAsFactors = FALSE)
   )
 
+  mySim3 <- simInit(
+    times = list(start = 0.0, end = endTime, timeunit = "year"),
+    params = list(
+      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+      # Turn off interactive plotting
+      fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(30)),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+    ),
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpCache),
+    # Save final state of landscape and caribou
+    outputs = data.frame(objectName = c("landscape", "caribou"),
+                         stringsAsFactors = FALSE)
+  )
+
   if (FALSE) {
   for (pl in c("sequential", "multiprocess", "callr")) {
     cat(" -- testing future plan when", pl, "                ")
@@ -81,13 +99,14 @@ test_that("experiment2 does not work correctly", {
     expect_false(identical(sims$`1_rep1`$caribou$x1, sims$`2_rep2`$caribou$x1))
     expect_false(identical(sims$`1_rep1`$caribou$x1, sims$`2_rep1`$caribou$x1))
   }
-  }
+}
 
-  sims <- experiment2(mySim1, mySim2, replicates = c(5,5))
+  browser()
+  sims <- experiment2(mySim1, mySim2, mySim3, replicates = c(5,5,5))
 
   expect_true(is(sims, "simLists"))
   mess <- capture.output(sims)
-  expect_true(sum(grepl("2 simLists", mess)) == 1)
+  expect_true(sum(grepl("3 simLists", mess)) == 1)
 
   df1 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned", NCaribou = quote(length(caribou$x1))))
   df2 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned", NCaribou = "length(caribou$x1)"))
