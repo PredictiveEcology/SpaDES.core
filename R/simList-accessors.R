@@ -1262,27 +1262,27 @@ setMethod(
   signature = "simList",
   definition = function(sim) {
     simUnit <- sim@simtimes[["timeunit"]]
-  saveTimeUnit <- attr(sim@outputs$saveTime, "unit")
-  if (is.null(saveTimeUnit)) saveTimeUnit <- simUnit
+    saveTimeUnit <- attr(sim@outputs$saveTime, "unit")
+    if (is.null(saveTimeUnit)) saveTimeUnit <- simUnit
 
-  out <- if (is.na(pmatch(saveTimeUnit, simUnit)) &
-             length(sim@outputs$saveTime) > 0) {
-    ## note the above line captures empty saveTime, whereas is.na does not
-    if (any(!is.na(sim@outputs$saveTime))) {
-      if (!is.null(sim@outputs$saveTime)) {
-        obj <- copy(sim@outputs) # don't change original sim
-        obj[, saveTime := convertTimeunit(saveTime, unit, sim@.xData)]
-        obj[]
-        obj
+    out <- if (is.na(pmatch(saveTimeUnit, simUnit)) &
+               length(sim@outputs$saveTime) > 0) {
+      ## note the above line captures empty saveTime, whereas is.na does not
+      if (any(!is.na(sim@outputs$saveTime))) {
+        if (!is.null(sim@outputs$saveTime)) {
+          obj <- copy(sim@outputs) # don't change original sim
+          obj[, saveTime := convertTimeunit(saveTime, unit, sim@.xData)]
+          obj[]
+          obj
+        }
+      } else {
+        sim@outputs
       }
     } else {
       sim@outputs
     }
-  } else {
-    sim@outputs
-  }
-  return(out)
-})
+    return(out)
+  })
 
 #' @export
 #' @rdname simList-accessors-inout

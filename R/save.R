@@ -9,8 +9,14 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
       firstSave <- min(outputs(sim)[, "saveTime"], na.rm = TRUE)
+      firstSaveWh <- which.min(outputs(sim)[, "saveTime"])
+      if ("eventPriority" %in% colnames(outputs(sim))) {
+        firstPriority <- outputs(sim)[firstSaveWh, "eventPriority"]
+      }
+      if (!exists("firstPriority", inherits = FALSE))
+        firstPriority <- .last()
       attributes(firstSave)$unit <- sim@simtimes[["timeunit"]]
-      sim <- scheduleEvent(sim, firstSave, "save", "spades", .last())
+      sim <- scheduleEvent(sim, firstSave, "save", "spades", firstPriority)
       #sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
     }
     checkPath(sim@paths$outputPath, create = TRUE)
@@ -191,6 +197,7 @@ saveFiles <- function(sim) {
 
   # Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
+    browser()
     nextTime <- min(outputs(sim)[is.na(outputs(sim)$saved), "saveTime"], na.rm = TRUE)
     attributes(nextTime)$unit <- sim@simtimes[["timeunit"]]
     if (time(sim) == end(sim)) {
