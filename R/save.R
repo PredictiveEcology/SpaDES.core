@@ -197,13 +197,20 @@ saveFiles <- function(sim) {
 
   # Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
-    browser()
-    nextTime <- min(outputs(sim)[is.na(outputs(sim)$saved), "saveTime"], na.rm = TRUE)
+    isNA <- is.na(outputs(sim)$saved)
+    nextTime <- min(outputs(sim)[isNA, "saveTime"], na.rm = TRUE)
+    nextTimeWh <- which.min(outputs(sim)[isNA, "saveTime"])
+    if ("eventPriority" %in% colnames(outputs(sim))) {
+      nextPriority <- outputs(sim)[isNA, "eventPriority"][nextTimeWh]
+    }
+    if (!exists("nextPriority", inherits = FALSE))
+      nextPriority <- .last()
+
     attributes(nextTime)$unit <- sim@simtimes[["timeunit"]]
     if (time(sim) == end(sim)) {
-      sim <- scheduleEvent(sim, nextTime, "save", "end", .last())
+      sim <- scheduleEvent(sim, nextTime, "save", "end", nextPriority)
     } else {
-      sim <- scheduleEvent(sim, nextTime, "save", "later", .last())
+      sim <- scheduleEvent(sim, nextTime, "save", "later", nextPriority)
     }
   }
   return(invisible(sim))
