@@ -4,7 +4,8 @@
 \alias{as.data.table.simLists}
 \title{Coerce elements of a simLists object to a data.table}
 \usage{
-\method{as.data.table}{simLists}(x, byRep = TRUE, vals, ...)
+\method{as.data.table}{simLists}(x, byRep = TRUE, vals,
+  objectsFromSim = NULL, objectsFromOutputs = NULL, ...)
 }
 \arguments{
 \item{byRep}{Should the data.table have a column labelled "rep", indicating replicate
@@ -14,71 +15,22 @@ number/label. Currently, only \code{TRUE} is accepted.}
 simList, or a list of quoted expressions to calculate for each \code{simList},
 or a mix of character and quoted expressions.}
 
+\item{objectsFromSim}{Character vector of objects to extract from the simLists. If
+omitted, it will extract all objects from each simList in order to calculate the
+\code{vals}. This may have a computational cost.}
+
+\item{objectsFromOutputs}{Character vector of objects to load from the
+\code{outputs(sim)} prior to evaluating \code{vals}. If there already is an object
+with that same name in the \code{simList}, then it will be overwritten with
+the object loaded from \code{outputs(sim)}. If there are many objects with the
+same name, specifically from several \code{saveTime} values in the \code{outputs(sim)},
+these will all be loaded, one at a time, \code{vals} evaluated one at a time, and
+all the unique values will be returned. A column, \code{saveTime}, will be
+part of the returned value.}
+
 \item{...}{Currently unused.}
 }
 \description{
 This is particularly useful to build plots using the tidyverse,
 e.g., \code{ggplot2}
-}
-\examples{
-\dontrun {
-endTime <- 5
-# Example of changing parameter values
-mySim1 <- simInit(
-  times = list(start = 0.0, end = endTime, timeunit = "year"),
-  params = list(
-    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-    # Turn off interactive plotting
-    fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(10)),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
-  ),
-  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-               outputPath = tmpdir,
-               cachePath = tmpCache),
-# Save final state of landscape and caribou
-  outputs = data.frame(objectName = c("landscape", "caribou"),
-                       stringsAsFactors = FALSE)
-)
-
-mySim2 <- simInit(
-  times = list(start = 0.0, end = endTime, timeunit = "year"),
-  params = list(
-.globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-    # Turn off interactive plotting
-    fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(20)),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
-  ),
-  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-               outputPath = tmpdir,
-               cachePath = tmpCache),
-  # Save final state of landscape and caribou
-  outputs = data.frame(objectName = c("landscape", "caribou"),
-                       stringsAsFactors = FALSE)
-)
-
-# Run experiment
-sims <- experiment2(mySim1, mySim2, replicates = c(5,5))
-
-# Simple, single variable output, quoted
-df1 <- as.data.table(sims, byRep = TRUE, vals = quote(length(caribou$x1)))
-
-# Use a variable that has every year's worth of results
-df1 <- as.data.table(sims, by = c("rep"), vals = c("nPixelsBurned"))
-
-measure.cols <- grep("nPixelsBurned", names(df1), value = TRUE)
-df1a <- data.table::melt(df1, measure.vars = measure.cols, variable.name = "year")
-df1a[, year := as.numeric(gsub(".*V([[:digit:]])", "\\\\1", df1a$year))]
-df1a <- df1a[, list(sd = sd(value), value = mean(value)), by = c("simList", "year")]
-p<- ggplot(df1a, aes(x=year, y=value, group=simList, color=simList)) +
-  geom_line() +
-  geom_point() +
-  geom_errorbar(aes(ymin=value-sd, ymax=value+sd), width=.2,
-                position=position_dodge(0.05))
-print(p)
-}
-
 }
