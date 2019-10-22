@@ -67,7 +67,12 @@ See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
-\code{saveTime} (numeric). See \code{\link{outputs}} and
+\code{saveTime} (numeric) and \code{eventPriority} (numeric). If
+\code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
+is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
+it should give "initial conditions".
+
+See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional list of module names specifying the order in
@@ -289,6 +294,7 @@ if (require(rgdal)) {
    outputs = data.frame(
      expand.grid(objectName = c("caribou","landscape"),
      saveTime = 1:2,
+     eventPriority = c(0,10), # eventPriority 0 may give "initial" conditions
      stringsAsFactors = FALSE))
  )
 
