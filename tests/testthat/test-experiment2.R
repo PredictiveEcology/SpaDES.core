@@ -6,7 +6,7 @@ test_that("experiment2 does not work correctly", {
   }, add = TRUE)
 
 
-  endTime <- 4
+  endTime <- 5
   # Example of changing parameter values
   mySim1 <- simInit(
     times = list(start = 0.0, end = endTime, timeunit = "year"),
@@ -22,8 +22,8 @@ test_that("experiment2 does not work correctly", {
                  outputPath = tmpdir,
                  cachePath = tmpCache),
     # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou", "caribou"),
-                         saveTimes = c(endTime, unique(c(ceiling(endTime/2),endTime))),
+    outputs = data.frame(objectName = c(rep("landscape", endTime), "caribou", "caribou"),
+                         saveTimes = c(seq_len(endTime), unique(c(ceiling(endTime/2),endTime))),
                          stringsAsFactors = FALSE)
   )
 
@@ -41,8 +41,8 @@ test_that("experiment2 does not work correctly", {
                  outputPath = tmpdir,
                  cachePath = tmpCache),
     # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou", "caribou"),
-                         saveTimes = c(endTime, unique(c(ceiling(endTime/2),endTime))),
+    outputs = data.frame(objectName = c(rep("landscape", endTime), "caribou", "caribou"),
+                         saveTimes = c(seq_len(endTime), unique(c(ceiling(endTime/2),endTime))),
                          stringsAsFactors = FALSE)
   )
 
@@ -60,8 +60,8 @@ test_that("experiment2 does not work correctly", {
                  outputPath = tmpdir,
                  cachePath = tmpCache),
     # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou", "caribou"),
-                         saveTimes = c(endTime, unique(c(ceiling(endTime/2),endTime))),
+    outputs = data.frame(objectName = c(rep("landscape", endTime), "caribou", "caribou"),
+                         saveTimes = c(seq_len(endTime), unique(c(ceiling(endTime/2),endTime))),
                          stringsAsFactors = FALSE)
   )
 
@@ -104,12 +104,14 @@ test_that("experiment2 does not work correctly", {
 
   stStart <- list()
   stEnd <- list()
-  for (pl in c("sequential", "multiprocess", "callr")) {
+  for (pl in c("sequential")) {
+    #for (pl in c("sequential", "multiprocess", "callr")) {
     stStart[[pl]] <- Sys.time()
     cat(" -- testing future plan when", pl, "                ")
     warn <- capture_warnings(plan(pl, workers = 3)) # just about "workers" not defined in "sequential"
     cap1 <- capture.output(mess <- capture_messages(
-      sims <- experiment2(sim1 = mySim1, sim2 = mySim2, sim3 = mySim3, replicates = 3)
+      sims <- experiment2(sim1 = mySim1, sim2 = mySim2, sim3 = mySim3,
+                          replicates = 3, useCache = FALSE)
     ))
     stEnd[[pl]] <- Sys.time()
   }
@@ -152,5 +154,46 @@ test_that("experiment2 does not work correctly", {
       stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
     print(p)
 
+  }
+
+  df1 <- as.data.table(sims, byRep = TRUE,
+                       vals = c(meanFireSize = quote(mean(table(landscape$Fires[])[-1]))),
+                       objectsFromOutputs = c("landscape"))
+  if (interactive()) {
+    # with an unevaluated string
+    p<- ggplot(df1, aes(x=simList, y=meanFireSize, group=simList, color=simList)) +
+      stat_summary(geom = "point", fun.y = mean) +
+      stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
+    print(p)
+
+    p <- ggplot(df1, aes(x=saveTime, y=meanFireSize, group=simList, color=simList)) +
+      stat_summary(geom = "point", fun.y = mean) +
+      stat_summary(geom = "line", fun.y = mean) +
+      stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
+    print(p)
+
+  }
+
+  fn <- quote({
+    landscape$Fires[landscape$Fires[]==0] <- NA;
+    a <- boundaries(landscape$Fires, type = "inner");
+    a[landscape$Fires[] > 0 & a[] == 1] <- landscape$Fires[landscape$Fires[] > 0 & a[] == 1];
+    peri <- table(a[]);
+    area <- table(landscape$Fires[]);
+    keep <- match(names(area),names(peri));
+    mean(peri[keep]/area)
+  })
+
+  df1 <- as.data.table(sims, byRep = TRUE,
+                       vals = c(perimToArea = fn,
+                                meanFireSize = quote(mean(table(landscape$Fires[])[-1]))),
+                       objectsFromOutputs = c("landscape"))
+  if (interactive()) {
+    # with an unevaluated string
+    p <- ggplot(df1, aes(x=saveTime, y=perimToArea, group=simList, color=simList)) +
+      stat_summary(geom = "point", fun.y = mean) +
+      stat_summary(geom = "line", fun.y = mean) +
+      stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
+    warn <- capture_warnings(print(p))
   }
 })

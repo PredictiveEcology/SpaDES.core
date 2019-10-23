@@ -1,105 +1,67 @@
 ################################################################################
 #' Run experiment, algorithm 2, using \code{\link{spades}}
 #'
-#' @inheritParams spades
+#' Given one or more \code{simList} objects, run a series of \code{spades} calls
+#' in a structured, organized way. Methods are available to deal with outputs,
+#' such as \code{as.data.table.simList} which can pull out simple to complex
+#' values from every resulting \code{simList} or object saved by \code{outputs}
+#' in every \code{simList} run. This uses \code{future} internally, allowing
+#' for various backends and parallelism.0
+#'
+#' @param ... One or more \code{simList} objects
 #' @param replicates The number of replicates to run of the same \code{simList}.
 #'                   See details and examples.
 #'
 #' @param clearSimEnv Logical. If TRUE, then the envir(sim) of each simList in the return list
 #'                    is emptied. This is to reduce RAM load of large return object.
 #'                    Default FALSE.
+#' @param createUniquePaths A character vector of the \code{paths} passed to \code{simInit},
+#'   indicating which should create a new, unique path, as a sub-path to the original
+#'   \code{paths} of \code{simInit}. Default, and currently only option, is \code{"outputPath"}
 #'
-#' @param ... Passed to \code{spades}. Specifically, \code{debug}, \code{.plotInitialTime},
-#'            \code{.saveInitialTime}, \code{cache} and/or \code{notOlderThan}. Caching
-#'            is still experimental. It is tested to work under some conditions, but not
-#'            all. See details.
-#'
-#' @inheritParams POM
+#' @param useCache Logical. Passed to \code{spades}. This will be passed with the \code{simList}
+#'   name and replicate number, allowing each replicate and each \code{simList} to be
+#'   seen as a non-cached call to \code{spades}. This will, however, may prevent \code{spades}
+#'   calls from running a second time during second call to the same
+#'   \code{experiment2} function.
 #'
 #' @details
-#' This function requires at least 1 complete simList.
 #'
-#' This function is parallel aware, using the same mechanism as used in the \code{raster}
-#' package. Specifically, if you start a cluster using \code{\link{beginCluster}}, then
-#' this experiment function will automatically use that cluster. It is always a good
-#' idea to stop the cluster when finished, using \code{\link{endCluster}}.
+#' The \code{outputPath} is changed so that every simulation puts outputs in a sub-directory
+#' of the original \code{outputPath} of each \code{simList}.
 #'
-#'
-#' Output directories are changed using this function: this is one of the dominant
-#' side effects of this function. If there are only replications, then a set of
-#' subdirectories will be created, one for each replicate.
-#' If there are varying parameters and or modules, \code{outputPath} is updated
-#' to include a subdirectory for each level of the experiment.
-#' These are not nested, i.e., even if there are nested factors, all subdirectories
-#' due to the experimental setup will be at the same level.
-#' Replicates will be one level below this.
-#' The subdirectory names will include the module(s), parameter names, the parameter values,
-#' and input index number (i.e., which row of the inputs data.frame).
-#' The default rule for naming is a concatenation of:
-#'
-#' 1. The experiment level (arbitrarily starting at 1). This is padded with zeros if there are
-#' many experiment levels.
-#'
-#' 2. The module, parameter name and parameter experiment level (not the parameter value,
-#' as values could be complex), for each parameter that is varying.
-#'
-#' 3. The module set.
-#'
-#' 4. The input index number
-#'
-#' 5. Individual identifiers are separated by a dash.
-#'
-#' 6. Module - Parameter - Parameter index triplets are separated by underscore.
-#'
-#' Replication is treated slightly differently. \code{outputPath} is always 1 level below the
-#' experiment level for a replicate.
-#' If the call to \code{experiment} is not a factorial experiment (i.e., it is just
-#' replication), then the
-#' default is to put the replicate subdirectories at the top level of \code{outputPath}.
-#' To force this one level down, \code{dirPrefix} can be used or a manual change to
-#' \code{outputPath} before the call to experiment.
-#'
-#' If \code{cache = TRUE} is passed, then this will pass this to \code{spades},
-#' with the additional argument \code{replicate = x}, where x is the replicate number.
-#' That means that if a user runs \code{experiment} with \code{replicate = 4} and
-#' \code{cache = TRUE}, then SpaDES will run 4 replicates, caching the results,
-#' including replicate = 1, replicate = 2, replicate = 3, and replicate = 4.
-#' Thus, if a second call to experiment with the exact same simList is passed,
-#' and \code{replicates = 6}, the first 4 will be taken from the cached copies,
-#' and replicate 5 and 6 will be run (and cached) as normal.
-#' If \code{notOlderThan} used with a time that is more recent than the cached copy,
-#' then a new spades will be done, and the cached copy will be deleted from the
-#' cache repository, so there will only ever be one copy of a particular replicate
-#' for a particular simList.
-#' NOTE: caching may not work as desired on a Windows machine because the sqlite
-#' database can only be written to one at a time, so there may be collisions.
-#'
-#' @return Invisibly returns a \code{simLists} object.
+#' @return Invisibly returns a \code{simLists} object. This class
+#' extends the \code{environment} class and
+#' contains \code{simList} objects.
 #'
 #' @seealso \code{\link{simInit}}, \code{\link{spades}}, \code{\link{experiment}}
 #'
 #' @author Eliot McIntire
 #' @export
-#' @importFrom parallel clusterApplyLB clusterEvalQ stopCluster
-#' @importFrom raster getCluster returnCluster
 #' @rdname experiment2
 #'
 setGeneric(
   "experiment2",
   signature = "...",
   function(..., replicates = 1, clearSimEnv = FALSE,
-           createUniquePaths = c("outputPath")) {
+           createUniquePaths = c("outputPath"), useCache = FALSE) {
     standardGeneric("experiment2")
   })
 
-#' @rdname experiment
+#' @rdname experiment2
 #' @importFrom future.apply future_lapply
 setMethod(
   "experiment2",
   signature("simList"),
   definition = function(..., replicates, clearSimEnv,
-                        createUniquePaths = c("outputPath")) {
+                        createUniquePaths = c("outputPath"),
+                        useCache = FALSE) {
     # determine packages to load in the workers
+    if (any(createUniquePaths != "outputPath")) {
+      message("createUniquePaths only accepts outputPath, currently",
+              ". Setting it to 'outputPath'")
+      createUniquePaths <- "outputPath"
+    }
     pkg <- unique(unlist(lapply(list(...), packages)))
     outSimLists <- new("simLists")
     ll <- list(...)
@@ -134,7 +96,8 @@ setMethod(
                            createUniquePaths = createUniquePaths,
                            names = namsExpanded,
                            simNames = simNames,
-
+                           useCache = useCache,
+                           .spades = .spades,
                            FUN = experiment2Inner,
                            future.packages = pkg
     ),
@@ -143,20 +106,25 @@ setMethod(
   })
 
 experiment2Inner <- function(X, ll, clearSimEnv, createUniquePaths,
-                             simNames, names) {
+                             simNames, names, useCache = FALSE, ...) {
   simName <- simNames[X]
   name <- names[X]
   outputPath(ll[[simName]]) <- checkPath(file.path(outputPath(ll[[simName]]), name),
                                    create = TRUE)
-  s <- spades(Copy(ll[[simName]]))
+  s <- Cache(.spades, ll[[simName]], useCache = useCache, simName, ...)
   if (isTRUE(clearSimEnv))
     rm(ls(s), envir = envir(s))
   s
 }
 
-#' @param object  \code{simList}
+.spades <- function(sim, ...) {
+  s <- spades(Copy(sim), ...)
+}
+
+#' Show method for \code{simLists}
+#' @param object  \code{simLists}
 #'
-#' @author Alex Chubaty
+#' @author Eliot McIntire
 #' @export
 setMethod(
   "show",
@@ -170,10 +138,6 @@ setMethod(
     simListsBySimList <- .objNamesBySimList(object)
     simLists <- unlist(simListsBySimList)
     simLists <- gsub("_.*", "", simLists)
-    #objs <- ls(object)
-    #
-    #simListsBySimList <- split(objs, f = simLists)
-    #simListsBySimList <- lapply(simListsBySimList, sort)
 
     lengths <- lapply(simListsBySimList, length)
     uniqueLengths <- unique(unlist(lengths))
@@ -224,9 +188,15 @@ setMethod(
 #'   all the unique values will be returned. A column, \code{saveTime}, will be
 #'   part of the returned value.
 #' @param ... Currently unused.
+#' @details
+#' See examples.
+#'
 #' @examples
 #' \dontrun {
+#' # Make 3 simLists -- set up scenarios
 #' endTime <- 5
+#' tmpdir <- file.path(tempdir(), "testing")
+#' tmpCache <- file.path(tempdir(), "testingCache")
 #' # Example of changing parameter values
 #' mySim1 <- simInit(
 #'   times = list(start = 0.0, end = endTime, timeunit = "year"),
@@ -241,15 +211,16 @@ setMethod(
 #'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
 #'                outputPath = tmpdir,
 #'                cachePath = tmpCache),
-#' # Save final state of landscape and caribou
-#'   outputs = data.frame(objectName = c("landscape", "caribou"),
+#'   # Save final state of landscape and caribou
+#'   outputs = data.frame(objectName = c(rep("landscape", endTime), "caribou", "caribou"),
+#'                        saveTimes = c(seq_len(endTime), unique(c(ceiling(endTime/2),endTime))),
 #'                        stringsAsFactors = FALSE)
 #' )
 #'
 #' mySim2 <- simInit(
 #'   times = list(start = 0.0, end = endTime, timeunit = "year"),
 #'   params = list(
-#' .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+#'     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
 #'     # Turn off interactive plotting
 #'     fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(20)),
 #'     caribouMovement = list(.plotInitialTime = NA),
@@ -260,36 +231,84 @@ setMethod(
 #'                outputPath = tmpdir,
 #'                cachePath = tmpCache),
 #'   # Save final state of landscape and caribou
-#'   outputs = data.frame(objectName = c("landscape", "caribou"),
+#'   outputs = data.frame(objectName = c(rep("landscape", endTime), "caribou", "caribou"),
+#'                        saveTimes = c(seq_len(endTime), unique(c(ceiling(endTime/2),endTime))),
+#'                        stringsAsFactors = FALSE)
+#' )
+#'
+#' mySim3 <- simInit(
+#'   times = list(start = 0.0, end = endTime, timeunit = "year"),
+#'   params = list(
+#'     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+#'     # Turn off interactive plotting
+#'     fireSpread = list(.plotInitialTime = NA, spreadprob = c(0.2), nFires = c(30)),
+#'     caribouMovement = list(.plotInitialTime = NA),
+#'     randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+#'   ),
+#'   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'                outputPath = tmpdir,
+#'                cachePath = tmpCache),
+#'   # Save final state of landscape and caribou
+#'   outputs = data.frame(objectName = c(rep("landscape", endTime), "caribou", "caribou"),
+#'                        saveTimes = c(seq_len(endTime), unique(c(ceiling(endTime/2),endTime))),
 #'                        stringsAsFactors = FALSE)
 #' )
 #'
 #' # Run experiment
-#' sims <- experiment2(mySim1, mySim2, replicates = c(5,5))
+#' sims <- experiment2(sim1 = mySim1, sim2 = mySim2, sim3 = mySim3,
+#'       replicates = 3, useCache = FALSE)
 #'
+#' # Convert to data.table so can do stuff with
+#' # Just pull out a variable from the simLists -- simplest case
+#' df1 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned"))
 #'
-#'   df1 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned"))
+#' measure.cols <- grep("nPixelsBurned", names(df1), value = TRUE)
+#' df1Short <- data.table::melt(df1, measure.vars = measure.cols, variable.name = "year")
+#' df1Short[, year := as.numeric(gsub(".*V([[:digit:]])", "\\1", df1Short$year))]
+#' library(ggplot2)
+#' p<- ggplot(df1Short, aes(x=year, y=value, group=simList, color=simList)) +
+#'   stat_summary(geom = "point", fun.y = mean) +
+#'   stat_summary(geom = "line", fun.y = mean) +
+#'   stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
 #'
-#'   measure.cols <- grep("nPixelsBurned", names(df1), value = TRUE)
-#'   df1Short <- data.table::melt(df1, measure.vars = measure.cols, variable.name = "year")
-#'   df1Short[, year := as.numeric(gsub(".*V([[:digit:]])", "\\1", df1Short$year))]
-#'   p<- ggplot(df1Short, aes(x=year, y=value, group=simList, color=simList)) +
-#'     stat_summary(geom = "point", fun.y = mean) +
-#'     stat_summary(geom = "line", fun.y = mean) +
-#' stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
+#' print(p)
 #'
-#'   print(p)
-#'
-#' # Simple, single variable output, quoted -- next two lines are identical
+#' # A quoted function -- do not prefix objects with 'sim' -- next two lines are identical
 #' df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = quote(length(caribou$x1))))
 #' df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = "length(caribou$x1)"))
 #'
-#'   p<- ggplot(df1, aes(x=simList, y=NCaribou.V1, group=simList, color=simList)) +
-#'     stat_summary(geom = "point", fun.y = mean, position = "dodge") +
-#'     stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
+#'   p<- ggplot(df1, aes(x=simList, y=NCaribou, group=simList, color=simList)) +
+#'     stat_summary(geom = "point", fun.y = mean) +
+#'     stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
 #'   print(p)
 #'
+#' # A much more complicated object to calculate:
+#' library(raster)
+#' perimToAreaRatioFn <- quote({
+#'   landscape$Fires[landscape$Fires[]==0] <- NA;
+#'   a <- boundaries(landscape$Fires, type = "inner");
+#'   a[landscape$Fires[] > 0 & a[] == 1] <- landscape$Fires[landscape$Fires[] > 0 & a[] == 1];
+#'   peri <- table(a[]);
+#'   area <- table(landscape$Fires[]);
+#'   keep <- match(names(area),names(peri));
+#'   mean(peri[keep]/area)
+#' })
+#'
+#' df1 <- as.data.table(sims, byRep = TRUE,
+#'                      vals = c(perimToArea = perimToAreaRatioFn,
+#'                               meanFireSize = quote(mean(table(landscape$Fires[])[-1]))),
+#'                      objectsFromOutputs = c("landscape"))
+#' if (interactive()) {
+#'   # with an unevaluated string
+#'   p <- ggplot(df1, aes(x=saveTime, y=perimToArea, group=simList, color=simList)) +
+#'     stat_summary(geom = "point", fun.y = mean) +
+#'     stat_summary(geom = "line", fun.y = mean) +
+#'     stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
+#'   print(p)
 #' }
+#'
+#'
 #' } # end /dontrun
 #'
 as.data.table.simLists <- function(x, byRep = TRUE, vals,
@@ -375,15 +394,16 @@ as.data.table.simLists <- function(x, byRep = TRUE, vals,
     ll3 <- lapply(labels, ll2 = ll2, function(n, ll2)  t(rbindlist(ll2[n])))
     dt <- data.table(sim1 = rownames(ll3[[1]]), as.data.table(ll3))
   } else {
-    dt <- rbindlist(ll, idcol = "sim1")
+    dt <- rbindlist(ll, use.names = TRUE, idcol = "sim1", fill = TRUE)
   }
   dt[, `:=`(simList = gsub("_.*", "", sim1), reps = gsub(".*_", "", sim1))]
   varNameOnly <- gsub(".V[[:digit:]]+", "", names(dt))
   counts <- table(varNameOnly)
   whichSingleton <- which(counts == 1)
-  out <- lapply(names(whichSingleton), dt = dt, function(n, dt) {
-    setnames(dt, old = grep(n, names(dt), value = TRUE), new = n)
-  })
+
+  # out <- lapply(names(whichSingleton), dt = dt, function(n, dt) {
+  #   setnames(dt, old = grep(n, names(dt), value = TRUE), new = n)
+  # })
   # dt <- data.table(simList = simLists, reps = reps, dt)
   dt[]
 
