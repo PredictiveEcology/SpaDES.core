@@ -305,7 +305,7 @@ setMethod(
 #'     stat_summary(geom = "point", fun.y = mean) +
 #'     stat_summary(geom = "line", fun.y = mean) +
 #'     stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
-#'   print(p)
+#'   print(p) # may have NAs, giving warning, if perimeter calculation couldn't be completed
 #' }
 #'
 #'
