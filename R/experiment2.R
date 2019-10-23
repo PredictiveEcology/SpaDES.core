@@ -297,12 +297,15 @@ as.data.table.simLists <- function(x, byRep = TRUE, vals,
   }
   dt[, `:=`(simList = gsub("_.*", "", simName), reps = gsub(".*_", "", simName))]
   varNameOnly <- gsub(".V[[:digit:]]+", "", names(dt))
+  changed <- which(varNameOnly != names(dt))
   counts <- table(varNameOnly)
   whichSingleton <- which(counts == 1)
 
-  # out <- lapply(names(whichSingleton), dt = dt, function(n, dt) {
-  #   setnames(dt, old = grep(n, names(dt), value = TRUE), new = n)
-  # })
+  if (any(changed %in% whichSingleton)) {
+    out <- lapply(names(whichSingleton), dt = dt, function(n, dt) {
+      setnames(dt, old = grep(n, names(dt), value = TRUE), new = n)
+    })
+  }
   # dt <- data.table(simList = simLists, reps = reps, dt)
   dt[]
 
