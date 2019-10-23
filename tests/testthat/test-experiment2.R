@@ -110,7 +110,7 @@ test_that("experiment2 does not work correctly", {
     #for (pl in c("sequential", "multiprocess", "callr")) {
     stStart[[pl]] <- Sys.time()
     cat(" -- testing future plan when", pl, "                ")
-    warn <- capture_warnings(plan(pl, workers = 3)) # just about "workers" not defined in "sequential"
+    warn <- capture_warnings(plan(pl, workers = 2)) # just about "workers" not defined in "sequential"
     cap1 <- capture.output(mess <- capture_messages(
       sims <- experiment2(sim1 = mySim1, sim2 = mySim2, sim3 = mySim3,
                           replicates = 3, useCache = FALSE)

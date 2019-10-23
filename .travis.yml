@@ -10,6 +10,9 @@ matrix:
   - os: linux
     dist: xenial
     r: oldrel
+    env:
+      - R_FUTURE_FORKS_ENABLED=false
+      - R_FUTURE_PLAN=multisession
     addons:
       apt:
         sources:
@@ -28,6 +31,9 @@ matrix:
   - os: linux
     dist: xenial
     r: release
+    env:
+      - R_FUTURE_FORKS_ENABLED=false
+      - R_FUTURE_PLAN=multisession
     addons:
       apt:
         sources:
@@ -60,6 +66,9 @@ matrix:
   - os: linux
     dist: xenial
     r: devel
+    env:
+      - R_FUTURE_FORKS_ENABLED=false
+      - R_FUTURE_PLAN=multisession
     addons:
       apt:
         sources:
@@ -81,6 +90,9 @@ matrix:
       - stringi
   - os: osx
     osx_image: xcode9.4
+    env:
+      - R_FUTURE_FORKS_ENABLED=false
+      - R_FUTURE_PLAN=multisession
     addons:
       homebrew:
         packages:
@@ -98,6 +110,9 @@ matrix:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
   - os: osx
     osx_image: xcode9.4
+    env:
+      - R_FUTURE_FORKS_ENABLED=false
+      - R_FUTURE_PLAN=multisession
     addons:
       homebrew:
         packages:
