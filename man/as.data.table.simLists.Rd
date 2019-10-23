@@ -8,6 +8,8 @@
   objectsFromSim = NULL, objectsFromOutputs = NULL, ...)
 }
 \arguments{
+\item{x}{An R object.}
+
 \item{byRep}{Should the data.table have a column labelled "rep", indicating replicate
 number/label. Currently, only \code{TRUE} is accepted.}
 

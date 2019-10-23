@@ -41,14 +41,14 @@ contains \code{simList} objects.
 \description{
 Given one or more \code{simList} objects, run a series of \code{spades} calls
 in a structured, organized way. Methods are available to deal with outputs,
-such as \code{as.data.table.simList} which can pull out simple to complex
+such as \code{as.data.table.simLists} which can pull out simple to complex
 values from every resulting \code{simList} or object saved by \code{outputs}
 in every \code{simList} run. This uses \code{future} internally, allowing
 for various backends and parallelism.0
 }
 \details{
 This function, because of its class formalism, allows for methods to be used. For example,
-\code{\link{as.data.table.simList}} allows user to pull out specific objects (in
+\code{\link{as.data.table.simLists}} allows user to pull out specific objects (in
 the \code{simList} objects or on disk saved in \code{outputPath(sim)}).
 
 The \code{outputPath} is changed so that every simulation puts outputs in a
