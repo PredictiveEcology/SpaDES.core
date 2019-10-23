@@ -54,7 +54,6 @@ setClass(
 #' @export
 #' @include misc-methods.R
 #' @rdname initialize-method
-#'
 setMethod("initialize",
           signature(.Object = "simLists"),
           definition = function(.Object, ...) {
@@ -63,7 +62,6 @@ setMethod("initialize",
 
             .Object@.xData <- new.env(parent = emptyenv())
 
-            #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             attr(.Object@.xData, "name") <- "simLists"
             #
             return(.Object)
