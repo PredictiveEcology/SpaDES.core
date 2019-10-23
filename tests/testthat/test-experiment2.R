@@ -1,4 +1,4 @@
-test_that("experiment2 does not work correctly", {
+test_that("experiment2 test 1", {
   #if (!interactive())
   skip_on_cran()
   skip_on_appveyor()
@@ -67,7 +67,9 @@ test_that("experiment2 does not work correctly", {
                          stringsAsFactors = FALSE)
   )
 
-  for (pl in c("sequential", "multiprocess", "callr")) {
+  planTypes <- c("sequential", "multiprocess")
+  planTypes <- if (requireNamespace("future.callr")) c(planTypes, "callr")
+  for (pl in planTypes) {
     cat(" -- testing future plan when", pl, "                ")
     warn <- capture_warnings(plan(pl, workers = 2)) # just about "workers" not defined in "sequential"
     # Test Caching
