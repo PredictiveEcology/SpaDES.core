@@ -132,31 +132,34 @@ test_that("experiment2 does not work correctly", {
                        objectsFromOutputs = c("caribou"))
 
 
+  df1 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned"))
+
+  measure.cols <- grep("nPixelsBurned", names(df1), value = TRUE)
+  df1Short <- data.table::melt(df1, measure.vars = measure.cols,
+                               variable.name = "year", variable.factor = FALSE)
+  # df1Short[, year := as.numeric(gsub(".*V([[:digit:]])", "\\1", df1Short$year))]
+  df1Short[, year := as.numeric(unlist(lapply(strsplit(year, split = "\\.V"), function(x) x[2])))]
+
   if (interactive()) {
-    df1 <- as.data.table(sims, byRep = TRUE, vals = c("nPixelsBurned"))
-
-    measure.cols <- grep("nPixelsBurned", names(df1), value = TRUE)
-    df1Short <- data.table::melt(df1, measure.vars = measure.cols,
-                                 variable.name = "year", variable.factor = FALSE)
-    # df1Short[, year := as.numeric(gsub(".*V([[:digit:]])", "\\1", df1Short$year))]
-    df1Short[, year := as.numeric(unlist(lapply(strsplit(year, split = "\\.V"), function(x) x[2])))]
-
     p<- ggplot(df1Short, aes(x=year, y=value, group=simList, color=simList)) +
       stat_summary(geom = "point", fun.y = mean) +
       stat_summary(geom = "line", fun.y = mean) +
       stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
 
     print(p)
+  }
+  # with an unevaluated string
+  df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = "length(caribou$x1)"))
+  caribouColName <- grep("NCaribou", colnames(df1), value = TRUE)
+  expect_true(length(caribouColName) == 1)
 
-    # with an unevaluated string
-    df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = "length(caribou$x1)"))
-
-    p<- ggplot(df1, aes(x=simList, y=NCaribou, group=simList, color=simList)) +
+  if (interactive()) {
+    p<- ggplot(df1, aes_string(x="simList", y=caribouColName, group="simList", color="simList")) +
       stat_summary(geom = "point", fun.y = mean) +
       stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
     print(p)
-
   }
+
 
   df1 <- as.data.table(sims, byRep = TRUE,
                        vals = c(meanFireSize = quote(mean(table(landscape$Fires[])[-1]))),
