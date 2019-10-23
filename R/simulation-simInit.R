@@ -633,7 +633,7 @@ setMethod(
       sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
 
       ## schedule each module's init event:
-      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .normal())
+      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
 
       ### add module name to the loaded list
       names(m) <- mFullPath
