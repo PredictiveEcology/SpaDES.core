@@ -283,7 +283,7 @@ setMethod(
 #'     stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
 #'   print(p)
 #'
-#' # A much more complicated object to calculate:
+#' # A much more complicated object to calculate -- an estimate of perimeter to area ratio of fires
 #' library(raster)
 #' perimToAreaRatioFn <- quote({
 #'   landscape$Fires[landscape$Fires[]==0] <- NA;
@@ -298,7 +298,7 @@ setMethod(
 #' df1 <- as.data.table(sims, byRep = TRUE,
 #'                      vals = c(perimToArea = perimToAreaRatioFn,
 #'                               meanFireSize = quote(mean(table(landscape$Fires[])[-1]))),
-#'                      objectsFromOutputs = c("landscape"))
+#'                      objectsFromOutputs = c("landscape")) # need to get landscape obj from disk
 #' if (interactive()) {
 #'   # with an unevaluated string
 #'   p <- ggplot(df1, aes(x=saveTime, y=perimToArea, group=simList, color=simList)) +
@@ -392,11 +392,11 @@ as.data.table.simLists <- function(x, byRep = TRUE, vals,
     labels <- seq_along(ll2)
     names(labels) <- names(ll2)
     ll3 <- lapply(labels, ll2 = ll2, function(n, ll2)  t(rbindlist(ll2[n])))
-    dt <- data.table(sim1 = rownames(ll3[[1]]), as.data.table(ll3))
+    dt <- data.table(simName = rownames(ll3[[1]]), as.data.table(ll3))
   } else {
-    dt <- rbindlist(ll, use.names = TRUE, idcol = "sim1", fill = TRUE)
+    dt <- rbindlist(ll, use.names = TRUE, idcol = "simName", fill = TRUE)
   }
-  dt[, `:=`(simList = gsub("_.*", "", sim1), reps = gsub(".*_", "", sim1))]
+  dt[, `:=`(simList = gsub("_.*", "", simName), reps = gsub(".*_", "", simName))]
   varNameOnly <- gsub(".V[[:digit:]]+", "", names(dt))
   counts <- table(varNameOnly)
   whichSingleton <- which(counts == 1)

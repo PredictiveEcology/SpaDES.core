@@ -129,7 +129,7 @@ df1 <- as.data.table(sims, byRep = TRUE, vals = list(NCaribou = "length(caribou$
     stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2)
   print(p)
 
-# A much more complicated object to calculate:
+# A much more complicated object to calculate -- an estimate of perimeter to area ratio of fires
 library(raster)
 perimToAreaRatioFn <- quote({
   landscape$Fires[landscape$Fires[]==0] <- NA;
@@ -144,7 +144,7 @@ perimToAreaRatioFn <- quote({
 df1 <- as.data.table(sims, byRep = TRUE,
                      vals = c(perimToArea = perimToAreaRatioFn,
                               meanFireSize = quote(mean(table(landscape$Fires[])[-1]))),
-                     objectsFromOutputs = c("landscape"))
+                     objectsFromOutputs = c("landscape")) # need to get landscape obj from disk
 if (interactive()) {
   # with an unevaluated string
   p <- ggplot(df1, aes(x=saveTime, y=perimToArea, group=simList, color=simList)) +
