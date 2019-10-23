@@ -1,5 +1,7 @@
 test_that("experiment2 does not work correctly", {
-  if (!interactive()) skip("Not ready")
+  #if (!interactive())
+  skip_on_cran()
+  skip_on_appveyor()
   testInitOut <- testInit(c("raster", "future.callr", "future", "ggplot2"), smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
