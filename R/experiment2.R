@@ -77,7 +77,7 @@ setMethod(
               ". Setting it to 'outputPath'")
       createUniquePaths <- "outputPath"
     }
-    pkg <- unique(unlist(lapply(list(...), packages)))
+    pkg <- unique(unlist(lapply(list(...), packages, clean = TRUE)))
     outSimLists <- new("simLists")
     ll <- list(...)
     possSimNames <- as.character(seq_along(list(...)))

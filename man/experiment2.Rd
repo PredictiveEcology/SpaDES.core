@@ -124,7 +124,10 @@ have already been run. See example, via \code{new("simLists")}
                          stringsAsFactors = FALSE)
   )
 
-  # Run experiment
+  # Run experiment -- can use parallelism, if desired. Default is plan("sequential"), meaning
+  #   "normal" sequential, single threaded runs
+  # library(future)
+  # plan("multiprocess")
   sims <- experiment2(sim1 = mySim1, sim2 = mySim2, sim3 = mySim3,
                       replicates = 3, useCache = FALSE)
 
