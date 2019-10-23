@@ -28,7 +28,6 @@ matrix:
       - xvfb
     r_binary_packages:
       - BH
-      - dplyr
   - os: linux
     dist: xenial
     r: release
