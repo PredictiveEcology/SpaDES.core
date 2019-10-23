@@ -27,14 +27,20 @@
 #'
 #' @details
 #'
-#' The \code{outputPath} is changed so that every simulation puts outputs in a sub-directory
+#' This function, because of its class formalism, allows for methods to be used. For example,
+#' \code{\link{as.data.table.simList}} allows user to pull out specific objects (in
+#' the \code{simList} objects or on disk saved in \code{outputPath(sim)}).
+#'
+#' The \code{outputPath} is changed so that every simulation puts outputs in a
+#' sub-directory
 #' of the original \code{outputPath} of each \code{simList}.
 #'
 #' @return Invisibly returns a \code{simLists} object. This class
 #' extends the \code{environment} class and
 #' contains \code{simList} objects.
 #'
-#' @seealso \code{\link{simInit}}, \code{\link{spades}}, \code{\link{experiment}}
+#' @seealso \code{\link{as.data.table.simList}},
+#'   \code{\link{simInit}}, \code{\link{spades}}, \code{\link{experiment}}
 #'
 #' @author Eliot McIntire
 #' @export
@@ -310,7 +316,7 @@ setMethod(
 #'
 #'
 #' } # end /dontrun
-#'
+#' @exportMethod as.data.table
 as.data.table.simLists <- function(x, byRep = TRUE, vals,
                                    objectsFromSim = NULL,
                                    objectsFromOutputs = NULL,  ...) {

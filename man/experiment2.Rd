@@ -47,11 +47,17 @@ in every \code{simList} run. This uses \code{future} internally, allowing
 for various backends and parallelism.0
 }
 \details{
-The \code{outputPath} is changed so that every simulation puts outputs in a sub-directory
+This function, because of its class formalism, allows for methods to be used. For example,
+\code{\link{as.data.table.simList}} allows user to pull out specific objects (in
+the \code{simList} objects or on disk saved in \code{outputPath(sim)}).
+
+The \code{outputPath} is changed so that every simulation puts outputs in a
+sub-directory
 of the original \code{outputPath} of each \code{simList}.
 }
 \seealso{
-\code{\link{simInit}}, \code{\link{spades}}, \code{\link{experiment}}
+\code{\link{as.data.table.simList}},
+  \code{\link{simInit}}, \code{\link{spades}}, \code{\link{experiment}}
 }
 \author{
 Eliot McIntire
