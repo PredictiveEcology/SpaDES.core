@@ -45,7 +45,7 @@ memoryUseThisSession <- function (thisPid)
     aa <- try(system(paste("ps -eo rss,pid | grep", thisPid), intern = TRUE), silent = TRUE)
     aa2 <- strsplit(aa, split = " +")[[1]][1]
   } else {
-    aa <- try(system(paste0('tasklist /fi "pid eq ', thisPid, '"'), inter = TRUE), silent = TRUE)
+    aa <- try(system(paste0('tasklist /fi "pid eq ', thisPid, '"'), intern = TRUE), silent = TRUE)
     aa2 <- strsplit(aa[grepl(thisPid, aa)], split = " +")[[1]][5] # pull out 5th item in character string
     aa2 <- gsub(",", "", aa2) # comes with human readable comma -- must remove
   }
