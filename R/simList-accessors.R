@@ -1105,7 +1105,7 @@ setReplaceMethod(
 
          for (nT in newTime) {
            attributes(nT)$unit <- timeunit(sim)
-           sim <- scheduleEvent(sim, nT, "load", "inputs", .first())
+           sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
          }
          toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
                                 by = c("eventTime", "moduleName", "eventType"))
@@ -1121,7 +1121,7 @@ setReplaceMethod(
          newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"] %>%
            min(., na.rm = TRUE)
          attributes(newTime)$unit <- "seconds"
-         sim <- scheduleEvent(sim, newTime, "load", "inputs", .first())
+         sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
        }
      }
    }

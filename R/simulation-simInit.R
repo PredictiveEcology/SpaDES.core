@@ -583,7 +583,7 @@ setMethod(
       # schedule each module's init event:
       #.refreshEventQueues()
       sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
-                           c, "init", .first())
+                           c, "init", .first() - 1)
     }
 
     ## assign user-specified non-global params, while
