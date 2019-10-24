@@ -28,7 +28,7 @@ matrix:
       - xvfb
     r_binary_packages:
       - BH
-      - git2r
+      - httpuv
   - os: linux
     dist: xenial
     r: release
