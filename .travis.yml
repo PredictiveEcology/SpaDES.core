@@ -7,10 +7,7 @@ env:
     - CRAN_REPO=https://cloud.r-project.org
 matrix:
   include:
-  - stage: prepare cache
-      script: true
-  - stage: main
-    os: linux
+  - os: linux
     dist: xenial
     r: oldrel
     env:
