@@ -46,6 +46,7 @@ test_that("downloadData downloads and unzips module data", {
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))
 
+
     # shouldn't need a redownload because file exists
     a <- capture.output(t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
                                    files = c("DEM.tif", "habitatQuality.tif"))))
