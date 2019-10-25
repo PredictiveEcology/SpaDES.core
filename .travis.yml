@@ -1,6 +1,11 @@
 sudo: required
 language: r
 cache: packages
+jobs:
+  include:
+    - stage: prepare cache
+      script: true
+    - stage: test
 cran: https://cloud.r-project.org
 env:
   global:
