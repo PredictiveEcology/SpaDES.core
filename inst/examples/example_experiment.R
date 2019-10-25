@@ -39,7 +39,7 @@ if (interactive()) {
 
   # Read in outputs from sims object
   fireMaps <- do.call(stack, lapply(1:NROW(attr(sims, "experiment")$expDesign),
-                                    function(x) sims[[x]]$landscape$fires))
+                                    function(x) sims[[x]]$landscape$Fires))
   if (interactive()) Plot(fireMaps, new = TRUE)
 
   # Or reload objects from files, useful if sim objects too large to store in RAM
