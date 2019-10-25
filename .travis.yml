@@ -5,7 +5,7 @@ cran: https://cloud.r-project.org
 env:
   global:
     - CRAN_REPO=https://cloud.r-project.org
-matrix:
+jobs:
   include:
   - os: linux
     dist: xenial
