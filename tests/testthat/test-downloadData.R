@@ -52,11 +52,10 @@ test_that("downloadData downloads and unzips module data", {
     expect_true(t1[3] > t2[3]) # compare elapsed times
 
     # if one file is missing, will fill in correctly
-    if (interactive()) {
-      unlink(file.path(datadir, filenames)[1])
-      a <- capture.output(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
-      expect_true(all(file.exists(file.path(datadir, filenames))))
-    }
+    unlink(file.path(datadir, filenames)[1])
+    a <- capture.output(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
+    expect_true(all(file.exists(file.path(datadir, filenames))))
+
     # if files are there, but one is incorrectly named
     file.rename(from = file.path(datadir, filenames[1]),
                 to = file.path(datadir, "test.tif"))
