@@ -209,6 +209,8 @@ setMethod(
 #'
 #' @export
 #' @importFrom data.table as.data.table
+#' @include simLists-class.R
+#'
 #' @example inst/examples/example_experiment2.R
 as.data.table.simLists <- function(x, byRep = TRUE, vals,
                                    objectsFromSim = NULL,
@@ -308,14 +310,13 @@ as.data.table.simLists <- function(x, byRep = TRUE, vals,
   }
   # dt <- data.table(simList = simLists, reps = reps, dt)
   dt[]
-
 }
+
 .objNamesBySimList <- function(simLists) {
   objs <- ls(simLists)
   simLists <- gsub("_.*", "", objs)
   simListsBySimList <- split(objs, f = simLists)
   simListsBySimList <- lapply(simListsBySimList, sort)
-
 }
 
 updateNames <- function(lst, newNames) {

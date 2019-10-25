@@ -36,8 +36,7 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
 #'   be found with \code{Sys.getpid()}
 #' @export
 #' @rdname memoryUse
-memoryUseThisSession <- function (thisPid)
-{
+memoryUseThisSession <- function(thisPid) {
   ps <- Sys.which("ps")
   if (missing(thisPid)) thisPid <- Sys.getpid()
   if (nzchar(ps)) {
