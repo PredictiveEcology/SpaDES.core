@@ -98,6 +98,7 @@ jobs:
   - os: osx
     osx_image: xcode9.4
     env:
+      - GLPK=true
       - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
@@ -111,8 +112,6 @@ jobs:
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
-    env:
-      - GLPK=true
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
@@ -121,6 +120,7 @@ jobs:
   - os: osx
     osx_image: xcode9.4
     env:
+      - GLPK=false
       - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
@@ -133,8 +133,6 @@ jobs:
     latex: false
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
-    env:
-      - GLPK=false
     before_script:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
       - Rscript -e 'install.packages("devtools", type = "source")'
