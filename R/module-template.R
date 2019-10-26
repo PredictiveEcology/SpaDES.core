@@ -182,7 +182,6 @@ setMethod(
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @rdname newModuleCode
-#'
 setGeneric("newModuleCode", function(name, path, open, type, children) {
   standardGeneric("newModuleCode")
 })
@@ -190,6 +189,7 @@ setGeneric("newModuleCode", function(name, path, open, type, children) {
 #' @export
 #' @family module creation helpers
 #' @importFrom reproducible checkPath
+#' @importFrom whisker whisker.render
 #' @rdname newModuleCode
 # igraph exports %>% from magrittr
 setMethod(
@@ -209,215 +209,55 @@ setMethod(
       capture.output(dput(children))
     }
 
-    cat("
-# Everything in this file gets sourced during simInit, and all functions and objects
-# are put into the simList. To use objects, use sim$xxx, and are thus globally available
-# to all modules. Functions can be used without sim$ as they are namespaced, like functions
-# in R packages. If exact location is required, functions will be: sim$<moduleName>$FunctionName
-defineModule(sim, list(
-  name = \"", name, "\",
-  description = ", moduleDefaults$description, ", #\"insert module description here\",
-  keywords = ", moduleDefaults$keywords, ", # c(\"insert key words here\"),
-  authors = ", getOption("devtools.desc.author",
-                         "c(person(c(\"First\", \"Middle\"), \"Last\", email = \"email@example.com\", role = c(\"aut\", \"cre\")))"), ",
-  childModules = ", children_char, ",
-  version = list(SpaDES.core = \"", as.character(utils::packageVersion("SpaDES.core")), "\", ",
-        name, " = \"0.0.1\"", if (type == "parent") paste0(", ", children, " = \"0.0.1\""),
-        "),
-  ", if (type == "child") {paste0("spatialExtent = ", deparse(moduleDefaults$extent) ,",")},
-  "
-  timeframe = ", deparse(moduleDefaults$timeframe), ",
-  timeunit = ", deparse(moduleDefaults$timeunit), ",","
-  citation = list(\"citation.bib\"),
-  documentation = list(\"README.txt\", \"", name, ".Rmd\")",
-  if (type == "child") {paste0(",
-  reqdPkgs = ", deparse(moduleDefaults$reqdPkgs), ",
-  parameters = rbind(
-    #defineParameter(\"paramName\", \"paramClass\", value, min, max, \"parameter description\"),
-    defineParameter(\".plotInitialTime\", \"numeric\", NA, NA, NA, \"This describes the simulation time at which the first plot event should occur\"),
-    defineParameter(\".plotInterval\", \"numeric\", NA, NA, NA, \"This describes the simulation time interval between plot events\"),
-    defineParameter(\".saveInitialTime\", \"numeric\", NA, NA, NA, \"This describes the simulation time at which the first save event should occur\"),
-    defineParameter(\".saveInterval\", \"numeric\", NA, NA, NA, \"This describes the simulation time interval between save events\"),
-    defineParameter(\".useCache\", \"logical\", FALSE, NA, NA, \"Should this entire module be run with caching activated? This is generally intended for data-type modules, where stochasticity and time are not relevant\")
-  ),
-  inputObjects = bind_rows(
-    #expectsInput(\"objectName\", \"objectClass\", \"input object description\", sourceURL, ...),
-    expectsInput(objectName = NA, objectClass = NA, desc = NA, sourceURL = NA)
-  ),
-  outputObjects = bind_rows(
-    #createsOutput(\"objectName\", \"objectClass\", \"output object description\", ...),
-    createsOutput(objectName = NA, objectClass = NA, desc = NA)
-  )")},"
-))\n",
-      file = filenameR, fill = FALSE, sep = "")
+    version <- list(SpaDES.core = utils::packageVersion("SpaDES.core"))
+    version[[name]] <- moduleDefaults[["version"]]
+    if (type == "parent")
+      lapply(children, function(x) version[[x]] <<- "0.01")
 
-    if (type == "child") {
-      cat("
-## event types
-#   - type `init` is required for initialization
-
-doEvent.", name, " = function(sim, eventTime, eventType) {
-  switch(
-    eventType,
-    init = {
-      ### check for more detailed object dependencies:
-      ### (use `checkObject` or similar)
-
-      # do stuff for this event
-      sim <- Init(sim)
-
-      # schedule future event(s)
-      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, \"", name, "\", \"plot\")
-      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, \"", name, "\", \"save\")
-    },
-    plot = {
-      # ! ----- EDIT BELOW ----- ! #
-      # do stuff for this event
-
-      #plotFun(sim) # uncomment this, replace with object to plot
-      # schedule future event(s)
-
-      # e.g.,
-      #sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, \"", name, "\", \"plot\")
-
-      # ! ----- STOP EDITING ----- ! #
-    },
-    save = {
-      # ! ----- EDIT BELOW ----- ! #
-      # do stuff for this event
-
-      # e.g., call your custom functions/methods here
-      # you can define your own methods below this `doEvent` function
-
-      # schedule future event(s)
-
-      # e.g.,
-      # sim <- scheduleEvent(sim, time(sim) + P(sim)$.saveInterval, \"", name, "\", \"save\")
-
-      # ! ----- STOP EDITING ----- ! #
-    },
-    event1 = {
-      # ! ----- EDIT BELOW ----- ! #
-      # do stuff for this event
-
-      # e.g., call your custom functions/methods here
-      # you can define your own methods below this `doEvent` function
-
-      # schedule future event(s)
-
-      # e.g.,
-      # sim <- scheduleEvent(sim, time(sim) + increment, \"", name, "\", \"templateEvent\")
-
-      # ! ----- STOP EDITING ----- ! #
-    },
-    event2 = {
-      # ! ----- EDIT BELOW ----- ! #
-      # do stuff for this event
-
-      # e.g., call your custom functions/methods here
-      # you can define your own methods below this `doEvent` function
-
-      # schedule future event(s)
-
-      # e.g.,
-      # sim <- scheduleEvent(sim, time(sim) + increment, \"", name, "\", \"templateEvent\")
-
-      # ! ----- STOP EDITING ----- ! #
-    },
-    warning(paste(\"Undefined event type: \'\", current(sim)[1, \"eventType\", with = FALSE],
-                  \"\' in module \'\", current(sim)[1, \"moduleName\", with = FALSE], \"\'\", sep = \"\"))
-  )
-  return(invisible(sim))
-}
-
-## event functions
-#   - keep event functions short and clean, modularize by calling subroutines from section below.
-
-### template initialization
-Init <- function(sim) {
-  # # ! ----- EDIT BELOW ----- ! #
-
-  # ! ----- STOP EDITING ----- ! #
-
-  return(invisible(sim))
-}
-
-### template for save events
-Save <- function(sim) {
-  # ! ----- EDIT BELOW ----- ! #
-  # do stuff for this event
-  sim <- saveFiles(sim)
-
-  # ! ----- STOP EDITING ----- ! #
-  return(invisible(sim))
-}
-
-### template for plot events
-plotFun <- function(sim) {
-  # ! ----- EDIT BELOW ----- ! #
-  # do stuff for this event
-  #Plot(sim$object)
-
-  # ! ----- STOP EDITING ----- ! #
-  return(invisible(sim))
-}
-
-### template for your event1
-Event1 <- function(sim) {
-  # ! ----- EDIT BELOW ----- ! #
-  # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  # sim$event1Test1 <- \" this is test for event 1. \" # for dummy unit test
-  # sim$event1Test2 <- 999 # for dummy unit test
-
-
-  # ! ----- STOP EDITING ----- ! #
-  return(invisible(sim))
-}
-
-### template for your event2
-Event2 <- function(sim) {
-  # ! ----- EDIT BELOW ----- ! #
-  # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  # sim$event2Test1 <- \" this is test for event 2. \" # for dummy unit test
-  # sim$event2Test2 <- 777  # for dummy unit test
-
-
-  # ! ----- STOP EDITING ----- ! #
-  return(invisible(sim))
-}
-
-.inputObjects <- function(sim) {
-  # Any code written here will be run during the simInit for the purpose of creating
-  # any objects required by this module and identified in the inputObjects element of defineModule.
-  # This is useful if there is something required before simulation to produce the module
-  # object dependencies, including such things as downloading default datasets, e.g.,
-  # downloadData(\"LCC2005\", modulePath(sim)).
-  # Nothing should be created here that does not create a named object in inputObjects.
-  # Any other initiation procedures should be put in \"init\" eventType of the doEvent function.
-  # Note: the module developer can check if an object is 'suppliedElsewhere' to
-  # selectively skip unnecessary steps because the user has provided those inputObjects in the
-  # simInit call, or another module will supply or has supplied it. e.g.,
-  # if (!suppliedElsewhere('defaultColor', sim)) {
-  #   sim$map <- Cache(prepInputs, extractURL('map')) # download, extract, load file from url in sourceURL
-  # }
-
-  #cacheTags <- c(currentModule(sim), \"function:.inputObjects\") ## uncomment this if Cache is being used
-  dPath <- asPath(getOption(\"reproducible.destinationPath\", dataPath(sim)), 1)
-  message(currentModule(sim), \": using dataPath '\", dPath, \"'.\")
-
-  # ! ----- EDIT BELOW ----- ! #
-
-  # ! ----- STOP EDITING ----- ! #
-  return(invisible(sim))
-}
-### add additional events as needed by copy/pasting from above\n",
-        file = filenameR, fill = FALSE, sep = "", append = TRUE)
+    modulePartialMeta <- list(
+      reqdPkgs = deparse(moduleDefaults$reqdPkgs)
+    )
+    modulePartialMetaTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
+                                                     "modulePartialMeta.R.template"))
+    otherMetadata <- if (type == "child") {
+      whisker.render(modulePartialMetaTemplate, modulePartialMeta)
+    } else {
+      paste("## this is a parent module and as such does not have any",
+            "reqdPkgs, parameters, inputObjects, nor outputObjects.")
     }
+
+    modulePartialEvents <- list(
+      name = name,
+      name_char = deparse(name)
+    )
+    moduleEventsTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
+                                                "modulePartialEvents.R.template"))
+    moduleEvents <- if (type == "child") {
+      whisker.render(moduleEventsTemplate, modulePartialEvents)
+    } else {
+      "## this is a parent module and as such does not have any events."
+    }
+
+    moduleData <- list(
+      authors = deparse(moduleDefaults$authors),
+      children = children_char,
+      citation = deparse(moduleDefaults$citation),
+      description = deparse(moduleDefaults$description),
+      events = moduleEvents,
+      keywords = deparse(moduleDefaults$keywords),
+      name = deparse(name),
+      otherMetadata = otherMetadata,
+      timeframe = deparse(moduleDefaults$timeframe),
+      timeunit = deparse(moduleDefaults$timeunit),
+      type = type,
+      versions = deparse(version)
+    )
+    moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
+    writeLines(whisker.render(moduleTemplate, moduleData), filenameR)
 
     if (open) openModules(name, nestedPath)
 })
 
-################################################################################
 #' Create new module documentation
 #'
 #' @inheritParams newModuleCode
@@ -446,109 +286,32 @@ setMethod(
     filenameLICENSE <- file.path(nestedPath, "LICENSE")
     filenameREADME <- file.path(nestedPath, "README.txt")
 
-    ### Make R Markdown file for module documentation
-    cat(
-"---
-title: \"", name, "\"
-author: \"", Sys.getenv('USER'), "\"
-date: \"", format(Sys.Date(), "%d %B %Y"), "\"
-output: pdf_document
----
-
-# Overview
-
-Provide an overview of what the module does / how to use the module.
-
-Module documentation should be written so that others can use your module.
-This is a template for module documentation, and should be changed to reflect your module.
-
-## R Markdown
-
-R Markdown syntax allows R code, outputs, and figures to be rendered in the documentation.
-
-For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
-
-# Usage
-
-```{r module_usage}
-library(SpaDES)
-
-setPaths(modulePath = file.path(\"", path, "\"))
-getPaths() # shows where the 4 relevant paths are
-
-times <- list(start = 0, end = 10)
-
-parameters <- list(
-  #.progress = list(type = \"text\", interval = 1), # for a progress bar
-  ## If there are further modules, each can have its own set of parameters:
-  #module1 = list(param1 = value1, param2 = value2),
-  #module2 = list(param1 = value1, param2 = value2)
-)
-modules <- list(\"", name, "\")
-objects <- list()
-inputs <- list()
-outputs <- list()
-
-mySim <- simInit(times = times, params = parameters, modules = modules,
-                 objects = objects)
-
-mySimOut <- spades(mySim)
-```
-
-# Events
-
-Describe what happens for each event type.
-
-## Plotting
-
-Write what is plotted.
-
-## Saving
-
-Write what is saved.
-
-# Data dependencies
-
-## Input data
-
-How to obtain input data, and a description of the data required by the module.
-If `sourceURL` is specified, `downloadData(\"", name, "\", \"path/to/modules/dir\")` may be sufficient.
-
-## Output data
-
-Description of the module outputs.
-
-# Links to other modules
-
-Describe any anticipated linkages to other modules.
-
-",
-        file = filenameRmd, fill = FALSE, sep = "")
+    moduleRmd <- list(
+      author = Sys.getenv('USER'),
+      date = format(Sys.Date(), "%d %B %Y"),
+      name = name,
+      path = path
+    )
+    moduleRmdTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.Rmd.template"))
+    writeLines(whisker.render(moduleRmdTemplate, moduleRmd), filenameRmd)
 
     ### Make citation.bib file
-    cat("
-@Manual{,
-  title = {", name ,"},
-  author = {{Authors}},
-  organization = {Organization},
-  address = {Somewhere, Someplace},
-  year = {", format(Sys.Date(), "%Y"), "},
-  url = {},
-}
-",
-        file = filenameCitation, fill = FALSE, sep = "")
+    moduleCite <- list(
+      author = paste(paste(moduleDefaults[["authors"]]$given, collapse = " "),
+                     moduleDefaults[["authors"]]$family),
+      name = name,
+      year = format(Sys.Date(), "%Y")
+    )
+    moduleCiteTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "citation.bib.template"))
+    writeLines(whisker.render(moduleCiteTemplate, moduleCite), filenameCitation)
 
     ### Make LICENSE file
-    cat("
-# Provide explicit details of the license for this module.
-# See http://choosealicense.com for help selecting one.",
-        file = filenameLICENSE, fill = FALSE, sep = "")
+    licenseTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "LICENSE.template"))
+    writeLines(whisker.render(licenseTemplate), filenameLICENSE)
 
     ### Make README file
-    cat("
-Any other details that a user may need to know, like where to get more information,
-where to download data, etc.",
-        file = filenameREADME, fill = FALSE, sep = "")
+    ReadmeTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "README.template"))
+    writeLines(whisker.render(ReadmeTemplate), filenameREADME)
 
     if (open) {
       # use tryCatch: RStudio bug causes file open to fail on Windows (#209)
@@ -587,7 +350,6 @@ setMethod("newModuleDocumentation",
             newModuleDocumentation(name = name, path = ".", open = interactive())
 })
 
-################################################################################
 #' Create template testing structures for new modules
 #'
 #' @param name  Character string specifying the name of the new module.
@@ -626,6 +388,7 @@ setMethod(
     unitTestsR <- file.path(testDir, "unitTests.R") # source this to run all tests
     testTemplate <- file.path(testthatDir, "test-template.R")
 
+    # TODO: move this template to inst/templates and use whisker
     cat("
 # Please build your own test file from test-Template.R, and place it in tests folder
 # please specify the package you need to run the sim function in the test files.
@@ -719,7 +482,6 @@ test_that(\"test Event1 and Event2.\", {
       file = testTemplate, fill = FALSE, sep = "")
 })
 
-################################################################################
 #' Open all modules nested within a base directory
 #'
 #' This is just a convenience wrapper for opening several modules at once, recursively.
@@ -767,12 +529,12 @@ setMethod(
     origDir <- getwd()
     setwd(basedir)
     if (any(name == "all")) {
-      Rfiles <- dir(pattern = "[\\.][rR]$", recursive = TRUE, full.names = TRUE)
+      Rfiles <- dir(pattern = "[\\.][Rr]$", recursive = TRUE, full.names = TRUE)
     } else if (all(ncharFileExt > 0) & all(fileExtension != "R")) {
       Rfiles <- dir(pattern = name, recursive = TRUE, full.names = TRUE)
       Rfiles <- Rfiles[unlist(lapply(name, function(n) grep(pattern = n, Rfiles)))]
     } else {
-      Rfiles <- dir(pattern = "[\\.][rR]$", recursive = TRUE, full.names = TRUE)
+      Rfiles <- dir(pattern = "[\\.][Rr]$", recursive = TRUE, full.names = TRUE)
       Rfiles <- Rfiles[unlist(lapply(name, function(n) grep(pattern = n, Rfiles)))]
     }
     # remove tests
@@ -785,12 +547,11 @@ setMethod(
     if (length(onlyModuleRFile) > 0) Rfiles <- Rfiles[onlyModuleRFile]
 
     # Open Rmd file also
-    RfileRmd <- dir(pattern = paste0(name, ".[rR]md$"), recursive = TRUE, full.names = TRUE)
+    RfileRmd <- dir(pattern = paste0(name, ".[Rr]md$"), recursive = TRUE, full.names = TRUE)
 
     Rfiles <- c(Rfiles, RfileRmd)
     Rfiles <- Rfiles[grep(pattern = "[/\\\\]", Rfiles)]
-    Rfiles <- Rfiles[sapply(strsplit(Rfiles,"[/\\\\\\.]"),
-                            function(x) any(duplicated(x)))]
+    Rfiles <- Rfiles[sapply(strsplit(Rfiles,"[/\\\\\\.]"), function(x) any(duplicated(x)))]
 
     lapply(file.path(basedir, Rfiles), .fileEdit)
     setwd(origDir)
@@ -829,7 +590,6 @@ setMethod("openModules",
             openModules(name = mods, path = modulePath(name))
 })
 
-################################################################################
 #' Create a copy of an existing module
 #'
 #' @param from  The name of the module to copy.
@@ -916,7 +676,6 @@ setMethod("copyModule",
             copyModule(from, to, path = getOption('spades.modulePath'), ...)
 })
 
-################################################################################
 #' Create a zip archive of a module subdirectory
 #'
 #' The most common use of this would be from a "modules" directory, rather than

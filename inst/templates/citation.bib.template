@@ -1,0 +1,8 @@
+@Manual{,
+  title = "{{{name}}}",
+  author = "{{{author}}}",
+  organization = "Organization",
+  address = "Somewhere, Someplace",
+  year = "{{{year}}}",
+  url = "",
+}

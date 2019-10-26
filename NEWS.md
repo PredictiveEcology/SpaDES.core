@@ -5,7 +5,7 @@ version 0.2.6.9000
 
 ## dependencies
 
-* ??
+* added `whisker` to Imports to facilitate module file templating (#100)
 
 ## new features
 

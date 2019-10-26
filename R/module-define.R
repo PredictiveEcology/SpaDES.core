@@ -9,12 +9,15 @@ moduleDefaults <- list(
   name = NA_character_,
   description = NA_character_,
   keywords = NA_character_,
-  authors = person("unknown"),
+  authors = getOption("devtools.desc.author",
+                      person(c("First", "Middle"), "Last",
+                             email = "email@example.com",
+                             role = c("aut", "cre"))),
   childModules = character(0),
-  version = quote(as.numeric_version(x$version)),
+  version = numeric_version("0.0.1"),
   extent = quote(raster::extent(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
-  citation = list(),
+  citation = list("citation.bib"),
   documentation = list(),
   reqdPkgs = list()
 )
