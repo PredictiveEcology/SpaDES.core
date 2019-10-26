@@ -11,9 +11,9 @@
 #' @return  Invoked for its side effect of opening a file for editing.
 #'
 #' @author Alex Chubaty
+#' @importFrom utils file.edit
 #' @keywords internal
 #' @rdname fileEdit
-#' @importFrom utils file.edit
 #'
 .fileEdit <- function(file) {
   if (Sys.getenv("RSTUDIO") == "1") {
@@ -171,7 +171,7 @@ setMethod(
 #'              The default is the current working directory.
 #'
 #' @param open  Logical. Should the new module file be opened after creation?
-#'              Default \code{TRUE}.
+#'              Default \code{TRUE} in an interactive session.
 #'
 #' @param type  Character string specifying one of \code{"child"} (default),
 #'              or \code{"parent"}.
@@ -189,9 +189,9 @@ setGeneric("newModuleCode", function(name, path, open, type, children) {
 
 #' @export
 #' @family module creation helpers
+#' @importFrom magrittr %>%
 #' @importFrom reproducible checkPath
 #' @rdname newModuleCode
-#'
 setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character", open = "logical",
@@ -576,7 +576,7 @@ setMethod("newModuleDocumentation",
 setMethod("newModuleDocumentation",
           signature = c(name = "character", path = "character", open = "missing"),
           definition = function(name, path) {
-            newModuleDocumentation(name = name, path = path, open = TRUE)
+            newModuleDocumentation(name = name, path = path, open = interactive())
 })
 
 #' @export
@@ -584,7 +584,7 @@ setMethod("newModuleDocumentation",
 setMethod("newModuleDocumentation",
           signature = c(name = "character", path = "missing", open = "missing"),
           definition = function(name) {
-            newModuleDocumentation(name = name, path = ".", open = TRUE)
+            newModuleDocumentation(name = name, path = ".", open = interactive())
 })
 
 ################################################################################
@@ -596,7 +596,7 @@ setMethod("newModuleDocumentation",
 #'              The default is the current working directory.
 #'
 #' @param open  Logical. Should the new module file be opened after creation?
-#'              Default \code{TRUE}.
+#'              Default \code{TRUE} in an interactive session.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath

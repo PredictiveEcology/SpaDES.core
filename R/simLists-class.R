@@ -1,4 +1,3 @@
-################################################################################
 #' The \code{simLists} class
 #'
 #' This is a grouping of \code{simList} objects
@@ -13,9 +12,9 @@
 #' uses an environment for objects and the latter uses a list.
 #' The class \code{simList_} is only used internally.
 #'
-#' @slot paths      Named list of \code{modulePath}, \code{inputPath},
-#'                  and \code{outputPath} paths. Partial matching is performed. These
-#'                  will be prepended to the relative paths of each \code{simList}
+#' @slot paths   Named list of \code{modulePath}, \code{inputPath},
+#'               and \code{outputPath} paths. Partial matching is performed.
+#'               These will be prepended to the relative paths of each \code{simList}
 #' @slot .xData  Environment holding the \code{simLists}.
 #'
 #' @section Accessor Methods:
@@ -27,22 +26,17 @@
 #'
 #'
 #' @aliases simLists
-#' @rdname simLists-class
-#' @rdname simLists
-#' @importFrom data.table as.data.table data.table
-#' @include simList-class.R helpers.R misc-methods.R module-dependencies-class.R
-#'
 #' @author Eliot McIntire
 #' @exportClass simLists
-#'
+#' @importFrom data.table as.data.table data.table
+#' @include simList-class.R
+#' @rdname simLists-class
 setClass(
   "simLists",
   contains = "environment",
-  slots = list(
-    .xData = "environment", paths = "list"
-  ),
+  slots = list(.xData = "environment", paths = "list"),
   validity = function(object) {
-    browser()
+    browser() ## TODO: fix this
   }
 )
 
@@ -57,12 +51,9 @@ setClass(
 setMethod("initialize",
           signature(.Object = "simLists"),
           definition = function(.Object, ...) {
-
-            .Object@paths = .paths()
-
+            .Object@paths <- .paths()
             .Object@.xData <- new.env(parent = emptyenv())
-
             attr(.Object@.xData, "name") <- "simLists"
-            #
+
             return(.Object)
-          })
+})

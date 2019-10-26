@@ -120,6 +120,7 @@ Collate:
     'plotting-diagrams.R'
     'plotting.R'
     'progress.R'
+    'project-template.R'
     'restart.R'
     'save.R'
     'simulation-spades.R'
