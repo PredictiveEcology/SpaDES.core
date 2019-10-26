@@ -5,7 +5,7 @@ cran: https://cloud.r-project.org
 env:
   global:
     - CRAN_REPO=https://cloud.r-project.org
-matrix:
+jobs:
   include:
   - os: linux
     dist: xenial
@@ -26,6 +26,9 @@ matrix:
           - libudunits2-dev
     services:
       - xvfb
+    before_script:
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
   - os: linux
@@ -49,6 +52,7 @@ matrix:
       - xvfb
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
@@ -60,9 +64,6 @@ matrix:
       - igraph
       - RSQlite
       - stringi
-    r_github_packages:
-      - jimhester/lintr
-      - r-lib/covr
   - os: linux
     dist: xenial
     r: devel
@@ -82,6 +83,9 @@ matrix:
           - libudunits2-dev
     services:
       - xvfb
+    before_script:
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
       - dplyr
@@ -106,6 +110,9 @@ matrix:
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     env:
       - GLPK=true
+    before_script:
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     before_install:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
   - os: osx
@@ -127,6 +134,8 @@ matrix:
       - GLPK=false
     before_script:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true
