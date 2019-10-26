@@ -69,9 +69,9 @@ setGeneric("newProjectCode", function(name, path, open) {
 #' @export
 #' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
-#' @rdname newModuleCode
+#' @rdname newProjectCode
 setMethod(
-  "newModuleCode",
+  "newProjectCode",
   signature = c(name = "character", path = "character", open = "logical"),
   definition = function(name, path, open = interactive()) {
     nestedPath <- checkPath(file.path(path, name), create = TRUE)
