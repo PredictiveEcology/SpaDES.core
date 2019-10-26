@@ -5,7 +5,8 @@
 #'
 #' @param name project name (name of project directory)
 #' @param path path to directory in which to create the project directory
-#' @param ...  additional arguments (not used)
+#' @param open  Logical. Should the new project file be opened after creation?
+#'              Default \code{TRUE} in an interactive session.
 #'
 #' @export
 #' @rdname newProject
@@ -18,7 +19,7 @@
 #' dir.exists(file.path(myProjDir, "modules"))
 #' dir.exists(file.path(myProjDir, "outputs"))
 #' unlink(myProjDir, recursive = TRUE) ## cleanup
-setGeneric("newProject", function(name, path, ...) {
+setGeneric("newProject", function(name, path, open) {
   standardGeneric("newProject")
 })
 
@@ -27,10 +28,8 @@ setGeneric("newProject", function(name, path, ...) {
 #' @importFrom reproducible checkPath
 setMethod(
   "newProject",
-  signature = c(name = "character", path = "character"),
-  definition = function(name, path, ...) {
-    args <- list(...)
-
+  signature = c(name = "character", path = "character", open = "logical"),
+  definition = function(name, path, open) {
     checkPath(path, create = TRUE)
     projDir <- checkPath(file.path(path, name), create = TRUE)
 
@@ -43,20 +42,24 @@ setMethod(
 
     ## TODO: check for Rstudio project?
 
-    newProjectCode(name, path)
+    newProjectCode(name, path, open = open)
 
     return(projDir)
 })
 
+#' @export
+#' @rdname newProject
+#' @importFrom reproducible checkPath
+setMethod(
+  "newProject",
+  signature = c(name = "character", path = "character", open = "missing"),
+  definition = function(name, path, open) {
+    newProject(name, path, open = interactive())
+})
+
 #' Create new module code file
 #'
-#' @param name  Character string specifying the name of the new module.
-#'
-#' @param path  Character string. Subdirectory in which to place the new module code file.
-#'              The default is the current working directory.
-#'
-#' @param open  Logical. Should the new project file be opened after creation?
-#'              Default \code{TRUE} in an interactive session.
+#' @inheritParams newProject
 #'
 #' @author Alex Chubaty
 #' @export

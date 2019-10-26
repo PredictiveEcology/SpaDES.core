@@ -12,10 +12,9 @@ newProjectCode(name, path, open)
   open = interactive())
 }
 \arguments{
-\item{name}{Character string specifying the name of the new module.}
+\item{name}{project name (name of project directory)}
 
-\item{path}{Character string. Subdirectory in which to place the new module code file.
-The default is the current working directory.}
+\item{path}{path to directory in which to create the project directory}
 
 \item{open}{Logical. Should the new project file be opened after creation?
 Default \code{TRUE} in an interactive session.}

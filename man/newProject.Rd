@@ -3,19 +3,23 @@
 \docType{methods}
 \name{newProject}
 \alias{newProject}
-\alias{newProject,character,character-method}
+\alias{newProject,character,character,logical-method}
+\alias{newProject,character,character,missing-method}
 \title{Create new SpaDES project}
 \usage{
-newProject(name, path, ...)
+newProject(name, path, open)
 
-\S4method{newProject}{character,character}(name, path, ...)
+\S4method{newProject}{character,character,logical}(name, path, open)
+
+\S4method{newProject}{character,character,missing}(name, path, open)
 }
 \arguments{
 \item{name}{project name (name of project directory)}
 
 \item{path}{path to directory in which to create the project directory}
 
-\item{...}{additional arguments (not used)}
+\item{open}{Logical. Should the new project file be opened after creation?
+Default \code{TRUE} in an interactive session.}
 }
 \description{
 Initialize a project with subdirectories \file{cache/}, \file{modules/},
