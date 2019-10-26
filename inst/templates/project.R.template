@@ -20,10 +20,13 @@ parameters <- list(
   module2 = list()  # rename module2 and provide named list of params
 )
 
+#?inputs
+#?outputs
+
 mySim <- simInit(
   times = simTimes,
   modules = moduleList,
-  params = parameters,
+  params = parameters
 )
 
 ## run the simulation

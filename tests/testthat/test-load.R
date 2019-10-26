@@ -409,9 +409,7 @@ test_that("test-load.R: interval loading of objects from .GlobalEnv", {
   end(a) <- 3
   a <- spades(a)
   expect_identical(a2, a$a)
-
 })
-
 
 test_that("Filenames for simList", {
   testInitOut <- testInit(c("raster"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),

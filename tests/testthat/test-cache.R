@@ -420,8 +420,4 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
   expect_true(grepl("Using cached copy", mess1))
-
 })
-
-
-
