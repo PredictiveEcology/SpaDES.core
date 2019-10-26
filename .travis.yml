@@ -26,6 +26,9 @@ jobs:
           - libudunits2-dev
     services:
       - xvfb
+    before_script:
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
   - os: linux
@@ -49,6 +52,7 @@ jobs:
       - xvfb
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
@@ -79,6 +83,9 @@ jobs:
           - libudunits2-dev
     services:
       - xvfb
+    before_script:
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
       - dplyr
@@ -103,6 +110,9 @@ jobs:
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     env:
       - GLPK=true
+    before_script:
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     before_install:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
   - os: osx
@@ -124,6 +134,8 @@ jobs:
       - GLPK=false
     before_script:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true
