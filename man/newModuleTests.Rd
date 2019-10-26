@@ -17,7 +17,7 @@ newModuleTests(name, path, open)
 The default is the current working directory.}
 
 \item{open}{Logical. Should the new module file be opened after creation?
-Default \code{TRUE}.}
+Default \code{TRUE} in an interactive session.}
 }
 \description{
 Create template testing structures for new modules

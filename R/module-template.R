@@ -189,9 +189,9 @@ setGeneric("newModuleCode", function(name, path, open, type, children) {
 
 #' @export
 #' @family module creation helpers
-#' @importFrom magrittr %>%
 #' @importFrom reproducible checkPath
 #' @rdname newModuleCode
+# igraph exports %>% from magrittr
 setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character", open = "logical",
