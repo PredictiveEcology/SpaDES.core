@@ -15,6 +15,7 @@
 }
 
 #' @keywords internal
+#' @include environment.R
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
 #' @keywords internal

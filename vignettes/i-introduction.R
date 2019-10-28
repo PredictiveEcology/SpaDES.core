@@ -30,20 +30,3 @@
 #  mySim <- spades(mySim)            # run the simulation, returning the completed sim object
 #  eventDiagram(mySim)               # visualize the sequence of events for all modules
 
-## ----experiment, eval=FALSE, echo=TRUE-----------------------------------
-#  ?experiment # will give many more examples than here
-#  
-#  # Copy Example 5 here:
-#   mySim <- simInit(
-#      times = list(start = 0.0, end = 2.0, timeunit = "year"),
-#      params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
-#      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#                   outputPath = tmpdir),
-#      # Save final state of landscape and caribou
-#      outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
-#    )
-#  
-#  sims <- experiment(mySim, replicates = 2)
-#  attr(sims, "experiment")$expDesign # shows 2 replicates of same experiment
-

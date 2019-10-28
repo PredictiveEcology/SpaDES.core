@@ -371,7 +371,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # laptop -- May 25, 2019 0.603 Seconds --> 120 microseconds/event!
   # laptop with new completed as environment -- May 25, 2019 0.357 Seconds --> 71 microseconds/event!
   options("spades.keepCompleted" = TRUE)
-  microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
+  library(microbenchmark)
+  microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
 
   # Turn off completed list
   #  Changed to use "seconds" -- better comparison with simple loop
@@ -385,11 +386,11 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # With many new "exists"
   # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
   options("spades.keepCompleted" = FALSE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  (a2 <- microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
   #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
 
   a <- 0
-  a3 <- microbenchmark::microbenchmark(
+  a3 <- microbenchmark(
     for (i in 1:N) {
       a <- a + 1
     }
@@ -408,12 +409,12 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Turn off completed list
   # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
   options("spades.keepCompleted" = FALSE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  (a2 <- microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
   #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
 
   # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
   options("spades.keepCompleted" = TRUE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  (a2 <- microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
 })
 
 test_that("conflicting function types", {
@@ -939,18 +940,6 @@ test_that("simInitAndSpades", {
     spades(debug = FALSE)
 
   expect_true(all.equal(mySim, mySim2))
-
-  set.seed(123)
-  mySim <- simInitAndExperiment(times = times, params = params,
-                                modules = modules, objects = list(), paths = paths, debug = FALSE)
-
-  set.seed(123)
-  mySim2 <- simInit(times = times, params = params,
-                    modules = modules, objects = list(), paths = paths) %>%
-    experiment(debug = FALSE)
-
-  expect_true(all.equal(mySim, mySim2))
-
 })
 
 test_that("scheduleEvent with invalid values for eventTime", {
