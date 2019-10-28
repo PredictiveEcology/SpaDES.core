@@ -89,6 +89,7 @@ Collate:
     'checkpoint.R'
     'code-checking.R'
     'copy.R'
+    'deprecated.R'
     'downloadData.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'

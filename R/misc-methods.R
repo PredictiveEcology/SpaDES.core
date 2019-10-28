@@ -589,6 +589,7 @@ setMethod(
 #' @keywords internal
 #' @name setPaths
 #' @rdname setPaths
+#' @export
 #'
 #' @examples
 #' \dontrun{
