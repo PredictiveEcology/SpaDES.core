@@ -1,9 +1,15 @@
-gitSite <- "PredictiveEcology/SpaDES.experiment@master"
+gitSite <- c("PredictiveEcology/SpaDES.experiment@development",
+             "PredictiveEcology/SpaDES.experiment@master")
 deprecatedExpt <- paste0("experiment and experiment2 are no longer in SpaDES.core. ",
                          "Please use SpaDES.experiment::experiment or SpaDES.experiment::experiment2, ",
                          "which for now can be done with ",
-                         "/ndevtools::install_github('",gitSite,"')")
+                         "devtools::install_github('",gitSite,"')")
 
+deprecatedMsg <- function(fnName, newPackage = "SpaDES.experiment", gitSite) {
+  paste0(fnName, " has been moved to ", newPackage, ". ",
+         "Please install with ",
+         paste0("devtools::install_github('",gitSite, "')", collapse = " or "))
+}
 #' Deprecated functions
 #'
 #' These functions have been moved to \code{SpaDES.experiment} package.
@@ -25,10 +31,8 @@ experiment2 <- function(...) {
 #' @export
 #' @rdname deprecated
 POM <- function(...) {
-  .Deprecated(msg = paste0("POM is no longer in SpaDES.core.",
-                           "Please use SpaDES.experiment::POM, ",
-                           "which for now can be done with ",
-                           "/ndevtools::install_github('",gitSite,"')"))
+  fnName <- "POM"
+  .Deprecated(msg = deprecatedMsg(fName, "SpaDES.experiment", gitSite))
 }
 
 #' @export
