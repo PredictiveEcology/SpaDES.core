@@ -196,6 +196,9 @@ setMethod(
         if (!is.na(version)) {
           v <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
                                    defineModuleElement = "version")
+          if (isTRUE(length(v) > length(name))) {
+            v <- v[names(v) %in% name]
+          }
           result <- ifelse(v == numeric_version(version), TRUE, FALSE)
         }
       }
