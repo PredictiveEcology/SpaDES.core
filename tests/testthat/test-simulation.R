@@ -673,8 +673,9 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
   #lineWithInit <- grep(xxx, pattern = "^Init")
 
   xxx1 <- gsub(xxx, pattern = '.plotInitialTime', replacement = '.plotInitialTim') # nolint
-  xxx2 <- gsub(",$", grep(".plotInitialTim\\>", xxx1, value = TRUE)[1], replacement = "")
-  xxx3 <- parse(text = xxx2)
+  xxx2a <- grep(".plotInitialTim\\>", xxx1, value = TRUE)[1]
+  xxx2b <- gsub(",$", grep("time interval between plot", xxx1, value = TRUE), replacement = "")
+  xxx3 <- parse(text = paste(xxx2a, xxx2b))
   # show that it is logical
   expect_true(is.logical(eval(xxx3)$default[[1]]))
 

@@ -13,8 +13,8 @@ defineModule(sim, list(
   version = {{{versions}}},
   timeframe = {{{timeframe}}},
   timeunit = {{{timeunit}}},
-  citation = {{citation}},
-  documentation = deparse(list("README.txt", "{{{name}}}.Rmd")),
+  citation = {{{citation}}},
+  documentation = deparse(list("README.txt", {{{RmdName}}})),
 {{{otherMetadata}}}
 ))
 

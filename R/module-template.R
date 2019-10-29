@@ -209,13 +209,13 @@ setMethod(
       capture.output(dput(children))
     }
 
-    version <- list(SpaDES.core = utils::packageVersion("SpaDES.core"))
+    version <- list(SpaDES.core = as.character(utils::packageVersion("SpaDES.core")))
     version[[name]] <- moduleDefaults[["version"]]
     if (type == "parent")
-      lapply(children, function(x) version[[x]] <<- "0.01")
+      lapply(children, function(x) version[[x]] <<- "0.0.1")
 
     modulePartialMeta <- list(
-      reqdPkgs = deparse(moduleDefaults$reqdPkgs)
+      reqdPkgs = deparse(moduleDefaults[["reqdPkgs"]])
     )
     modulePartialMetaTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
                                                      "modulePartialMeta.R.template"))
@@ -239,16 +239,17 @@ setMethod(
     }
 
     moduleData <- list(
-      authors = deparse(moduleDefaults$authors),
+      authors = deparse(moduleDefaults[["authors"]], width.cutoff = 500),
       children = children_char,
-      citation = deparse(moduleDefaults$citation),
-      description = deparse(moduleDefaults$description),
+      citation = deparse(moduleDefaults[["citation"]]),
+      description = deparse(moduleDefaults[["description"]]),
       events = moduleEvents,
-      keywords = deparse(moduleDefaults$keywords),
+      keywords = deparse(moduleDefaults[["keywords"]]),
       name = deparse(name),
       otherMetadata = otherMetadata,
-      timeframe = deparse(moduleDefaults$timeframe),
-      timeunit = deparse(moduleDefaults$timeunit),
+      RmdName = deparse(paste0(name, ".Rmd")),
+      timeframe = deparse(moduleDefaults[["timeframe"]]),
+      timeunit = deparse(moduleDefaults[["timeunit"]]),
       type = type,
       versions = deparse(version)
     )
@@ -298,7 +299,7 @@ setMethod(
     ### Make citation.bib file
     moduleCite <- list(
       author = paste(paste(moduleDefaults[["authors"]]$given, collapse = " "),
-                     moduleDefaults[["authors"]]$family),
+                     moduleDefaults[["authors"]]$family), ## need to use `$` here
       name = name,
       year = format(Sys.Date(), "%Y")
     )

@@ -12,8 +12,8 @@ doEvent.{{{name}}} = function(sim, eventTime, eventType) {
       sim <- Init(sim)
 
       # schedule future event(s)
-      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, name_char), "plot")
-      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, name_char), "save")
+      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, {{{name_char}}}, "plot")
+      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, {{{name_char}}}, "save")
     },
     plot = {
       # ! ----- EDIT BELOW ----- ! #

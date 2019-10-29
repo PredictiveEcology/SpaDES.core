@@ -5,16 +5,16 @@
 #' @export
 #'
 moduleDefaults <- list(
-  timeunit = "year",
+  timeunit = NA_character_,
   name = NA_character_,
-  description = NA_character_,
-  keywords = NA_character_,
+  description = "",
+  keywords = "",
   authors = getOption("devtools.desc.author",
                       person(c("First", "Middle"), "Last",
                              email = "email@example.com",
                              role = c("aut", "cre"))),
   childModules = character(0),
-  version = numeric_version("0.0.1"),
+  version = "0.0.0.9000", ## numeric_versions don't deparse well
   extent = quote(raster::extent(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
@@ -237,10 +237,11 @@ setMethod(
     ## maintain backwards compatibility with SpaDES versions prior to 1.3.1.9044
     ## where `version` was a single `numeric_version` value instead of named list
     x$version <- if (is.null(names(x$version))) {
-      eval(moduleDefaults$version) ## SpaDES < 1.3.1.9044
+      eval(moduleDefaults[["version"]]) ## SpaDES < 1.3.1.9044
     } else {
-      as.numeric_version(x$version[[x$name]]) ## SpaDES >= 1.3.1.9044
+      x$version[[x$name]] ## SpaDES >= 1.3.1.9044
     }
+    x$version <- as.numeric_version(x$version)
 
     x$spatialExtent <- if (!is(x$spatialExtent, "Extent")) {
       if (is.null(x$spatialExtent)) {

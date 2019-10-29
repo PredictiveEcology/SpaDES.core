@@ -8,8 +8,8 @@ test_that("defineModule correctly handles different inputs", {
   # check empty metadata
   x0 <- list()
   expect_warning(defineModule(tmp, x0))
-  expect_identical(suppressWarnings(defineModule(tmp, x0)),
-                   suppressWarnings(defineModule(tmp, .emptyMetadata())))
+  expect_equal(suppressWarnings(defineModule(tmp, x0)), ## TODO: should these be identical?
+               suppressWarnings(defineModule(tmp, .emptyMetadata())))
 
   # check each element in metadata
   x1 <- list(
