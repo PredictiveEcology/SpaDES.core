@@ -32,7 +32,7 @@ experiment2 <- function(...) {
 #' @rdname deprecated
 POM <- function(...) {
   fnName <- "POM"
-  .Deprecated(msg = deprecatedMsg(fName, "SpaDES.experiment", gitSite))
+  .Deprecated(msg = deprecatedMsg(fnName, "SpaDES.experiment", gitSite))
 }
 
 #' @export
