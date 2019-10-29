@@ -12,8 +12,8 @@ This is a grouping of \code{simList} objects
 
 \describe{
 \item{\code{paths}}{Named list of \code{modulePath}, \code{inputPath},
-and \code{outputPath} paths. Partial matching is performed.
-These will be prepended to the relative paths of each \code{simList}}
+and \code{outputPath} paths. Partial matching is performed. These
+will be prepended to the relative paths of each \code{simList}}
 
 \item{\code{.xData}}{Environment holding the \code{simLists}.}
 }}
