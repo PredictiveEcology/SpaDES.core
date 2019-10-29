@@ -506,11 +506,14 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
               filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename),
               fileBackend = getOption("spades.saveSimList.fileBackend", 0),
               filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
-  if (requireNamespace("pryr")) {
-    mu <- getFromNamespace("mem_used", "pryr")()
+
+  # from pryr::mem_used
+  #if (requireNamespace("pryr")) {
+    mu <- sum(gc()[,1] * c(as.integer(8 * .Machine$sizeof.pointer - .Machine$sizeof.pointer),
+                           as.integer(8)))
     class(mu) <- "object_size"
     message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
-  }
+  #}
 
   .spadesCall <- sim$._restartRList$.spadesCall
   .spades.simFilename <- sim$._restartRList$simFilename
