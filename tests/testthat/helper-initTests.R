@@ -84,5 +84,4 @@ testOnExit <- function(testInitOut) {
   lapply(testInitOut$libs, function(lib) {
     detach(paste0("package:", lib), character.only = TRUE)}
   )
-
 }

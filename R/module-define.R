@@ -5,6 +5,7 @@
 #' @export
 #'
 moduleDefaults <- list(
+  ## these need to match up with `.emptyMetadata` list in helpers.R
   timeunit = NA_character_,
   name = NA_character_,
   description = "",
@@ -204,7 +205,7 @@ setMethod(
       warning(paste0(
         "The \'", x$name, "\' module is missing the metadata for:\n",
         paste(" - ", metadataMissing, collapse = "\n"), "\n",
-        "Using default values, which may not be desireable.\n",
+        "Using default values, which may not be desirable.\n",
         "See moduleDefaults"
       ))
     }

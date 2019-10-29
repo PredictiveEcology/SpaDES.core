@@ -3,13 +3,14 @@ test_that("defineModule correctly handles different inputs", {
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
+
   tmp <- simInit()
 
   # check empty metadata
   x0 <- list()
   expect_warning(defineModule(tmp, x0))
-  expect_equal(suppressWarnings(defineModule(tmp, x0)), ## TODO: should these be identical?
-               suppressWarnings(defineModule(tmp, .emptyMetadata())))
+  expect_identical(suppressWarnings(defineModule(tmp, x0)),
+                   suppressWarnings(defineModule(tmp, .emptyMetadata())))
 
   # check each element in metadata
   x1 <- list(
@@ -18,9 +19,9 @@ test_that("defineModule correctly handles different inputs", {
     keywords = c("test"),
     childModules = character(),
     authors = c(person(c("Alex", "M"), "Chubaty",
-                       email = "alexander.chubaty@canada.ca",
+                       email = "alex.chubaty@gmail.com",
                        role = c("aut", "cre"))),
-    version = list(testModule = "0.0.1"),
+    version = list(testModule = "0.0.0.9000"),
     spatialExtent = raster::extent(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = NA_character_,
@@ -60,7 +61,7 @@ test_that("defineModule correctly handles different inputs", {
 
   ## check version
   x2 <- x1
-  x2$version <- "0.0.1"
+  x2$version <- "0.0.0.9000"
   expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
 
   ## check spatialExtent
