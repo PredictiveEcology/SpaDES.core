@@ -1,4 +1,3 @@
-
 test_that("test event-level cache", {
   testInitOut <- testInit(smcc = FALSE)
   on.exit({
@@ -26,11 +25,15 @@ test_that("test event-level cache", {
 
   set.seed(1123)
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)))
+                capture_output({
+                  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+                }))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
-  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
+  mess1 <- capture_output({
+    sims <- spades(Copy(mySim), debug = FALSE)
+  })
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
@@ -39,7 +42,6 @@ test_that("test event-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
-
 })
 
 test_that("test module-level cache", {
@@ -75,7 +77,9 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE))))
+                  capture_output({
+                    sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+                  })))
   dev.off()
 
   expect_true(file.info(tmpfile)$size > 20000)
@@ -87,7 +91,9 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile1)
-  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
+  mess1 <- capture_output({
+    sims <- spades(Copy(mySim), debug = FALSE)
+  })
   dev.off()
 
   if (!identical(Sys.info()[["sysname"]], "Windows") || interactive()) ## TODO: TEMPORARY to avoid random CRAN fail
@@ -103,7 +109,6 @@ test_that("test module-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
-
 })
 
 test_that("test .prepareOutput", {
@@ -359,7 +364,9 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
   # Try again, hi should be there
   expect_true(is.null(mySim$test$hi)) # is not in the
-  mess1 <- capture_output(mySim2 <- spades(Copy(mySim)))
+  mess1 <- capture_output({
+    mySim2 <- spades(Copy(mySim))
+  })
   expect_true(mySim2$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
