@@ -178,7 +178,6 @@ setMethod(
     }
 
     essentialFiles <- c(
-      "data/CHECKSUMS.txt",
       paste0(name, ".R")
     ) %>%
       file.path(path, name, .)
