@@ -3,6 +3,8 @@ if (getRversion() >= "3.1.0") {
                            "expectedFile", "filesize.x", "filesize.y", "result"))
 }
 
+defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
+
 #' Find the latest module version from a SpaDES module repository
 #'
 #' Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
@@ -64,7 +66,8 @@ setMethod(
 setMethod("getModuleVersion",
           signature = c(name = "character", repo = "missing"),
           definition = function(name) {
-            v <- getModuleVersion(name, getOption("spades.moduleRepo"))
+            v <- getModuleVersion(name, getOption("spades.moduleRepo",
+                                                  defaultGitRepoToSpaDESModules))
             return(v)
 })
 
@@ -129,7 +132,8 @@ setMethod(
 setMethod("checkModule",
           signature = c(name = "character", repo = "missing"),
           definition = function(name) {
-            v <- checkModule(name, getOption("spades.moduleRepo"))
+            v <- checkModule(name, getOption("spades.moduleRepo",
+                                             defaultGitRepoToSpaDESModules))
             return(v)
 })
 
@@ -374,7 +378,8 @@ setMethod(
   definition = function(name, quickCheck, overwrite) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
-                            repo = getOption("spades.moduleRepo"),
+                            repo = getOption("spades.moduleRepo",
+                                             defaultGitRepoToSpaDESModules),
                             data = FALSE, quiet = FALSE,
                             quickCheck = quickCheck, overwrite = overwrite)
     return(invisible(files))
@@ -390,7 +395,8 @@ setMethod(
                         overwrite) {
     if (missing(path)) path <- getOption("spades.modulePath")
     if (missing(version)) version <- NA_character_
-    if (missing(repo)) repo <- getOption("spades.moduleRepo")
+    if (missing(repo)) repo <- getOption("spades.moduleRepo",
+                                         defaultGitRepoToSpaDESModules)
     if (missing(data)) data <- FALSE
     if (missing(quiet)) quiet <- FALSE
     if (missing(quickCheck)) quickCheck <- FALSE
