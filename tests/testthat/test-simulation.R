@@ -445,7 +445,7 @@ test_that("conflicting function types", {
 
       levels(poiuoiu) <- rat
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
@@ -460,7 +460,7 @@ test_that("conflicting function types", {
       poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
       poiuoiu <- scale(poiuoiu)
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  "raster::scale")
@@ -472,7 +472,7 @@ test_that("conflicting function types", {
       poiuoiu <- raster::scale(poiuoiu)
       sim$poiuoiu <- poiuoiu
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  "poiuoiu is assigned")
@@ -501,7 +501,7 @@ test_that("conflicting function types", {
       sim@.xData$g1 <- f
       return(list(a, d, f, sim))
       ",
-      xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
+      xxx1[(lineWithInit + 1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
@@ -531,14 +531,14 @@ test_that("conflicting function types", {
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_error(simInit(paths = list(modulePath = tmpdir), modules = m),
                c(paste0(m, ": You have created an object")))
 
   # declared in metadata inputObjects
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
-  cat(xxx[1:(lineWithInputObjects-1)], "
+  cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('a', 'numeric', '', '')
       ",
       xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
@@ -548,22 +548,22 @@ test_that("conflicting function types", {
 
   # declared in metadata outputObjects
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
-  cat(xxx[1:(lineWithOutputObjects-1)], "
+  cat(xxx[1:(lineWithOutputObjects - 1)], "
       createsOutput('b', 'numeric', '')
       ",
-      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInputObjects + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  c(paste0(m, ": module code: b is declared in metadata outputObjects")))
 
-  cat(xxx[1:(lineWithInputObjects-1)], "
+  cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('a', 'numeric', '', '')
       ",
-      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)],
+      xxx[(lineWithInputObjects+1):(lineWithOutputObjects - 1)],
       "
       createsOutput('b', 'numeric', '')
       ",
-      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInputObjects + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
@@ -597,7 +597,7 @@ test_that("conflicting function types", {
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
   lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1]
-  cat(xxx[1:(lineWithInputObjects-1)], "
+  cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
@@ -734,19 +734,19 @@ test_that("messaging with multiple modules", {
                     "\\testtime\", \"logical\", NA_real_", xxx1[[3]])
   xxx1[[4]] <- xxx[[4]] # clean one
 
-  cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
+  cat(xxx1[[1]][1:(lineWithInputObjects - 1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx1[[1]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx1[[1]][(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co2', 'numeric', ''),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx1[[1]][(lineWithOutputObjects+1):lineWithInit], "
+      xxx1[[1]][(lineWithInputObjects + 1):lineWithInit], "
       a <- sim$b
       sim$g <- f
       holy(sim$co4) <- f
@@ -757,7 +757,7 @@ test_that("messaging with multiple modules", {
       xx <- c(1,2)
       xx[sim$ei4] <- NA
       ",
-      xxx1[[1]][(lineWithInit+1):lineWithDotInputObjects], "
+      xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
       sim$g <- 1
       sim$ei1 <- 4
@@ -765,28 +765,28 @@ test_that("messaging with multiple modules", {
       fff <- sim$co3
       sim$co1 <- 123
       ",
-      xxx1[[1]][(lineWithDotInputObjects+1):length(xxx1[[1]])],
+      xxx1[[1]][(lineWithDotInputObjects + 1):length(xxx1[[1]])],
       sep = "\n", fill = FALSE, file = fileNames[1])
 
 
-  cat(xxx1[[2]][1:(lineWithInputObjects-1)], "
+  cat(xxx1[[2]][1:(lineWithInputObjects - 1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx1[[2]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx1[[2]][(lineWithInputObjects+1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx1[[2]][(lineWithOutputObjects+1):lineWithInit], "
+      xxx1[[2]][(lineWithInputObjects + 1):lineWithInit], "
       a <- sim$b
       xx <- c(1,2)
       xx[sim$ei4] <- NA
       ",
-      xxx1[[2]][(lineWithInit+1):lineWithDotInputObjects], "
+      xxx1[[2]][(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
       sim$co1 <- 123
       ",
-      xxx1[[2]][(lineWithDotInputObjects+1):length(xxx1[[2]])],
+      xxx1[[2]][(lineWithDotInputObjects + 1):length(xxx1[[2]])],
       sep = "\n", fill = FALSE, file = fileNames[2])
 
   fullMessage <- c(
@@ -822,7 +822,7 @@ test_that("messaging with multiple modules", {
     "test4: module code appears clean"
   )
 
-  for(y in 3:4) {
+  for (y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
 
@@ -878,7 +878,7 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
 
       sim$a <- 1
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   mm <- cleanMessage(mm)
@@ -911,7 +911,6 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   #   cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
   # }
   expect_true(test1 || test2)
-
 })
 
 test_that("simInitAndSpades", {
@@ -949,9 +948,13 @@ test_that("scheduleEvent with invalid values for eventTime", {
     testOnExit(testInitOut)
   }, add = TRUE)
   s <- simInit(times = list(start = 1, end = 10))
-  expect_error(s <- scheduleEvent(s, eventTime = -1, eventType = "test1", moduleName = "test"))
-  expect_warning(s <- scheduleEvent(s, eventTime = numeric(), eventType = "test1", moduleName = "test"))
-  expect_error(s <- scheduleEvent(s, eventTime = 0, eventType = "test1", moduleName = "test"))
-
-
+  expect_error({
+    s <- scheduleEvent(s, eventTime = -1, eventType = "test1", moduleName = "test")
+  })
+  expect_warning({
+    s <- scheduleEvent(s, eventTime = numeric(), eventType = "test1", moduleName = "test")
+  })
+  expect_error({
+    s <- scheduleEvent(s, eventTime = 0, eventType = "test1", moduleName = "test")
+  })
 })

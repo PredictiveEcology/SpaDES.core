@@ -24,7 +24,7 @@ test_that("defineModule correctly handles different inputs", {
     version = list(testModule = "0.0.0.9000"),
     spatialExtent = raster::extent(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = NA_character_,
+    timeunit = "year",
     citation = list(),
     documentation = list(),
     reqdPkgs = list("grid", "raster", "sp"),
@@ -174,22 +174,22 @@ test_that("3 levels of parent and child modules load and show correctly", {
 
   fileName <- "child2/child2.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = NA_character_", replacement = "timeunit = 'day'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "day"')
   cat(xxx1, file = fileName, sep = "\n")
 
   fileName <- "child3/child3.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = NA_character_", replacement = "timeunit = 'week'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "week"')
   cat(xxx1, file = fileName, sep = "\n")
 
   fileName <- "child5/child5.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = NA_character_", replacement = "timeunit = 'second'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "second"')
   cat(xxx1, file = fileName, sep = "\n")
 
   fileName <- "par1/par1.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = NA_character_", replacement = "timeunit = 'month'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "month"')
   cat(xxx1, file = fileName, sep = "\n")
 
   if (Sys.which("glpsol") == "") {
