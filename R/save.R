@@ -9,8 +9,14 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
       firstSave <- min(outputs(sim)[, "saveTime"], na.rm = TRUE)
+      firstSaveWh <- which.min(outputs(sim)[, "saveTime"])
+      if ("eventPriority" %in% colnames(outputs(sim))) {
+        firstPriority <- outputs(sim)[firstSaveWh, "eventPriority"]
+      }
+      if (!exists("firstPriority", inherits = FALSE))
+        firstPriority <- .last()
       attributes(firstSave)$unit <- sim@simtimes[["timeunit"]]
-      sim <- scheduleEvent(sim, firstSave, "save", "spades", .last())
+      sim <- scheduleEvent(sim, firstSave, "save", "spades", firstPriority)
       #sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
     }
     checkPath(sim@paths$outputPath, create = TRUE)
@@ -191,12 +197,20 @@ saveFiles <- function(sim) {
 
   # Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
-    nextTime <- min(outputs(sim)[is.na(outputs(sim)$saved), "saveTime"], na.rm = TRUE)
+    isNA <- is.na(outputs(sim)$saved)
+    nextTime <- min(outputs(sim)[isNA, "saveTime"], na.rm = TRUE)
+    nextTimeWh <- which.min(outputs(sim)[isNA, "saveTime"])
+    if ("eventPriority" %in% colnames(outputs(sim))) {
+      nextPriority <- outputs(sim)[isNA, "eventPriority"][nextTimeWh]
+    }
+    if (!exists("nextPriority", inherits = FALSE))
+      nextPriority <- .last()
+
     attributes(nextTime)$unit <- sim@simtimes[["timeunit"]]
     if (time(sim) == end(sim)) {
-      sim <- scheduleEvent(sim, nextTime, "save", "end", .last())
+      sim <- scheduleEvent(sim, nextTime, "save", "end", nextPriority)
     } else {
-      sim <- scheduleEvent(sim, nextTime, "save", "later", .last())
+      sim <- scheduleEvent(sim, nextTime, "save", "later", nextPriority)
     }
   }
   return(invisible(sim))
@@ -492,11 +506,14 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
               filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename),
               fileBackend = getOption("spades.saveSimList.fileBackend", 0),
               filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir))
-  if (requireNamespace("pryr")) {
-    mu <- getFromNamespace("mem_used", "pryr")()
+
+  # from pryr::mem_used
+  #if (requireNamespace("pryr")) {
+    mu <- sum(gc()[,1] * c(as.integer(8 * .Machine$sizeof.pointer - .Machine$sizeof.pointer),
+                           as.integer(8)))
     class(mu) <- "object_size"
     message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
-  }
+  #}
 
   .spadesCall <- sim$._restartRList$.spadesCall
   .spades.simFilename <- sim$._restartRList$simFilename

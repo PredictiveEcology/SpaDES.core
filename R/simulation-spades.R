@@ -24,7 +24,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table data.table rbindlist setkey
+#' @importFrom data.table data.table rbindlist setkey fread
 #' @importFrom stringi stri_pad_right stri_pad stri_length
 #' @importFrom reproducible Cache
 #' @importFrom utils write.table
@@ -599,7 +599,6 @@ scheduleConditionalEvent <- function(sim,
 #' @return Invisibly returns the modified \code{simList} object.
 #'
 #' @seealso \code{\link{SpaDES.core-package}},
-#' \code{\link{experiment}} for using replication with \code{spades},
 #' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
 #' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
 #' uses \code{\link[reproducible]{Cache}}.
@@ -624,8 +623,7 @@ scheduleConditionalEvent <- function(sim,
 #' the function will simply return the result that would have come if it had
 #' been rerun. Use this with caution, as it will return exactly the result from
 #' a previous run, even if there is stochasticity internally.
-#' Caching is only based on the input simList. See also \code{experiment} for
-#' the same mechanism, but it can be used with replication.
+#' Caching is only based on the input simList.
 #' See also the vignette on caching for examples.
 #'
 #' @section \code{debug}:
@@ -770,6 +768,17 @@ setMethod(
     .pkgEnv[["spades.nCompleted"]] <- getOption("spades.nCompleted")
     .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
     .pkgEnv[["spades.keepCompleted"]] <- getOption("spades.keepCompleted", TRUE)
+
+    # Memory Use
+    # memory estimation of each event/sim
+    if (getOption("spades.memoryUseInterval", 0) > 0) {
+      originalPlan <- future::plan()
+      sim <- memoryUseSetup(sim, originalPlan)
+      # Do the on.exit stuff
+      on.exit({
+        sim <- memoryUseOnExit(sim, originalPlan)
+      }, add = TRUE)
+    }
 
     # timeunits gets accessed every event -- this should only be needed once per simList
     sim@.xData$.timeunits <- timeunits(sim)

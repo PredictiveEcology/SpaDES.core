@@ -772,3 +772,85 @@ unmakeMemoisable.simList_ <- function(x) {
   }
   return(y)
 }
+
+
+if (!isGeneric("clearCache")) {
+  setGeneric(
+    "clearCache",
+    function(x, userTags = character(), after, before,
+             ask = getOption("reproducible.ask"),
+             useCloud = FALSE,
+             cloudFolderID = NULL, ...) {
+      standardGeneric("clearCache")
+    }
+  )
+}
+
+#' clearCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @inheritParams reproducible::clearCache
+#' @importFrom reproducible clearCache
+#' @importMethodsFrom reproducible clearCache
+#' @rdname clearCache
+setMethod(
+  "clearCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ask, useCloud = FALSE,
+                        cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
+                        ...) {
+    x <- x@paths$cachePath
+    clearCache(x = x, userTags = userTags, after = after, before = before,
+               ask = ask, useCloud = useCloud,
+               cloudFolderID = cloudFolderID,
+               ...)
+  })
+
+
+if (!isGeneric("showCache")) {
+  setGeneric("showCache", function(x, userTags = character(), after, before, ...) {
+    standardGeneric("showCache")
+  })
+}
+
+#' showCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @importFrom reproducible showCache
+#' @importMethodsFrom reproducible showCache
+#' @rdname clearCache
+setMethod(
+  "showCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ...) {
+    x <- x@paths$cachePath
+    showCache(x = x, userTags = userTags, after = after, before = before,
+               ...)
+  })
+
+if (!isGeneric("keepCache")) {
+  setGeneric("keepCache", function(x, userTags = character(), after, before, ...) {
+    standardGeneric("keepCache")
+  })
+}
+
+#' keepCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @importFrom reproducible keepCache
+#' @importMethodsFrom reproducible keepCache
+#' @rdname clearCache
+setMethod(
+  "keepCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ...) {
+    x <- x@paths$cachePath
+    keepCache(x = x, userTags = userTags, after = after, before = before,
+               ...)
+  })

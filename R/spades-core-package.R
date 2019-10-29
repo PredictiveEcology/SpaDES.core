@@ -43,7 +43,10 @@
 #'   \tabular{ll}{
 #'     \code{\link{simInit}} \tab Initialize a new simulation\cr
 #'     \code{\link{spades}} \tab Run a discrete event simulation\cr
-#'     \code{\link{experiment}} \tab Run multiple \code{\link{spades}} calls\cr
+#'     \code{experiment} \tab In \code{SpaDES.experiment} package.
+#'                                   Run multiple \code{\link{spades}} calls\cr
+#'     \code{experiment2} \tab In \code{SpaDES.experiment} package.
+#'                                   Run multiple \code{\link{spades}} calls\cr
 #'   }
 #' }
 #'

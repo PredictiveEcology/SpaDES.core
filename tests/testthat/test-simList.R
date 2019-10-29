@@ -1,4 +1,4 @@
-test_that("simList object initializes correctly", {
+test_that("simList object initializes correctly (1)", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -286,7 +286,7 @@ test_that("simList test all signatures", {
   }
 })
 
-test_that("simList object initializes correctly", {
+test_that("simList object initializes correctly (2)", {
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)

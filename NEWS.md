@@ -5,10 +5,11 @@ version 0.2.6.9000
 
 ## dependencies
 
-* ??
+* Removed dependency packages `DEoptim`, `dplyr`, `future.apply`, `Matrix`, `parallel`, `pryr`, `purrr`, and `rgenoud`, which are no longer required. See "deprecated" info below.
 
 ## new features
 
+* memory and peak memory estimation is now available for *nix-type systems, when `future` is installed. See new vignette `iv-advanced` and ?memoryUse
 * the temporary directory used by `raster` operations (see `?raster::tmpDir`) can now be set via `setPaths(rasterPath = "my/temp/raster/dir")` or `rasterPath(sim) <- "my/temp/raster/dir"` (#90).
 * new function and capacity: `restartR` restarts R mid-stream to deal with apparent memory leaks in R.
   In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <https://github.com/r-lib/fastmap>).
@@ -19,6 +20,10 @@ version 0.2.6.9000
 ## bug fixes
 
 * `newModule()` now uses `open = interactive()` as default to prevent files being left open during tests.
+
+## deprecated
+
+* `experiment()`, `experiment2()`, and `POM()` have been moved to the `SpaDES.experiment` package
 
 version 0.2.6
 =============

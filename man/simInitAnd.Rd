@@ -2,16 +2,11 @@
 % Please edit documentation in R/simulation-simInit.R
 \name{simInitAndSpades}
 \alias{simInitAndSpades}
-\alias{simInitAndExperiment}
-\title{Call \code{simInit} and \code{spades} or \code{experiment} together}
+\title{Call \code{simInit} and \code{spades} together}
 \usage{
 simInitAndSpades(times, params, modules, objects, paths, inputs, outputs,
   loadOrder, notOlderThan, debug, progress, cache, .plotInitialTime,
   .saveInitialTime, ...)
-
-simInitAndExperiment(times, params, modules, objects, paths, inputs,
-  outputs, loadOrder, notOlderThan, replicates, dirPrefix, substrLength,
-  saveExperiment, experimentFile, clearSimEnv, cl, ...)
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times
@@ -52,7 +47,12 @@ See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
-\code{saveTime} (numeric). See \code{\link{outputs}} and
+\code{saveTime} (numeric) and \code{eventPriority} (numeric). If
+\code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
+is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
+it should give "initial conditions".
+
+See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional list of module names specifying the order in
@@ -88,51 +88,17 @@ parameter for all modules. See Details.}
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
 parameter for all modules. See Details.}
 
-\item{...}{Arguments passed to simInit, and spades or experiment}
-
-\item{replicates}{The number of replicates to run of the same \code{simList}.
-See details and examples.}
-
-\item{dirPrefix}{String vector. This will be concatenated as a prefix on the
-directory names. See details and examples.}
-
-\item{substrLength}{Numeric. While making \code{outputPath} for each spades call, this
-is the number of characters kept from each factor level.
-See details and examples.}
-
-\item{saveExperiment}{Logical. Should params, modules, inputs, sim, and resulting
-experimental design be saved to a file. If TRUE are saved to a single list
-called \code{experiment}. Default TRUE.}
-
-\item{experimentFile}{String. Filename if \code{saveExperiment} is TRUE; saved to
-\code{outputPath(sim)} in \code{.RData} format. See Details.}
-
-\item{clearSimEnv}{Logical. If TRUE, then the envir(sim) of each simList in the return list
-is emptied. This is to reduce RAM load of large return object.
-Default FALSE.}
-
-\item{cl}{A cluster object. Optional. This would generally be created using
-parallel::makeCluster or equivalent. This is an alternative way, instead
-of \code{beginCluster()}, to use parallelism for this function, allowing for
-more control over cluster use.}
+\item{...}{Arguments passed to simInit and spades}
 }
 \value{
 Same as \code{\link{spades}} (a \code{simList}) or
-    \code{\link{experiment}} (list of \code{simList} objects)
 }
 \description{
 These functions are convenience wrappers that may allow for
 more efficient Caching.
 Passes all arguments to \code{simInit}, then passes the created \code{simList}
-to \code{spades} or \code{experiment}.
-}
-\details{
-\code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
-these are also in \code{simInit}. If the \code{experiment} is being used
-to vary these arguments, it must be done separately (i.e., \code{simInit} then
-\code{experiment}).
+to \code{spades}.
 }
 \seealso{
 \code{\link{simInit}}, \code{\link{spades}}
-    \code{\link{experiment}}
 }

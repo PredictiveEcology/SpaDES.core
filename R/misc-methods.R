@@ -596,6 +596,7 @@ setMethod(
 #' @importFrom raster tmpDir
 #' @name setPaths
 #' @rdname setPaths
+#' @export
 #'
 #' @examples
 #' \dontrun{
