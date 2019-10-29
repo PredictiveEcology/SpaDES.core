@@ -265,32 +265,7 @@ Plotting methods using `Plot` are optimized for speed and are much faster than t
 Running multiple simulations with different parameter values is a critical part of sensitivity and robustness analysis, simulation experiments, optimization, and pattern oriented modelling.
 Likewise, greater understanding and evaluation of models and their uncertainty requires simulation replication and repetition [@Grimm:2005bk; @Thiele2015].
 Using `R` as a common platform for data, simulation, and analyses we can do all of these easily and directly as part of our `SpaDES` simulation without breaking the linkages between model and analysis.
-This workflow facilitates and enhances the use of ensemble and consensus modelling, and studies of cumulative effects.
-
-## Running a groups of simulations: the `experiment` function
-
-Once a simulation is properly initialized and runs correctly with the `spades` function, it is likely time to do things like run replicates.
-There is a function, `experiment` to do this, as well as building parameter and module "simulation experiments".
-For example, you can pass alternative values to parameters in modules and the `experiment` will build a fully factorial experiment, with replication and run them.
-This function (as with `POM` and `splitRaster`) is parallel-aware and can either proceed with a cluster object (`cl` argument) or a cluster running in the background using the `raster::beginCluster`.
-
-```{r experiment, eval=FALSE, echo=TRUE}
-?experiment # will give many more examples than here
-
-# Copy Example 5 here:
- mySim <- simInit(
-    times = list(start = 0.0, end = 2.0, timeunit = "year"),
-    params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tmpdir),
-    # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
-  )
-
-sims <- experiment(mySim, replicates = 2)
-attr(sims, "experiment")$expDesign # shows 2 replicates of same experiment
-```
+This workflow facilitates and enhances the use of ensemble and consensus modelling, and studies of cumulative effects. The tools for these experiments are now in a separate package, `SpaDES.experiment`.
 
 # Additional resources
 

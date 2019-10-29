@@ -29,35 +29,6 @@ system.time({
 })
 all.equal(outSim, outSimCached) 
 
-## ----experiment-cache----------------------------------------------------
-system.time({
-  sims1 <- experiment(mySim, replicates = 2, cache = TRUE)
-})
-
-# internal -- second time faster
-system.time({
-  sims2 <- experiment(mySim, replicates = 2, cache = TRUE)
-})
-all.equal(sims1, sims2)
-
-## ----Cache-experiment----------------------------------------------------
-# External
-outputs(mySim) <- data.frame(objectName = "landscape")
-system.time({
-  sims3 <- Cache(experiment, mySim, replicates = 3, .plotInitialTime = NA,
-                 clearSimEnv = TRUE)
-})
-
-## ----Cache-experiment-2--------------------------------------------------
-system.time({
-  sims4 <- Cache(experiment, mySim, replicates = 3, .plotInitialTime = NA,
-                 clearSimEnv = TRUE)
-})
-# test they are all equal
-lapply(1:2, function(x) all.equal(sims3[[x]], sims4[[x]])) 
-
-dir(outputPath(mySim), recursive = TRUE)
-
 ## ----module-level, echo=TRUE---------------------------------------------
 # Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
@@ -119,7 +90,7 @@ if (requireNamespace("archivist")) {
 ## ---- eval=FALSE, echo=TRUE----------------------------------------------
 #  simInit --> many .inputObjects calls
 #  
-#  experiment --> many spades calls --> many module calls --> many event calls --> many function calls
+#  spades call --> many module calls --> many event calls --> many function calls
 #  
 
 ## ---- eval=FALSE, echo=TRUE----------------------------------------------
