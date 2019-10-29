@@ -899,20 +899,20 @@ setMethod(
     return(invisible(sim))
 })
 
-#' Call \code{simInit} and \code{spades} or \code{experiment} together
+#' Call \code{simInit} and \code{spades} together
 #'
 #' These functions are convenience wrappers that may allow for
 #' more efficient Caching.
 #' Passes all arguments to \code{simInit}, then passes the created \code{simList}
-#' to \code{spades} or \code{experiment}.
+#' to \code{spades}.
 #'
-#' @param ... Arguments passed to simInit, and spades or experiment
+#' @param ... Arguments passed to simInit and spades
 #'
 #' @return Same as \code{\link{spades}} (a \code{simList}) or
-#'     \code{\link{experiment}} (list of \code{simList} objects)
+#'
 #'
 #' @seealso \code{\link{simInit}}, \code{\link{spades}}
-#'     \code{\link{experiment}}
+#'
 #' @export
 #' @inheritParams simInit
 #' @inheritParams spades
@@ -945,53 +945,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   sim <- do.call(spades, objsSpades)
 }
 
-#' @export
-#' @aliases simInitAndExperiment
-#' @rdname simInitAnd
-#' @inheritParams simInit
-#' @inheritParams experiment
-#' @details
-#' \code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
-#' these are also in \code{simInit}. If the \code{experiment} is being used
-#' to vary these arguments, it must be done separately (i.e., \code{simInit} then
-#' \code{experiment}).
-simInitAndExperiment <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
-                                 notOlderThan, replicates,
-                                 dirPrefix, substrLength, saveExperiment,
-                                 experimentFile, clearSimEnv, cl, ...)  {
-  list2env(list(...), envir = environment())
-  lsAllNames <- ls(all.names = TRUE)
-  lsAllNames <- lsAllNames[lsAllNames != "..."]
-
-  objsAll <- mget(lsAllNames, envir = environment())
-
-  objsSimInit <- objsAll[formalArgs(simInit)]
-
-  namesMatchCall <- names(match.call())
-  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
-
-  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
-                 modules = objsSimInit$modules, objects = objsSimInit$objects,
-                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
-                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
-                 notOlderThan = objsSimInit$notOlderThan)
-  #sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
-
-  experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
-  objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
-  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
-
-  # Because there are some arguments in BOTH simInit and Experiment, can't pass them
-  #  through, because they have different meaning
-  objsExperiment <- objsExperiment[!names(objsExperiment) %in% names(objsSimInit)]
-  onlyInSpades <- setdiff(names(objsSpades), names(objsExperiment))
-  if (length(onlyInSpades))
-    objsExperiment[onlyInSpades] <- objsSpades[onlyInSpades]
-  sims <- do.call(experiment, objsExperiment)#AndX(scalls, "simInitAndExperiment", ...)
-
-  return(sims)
-}
 
 #' Identify Child Modules from a recursive list
 #'
