@@ -3,6 +3,7 @@ test_that("defineModule correctly handles different inputs", {
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
+
   tmp <- simInit()
 
   # check empty metadata
@@ -18,12 +19,12 @@ test_that("defineModule correctly handles different inputs", {
     keywords = c("test"),
     childModules = character(),
     authors = c(person(c("Alex", "M"), "Chubaty",
-                       email = "alexander.chubaty@canada.ca",
+                       email = "alex.chubaty@gmail.com",
                        role = c("aut", "cre"))),
-    version = list(testModule = "0.0.1"),
+    version = list(testModule = "0.0.0.9000"),
     spatialExtent = raster::extent(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = NA_character_,
+    timeunit = "year",
     citation = list(),
     documentation = list(),
     reqdPkgs = list("grid", "raster", "sp"),
@@ -60,7 +61,7 @@ test_that("defineModule correctly handles different inputs", {
 
   ## check version
   x2 <- x1
-  x2$version <- "0.0.1"
+  x2$version <- "0.0.0.9000"
   expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
 
   ## check spatialExtent
@@ -173,22 +174,22 @@ test_that("3 levels of parent and child modules load and show correctly", {
 
   fileName <- "child2/child2.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = 'year'", replacement = "timeunit = 'day'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "day"')
   cat(xxx1, file = fileName, sep = "\n")
 
   fileName <- "child3/child3.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = 'year'", replacement = "timeunit = 'week'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "week"')
   cat(xxx1, file = fileName, sep = "\n")
 
   fileName <- "child5/child5.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = 'year'", replacement = "timeunit = 'second'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "second"')
   cat(xxx1, file = fileName, sep = "\n")
 
   fileName <- "par1/par1.R"
   xxx <- readLines(fileName)
-  xxx1 <- gsub(xxx, pattern = "timeunit = 'year'", replacement = "timeunit = 'month'")
+  xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "month"')
   cat(xxx1, file = fileName, sep = "\n")
 
   if (Sys.which("glpsol") == "") {

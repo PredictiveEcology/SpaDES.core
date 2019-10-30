@@ -40,7 +40,6 @@ test_that("module templates work", {
   #test_file(file.path(mpath, "tests", "testthat", "test-template.R"))
 })
 
-
 test_that("empty defineModule", {
   testInitOut <- testInit("knitr", smcc = FALSE)
   on.exit({
@@ -48,19 +47,17 @@ test_that("empty defineModule", {
   }, add = TRUE)
 
   sim <- simInit()
-  expect_warning(sim <- defineModule(sim, list()))
+  sim <- expect_warning(defineModule(sim, list()))
   b <- depends(sim)
   out <- lapply(names(moduleDefaults), function(modDef) {
     if (modDef != "version") {
       if (all(!(c("extent", "timeframe") %in% modDef))) {
-        expect_identical(slot(b@dependencies[[1]], modDef),moduleDefaults[[modDef]])
+        expect_identical(slot(b@dependencies[[1]], modDef), moduleDefaults[[modDef]])
       } else if (modDef == "extent") {
-        expect_identical(slot(b@dependencies[[1]], "spatialExtent"),eval(moduleDefaults[[modDef]]))
+        expect_identical(slot(b@dependencies[[1]], "spatialExtent"), eval(moduleDefaults[[modDef]]))
       } else if (modDef == "timeframe") {
-        expect_identical(slot(b@dependencies[[1]], "timeframe"),eval(moduleDefaults[[modDef]]))
+        expect_identical(slot(b@dependencies[[1]], "timeframe"), eval(moduleDefaults[[modDef]]))
       }
-
     }
-
   })
 })

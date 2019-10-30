@@ -138,9 +138,9 @@ See more details below.
 the metadata of modules. Take the example of a module named, \code{Fire}, which
 has a parameter named \code{.plotInitialTime}. In the metadata of that module,
 it says \code{TRUE}. Here we can override that default with:
-\code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting. Since
-this is a list of lists, one can override the module defaults for multiple parameters
-from multiple modules all at once, with say:
+\code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
+Since this is a list of lists, one can override the module defaults for multiple
+parameters from multiple modules all at once, with say:
 \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))}.
 

@@ -5,16 +5,20 @@
 #' @export
 #'
 moduleDefaults <- list(
+  ## these need to match up with `.emptyMetadata` list in helpers.R
   timeunit = "year",
   name = NA_character_,
-  description = NA_character_,
-  keywords = NA_character_,
-  authors = person("unknown"),
+  description = "",
+  keywords = "",
+  authors = getOption("devtools.desc.author",
+                      person(c("First", "Middle"), "Last",
+                             email = "email@example.com",
+                             role = c("aut", "cre"))),
   childModules = character(0),
-  version = quote(as.numeric_version(x$version)),
+  version = "0.0.0.9000", ## numeric_versions don't deparse well
   extent = quote(raster::extent(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
-  citation = list(),
+  citation = list("citation.bib"),
   documentation = list(),
   reqdPkgs = list()
 )
@@ -143,44 +147,6 @@ moduleDefaults <- list(
 #'
 #'   ## view the resulting module file
 #'   if (interactive()) file.edit(file.path(tempdir(), "test", "test.R"))
-#'
-#'   # The default defineModule created by newModule is currently (SpaDES version 1.3.1.9044):
-#'   defineModule(sim, list(
-#'     name = "test",
-#'     description = "insert module description here",
-#'     keywords = c("insert key words here"),
-#'     authors = c(person(c("First", "Middle"), "Last",
-#'                        email = "email@example.com", role = c("aut", "cre"))),
-#'     childModules = character(0),
-#'     version = list(SpaDES = "1.3.1.9044", test = "0.0.1"),
-#'     spatialExtent = raster::extent(rep(NA_real_, 4)),
-#'     timeframe = as.POSIXlt(c(NA, NA)),
-#'     timeunit = NA_character_, # e.g., "year",
-#'     citation = list("citation.bib"),
-#'     documentation = list("README.txt", "test.Rmd"),
-#'     reqdPkgs = list(),
-#'     parameters = rbind(
-#'       #defineParameter("paramName", "paramClass", value, min, max,
-#'       # "parameter description")),
-#'       defineParameter(".plotInitialTime", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first plot event should occur"),
-#'       defineParameter(".plotInterval", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first plot event should occur"),
-#'       defineParameter(".saveInitialTime", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first save event should occur"),
-#'       defineParameter(".saveInterval", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first save event should occur")
-#'     ),
-#'     inputObjects = bind_rows(
-#'       expectsInput(objectName = NA_character_, objectClass = NA_character_,
-#'         sourceURL = NA_character_, desc = NA_character_, other = NA_character_)
-#'     ),
-#'     outputObjects = bind_rows(
-#'       createsOutput(objectName = NA_character_, objectClass = NA_character_,
-#'         desc = NA_character_, other = NA_character_)
-#'     )
-#'   ))
-#'
 #' }
 #'
 setGeneric("defineModule", function(sim, x) {
@@ -201,7 +167,7 @@ setMethod(
       warning(paste0(
         "The \'", x$name, "\' module is missing the metadata for:\n",
         paste(" - ", metadataMissing, collapse = "\n"), "\n",
-        "Using default values, which may not be desireable.\n",
+        "Using default values, which may not be desirable.\n",
         "See moduleDefaults"
       ))
     }
@@ -234,10 +200,11 @@ setMethod(
     ## maintain backwards compatibility with SpaDES versions prior to 1.3.1.9044
     ## where `version` was a single `numeric_version` value instead of named list
     x$version <- if (is.null(names(x$version))) {
-      eval(moduleDefaults$version) ## SpaDES < 1.3.1.9044
+      eval(moduleDefaults[["version"]]) ## SpaDES < 1.3.1.9044
     } else {
-      as.numeric_version(x$version[[x$name]]) ## SpaDES >= 1.3.1.9044
+      x$version[[x$name]] ## SpaDES >= 1.3.1.9044
     }
+    x$version <- as.numeric_version(x$version)
 
     x$spatialExtent <- if (!is(x$spatialExtent, "Extent")) {
       if (is.null(x$spatialExtent)) {

@@ -1,4 +1,3 @@
-################################################################################
 #' The \code{simList} class
 #'
 #' Contains the minimum components of a \code{SpaDES} simulation.
@@ -105,7 +104,6 @@
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @exportClass simList
-#'
 setClass(
   "simList",
   contains = "environment",
@@ -137,11 +135,9 @@ setClass(
 #' @export
 #' @include misc-methods.R
 #' @rdname initialize-method
-#'
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object, ...) {
-
             sn <- slotNames(.Object)
             dots <- list(...)
             slotsProvided <- sn %in% names(dots)
