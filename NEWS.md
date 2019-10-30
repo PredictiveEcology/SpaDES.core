@@ -6,6 +6,7 @@ version 0.2.6.9000
 ## dependencies
 
 * Removed dependency packages `DEoptim`, `dplyr`, `future.apply`, `Matrix`, `parallel`, `pryr`, `purrr`, and `rgenoud`, which are no longer required. See "deprecated" info below.
+* added `whisker` to Imports to facilitate module file templating (#100)
 
 ## new features
 
@@ -16,6 +17,7 @@ version 0.2.6.9000
   This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation.
   The new functionality allows a user who is hitting this memory leak issue to restart R as a work around.
   See `?restartR` for instructions.
+* new function `newProject` to initalize a SpaDES project with subdirectories `cache/`, `inputs/`, `modules/`, and `outputs/`, and `setPaths()` accordingly.
 
 ## bug fixes
 

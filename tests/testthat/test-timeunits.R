@@ -228,11 +228,11 @@ test_that("timeunits with child and parent modules work correctly", {
 
   cacheDir <- file.path(tmpdir, rndstr(1, 6)) %>% checkPath(create = TRUE)
   try(clearCache(cacheDir, ask = FALSE), silent = TRUE)
-  expect_error(
+  expect_error({
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects")))
-  )
+  })
 
 
   xxx1 <- c(xxx[seq(lineOfInterest1 - 1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
@@ -255,19 +255,20 @@ test_that("timeunits with child and parent modules work correctly", {
                    "There is no similar item in the cacheRepo",
                    "child6: using dataPath",
                    sep = "|")
-  expect_silent(expect_message(
-    mySim <- simInit(modules = list(modName),
-                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                     params = list("child6" = list(.useCache = ".inputObjects"))),
-    msgGrep)
-  )
-
-  # pulls cached value
-  a <- capture.output(mm1 <- capture_messages(
+  expect_silent(expect_message({
     mySim <- simInit(modules = list(modName),
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects")))
-  ))
+  }, msgGrep))
+
+  # pulls cached value
+  a <- capture.output({
+    mm1 <- capture_messages({
+      mySim <- simInit(modules = list(modName),
+                       paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                       params = list("child6" = list(.useCache = ".inputObjects")))
+    })
+  })
   mm1 <- cleanMessage(mm1)
   fullMessage <- c(
     "Running .inputObjects for child6",
@@ -280,22 +281,26 @@ test_that("timeunits with child and parent modules work correctly", {
   # Change the file that is in the arguments to .inputObjects
   write.table(x = data.frame(sample(1e6, 1)), file = theFile)
   # Cache should force a rerun -- i.e., not cached value
-  a <- capture.output(mm1 <- capture_messages(
-    mySim <- simInit(modules = list(modName),
-                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                     params = list("child6" = list(.useCache = ".inputObjects")))))
+  a <- capture.output({
+    mm1 <- capture_messages({
+      mySim <- simInit(modules = list(modName),
+                       paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                       params = list("child6" = list(.useCache = ".inputObjects")))
+      })
+    })
 
   mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
 
   # pulls cached value
-  a <- capture.output(mm1 <- capture_messages(
-    mySim <- simInit(modules = list(modName),
-                     paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
-                     params = list("child6" = list(.useCache = ".inputObjects")))
-  ))
+  a <- capture.output({
+    mm1 <- capture_messages({
+      mySim <- simInit(modules = list(modName),
+                       paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
+                       params = list("child6" = list(.useCache = ".inputObjects")))
+    })
+  })
   mm1 <- cleanMessage(mm1)
-  expect_true(all(unlist(lapply(fullMessage,
-                                function(x) any(grepl(mm1, pattern = x))))))
+  expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
   expect_true(any(grepl("Running .inputObjects", mm1)))
 })

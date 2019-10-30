@@ -1,0 +1,36 @@
+## load required packages
+library(data.table)
+library(sp)
+library(raster)
+library(SpaDES)
+
+## environment setup
+setPaths(cachePath = "cache",
+         inputPath = "inputs",
+         modulePath = "modules",
+         outputPath = "outputs")
+
+## simulation initialization
+simTimes <- c(start = 0, end = 10)
+
+moduleList <- list("module1", "module2") # rename module1 and module2
+
+parameters <- list(
+  module1 = list(), # rename module1 and provide named list of params
+  module2 = list()  # rename module2 and provide named list of params
+)
+
+#?inputs
+#?outputs
+
+mySim <- simInit(
+  times = simTimes,
+  modules = moduleList,
+  params = parameters
+)
+
+## run the simulation
+mySimOut <- spades(mySim) # opitonally, use `spades(Copy(mySim))`
+
+## run a simulation experiment
+# see `?experiment`

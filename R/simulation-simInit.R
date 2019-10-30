@@ -2,7 +2,6 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables(".")
 }
 
-################################################################################
 #' Initialize a new simulation
 #'
 #' Create a new simulation object, the "sim" object. This object is implemented
@@ -49,9 +48,9 @@ if (getRversion() >= "3.1.0") {
 #' the metadata of modules. Take the example of a module named, \code{Fire}, which
 #' has a parameter named \code{.plotInitialTime}. In the metadata of that module,
 #' it says \code{TRUE}. Here we can override that default with:
-#' \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting. Since
-#' this is a list of lists, one can override the module defaults for multiple parameters
-#' from multiple modules all at once, with say:
+#' \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
+#' Since this is a list of lists, one can override the module defaults for multiple
+#' parameters from multiple modules all at once, with say:
 #' \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
 #'            caribouModule = list(N = 1000))}.
 #'
@@ -360,7 +359,9 @@ setMethod(
     # paths
     oldGetPaths <- .paths()
     do.call(setPaths, paths)
-    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
+    on.exit({
+      do.call(setPaths, append(list(silent = TRUE), oldGetPaths))
+    }, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
@@ -868,10 +869,10 @@ setMethod(
                        "params",
                        "modules",
                        "objects",
-                      "paths",
-                      "inputs",
-                      "outputs",
-                      "loadOrder")
+                       "paths",
+                       "inputs",
+                       "outputs",
+                       "loadOrder")
     ma <- match(expectedOrder, listNames)
     li <- li[ma]
 

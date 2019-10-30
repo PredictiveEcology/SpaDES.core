@@ -19,7 +19,7 @@ newModuleCode(name, path, open, type, children)
 The default is the current working directory.}
 
 \item{open}{Logical. Should the new module file be opened after creation?
-Default \code{TRUE}.}
+Default \code{TRUE} in an interactive session.}
 
 \item{type}{Character string specifying one of \code{"child"} (default),
 or \code{"parent"}.}
