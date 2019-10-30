@@ -21,7 +21,8 @@ version 0.2.6.9000
 
 ## bug fixes
 
-* varous bug fixes and improvements.
+* `newModule()` now uses `open = interactive()` as default to prevent files being left open during tests.
+* various bug fixes and improvements.
 
 ## deprecated
 

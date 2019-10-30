@@ -23,9 +23,13 @@
 \alias{modulePath,simList-method}
 \alias{modulePath<-}
 \alias{modulePath<-,simList-method}
+\alias{rasterPath}
+\alias{rasterPath,simList-method}
+\alias{rasterPath<-}
+\alias{rasterPath<-,simList-method}
 \alias{dataPath}
 \alias{dataPath,simList-method}
-\title{Specify paths for modules, inputs, and outputs}
+\title{Specify paths for modules, inputs, outputs, and temporary rasters}
 \usage{
 paths(sim)
 
@@ -67,6 +71,14 @@ modulePath(sim) <- value
 
 \S4method{modulePath}{simList}(sim) <- value
 
+rasterPath(sim)
+
+\S4method{rasterPath}{simList}(sim)
+
+rasterPath(sim) <- value
+
+\S4method{rasterPath}{simList}(sim) <- value
+
 dataPath(sim)
 
 \S4method{dataPath}{simList}(sim)
@@ -97,19 +109,17 @@ will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
 }
 \details{
 These are ways to add or access the file paths used by \code{\link{spades}}.
-There are four file paths: \code{cachePath}, \code{modulePath},
-\code{inputPath}, and \code{outputPath}.
+There are five file paths: \code{cachePath}, \code{modulePath},
+\code{inputPath}, \code{outputPath}, and \code{rasterPath}.
 Each has a function to get or set the value in a \code{simList} object.
 If no paths are specified, the defaults are as follows:
 
 \itemize{
   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
-
-\item \code{inputPath}: \code{getOption("spades.modulePath")};
-
-\item \code{modulePath}: \code{getOption("spades.inputPath")};
-
-\item \code{inputPath}: \code{getOption("spades.outputPath")}.
+  \item \code{inputPath}: \code{getOption("spades.modulePath")};
+  \item \code{modulePath}: \code{getOption("spades.inputPath")};
+  \item \code{outputPath}: \code{getOption("spades.outputPath")};
+  \item \code{rasterPath}: \code{raster::tmpDir()}
 }
 }
 \seealso{

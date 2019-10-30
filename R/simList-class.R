@@ -150,6 +150,7 @@ setMethod("initialize",
             haves <- na.omit(match(sn[!slotsProvided], expected))
             if (any(1 == haves))
               .Object@modules = as.list(NULL)
+
             if (any(2 == haves))
               .Object@params = list(
                 .checkpoint = list(interval = NA_real_, file = NULL),
@@ -174,7 +175,7 @@ setMethod("initialize",
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
-            #
+
             return(.Object)
 })
 

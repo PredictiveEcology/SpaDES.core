@@ -18,8 +18,8 @@ Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
 of the DES, with current benchmarking as low as 56 microseconds overhead for
 each event (including scheduling, sorting event queue, spawning event etc.) or
-38 microseconds if there is no sorting (i.e., no sorting occurs under simple
-conditions). Under most event conditions, therefore, the DES itself will contribute
+38 microseconds if there is no sorting (i.e., no sorting occurs under simple conditions).
+Under most event conditions, therefore, the DES itself will contribute
 very minimally compared to the content of the events, which may often be
 milliseconds to many seconds each event.
 
@@ -111,7 +111,8 @@ of a \code{\link{simList}} object are summarized further below.
      \code{\link{modulePath}} \tab Global simulation module path.\cr
      \code{\link{inputPath}} \tab Global simulation input path.\cr
      \code{\link{outputPath}} \tab Global simulation output path.\cr
-     \code{\link{paths}} \tab Global simulation paths (cache, modules, inputs, outputs).\cr
+     \code{\link{rasterPath}} \tab Global simulation temporary raster path.\cr
+     \code{\link{paths}} \tab Global simulation paths (cache, modules, inputs, outputs, rasters).\cr
   }
 }
 
