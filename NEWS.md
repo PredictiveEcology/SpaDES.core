@@ -5,7 +5,7 @@ version 0.2.6.9000
 
 ## dependencies
 
-* Removed dependency packages `DEoptim`, `dplyr`, `future.apply`, `Matrix`, `parallel`, `pryr`, `purrr`, and `rgenoud`, which are no longer required. See "deprecated" info below.
+* Removed dependency packages `DEoptim`, `future.apply`, `Matrix`, `parallel`, `pryr`, `purrr`, and `rgenoud`, which are no longer required. See "deprecated" info below.
 * added `whisker` to Imports to facilitate module file templating (#100)
 
 ## new features
