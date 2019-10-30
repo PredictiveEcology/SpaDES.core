@@ -1823,7 +1823,7 @@ setMethod("dataPath",
           signature = "simList",
           definition = function(sim) {
             return(file.path(modulePath(sim, currentModule(sim)), currentModule(sim), "data"))
-          })
+})
 
 ################################################################################
 #' Time usage in \code{SpaDES}

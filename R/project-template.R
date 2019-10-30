@@ -37,7 +37,8 @@ setMethod(
       cachePath = checkPath(file.path(path, name, "cache"), create = TRUE),
       inputPath = checkPath(file.path(path, name, "inputs"), create = TRUE),
       modulePath = checkPath(file.path(path, name, "modules"), create = TRUE),
-      outputPath = checkPath(file.path(path, name, "outputs"), create = TRUE)
+      outputPath = checkPath(file.path(path, name, "outputs"), create = TRUE)#,
+      #rasterPath = checkPath(file.path(dirname(tempdir()), "scratch", name), create = TRUE)
     )
 
     ## TODO: check for Rstudio project?
