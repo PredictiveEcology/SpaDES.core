@@ -10,7 +10,6 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom dplyr mutate
 #' @importFrom stats na.omit
 #' @importFrom utils capture.output ls.str
 #' @include simList-class.R
@@ -1172,7 +1171,6 @@ setReplaceMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @importFrom dplyr inner_join
 #' @importFrom data.table := data.table
 #' @importFrom R.utils isAbsolutePath
 #' @importFrom stats na.omit

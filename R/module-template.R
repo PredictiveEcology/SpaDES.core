@@ -708,10 +708,6 @@ setMethod(
   signature = c(name = "character", path = "character", version = "character"),
   definition = function(name, path, version, data, ...) {
     dots <- list(...)
-    if (Sys.info()["sysname"] == "Windows") {
-      if (is.null(dots$zip) & all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
-        stop("External zip command paths missing.\nAdd 'zip = \"path/to/zip.exe\"' specifying path to zip.exe")
-    }
 
     path <- checkPath(path, create = FALSE)
     callingWd <- getwd()
@@ -731,7 +727,13 @@ setMethod(
       allFiles <- sort(c(allFiles, file.path(name, "data", "CHECKSUMS.txt")))
     }
 
-    zip(zipFileName, files = allFiles, ...)
+    tryOut <- try(zip(zipFileName, files = allFiles, ...))
+    if (is(tryOut, "try-error")) {
+      if (Sys.info()["sysname"] == "Windows") {
+        if (is.null(dots$zip) & all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
+          stop("External zip command paths missing.\nAdd 'zip = \"path/to/zip.exe\"' specifying path to zip.exe")
+      }
+    }
     file.copy(zipFileName, to = paste0(name, "/", zipFileName), overwrite = TRUE)
     file.remove(zipFileName)
 })

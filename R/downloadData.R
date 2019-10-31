@@ -202,7 +202,7 @@ remoteFileSize <- function(url) {
 #'
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
-#' @importFrom dplyr mutate bind_rows
+#' @importFrom dplyr bind_rows
 #' @importFrom RCurl url.exists
 #' @importFrom reproducible checkPath compareNA
 #' @importFrom utils download.file
