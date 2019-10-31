@@ -111,7 +111,6 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param sim A \code{simList} simulation object.
 #'
 #' @importFrom data.table data.table
-#' @importFrom dplyr bind_rows
 #' @export
 #' @rdname saveFiles
 #'

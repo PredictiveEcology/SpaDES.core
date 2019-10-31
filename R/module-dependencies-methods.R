@@ -143,7 +143,7 @@ setMethod("depsGraph",
 #' @author Alex Chubaty
 #' @export
 #' @importFrom data.table as.data.table data.table rbindlist
-#' @importFrom dplyr anti_join bind_rows filter inner_join lead
+#' @importFrom dplyr anti_join filter inner_join lead
 #' @importFrom stats na.omit
 #' @include simList-class.R
 #' @keywords internal
