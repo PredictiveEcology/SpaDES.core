@@ -16,8 +16,7 @@ cleanMessage <- function(mm) {
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
-                     opts = list(reproducible.inputPaths = NULL), tmpFileExt = "",
-                     needGoogle = FALSE) {
+                     opts = list(reproducible.inputPaths = NULL), tmpFileExt = "") {
   opts1 <- if (smcc)
     list(spades.moduleCodeChecks = smcc)
   else
@@ -52,35 +51,6 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   if (setPaths)
     setPaths(cachePath = tmpdir)
 
-  if (isTRUE(needGoogle)) {
-    if (utils::packageVersion("googledrive") >= "1.0.0")
-      googledrive::drive_deauth()
-    else
-      googledrive::drive_auth_config(active = TRUE)
-
-    if (quickPlot::isRstudioServer()) {
-      options(httr_oob_default = TRUE)
-    }
-
-    ## #119 changed use of .httr-oauth (i.e., no longer used)
-    ## instead, uses ~/.R/gargle/gargle-oauth/long_random_token_name_with_email
-    if (interactive()) {
-      if (utils::packageVersion("googledrive") >= "1.0.0") {
-        googledrive::drive_deauth()
-      } else {
-        if (file.exists("~/.httr-oauth")) {
-          linkOrCopy("~/.httr-oauth", to = file.path(tmpdir, ".httr-oauth"))
-        } else {
-          googledrive::drive_auth()
-          print("copying .httr-oauth to ~/.httr-oauth")
-          file.copy(".httr-oauth", "~/.httr-oauth", overwrite = TRUE)
-        }
-
-        if (!file.exists("~/.httr-oauth"))
-          message("Please put an .httr-oauth file in your ~ directory")
-      }
-    }
-  }
 
   checkPath(tmpdir, create = TRUE)
   origDir <- setwd(tmpdir)
@@ -113,10 +83,6 @@ testOnExit <- function(testInitOut) {
       options(testInitOut$opts)
     setwd(testInitOut$origDir)
     unlink(testInitOut$tmpdir, recursive = TRUE)
-    if (isTRUE(testInitOut$needGoogle)) {
-      if (utils::packageVersion("googledrive") < "1.0.0")
-        googledrive::drive_auth_config(active = FALSE)
-    }
     lapply(testInitOut$libs, function(lib) {
       try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
     )
