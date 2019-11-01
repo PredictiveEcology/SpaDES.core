@@ -280,6 +280,7 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 #' @rdname downloadModule
 #' @importFrom reproducible checkPath
 #' @importFrom utils unzip zip
+#' @importFrom data.table setDF rbindlist
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
@@ -330,8 +331,9 @@ setMethod(
                             checksum.y = character(0), algorithm.x = character(0),
                             algorithm.y = character(0),
                             stringsAsFactors = FALSE)
+    dataList3 <- dataList2
     if (!is.null(children)) {
-      if (all(nzchar(children) & !is.na(children))) {
+      if (all(nzchar(children) && !is.na(children) && length(children))) {
         tmp <- lapply(children, function(x) {
           f <- if (!is.null(childVersions[[x]])) {
             downloadModule(x, path = path, repo = repo, data = data, version = childVersions[[x]],
@@ -341,7 +343,8 @@ setMethod(
                            overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
-          dataList2 <<- bind_rows(dataList2, f[[2]])
+#          dataList2 <<- bind_rows(dataList2, f[[2]])
+          dataList2 <<- setDF(rbindlist(list(dataList2, f[[2]]), use.names = TRUE, fill = TRUE))
         })
       }
     }
@@ -368,7 +371,9 @@ setMethod(
     }
     message(crayon::magenta("Download complete for module ", name, " (v", version, ").", sep = ""))
 
-    return(list(c(files, files2), bind_rows(dataList, dataList2)))
+    return(list(c(files, files2),
+                setDF(rbindlist(list(dataList, dataList2), use.names = TRUE, fill = TRUE))))
+#                bind_rows(dataList, dataList2)))
 })
 
 #' @rdname downloadModule
