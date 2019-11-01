@@ -753,8 +753,10 @@ setMethod(
     if (!is.null(sim@.xData[["._randomSeed"]])) {
       message("Resetting .Random.seed of session because sim$._randomSeed is not NULL. ",
               "To get a different seed, run: sim$._randomSeed <- NULL to clear it.")
-      assign(".Random.seed", sim@.xData$._randomSeed, envir = .GlobalEnv)
-      do.call("RNGkind", as.list(sim$._rng.kind))
+      assign(".Random.seed", sim@.xData$._randomSeed[[1]], envir = .GlobalEnv)
+      if (!is.null(sim$._rng.kind)) {
+        do.call("RNGkind", as.list(sim$._rng.kind))
+      }
       sim@.xData[["._randomSeed"]] <- NULL
       sim@.xData[["._rng.kind"]] <- NULL
     }
