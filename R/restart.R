@@ -116,6 +116,17 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
     if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
       pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
       subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
+
+      doesntUseNamespacing <- !.isNamespaced(sim, module)
+
+      # evaluate the rest of the parsed file
+      if (doesntUseNamespacing) {
+        out1 <- evalWithActiveCode(pp[[1]],
+                                   sim@.xData,
+                                   sim = sim)
+      }
+
+
       if (length(subFiles)) {
         pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
       }
