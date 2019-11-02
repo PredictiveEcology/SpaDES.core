@@ -1097,12 +1097,15 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           }
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
+          showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
                        cacheRepo = sim@paths$cachePath,
+                       showSimilar = showSimilar,
                        userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
                                     "function:.inputObjects"))
