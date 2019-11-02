@@ -1176,8 +1176,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
          moduleTxt2," exist in:\n    ", modulePath)
   }
   if (!isTRUE(all(unlist(lapply(moduleFilesExist, any))))) {
-    stop("These main module file(s) are missing:\n    ",
-         paste(unlist(moduleFilesPoss)[!unlist(moduleFilesExist)], sep = "\n  "))
+    notExist <- !unlist(lapply(moduleFilesExist, any));
+    notExist <- Map(poss = moduleDirsPoss[notExist], exist = moduleFilesExist[notExist],
+        function(poss, exist) poss[!exist])
+    stop(paste0(names(notExist), " doesn't exist in modulePath(sim): (",
+                   lapply(notExist, paste, collapse = ", "), ")", collapse = "\n"))
   }
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])
