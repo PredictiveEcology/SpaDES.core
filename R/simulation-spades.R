@@ -171,12 +171,14 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             }
           }
 
+          showSimilar <- isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
           # This is to create a namespaced module call
           if (!.pkgEnv[["skipNamespacing"]])
             .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
                               removeOthers = FALSE)
 
-          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan)
+          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                           showSimilar = showSimilar)
 
           if (!exists(curModuleName, envir = sim, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
@@ -994,7 +996,8 @@ setMethod(
 })
 
 #' @keywords internal
-.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan) {
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                      showSimilar) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
@@ -1017,6 +1020,7 @@ setMethod(
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
+                showSimilar = showSimilar,
                      cacheRepo = sim@paths[["cachePath"]]))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent

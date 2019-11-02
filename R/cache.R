@@ -125,7 +125,9 @@ setMethod(
 
     # if this call is within a single module, only keep module-specific params
     if (length(curMod) > 0) {
+      omitParams <- c(".showSimilar", ".useCache")
       object@params <- object@params[curMod]
+      object@params[[curMod]] <- object@params[[curMod]][!names(object@params[[curMod]]) %in% omitParams]
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
