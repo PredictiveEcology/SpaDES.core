@@ -114,7 +114,7 @@ Init <- function(sim) {
   habitatQuality <- habitatQuality / maxValue(habitatQuality)
 
   # Stack them into a single stack and assign to global env
-  mapStack <- stack(DEM, forestAge, habitatQuality, percentPine)
+  mapStack <- raster::stack(DEM, forestAge, habitatQuality, percentPine)
   names(mapStack) <- c("DEM", "forestAge", "habitatQuality", "percentPine")
 
   setColors(mapStack) <- list(DEM = brewer.pal(9, "YlOrBr"),
