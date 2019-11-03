@@ -132,13 +132,32 @@ setMethod(
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
 
-    nonDotList <- grep(".list", slotNames(object), invert = TRUE, value = TRUE)
+    nonDotList <- grep(".list|.Data", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
     obj$.list <- object@.Data
     if (length(obj$.list)) {
       objNames <- names(obj$.list[[1]])
       dotUnderscoreObjs <- objNames[startsWith(objNames, "._")]
       obj$.list[[1]][dotUnderscoreObjs] <- NULL
+
+      # Now deal with ._ objects inside each module's environment
+      objNamesInner <- lapply(obj$.list[[1]][], names)
+      namesObjNamesInner <- names(objNamesInner)
+      names(namesObjNamesInner) <- namesObjNamesInner
+      nestedDotUnderscoreObjs <- lapply(namesObjNamesInner,
+                                        function(x) {
+                                          if (!is.null(objNamesInner[[x]]))
+                                            objNamesInner[[x]][startsWith(objNamesInner[[x]], "._")]
+                                          })
+      nestedDotUnderscoreObjs <- nestedDotUnderscoreObjs[names(unlist(nestedDotUnderscoreObjs, recursive = FALSE))]
+      noneToRm <- unlist(lapply(nestedDotUnderscoreObjs, function(x) length(x) == 0))
+      nestedDotUnderscoreObjs[noneToRm] <- NULL
+      obj$.list[[1]][names(nestedDotUnderscoreObjs)] <-
+        Map(na = obj$.list[[1]][names(nestedDotUnderscoreObjs)],
+            nduo = nestedDotUnderscoreObjs, function(na, nduo) {
+              na[nduo] <- NULL
+              na
+      })
     }
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
