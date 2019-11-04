@@ -303,7 +303,12 @@ Message <- function(mess, sim = NULL, file = NULL, ...) {
       }
     }
   }
-  message(mess)
+  if (is(mess, "data.frame")) {
+    mess <- paste0(capture.output(mess), collapse = "\n")
+    message(mess)
+  } else{
+    message(mess)
+  }
   if (!is.null(file)) {
     if (any(grepl("\x1b\\[.{3}", mess))) {
       mess <- gsub("\x1b\\[.{3}", "", mess)
