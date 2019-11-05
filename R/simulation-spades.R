@@ -171,7 +171,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             }
           }
 
-          showSimilar <- isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
+          showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
+            isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
+              getOption("reproducible.showSimilar", FALSE)
+            } else {
+              isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
+            }
+          }
           # This is to create a namespaced module call
           if (!.pkgEnv[["skipNamespacing"]])
             .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
