@@ -102,7 +102,8 @@ checkpointLoad <- function(file, envir = parent.frame()) {
 #' @rdname checkpoint
 .checkpointSave <- function(sim, file) {
   sim$._timestamp <- Sys.time() # nolint
-  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv) # nolint
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
+  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE) # nolint
   sim$._rng.kind <- RNGkind() # nolint
 
   tmpEnv <- new.env()

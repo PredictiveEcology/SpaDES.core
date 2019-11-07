@@ -308,7 +308,8 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
       }
     }
   }
-  sim@.xData$._randomSeed <- .Random.seed
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
+  sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   sim@.xData$._rng.kind <- RNGkind()
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())

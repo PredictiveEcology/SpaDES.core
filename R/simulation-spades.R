@@ -1134,7 +1134,9 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
   }
   endTime <- Sys.time()
   rmo$preEvents <- sim@events
-  rmo$randomSeed <- append(list(.Random.seed), rmo$randomSeed)
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
+  rmo$randomSeed <- append(list(get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)),
+                           rmo$randomSeed)
 
   rmo$recoverModeTiming <- rmo$recoverModeTiming + (endTime - startTime)
 
