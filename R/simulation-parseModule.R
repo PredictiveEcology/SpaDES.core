@@ -235,6 +235,7 @@ setMethod(
                                                    sim@.xData[[mBase]],
                                                    sim = sim)
 
+        # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
         doesntUseNamespacing <- !.isNamespaced(sim, mBase)
 
         # evaluate the rest of the parsed file

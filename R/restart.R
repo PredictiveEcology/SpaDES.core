@@ -114,28 +114,31 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
     pp <- list()
     moduleFolder <- file.path(modulePath(sim, module = module), module)
     if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
-      pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
+      pp[[1]] <- .parseConditional(sim, file.path(moduleFolder, paste0(module, ".R")))
+      # pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
       subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
 
       doesntUseNamespacing <- !.isNamespaced(sim, module)
 
       # evaluate the rest of the parsed file
       if (doesntUseNamespacing) {
-        out1 <- evalWithActiveCode(pp[[1]],
+        out1 <- evalWithActiveCode(pp[[1]][["parsedFile"]][!pp[[1]][["defineModuleItem"]]],
                                    sim@.xData,
                                    sim = sim)
       }
 
 
       if (length(subFiles)) {
-        pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
+        pp[seq_len(length(subFiles)) + 1] <-
+          lapply(subFiles, function(ff) .parseConditional(sim, ff))
       }
       #ee <- new.env()
       #ee$sim <- sim
       # sim@.xData[[module]]$sim <- sim
-      lapply(pp, function(pp1) evalWithActiveCode(pp1,
+      lapply(pp, function(pp2) {
+        evalWithActiveCode(pp2[["parsedFile"]][!pp2[["defineModuleItem"]]],
                                                   sim@.xData[[module]],
-                                                  sim = sim))
+                                                  sim = sim)})
       message(crayon::blue("Reparsing", module, "source code"))
     }
     #rm(list = "sim", envir = ee)

@@ -333,7 +333,7 @@ setMethod(
                             stringsAsFactors = FALSE)
     dataList3 <- dataList2
     if (!is.null(children)) {
-      if (all(nzchar(children) && !is.na(children) && length(children))) {
+      if (all(nzchar(children) & !is.na(children)) && length(children)) {
         tmp <- lapply(children, function(x) {
           f <- if (!is.null(childVersions[[x]])) {
             downloadModule(x, path = path, repo = repo, data = data, version = childVersions[[x]],

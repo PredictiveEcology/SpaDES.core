@@ -12,7 +12,7 @@ test_that("test event-level cache", {
       # Turn off interactive plotting
       fireSpread = list(.plotInitialTime = NA),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
@@ -371,4 +371,41 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
   expect_true(grepl("Using cached copy", mess1))
+})
+
+
+test_that("test showSimilar", {
+  testInitOut <- testInit(smcc = FALSE, "raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  # Example of changing parameter values
+  params <- list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+    # Turn off interactive plotting
+    fireSpread = list(.plotInitialTime = NA),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+  )
+
+  mySim <- simInit(
+    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+    param = params,
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    # Save final state of landscape and caribou
+    outputs = data.frame(objectName = c("landscape", "caribou"),
+                         stringsAsFactors = FALSE)
+  )
+
+  out1 <- spades(Copy(mySim))#, showSimilar = TRUE)
+  params(mySim)$randomLandscapes$nx <- 101
+  mess <- capture_messages(out2 <- spades(Copy(mySim)))#, showSimilar = TRUE)
+  mySim$a <- 1
+  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  mySim$a <- 2
+  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
 })

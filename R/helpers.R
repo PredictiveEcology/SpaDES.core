@@ -287,3 +287,32 @@ all.equal.simList <- function(target, current, ...) {
 
   all.equal.default(target, current)
 }
+
+
+Message <- function(mess, sim = NULL, file = NULL, ...) {
+  needFile <- !is.null(file) || !isFALSE(getOption("spades.messageFile", FALSE))
+  if (needFile) {
+    if (!is.null(sim)) {
+      file <- file.path(outputPath(sim), "messages.txt")
+    } else {
+      if (is.null(file)) {
+        if (isTRUE(getOption("spades.messageFile")))
+          stop("options('spades.messageFile') is TRUE, which only works if sim is provided. ",
+               "Please provide a sim or file name")
+        file <- getOption("spades.messageFile")
+      }
+    }
+  }
+  if (is(mess, "data.frame")) {
+    mess <- paste0(capture.output(mess), collapse = "\n")
+    message(mess)
+  } else{
+    message(mess)
+  }
+  if (!is.null(file)) {
+    if (any(grepl("\x1b\\[.{3}", mess))) {
+      mess <- gsub("\x1b\\[.{3}", "", mess)
+    }
+    cat(mess, file = file, append = TRUE, fill = TRUE, ...)
+  }
+}
