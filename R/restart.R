@@ -122,7 +122,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 
       # evaluate the rest of the parsed file
       if (doesntUseNamespacing) {
-        out1 <- evalWithActiveCode(pp[[1]][["parsedFile"]][!pp1[["defineModuleItem"]]],
+        out1 <- evalWithActiveCode(pp[[1]][["parsedFile"]][!pp[[1]][["defineModuleItem"]]],
                                    sim@.xData,
                                    sim = sim)
       }
