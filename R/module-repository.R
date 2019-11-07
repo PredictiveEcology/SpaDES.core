@@ -285,7 +285,7 @@ setMethod(
   "downloadModule",
   signature = c(name = "character", path = "character", version = "character",
                 repo = "character", data = "logical", quiet = "logical",
-                quickCheck = "ANY", overwrite = "logical"),
+                quickCheck = "logical", overwrite = "logical"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
     path <- checkPath(path, create = TRUE)
@@ -381,7 +381,7 @@ setMethod(
   "downloadModule",
   signature = c(name = "character", path = "missing", version = "missing",
                 repo = "missing", data = "missing", quiet = "missing",
-                quickCheck = "ANY", overwrite = "ANY"),
+                quickCheck = "logical", overwrite = "ANY"),
   definition = function(name, quickCheck, overwrite) {
     files <- downloadModule(name, path = getOption("spades.modulePath"),
                             version = NA_character_,
@@ -396,7 +396,7 @@ setMethod(
 setMethod(
   "downloadModule",
   signature = c(name = "character", path = "ANY", version = "ANY",
-                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "ANY",
+                repo = "ANY", data = "ANY", quiet = "ANY", quickCheck = "logical",
                 overwrite = "ANY"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
