@@ -358,7 +358,7 @@ test_that("test that module directory exists, but not files", {
 
   file.remove(mainParentModuleFile)
   a <- capture_messages({
-    expect_error(simInit(paths = paths, modules = modules, times = times), "are missing")
+    expect_error(simInit(paths = paths, modules = modules, times = times), "doesn't exist")
   })
 
   unlink(dirname(mainParentModuleFile), recursive = TRUE)
