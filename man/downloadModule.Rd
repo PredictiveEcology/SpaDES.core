@@ -3,24 +3,24 @@
 \docType{methods}
 \name{downloadModule}
 \alias{downloadModule}
-\alias{downloadModule,character,character,character,character,logical,logical,logical,logical-method}
-\alias{downloadModule,character,missing,missing,missing,missing,missing,logical,ANY-method}
-\alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY,logical,ANY-method}
+\alias{downloadModule,character,character,character,character,logical,logical,ANY,logical-method}
+\alias{downloadModule,character,missing,missing,missing,missing,missing,ANY,ANY-method}
+\alias{downloadModule,character,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
 \title{Download a module from a SpaDES module GitHub repository}
 \usage{
 downloadModule(name, path, version, repo, data, quiet,
   quickCheck = FALSE, overwrite = FALSE)
 
 
-  \S4method{downloadModule}{character,character,character,character,logical,logical,logical,logical}(name,
+  \S4method{downloadModule}{character,character,character,character,logical,logical,ANY,logical}(name,
   path, version, repo, data, quiet, quickCheck = FALSE,
   overwrite = FALSE)
 
 
-  \S4method{downloadModule}{character,missing,missing,missing,missing,missing,logical,ANY}(name,
+  \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,ANY}(name,
   quickCheck, overwrite)
 
-\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,logical,ANY}(name,
+\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name,
   path, version, repo, data, quiet, quickCheck = FALSE,
   overwrite = FALSE)
 }
