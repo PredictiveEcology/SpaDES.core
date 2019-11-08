@@ -2663,6 +2663,7 @@ setMethod(
       depsInSim <- list(NULL)
     } else {
       depsInSim <- sim@depends@dependencies
+      if (is.null(depsInSim[[1]])) return(character()) # basically for empty simList objects
     }
 
     if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,
