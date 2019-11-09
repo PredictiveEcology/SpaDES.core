@@ -10,7 +10,6 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom dplyr mutate
 #' @importFrom stats na.omit
 #' @importFrom utils capture.output ls.str
 #' @include simList-class.R
@@ -1105,7 +1104,7 @@ setReplaceMethod(
 
          for (nT in newTime) {
            attributes(nT)$unit <- timeunit(sim)
-           sim <- scheduleEvent(sim, nT, "load", "inputs", .first())
+           sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
          }
          toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
                                 by = c("eventTime", "moduleName", "eventType"))
@@ -1121,7 +1120,7 @@ setReplaceMethod(
          newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"] %>%
            min(., na.rm = TRUE)
          attributes(newTime)$unit <- "seconds"
-         sim <- scheduleEvent(sim, newTime, "load", "inputs", .first())
+         sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
        }
      }
    }
@@ -1172,7 +1171,6 @@ setReplaceMethod(
 #'
 #' @export
 #' @include simList-class.R
-#' @importFrom dplyr inner_join
 #' @importFrom data.table := data.table
 #' @importFrom R.utils isAbsolutePath
 #' @importFrom stats na.omit
@@ -1262,27 +1260,27 @@ setMethod(
   signature = "simList",
   definition = function(sim) {
     simUnit <- sim@simtimes[["timeunit"]]
-  saveTimeUnit <- attr(sim@outputs$saveTime, "unit")
-  if (is.null(saveTimeUnit)) saveTimeUnit <- simUnit
+    saveTimeUnit <- attr(sim@outputs$saveTime, "unit")
+    if (is.null(saveTimeUnit)) saveTimeUnit <- simUnit
 
-  out <- if (is.na(pmatch(saveTimeUnit, simUnit)) &
-             length(sim@outputs$saveTime) > 0) {
-    ## note the above line captures empty saveTime, whereas is.na does not
-    if (any(!is.na(sim@outputs$saveTime))) {
-      if (!is.null(sim@outputs$saveTime)) {
-        obj <- copy(sim@outputs) # don't change original sim
-        obj[, saveTime := convertTimeunit(saveTime, unit, sim@.xData)]
-        obj[]
-        obj
+    out <- if (is.na(pmatch(saveTimeUnit, simUnit)) &
+               length(sim@outputs$saveTime) > 0) {
+      ## note the above line captures empty saveTime, whereas is.na does not
+      if (any(!is.na(sim@outputs$saveTime))) {
+        if (!is.null(sim@outputs$saveTime)) {
+          obj <- copy(sim@outputs) # don't change original sim
+          obj[, saveTime := convertTimeunit(saveTime, unit, sim@.xData)]
+          obj[]
+          obj
+        }
+      } else {
+        sim@outputs
       }
     } else {
       sim@outputs
     }
-  } else {
-    sim@outputs
-  }
-  return(out)
-})
+    return(out)
+  })
 
 #' @export
 #' @rdname simList-accessors-inout
@@ -1470,27 +1468,23 @@ setReplaceMethod(
    return(sim)
 })
 
-
-
 ################################################################################
-#' Specify paths for modules, inputs, and outputs
+#' Specify paths for modules, inputs, outputs, and temporary rasters
 #'
 #' Accessor functions for the \code{paths} slot in a \code{simList} object.
 #'
 #' These are ways to add or access the file paths used by \code{\link{spades}}.
-#' There are four file paths: \code{cachePath}, \code{modulePath},
-#' \code{inputPath}, and \code{outputPath}.
+#' There are five file paths: \code{cachePath}, \code{modulePath},
+#' \code{inputPath}, \code{outputPath}, and \code{rasterPath}.
 #' Each has a function to get or set the value in a \code{simList} object.
 #' If no paths are specified, the defaults are as follows:
 #'
 #' \itemize{
 #'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
-#'
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
-#'
 #'   \item \code{modulePath}: \code{getOption("spades.inputPath")};
-#'
-#'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
+#'   \item \code{outputPath}: \code{getOption("spades.outputPath")};
+#'   \item \code{rasterPath}: \code{raster::tmpDir()}
 #' }
 #'
 #' @inheritParams params
@@ -1737,7 +1731,6 @@ setMethod("modulePath",
             } else {
               sim@paths$modulePath
             }
-
 })
 
 #' @export
@@ -1761,6 +1754,47 @@ setReplaceMethod(
     return(sim)
 })
 
+################################################################################
+#' @inheritParams paths
+#'
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setGeneric("rasterPath", function(sim) {
+  standardGeneric("rasterPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("rasterPath",
+          signature = "simList",
+          definition = function(sim) {
+            sim@paths$rasterPath
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("rasterPath<-",
+           function(sim, value) {
+             standardGeneric("rasterPath<-")
+})
+
+#' @name rasterPath<-
+#' @aliases rasterPath<-,simList-method
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#' @export
+setReplaceMethod(
+  "rasterPath",
+  signature = "simList",
+  function(sim, value) {
+    sim@paths$rasterPath <- unname(unlist(value))
+    checkPath(sim@paths$rasterPath, create = TRUE)
+    validObject(sim)
+    return(sim)
+})
 
 #' @description
 #' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
@@ -1787,7 +1821,7 @@ setMethod("dataPath",
           signature = "simList",
           definition = function(sim) {
             return(file.path(modulePath(sim, currentModule(sim)), currentModule(sim), "data"))
-          })
+})
 
 ################################################################################
 #' Time usage in \code{SpaDES}
@@ -2629,6 +2663,7 @@ setMethod(
       depsInSim <- list(NULL)
     } else {
       depsInSim <- sim@depends@dependencies
+      if (is.null(depsInSim[[1]])) return(character()) # basically for empty simList objects
     }
 
     if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,

@@ -2,7 +2,6 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables(".")
 }
 
-################################################################################
 #' Initialize a new simulation
 #'
 #' Create a new simulation object, the "sim" object. This object is implemented
@@ -49,9 +48,9 @@ if (getRversion() >= "3.1.0") {
 #' the metadata of modules. Take the example of a module named, \code{Fire}, which
 #' has a parameter named \code{.plotInitialTime}. In the metadata of that module,
 #' it says \code{TRUE}. Here we can override that default with:
-#' \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting. Since
-#' this is a list of lists, one can override the module defaults for multiple parameters
-#' from multiple modules all at once, with say:
+#' \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
+#' Since this is a list of lists, one can override the module defaults for multiple
+#' parameters from multiple modules all at once, with say:
 #' \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
 #'            caribouModule = list(N = 1000))}.
 #'
@@ -151,7 +150,12 @@ if (getRversion() >= "3.1.0") {
 #' @param outputs A \code{data.frame}. Can specify from 1 to 5
 #' columns with following column names: \code{objectName} (character, required),
 #' \code{file} (character), \code{fun} (character), \code{package} (character),
-#' \code{saveTime} (numeric). See \code{\link{outputs}} and
+#' \code{saveTime} (numeric) and \code{eventPriority} (numeric). If
+#' \code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
+#' is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
+#' it should give "initial conditions".
+#'
+#' See \code{\link{outputs}} and
 #' \code{vignette("ii-modules")} section about outputs.
 #'
 #' @param loadOrder  An optional list of module names specifying the order in
@@ -277,6 +281,7 @@ if (getRversion() >= "3.1.0") {
 #'    outputs = data.frame(
 #'      expand.grid(objectName = c("caribou","landscape"),
 #'      saveTime = 1:2,
+#'      eventPriority = c(0,10), # eventPriority 0 may give "initial" conditions
 #'      stringsAsFactors = FALSE))
 #'  )
 #'
@@ -354,7 +359,9 @@ setMethod(
     # paths
     oldGetPaths <- .paths()
     do.call(setPaths, paths)
-    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
+    on.exit({
+      do.call(setPaths, append(list(silent = TRUE), oldGetPaths))
+    }, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
@@ -385,9 +392,6 @@ setMethod(
 
     modules <- modules[!sapply(modules, is.null)] %>%
       lapply(., `attributes<-`, list(parsed = FALSE))
-
-    # core modules
-    core <- .pkgEnv$.coreModules
 
     # parameters for core modules
     dotParamsReal <- list(".saveInterval",
@@ -530,6 +534,18 @@ setMethod(
     ## for now, assign only some core & global params
     sim@params$.globals <- params$.globals
 
+    # core modules
+    core <- .pkgEnv$.coreModules
+    # remove the restartR module if it is not used. This is easier than adding it because
+    #   the simInit is not run again during restarts, so it won't hit this again. That
+    #   is problematic for restartR situation, but not for "normal" situation.
+    if (is.null(params$.restartR$.restartRInterval) && getOption("spades.restartRInterval", 0) == 0) {
+      core <- setdiff(core, "restartR")
+      # .pkgEnv$.coreModules <- core
+    } else {
+      restartDir <- checkAndSetRestartDir(sim = sim)
+    }
+
     ## add core module name to the loaded list (loaded with the package)
     modulesLoaded <- append(modulesLoaded, core)
 
@@ -568,7 +584,7 @@ setMethod(
       # schedule each module's init event:
       #.refreshEventQueues()
       sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
-                           c, "init", .normal())
+                           c, "init", .first() - 1)
     }
 
     ## assign user-specified non-global params, while
@@ -618,7 +634,7 @@ setMethod(
       sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
 
       ## schedule each module's init event:
-      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .normal())
+      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
 
       ### add module name to the loaded list
       names(m) <- mFullPath
@@ -853,10 +869,10 @@ setMethod(
                        "params",
                        "modules",
                        "objects",
-                      "paths",
-                      "inputs",
-                      "outputs",
-                      "loadOrder")
+                       "paths",
+                       "inputs",
+                       "outputs",
+                       "loadOrder")
     ma <- match(expectedOrder, listNames)
     li <- li[ma]
 
@@ -883,20 +899,20 @@ setMethod(
     return(invisible(sim))
 })
 
-#' Call \code{simInit} and \code{spades} or \code{experiment} together
+#' Call \code{simInit} and \code{spades} together
 #'
 #' These functions are convenience wrappers that may allow for
 #' more efficient Caching.
 #' Passes all arguments to \code{simInit}, then passes the created \code{simList}
-#' to \code{spades} or \code{experiment}.
+#' to \code{spades}.
 #'
-#' @param ... Arguments passed to simInit, and spades or experiment
+#' @param ... Arguments passed to simInit and spades
 #'
 #' @return Same as \code{\link{spades}} (a \code{simList}) or
-#'     \code{\link{experiment}} (list of \code{simList} objects)
+#'
 #'
 #' @seealso \code{\link{simInit}}, \code{\link{spades}}
-#'     \code{\link{experiment}}
+#'
 #' @export
 #' @inheritParams simInit
 #' @inheritParams spades
@@ -929,53 +945,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   sim <- do.call(spades, objsSpades)
 }
 
-#' @export
-#' @aliases simInitAndExperiment
-#' @rdname simInitAnd
-#' @inheritParams simInit
-#' @inheritParams experiment
-#' @details
-#' \code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
-#' these are also in \code{simInit}. If the \code{experiment} is being used
-#' to vary these arguments, it must be done separately (i.e., \code{simInit} then
-#' \code{experiment}).
-simInitAndExperiment <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
-                                 notOlderThan, replicates,
-                                 dirPrefix, substrLength, saveExperiment,
-                                 experimentFile, clearSimEnv, cl, ...)  {
-  list2env(list(...), envir = environment())
-  lsAllNames <- ls(all.names = TRUE)
-  lsAllNames <- lsAllNames[lsAllNames != "..."]
-
-  objsAll <- mget(lsAllNames, envir = environment())
-
-  objsSimInit <- objsAll[formalArgs(simInit)]
-
-  namesMatchCall <- names(match.call())
-  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
-
-  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
-                 modules = objsSimInit$modules, objects = objsSimInit$objects,
-                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
-                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
-                 notOlderThan = objsSimInit$notOlderThan)
-  #sim <- do.call(simInit, objsSimInit)#AndX(scalls, "simInitAndExperiment", ...)
-
-  experimentFormals <- formalArgs(experiment)[formalArgs(experiment) %in% names(objsAll)]
-  objsExperiment <- append(list(sim = sim), objsAll[experimentFormals])
-  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
-
-  # Because there are some arguments in BOTH simInit and Experiment, can't pass them
-  #  through, because they have different meaning
-  objsExperiment <- objsExperiment[!names(objsExperiment) %in% names(objsSimInit)]
-  onlyInSpades <- setdiff(names(objsSpades), names(objsExperiment))
-  if (length(onlyInSpades))
-    objsExperiment[onlyInSpades] <- objsSpades[onlyInSpades]
-  sims <- do.call(experiment, objsExperiment)#AndX(scalls, "simInitAndExperiment", ...)
-
-  return(sims)
-}
 
 #' Identify Child Modules from a recursive list
 #'
@@ -1128,12 +1097,15 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
           }
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
+          showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
                        cacheRepo = sim@paths$cachePath,
+                       showSimilar = showSimilar,
                        userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
                                     "function:.inputObjects"))
@@ -1207,8 +1179,11 @@ simInitAndExperiment <- function(times, params, modules, objects, paths, inputs,
          moduleTxt2," exist in:\n    ", modulePath)
   }
   if (!isTRUE(all(unlist(lapply(moduleFilesExist, any))))) {
-    stop("These main module file(s) are missing:\n    ",
-         paste(unlist(moduleFilesPoss)[!unlist(moduleFilesExist)], sep = "\n  "))
+    notExist <- !unlist(lapply(moduleFilesExist, any));
+    notExist <- Map(poss = moduleDirsPoss[notExist], exist = moduleFilesExist[notExist],
+        function(poss, exist) poss[!exist])
+    stop(paste0(names(notExist), " doesn't exist in modulePath(sim): (",
+                   lapply(notExist, paste, collapse = ", "), ")", collapse = "\n"))
   }
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])

@@ -184,7 +184,7 @@ Stats <- function(sim) {
 
   landscapes <- sim[[SpaDES.core::P(sim)$stackName]]
 
-  sim[[SpaDES.core::globals(sim)$burnStats]] <- c(npix, length(which(values(landscapes$Fires) > 0)))
+  sim[[SpaDES.core::globals(sim)$burnStats]] <- c(npix, length(which(raster::values(landscapes$Fires) > 0)))
 
   return(invisible(sim))
 }

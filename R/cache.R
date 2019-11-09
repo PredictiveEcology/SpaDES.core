@@ -73,7 +73,8 @@ setMethod(
     }
     envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
                      function(objs, name) {
-                       objs <- objs[!objs %in% c("._parsedData", "._sourceFilename", "mod")]
+                       dotUnderscoreObjs <- objs[startsWith(objs, "._")]
+                       objs <- objs[!objs %in% c(dotUnderscoreObjs, "mod")]
                        objectsToDigest <- sort(objs, method = "radix")
                        objectsToDigest <- objectsToDigest[objectsToDigest %in%
                                                             .objects[[name]]]
@@ -124,17 +125,39 @@ setMethod(
 
     # if this call is within a single module, only keep module-specific params
     if (length(curMod) > 0) {
+      omitParams <- c(".showSimilar", ".useCache")
       object@params <- object@params[curMod]
+      object@params[[curMod]] <- object@params[[curMod]][!names(object@params[[curMod]]) %in% omitParams]
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
 
-    nonDotList <- grep(".list", slotNames(object), invert = TRUE, value = TRUE)
+    nonDotList <- grep(".list|.Data", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
     obj$.list <- object@.Data
     if (length(obj$.list)) {
-      obj$.list[[1]]$._startClockTime <- NULL
-      obj$.list[[1]]$._timestamp <- NULL
+      objNames <- names(obj$.list[[1]])
+      dotUnderscoreObjs <- objNames[startsWith(objNames, "._")]
+      obj$.list[[1]][dotUnderscoreObjs] <- NULL
+
+      # Now deal with ._ objects inside each module's environment
+      objNamesInner <- lapply(obj$.list[[1]][], names)
+      namesObjNamesInner <- names(objNamesInner)
+      names(namesObjNamesInner) <- namesObjNamesInner
+      nestedDotUnderscoreObjs <- lapply(namesObjNamesInner,
+                                        function(x) {
+                                          if (!is.null(objNamesInner[[x]]))
+                                            objNamesInner[[x]][startsWith(objNamesInner[[x]], "._")]
+                                          })
+      nestedDotUnderscoreObjs <- nestedDotUnderscoreObjs[names(unlist(nestedDotUnderscoreObjs, recursive = FALSE))]
+      noneToRm <- unlist(lapply(nestedDotUnderscoreObjs, function(x) length(x) == 0))
+      nestedDotUnderscoreObjs[noneToRm] <- NULL
+      obj$.list[[1]][names(nestedDotUnderscoreObjs)] <-
+        Map(na = obj$.list[[1]][names(nestedDotUnderscoreObjs)],
+            nduo = nestedDotUnderscoreObjs, function(na, nduo) {
+              na[nduo] <- NULL
+              na
+      })
     }
 
     obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
@@ -366,13 +389,18 @@ setMethod(
 
       isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
         names(preDigest[[whSimList]]$.list[[whSimList2]])
-      newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
-      newObjs <- newObjs[!startsWith(newObjs, "._")]
-      existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-      post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
-      pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
-      changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
-      c(newObjs, changedObjs)
+      if (length(isNewObj)) {
+        newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
+        newObjs <- newObjs[!startsWith(newObjs, "._")]
+        existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
+        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+        changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
+        changed <- c(newObjs, changedObjs)
+      } else {
+        changed <- character()
+      }
+      changed
     } else {
       character()
     }
@@ -765,3 +793,85 @@ unmakeMemoisable.simList_ <- function(x) {
   }
   return(y)
 }
+
+
+if (!isGeneric("clearCache")) {
+  setGeneric(
+    "clearCache",
+    function(x, userTags = character(), after, before,
+             ask = getOption("reproducible.ask"),
+             useCloud = FALSE,
+             cloudFolderID = NULL, ...) {
+      standardGeneric("clearCache")
+    }
+  )
+}
+
+#' clearCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @inheritParams reproducible::clearCache
+#' @importFrom reproducible clearCache
+#' @importMethodsFrom reproducible clearCache
+#' @rdname clearCache
+setMethod(
+  "clearCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ask, useCloud = FALSE,
+                        cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
+                        ...) {
+    x <- x@paths$cachePath
+    clearCache(x = x, userTags = userTags, after = after, before = before,
+               ask = ask, useCloud = useCloud,
+               cloudFolderID = cloudFolderID,
+               ...)
+  })
+
+
+if (!isGeneric("showCache")) {
+  setGeneric("showCache", function(x, userTags = character(), after, before, ...) {
+    standardGeneric("showCache")
+  })
+}
+
+#' showCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @importFrom reproducible showCache
+#' @importMethodsFrom reproducible showCache
+#' @rdname clearCache
+setMethod(
+  "showCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ...) {
+    x <- x@paths$cachePath
+    showCache(x = x, userTags = userTags, after = after, before = before,
+               ...)
+  })
+
+if (!isGeneric("keepCache")) {
+  setGeneric("keepCache", function(x, userTags = character(), after, before, ...) {
+    standardGeneric("keepCache")
+  })
+}
+
+#' keepCache for simList objects
+#'
+#' This will take the \code{cachePath(object)} and pass
+#' @export
+#'
+#' @importFrom reproducible keepCache
+#' @importMethodsFrom reproducible keepCache
+#' @rdname clearCache
+setMethod(
+  "keepCache",
+  signature = "simList",
+  definition = function(x, userTags, after, before, ...) {
+    x <- x@paths$cachePath
+    keepCache(x = x, userTags = userTags, after = after, before = before,
+               ...)
+  })

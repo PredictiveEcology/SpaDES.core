@@ -1,4 +1,4 @@
-test_that("simList object initializes correctly", {
+test_that("simList object initializes correctly (1)", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -83,10 +83,10 @@ test_that("simList object initializes correctly", {
 
   ### SLOT modules
   expect_is(modules(mySim), "list")
-  compList <- as.list(c(defaults, modules))
+  compList <- setdiff(as.list(c(defaults, modules)), "restartR")
   attr(compList, "modulesGraph") <- data.frame(from = character(0), to = character(),
                                                stringsAsFactors = FALSE)
-  expect_equivalent(modules(mySim, hidden = TRUE), compList)
+  expect_equivalent(unname(modules(mySim, hidden = TRUE)), compList)
   expect_equal(unname(modules(mySim)), as.list(modules))
 
   ### SLOT params
@@ -286,7 +286,7 @@ test_that("simList test all signatures", {
   }
 })
 
-test_that("simList object initializes correctly", {
+test_that("simList object initializes correctly (2)", {
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
@@ -358,7 +358,7 @@ test_that("test that module directory exists, but not files", {
 
   file.remove(mainParentModuleFile)
   a <- capture_messages({
-    expect_error(simInit(paths = paths, modules = modules, times = times), "are missing")
+    expect_error(simInit(paths = paths, modules = modules, times = times), "doesn't exist")
   })
 
   unlink(dirname(mainParentModuleFile), recursive = TRUE)

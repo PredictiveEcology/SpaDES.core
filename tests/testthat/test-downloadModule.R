@@ -68,7 +68,8 @@ test_that("downloadModule downloads and unzips a parent module", {
     d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
       c(m, "data", "testthat") %>% sort()
 
-    expect_equal(length(f), 43)
+    valToCompare <- 45 # if (.Platform$OS.type == "unix" || isWindows()) 45 else 43
+    expect_equal(length(f), valToCompare)
     expect_equal(d, d_expected)
   }
 })

@@ -1,5 +1,33 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.6.9000
+=============
+
+## dependencies
+
+* Removed dependency packages `DEoptim`, `future.apply`, `Matrix`, `parallel`, `pryr`, `purrr`, and `rgenoud`, which are no longer required. See "deprecated" info below.
+* added `whisker` to Imports to facilitate module file templating (#100)
+
+## new features
+
+* memory and peak memory estimation is now available for *nix-type systems, when `future` is installed.
+  See new vignette `iv-advanced` and `?memoryUse`.
+* new function and capacity: `restartR`. Restarts R mid-stream to deal with apparent memory leaks in R.
+  In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <https://github.com/r-lib/fastmap>).
+  This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation.
+  The new functionality allows a user who is hitting this memory leak issue to restart R as a work around.
+  See `?restartR` for instructions.
+* new function `newProject` to initalize a SpaDES project with subdirectories `cache/`, `inputs/`, `modules/`, and `outputs/`, and `setPaths()` accordingly.
+
+## bug fixes
+
+* `newModule()` now uses `open = interactive()` as default to prevent files being left open during tests.
+* various bug fixes and improvements.
+
+## deprecated
+
+* `experiment()`, `experiment2()`, and `POM()` have been moved to the `SpaDES.experiment` package
+
 version 0.2.6
 =============
 

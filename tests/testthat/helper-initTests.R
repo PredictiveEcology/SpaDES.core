@@ -17,10 +17,10 @@ cleanMessage <- function(mm) {
 # sets options("spades.debug" = FALSE) if debug = FALSE
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
                      opts = list(reproducible.inputPaths = NULL), tmpFileExt = "") {
-  opts1 <- if (smcc)
+  opts1 <- #if (smcc)
     list(spades.moduleCodeChecks = smcc)
-  else
-    list()
+  #else
+    #list()
 
   if (length(opts)) {
     opts1 <- append( opts1, opts)
@@ -50,6 +50,8 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   tmpdir <- file.path(tempdir(), rndstr(1, 6))
   if (setPaths)
     setPaths(cachePath = tmpdir)
+
+
   checkPath(tmpdir, create = TRUE)
   origDir <- setwd(tmpdir)
   tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
@@ -64,7 +66,7 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
     tmpfile <- normPath(tmpfile)
   }
 
-  outList <- list(opts = opts1, optsDebug = optsDebug, tmpdir = tmpdir,
+  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
                   origDir = origDir, libs = libraries,
                   tmpCache = tmpCache, optsAsk = optsAsk,
                   tmpfile = tmpfile)
@@ -73,16 +75,15 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
 }
 
 testOnExit <- function(testInitOut) {
-  if (length(testInitOut$opts))
-    options("spades.moduleCodeChecks" = testInitOut$opts[[1]])
-  if (length(testInitOut$optsDebug))
-    options("spades.debug" = testInitOut$optsDebug[[1]])
-  if (length(testInitOut$optsAsk))
-    options("reproducible.ask" = testInitOut$optsAsk[[1]])
-  setwd(testInitOut$origDir)
-  unlink(testInitOut$tmpdir, recursive = TRUE)
-  lapply(testInitOut$libs, function(lib) {
-    detach(paste0("package:", lib), character.only = TRUE)}
-  )
-
-}
+    if (length(testInitOut$optsVerbose))
+      options("reproducible.verbose" = testInitOut$optsVerbose[[1]])
+    if (length(testInitOut$optsAsk))
+      options("reproducible.ask" = testInitOut$optsAsk[[1]])
+    if (length(testInitOut$opts))
+      options(testInitOut$opts)
+    setwd(testInitOut$origDir)
+    unlink(testInitOut$tmpdir, recursive = TRUE)
+    lapply(testInitOut$libs, function(lib) {
+      try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
+    )
+  }

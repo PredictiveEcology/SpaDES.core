@@ -1,60 +1,3 @@
-test_that("test cache", {
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
-                                      spades.useRequire = FALSE),
-                          setPaths = FALSE)
-
-  try(clearCache(tmpdir), silent = TRUE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-
-  # Example of changing parameter values
-  mySim <- simInit(
-    times = list(start = 0.0, end = 1.0, timeunit = "year"),
-    params = list(
-      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-      # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA)
-    ),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tmpdir,
-                 cachePath = tmpdir),
-    # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou"),
-                         stringsAsFactors = FALSE)
-  )
-
-  set.seed(1123)
-  expr <- quote(experiment(Copy(mySim), replicates = 2, cache = TRUE, debug = FALSE,
-                           omitArgs = c("progress", "debug", ".plotInitialTime", ".saveInitialTime")))
-  sims <- eval(expr)
-  out <- showCache(sims[[1]])
-  expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies, one for each "experiment"
-  expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
-  expect_output(print(out), "cacheId")
-  expect_output(print(out), "simList")
-  expect_true(NROW(out[!tagKey %in% c("preDigest", "otherFunctions")]) == 16) #
-  expect_true(NROW(out[tagKey %in% "preDigest"]) ==
-                     (length(slotNames(sims[[1]]))*2 + 2 * length(modules(mySim)) + 2 * 2)) # 2 args for Cache -- FUN & replicate
-  expect_message(sims <- eval(expr),
-                 "loading cached result from previous spades call")
-
-  out2 <- showCache(sims[[1]])
-
-  # 2 original times, 2 cached times per spades
-  expect_true(NROW(out2[tagKey == "accessed"]) == 4)
-
-  # 2 cached copies of spades
-  expect_true(NROW(unique(out2$artifact)) == 2)
-
-  clearCache(sims[[1]], ask = FALSE)
-  out <- showCache(sims[[1]])
-  expect_true(NROW(out) == 0)
-})
-
 test_that("test event-level cache", {
   testInitOut <- testInit(smcc = FALSE)
   on.exit({
@@ -69,7 +12,7 @@ test_that("test event-level cache", {
       # Turn off interactive plotting
       fireSpread = list(.plotInitialTime = NA),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
@@ -82,11 +25,15 @@ test_that("test event-level cache", {
 
   set.seed(1123)
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)))
+                capture_output({
+                  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+                }))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
-  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
+  mess1 <- capture_output({
+    sims <- spades(Copy(mySim), debug = FALSE)
+  })
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
@@ -95,7 +42,6 @@ test_that("test event-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
-
 })
 
 test_that("test module-level cache", {
@@ -131,7 +77,9 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE))))
+                  capture_output({
+                    sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+                  })))
   dev.off()
 
   expect_true(file.info(tmpfile)$size > 20000)
@@ -143,7 +91,9 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile1)
-  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
+  mess1 <- capture_output({
+    sims <- spades(Copy(mySim), debug = FALSE)
+  })
   dev.off()
 
   if (!identical(Sys.info()[["sysname"]], "Windows") || interactive()) ## TODO: TEMPORARY to avoid random CRAN fail
@@ -159,7 +109,6 @@ test_that("test module-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
-
 })
 
 test_that("test .prepareOutput", {
@@ -415,13 +364,48 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
   # Try again, hi should be there
   expect_true(is.null(mySim$test$hi)) # is not in the
-  mess1 <- capture_output(mySim2 <- spades(Copy(mySim)))
+  mess1 <- capture_output({
+    mySim2 <- spades(Copy(mySim))
+  })
   expect_true(mySim2$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
   expect_true(grepl("Using cached copy", mess1))
-
 })
 
 
+test_that("test showSimilar", {
+  testInitOut <- testInit(smcc = FALSE, "raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
+  # Example of changing parameter values
+  params <- list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+    # Turn off interactive plotting
+    fireSpread = list(.plotInitialTime = NA),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+  )
+
+  mySim <- simInit(
+    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+    param = params,
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    # Save final state of landscape and caribou
+    outputs = data.frame(objectName = c("landscape", "caribou"),
+                         stringsAsFactors = FALSE)
+  )
+
+  out1 <- spades(Copy(mySim))#, showSimilar = TRUE)
+  params(mySim)$randomLandscapes$nx <- 101
+  mess <- capture_messages(out2 <- spades(Copy(mySim)))#, showSimilar = TRUE)
+  mySim$a <- 1
+  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  mySim$a <- 2
+  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+})

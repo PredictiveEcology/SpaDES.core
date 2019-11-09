@@ -10,10 +10,12 @@
 #' @name .coreModules
 #' @rdname coreModules
 .coreModules <- function() {
-  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load")
+  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load",
+       restartR = "restartR")
 }
 
 #' @keywords internal
+#' @include environment.R
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
 #' @keywords internal
@@ -113,18 +115,18 @@ setMethod(
   signature(x = "missing"),
   definition = function() {
     out <- list(
-      name = character(0),
-      description = character(0),
-      keywords = character(0),
-      childModules = character(0),
-      authors = person("unknown"),
-      version = numeric_version(NULL),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
-      timeframe = as.POSIXlt(c(NA, NA)),
-      timeunit = NA_character_,
-      citation = list(),
-      documentation = list(),
-      reqdPkgs = list(),
+      name = moduleDefaults[["name"]],
+      description = moduleDefaults[["description"]],
+      keywords = moduleDefaults[["keywords"]],
+      childModules = moduleDefaults[["childModules"]],
+      authors = moduleDefaults[["authors"]],
+      version = moduleDefaults[["version"]],
+      spatialExtent = raster::extent(rep(NA_real_, 4)), ## match up with moduleDefaults
+      timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
+      timeunit = moduleDefaults[["timeunit"]],
+      citation = moduleDefaults[["citation"]],
+      documentation = moduleDefaults[["documentation"]],
+      reqdPkgs = moduleDefaults[["reqdPkgs"]],
       parameters = defineParameter(),
       inputObjects = ._inputObjectsDF(),
       outputObjects = ._outputObjectsDF()
@@ -284,4 +286,33 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
   all.equal.default(target, current)
+}
+
+
+Message <- function(mess, sim = NULL, file = NULL, ...) {
+  needFile <- !is.null(file) || !isFALSE(getOption("spades.messageFile", FALSE))
+  if (needFile) {
+    if (!is.null(sim)) {
+      file <- file.path(outputPath(sim), "messages.txt")
+    } else {
+      if (is.null(file)) {
+        if (isTRUE(getOption("spades.messageFile")))
+          stop("options('spades.messageFile') is TRUE, which only works if sim is provided. ",
+               "Please provide a sim or file name")
+        file <- getOption("spades.messageFile")
+      }
+    }
+  }
+  if (is(mess, "data.frame")) {
+    mess <- paste0(capture.output(mess), collapse = "\n")
+    message(mess)
+  } else{
+    message(mess)
+  }
+  if (!is.null(file)) {
+    if (any(grepl("\x1b\\[.{3}", mess))) {
+      mess <- gsub("\x1b\\[.{3}", "", mess)
+    }
+    cat(mess, file = file, append = TRUE, fill = TRUE, ...)
+  }
 }

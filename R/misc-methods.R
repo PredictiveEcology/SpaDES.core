@@ -582,13 +582,21 @@ setMethod(
 #' @param outputPath  The default local directory in which to save simulation outputs.
 #'                    If not specified, defaults to \code{getOption("spades.outputPath")}.
 #'
+#' @param rasterPath  The default local directory in which to save transient raster files.
+#'                    If not specified, defaults to \code{\link[raster]{tmpDir}}.
+#'                    \emph{Important note:} this location may not be cleaned up automatically,
+#'                    so be sure to monitor this directory and remove unecessary temp files
+#'                    that may contribute to excessive disk usage.
+#'
 #' @return Returns a named list of the user's default working directories.
 #' \code{setPaths} is invoked for the side effect of setting these directories.
 #'
 #' @author Alex Chubaty
 #' @keywords internal
+#' @importFrom raster tmpDir
 #' @name setPaths
 #' @rdname setPaths
+#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -618,7 +626,8 @@ setMethod(
     cachePath = .getOption("reproducible.cachePath"),
     inputPath = getOption("spades.inputPath"),
     modulePath = getOption("spades.modulePath"),
-    outputPath = getOption("spades.outputPath")
+    outputPath = getOption("spades.outputPath"),
+    rasterPath = tmpDir()
   )
 }
 
@@ -634,22 +643,24 @@ Paths <- .paths()
 
 #' @export
 #' @rdname setPaths
+#' @importFrom raster tmpDir
 #' @importFrom reproducible checkPath
 #' @importFrom R.utils getOption
 #' @param silent Logical. Should the messaging occur.
-setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALSE) {
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {
   defaults <- list(
     CP = FALSE,
     IP = FALSE,
     MP = FALSE,
-    OP = FALSE
+    OP = FALSE,
+    RP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath")     # nolint
+    cachePath <- .getOption("reproducible.cachePath") # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {
-    inputPath <- getOption("spades.inputPath")    # nolint
+    inputPath <- getOption("spades.inputPath") # nolint
     defaults$IP <- TRUE
   }
   if (missing(modulePath)) {
@@ -660,13 +671,19 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
     outputPath <- getOption("spades.outputPath") # nolint
     defaults$OP <- TRUE
   }
+  if (missing(rasterPath)) {
+    rasterPath <- tmpDir()
+    defaults$RP <- TRUE
+  }
 
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
-  options(spades.inputPath = inputPath,
-          spades.modulePath = unlist(modulePath), spades.outputPath = outputPath,
-          reproducible.cachePath = cachePath)
+  options(rasterTmpDir = rasterPath,
+          reproducible.cachePath = cachePath,
+          spades.inputPath = inputPath,
+          spades.modulePath = unlist(modulePath),
+          spades.outputPath = outputPath)
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
@@ -676,25 +693,32 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
 
   if (!silent) {
     if (!allDefault) {
-      message("Setting:\n",
-              "  options(\n",
-              if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"), #nolint
-              if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
-              if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
-              if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
-              "  )")
+      message(
+        "Setting:\n",
+        "  options(\n",
+        if (!defaults$RP) paste0("    rasterTmpDir = '", normPath(rasterPath), "'\n"),
+        if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"),
+        if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
+        if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
+        if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
+        "  )"
+      )
     }
-    if (any(unlist(defaults)))
-      message("Paths set to:\n",
-              "  options(\n",
-              "    reproducible.cachePath = '", normPath(cachePath), "'\n",
-              "    spades.inputPath = '", normPath(inputPath), "'\n",
-              "    spades.outputPath = '", normPath(outputPath), "'\n",
-              "    spades.modulePath = '", modPaths, "'\n",
-              "  )")
+
+    if (any(unlist(defaults))) {
+      message(
+        "Paths set to:\n",
+        "  options(\n",
+        "    rasterTmpDir = '", normPath(rasterPath), "'\n",
+        "    reproducible.cachePath = '", normPath(cachePath), "'\n",
+        "    spades.inputPath = '", normPath(inputPath), "'\n",
+        "    spades.outputPath = '", normPath(outputPath), "'\n",
+        "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
+        "  )"
+      )
+    }
   }
 
   lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
 }
-

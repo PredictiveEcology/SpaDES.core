@@ -67,7 +67,12 @@ See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
-\code{saveTime} (numeric). See \code{\link{outputs}} and
+\code{saveTime} (numeric) and \code{eventPriority} (numeric). If
+\code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
+is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
+it should give "initial conditions".
+
+See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional list of module names specifying the order in
@@ -133,9 +138,9 @@ See more details below.
 the metadata of modules. Take the example of a module named, \code{Fire}, which
 has a parameter named \code{.plotInitialTime}. In the metadata of that module,
 it says \code{TRUE}. Here we can override that default with:
-\code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting. Since
-this is a list of lists, one can override the module defaults for multiple parameters
-from multiple modules all at once, with say:
+\code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
+Since this is a list of lists, one can override the module defaults for multiple
+parameters from multiple modules all at once, with say:
 \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))}.
 
@@ -289,6 +294,7 @@ if (require(rgdal)) {
    outputs = data.frame(
      expand.grid(objectName = c("caribou","landscape"),
      saveTime = 1:2,
+     eventPriority = c(0,10), # eventPriority 0 may give "initial" conditions
      stringsAsFactors = FALSE))
  )
 
