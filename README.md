@@ -44,3 +44,7 @@ install_github("PredictiveEcology/SpaDES.core", dependencies = TRUE) # stable
 library("devtools")
 install_github("PredictiveEcology/SpaDES.core", ref = "development", dependencies = TRUE) # unstable
 ```
+
+## Contributions
+
+Please see `CONTRIBUTING.md` for information on how to contribute to this project.
