@@ -536,7 +536,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://spades-core.predictiveecology.org/}
+  \item \url{https://spades-core.predictiveecology.org/}
   \item \url{https://github.com/PredictiveEcology/SpaDES.core}
   \item Report bugs at \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
 }
@@ -553,7 +553,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Yong Luo \email{yluo1@lakeheadu.ca} [contributor]
-  \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
+  \item Stev<U+263A>e Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
   \item Ceres Barros \email{cbarros@mail.ubc.ca} (0000-0003-4036-977X) [contributor]
   \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
