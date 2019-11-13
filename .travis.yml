@@ -61,9 +61,13 @@ jobs:
     r_binary_packages:
       - BH
       - dplyr
+      - git2r
       - igraph
+      - later
+      - RCurl
       - RSQlite
       - stringi
+      - XML
     r_github_packages:
       - jimhester/lintr
       - r-lib/covr
