@@ -24,7 +24,6 @@ test_that("test event-level cache", {
   )
 
   set.seed(1123)
-  browser()
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
                 capture_output({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
