@@ -1,6 +1,8 @@
 sudo: required
 language: r
-cache: packages
+cache:
+  - $HOME/.ccache
+  - packages
 cran: https://cloud.r-project.org
 env:
   global:
@@ -18,6 +20,7 @@ jobs:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
+          - ccache
           - libgdal-dev
           - libgeos-dev
           - libglpk-dev
@@ -26,6 +29,9 @@ jobs:
           - libudunits2-dev
     services:
       - xvfb
+    before_install:
+      - mkdir $HOME/.R && echo -e 'CXX_STD = CXX14\n\nVER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+      - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
@@ -42,6 +48,7 @@ jobs:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
+          - ccache
           - libgdal-dev
           - libgeos-dev
           - libglpk-dev
@@ -50,6 +57,9 @@ jobs:
           - libudunits2-dev
     services:
       - xvfb
+    before_install:
+      - mkdir $HOME/.R && echo -e 'CXX_STD = CXX14\n\nVER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+      - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
@@ -82,6 +92,7 @@ jobs:
         sources:
           - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
         packages:
+          - ccache
           - libgdal-dev
           - libgeos-dev
           - libglpk-dev
@@ -90,6 +101,9 @@ jobs:
           - libudunits2-dev
     services:
       - xvfb
+    before_install:
+      - mkdir $HOME/.R && echo -e 'CXX_STD = CXX14\n\nVER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+      - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
