@@ -114,9 +114,8 @@ jobs:
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
-      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
-    before_install:
       - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
   - os: osx
     osx_image: xcode9.4
     env:
@@ -134,8 +133,8 @@ jobs:
     r_build_args: "--no-build-vignettes"
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     before_script:
-      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
       - Rscript -e 'install.packages("devtools", type = "source")'
+      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
 r_build_args: " "
 r_check_args: "--as-cran"
