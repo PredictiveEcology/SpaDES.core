@@ -100,6 +100,7 @@ checkpointLoad <- function(file, envir = parent.frame()) {
 }
 
 #' @rdname checkpoint
+#' @importFrom stats runif
 .checkpointSave <- function(sim, file) {
   sim$._timestamp <- Sys.time() # nolint
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)

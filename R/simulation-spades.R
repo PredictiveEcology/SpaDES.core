@@ -1102,6 +1102,7 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
 }
 
 #' @keywords internal
+#' @importFrom stats runif
 recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
   if (is.null(allObjNames)) {
     allObjNames <- outputObjectNames(sim)

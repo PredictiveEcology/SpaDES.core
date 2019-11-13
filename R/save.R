@@ -275,6 +275,7 @@ saveFiles <- function(sim) {
 #'
 #' @export
 #' @rdname saveSimList
+#' @importFrom stats runif
 #' @seealso zipSimList
 #'
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
