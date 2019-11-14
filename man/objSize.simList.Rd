@@ -4,8 +4,13 @@
 \alias{objSize.simList}
 \title{Object size for \code{simList}}
 \usage{
-\method{objSize}{simList}(x, quick = getOption("reproducible.quick",
-  FALSE), enclosingEnvs = TRUE, .prevEnvirs = list(), ...)
+\method{objSize}{simList}(
+  x,
+  quick = getOption("reproducible.quick", FALSE),
+  enclosingEnvs = TRUE,
+  .prevEnvirs = list(),
+  ...
+)
 }
 \arguments{
 \item{x}{An object}

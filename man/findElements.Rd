@@ -4,10 +4,13 @@
 \alias{.findElementsInEnv}
 \alias{.findElement}
 \alias{.parsingSim}
-\title{Find all references to sim$}
+\title{Find all references to \code{sim$}}
 \usage{
-.findElementsInEnv(envToFindSim = parent.frame(),
-  moduleEnv = parent.frame(), type)
+.findElementsInEnv(
+  envToFindSim = parent.frame(),
+  moduleEnv = parent.frame(),
+  type
+)
 
 .findElement(x, type)
 
@@ -18,7 +21,7 @@
 the element accessing the simList is actually a call, e.g.,
 \code{sim[[P(sim)$stackName]]}}
 
-\item{moduleEnv}{The environment where the module functions are}
+\item{moduleEnv}{The environment where the module functions are.}
 
 \item{type}{Either "get", "assign", or "globals". See details.}
 
@@ -28,7 +31,7 @@ the element accessing the simList is actually a call, e.g.,
 A character string with all sim objects found
 }
 \description{
-Find all references to sim$
+Find all references to \code{sim$}
 
 \code{.parsingSim} will pull out the various ways to use sim, e.g.,
 \code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}

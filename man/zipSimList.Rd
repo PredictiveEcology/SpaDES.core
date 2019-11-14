@@ -4,8 +4,7 @@
 \alias{zipSimList}
 \title{Zip many of the files in a \code{simList}}
 \usage{
-zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
-  cache = FALSE)
+zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
 }
 \arguments{
 \item{sim}{A simList at the core of the zipping.}

@@ -14,7 +14,6 @@ if (getRversion() >= "3.1.0") {
 #' @author Alex Chubaty
 #' @keywords internal
 #' @rdname unparsed
-#'
 setGeneric(".unparsed",
            function(modules) {
              standardGeneric(".unparsed")
@@ -31,14 +30,7 @@ setMethod(
     return(ids)
 })
 
-################################################################################
-#' @return \code{.parseModulePartial} extracts just the individual element
-#' requested from the module. This can be useful if parsing the whole module
-#' would cause an error.
-#'
 #' @param filename The filename of the module to be parsed.
-#'
-#' @inheritParams spades
 #'
 #' @param defineModuleElement Character string indicating which of the list
 #'                            elements in defineModule should be extracted
@@ -48,13 +40,16 @@ setMethod(
 #'              parsing again. If the \code{envir} is transient, then this will
 #'              have no effect.
 #'
+#' @return \code{.parseModulePartial} extracts just the individual element
+#' requested from the module. This can be useful if parsing the whole module
+#' would cause an error.
+#'
 #' @author Eliot McIntire
 #' @export
 #' @include module-dependencies-class.R
 #' @include simList-class.R
 #' @include environment.R
 #' @rdname parseModule
-#'
 setGeneric(".parseModulePartial",
            function(sim, modules, filename, defineModuleElement, envir = NULL) {
              standardGeneric(".parseModulePartial")
@@ -155,19 +150,18 @@ setMethod(
 #'                             then the \code{.inputObjects} code will be skipped.
 #'
 #' @param notOlderThan Passed to \code{Cache} that may be used for .inputObjects function call.
-#' @inheritParams .parseModulePartial
 #'
 #' @param ... All \code{simInit} parameters.
 #'
 #' @return A \code{simList} simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @keywords internal
+#' @importFrom codetools checkUsageEnv findGlobals
 #' @importFrom reproducible Cache
-#' @importFrom codetools findGlobals checkUsageEnv
 #' @include environment.R
 #' @include module-dependencies-class.R
 #' @include simList-class.R
+#' @keywords internal
 #' @rdname parseModule
 #'
 setGeneric(".parseModule",

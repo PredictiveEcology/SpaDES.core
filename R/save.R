@@ -245,8 +245,6 @@ saveFiles <- function(sim) {
 #' Because of the environment slot, this is not quite as straightforward as
 #' just saving the object. This also has option for file-backed Rasters.
 #'
-#' @inheritParams spades
-#'
 #' @param sim Either a \code{simList} or a character string of the name
 #'        of a \code{simList} that can be found in \code{envir}. Using
 #'        a character string will assign that object name to the saved
@@ -274,10 +272,9 @@ saveFiles <- function(sim) {
 #' @return A saved \code{.RData} file in \code{filename} location.
 #'
 #' @export
-#' @rdname saveSimList
 #' @importFrom stats runif
+#' @rdname saveSimList
 #' @seealso zipSimList
-#'
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   if (is.character(sim)) {
     simName <- sim
@@ -329,7 +326,6 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' to not affect the original \code{simList}.
 #' VERY experimental; unlikely to work perfectly at the moment.
 #'
-#' @inheritParams saveSimList
 #' @param sim A simList at the core of the zipping.
 #' @param ... passed to \code{saveSimList}, including important ones such as \code{filename}.
 #' @param zipfile A character string indicating the filename for the zipfile. Passed to \code{zip}.

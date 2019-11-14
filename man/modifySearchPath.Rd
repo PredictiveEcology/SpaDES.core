@@ -4,8 +4,11 @@
 \alias{.modifySearchPath}
 \title{Modify package order in search path}
 \usage{
-.modifySearchPath(pkgs, removeOthers = FALSE,
-  skipNamespacing = !getOption("spades.switchPkgNamespaces"))
+.modifySearchPath(
+  pkgs,
+  removeOthers = FALSE,
+  skipNamespacing = !getOption("spades.switchPkgNamespaces")
+)
 }
 \arguments{
 \item{pkgs}{The packages that are to be placed at the beginning of the search path,}

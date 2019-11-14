@@ -4,9 +4,23 @@
 \alias{simInitAndSpades}
 \title{Call \code{simInit} and \code{spades} together}
 \usage{
-simInitAndSpades(times, params, modules, objects, paths, inputs, outputs,
-  loadOrder, notOlderThan, debug, progress, cache, .plotInitialTime,
-  .saveInitialTime, ...)
+simInitAndSpades(
+  times,
+  params,
+  modules,
+  objects,
+  paths,
+  inputs,
+  outputs,
+  loadOrder,
+  notOlderThan,
+  debug,
+  progress,
+  cache,
+  .plotInitialTime,
+  .saveInitialTime,
+  ...
+)
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times

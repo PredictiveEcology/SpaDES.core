@@ -117,4 +117,4 @@ Collate:
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.0

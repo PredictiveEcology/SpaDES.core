@@ -4,8 +4,7 @@
 \alias{paddedFloatToChar}
 \title{Convert numeric to character with padding}
 \usage{
-paddedFloatToChar(x, padL = ceiling(log10(x + 1)), padR = 3,
-  pad = "0")
+paddedFloatToChar(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "0")
 }
 \arguments{
 \item{x}{numeric. Number to be converted to character with padding}

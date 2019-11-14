@@ -4,8 +4,7 @@
 \alias{saveSimList}
 \title{Save a whole \code{simList} object to disk}
 \usage{
-saveSimList(sim, filename, fileBackend = 0, filebackedDir = NULL,
-  envir, ...)
+saveSimList(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...)
 }
 \arguments{
 \item{sim}{Either a \code{simList} or a character string of the name

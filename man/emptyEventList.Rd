@@ -18,8 +18,7 @@
 
 .emptyEventList(eventTime, moduleName, eventType, eventPriority)
 
-\S4method{.emptyEventList}{numeric,character,character,numeric}(eventTime,
-  moduleName, eventType, eventPriority)
+\S4method{.emptyEventList}{numeric,character,character,numeric}(eventTime, moduleName, eventType, eventPriority)
 
 \S4method{.emptyEventList}{missing,missing,missing,missing}()
 

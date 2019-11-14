@@ -4,9 +4,13 @@
 \alias{restartR}
 \title{Restart R programmatically}
 \usage{
-restartR(sim, reloadPkgs = TRUE, .First = NULL,
+restartR(
+  sim,
+  reloadPkgs = TRUE,
+  .First = NULL,
   .RDataFile = getOption("spades.restartR.RDataFilename"),
-  restartDir = getOption("spades.restartR.restartDir", NULL))
+  restartDir = getOption("spades.restartR.restartDir", NULL)
+)
 }
 \arguments{
 \item{sim}{Required. A \code{simList} to be retained through the restart}

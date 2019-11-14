@@ -250,18 +250,17 @@ setReplaceMethod(
 #' @param value The object to be stored at the slot.
 #'
 #' @param hidden Logical. If TRUE, show the default core modules.
+#'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.7 on Modules and dependencies.
 #'
+#' @aliases simList-accessors-modules
+#' @author Alex Chubaty
 #' @export
 #' @include simList-class.R
-#' @aliases simList-accessors-modules
 #' @rdname simList-accessors-modules
-#'
-#' @author Alex Chubaty
-#'
 setGeneric("modules", function(sim, hidden = FALSE) {
   standardGeneric("modules")
 })
@@ -401,7 +400,7 @@ setMethod(
 })
 
 ################################################################################
-#' Get and set simulation parameters.
+#' Get and set simulation parameters
 #'
 #' \code{params} and \code{P} access the parameter slot in the \code{simList}.
 #' \code{params} has a replace method, so can be used to update a parameter value.
@@ -427,12 +426,11 @@ setMethod(
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
 #'
+#' @aliases parameters
+#' @aliases simList-accessors-params
 #' @export
 #' @include simList-class.R
-#' @aliases simList-accessors-params
-#' @aliases parameters
 #' @rdname params
-#'
 setGeneric("params", function(sim) {
   standardGeneric("params")
 })
@@ -475,7 +473,6 @@ setReplaceMethod("params",
 #' @importFrom reproducible .grepSysCalls
 #' @include simList-class.R
 #' @rdname params
-#'
 P <- function(sim, module, param) {
   if (missing(sim)) stop("P takes a simList as first argument")
   if (missing(module)) {
@@ -504,22 +501,21 @@ P <- function(sim, module, param) {
   }
 }
 
-
 ################################################################################
-#' Get and set simulation globals.
+#' Get and set global simulation parameters
 #'
 #' \code{globals}, and the alias \code{G}, accesses or sets the "globals"
 #' in the \code{simList}. This currently is not an explicit slot in the \code{simList},
 #' but it is a \code{.globals} element in the \code{params} slot of the \code{simList}.
 #'
 #' @inheritParams params
-#' @include simList-class.R
-#' @export
-#' @rdname globals
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
 #'
+#' @export
+#' @include simList-class.R
+#' @rdname globals
 setGeneric("globals", function(sim) {
   standardGeneric("globals")
 })
@@ -539,10 +535,10 @@ setGeneric("globals<-",
              standardGeneric("globals<-")
 })
 
-#' @name globals<-
 #' @aliases globals<-,simList-method
-#' @rdname globals
 #' @export
+#' @name globals<-
+#' @rdname globals
 setReplaceMethod("globals",
                  signature = "simList",
                  function(sim, value) {
@@ -1849,8 +1845,6 @@ setMethod("dataPath",
 #'    \code{times} \tab List of all simulation times (current, start, end, timeunit).\cr
 #' }
 #'
-#' @inheritParams objs
-#'
 #' @param unit   Character. One of the time units used in \code{SpaDES}.
 #'
 #' @param x A \code{simList}
@@ -1863,17 +1857,15 @@ setMethod("dataPath",
 #'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
 #'
+#' @aliases simList-accessors-times
+#' @author Alex Chubaty and Eliot McIntire
 #' @export
+#' @family functions to access elements of a 'simList' object
 #' @include simList-class.R
 #' @include times.R
-#' @aliases simList-accessors-times
 #' @rdname simList-accessors-times
-#'
-#' @author Alex Chubaty and Eliot McIntire
-#'
 setGeneric("times", function(x, ...) {
   standardGeneric("times")
 })
@@ -1940,8 +1932,6 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' @inheritParams times
-#'
 #' @export
 #' @importFrom stats time
 #' @include simList-class.R
@@ -1964,18 +1954,18 @@ time.simList <- function(x, unit, ...) {
     return(t)
 }
 
+#' @aliases simList-accessors-times
 #' @export
 #' @rdname simList-accessors-times
-#' @aliases simList-accessors-times
 setGeneric("time<-", function(x, value) {
   standardGeneric("time<-")
 })
 
-#' @name time<-
 #' @aliases time<-,simList-method
-#' @export
-#' @rdname simList-accessors-times
 #' @aliases simList-accessors-times
+#' @export
+#' @name time<-
+#' @rdname simList-accessors-times
 setReplaceMethod(
   "time",
    signature = "simList",
@@ -1993,11 +1983,10 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' @inheritParams times
-#' @include times.R
-#' @importFrom stats end
-#' @include simList-class.R
 #' @export
+#' @importFrom stats end
+#' @include times.R
+#' @include simList-class.R
 #' @rdname simList-accessors-times
 end <- function(x, ...) UseMethod("end")
 
@@ -2020,18 +2009,18 @@ end.simList <- function(x, unit, ...) {
     return(t)
 }
 
+#' @aliases simList-accessors-times
 #' @export
 #' @rdname simList-accessors-times
-#' @aliases simList-accessors-times
 setGeneric("end<-", function(x, value) {
   standardGeneric("end<-")
 })
 
-#' @name end<-
 #' @aliases end<-,simList-method
-#' @export
-#' @rdname simList-accessors-times
 #' @aliases simList-accessors-times
+#' @export
+#' @name end<-
+#' @rdname simList-accessors-times
 setReplaceMethod(
   "end",
   signature = "simList",
@@ -2046,11 +2035,10 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' @inheritParams times
+#' @export
 #' @importFrom stats start
 #' @include simList-class.R
 #' @include times.R
-#' @export
 #' @rdname simList-accessors-times
 start <- function(x, ...) UseMethod("start")
 
@@ -2123,8 +2111,6 @@ setReplaceMethod(
 }
 
 ################################################################################
-#' @inheritParams times
-#'
 #' @details \code{timeunit} will extract the current units of the time used in a
 #' simulation (i.e., within a \code{spades} call).
 #' If it is set within a \code{simInit}, e.g.,
@@ -2148,37 +2134,36 @@ setReplaceMethod(
 #' \code{dfortnight <- function(x) lubridate::duration(dday(14))}
 #' can be placed anywhere in the search path or in a module.
 #'
-#' @include simList-class.R
-#' @export
-#' @rdname simList-accessors-times
 #' @aliases simList-accessors-times
-#'
+#' @export
+#' @include simList-class.R
+#' @rdname simList-accessors-times
 setGeneric("timeunit", function(x) {
   standardGeneric("timeunit")
 })
 
-#' @rdname simList-accessors-times
 #' @aliases simList-accessors-times
 #' @export
+#' @rdname simList-accessors-times
 setMethod("timeunit",
           signature = "simList",
           definition = function(x) {
             return(x@simtimes[["timeunit"]])
 })
 
+#' @aliases simList-accessors-times
 #' @export
 #' @rdname simList-accessors-times
-#' @aliases simList-accessors-times
 setGeneric("timeunit<-",
            function(x, value) {
              standardGeneric("timeunit<-")
 })
 
-#' @name timeunit<-
 #' @aliases timeunit<-,simList-method
-#' @export
-#' @rdname simList-accessors-times
 #' @aliases simList-accessors-times
+#' @export
+#' @name timeunit<-
+#' @rdname simList-accessors-times
 setReplaceMethod(
   "timeunit",
   signature = "simList",
@@ -2194,8 +2179,6 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' @inheritParams times
-#'
 #' @details \code{timeunits} will extract the current units of the time of all
 #' modules used in a simulation.
 #' This is different from \code{timeunit} because it is not necessarily
@@ -2206,18 +2189,17 @@ setReplaceMethod(
 #' than \code{time(sim)}. So as a module developer, it is advantageous to
 #' write out the longer one, minimizing the looking up that R must do.
 #'
+#' @aliases simList-accessors-times
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-times
-#'
-#' @aliases simList-accessors-times
 setGeneric("timeunits", function(x) {
   standardGeneric("timeunits")
 })
 
+#' @aliases simList-accessors-times
 #' @export
 #' @rdname simList-accessors-times
-#' @aliases simList-accessors-times
 setMethod(
   "timeunits",
   signature = "simList",
@@ -2282,15 +2264,13 @@ setMethod(
 #' @importFrom stats setNames
 #' @include simList-class.R
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
-#'
 setGeneric("events", function(sim, unit) {
   standardGeneric("events")
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setMethod(
   "events",
   signature = c("simList", "character"),
@@ -2309,9 +2289,9 @@ setMethod(
     return(obj)
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setMethod("events",
           signature = c("simList", "missing"),
           definition = function(sim, unit) {
@@ -2319,18 +2299,18 @@ setMethod("events",
             return(res)
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setGeneric("events<-",
            function(sim, value) {
              standardGeneric("events<-")
 })
 
-#' @name events<-
 #' @aliases events<-,simList-method
 #' @aliases simList-accessors-events
 #' @export
+#' @name events<-
 #' @rdname simList-accessors-events
 setReplaceMethod(
   "events",
@@ -2356,17 +2336,16 @@ setReplaceMethod(
 })
 
 #############################
-#' @rdname simList-accessors-events
 #' @aliases simList-accessors-events
-#'
 #' @export
+#' @rdname simList-accessors-events
 setGeneric("conditionalEvents", function(sim, unit) {
   standardGeneric("conditionalEvents")
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setMethod(
   "conditionalEvents",
   signature = c("simList", "character"),
@@ -2400,9 +2379,9 @@ setMethod(
     }
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setMethod("conditionalEvents",
           signature = c("simList", "missing"),
           definition = function(sim, unit) {
@@ -2413,20 +2392,20 @@ setMethod("conditionalEvents",
 ################################################################################
 #' @inheritParams events
 #'
+#' @aliases simList-accessors-events
 #' @export
 #' @importFrom data.table rbindlist
 #' @importFrom stats setNames
 #' @include simList-class.R
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 #'
 setGeneric("current", function(sim, unit) {
   standardGeneric("current")
 })
 
-#' @rdname simList-accessors-events
-#' @export
 #' @aliases simList-accessors-events
+#' @export
+#' @rdname simList-accessors-events
 setMethod(
   "current",
   signature = c("simList", "character"),
@@ -2447,9 +2426,9 @@ setMethod(
     return(rbindlist(list(out)))
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setMethod("current",
           signature = c("simList", "missing"),
           definition = function(sim, unit) {
@@ -2457,19 +2436,19 @@ setMethod("current",
             return(out)
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setGeneric("current<-",
            function(sim, value) {
              standardGeneric("current<-")
 })
 
-#' @name current<-
 #' @aliases current<-,simList-method
-#' @export
-#' @rdname simList-accessors-events
 #' @aliases simList-accessors-events
+#' @export
+#' @name current<-
+#' @rdname simList-accessors-events
 setReplaceMethod("current",
                  signature = "simList",
                  function(sim, value) {
@@ -2484,21 +2463,22 @@ setReplaceMethod("current",
 
 ################################################################################
 #' @inheritParams events
-#' @include simList-class.R
+#' @param times Logical. Should this function report the clockTime
+#'
+#' @aliases simList-accessors-events
+#' @export
 #' @importFrom data.table := data.table
 #' @importFrom stats setNames
-#' @param times Logical. Should this function report the clockTime
-#' @export
+#' @include simList-class.R
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setGeneric("completed", function(sim, unit, times = TRUE) {
   standardGeneric("completed")
 })
 
-#' @rdname simList-accessors-events
-#' @export
 #' @aliases simList-accessors-events
+#' @export
 #' @importFrom data.table rbindlist set setkeyv :=
+#' @rdname simList-accessors-events
 setMethod(
   "completed",
   signature = c("simList", "character"),
@@ -2530,9 +2510,9 @@ setMethod(
     return(obj)
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setMethod("completed",
           signature = c("simList", "missing"),
           definition = function(sim, unit, times = TRUE) {
@@ -2540,19 +2520,19 @@ setMethod("completed",
             return(out)
 })
 
+#' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
-#' @aliases simList-accessors-events
 setGeneric("completed<-",
            function(sim, value) {
              standardGeneric("completed<-")
 })
 
-#' @name completed<-
 #' @aliases completed<-,simList-method
-#' @export
-#' @rdname simList-accessors-events
 #' @aliases simList-accessors-events
+#' @export
+#' @name completed<-
+#' @rdname simList-accessors-events
 setReplaceMethod(
   "completed",
   signature = "simList",
@@ -2636,13 +2616,12 @@ setMethod(
 #'
 #' @return A sorted character vector of package names.
 #'
+#' @aliases simList-accessors-packages
+#' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @include simList-class.R
 #' @family functions to access elements of a 'simList' object
 #' @rdname packages
-#'
-#' @author Alex Chubaty & Eliot McIntire
-#' @aliases simList-accessors-packages
 #'
 # igraph exports %>% from magrittr
 setGeneric("packages", function(sim, modules, paths, filenames, envir,
@@ -2927,17 +2906,17 @@ setMethod("citation",
 })
 
 ################################################################################
-#' @inheritParams times
+#' @export
 #' @include simList-class.R
 #' @include times.R
-#' @export
 #' @rdname simList-accessors-times
 elapsedTime <- function(x, ...) UseMethod("elapsedTime")
 
+#' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
+#'                \code{FALSE} will report only by module. Default is \code{TRUE}.
+#'
 #' @export
 #' @rdname simList-accessors-times
-#' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
-#'                \code{FALSE} will report only by module. Default is \code{TRUE}
 elapsedTime.simList <- function(x, byEvent = TRUE, ...) {
   comp <- completed(x)
 

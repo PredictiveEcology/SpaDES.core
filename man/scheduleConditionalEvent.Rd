@@ -4,9 +4,15 @@
 \alias{scheduleConditionalEvent}
 \title{Schedule a conditional simulation event}
 \usage{
-scheduleConditionalEvent(sim, condition, moduleName, eventType,
-  eventPriority = .pkgEnv$.normalVal, minEventTime = start(sim),
-  maxEventTime = end(sim))
+scheduleConditionalEvent(
+  sim,
+  condition,
+  moduleName,
+  eventType,
+  eventPriority = .pkgEnv$.normalVal,
+  minEventTime = start(sim),
+  maxEventTime = end(sim)
+)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object.}

@@ -15,8 +15,14 @@ getPaths()
 
 Paths
 
-setPaths(cachePath, inputPath, modulePath, outputPath, rasterPath,
-  silent = FALSE)
+setPaths(
+  cachePath,
+  inputPath,
+  modulePath,
+  outputPath,
+  rasterPath,
+  silent = FALSE
+)
 }
 \arguments{
 \item{cachePath}{The default local directory in which to cache simulation outputs.

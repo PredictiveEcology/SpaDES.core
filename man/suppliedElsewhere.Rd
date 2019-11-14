@@ -4,8 +4,12 @@
 \alias{suppliedElsewhere}
 \title{Assess whether an object has or will be supplied from elsewhere}
 \usage{
-suppliedElsewhere(object, sim, where = c("sim", "user", "initEvent"),
-  returnWhere = FALSE)
+suppliedElsewhere(
+  object,
+  sim,
+  where = c("sim", "user", "initEvent"),
+  returnWhere = FALSE
+)
 }
 \arguments{
 \item{object}{Character vector}
