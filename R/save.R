@@ -245,8 +245,6 @@ saveFiles <- function(sim) {
 #' Because of the environment slot, this is not quite as straightforward as
 #' just saving the object. This also has option for file-backed Rasters.
 #'
-#' @inheritParams spades
-#'
 #' @param sim Either a \code{simList} or a character string of the name
 #'        of a \code{simList} that can be found in \code{envir}. Using
 #'        a character string will assign that object name to the saved
@@ -268,15 +266,15 @@ saveFiles <- function(sim) {
 #'        \code{NULL}, the default, or Character string. If \code{NULL}, then then the
 #'        files will be copied to the directory:
 #'        \code{file.path(dirname(filename), "rasters")}. A character string
-#'        will be interpretted as a path to copy all rasters to.
+#'        will be interpreted as a path to copy all rasters to.
 #' @param ... Passed to \code{save}, e.g., \code{compression}
 #'
 #' @return A saved \code{.RData} file in \code{filename} location.
 #'
 #' @export
+#' @importFrom stats runif
 #' @rdname saveSimList
-#' @seealso zipSimList
-#'
+#' @seealso \code{\link{zipSimList}}
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   if (is.character(sim)) {
     simName <- sim
@@ -328,10 +326,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' to not affect the original \code{simList}.
 #' VERY experimental; unlikely to work perfectly at the moment.
 #'
-#' @inheritParams saveSimList
 #' @param sim A simList at the core of the zipping.
 #' @param ... passed to \code{saveSimList}, including important ones such as \code{filename}.
-#' @param zipfile A character string indicating the filename for the zipfile. Passed to \code{zip}.
+#' @param zipfile A character string indicating the filename for the zip file. Passed to \code{zip}.
 #' @param outputs Logical. If \code{TRUE}, all files identified in
 #'    \code{outputs(sim)} will be included in the zip.
 #' @param inputs Logical. If \code{TRUE}, all files identified in
@@ -409,7 +406,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'   load no packages beyond normal R startup. Default \code{TRUE}
 #' @param .First A function to save to \code{~/.RData} which will
 #'    be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
-#'    meaning it will use the nonexported \code{SpaDES.core:::First}. If a
+#'    meaning it will use the non-exported \code{SpaDES.core:::First}. If a
 #'    user wants to make a custom \code{First} file, it should built off that one.
 #' @param .RDataFile A filename for saving simList. Defaults to
 #' \code{getOption("spades.restartR.RDataFilename")}, and the directory will
@@ -418,7 +415,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'     \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}
 #'
 #' @param restartDir A character string indicating root directory to
-#'     save \code{simList} and other ancilliary files during restart.
+#'     save \code{simList} and other ancillary files during restart.
 #'     Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
 #'     If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
 #'     \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},

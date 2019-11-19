@@ -19,7 +19,8 @@
 #' class. All other slots are the same.
 #' Thus, \code{simList} is identical to \code{simList_}, except that the former
 #' uses an environment for objects and the latter uses a list.
-#' The class \code{simList_} is only used internally.
+#' The class \code{simList_} is only used internally when saving/loading, because
+#' saving/loading a list behaves more reliably than saving/loading an environment.
 #'
 #' @slot modules    List of character names specifying which modules to load.
 #'
@@ -92,18 +93,16 @@
 #'   \code{eventPriority} \tab The priority given to the event. \cr
 #' }
 #'
-#' @aliases simList
-#' @rdname simList-class
-#' @rdname simList
-#' @importFrom data.table as.data.table data.table
-#' @include helpers.R misc-methods.R module-dependencies-class.R
-#'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
 #'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
 #'
+#' @aliases simList
 #' @author Alex Chubaty and Eliot McIntire
 #' @exportClass simList
+#' @importFrom data.table as.data.table data.table
+#' @include helpers.R misc-methods.R module-dependencies-class.R
+#' @rdname simList-class
 setClass(
   "simList",
   contains = "environment",
@@ -180,25 +179,9 @@ setMethod("initialize",
 })
 
 ################################################################################
-#' The \code{simList_} class
-#'
-#' Internal use only. Used when saving/loading a \code{simList}.
-#'
-#' This is identical to class \code{simList}, except that the \code{.xData} slot
-#' is replaced by a \code{.Data} containing a list to store the objects from the
-#' environment contained within the \code{simList}.
-#' Saving/loading a list behaves more reliably than saving/loading an environment.
-#'
-#' @inheritParams simList
-#'
-#' @seealso \code{\link{simList}}
-#'
 #' @aliases simList_
-#' @keywords internal
-#' @rdname simList_-class
-#'
-#' @author Alex Chubaty
-#'
+#' @aliases simList_-class
+#' @rdname simList-class
 setClass("simList_",
          contains = "list",
          slots = list(

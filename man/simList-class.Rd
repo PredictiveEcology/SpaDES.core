@@ -4,6 +4,8 @@
 \name{simList-class}
 \alias{simList-class}
 \alias{simList}
+\alias{simList_-class}
+\alias{simList_}
 \title{The \code{simList} class}
 \description{
 Contains the minimum components of a \code{SpaDES} simulation.
@@ -76,7 +78,8 @@ The \code{\link{simList_}} class is similar, but it extends the \code{list}
 class. All other slots are the same.
 Thus, \code{simList} is identical to \code{simList_}, except that the former
 uses an environment for objects and the latter uses a list.
-The class \code{simList_} is only used internally.
+The class \code{simList_} is only used internally when saving/loading, because
+saving/loading a list behaves more reliably than saving/loading an environment.
 }
 \section{Accessor Methods}{
 

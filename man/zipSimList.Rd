@@ -4,13 +4,12 @@
 \alias{zipSimList}
 \title{Zip many of the files in a \code{simList}}
 \usage{
-zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE,
-  cache = FALSE)
+zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
 }
 \arguments{
 \item{sim}{A simList at the core of the zipping.}
 
-\item{zipfile}{A character string indicating the filename for the zipfile. Passed to \code{zip}.}
+\item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
 
 \item{...}{passed to \code{saveSimList}, including important ones such as \code{filename}.}
 

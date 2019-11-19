@@ -585,7 +585,7 @@ setMethod(
 #' @param rasterPath  The default local directory in which to save transient raster files.
 #'                    If not specified, defaults to \code{\link[raster]{tmpDir}}.
 #'                    \emph{Important note:} this location may not be cleaned up automatically,
-#'                    so be sure to monitor this directory and remove unecessary temp files
+#'                    so be sure to monitor this directory and remove unnecessary temp files
 #'                    that may contribute to excessive disk usage.
 #'
 #' @return Returns a named list of the user's default working directories.

@@ -4,8 +4,7 @@
 \alias{saveSimList}
 \title{Save a whole \code{simList} object to disk}
 \usage{
-saveSimList(sim, filename, fileBackend = 0, filebackedDir = NULL,
-  envir, ...)
+saveSimList(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...)
 }
 \arguments{
 \item{sim}{Either a \code{simList} or a character string of the name
@@ -27,7 +26,7 @@ of the \code{simList}. Default is \code{0}.}
 \code{NULL}, the default, or Character string. If \code{NULL}, then then the
 files will be copied to the directory:
 \code{file.path(dirname(filename), "rasters")}. A character string
-will be interpretted as a path to copy all rasters to.}
+will be interpreted as a path to copy all rasters to.}
 
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can
@@ -43,5 +42,5 @@ Because of the environment slot, this is not quite as straightforward as
 just saving the object. This also has option for file-backed Rasters.
 }
 \seealso{
-zipSimList
+\code{\link{zipSimList}}
 }

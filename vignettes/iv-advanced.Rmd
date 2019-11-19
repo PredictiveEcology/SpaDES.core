@@ -26,7 +26,7 @@ While `profvis::profvis` is an essential tool for memory monitoring using deep R
 For example, it may be useful to know the *peak memory use* of an event, as this may be the limiting step for setting up many parallel instances. 
 There is an experimental tool that gets triggered with `options("spades.memoryUseInterval" = xxx)` where `xxx` is a `numeric` in seconds, e.g., `0.2`. If this is set, and `future` and `future.callr` are installed, then whenever a `spades` call is made, the memory use will be assessed at that regular interval. The procedure is:
 
-1) spawn a future session (i.e., a parallel session) that runs `system('ps')` which lists all processes. It only keeps the process that represents the process ID of the main rsession.
+1) spawn a future session (i.e., a parallel session) that runs `system('ps')` which lists all processes. It only keeps the process that represents the process ID of the main R session.
 
 2) that `ps` call writes to a text file every `getOption('spades.memoryUseInterval')`
 

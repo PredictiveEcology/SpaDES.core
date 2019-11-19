@@ -6,14 +6,14 @@ Description: Provide the core framework for a discrete event system (DES) to
     The core DES components facilitate modularity, and easily enable the user
     to include additional functionality by running user-built modules.
     Includes conditional scheduling, restart after interruption, packaging of
-    reuseable modules, tools for developing arbitrary automated workflows,
+    reusable modules, tools for developing arbitrary automated workflows,
     automated interweaving of modules of different temporal resolution,
     and tools for visualizing and understanding the DES project.
 URL:
-    http://spades-core.predictiveecology.org/,
+    https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2019-10-25
-Version: 0.2.6.9006
+Date: 2019-11-19
+Version: 0.2.7
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 3.5),
     quickPlot (>= 0.1.4),
-    reproducible (>= 0.2.10.9001)
+    reproducible (>= 0.2.11)
 Imports:
     backports,
     codetools,
@@ -117,4 +117,4 @@ Collate:
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.0

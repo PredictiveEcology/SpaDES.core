@@ -4,8 +4,7 @@
 \alias{restartSpades}
 \title{Restart an interrupted simulation}
 \usage{
-restartSpades(sim = NULL, module = NULL, numEvents = Inf,
-  restart = TRUE, ...)
+restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
 }
 \arguments{
 \item{sim}{A simList. If not supplied (the default), this will take the sim from

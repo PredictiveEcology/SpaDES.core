@@ -25,11 +25,9 @@
 #'
 #' @return Number of seconds within each unit
 #'
+#' @author Eliot McIntire
 #' @export
 #' @rdname spadesTime
-#'
-#' @author Eliot McIntire
-#'
 setGeneric("dyears", function(x) {
   standardGeneric("dyears")
 })
@@ -46,7 +44,6 @@ setMethod("dyears",
 yearsInSeconds <- as.numeric(dyears(1)) # 31557600L
 attributes(yearsInSeconds)$unit <- "second"
 
-#' @inheritParams dyears
 #' @export
 #' @rdname spadesTime
 setGeneric("dmonths", function(x) {
@@ -169,10 +166,9 @@ attributes(monthsInSeconds)$unit <- "second"
 #'
 #' @return A numeric vector of length 1, with \code{unit} attribute set to "seconds".
 #'
-#' @export
 #' @author Alex Chubaty & Eliot McIntire
+#' @export
 #' @rdname timeConversion
-#'
 inSeconds <- function(unit, envir, skipChecks = FALSE) {
   if (!skipChecks) {
     if (missing(envir)) envir <- .GlobalEnv
@@ -219,12 +215,12 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #'
 #' @param time   Numeric. With a unit attribute, indicating the time unit of the
 #'               input numeric. See Details.
+#'
+#' @author Eliot McIntire
 #' @export
 #' @importFrom stringi stri_detect_fixed
-#' @inheritParams inSeconds
 #' @include simList-class.R
 #' @rdname timeConversion
-#' @author Eliot McIntire
 convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   if (!skipChecks) {
     if (missing(envir)) envir <- .GlobalEnv

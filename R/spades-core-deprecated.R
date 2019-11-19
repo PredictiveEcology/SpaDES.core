@@ -10,6 +10,7 @@ deprecatedMsg <- function(fnName, newPackage = "SpaDES.experiment", gitSite) {
          "Please install with ",
          paste0("devtools::install_github('",gitSite, "')", collapse = " or "))
 }
+
 #' Deprecated functions
 #'
 #' These functions have been moved to \code{SpaDES.experiment} package.

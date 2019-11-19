@@ -23,7 +23,7 @@ if (!isGeneric(".robustDigest")) {
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
-#' @importFrom reproducible asPath  .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
+#' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
 #' @rdname robustDigest
@@ -794,7 +794,6 @@ unmakeMemoisable.simList_ <- function(x) {
   return(y)
 }
 
-
 if (!isGeneric("clearCache")) {
   setGeneric(
     "clearCache",
@@ -807,7 +806,7 @@ if (!isGeneric("clearCache")) {
   )
 }
 
-#' clearCache for simList objects
+#' \code{clearCache} for \code{simList} objects
 #'
 #' This will take the \code{cachePath(object)} and pass
 #' @export
@@ -827,8 +826,7 @@ setMethod(
                ask = ask, useCloud = useCloud,
                cloudFolderID = cloudFolderID,
                ...)
-  })
-
+})
 
 if (!isGeneric("showCache")) {
   setGeneric("showCache", function(x, userTags = character(), after, before, ...) {
@@ -836,7 +834,7 @@ if (!isGeneric("showCache")) {
   })
 }
 
-#' showCache for simList objects
+#' \code{showCache} for \code{simList} objects
 #'
 #' This will take the \code{cachePath(object)} and pass
 #' @export
@@ -859,7 +857,7 @@ if (!isGeneric("keepCache")) {
   })
 }
 
-#' keepCache for simList objects
+#' \code{keepCache} for \code{simList} objects
 #'
 #' This will take the \code{cachePath(object)} and pass
 #' @export
@@ -874,4 +872,4 @@ setMethod(
     x <- x@paths$cachePath
     keepCache(x = x, userTags = userTags, after = after, before = before,
                ...)
-  })
+})

@@ -15,8 +15,14 @@ getPaths()
 
 Paths
 
-setPaths(cachePath, inputPath, modulePath, outputPath, rasterPath,
-  silent = FALSE)
+setPaths(
+  cachePath,
+  inputPath,
+  modulePath,
+  outputPath,
+  rasterPath,
+  silent = FALSE
+)
 }
 \arguments{
 \item{cachePath}{The default local directory in which to cache simulation outputs.
@@ -35,7 +41,7 @@ If not specified, defaults to \code{getOption("spades.outputPath")}.}
 \item{rasterPath}{The default local directory in which to save transient raster files.
 If not specified, defaults to \code{\link[raster]{tmpDir}}.
 \emph{Important note:} this location may not be cleaned up automatically,
-so be sure to monitor this directory and remove unecessary temp files
+so be sure to monitor this directory and remove unnecessary temp files
 that may contribute to excessive disk usage.}
 
 \item{silent}{Logical. Should the messaging occur.}

@@ -26,14 +26,15 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 allCleanMessage <- "module code appears clean"
 cantCodeCheckMessage <- ": line could not be checked "
 
-#' Find all references to sim$
+#' Find all references to \code{sim$}
 #'
 #' @param envToFindSim An environment where sim is defined. This is used when
 #'                     the element accessing the simList is actually a call, e.g.,
 #'                     \code{sim[[P(sim)$stackName]]}
-#' @param moduleEnv The environment where the module functions are
-#' @param type Either "get", "assign", or "globals". See details.
 #'
+#' @param moduleEnv The environment where the module functions are.
+#'
+#' @param type Either "get", "assign", or "globals". See details.
 #'
 #' @details
 #' \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
@@ -55,8 +56,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @author Eliot McIntire
 #' @keywords internal
 #' @rdname findElements
-.findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(),
-                               type) {
+.findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(), type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
 
@@ -127,15 +127,15 @@ cantCodeCheckMessage <- ": line could not be checked "
   return(out)
 }
 
-#' @keywords internal
 #' @param x A call in which to search for sim
-#' @inheritParams .findElementsInEnv
+#'
 #' @details
 #' \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
 #' \code{type = "assign"}. Usually this is a test of existence of that object, in
 #' order to assign to that object. It is only reading it to determine whether or
 #' not it should write to it.
 #'
+#' @keywords internal
 #' @rdname findElements
 .findElement <- function(x, type) {
   if (is.atomic(x)) {
@@ -571,8 +571,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' Chose verb conjugation for "to be"
 #'
-#' @param item The item to accord conjugation with. If length 1, then "is"
-#' else "are"
+#' @param item The item to accord conjugation with. If length 1, then "is" else "are".
 #'
 #' @return
 #' "is" or "are"
@@ -585,8 +584,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
 #' \code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}
+#'
 #' @keywords internal
-#' @inheritParams .findElements
 #' @rdname findElements
 .parsingSim <- function(x, type) {
   if (length(x) > 1) {
