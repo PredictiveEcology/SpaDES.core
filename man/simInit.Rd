@@ -204,7 +204,7 @@ the defaults are as follows:
 }
 \note{
 Since the objects in the \code{simList} are passed-by-reference, it is useful
-to create a copy of the initalized \code{simList} object prior to running
+to create a copy of the initialized \code{simList} object prior to running
 the simulation (e.g., \code{mySimOut <- spades(Copy(mySim))}).
 This ensures you retain access to the original objects, which would otherwise
 be overwritten/modified during the simulation.

@@ -4,7 +4,7 @@
 \alias{clearCache,simList-method}
 \alias{showCache,simList-method}
 \alias{keepCache,simList-method}
-\title{clearCache for simList objects}
+\title{\code{clearCache} for \code{simList} objects}
 \usage{
 \S4method{clearCache}{simList}(
   x,

@@ -21,7 +21,7 @@ load no packages beyond normal R startup. Default \code{TRUE}}
 
 \item{.First}{A function to save to \code{~/.RData} which will
 be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
-meaning it will use the nonexported \code{SpaDES.core:::First}. If a
+meaning it will use the non-exported \code{SpaDES.core:::First}. If a
 user wants to make a custom \code{First} file, it should built off that one.}
 
 \item{.RDataFile}{A filename for saving simList. Defaults to
@@ -31,7 +31,7 @@ user wants to make a custom \code{First} file, it should built off that one.}
     \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
 
 \item{restartDir}{A character string indicating root directory to
-save \code{simList} and other ancilliary files during restart.
+save \code{simList} and other ancillary files during restart.
 Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
 If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
 \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},

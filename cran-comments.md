@@ -1,6 +1,6 @@
 ## Updated release
 
-This is a maintenance release with several package improvments and bug fixes.
+This is a maintenance release with several package improvements and bug fixes.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
