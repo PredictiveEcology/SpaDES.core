@@ -81,7 +81,7 @@ values set to defaults" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -111,6 +111,9 @@ values set to defaults" />
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -238,7 +241,7 @@ in which to replace element(s).</p></td>
                           the default values that will be used unless a module user
                           overrides them with the <code>params</code> argument in the
                           <code><a href='simInit.html'>simInit</a></code> call. The minimum and maximum are
-                          currently used by the <code><a href='https://predictiveecology.github.io/SpaDES.shiny/reference/shine.html'>SpaDES.shiny::shine</a></code> function and the
+                          currently used by the <code><a href='http://spades-shiny.predictiveecology.org/reference/shine.html'>SpaDES.shiny::shine</a></code> function and the
                           <code>POM</code> function, and they should indicate the range
                           of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr>
 <tr><td>A <code>data.frame</code> specifying the data objects expected as
@@ -283,44 +286,6 @@ in which to replace element(s).</p></td>
 
   <span class='co'>## view the resulting module file</span>
   <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test"</span>, <span class='st'>"test.R"</span>))
-
-  <span class='co'># The default defineModule created by newModule is currently (SpaDES version 1.3.1.9044):</span>
-  <span class='fu'>defineModule</span>(<span class='no'>sim</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-    <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"test"</span>,
-    <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"insert module description here"</span>,
-    <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"insert key words here"</span>),
-    <span class='kw'>authors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/person.html'>person</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"First"</span>, <span class='st'>"Middle"</span>), <span class='st'>"Last"</span>,
-                       <span class='kw'>email</span> <span class='kw'>=</span> <span class='st'>"email@example.com"</span>, <span class='kw'>role</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"aut"</span>, <span class='st'>"cre"</span>))),
-    <span class='kw'>childModules</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(<span class='fl'>0</span>),
-    <span class='kw'>version</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>SpaDES</span> <span class='kw'>=</span> <span class='st'>"1.3.1.9044"</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"0.0.1"</span>),
-    <span class='kw'>spatialExtent</span> <span class='kw'>=</span> <span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/extent.html'>extent</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>NA_real_</span>, <span class='fl'>4</span>)),
-    <span class='kw'>timeframe</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXlt</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>NA</span>, <span class='fl'>NA</span>)),
-    <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='co'># e.g., "year",</span>
-    <span class='kw'>citation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"citation.bib"</span>),
-    <span class='kw'>documentation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"README.txt"</span>, <span class='st'>"test.Rmd"</span>),
-    <span class='kw'>reqdPkgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-    <span class='kw'>parameters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span>(
-      <span class='co'>#defineParameter("paramName", "paramClass", value, min, max,</span>
-      <span class='co'># "parameter description")),</span>
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".plotInitialTime"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first plot event should occur"</span>),
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".plotInterval"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first plot event should occur"</span>),
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".saveInitialTime"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first save event should occur"</span>),
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".saveInterval"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first save event should occur"</span>)
-    ),
-    <span class='kw'>inputObjects</span> <span class='kw'>=</span> <span class='fu'>bind_rows</span>(
-      <span class='fu'><a href='expectsInput.html'>expectsInput</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>objectClass</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
-        <span class='kw'>sourceURL</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>desc</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>other</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>)
-    ),
-    <span class='kw'>outputObjects</span> <span class='kw'>=</span> <span class='fu'>bind_rows</span>(
-      <span class='fu'><a href='createsOutput.html'>createsOutput</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>objectClass</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
-        <span class='kw'>desc</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>other</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>)
-    )
-  ))
-
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -345,7 +310,7 @@ in which to replace element(s).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

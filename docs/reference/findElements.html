@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find all references to sim$ — .findElementsInEnv • SpaDES.core</title>
+<title>Find all references to <code>sim$</code> — .findElementsInEnv • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Find all references to sim$ — .findElementsInEnv" />
+<meta property="og:title" content="Find all references to <code>sim$</code> — .findElementsInEnv" />
 <meta property="og:description" content="Find all references to sim$
 .parsingSim will pull out the various ways to use sim, e.g.,
 sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
@@ -81,7 +81,7 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -112,6 +112,9 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -138,19 +141,22 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Find all references to sim$</h1>
+    <h1>Find all references to <code>sim$</code></h1>
     <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/code-checking.R'><code>R/code-checking.R</code></a></small>
     <div class="hidden name"><code>findElements.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Find all references to sim$</p>
+    <p>Find all references to <code>sim$</code></p>
 <p><code>.parsingSim</code> will pull out the various ways to use sim, e.g.,
 <code>sim$xxx</code>, <code>sim[['xxx']]</code>, <code>sim[[P(sim)$xxx]]</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>.findElementsInEnv</span>(<span class='kw'>envToFindSim</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
-  <span class='kw'>moduleEnv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(), <span class='no'>type</span>)
+    <pre class="usage"><span class='fu'>.findElementsInEnv</span>(
+  <span class='kw'>envToFindSim</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
+  <span class='kw'>moduleEnv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
+  <span class='no'>type</span>
+)
 
 <span class='fu'>.findElement</span>(<span class='no'>x</span>, <span class='no'>type</span>)
 
@@ -167,7 +173,7 @@ the element accessing the simList is actually a call, e.g.,
     </tr>
     <tr>
       <th>moduleEnv</th>
-      <td><p>The environment where the module functions are</p></td>
+      <td><p>The environment where the module functions are.</p></td>
     </tr>
     <tr>
       <th>type</th>
@@ -221,7 +227,7 @@ not it should write to it.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

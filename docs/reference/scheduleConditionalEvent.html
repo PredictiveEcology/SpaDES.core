@@ -81,7 +81,7 @@ sim$._conditionalEvents. This is very experimental. Use with caution." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -111,6 +111,9 @@ sim$._conditionalEvents. This is very experimental. Use with caution." />
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -149,9 +152,15 @@ updating the simulation object by creating or appending to
 <code>sim$._conditionalEvents</code>. This is very experimental. Use with caution.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>scheduleConditionalEvent</span>(<span class='no'>sim</span>, <span class='no'>condition</span>, <span class='no'>moduleName</span>, <span class='no'>eventType</span>,
-  <span class='kw'>eventPriority</span> <span class='kw'>=</span> <span class='no'>.pkgEnv</span>$<span class='no'>.normalVal</span>, <span class='kw'>minEventTime</span> <span class='kw'>=</span> <span class='fu'><a href='simList-accessors-times.html'>start</a></span>(<span class='no'>sim</span>),
-  <span class='kw'>maxEventTime</span> <span class='kw'>=</span> <span class='fu'><a href='simList-accessors-times.html'>end</a></span>(<span class='no'>sim</span>))</pre>
+    <pre class="usage"><span class='fu'>scheduleConditionalEvent</span>(
+  <span class='no'>sim</span>,
+  <span class='no'>condition</span>,
+  <span class='no'>moduleName</span>,
+  <span class='no'>eventType</span>,
+  <span class='kw'>eventPriority</span> <span class='kw'>=</span> <span class='no'>.pkgEnv</span>$<span class='no'>.normalVal</span>,
+  <span class='kw'>minEventTime</span> <span class='kw'>=</span> <span class='fu'><a href='simList-accessors-times.html'>start</a></span>(<span class='no'>sim</span>),
+  <span class='kw'>maxEventTime</span> <span class='kw'>=</span> <span class='fu'><a href='simList-accessors-times.html'>end</a></span>(<span class='no'>sim</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -201,15 +210,15 @@ even if the condition is met. Defaults to <code><a href='simList-accessors-times
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Returns the modified <code>simList</code> object, i.e., <code>sim$._conditionalEvents</code></p>
+    <p>Returns the modified <code>simList</code> object, i.e., <code>sim$._conditionalEvents</code>.</p>
 <p>This conditional event queue will be assessed at every single event in the normal event
-queue. If there are no conditional events, then <code>spades</code> will proceed as normal. As
-conditional event conditions are found to be true, then it will trigger a call to
-<code><a href='scheduleEvent.html'>scheduleEvent(...)</a></code> with the current time passed to <code>eventTime</code> <em>and</em> it will
-remove the conditional event from the conditional queue. If the user
-would like the triggered conditional event to occur as the very next event, then
-a possible strategy would be to set <code>eventPriority</code> of the conditional event to
-very low or even negative to ensure it gets inserted at the top of the event queue.</p>
+queue. If there are no conditional events, then <code>spades</code> will proceed as normal.
+As conditional event conditions are found to be true, then it will trigger a call to
+<code><a href='scheduleEvent.html'>scheduleEvent(...)</a></code> with the current time passed to <code>eventTime</code> <em>and</em>
+it will remove the conditional event from the conditional queue.
+If the user would like the triggered conditional event to occur as the very next event,
+then a possible strategy would be to set <code>eventPriority</code> of the conditional event
+to very low or even negative to ensure it gets inserted at the top of the event queue.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -222,24 +231,25 @@ very low or even negative to ensure it gets inserted at the top of the event que
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>  <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpB1vzV8/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpde3UfN/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpde3UfN/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpde3UfN/SpaDES/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpcXlD7Q/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpcXlD7Q/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcXlD7Q/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcXlD7Q/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcXlD7Q/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>  <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='st'>"sim$age &gt; 1"</span> <span class='co'># provide as string</span>
   <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&gt;</span> <span class='fl'>1</span>) <span class='co'># provide as a call</span>
   <span class='no'>condition</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/expression.html'>expression</a></span>(<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&gt;</span> <span class='fl'>1</span>) <span class='co'># provide as an expression</span>
   <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'>scheduleConditionalEvent</span>(<span class='no'>sim</span>, <span class='no'>condition</span>, <span class='st'>"firemodule"</span>, <span class='st'>"burn"</span>)
   <span class='fu'><a href='simList-accessors-events.html'>conditionalEvents</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt;      condition minEventTime maxEventTime moduleName eventType eventPriority
-#&gt; 1: sim$age &gt; 1            0            2 firemodule      burn             5</div><div class='input'>  <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>) <span class='co'># no changes to sim$age, i.e., it is absent</span></div><div class='output co'>#&gt; [1] "2019-09-13 07:36:07 | total elpsd: 0.0014 secs | 0 checkpoint init 5"
-#&gt; [1] "2019-09-13 07:36:07 | total elpsd: 0.0032 secs | 0 save init 5"
-#&gt; [1] "2019-09-13 07:36:07 | total elpsd: 0.0051 secs | 0 progress init 5"
-#&gt; [1] "2019-09-13 07:36:07 | total elpsd: 0.0064 secs | 0 load init 5"</div><div class='output co'>#&gt; <span class='message'>simList saved in</span>
+#&gt; 1: sim$age &gt; 1            0            2 firemodule      burn             5</div><div class='input'>  <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>) <span class='co'># no changes to sim$age, i.e., it is absent</span></div><div class='output co'>#&gt; [1] "2019-11-19 11:05:54 | total elpsd: 0.0016 secs | 0 checkpoint init 0"
+#&gt; [1] "2019-11-19 11:05:54 | total elpsd: 0.0034 secs | 0 save init 0"
+#&gt; [1] "2019-11-19 11:05:54 | total elpsd: 0.0047 secs | 0 progress init 0"
+#&gt; [1] "2019-11-19 11:05:54 | total elpsd: 0.006 secs | 0 load init 0"</div><div class='output co'>#&gt; <span class='message'>simList saved in</span>
 #&gt; <span class='message'> SpaDES.core:::.pkgEnv$.sim </span>
-#&gt; <span class='message'>It will be deleted at next spades call</span></div><div class='input'>  <span class='fu'><a href='simList-accessors-events.html'>events</a></span>(<span class='no'>sim</span>) <span class='co'># nothing scheduled</span></div><div class='output co'>#&gt; Null data.table (0 rows and 0 cols)</div><div class='input'>  <span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span> <span class='co'># change the value</span>
+#&gt; <span class='message'>It will be deleted at next spades() call.</span></div><div class='input'>  <span class='fu'><a href='simList-accessors-events.html'>events</a></span>(<span class='no'>sim</span>) <span class='co'># nothing scheduled</span></div><div class='output co'>#&gt; Null data.table (0 rows and 0 cols)</div><div class='input'>  <span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span> <span class='co'># change the value</span>
   <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>) <span class='co'># Run spades, the condition is now true, so event is</span></div><div class='output co'>#&gt; <span class='message'>  Conditional Event -- sim$age &gt; 1 is true. Scheduling for now</span></div><div class='output co'>#&gt; <span class='message'>simList saved in</span>
 #&gt; <span class='message'> SpaDES.core:::.pkgEnv$.sim </span>
-#&gt; <span class='message'>It will be deleted at next spades call</span></div><div class='input'>                     <span class='co'>#  scheduled at current time</span>
+#&gt; <span class='message'>It will be deleted at next spades() call.</span></div><div class='input'>                     <span class='co'>#  scheduled at current time</span>
   <span class='fu'><a href='simList-accessors-events.html'>events</a></span>(<span class='no'>sim</span>)        <span class='co'># now scheduled in the normal event queue</span></div><div class='output co'>#&gt;    eventTime moduleName eventType eventPriority
 #&gt; 1:         2 firemodule      burn             5</div></pre>
   </div>
@@ -265,7 +275,7 @@ very low or even negative to ensure it gets inserted at the top of the event que
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

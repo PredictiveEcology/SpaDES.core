@@ -84,7 +84,7 @@ SpaDES.core:::.pkgEnv$corePackages" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -114,6 +114,9 @@ SpaDES.core:::.pkgEnv$corePackages" />
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -155,8 +158,11 @@ The current set of these core packages used by SpaDES can be found here:
 <code>SpaDES.core:::.pkgEnv$corePackages</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>.modifySearchPath</span>(<span class='no'>pkgs</span>, <span class='kw'>removeOthers</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>skipNamespacing</span> <span class='kw'>=</span> !<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.switchPkgNamespaces"</span>))</pre>
+    <pre class="usage"><span class='fu'>.modifySearchPath</span>(
+  <span class='no'>pkgs</span>,
+  <span class='kw'>removeOthers</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>skipNamespacing</span> <span class='kw'>=</span> !<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.switchPkgNamespaces"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -203,7 +209,7 @@ conflicts between packages.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

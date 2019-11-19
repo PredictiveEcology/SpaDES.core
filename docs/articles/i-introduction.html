@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -67,6 +67,9 @@
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -99,7 +102,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">September 13 2019</h4>
+            <h4 class="date">November 19 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -268,27 +271,7 @@
 <div id="simulation-experiments" class="section level1">
 <h1 class="hasAnchor">
 <a href="#simulation-experiments" class="anchor"></a>Simulation experiments</h1>
-<p>Running multiple simulations with different parameter values is a critical part of sensitivity and robustness analysis, simulation experiments, optimization, and pattern oriented modelling. Likewise, greater understanding and evaluation of models and their uncertainty requires simulation replication and repetition <span class="citation">(Grimm and Railsback 2005; Thiele and Grimm 2015)</span>. Using <code>R</code> as a common platform for data, simulation, and analyses we can do all of these easily and directly as part of our <code>SpaDES</code> simulation without breaking the linkages between model and analysis. This workflow facilitates and enhances the use of ensemble and consensus modelling, and studies of cumulative effects.</p>
-<div id="running-a-groups-of-simulations-the-experiment-function" class="section level2">
-<h2 class="hasAnchor">
-<a href="#running-a-groups-of-simulations-the-experiment-function" class="anchor"></a>Running a groups of simulations: the <code>experiment</code> function</h2>
-<p>Once a simulation is properly initialized and runs correctly with the <code>spades</code> function, it is likely time to do things like run replicates. There is a function, <code>experiment</code> to do this, as well as building parameter and module “simulation experiments”. For example, you can pass alternative values to parameters in modules and the <code>experiment</code> will build a fully factorial experiment, with replication and run them. This function (as with <code>POM</code> and <code>splitRaster</code>) is parallel-aware and can either proceed with a cluster object (<code>cl</code> argument) or a cluster running in the background using the <code><a href="https://rdrr.io/pkg/raster/man/cluster.html">raster::beginCluster</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">?experiment <span class="co"># will give many more examples than here</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co"># Copy Example 5 here:</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"> mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">    <span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">2.0</span>, <span class="dt">timeunit =</span> <span class="st">"year"</span>),</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">    <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>)),</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">    <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span>),</a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">    <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),</a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">                 <span class="dt">outputPath =</span> tmpdir),</a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">    <span class="co"># Save final state of landscape and caribou</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">    <span class="dt">outputs =</span> <span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">objectName =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"landscape"</span>, <span class="st">"caribou"</span>), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">sims &lt;-<span class="st"> </span><span class="kw"><a href="../reference/experiment.html">experiment</a></span>(mySim, <span class="dt">replicates =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="kw"><a href="https://rdrr.io/r/base/attr.html">attr</a></span>(sims, <span class="st">"experiment"</span>)<span class="op">$</span>expDesign <span class="co"># shows 2 replicates of same experiment</span></a></code></pre></div>
-</div>
+<p>Running multiple simulations with different parameter values is a critical part of sensitivity and robustness analysis, simulation experiments, optimization, and pattern oriented modelling. Likewise, greater understanding and evaluation of models and their uncertainty requires simulation replication and repetition <span class="citation">(Grimm and Railsback 2005; Thiele and Grimm 2015)</span>. Using <code>R</code> as a common platform for data, simulation, and analyses we can do all of these easily and directly as part of our <code>SpaDES</code> simulation without breaking the linkages between model and analysis. This workflow facilitates and enhances the use of ensemble and consensus modelling, and studies of cumulative effects. The tools for these experiments are now in a separate package, <code>SpaDES.experiment</code>.</p>
 </div>
 <div id="additional-resources" class="section level1">
 <h1 class="hasAnchor">
@@ -423,11 +406,7 @@
       <li><a href="#agent-based-models">Agent based models</a></li>
       </ul>
 </li>
-      <li>
-<a href="#simulation-experiments">Simulation experiments</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#running-a-groups-of-simulations-the-experiment-function">Running a groups of simulations: the <code>experiment</code> function</a></li>
-      </ul>
-</li>
+      <li><a href="#simulation-experiments">Simulation experiments</a></li>
       <li>
 <a href="#additional-resources">Additional resources</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#spades-documentation-and-vignettes"><code>SpaDES</code> documentation and vignettes</a></li>
@@ -449,7 +428,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

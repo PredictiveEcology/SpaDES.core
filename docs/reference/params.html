@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get and set simulation parameters. — params • SpaDES.core</title>
+<title>Get and set simulation parameters — params • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Get and set simulation parameters. — params" />
+<meta property="og:title" content="Get and set simulation parameters — params" />
 <meta property="og:description" content="params and P access the parameter slot in the simList.
 params has a replace method, so can be used to update a parameter value." />
 <meta name="twitter:card" content="summary" />
@@ -80,7 +80,7 @@ params has a replace method, so can be used to update a parameter value." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -111,6 +111,9 @@ params has a replace method, so can be used to update a parameter value." />
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -137,7 +140,7 @@ params has a replace method, so can be used to update a parameter value." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get and set simulation parameters.</h1>
+    <h1>Get and set simulation parameters</h1>
     <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/simList-accessors.R'><code>R/simList-accessors.R</code></a></small>
     <div class="hidden name"><code>params.Rd</code></div>
     </div>
@@ -212,13 +215,19 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.1 on Simulation parameters.</p>
-<p>Other functions to access elements of a 'simList' object: <code><a href='addDepends.html'>.addDepends</a></code>,
-  <code><a href='checkpoint.html'>doEvent.checkpoint</a></code>, <code><a href='simList-accessors-envir.html'>envir</a></code>,
-  <code><a href='simList-accessors-events.html'>events</a></code>, <code><a href='globals.html'>globals</a></code>,
-  <code><a href='simList-accessors-inout.html'>inputs</a></code>, <code><a href='simList-accessors-modules.html'>modules</a></code>,
-  <code><a href='objects.html'>objs</a></code>, <code><a href='packages.html'>packages</a></code>,
-  <code><a href='simList-accessors-paths.html'>paths</a></code>, <code><a href='progress.html'>progressInterval</a></code>,
-  <code><a href='simList-accessors-times.html'>times</a></code></p></div>
+<p>Other functions to access elements of a 'simList' object: 
+<code><a href='addDepends.html'>.addDepends</a>()</code>,
+<code><a href='checkpoint.html'>doEvent.checkpoint</a>()</code>,
+<code><a href='simList-accessors-envir.html'>envir</a>()</code>,
+<code><a href='simList-accessors-events.html'>events</a>()</code>,
+<code><a href='globals.html'>globals</a>()</code>,
+<code><a href='simList-accessors-inout.html'>inputs</a>()</code>,
+<code><a href='simList-accessors-modules.html'>modules</a>()</code>,
+<code><a href='objects.html'>objs</a>()</code>,
+<code><a href='packages.html'>packages</a>()</code>,
+<code><a href='simList-accessors-paths.html'>paths</a>()</code>,
+<code><a href='progress.html'>progressInterval</a>()</code>,
+<code><a href='simList-accessors-times.html'>times</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>modules</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>)
@@ -226,13 +235,14 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='no'>modules</span>, <span class='kw'>paths</span> <span class='kw'>=</span> <span class='no'>paths</span>,
                  <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpDIhvFY/temp_libpath16fe211a72ecd/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpNg41q7/temp_libpath171d06ee3b440/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpB1vzV8/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpde3UfN/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpde3UfN/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpDIhvFY/temp_libpath16fe211a72ecd/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpcXlD7Q/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpcXlD7Q/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpcXlD7Q/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpcXlD7Q/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpNg41q7/temp_libpath171d06ee3b440/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='output co'>#&gt; <span class='message'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></div><div class='input'>
 <span class='co'># update some parameters using assignment -- currently only params will work</span>
 <span class='fu'>params</span>(<span class='no'>mySim</span>)$<span class='no'>randomLandscapes</span>$<span class='no'>nx</span> <span class='kw'>&lt;-</span> <span class='fl'>200</span>
@@ -540,7 +550,7 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

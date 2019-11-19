@@ -85,7 +85,7 @@ See more details below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -115,6 +115,9 @@ See more details below." />
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -157,28 +160,69 @@ information, such as times, paths, modules, and module load order.
 See more details below.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simInit</span>(<span class='no'>times</span>, <span class='no'>params</span>, <span class='no'>modules</span>, <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>simInit</span>(
+  <span class='no'>times</span>,
+  <span class='no'>params</span>,
+  <span class='no'>modules</span>,
+  <span class='no'>objects</span>,
+  <span class='no'>paths</span>,
+  <span class='no'>inputs</span>,
+  <span class='no'>outputs</span>,
+  <span class='no'>loadOrder</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
 
-
-  <span class='co'># S4 method for list,list,list,list,list,data.frame,data.frame,character</span>
-<span class='fu'>simInit</span>(<span class='no'>times</span>,
-  <span class='no'>params</span>, <span class='no'>modules</span>, <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='co'># S4 method for list,list,list,list,list,data.frame,data.frame,character</span>
+<span class='fu'>simInit</span>(
+  <span class='no'>times</span>,
+  <span class='no'>params</span>,
+  <span class='no'>modules</span>,
+  <span class='no'>objects</span>,
+  <span class='no'>paths</span>,
+  <span class='no'>inputs</span>,
+  <span class='no'>outputs</span>,
+  <span class='no'>loadOrder</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
 
 <span class='co'># S4 method for ANY,ANY,ANY,character,ANY,ANY,ANY,ANY</span>
-<span class='fu'>simInit</span>(<span class='no'>times</span>, <span class='no'>params</span>,
-  <span class='no'>modules</span>, <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>simInit</span>(
+  <span class='no'>times</span>,
+  <span class='no'>params</span>,
+  <span class='no'>modules</span>,
+  <span class='no'>objects</span>,
+  <span class='no'>paths</span>,
+  <span class='no'>inputs</span>,
+  <span class='no'>outputs</span>,
+  <span class='no'>loadOrder</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
 
 <span class='co'># S4 method for ANY,ANY,character,ANY,ANY,ANY,ANY,ANY</span>
-<span class='fu'>simInit</span>(<span class='no'>times</span>, <span class='no'>params</span>,
-  <span class='no'>modules</span>, <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>simInit</span>(
+  <span class='no'>times</span>,
+  <span class='no'>params</span>,
+  <span class='no'>modules</span>,
+  <span class='no'>objects</span>,
+  <span class='no'>paths</span>,
+  <span class='no'>inputs</span>,
+  <span class='no'>outputs</span>,
+  <span class='no'>loadOrder</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
 
 <span class='co'># S4 method for ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY</span>
-<span class='fu'>simInit</span>(<span class='no'>times</span>, <span class='no'>params</span>, <span class='no'>modules</span>,
-  <span class='no'>objects</span>, <span class='no'>paths</span>, <span class='no'>inputs</span>, <span class='no'>outputs</span>, <span class='no'>loadOrder</span>, <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>simInit</span>(
+  <span class='no'>times</span>,
+  <span class='no'>params</span>,
+  <span class='no'>modules</span>,
+  <span class='no'>objects</span>,
+  <span class='no'>paths</span>,
+  <span class='no'>inputs</span>,
+  <span class='no'>outputs</span>,
+  <span class='no'>loadOrder</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -235,7 +279,11 @@ See <code><a href='simList-accessors-inout.html'>inputs</a></code> and vignette(
       <td><p>A <code>data.frame</code>. Can specify from 1 to 5
 columns with following column names: <code>objectName</code> (character, required),
 <code>file</code> (character), <code>fun</code> (character), <code>package</code> (character),
-<code>saveTime</code> (numeric). See <code><a href='simList-accessors-inout.html'>outputs</a></code> and
+<code>saveTime</code> (numeric) and <code>eventPriority</code> (numeric). If
+<code>eventPriority</code> is not set, it defaults to <code><a href='priority.html'>.last()</a></code>. If <code>eventPriority</code>
+is set to a low value, e.g., 0, 1, 2 and <code>saveTime</code> is <code><a href='simList-accessors-times.html'>start(sim)</a></code>,
+it should give "initial conditions".</p>
+<p>See <code><a href='simList-accessors-inout.html'>outputs</a></code> and
 <code><a href='../articles/ii-modules.html'>vignette("ii-modules")</a></code> section about outputs.</p></td>
     </tr>
     <tr>
@@ -300,9 +348,9 @@ specified in the arguments supplied.</p>
 the metadata of modules. Take the example of a module named, <code>Fire</code>, which
 has a parameter named <code>.plotInitialTime</code>. In the metadata of that module,
 it says <code>TRUE</code>. Here we can override that default with:
-<code><a href='https://rdrr.io/r/base/list.html'>list(Fire=list(.plotInitialTime=NA))</a></code>, effectively turning off plotting. Since
-this is a list of lists, one can override the module defaults for multiple parameters
-from multiple modules all at once, with say:
+<code><a href='https://rdrr.io/r/base/list.html'>list(Fire=list(.plotInitialTime=NA))</a></code>, effectively turning off plotting.
+Since this is a list of lists, one can override the module defaults for multiple
+parameters from multiple modules all at once, with say:
 <code><a href='https://rdrr.io/r/base/list.html'>list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))</a></code>.</p>
 <p>We implement a discrete event simulation in a more modular fashion so it is
@@ -321,7 +369,7 @@ the defaults are as follows:</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Since the objects in the <code>simList</code> are passed-by-reference, it is useful
-to create a copy of the initalized <code>simList</code> object prior to running
+to create a copy of the initialized <code>simList</code> object prior to running
 the simulation (e.g., <code>mySimOut &lt;- spades(Copy(mySim))</code>).
 This ensures you retain access to the original objects, which would otherwise
 be overwritten/modified during the simulation.</p>
@@ -458,6 +506,7 @@ Please see the vignette dedicated to this topic.</p>
    <span class='kw'>outputs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
      <span class='fu'><a href='https://rdrr.io/r/base/expand.grid.html'>expand.grid</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"caribou"</span>,<span class='st'>"landscape"</span>),
      <span class='kw'>saveTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>2</span>,
+     <span class='kw'>eventPriority</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>10</span>), <span class='co'># eventPriority 0 may give "initial" conditions</span>
      <span class='kw'>stringsAsFactors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))
  )
 
@@ -501,7 +550,7 @@ Please see the vignette dedicated to this topic.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

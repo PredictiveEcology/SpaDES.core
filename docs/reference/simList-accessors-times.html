@@ -83,7 +83,7 @@ shows the user time in the units of the model as shown with timeunit(sim)" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -113,6 +113,9 @@ shows the user time in the units of the model as shown with timeunit(sim)" />
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -235,7 +238,7 @@ time units (if used within a module).</p></td>
     <tr>
       <th>byEvent</th>
       <td><p>Logical. If <code>TRUE</code>, the elapsed time will be by module and event;
-<code>FALSE</code> will report only by module. Default is <code>TRUE</code></p></td>
+<code>FALSE</code> will report only by module. Default is <code>TRUE</code>.</p></td>
     </tr>
     </table>
 
@@ -293,13 +296,19 @@ of the simulation:</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.5 on Simulation times.</p>
-<p>Other functions to access elements of a 'simList' object: <code><a href='addDepends.html'>.addDepends</a></code>,
-  <code><a href='checkpoint.html'>doEvent.checkpoint</a></code>, <code><a href='simList-accessors-envir.html'>envir</a></code>,
-  <code><a href='simList-accessors-events.html'>events</a></code>, <code><a href='globals.html'>globals</a></code>,
-  <code><a href='simList-accessors-inout.html'>inputs</a></code>, <code><a href='simList-accessors-modules.html'>modules</a></code>,
-  <code><a href='objects.html'>objs</a></code>, <code><a href='packages.html'>packages</a></code>,
-  <code><a href='params.html'>params</a></code>, <code><a href='simList-accessors-paths.html'>paths</a></code>,
-  <code><a href='progress.html'>progressInterval</a></code></p></div>
+<p>Other functions to access elements of a 'simList' object: 
+<code><a href='addDepends.html'>.addDepends</a>()</code>,
+<code><a href='checkpoint.html'>doEvent.checkpoint</a>()</code>,
+<code><a href='simList-accessors-envir.html'>envir</a>()</code>,
+<code><a href='simList-accessors-events.html'>events</a>()</code>,
+<code><a href='globals.html'>globals</a>()</code>,
+<code><a href='simList-accessors-inout.html'>inputs</a>()</code>,
+<code><a href='simList-accessors-modules.html'>modules</a>()</code>,
+<code><a href='objects.html'>objs</a>()</code>,
+<code><a href='packages.html'>packages</a>()</code>,
+<code><a href='params.html'>params</a>()</code>,
+<code><a href='simList-accessors-paths.html'>paths</a>()</code>,
+<code><a href='progress.html'>progressInterval</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -324,7 +333,7 @@ of the simulation:</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

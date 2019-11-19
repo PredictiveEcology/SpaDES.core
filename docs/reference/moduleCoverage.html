@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -109,6 +109,9 @@
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -175,7 +178,7 @@ The `moduleCoverage` object contains the percent value of unit test coverage
 for the module.
 The `functionCoverage` object contains percentage values for unit test
 coverage for each function defined in the module.
-Please use <code><a href='https://rdrr.io/pkg/covr/man/report.html'>report</a></code> to view the coverage information.
+Please use <code><a href='http://covr.r-lib.org/reference/report.html'>report</a></code> to view the coverage information.
 Two data.tables give the information of all the tested and untested functions
 in the module.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
@@ -192,10 +195,10 @@ To accurately test your module, the test filename must follow the format
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
- <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for %&gt;%</span>
+ <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for </span>
  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>SpaDES.core</span>)
  <span class='no'>tmpdir</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"coverage"</span>)
- <span class='no'>modulePath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"Modules"</span>) <span class='kw'>%&gt;%</span> <span class='fu'>checkPath</span>(<span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+ <span class='no'>modulePath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"Modules"</span>)
  <span class='no'>moduleName</span> <span class='kw'>&lt;-</span> <span class='st'>"forestAge"</span> <span class='co'># sample module to test</span>
  <span class='fu'><a href='downloadModule.html'>downloadModule</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>) <span class='co'># download sample module</span>
  <span class='no'>testResults</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleCoverage</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>)
@@ -226,7 +229,7 @@ To accurately test your module, the test filename must follow the format
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

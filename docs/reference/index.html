@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -107,6 +107,9 @@
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -158,12 +161,6 @@
           <p><code><a href="Copy.html">Copy(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
         <td><p>Copy for simList class objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="POM.html">POM()</a></code> </p>
-        </td>
-        <td><p>Use Pattern Oriented Modeling to fit unknown parameters</p></td>
       </tr><tr>
         
         <td>
@@ -258,6 +255,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="clearCache.html">clearCache(<i>&lt;simList&gt;</i>)</a></code> <code><a href="clearCache.html">showCache(<i>&lt;simList&gt;</i>)</a></code> <code><a href="clearCache.html">keepCache(<i>&lt;simList&gt;</i>)</a></code> </p>
+        </td>
+        <td><p><code>clearCache</code> for <code>simList</code> objects</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="copyModule.html">copyModule()</a></code> </p>
         </td>
         <td><p>Create a copy of an existing module</p></td>
@@ -279,6 +282,12 @@
           <p><code><a href="defineParameter.html">defineParameter()</a></code> </p>
         </td>
         <td><p>Define a parameter used in a module</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="deprecated.html">experiment()</a></code> <code><a href="deprecated.html">experiment2()</a></code> <code><a href="deprecated.html">POM()</a></code> <code><a href="deprecated.html">simInitAndExperiment()</a></code> </p>
+        </td>
+        <td><p>Deprecated functions</p></td>
       </tr><tr>
         
         <td>
@@ -318,12 +327,6 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="experiment.html">experiment()</a></code> </p>
-        </td>
-        <td><p>Run an experiment using <code>spades</code></p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="extractURL.html">extractURL()</a></code> </p>
         </td>
         <td><p>Extract a url from module metadata</p></td>
@@ -350,7 +353,7 @@
         <td>
           <p><code><a href="globals.html">globals()</a></code> <code><a href="globals.html">`globals<-`()</a></code> <code><a href="globals.html">G()</a></code> <code><a href="globals.html">`G<-`()</a></code> </p>
         </td>
-        <td><p>Get and set simulation globals.</p></td>
+        <td><p>Get and set global simulation parameters</p></td>
       </tr><tr>
         
         <td>
@@ -360,7 +363,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="loadFiles.html">.fileExtensions()</a></code> <code><a href="loadFiles.html">loadFiles()</a></code> <code><a href="loadFiles.html">.saveFileExtensions()</a></code> <code><a href="loadFiles.html">saveSimList()</a></code> </p>
+          <p><code><a href="loadFiles.html">.fileExtensions()</a></code> <code><a href="loadFiles.html">loadFiles()</a></code> <code><a href="loadFiles.html">.saveFileExtensions()</a></code> </p>
         </td>
         <td><p>File extensions map</p></td>
       </tr><tr>
@@ -381,6 +384,12 @@
           <p><code><a href="maxTimeunit.html">maxTimeunit()</a></code> </p>
         </td>
         <td><p>Determine the largest timestep unit in a simulation</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="memoryUse.html">memoryUseThisSession()</a></code> <code><a href="memoryUse.html">memoryUse()</a></code> </p>
+        </td>
+        <td><p>Estimate memory used with <code>system("ps")</code></p></td>
       </tr><tr>
         
         <td>
@@ -450,6 +459,18 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="newProject.html">newProject()</a></code> </p>
+        </td>
+        <td><p>Create new SpaDES project</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="newProjectCode.html">newProjectCode()</a></code> </p>
+        </td>
+        <td><p>Create new module code file</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="objSize.simList.html">objSize(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
         <td><p>Object size for <code>simList</code></p></td>
@@ -500,7 +521,7 @@
         <td>
           <p><code><a href="params.html">params()</a></code> <code><a href="params.html">`params<-`()</a></code> <code><a href="params.html">P()</a></code> <code><a href="params.html">parameters()</a></code> </p>
         </td>
-        <td><p>Get and set simulation parameters.</p></td>
+        <td><p>Get and set simulation parameters</p></td>
       </tr><tr>
         
         <td>
@@ -558,6 +579,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="restartR.html">restartR()</a></code> </p>
+        </td>
+        <td><p>Restart R programmatically</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="restartSpades.html">restartSpades()</a></code> </p>
         </td>
         <td><p>Restart an interrupted simulation</p></td>
@@ -579,6 +606,12 @@
           <p><code><a href="saveFiles.html">saveFiles()</a></code> </p>
         </td>
         <td><p>Save objects using <code>.saveObjects</code> in <code>params</code> slot of <code>simInit</code></p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="saveSimList.html">saveSimList()</a></code> </p>
+        </td>
+        <td><p>Save a whole <code>simList</code> object to disk</p></td>
       </tr><tr>
         
         <td>
@@ -606,9 +639,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="simInitAnd.html">simInitAndSpades()</a></code> <code><a href="simInitAnd.html">simInitAndExperiment()</a></code> </p>
+          <p><code><a href="simInitAnd.html">simInitAndSpades()</a></code> </p>
         </td>
-        <td><p>Call <code>simInit</code> and <code>spades</code> or <code>experiment</code> together</p></td>
+        <td><p>Call <code>simInit</code> and <code>spades</code> together</p></td>
       </tr><tr>
         
         <td>
@@ -642,9 +675,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-paths.html">paths()</a></code> <code><a href="simList-accessors-paths.html">`paths<-`()</a></code> <code><a href="simList-accessors-paths.html">cachePath()</a></code> <code><a href="simList-accessors-paths.html">`cachePath<-`()</a></code> <code><a href="simList-accessors-paths.html">inputPath()</a></code> <code><a href="simList-accessors-paths.html">`inputPath<-`()</a></code> <code><a href="simList-accessors-paths.html">outputPath()</a></code> <code><a href="simList-accessors-paths.html">`outputPath<-`()</a></code> <code><a href="simList-accessors-paths.html">modulePath()</a></code> <code><a href="simList-accessors-paths.html">`modulePath<-`()</a></code> <code><a href="simList-accessors-paths.html">dataPath()</a></code> </p>
+          <p><code><a href="simList-accessors-paths.html">paths()</a></code> <code><a href="simList-accessors-paths.html">`paths<-`()</a></code> <code><a href="simList-accessors-paths.html">cachePath()</a></code> <code><a href="simList-accessors-paths.html">`cachePath<-`()</a></code> <code><a href="simList-accessors-paths.html">inputPath()</a></code> <code><a href="simList-accessors-paths.html">`inputPath<-`()</a></code> <code><a href="simList-accessors-paths.html">outputPath()</a></code> <code><a href="simList-accessors-paths.html">`outputPath<-`()</a></code> <code><a href="simList-accessors-paths.html">modulePath()</a></code> <code><a href="simList-accessors-paths.html">`modulePath<-`()</a></code> <code><a href="simList-accessors-paths.html">rasterPath()</a></code> <code><a href="simList-accessors-paths.html">`rasterPath<-`()</a></code> <code><a href="simList-accessors-paths.html">dataPath()</a></code> </p>
         </td>
-        <td><p>Specify paths for modules, inputs, and outputs</p></td>
+        <td><p>Specify paths for modules, inputs, outputs, and temporary rasters</p></td>
       </tr><tr>
         
         <td>
@@ -705,6 +738,12 @@
           <p><code><a href="zipModule.html">zipModule()</a></code> </p>
         </td>
         <td><p>Create a zip archive of a module subdirectory</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="zipSimList.html">zipSimList()</a></code> </p>
+        </td>
+        <td><p>Zip many of the files in a <code>simList</code></p></td>
       </tr>
     </tbody>
     </table>
@@ -725,7 +764,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

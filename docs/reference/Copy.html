@@ -85,7 +85,7 @@ See Copy." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -115,6 +115,9 @@ See Copy." />
     </li>
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+    </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
     </li>
   </ul>
 </li>
@@ -153,12 +156,12 @@ all objects within that slot are pass-by-reference. That means
 it is not possible to simply copy an object with an assignment operator:
 the two objects will share the same objects. As one simList object changes
 so will the other. when this is not the desired behaviour, use this function.
-NOTE: use capital C, to limit confusion with <code><a href='https://rdrr.io/pkg/data.table/man/copy.html'>data.table::copy()</a></code>
+NOTE: use capital C, to limit confusion with <code><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>data.table::copy()</a></code>
 See <code><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>Copy</span>(<span class='no'>object</span>, <span class='no'>objects</span>, <span class='no'>queues</span>)</pre>
+<span class='fu'>Copy</span>(<span class='no'>object</span>, <span class='no'>filebackedDir</span>, <span class='no'>objects</span>, <span class='no'>queues</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,6 +169,16 @@ See <code><a href='http://reproducible.predictiveecology.org/reference/Copy.html
     <tr>
       <th>object</th>
       <td><p>An R object (likely containing environments) or an environment.</p></td>
+    </tr>
+    <tr>
+      <th>filebackedDir</th>
+      <td><p>A directory to copy any files that are backing R objects,
+currently only valid for <code>Raster</code> classes. Defaults
+to <code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir()</a></code>, which is unlikely to be very useful.
+Can be <code>NULL</code>, which means that the file will not be
+copied and could therefore cause a collision as the
+pre-copied object and post-copied object would have the same
+file backing them.</p></td>
     </tr>
     <tr>
       <th>objects</th>
@@ -176,10 +189,18 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
       <th>queues</th>
       <td><p>Logical. Should the events queues (<code>events</code>,
 <code>current</code>, <code>completed</code>) be deep copied via
-<code><a href='https://rdrr.io/pkg/data.table/man/copy.html'>data.table::copy</a></code></p></td>
+<code><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>data.table::copy</a></code></p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>simList</code> objects can contain a lot of information, much of which could be
+in pass-by-reference objects (e.g., <code>data.table</code> class), and objects that are
+file-backed, such as some <code>Raster*</code>-class objects. For all the objects that
+are file-backed, it is likely <em>very</em> important to give unique file-backed
+directories. This should be passed here, which gets passed on to the many methods
+of <code>Copy</code> in <code>reproducible</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='http://reproducible.predictiveecology.org/reference/Copy.html'>Copy</a></code></p></div>
@@ -189,6 +210,7 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
     </ul>
 
@@ -204,7 +226,7 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>
