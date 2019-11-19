@@ -8,21 +8,25 @@
 
 <title>Define a new module. — defineModule • SpaDES.core</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,12 +34,13 @@
 
 
 
-<meta property="og:title" content="Define a new module. — defineModule" />
 
+<meta property="og:title" content="Define a new module. — defineModule" />
 <meta property="og:description" content="Specify a new module's metadata as well as object and package dependencies.
 Packages are loaded during this call. Any or all of these can be missing, with missing
 values set to defaults" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -59,6 +64,7 @@ values set to defaults" />
   gtag('config', 'UA-58633549-6');
 </script>
 
+
   </head>
 
   <body>
@@ -75,7 +81,7 @@ values set to defaults" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -83,7 +89,7 @@ values set to defaults" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,17 +112,19 @@ values set to defaults" />
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+    </li>
   </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -127,6 +135,7 @@ values set to defaults" />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -138,18 +147,16 @@ values set to defaults" />
     </div>
 
     <div class="ref-description">
-    
     <p>Specify a new module's metadata as well as object and package dependencies.
 Packages are loaded during this call. Any or all of these can be missing, with missing
 values set to defaults</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>defineModule</span>(<span class='no'>sim</span>, <span class='no'>x</span>)
 
 <span class='co'># S4 method for simList,list</span>
 <span class='fu'>defineModule</span>(<span class='no'>sim</span>, <span class='no'>x</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -163,201 +170,131 @@ in which to replace element(s).</p></td>
       <td><p>A list with a number of named elements, referred to as the metadata. See details.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Updated <code>simList</code> object.</p>
-    
     <h2 class="hasAnchor" id="required-metadata-elements"><a class="anchor" href="#required-metadata-elements"></a>Required metadata elements</h2>
 
     
-    <table class='table'>
-<tr><td></td><td></td></tr>
-<tr><td><code>name</code></td><td></td></tr>
-<tr><td>Module name. Must match the filename (without the</td><td><code>.R</code></td></tr>
-<tr><td>extension).</td><td>This is currently not parsed by SpaDES;</td></tr>
-<tr><td>it is for human readers only.</td><td></td></tr>
-<tr><td></td><td><code>description</code></td></tr>
-<tr><td></td><td>Brief description of the module.</td></tr>
-<tr><td>This is currently not parsed by SpaDES;</td><td>it is for human readers only.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>keywords</code></td><td></td></tr>
-<tr><td>Author-supplied keywords.</td><td>This is currently not parsed by SpaDES;</td></tr>
-<tr><td>it is for human readers only.</td><td></td></tr>
-<tr><td></td><td><code>childModules</code></td></tr>
-<tr><td></td><td>If this contains any character vector, then it will</td></tr>
-<tr><td>be treated as a parent module. If this is a parent module,</td><td>then only this list entry will be read. For normal,</td></tr>
-<tr><td>i.e., 'child modules', this should be</td><td><code><a href='https://www.rdocumentation.org/packages/base/topics/character'>character(0)</a></code></td></tr>
-<tr><td>or</td><td></td></tr>
-<tr><td><code>NA</code></td><td>.</td></tr>
-<tr><td>If a character vector is provided, then these must be the</td><td>names of the modules located in the same file path as this</td></tr>
-<tr><td>parent module that will be loaded during the</td><td><code>simInit</code></td></tr>
-<tr><td>.</td><td></td></tr>
-<tr><td></td><td><code>authors</code></td></tr>
-<tr><td></td><td>Module author information (as a vector of</td></tr>
-<tr><td><code><a href='https://www.rdocumentation.org/packages/utils/topics/person'>person</a></code></td><td></td></tr>
-<tr><td>objects. This is currently not parsed by SpaDES;</td><td>it is for human readers only.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>version</code></td><td></td></tr>
-<tr><td>Module version number (will be coerced to</td><td><code><a href='https://www.rdocumentation.org/packages/base/topics/numeric_version'>numeric_version</a></code></td></tr>
-<tr><td></td><td>if a character or numeric are supplied).</td></tr>
-<tr><td>The module developer should update manually this with each change</td><td>that is made to the module. See</td></tr>
-<tr><td><a href='http://semver.org/'>http://semver.org/</a></td><td></td></tr>
-<tr><td>for a widely accepted standard for version numbering.</td><td></td></tr>
-<tr><td></td><td><code>spatialExtent</code></td></tr>
-<tr><td></td><td>The spatial extent of the module supplied via</td></tr>
-<tr><td></td><td><code><a href='https://www.rdocumentation.org/packages/raster/topics/extent'>raster::extent</a></code></td></tr>
-<tr><td>. This is currently unimplemented.</td><td>Once implemented, this should define what spatial region this</td></tr>
-<tr><td>module is scientifically reasonable to be used in.</td><td></td></tr>
-<tr><td></td><td><code>timeframe</code></td></tr>
-<tr><td></td><td>Vector (length 2) of POSIXt dates specifying the temporal extent</td></tr>
-<tr><td>of the module. Currently unimplemented.</td><td>Once implemented, this should define what time frame this</td></tr>
-<tr><td>module is scientifically reasonable to be used for.</td><td></td></tr>
-<tr><td></td><td><code>timeunit</code></td></tr>
-<tr><td></td><td>Time scale of the module (e.g., "day", "year"). This</td></tr>
-<tr><td>MUST be specified. It indicates what '1' unit of time</td><td>means for this module.</td></tr>
-<tr><td><code>SpaDES</code></td><td>interprets this</td></tr>
-<tr><td>and if modules have different</td><td><code>timeunit</code></td></tr>
-<tr><td>values</td><td>then it will correctly schedule each module, using the</td></tr>
-<tr><td>smallest (currently the default) timeunit as the</td><td>'model' timeunit in the</td></tr>
-<tr><td><code>spades</code></td><td>call.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>citation</code></td><td></td></tr>
-<tr><td>List of character strings specifying module citation information.</td><td>Alternatively, a list of filenames of</td></tr>
-<tr><td><code>.bib</code></td><td>or similar files.</td></tr>
-<tr><td>This is currently not parsed by SpaDES;</td><td>it is for human readers only.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>documentation</code></td><td></td></tr>
-<tr><td>List of filenames referring to module documentation sources.</td><td>This is currently not parsed by SpaDES;</td></tr>
-<tr><td>it is for human readers only.</td><td></td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>reqdPkgs</code></td><td></td></tr>
-<tr><td>List of R package names required by the module. These</td><td>packages will be loaded when</td></tr>
-<tr><td><code>simInit</code></td><td>is called.</td></tr>
-<tr><td></td><td><code><a href='http://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code></td></tr>
-<tr><td>will be used internally</td><td>to load if available, and install if not available.</td></tr>
-<tr><td>Because</td><td><code><a href='http://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code></td></tr>
-<tr><td>can also download from</td><td>GitHub.com, these packages can specify package names stored</td></tr>
-<tr><td>on GitHub, e.g.,</td><td><code>"PredictiveEcology/SpaDES.core@development"</code></td></tr>
-<tr><td>.</td><td></td></tr>
-<tr><td></td><td><code>parameters</code></td></tr>
-<tr><td></td><td>A data.frame specifying the parameters used in the module.</td></tr>
-<tr><td>Usually produced by</td><td><code>rbind</code></td></tr>
-<tr><td>-ing the outputs of multiple</td><td></td></tr>
-<tr><td><code><a href='defineParameter.html'>defineParameter</a></code></td><td>calls. These parameters indicate</td></tr>
-<tr><td>the default values that will be used unless a module user</td><td>overrides them with the</td></tr>
-<tr><td><code>params</code></td><td>argument in the</td></tr>
-<tr><td></td><td><code><a href='simInit.html'>simInit</a></code></td></tr>
-<tr><td>call. The minimum and maximum are</td><td>currently used by the</td></tr>
-<tr><td><code><a href='https://predictiveecology.github.io/SpaDES.shiny/reference/shine.html'>SpaDES.shiny::shine</a></code></td><td>function and the</td></tr>
-<tr><td></td><td><code>POM</code></td></tr>
-<tr><td>function, and they should indicate the range</td><td>of values that are reasonable scientifically.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>inputObjects</code></td><td></td></tr>
-<tr><td>A</td><td><code>data.frame</code></td></tr>
-<tr><td>specifying the data objects expected as</td><td>inputs to the module,</td></tr>
-<tr><td>with columns</td><td><code>objectName</code></td></tr>
-<tr><td>(class</td><td><code>character</code></td></tr>
-<tr><td>),</td><td></td></tr>
-<tr><td><code>objectClass</code></td><td>(class</td></tr>
-<tr><td><code>character</code></td><td>),</td></tr>
-<tr><td></td><td><code>sourceURL</code></td></tr>
-<tr><td>(class</td><td><code>character</code></td></tr>
-<tr><td>), and</td><td><code>other</code></td></tr>
-<tr><td></td><td>(currently spades does nothing with this column).</td></tr>
-<tr><td>This data.frame identifies the objects that are expected,</td><td>but does not do any loading of that object into the simList.</td></tr>
-<tr><td>The</td><td><code>sourceURL</code></td></tr>
-<tr><td>gives the developer the opportunity</td><td>to identify the source of a data file that can be used</td></tr>
-<tr><td>with the model. This URL will be</td><td>used if the user calls</td></tr>
-<tr><td><code>downloadData</code></td><td>(or</td></tr>
-<tr><td></td><td><code><a href='downloadModule.html'>downloadModule(..., data = TRUE)</a></code></td></tr>
-<tr><td>. If the raw data</td><td>must be modified, the developer can use create a</td></tr>
-<tr><td>function called</td><td><code>.inputObjects</code></td></tr>
-<tr><td>in their module. That</td><td>function will be run during the</td></tr>
-<tr><td><code>simInit</code></td><td>call. The</td></tr>
-<tr><td>developer should ensure that if the object is supplied</td><td>by the module user as an argument in the</td></tr>
-<tr><td><code>simInit</code></td><td>, then</td></tr>
-<tr><td>the</td><td><code>.inputObjects</code></td></tr>
-<tr><td>should not be run, i.e., use an</td><td></td></tr>
-<tr><td><code>(is.null(sim$xxx)))</code></td><td>.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>outputObjects</code></td><td></td></tr>
-<tr><td>A</td><td><code>data.frame</code></td></tr>
-<tr><td>specifying the data objects output by</td><td>the module, with columns identical to those in</td></tr>
-<tr><td></td><td><code>inputObjects</code></td></tr>
-<tr><td>. Like</td><td><code>inputObjects</code></td></tr>
-<tr><td>above,</td><td>this only identifies the objects that this module will output</td></tr>
-<tr><td>into the</td><td><code>simList</code></td></tr>
-<tr><td>.</td><td>The module developer must create the necessary functions</td></tr>
-<tr><td>that will cause these objects to be put into the</td><td></td></tr>
-<tr><td><code>simList</code></td><td>.</td></tr>
-<tr><td></td><td></td></tr>
+
+
+<table class='table'>
+<tr><td><code>name</code></td><td>Module name. Must match the filename (without the <code>.R</code> extension).
+                    This is currently not parsed by SpaDES;
+                        it is for human readers only.</td></tr>
+<tr><td><code>description</code></td><td>Brief description of the module.
+                           This is currently not parsed by SpaDES;
+                           it is for human readers only.</td></tr>
+<tr><td><code>keywords</code></td><td>Author-supplied keywords.
+                        This is currently not parsed by SpaDES;
+                        it is for human readers only.</td></tr>
+<tr><td><code>childModules</code></td><td>If this contains any character vector, then it will
+                            be treated as a parent module. If this is a parent module,
+                            then only this list entry will be read. For normal,
+                            i.e., 'child modules', this should be <code><a href='https://rdrr.io/r/base/character.html'>character(0)</a></code> or
+                            <code>NA</code>.
+                            If a character vector is provided, then these must be the
+                            names of the modules located in the same file path as this
+                            parent module that will be loaded during the <code>simInit</code>.</td></tr>
+<tr><td><code>authors</code></td><td>Module author information (as a vector of <code><a href='https://rdrr.io/r/utils/person.html'>person</a></code>
+                       objects. This is currently not parsed by SpaDES;
+                       it is for human readers only.</td></tr>
+<tr><td><code>version</code></td><td>Module version number (will be coerced to <code><a href='https://rdrr.io/r/base/numeric_version.html'>numeric_version</a></code>
+                       if a character or numeric are supplied).
+                       The module developer should update manually this with each change
+                       that is made to the module. See <a href='http://semver.org/'>http://semver.org/</a>
+                       for a widely accepted standard for version numbering.</td></tr>
+<tr><td><code>spatialExtent</code></td><td>The spatial extent of the module supplied via
+                             <code><a href='https://rdrr.io/pkg/raster/man/extent.html'>raster::extent</a></code>. This is currently unimplemented.
+                             Once implemented, this should define what spatial region this
+                             module is scientifically reasonable to be used in.</td></tr>
+<tr><td><code>timeframe</code></td><td>Vector (length 2) of POSIXt dates specifying the temporal extent
+                         of the module. Currently unimplemented.
+                         Once implemented, this should define what time frame this
+                         module is scientifically reasonable to be used for.</td></tr>
+<tr><td><code>timeunit</code></td><td>Time scale of the module (e.g., "day", "year"). This
+                        MUST be specified. It indicates what '1' unit of time
+                        means for this module. <code>SpaDES</code> interprets this
+                        and if modules have different <code>timeunit</code> values
+                        then it will correctly schedule each module, using the
+                        smallest (currently the default) timeunit as the
+                        'model' timeunit in the <code>spades</code> call.</td></tr>
+<tr><td><code>citation</code></td><td>List of character strings specifying module citation information.
+                        Alternatively, a list of filenames of <code>.bib</code> or similar files.
+                        This is currently not parsed by SpaDES;
+                        it is for human readers only.</td></tr>
+<tr><td><code>documentation</code></td><td>List of filenames referring to module documentation sources.
+                             This is currently not parsed by SpaDES;
+                             it is for human readers only.</td></tr>
+<tr><td></td><td><code>reqdPkgs</code></td></tr>
+<tr><td>List of R package names required by the module. These
+                        packages will be loaded when <code>simInit</code> is called.
+                        <code><a href='http://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
+                        to load if available, and install if not available.
+                        Because <code><a href='http://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
+                        GitHub.com, these packages can specify package names stored
+                        on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr>
+<tr><td>A data.frame specifying the parameters used in the module.
+                          Usually produced by <code>rbind</code>-ing the outputs of multiple
+                          <code><a href='defineParameter.html'>defineParameter</a></code> calls. These parameters indicate
+                          the default values that will be used unless a module user
+                          overrides them with the <code>params</code> argument in the
+                          <code><a href='simInit.html'>simInit</a></code> call. The minimum and maximum are
+                          currently used by the <code><a href='http://spades-shiny.predictiveecology.org/reference/shine.html'>SpaDES.shiny::shine</a></code> function and the
+                          <code>POM</code> function, and they should indicate the range
+                          of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr>
+<tr><td>A <code>data.frame</code> specifying the data objects expected as
+                            inputs to the module,
+                            with columns <code>objectName</code> (class <code>character</code>),
+                            <code>objectClass</code> (class <code>character</code>),
+                            <code>sourceURL</code> (class <code>character</code>), and <code>other</code>
+                             (currently spades does nothing with this column).
+                            This data.frame identifies the objects that are expected,
+                            but does not do any loading of that object into the simList.
+                            The <code>sourceURL</code> gives the developer the opportunity
+                            to identify the source of a data file that can be used
+                            with the model. This URL will be
+                            used if the user calls <code>downloadData</code> (or
+                            <code><a href='downloadModule.html'>downloadModule(..., data = TRUE)</a></code>. If the raw data
+                            must be modified, the developer can use create a
+                            function called <code>.inputObjects</code> in their module. That
+                            function will be run during the <code>simInit</code> call. The
+                            developer should ensure that if the object is supplied
+                            by the module user as an argument in the <code>simInit</code>, then
+                            the <code>.inputObjects</code> should not be run, i.e., use an
+                            <code>(is.null(sim$xxx)))</code>.</td><td><code>outputObjects</code></td></tr>
+<tr><td>A <code>data.frame</code> specifying the data objects output by
+                             the module, with columns identical to those in
+                             <code>inputObjects</code>. Like <code>inputObjects</code> above,
+                             this only identifies the objects that this module will output
+                             into the <code>simList</code>.
+                             The module developer must create the necessary functions
+                             that will cause these objects to be put into the
+                             <code>simList</code>.</td><td></td></tr>
 </table>
-    
+
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>moduleDefaults</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
   <span class='co'>## a default version of the defineModule is created with a call to newModule</span>
-  <span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"test"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>())
+  <span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"test"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>open</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
   <span class='co'>## view the resulting module file</span>
-  <span class='kw'>if</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/interactive'>interactive</a></span>()) <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/file.edit'>file.edit</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>(), <span class='st'>"test"</span>, <span class='st'>"test.R"</span>))
-
-  <span class='co'># The default defineModule created by newModule is currently (SpaDES version 1.3.1.9044):</span>
-  <span class='fu'>defineModule</span>(<span class='no'>sim</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(
-    <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"test"</span>,
-    <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"insert module description here"</span>,
-    <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"insert key words here"</span>),
-    <span class='kw'>authors</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/person'>person</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"First"</span>, <span class='st'>"Middle"</span>), <span class='st'>"Last"</span>,
-                       <span class='kw'>email</span> <span class='kw'>=</span> <span class='st'>"email@example.com"</span>, <span class='kw'>role</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"aut"</span>, <span class='st'>"cre"</span>))),
-    <span class='kw'>childModules</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(<span class='fl'>0</span>),
-    <span class='kw'>version</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>SpaDES</span> <span class='kw'>=</span> <span class='st'>"1.3.1.9044"</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"0.0.1"</span>),
-    <span class='kw'>spatialExtent</span> <span class='kw'>=</span> <span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/raster/topics/extent'>extent</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>NA_real_</span>, <span class='fl'>4</span>)),
-    <span class='kw'>timeframe</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/as.POSIXlt'>as.POSIXlt</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>NA</span>, <span class='fl'>NA</span>)),
-    <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='co'># e.g., "year",</span>
-    <span class='kw'>citation</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='st'>"citation.bib"</span>),
-    <span class='kw'>documentation</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='st'>"README.txt"</span>, <span class='st'>"test.Rmd"</span>),
-    <span class='kw'>reqdPkgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-    <span class='kw'>parameters</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>rbind</a></span>(
-      <span class='co'>#defineParameter("paramName", "paramClass", value, min, max,</span>
-      <span class='co'># "parameter description")),</span>
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".plotInitialTime"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first plot event should occur"</span>),
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".plotInterval"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first plot event should occur"</span>),
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".saveInitialTime"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first save event should occur"</span>),
-      <span class='fu'><a href='defineParameter.html'>defineParameter</a></span>(<span class='st'>".saveInterval"</span>, <span class='st'>"numeric"</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>, <span class='fl'>NA</span>,
-      <span class='st'>"This describes the simulation time at which the first save event should occur"</span>)
-    ),
-    <span class='kw'>inputObjects</span> <span class='kw'>=</span> <span class='fu'>bind_rows</span>(
-      <span class='fu'><a href='expectsInput.html'>expectsInput</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>objectClass</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
-        <span class='kw'>sourceURL</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>desc</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>other</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>)
-    ),
-    <span class='kw'>outputObjects</span> <span class='kw'>=</span> <span class='fu'>bind_rows</span>(
-      <span class='fu'><a href='createsOutput.html'>createsOutput</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>objectClass</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
-        <span class='kw'>desc</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>other</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>)
-    )
-  ))
-
-<span class='co'># }</span><div class='input'>
-</div></pre>
+  <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test"</span>, <span class='st'>"test.R"</span>))
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#required-metadata-elements">Required metadata elements</a></li>
-
       <li><a href="#see-also">See also</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
@@ -366,19 +303,23 @@ in which to replace element(s).</p></td>
   </div>
 </div>
 
+
       <footer>
       <div class="copyright">
   <p>Developed by Alex M Chubaty, Eliot J B McIntire.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

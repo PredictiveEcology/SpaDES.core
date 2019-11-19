@@ -8,21 +8,25 @@
 
 <title><code>.robustDigest</code> for <code>simList</code> objects — .robustDigest,simList-method • SpaDES.core</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,12 +34,12 @@
 
 
 
-<meta property="og:title" content="<code>.robustDigest</code> for <code>simList</code> objects — .robustDigest,simList-method" />
 
-<meta property="og:description" content="This is intended to be used within the Cache function, but can be
-used to evaluate what a simList would look like once it is
-converted to a repeatably digestible object." />
+<meta property="og:title" content="<code>.robustDigest</code> for <code>simList</code> objects — .robustDigest,simList-method" />
+<meta property="og:description" content="This is intended to be used within the Cache function, but can be used to evaluate what
+a simList would look like once it is converted to a repeatably digestible object." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -59,6 +63,7 @@ converted to a repeatably digestible object." />
   gtag('config', 'UA-58633549-6');
 </script>
 
+
   </head>
 
   <body>
@@ -75,7 +80,7 @@ converted to a repeatably digestible object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -83,7 +88,7 @@ converted to a repeatably digestible object." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,17 +111,19 @@ converted to a repeatably digestible object." />
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+    </li>
   </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -127,6 +134,7 @@ converted to a repeatably digestible object." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -138,17 +146,13 @@ converted to a repeatably digestible object." />
     </div>
 
     <div class="ref-description">
-    
-    <p>This is intended to be used within the <code>Cache</code> function, but can be
-used to evaluate what a <code>simList</code> would look like once it is
-converted to a repeatably digestible object.</p>
-    
+    <p>This is intended to be used within the <code>Cache</code> function, but can be used to evaluate what
+a <code>simList</code> would look like once it is converted to a repeatably digestible object.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>.robustDigest</span>(<span class='no'>object</span>, <span class='no'>.objects</span>, <span class='no'>length</span>, <span class='no'>algo</span>, <span class='no'>quick</span>,
-  <span class='no'>classOptions</span>)</pre>
-    
+<span class='fu'>.robustDigest</span>(<span class='no'>object</span>, <span class='no'>.objects</span>, <span class='no'>length</span>, <span class='no'>algo</span>, <span class='no'>quick</span>, <span class='no'>classOptions</span>)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -169,17 +173,17 @@ the list, environment or similar objects.</p></td>
       <td><p>Numeric. If the element passed to Cache is a <code>Path</code> class
 object (from e.g., <code>asPath(filename)</code>) or it is a <code>Raster</code> with
 file-backing, then this will be
-passed to <code><a href='https://www.rdocumentation.org/packages/digest/topics/digest'>digest::digest</a></code>, essentially limiting the number of bytes
+passed to <code><a href='https://rdrr.io/pkg/digest/man/digest.html'>digest::digest</a></code>, essentially limiting the number of bytes
 to digest (for speed). This will only be used if <code>quick = FALSE</code>.
-Default is <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption("reproducible.length")</a></code>,
+Default is <code><a href='https://rdrr.io/r/base/options.html'>getOption("reproducible.length")</a></code>,
 which is set to <code>Inf</code>.</p></td>
     </tr>
     <tr>
       <th>algo</th>
       <td><p>The algorithms to be used; currently available choices are
     <code>md5</code>, which is also the default, <code>sha1</code>, <code>crc32</code>,
-    <code>sha256</code>, <code>sha512</code>, <code>xxhash32</code>, <code>xxhash64</code> and
-    <code>murmur32</code>.</p></td>
+    <code>sha256</code>, <code>sha512</code>, <code>xxhash32</code>, <code>xxhash64</code>,
+    <code>murmur32</code> and <code>spookyhash</code>.</p></td>
     </tr>
     <tr>
       <th>quick</th>
@@ -192,7 +196,7 @@ will assess if it is a path to a file or directory first. If not, it will treat
 the object as a character string. If it is known that character strings should
 not be treated as paths, then <code>quick = TRUE</code> will be much faster, with no loss
 of information. If it is file or directory, then it will digest the file content,
-or <code><a href='https://www.rdocumentation.org/packages/base/topics/basename'>basename(object)</a></code>. For class <code>Path</code> objects, the file's metadata
+or <code><a href='https://rdrr.io/r/base/basename.html'>basename(object)</a></code>. For class <code>Path</code> objects, the file's metadata
 (i.e., filename and file size)
 will be hashed instead of the file contents if <code>quick = TRUE</code>.
 If set to <code>FALSE</code> (default),
@@ -207,35 +211,31 @@ specific classes. Should be options that the <code>.robustDigest</code> knows wh
 to do with.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>See <code>robustDigest</code>. This method strips out stuff
-from a <code>simList</code> class object that would make it otherwise not
-reproducibly digestible between sessions, operating systems,
-or machines. This will likely still not allow identical digest
-results across R versions.</p>
-    
+    <p>See <code>robustDigest</code>.
+This method strips out stuff from a <code>simList</code> class object that would make it otherwise not
+reproducibly digestible between sessions, operating systems, or machines.
+This will likely still not allow identical digest results across R versions.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>robustDigest</code></p></div>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#details">Details</a></li>
-
       <li><a href="#see-also">See also</a></li>
-          </ul>
+    </ul>
 
     <h2>Author</h2>
     <p>Eliot McIntire</p>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -243,13 +243,16 @@ results across R versions.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

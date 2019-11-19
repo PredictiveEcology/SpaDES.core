@@ -8,21 +8,25 @@
 
 <title>The <code>simList</code> class — simList-class • SpaDES.core</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,12 +34,13 @@
 
 
 
-<meta property="og:title" content="The <code>simList</code> class — simList-class" />
 
+<meta property="og:title" content="The <code>simList</code> class — simList-class" />
 <meta property="og:description" content="Contains the minimum components of a SpaDES simulation.
 Various slot accessor methods (i.e., get and set functions) are provided
 (see 'Accessor Methods' below)." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -59,6 +64,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
   gtag('config', 'UA-58633549-6');
 </script>
 
+
   </head>
 
   <body>
@@ -75,7 +81,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -83,7 +89,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,17 +112,19 @@ Various slot accessor methods (i.e., get and set functions) are provided
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+    </li>
   </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -127,6 +135,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -138,146 +147,141 @@ Various slot accessor methods (i.e., get and set functions) are provided
     </div>
 
     <div class="ref-description">
-    
     <p>Contains the minimum components of a <code>SpaDES</code> simulation.
 Various slot accessor methods (i.e., get and set functions) are provided
 (see 'Accessor Methods' below).</p>
-    
     </div>
 
-        
+
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Based on code from chapter 7.8.3 of Matloff (2011): "Discrete event simulation".
 Here, we implement a discrete event simulation in a more modular fashion so
 it's easier to add simulation components (i.e., "simulation modules").
 We use S4 classes and methods, and use <code>data.table</code> instead of
-<code><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></code> to implement the event queue (because it is much
+<code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> to implement the event queue (because it is much
 more efficient).</p>
-    
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
-    <dl class='dl-horizontal'>
+
+<dl class='dl-horizontal'>
 <dt><code>modules</code></dt><dd><p>List of character names specifying which modules to load.</p></dd>
-    <dt><code>params</code></dt><dd><p>Named list of potentially other lists specifying simulation
+
+<dt><code>params</code></dt><dd><p>Named list of potentially other lists specifying simulation
 parameters.</p></dd>
-    <dt><code>events</code></dt><dd><p>The list of scheduled events (i.e., event queue), as a
-<code>data.table</code>. See 'Event Lists' for more information.</p></dd>
-    <dt><code>current</code></dt><dd><p>The current event, as a <code>data.table</code>.
+
+<dt><code>events</code></dt><dd><p>The list of scheduled events (i.e., event queue), which can
+be converted to a sorted <code>data.table</code> with <code><a href='simList-accessors-events.html'>events(sim)</a></code>.
+See 'Event Lists' for more information.</p></dd>
+
+<dt><code>current</code></dt><dd><p>The current event, as a <code>data.table</code>.
 See 'Event Lists' for more information..</p></dd>
-    <dt><code>completed</code></dt><dd><p>The list of completed events, as a <code>list</code>.
+
+<dt><code>completed</code></dt><dd><p>An environment consisting of completed events, with
+each object named a character representation of the order
+of events. This was converted from a previous version which
+was a list. This was changed because the list became
+slow as number of events increased.
 See 'Event Lists' for more information. It is kept
-as a list of individual events for speed. The <code>completed</code>
+as an environment of individual events for speed. The <code>completed</code>
 method converts it to a sorted <code>data.table</code>.</p></dd>
-    <dt><code>depends</code></dt><dd><p>A <code>.simDeps</code> list of <code><a href='moduleDeps-class.html'>.moduleDeps</a></code> objects
+
+<dt><code>depends</code></dt><dd><p>A <code>.simDeps</code> list of <code><a href='moduleDeps-class.html'>.moduleDeps</a></code> objects
 containing module object dependency information.</p></dd>
-    <dt><code>simtimes</code></dt><dd><p>List of numerical values describing the simulation start
+
+<dt><code>simtimes</code></dt><dd><p>List of numerical values describing the simulation start
 and end times; as well as the current simulation time.</p></dd>
-    <dt><code>inputs</code></dt><dd><p>a <code>data.frame</code> or <code>data.table</code> of files and
+
+<dt><code>inputs</code></dt><dd><p>a <code>data.frame</code> or <code>data.table</code> of files and
 metadata</p></dd>
-    <dt><code>outputs</code></dt><dd><p>a <code>data.frame</code>  or <code>data.table</code> of files and
+
+<dt><code>outputs</code></dt><dd><p>a <code>data.frame</code>  or <code>data.table</code> of files and
 metadata</p></dd>
-    <dt><code>paths</code></dt><dd><p>Named list of <code>modulePath</code>, <code>inputPath</code>,
+
+<dt><code>paths</code></dt><dd><p>Named list of <code>modulePath</code>, <code>inputPath</code>,
 and <code>outputPath</code> paths. Partial matching is performed.</p></dd>
-    <dt><code>.xData</code></dt><dd><p>Environment referencing the objects used in the simulation.
+
+<dt><code>.xData</code></dt><dd><p>Environment referencing the objects used in the simulation.
 Several "shortcuts" to accessing objects referenced by this
 environment are provided, and can be used on the
 <code>simList</code> object directly instead of specifying the
 <code>.xData</code> slot: <code>$</code>, <code>[[</code>, <code>ls</code>,
 <code>ls.str</code>, <code>objs</code>. See examples.</p></dd>
-    <dt><code>.envir</code></dt><dd><p>Deprecated. Please do not use any more.</p></dd>
+
+<dt><code>.envir</code></dt><dd><p>Deprecated. Please do not use any more.</p></dd>
+
 </dl>
-    
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>The <code>simList</code> class extends the <code>environment</code>, by adding
 several slots that provide information about the metadata for a discrete
 event simulation. The environment slot, if accessed directly is <code>.xData</code>
 and this is where input and output objects from modules are placed.
-The <code><a href='simList_-class.html'>simList_</a></code> class is similar, but it extends the <code>list</code>
+The <code>simList_</code> class is similar, but it extends the <code>list</code>
 class. All other slots are the same.
 Thus, <code>simList</code> is identical to <code>simList_</code>, except that the former
 uses an environment for objects and the latter uses a list.
-The class <code>simList_</code> is only used internally.</p>
-    
+The class <code>simList_</code> is only used internally when saving/loading, because
+saving/loading a list behaves more reliably than saving/loading an environment.</p>
     <h2 class="hasAnchor" id="accessor-methods"><a class="anchor" href="#accessor-methods"></a>Accessor Methods</h2>
 
     
-    <p>Several slot (and sub-slot) accessor methods are provided for use, and
+
+
+<p>Several slot (and sub-slot) accessor methods are provided for use, and
 categorized into separate help pages:</p><table class='table'>
-<tr><td></td><td></td></tr>
-<tr><td><code><a href='simList-accessors-envir.html'>simList-accessors-envir</a></code></td><td></td></tr>
-<tr><td>Simulation environment.</td><td></td></tr>
-<tr><td></td><td><code><a href='simList-accessors-events.html'>simList-accessors-events</a></code></td></tr>
-<tr><td></td><td>Scheduled and completed events.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code><a href='simList-accessors-inout.html'>simList-accessors-inout</a></code></td><td></td></tr>
-<tr><td>Passing data in to / out of simulations.</td><td></td></tr>
-<tr><td></td><td><code><a href='simList-accessors-modules.html'>simList-accessors-modules</a></code></td></tr>
-<tr><td></td><td>Modules loaded and used; module dependencies.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code><a href='objects.html'>simList-accessors-objects</a></code></td><td></td></tr>
-<tr><td>Accessing objects used in the simulation.</td><td></td></tr>
-<tr><td></td><td><code><a href='params.html'>simList-accessors-params</a></code></td></tr>
-<tr><td></td><td>Global and module-specific parameters.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>simList-accessors-paths</a></code></td><td></td></tr>
-<tr><td>File paths for modules, inputs, and outputs.</td><td></td></tr>
-<tr><td></td><td><code><a href='simList-accessors-times.html'>simList-accessors-times</a></code></td></tr>
-<tr><td></td><td>Simulation times.</td></tr>
-<tr><td></td><td></td></tr>
+<tr><td><code><a href='simList-accessors-envir.html'>simList-accessors-envir</a></code></td><td>Simulation environment.</td></tr>
+<tr><td><code><a href='simList-accessors-events.html'>simList-accessors-events</a></code></td><td>Scheduled and completed events.</td></tr>
+<tr><td><code><a href='simList-accessors-inout.html'>simList-accessors-inout</a></code></td><td>Passing data in to / out of simulations.</td></tr>
+<tr><td><code><a href='simList-accessors-modules.html'>simList-accessors-modules</a></code></td><td>Modules loaded and used; module dependencies.</td></tr>
+<tr><td><code><a href='objects.html'>simList-accessors-objects</a></code></td><td>Accessing objects used in the simulation.</td></tr>
+<tr><td><code><a href='params.html'>simList-accessors-params</a></code></td><td>Global and module-specific parameters.</td></tr>
+<tr><td><code><a href='simList-accessors-paths.html'>simList-accessors-paths</a></code></td><td>File paths for modules, inputs, and outputs.</td></tr>
+<tr><td><code><a href='simList-accessors-times.html'>simList-accessors-times</a></code></td><td>Simulation times.</td></tr>
 </table>
-    
+
+
     <h2 class="hasAnchor" id="event-lists"><a class="anchor" href="#event-lists"></a>Event Lists</h2>
 
     
-    <p>The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
+
+
+<p>The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
 The completed event list is an ordered list in the exact order that the events
 were executed.
 Each event is represented by a <code>data.table</code> row consisting of:</p><table class='table'>
-<tr><td></td><td></td></tr>
-<tr><td><code>eventTime</code></td><td></td></tr>
-<tr><td>The time the event is to occur.</td><td></td></tr>
-<tr><td></td><td><code>moduleName</code></td></tr>
-<tr><td></td><td>The module from which the event is taken.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>eventType</code></td><td></td></tr>
-<tr><td>A character string for the programmer-defined event type.</td><td></td></tr>
-<tr><td></td><td><code>eventPriority</code></td></tr>
-<tr><td></td><td>The priority given to the event.</td></tr>
-<tr><td></td><td></td></tr>
+<tr><td><code>eventTime</code></td><td>The time the event is to occur.</td></tr>
+<tr><td><code>moduleName</code></td><td>The module from which the event is taken.</td></tr>
+<tr><td><code>eventType</code></td><td>A character string for the programmer-defined event type.</td></tr>
+<tr><td><code>eventPriority</code></td><td>The priority given to the event.</td></tr>
 </table>
-    
+
+
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
             Retrieved from <a href='https://www.nostarch.com/artofr.htm'>https://www.nostarch.com/artofr.htm</a></p>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      
       <li><a href="#details">Details</a></li>
-
       <li><a href="#slots">Slots</a></li>
-
       <li><a href="#note">Note</a></li>
-
       <li><a href="#accessor-methods">Accessor Methods</a></li>
-
       <li><a href="#event-lists">Event Lists</a></li>
-
       <li><a href="#references">References</a></li>
-          </ul>
+    </ul>
 
     <h2>Author</h2>
     <p>Alex Chubaty and Eliot McIntire</p>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -285,13 +289,16 @@ Each event is represented by a <code>data.table</code> row consisting of:</p><ta
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

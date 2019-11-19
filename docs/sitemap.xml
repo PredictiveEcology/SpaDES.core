@@ -7,9 +7,6 @@
     <loc>http://spades-core.predictiveecology.org//reference/Copy.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/POM.html</loc>
-  </url>
-  <url>
     <loc>http://spades-core.predictiveecology.org//reference/Plot.html</loc>
   </url>
   <url>
@@ -58,6 +55,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/classFilter.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/clearCache.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/copyModule.html</loc>
   </url>
   <url>
@@ -73,6 +73,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/defineParameter.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/deprecated.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/depsEdgeList.html</loc>
   </url>
   <url>
@@ -86,9 +89,6 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/doEvent.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/dot-setupCl.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/downloadData.html</loc>
@@ -107,9 +107,6 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/expectsInput.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/experiment.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/extractURL.html</loc>
@@ -181,6 +178,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/maxTimeunit.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/memoryUse.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/minTimeunit.html</loc>
   </url>
   <url>
@@ -221,6 +221,12 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/newModuleTests.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/newProject.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/newProjectCode.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/objSize.simList.html</loc>
@@ -286,6 +292,12 @@
     <loc>http://spades-core.predictiveecology.org//reference/remoteFileSize.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/restartR.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/restartSpades.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/rndstr.html</loc>
   </url>
   <url>
@@ -299,6 +311,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/saveFiles.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/saveSimList.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/scheduleConditionalEvent.html</loc>
@@ -349,9 +364,6 @@
     <loc>http://spades-core.predictiveecology.org//reference/simList-class.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList_-class.html</loc>
-  </url>
-  <url>
     <loc>http://spades-core.predictiveecology.org//reference/spades-classes.html</loc>
   </url>
   <url>
@@ -388,6 +400,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/zipModule.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/zipSimList.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//articles/i-introduction.html</loc>
   </url>
   <url>
@@ -395,5 +410,8 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//articles/iii-cache.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//articles/iv-advanced.html</loc>
   </url>
 </urlset>

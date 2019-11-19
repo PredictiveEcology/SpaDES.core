@@ -8,21 +8,25 @@
 
 <title>Run a spatial discrete event simulation — spades • SpaDES.core</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,12 +34,13 @@
 
 
 
-<meta property="og:title" content="Run a spatial discrete event simulation — spades" />
 
+<meta property="og:title" content="Run a spatial discrete event simulation — spades" />
 <meta property="og:description" content="Here, we implement a simulation in a more modular fashion so it's easier to add
 submodules to the simulation. We use S4 classes and methods, and use `data.table`
 instead of `data.frame` to implement the event queue (because it is much faster)." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -59,6 +64,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
   gtag('config', 'UA-58633549-6');
 </script>
 
+
   </head>
 
   <body>
@@ -75,7 +81,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
       </span>
     </div>
 
@@ -83,7 +89,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,17 +112,19 @@ instead of `data.frame` to implement the event queue (because it is much faster)
     <li>
       <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
     </li>
+    <li>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+    </li>
   </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -127,6 +135,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -138,29 +147,46 @@ instead of `data.frame` to implement the event queue (because it is much faster)
     </div>
 
     <div class="ref-description">
-    
     <p>Here, we implement a simulation in a more modular fashion so it's easier to add
 submodules to the simulation. We use S4 classes and methods, and use `data.table`
 instead of `data.frame` to implement the event queue (because it is much faster).</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>spades</span>(<span class='no'>sim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
-  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>spades</span>(
+  <span class='no'>sim</span>,
+  <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.debug"</span>),
+  <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='no'>cache</span>,
+  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for simList,ANY,ANY,missing</span>
-<span class='fu'>spades</span>(<span class='no'>sim</span>,
-  <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
-  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>spades</span>(
+  <span class='no'>sim</span>,
+  <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.debug"</span>),
+  <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='no'>cache</span>,
+  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for ANY,ANY,ANY,logical</span>
-<span class='fu'>spades</span>(<span class='no'>sim</span>,
-  <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"spades.debug"</span>), <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>cache</span>,
-  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
-    
+<span class='fu'>spades</span>(
+  <span class='no'>sim</span>,
+  <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.debug"</span>),
+  <span class='kw'>progress</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='no'>cache</span>,
+  <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>notOlderThan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -172,7 +198,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       <th>debug</th>
       <td><p>Optional logical flag or character vector indicating what to print to
 console at each event. See details.
-Default is to use the value in <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption("spades.debug")</a></code>.</p></td>
+Default is to use the value in <code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.debug")</a></code>.</p></td>
     </tr>
     <tr>
       <th>progress</th>
@@ -202,7 +228,7 @@ parameter for all modules. See Details.</p></td>
       <th>notOlderThan</th>
       <td><p>Date or time. Passed to <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>reproducible::Cache</a></code> to update the cache.
 Default is <code>NULL</code>, meaning don't update the cache.
-If <code><a href='https://www.rdocumentation.org/packages/base/topics/Sys.time'>Sys.time()</a></code> is provided, then it will force a recache,
+If <code><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time()</a></code> is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
 Ignored if <code>cache</code> is <code>FALSE</code>.</p></td>
     </tr>
@@ -214,11 +240,10 @@ and thus <code>spades</code> will not use a cached copy as long as
 anything passed in <code>...</code> is unique, i.e., not cached previously.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Invisibly returns the modified <code>simList</code> object.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The is the workhorse function in the SpaDES package. It runs simulations by
@@ -237,10 +262,8 @@ Instead, upon a call to <code>spades</code> in which the simList is identical,
 the function will simply return the result that would have come if it had
 been rerun. Use this with caution, as it will return exactly the result from
 a previous run, even if there is stochasticity internally.
-Caching is only based on the input simList. See also <code>experiment</code> for
-the same mechanism, but it can be used with replication.
+Caching is only based on the input simList.
 See also the vignette on caching for examples.</p>
-    
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>The debug option is primarily intended to facilitate building simulation
@@ -248,15 +271,16 @@ models by the user.
 Will print additional outputs informing the user of updates to the values of
 various <code>simList</code> slot components.
 See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https://github.com/PredictiveEcology/SpaDES/wiki/Debugging</a> for details.</p>
-    
     <h2 class="hasAnchor" id="debug"><a class="anchor" href="#debug"></a><code>debug</code></h2>
 
     
-    <p><code>debug</code> can be a logical, character vector or a numeric scalar (currently
+
+
+<p><code>debug</code> can be a logical, character vector or a numeric scalar (currently
 1 or 2).
 If <code>debug</code> is specified and is not <code>FALSE</code>, 2 things could happen:
 1) there can be messages sent to console, such as events as they pass by, and
-2) if <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>options("spades.browserOnError" = TRUE)</a></code> (experimental still) if
+2) if <code><a href='https://rdrr.io/r/base/options.html'>options("spades.browserOnError" = TRUE)</a></code> (experimental still) if
 there is an error, it will attempt to open a browser
 in the event where the error occurred. You can edit, and then press <code>c</code> to continue
 or <code>Q</code> to quit, plus all other normal interactive browser tools.
@@ -267,54 +291,47 @@ with the one just edited. There may be some unexpected consequences if the
 option <code>spades.debug</code> is used. The following
 options for debug are available:</p>
 <table class='table'>
-<tr><td></td><td></td></tr>
-<tr><td><code>TRUE</code></td><td></td></tr>
-<tr><td>the event immediately following will be printed as it</td><td>runs (equivalent to</td></tr>
-<tr><td><code><a href='simList-accessors-events.html'>current(sim)</a></code></td><td>).</td></tr>
-<tr><td></td><td>function name (as character string)</td></tr>
-<tr><td>If a function, then it will be run on the</td><td>simList, e.g., "time" will run</td></tr>
-<tr><td></td><td><code><a href='https://www.rdocumentation.org/packages/stats/topics/time'>time(sim)</a></code></td></tr>
-<tr><td>at each event.</td><td></td></tr>
-<tr><td>moduleName (as character string)</td><td>All calls to that module will be entered</td></tr>
-<tr><td>interactively</td><td></td></tr>
-<tr><td>eventName (as character string)</td><td>All calls that have that event name (in any module)</td></tr>
-<tr><td>will be entered interactively</td><td></td></tr>
-<tr><td></td><td><code>c(&lt;moduleName&gt;, &lt;eventName&gt;)</code></td></tr>
-<tr><td></td><td>Only the event in that specified module</td></tr>
-<tr><td>will be entered into.</td><td></td></tr>
-<tr><td>Any other R expression expressed as a character string</td><td></td></tr>
-<tr><td>Will be evaluated with access to the simList as 'sim'.</td><td>If this is more than one character string, then all will</td></tr>
-<tr><td>be printed to the screen in their sequence.</td><td></td></tr>
-<tr><td>A numeric scalar, currently 1 or 2 (maybe others)</td><td>This will print out alternative forms of event</td></tr>
+<tr><td><code>TRUE</code></td><td>the event immediately following will be printed as it
+runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</a></code>).</td></tr>
+<tr><td>function name (as character string)</td><td>If a function, then it will be run on the
+                                           simList, e.g., "time" will run
+                                           <code><a href='https://rdrr.io/r/stats/time.html'>time(sim)</a></code> at each event.</td></tr>
+<tr><td>moduleName (as character string)</td><td>All calls to that module will be entered
+                                        interactively</td></tr>
+<tr><td>eventName (as character string)</td><td>All calls that have that event name (in any module)
+                                       will be entered interactively</td></tr>
+<tr><td><code>c(&lt;moduleName&gt;, &lt;eventName&gt;)</code></td><td>Only the event in that specified module
+                                            will be entered into.</td></tr>
+<tr><td>Any other R expression expressed as a character string</td><td>Will be evaluated with access to the simList as 'sim'.
+                               If this is more than one character string, then all will
+                               be printed to the screen in their sequence.</td></tr>
+<tr><td>A numeric scalar, currently 1 or 2 (maybe others)</td><td>This will print out alternative forms of event
+                                          information that users may find useful</td></tr>
 <tr><td>information that users may find useful</td><td></td></tr>
-<tr><td>information that users may find useful</td><td></td></tr>
-<tr><td></td><td></td></tr>
 </table>
-    
+
+
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
             Retrieved from <a href='https://www.nostarch.com/artofr.htm'>https://www.nostarch.com/artofr.htm</a></p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>,
-<code><a href='experiment.html'>experiment</a></code> for using replication with <code>spades</code>,
 <code><a href='simInit.html'>simInit</a></code>, and the caching vignette (very important for reproducibility):
 <a href='https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html</a> which
 uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code>.</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
- <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
- <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(
-   <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>, <span class='kw'>burnStats</span> <span class='kw'>=</span> <span class='st'>"nPixelsBurned"</span>)
+ <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
+ <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+   <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>, <span class='kw'>burnStats</span> <span class='kw'>=</span> <span class='st'>"nPixelsBurned"</span>)
  ),
- <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
- <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
+ <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
+ <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 )
 <span class='fu'>spades</span>(<span class='no'>mySim</span>)
 
@@ -335,35 +352,27 @@ uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.ht
 <span class='co'>#   time to establish cache, second time to return cached result</span>
 <span class='kw'>for</span> (<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fl'>2</span>) {
  <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-   <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
-   <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(
-     <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>, <span class='kw'>burnStats</span> <span class='kw'>=</span> <span class='st'>"nPixelsBurned"</span>)
+   <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
+   <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+     <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>, <span class='kw'>burnStats</span> <span class='kw'>=</span> <span class='st'>"nPixelsBurned"</span>)
    ),
-   <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
-   <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
+   <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
+   <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
  )
- <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='no'>out</span> <span class='kw'>&lt;-</span> <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>cache</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)))
+ <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span>(<span class='no'>out</span> <span class='kw'>&lt;-</span> <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>cache</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)))
 }
-<span class='co'># }</span><div class='input'>
-</div></pre>
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#note">Note</a></li>
-
       <li><a href="#debug"><code>debug</code></a></li>
-
       <li><a href="#references">References</a></li>
-
       <li><a href="#see-also">See also</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
@@ -372,19 +381,23 @@ uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.ht
   </div>
 </div>
 
+
       <footer>
       <div class="copyright">
   <p>Developed by Alex M Chubaty, Eliot J B McIntire.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 
