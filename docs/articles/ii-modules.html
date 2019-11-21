@@ -103,7 +103,7 @@
 </h1>
                         <h4 class="author">Alex M. Chubaty</h4>
             
-            <h4 class="date">November 19 2019</h4>
+            <h4 class="date">November 21 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/ii-modules.Rmd"><code>vignettes/ii-modules.Rmd</code></a></small>
       <div class="hidden name"><code>ii-modules.Rmd</code></div>
@@ -473,64 +473,64 @@
 <a href="#event-diagram" class="anchor"></a>Event diagram</h3>
 <p>To better understand how events are scheduled within a simulation, a visual representation called an <code>eventDiagram</code> illustrates the sequences of events within a simulation.</p>
 <p>Simulation time is presented on the x-axis, starting at date <code>startDate</code>. Each module appears in a color-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module. Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module’s event corresponds to the module’s timestep unit, not the event’s “duration”.</p>
-<pre><code>## [1] "2019-11-19 11:06:15 | total elpsd: 0.0027 secs | 0 checkpoint init 0"
-## [1] "2019-11-19 11:06:15 | total elpsd: 0.0056 secs | 0 save init 0"
-## [1] "2019-11-19 11:06:15 | total elpsd: 0.0073 secs | 0 progress init 0"
-## [1] "2019-11-19 11:06:15 | total elpsd: 0.0088 secs | 0 load init 0"
-## [1] "2019-11-19 11:06:15 | total elpsd: 0.01 secs | 0 randomLandscapes init 1"
-## [1] "2019-11-19 11:06:16 | total elpsd: 1.2 secs | 0 fireSpread init 1"
-## [1] "2019-11-19 11:06:16 | total elpsd: 1.3 secs | 0 caribouMovement init 1"
-## [1] "2019-11-19 11:06:16 | total elpsd: 1.3 secs | 0 fireSpread burn 5"
-## [1] "2019-11-19 11:06:17 | total elpsd: 1.4 secs | 0 fireSpread stats 5"
-## [1] "2019-11-19 11:06:17 | total elpsd: 1.4 secs | 0 randomLandscapes plot 10"
-## [1] "2019-11-19 11:06:17 | total elpsd: 1.6 secs | 0 fireSpread plot.init 10"</code></pre>
-<pre><code>## [1] "2019-11-19 11:06:17 | total elpsd: 1.8 secs | 0.0833333333333333 caribouMovement plot.init 10"
-## [1] "2019-11-19 11:06:17 | total elpsd: 1.9 secs | 0.166666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:17 | total elpsd: 2 secs | 0.25 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:17 | total elpsd: 2.1 secs | 0.333333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:17 | total elpsd: 2.2 secs | 0.416666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:17 | total elpsd: 2.3 secs | 0.5 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.4 secs | 0.583333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.5 secs | 0.666666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.6 secs | 0.75 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.7 secs | 0.833333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.8 secs | 0.916666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.9 secs | 1 caribouMovement move 5"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.9 secs | 1 fireSpread burn 5"
-## [1] "2019-11-19 11:06:18 | total elpsd: 2.9 secs | 1 fireSpread stats 5"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3 secs | 1 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3 secs | 1.08333333333333 caribouMovement move 5"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3.1 secs | 1.08333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3.2 secs | 1.16666666666667 caribouMovement move 5"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3.2 secs | 1.16666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3.3 secs | 1.25 caribouMovement move 5"
-## [1] "2019-11-19 11:06:18 | total elpsd: 3.3 secs | 1.25 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.4 secs | 1.33333333333333 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.4 secs | 1.33333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.5 secs | 1.41666666666667 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.5 secs | 1.41666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.6 secs | 1.5 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.6 secs | 1.5 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.7 secs | 1.58333333333333 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.7 secs | 1.58333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.8 secs | 1.66666666666667 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.8 secs | 1.66666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.9 secs | 1.75 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 3.9 secs | 1.75 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4 secs | 1.83333333333333 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4 secs | 1.83333333333333 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4.1 secs | 1.91666666666667 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4.1 secs | 1.91666666666667 caribouMovement plot 10"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4.2 secs | 2 fireSpread burn 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4.2 secs | 2 caribouMovement move 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4.3 secs | 2 fireSpread stats 5"
-## [1] "2019-11-19 11:06:19 | total elpsd: 4.3 secs | 2 caribouMovement plot 10"</code></pre>
+<pre><code>## [1] "2019-11-21 09:42:28 | total elpsd: 0.0026 secs | 0 checkpoint init 0"
+## [1] "2019-11-21 09:42:28 | total elpsd: 0.0056 secs | 0 save init 0"
+## [1] "2019-11-21 09:42:28 | total elpsd: 0.0072 secs | 0 progress init 0"
+## [1] "2019-11-21 09:42:28 | total elpsd: 0.0089 secs | 0 load init 0"
+## [1] "2019-11-21 09:42:28 | total elpsd: 0.01 secs | 0 randomLandscapes init 1"
+## [1] "2019-11-21 09:42:29 | total elpsd: 1.2 secs | 0 fireSpread init 1"
+## [1] "2019-11-21 09:42:29 | total elpsd: 1.2 secs | 0 caribouMovement init 1"
+## [1] "2019-11-21 09:42:29 | total elpsd: 1.3 secs | 0 fireSpread burn 5"
+## [1] "2019-11-21 09:42:29 | total elpsd: 1.3 secs | 0 fireSpread stats 5"
+## [1] "2019-11-21 09:42:29 | total elpsd: 1.4 secs | 0 randomLandscapes plot 10"
+## [1] "2019-11-21 09:42:29 | total elpsd: 1.6 secs | 0 fireSpread plot.init 10"</code></pre>
+<pre><code>## [1] "2019-11-21 09:42:30 | total elpsd: 1.8 secs | 0.0833333333333333 caribouMovement plot.init 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 1.8 secs | 0.166666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 1.9 secs | 0.25 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2 secs | 0.333333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.1 secs | 0.416666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.2 secs | 0.5 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.3 secs | 0.583333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.4 secs | 0.666666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.5 secs | 0.75 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.6 secs | 0.833333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:30 | total elpsd: 2.7 secs | 0.916666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 2.8 secs | 1 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 2.8 secs | 1 fireSpread burn 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 2.9 secs | 1 fireSpread stats 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 2.9 secs | 1 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3 secs | 1.08333333333333 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3 secs | 1.08333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.1 secs | 1.16666666666667 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.1 secs | 1.16666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.2 secs | 1.25 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.2 secs | 1.25 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.3 secs | 1.33333333333333 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.3 secs | 1.33333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.4 secs | 1.41666666666667 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.4 secs | 1.41666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.5 secs | 1.5 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.6 secs | 1.5 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.7 secs | 1.58333333333333 caribouMovement move 5"
+## [1] "2019-11-21 09:42:31 | total elpsd: 3.7 secs | 1.58333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:32 | total elpsd: 3.8 secs | 1.66666666666667 caribouMovement move 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 3.8 secs | 1.66666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:32 | total elpsd: 3.9 secs | 1.75 caribouMovement move 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 3.9 secs | 1.75 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4 secs | 1.83333333333333 caribouMovement move 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4 secs | 1.83333333333333 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4.1 secs | 1.91666666666667 caribouMovement move 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4.1 secs | 1.91666666666667 caribouMovement plot 10"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4.2 secs | 2 fireSpread burn 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4.2 secs | 2 caribouMovement move 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4.3 secs | 2 fireSpread stats 5"
+## [1] "2019-11-21 09:42:32 | total elpsd: 4.3 secs | 2 caribouMovement plot 10"</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(SpaDES.tools) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(RandomFields))  {</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2">  <span class="co"># overview of the events in the simulation</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3">  <span class="kw"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(mySim, <span class="st">"0000-06-01"</span>, <span class="dt">n =</span> <span class="dv">200</span>, <span class="dt">width =</span> <span class="dv">720</span>)</a>
 <a class="sourceLine" id="cb8-4" data-line-number="4">}</a></code></pre></div>
-<div id="htmlwidget-401816c9b3cfc560af01" style="width:720px;height:1326px;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-401816c9b3cfc560af01">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nburn:active,fireSpread7,2-06-01,2-06-07\nstats:active,fireSpread8,2-06-01,2-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\nmove:active,caribouMovement15,1-07-01,1-07-07\nplot:crit,caribouMovement16,1-07-01,1-07-07\nmove:active,caribouMovement17,1-08-01,1-08-07\nplot:crit,caribouMovement18,1-08-01,1-08-07\nmove:active,caribouMovement19,1-08-31,1-09-06\nplot:crit,caribouMovement20,1-08-31,1-09-06\nmove:active,caribouMovement21,1-10-01,1-10-07\nplot:crit,caribouMovement22,1-10-01,1-10-07\nmove:active,caribouMovement23,1-10-31,1-11-06\nplot:crit,caribouMovement24,1-10-31,1-11-06\nmove:active,caribouMovement25,1-11-30,1-12-07\nplot:crit,caribouMovement26,1-11-30,1-12-07\nmove:active,caribouMovement27,1-12-31,2-01-06\nplot:crit,caribouMovement28,1-12-31,2-01-06\nmove:active,caribouMovement29,2-01-30,2-02-06\nplot:crit,caribouMovement30,2-01-30,2-02-06\nmove:active,caribouMovement31,2-03-02,2-03-08\nplot:crit,caribouMovement32,2-03-02,2-03-08\nmove:active,caribouMovement33,2-04-01,2-04-07\nplot:crit,caribouMovement34,2-04-01,2-04-07\nmove:active,caribouMovement35,2-05-02,2-05-08\nplot:crit,caribouMovement36,2-05-02,2-05-08\nmove:active,caribouMovement37,2-06-01,2-06-07\nplot:crit,caribouMovement38,2-06-01,2-06-07\n"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-57cb15034f83fd445a30" style="width:720px;height:1326px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-57cb15034f83fd445a30">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nburn:active,fireSpread7,2-06-01,2-06-07\nstats:active,fireSpread8,2-06-01,2-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\nmove:active,caribouMovement15,1-07-01,1-07-07\nplot:crit,caribouMovement16,1-07-01,1-07-07\nmove:active,caribouMovement17,1-08-01,1-08-07\nplot:crit,caribouMovement18,1-08-01,1-08-07\nmove:active,caribouMovement19,1-08-31,1-09-06\nplot:crit,caribouMovement20,1-08-31,1-09-06\nmove:active,caribouMovement21,1-10-01,1-10-07\nplot:crit,caribouMovement22,1-10-01,1-10-07\nmove:active,caribouMovement23,1-10-31,1-11-06\nplot:crit,caribouMovement24,1-10-31,1-11-06\nmove:active,caribouMovement25,1-11-30,1-12-07\nplot:crit,caribouMovement26,1-11-30,1-12-07\nmove:active,caribouMovement27,1-12-31,2-01-06\nplot:crit,caribouMovement28,1-12-31,2-01-06\nmove:active,caribouMovement29,2-01-30,2-02-06\nplot:crit,caribouMovement30,2-01-30,2-02-06\nmove:active,caribouMovement31,2-03-02,2-03-08\nplot:crit,caribouMovement32,2-03-02,2-03-08\nmove:active,caribouMovement33,2-04-01,2-04-07\nplot:crit,caribouMovement34,2-04-01,2-04-07\nmove:active,caribouMovement35,2-05-02,2-05-08\nplot:crit,caribouMovement36,2-05-02,2-05-08\nmove:active,caribouMovement37,2-06-01,2-06-07\nplot:crit,caribouMovement38,2-06-01,2-06-07\n"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="module-documentation-modulename-rmd" class="section level2">
@@ -635,8 +635,8 @@
 <p><img src="ii-modules_files/figure-html/module-object-diagrams-2.png" width="672"></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># detailed visual representation of objects</span></a>
 <a class="sourceLine" id="cb14-2" data-line-number="2"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim, <span class="dt">width =</span> <span class="dv">720</span>)</a></code></pre></div>
-<div id="htmlwidget-f04dbb0db8db30bd7491" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f04dbb0db8db30bd7491">{"x":{"diagram":"sequenceDiagram\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing the relationships between each module. In the example above, line 2 of the output indicates that the <code>fireSpread</code> module relies on an object <code>landscape</code> provided by the <code>caribouMovement</code> module. This edgelist is used inside the <code>depsGraph</code> function to produce a dependency graph (network), where each module corresponds to a vertex (node), and object dependencies are denoted by the arrows. When plotting the dependency graph, it’s often useful to use the <code>plot=TRUE</code> argument to simplify the network by showing no more than one object dependency between modules.</p>
+<div id="htmlwidget-727b316114387514644f" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-727b316114387514644f">{"x":{"diagram":"sequenceDiagram\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing the relationships between each module. In the example above, line 2 of the output indicates that the <code>fireSpread</code> module relies on an object <code>landscape</code> provided by the <code>caribouMovement</code> module. This edgelist is used inside the <code>depsGraph</code> function to produce a dependency graph (network), where each module corresponds to a vertex (node), and object dependencies are denoted by the arrows. When plotting the dependency graph, it’s often useful to use the <code>plot=TRUE</code> argument to simplify the network by showing no more than one object dependency between modules.</p>
 </div>
 </div>
 <div id="core-modules" class="section level1">
@@ -971,7 +971,7 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 ## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim)   <span class="co"># shows all files and objects that are "outputs"</span></a></code></pre></div>
 <pre><code>##   objectName                                            file     fun package
-## 1  landscape /tmp/RtmpZwfAKT/simOutputs/landscape_year10.rds saveRDS    base
+## 1  landscape /tmp/Rtmp1UmHMC/simOutputs/landscape_year10.rds saveRDS    base
 ##   saveTime saved arguments
 ## 1       10    NA        NA</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInitialTime</a></code></pre></div>
@@ -981,21 +981,21 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveObjects</a></code></pre></div>
 <pre><code>## [1] "landscape"</code></pre>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.savePath</a></code></pre></div>
-<pre><code>## [1] "/tmp/RtmpZwfAKT/simOutputs/randomLandscapes"</code></pre>
+<pre><code>## [1] "/tmp/Rtmp1UmHMC/simOutputs/randomLandscapes"</code></pre>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">ftmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"spades_vignetteOutputs"</span>)</a>
 <a class="sourceLine" id="cb35-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/grDevices/pdf.html">pdf</a></span>(ftmp)</a>
 <a class="sourceLine" id="cb35-3" data-line-number="3"><span class="kw">clearPlot</span>()</a>
 <a class="sourceLine" id="cb35-4" data-line-number="4">mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a></code></pre></div>
-<pre><code>## [1] "2019-11-19 11:06:21 | total elpsd: 0.0012 secs | 0 checkpoint init 0"
-## [1] "2019-11-19 11:06:21 | total elpsd: 0.0025 secs | 0 save init 0"
-## [1] "2019-11-19 11:06:21 | total elpsd: 0.0041 secs | 0 progress init 0"
-## [1] "2019-11-19 11:06:21 | total elpsd: 0.0065 secs | 0 load init 0"
-## [1] "2019-11-19 11:06:21 | total elpsd: 0.0077 secs | 0 randomLandscapes init 1"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1 secs | 0 randomLandscapes plot 10"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.1 secs | 0 randomLandscapes save 11"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.2 secs | 10 save spades 10"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.4 secs | 10 save later 10"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.4 secs | 10 randomLandscapes save 11"</code></pre>
+<pre><code>## [1] "2019-11-21 09:42:33 | total elpsd: 0.0012 secs | 0 checkpoint init 0"
+## [1] "2019-11-21 09:42:33 | total elpsd: 0.0027 secs | 0 save init 0"
+## [1] "2019-11-21 09:42:33 | total elpsd: 0.0043 secs | 0 progress init 0"
+## [1] "2019-11-21 09:42:33 | total elpsd: 0.0056 secs | 0 load init 0"
+## [1] "2019-11-21 09:42:33 | total elpsd: 0.0067 secs | 0 randomLandscapes init 1"
+## [1] "2019-11-21 09:42:34 | total elpsd: 0.98 secs | 0 randomLandscapes plot 10"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.1 secs | 0 randomLandscapes save 11"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.1 secs | 10 save spades 10"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 10 save later 10"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 10 randomLandscapes save 11"</code></pre>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="co"># More sophisticated, passing arguments to outputs()</span></a>
 <a class="sourceLine" id="cb37-2" data-line-number="2"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
 <a class="sourceLine" id="cb37-3" data-line-number="3">  <span class="dt">objectName =</span> <span class="st">"landscape"</span>, <span class="dt">fun =</span> <span class="st">"writeRaster"</span>, <span class="dt">package =</span> <span class="st">"raster"</span>,</a>
@@ -1003,20 +1003,20 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <a class="sourceLine" id="cb37-5" data-line-number="5">    <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">dataType =</span> <span class="st">"FLT4S"</span>, <span class="dt">format =</span> <span class="st">"raster"</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb37-6" data-line-number="6">})))</a>
 <a class="sourceLine" id="cb37-7" data-line-number="7">mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a></code></pre></div>
-<pre><code>## [1] "2019-11-19 11:06:22 | total elpsd: 1.5 secs | 0 checkpoint init 0"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.5 secs | 0 save init 0"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.5 secs | 0 progress init 0"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.5 secs | 0 load init 0"
-## [1] "2019-11-19 11:06:22 | total elpsd: 1.5 secs | 0 randomLandscapes init 1"
-## [1] "2019-11-19 11:06:23 | total elpsd: 2.4 secs | 0 randomLandscapes plot 10"
-## [1] "2019-11-19 11:06:23 | total elpsd: 2.5 secs | 0 randomLandscapes save 11"
-## [1] "2019-11-19 11:06:23 | total elpsd: 2.5 secs | 3 save spades 10"</code></pre>
+<pre><code>## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 checkpoint init 0"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 save init 0"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 progress init 0"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 load init 0"
+## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 randomLandscapes init 1"
+## [1] "2019-11-21 09:42:36 | total elpsd: 2.4 secs | 0 randomLandscapes plot 10"
+## [1] "2019-11-21 09:42:36 | total elpsd: 2.5 secs | 0 randomLandscapes save 11"
+## [1] "2019-11-21 09:42:36 | total elpsd: 2.6 secs | 3 save spades 10"</code></pre>
 <pre><code>## Warning in .datatype(...): argument "datatype" misspelled as "dataType"</code></pre>
-<pre><code>## [1] "2019-11-19 11:06:23 | total elpsd: 2.6 secs | 3 save later 10"
-## [1] "2019-11-19 11:06:23 | total elpsd: 2.6 secs | 6 save later 10"</code></pre>
+<pre><code>## [1] "2019-11-21 09:42:36 | total elpsd: 2.6 secs | 3 save later 10"
+## [1] "2019-11-21 09:42:36 | total elpsd: 2.6 secs | 6 save later 10"</code></pre>
 <pre><code>## Warning in .datatype(...): argument "datatype" misspelled as "dataType"</code></pre>
-<pre><code>## [1] "2019-11-19 11:06:24 | total elpsd: 2.8 secs | 6 save later 10"
-## [1] "2019-11-19 11:06:24 | total elpsd: 2.8 secs | 10 randomLandscapes save 11"</code></pre>
+<pre><code>## [1] "2019-11-21 09:42:36 | total elpsd: 2.8 secs | 6 save later 10"
+## [1] "2019-11-21 09:42:36 | total elpsd: 2.8 secs | 10 randomLandscapes save 11"</code></pre>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/grDevices/dev.html">dev.off</a></span>()</a></code></pre></div>
 <pre><code>## png 
 ##   2</code></pre>

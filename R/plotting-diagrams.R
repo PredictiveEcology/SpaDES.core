@@ -457,7 +457,9 @@ setMethod(
       return(invisible(NULL))
     } else {
       mg <- attr(sim@modules, "modulesGraph")
-      parents <- unique(mg[, "from"])
+      mg[["from"]] <- basename(mg[["from"]])
+      mg[["to"]] <- basename(mg[["to"]])
+      parents <- unique(mg[, "from"]) %>% basename()
 
       deps <- depsEdgeList(sim)[, list(from, to)]
       el <- rbind(mg, deps)
@@ -479,7 +481,7 @@ setMethod(
         membership[which(names(V(grph)) == "_INPUT_")] <- max(membership, na.rm = TRUE) + 1
         grps$membership <- membership
 
-        el1 <- lapply(parents, function(par) data.frame(el[from == par]))
+        el1 <- lapply(parents, function(par) data.frame(el["from" == par]))
         el1 <- rbindlist(el1)
         e <- apply(el1, 1, paste, collapse = "|")
         e <- edges(e)
