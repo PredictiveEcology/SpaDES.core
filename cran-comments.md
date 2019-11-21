@@ -19,10 +19,10 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 3.6.1
 
 ### Development R version
-* Ubuntu 16.04              (travis-ci), R 4.0.0 (2019-11-18 r77436)
+* Ubuntu 16.04              (travis-ci), R 4.0.0 (2019-11-21 r77446)
 * Ubuntu 18.04                  (local), R 4.0.0 (2019-11-21 r77446)
-* Windows                    (appveyor), R 4.0.0 (2019-11-18 r77436)
-* Windows                 (win-builder), R 4.0.0 (2019-11-20 r77445)
+* Windows                    (appveyor), R 4.0.0 (2019-11-20 r77445)
+* Windows                 (win-builder), R 4.0.0 (2019-11-21 r77446)
 
 ## R CMD check results
 
