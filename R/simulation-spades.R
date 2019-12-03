@@ -106,21 +106,21 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                 evnts2[1L:2L, ] <- names(evnts1) %>%
                   stri_pad(., .pkgEnv[[".spadesDebugWidth"]]) %>%
                   rbind(., evnts1)
-                message(crayon::black("This is the current event, printed as it is happening:\n"))
-                message(crayon::black(paste(unname(evnts2[1, ]), collapse = ' ')))
-                message(crayon::black(paste(unname(evnts2[2, ]), collapse = ' ')))
+                message("This is the current event, printed as it is happening:\n")
+                message(paste(unname(evnts2[1, ]), collapse = ' '))
+                message(paste(unname(evnts2[2, ]), collapse = ' '))
                 # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
                 .pkgEnv[[".spadesDebugFirst"]] <- FALSE
               } else {
                 colnames(evnts1) <- NULL
                 # write.table(evnts1, quote = FALSE, row.names = FALSE)
-                message(crayon::black(paste(unname(evnts1), collapse = ' ')))
+                message(paste(unname(evnts1), collapse = ' '))
               }
             }
           } else if (debug[[i]] == 1) {
-            message(crayon::black(paste0(Sys.time(),
+            message(paste0(Sys.time(),
                          " | total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
-                         " | ", paste(unname(current(sim)), collapse = ' '))))
+                         " | ", paste(unname(current(sim)), collapse = ' ')))
           } else if (debug[[i]] == 2) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                                attr(sim, "completedCounter") == 1) {
@@ -128,9 +128,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             } else {
               .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
             }
-            message(crayon::black(paste0(format(Sys.time(), format = "%H:%M:%S"),
+            message(paste0(format(Sys.time(), format = "%H:%M:%S"),
                          " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
-                         " | ", paste(unname(current(sim)), collapse = ' '))))
+                         " | ", paste(unname(current(sim)), collapse = ' ')))
           } else if (debug[[i]] == "simList") {
             print(sim)
           } else if (grepl(debug[[i]], pattern = "\\(")) {
@@ -741,6 +741,8 @@ setGeneric(
 })
 
 #' @rdname spades
+#' @importFrom logging loginfo logwarn logerror getLogger basicConfig getHandler
+#' @importFrom logging setLevel addHandler writeToFile logReset
 setMethod(
   "spades",
   signature(sim = "simList", cache = "missing"),
@@ -752,6 +754,17 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         ...) {
+
+    if (!missing(debug)) {
+      if (!isFALSE(debug)) {
+        browser()
+        with(getLogger(), names(handlers))
+        logReset()
+        basicConfig(level='FINEST')
+        setLevel("INFO", getHandler('basic.stdout'))
+        addHandler(writeToFile, file="~/testing.log", level = "WARN")
+      }
+    }
 
     .pkgEnv$.sim <- NULL # Clear anything that was here.
     # set the options("spades.xxxPath") to the values in the sim@paths
@@ -914,8 +927,9 @@ setMethod(
       if (recoverMode > 0) {
         rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
       }
+
       mess <- capture.output(type = "message", withCallingHandlers({
-        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+        sim1 <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
       }, warning = function(w){ logwarn(paste0(collapse = " ", c(names(w), w)))},
       error = function(e) {logerror(e)},
       message = function(m) {loginfo(m$message)}))
