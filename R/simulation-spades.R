@@ -106,18 +106,21 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                 evnts2[1L:2L, ] <- names(evnts1) %>%
                   stri_pad(., .pkgEnv[[".spadesDebugWidth"]]) %>%
                   rbind(., evnts1)
-                cat("This is the current event, printed as it is happening:\n")
-                write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
+                message(crayon::black("This is the current event, printed as it is happening:\n"))
+                message(crayon::black(paste(unname(evnts2[1, ]), collapse = ' ')))
+                message(crayon::black(paste(unname(evnts2[2, ]), collapse = ' ')))
+                # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
                 .pkgEnv[[".spadesDebugFirst"]] <- FALSE
               } else {
                 colnames(evnts1) <- NULL
-                write.table(evnts1, quote = FALSE, row.names = FALSE)
+                # write.table(evnts1, quote = FALSE, row.names = FALSE)
+                message(crayon::black(paste(unname(evnts1), collapse = ' ')))
               }
             }
           } else if (debug[[i]] == 1) {
-            print(paste0(Sys.time(),
+            message(crayon::black(paste0(Sys.time(),
                          " | total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
-                         " | ", paste(unname(current(sim)), collapse = ' ')))
+                         " | ", paste(unname(current(sim)), collapse = ' '))))
           } else if (debug[[i]] == 2) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                                attr(sim, "completedCounter") == 1) {
@@ -125,9 +128,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             } else {
               .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
             }
-            print(paste0(format(Sys.time(), format = "%H:%M:%S"),
+            message(crayon::black(paste0(format(Sys.time(), format = "%H:%M:%S"),
                          " | elpsd: ", format(Sys.time() - compareTime, digits = 2),
-                         " | ", paste(unname(current(sim)), collapse = ' ')))
+                         " | ", paste(unname(current(sim)), collapse = ' '))))
           } else if (debug[[i]] == "simList") {
             print(sim)
           } else if (grepl(debug[[i]], pattern = "\\(")) {

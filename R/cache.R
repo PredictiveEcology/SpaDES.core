@@ -259,25 +259,25 @@ setMethod(
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
-          cat(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
         } else if (!is.na(fromMemoise)) {
-          cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
+          message(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
                            "adding to memoised copy\n"))
         } else {
-          cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
         }
       } else {
         if (isTRUE(fromMemoise)) {
-          cat(crayon::blue("  Using memoised copy of", cur$eventType, "event in",
+          message(crayon::blue("  Using memoised copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
 
         } else if (!is.na(fromMemoise)) {
-          cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
+          message(crayon::blue("  Using cached copy of", cur$eventType, "event in",
                            cur$moduleName, "module. ",
                            if (fromMemoise) "Adding to memoised copy.",
                            "\n"))
         } else {
-          cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
+          messsage(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
         }
 
