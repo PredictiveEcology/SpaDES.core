@@ -914,7 +914,13 @@ setMethod(
       if (recoverMode > 0) {
         rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
       }
-      sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+      mess <- capture.output(type = "message", withCallingHandlers({
+        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+      }, warning = function(w){ logwarn(paste0(collapse = " ", c(names(w), w)))},
+      error = function(e) {logerror(e)},
+      message = function(m) {loginfo(m$message)}))
+
+
       if (recoverMode > 0) {
         rmo <- recoverModePost(sim, rmo, recoverMode)
       }
