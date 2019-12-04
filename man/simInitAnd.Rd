@@ -82,7 +82,8 @@ Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
 
-\item{debug}{Optional tools for invoking debugging. See details.
+\item{debug}{Optional tools for invoking debugging. Supplying a \code{list}
+will invoke the more powerful \code{logging} package. See details.
 Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{progress}{Logical (\code{TRUE} or \code{FALSE} show a graphical progress bar),

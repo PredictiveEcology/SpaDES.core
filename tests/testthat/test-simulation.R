@@ -867,7 +867,9 @@ test_that("debug using logging", {
   #mess <- capture.output(type = "output",
   mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
   logReset()
+  unlink(tmpfile)
   # mess <- capture_messages(mySim2 <- spades(Copy(mySim), debug = list("console" = list(), debug = 1),
+  expect_false(file.exists(tmpfile))
   mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",
                             mySim2 <- spades(Copy(mySim),
@@ -875,17 +877,17 @@ test_that("debug using logging", {
                                              .plotInitialTime = NA)
     )
   )
-  expect_true(any(grepl("total elpsd", mess1)))
+  expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
   expect_true(any(grepl("total elpsd", mess2)))
   expect_true(any(grepl(Sys.Date(), mess2))) # the loginfo does have date
-  expect_false(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+  expect_false(any(grepl(Sys.Date(), mess1))) # original debug has date added
 
 
   logReset()
   mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",
                             mySim2 <- spades(Copy(mySim),
-                                             debug = list(#"console" = list(),
+                                             debug = list("console" = list(),
                                                           "file" = list(file = tmpfile),
                                                           debug = 1),
                                              .plotInitialTime = NA)
@@ -896,8 +898,7 @@ test_that("debug using logging", {
   log1 <- readLines(tmpfile)
   expect_true(any(grepl("total elpsd", log1)))
   expect_true(any(grepl(Sys.Date(), log1)))
-  expect_true(any(grepl("total elpsd", mess1)))  # messages still collected via capture_messages
-  expect_false(any(grepl("total elpsd", mess2))) # didn't use/setup console -- so empty
+  expect_false(any(grepl("total elpsd", mess1)))  # messages not produced with debug as list
   unlink(tmpfile)
 
   logReset()
@@ -910,9 +911,8 @@ test_that("debug using logging", {
   )
 
   expect_false(file.exists(tmpfile))
+  expect_true(length(mess2) == 0)
   expect_false(any(grepl("total elpsd", mess1)))
-  expect_false(any(grepl("total elpsd", mess2)))
-  expect_false(any(grepl(Sys.Date(), mess2))) # the loginfo wasn't triggered with debug = 1
   expect_false(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
 
 
