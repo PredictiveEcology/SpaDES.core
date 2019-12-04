@@ -866,10 +866,14 @@ test_that("debug using logging", {
   set.seed(123)
   #mess <- capture.output(type = "output",
   mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
-#  mess <- capture_messages(
   logReset()
   mess <- capture_messages(mySim2 <- spades(Copy(mySim), debug = list("console" = list(), debug = 1),
-                                            .plotInitialTime = NA))
- #   )
+  mess1 <- capture_messages(
+    mess2 <- capture.output(type = "output",
+                           mySim2 <- spades(Copy(mySim),
+                                            debug = list("console" = list(), debug = 1),
+                                            .plotInitialTime = NA)
+    )
+  )
   expect_true(any(grepl("total elpsd", mess)))
 })
