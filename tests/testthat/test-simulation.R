@@ -846,7 +846,7 @@ test_that("scheduleEvent with invalid values for eventTime", {
 })
 
 test_that("debug using logging", {
-  testInitOut <- testInit()
+  testInitOut <- testInit(tmpFileExt = "log")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -867,13 +867,53 @@ test_that("debug using logging", {
   #mess <- capture.output(type = "output",
   mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
   logReset()
-  mess <- capture_messages(mySim2 <- spades(Copy(mySim), debug = list("console" = list(), debug = 1),
+  # mess <- capture_messages(mySim2 <- spades(Copy(mySim), debug = list("console" = list(), debug = 1),
   mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",
-                           mySim2 <- spades(Copy(mySim),
-                                            debug = list("console" = list(), debug = 1),
-                                            .plotInitialTime = NA)
+                            mySim2 <- spades(Copy(mySim),
+                                             debug = list("console" = list(), debug = 1),
+                                             .plotInitialTime = NA)
     )
   )
-  expect_true(any(grepl("total elpsd", mess)))
+  expect_true(any(grepl("total elpsd", mess1)))
+  expect_true(any(grepl("total elpsd", mess2)))
+  expect_true(any(grepl(Sys.Date(), mess2))) # the loginfo does have date
+  expect_false(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+
+
+  logReset()
+  mess1 <- capture_messages(
+    mess2 <- capture.output(type = "output",
+                            mySim2 <- spades(Copy(mySim),
+                                             debug = list(#"console" = list(),
+                                                          "file" = list(file = tmpfile),
+                                                          debug = 1),
+                                             .plotInitialTime = NA)
+    )
+  )
+
+  expect_true(file.exists(tmpfile))
+  log1 <- readLines(tmpfile)
+  expect_true(any(grepl("total elpsd", log1)))
+  expect_true(any(grepl(Sys.Date(), log1)))
+  expect_true(any(grepl("total elpsd", mess1)))  # messages still collected via capture_messages
+  expect_false(any(grepl("total elpsd", mess2))) # didn't use/setup console -- so empty
+  unlink(tmpfile)
+
+  logReset()
+  mess1 <- capture.output(type = "message",
+    mess2 <- capture.output(type = "output",
+                            mySim2 <- spades(Copy(mySim),
+                                             debug = 1,
+                                             .plotInitialTime = NA)
+    )
+  )
+
+  expect_false(file.exists(tmpfile))
+  expect_false(any(grepl("total elpsd", mess1)))
+  expect_false(any(grepl("total elpsd", mess2)))
+  expect_false(any(grepl(Sys.Date(), mess2))) # the loginfo wasn't triggered with debug = 1
+  expect_false(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+
+
 })

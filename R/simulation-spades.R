@@ -776,6 +776,7 @@ setMethod(
 
     debug <- setupDebugger(debug)
 
+
     mess <- capture.output(
       type = "message",
       sim <- withCallingHandlers({
