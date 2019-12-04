@@ -9,8 +9,7 @@ doEvent(sim, debug = FALSE, notOlderThan)
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}
 
-\item{debug}{Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+\item{debug}{Optional tools for invoking debugging. See details.
 Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{notOlderThan}{Date or time. Passed to \code{reproducible::Cache} to update the cache.

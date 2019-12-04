@@ -42,8 +42,7 @@ spades(
 \arguments{
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}
 
-\item{debug}{Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+\item{debug}{Optional tools for invoking debugging. See details.
 Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{progress}{Logical (\code{TRUE} or \code{FALSE} show a graphical progress bar),
@@ -112,6 +111,28 @@ See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details
 }
 \section{\code{debug}}{
 
+
+The most powerful way to use debug is to invoke the \code{logging}
+R package. To invoke this, \code{debug} can be a list with 3 named elements:
+\code{console}, \code{file}, and \code{debug}.
+\tabular{lll}{
+  \code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
+  \code{file} \tab \code{append} \tab \cr
+              \tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
+              \tab \code{level} \tab The \code{level}, see below, of information shown\cr
+  \code{debug} \tab See possible values below\cr
+  }
+
+\code{level} can be a number from 0 to 100 or a character string matching one
+of the values in \code{\link{logging::loglevels}}. These are hierarchical levels of
+information passed to the console. Set a lower number for more information and a
+higher number for less information. Errors in code will be shown if \code{level}
+is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if
+\code{level} is set to \code{"WARN"} or \code{30} or above;
+normal messages in code will
+be shown if \code{level} is set to \code{"INFO"} or \code{20} or above. Some
+functions may have information at the lower levels, but currently, there are few
+to none.
 
 \code{debug} can be a logical, character vector or a numeric scalar (currently
 1 or 2).

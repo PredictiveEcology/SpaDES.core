@@ -27,7 +27,7 @@ test_that("saving files does not work correctly", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
 
-  mySim <- spades(mySim, debug =  1)
+  mySim <- spades(mySim)
 
   # test spades-level mechanism
   expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))
