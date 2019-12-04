@@ -648,7 +648,7 @@ scheduleConditionalEvent <- function(sim,
 #'   }
 #'
 #' \code{level} can be a number from 0 to 100 or a character string matching one
-#' of the values in \code{\link{logging::loglevels}}. These are hierarchical levels of
+#' of the values in \code{\link[logging]{loglevels}}. These are hierarchical levels of
 #' information passed to the console. Set a lower number for more information and a
 #' higher number for less information. Errors in code will be shown if \code{level}
 #' is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if
@@ -779,11 +779,6 @@ setMethod(
     mess <- capture.output(
       type = "message",
       sim <- withCallingHandlers({
-        # sim <- tryLog(silent.messages = TRUE, include.full.call.stack = FALSE,#getOption("tryCatchLog.include.full.call.stack",
-        #                                                     #   TRUE),
-        #                    include.compact.call.stack = FALSE#getOption("tryCatchLog.include.compact.call.stack",
-        #                                                           #TRUE
-        #                                                           , {
 
         .pkgEnv$.sim <- NULL # Clear anything that was here.
         # set the options("spades.xxxPath") to the values in the sim@paths

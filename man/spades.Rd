@@ -124,7 +124,7 @@ R package. To invoke this, \code{debug} can be a list with 3 named elements:
   }
 
 \code{level} can be a number from 0 to 100 or a character string matching one
-of the values in \code{\link{logging::loglevels}}. These are hierarchical levels of
+of the values in \code{\link[logging]{loglevels}}. These are hierarchical levels of
 information passed to the console. Set a lower number for more information and a
 higher number for less information. Errors in code will be shown if \code{level}
 is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if

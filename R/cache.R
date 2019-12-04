@@ -277,7 +277,7 @@ setMethod(
                            if (fromMemoise) "Adding to memoised copy.",
                            "\n"))
         } else {
-          messsage(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
+          message(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
         }
 
