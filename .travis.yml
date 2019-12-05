@@ -75,7 +75,6 @@ jobs:
       - igraph
       - later
       - RCurl
-      - RSQlite
       - stringi
       - XML
     r_github_packages:
@@ -111,7 +110,6 @@ jobs:
       - BH
       - dplyr
       - igraph
-      - RSQlite
       - stringi
   - os: osx
     osx_image: xcode9.4
