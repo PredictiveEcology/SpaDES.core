@@ -990,7 +990,7 @@ setMethod(
       } else {
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
       }
-      rlang::cnd_muffle(m)
+      tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
     return(invisible(sim))
