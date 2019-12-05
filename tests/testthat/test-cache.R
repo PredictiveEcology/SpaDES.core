@@ -370,7 +370,7 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim2$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
-  expect_true(grepl("Using cached copy", mess1))
+  expect_true(any(grepl("Using cached copy", mess1)))
 })
 
 
