@@ -10,8 +10,7 @@ if (getRversion() >= "3.1.0") {
 #' Calls the module corresponding to the event call, and executes the event.
 #'
 #' Here, we implement a simulation in a more modular fashion so it's easier to add
-#' submodules to the simulation. We use S4 classes and methods, and use `data.table`
-#' instead of `data.frame` to implement the event queue (because it is much faster).
+#' submodules to the simulation. We use S4 classes and methods.
 #'
 #' @param sim Character string for the \code{simList} simulation object.
 #'
@@ -638,11 +637,15 @@ scheduleConditionalEvent <- function(sim,
 #' @section \code{debug}:
 #'
 #' The most powerful way to use debug is to invoke the \code{logging}
-#' R package. To invoke this, \code{debug} can be a list with 3 named elements:
-#' \code{console}, \code{file}, and \code{debug}.
+#' R package. To invoke this, \code{debug} must be a list with up to 3
+#' named elements:
+#' \code{console}, \code{file}, and \code{debug}. Each of these list elements
+#' must be a list (including empty \code{list()} for defaults) with the
+#' sub-list elements here:
 #' \tabular{lll}{
 #'   \code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-#'   \code{file} \tab \code{append} \tab \cr
+#'   \code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
+#'                                       log entries are appended to file, if it exists\cr
 #'               \tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
 #'               \tab \code{level} \tab The \code{level}, see below, of information shown\cr
 #'   \code{debug} \tab See possible values below\cr
@@ -656,8 +659,8 @@ scheduleConditionalEvent <- function(sim,
 #' \code{level} is set to \code{"WARN"} or \code{30} or above;
 #' normal messages in code will
 #' be shown if \code{level} is set to \code{"INFO"} or \code{20} or above. Some
-#' functions may have information at the lower levels, but currently, there are few
-#' to none.
+#' functions in the SpaDES ecosystem may have information at the lower levels,
+#' but currently, there are few to none.
 #'
 #' \code{debug} can be a logical, character vector or a numeric scalar (currently
 #' 1 or 2).

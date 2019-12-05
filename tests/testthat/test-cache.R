@@ -25,13 +25,13 @@ test_that("test event-level cache", {
 
   set.seed(1123)
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output({
+                capture_messages({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                 }))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
-  mess1 <- capture_output({
+  mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = FALSE)
   })
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
@@ -77,7 +77,7 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output({
+                  capture_messages({
                     sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                   })))
   dev.off()
@@ -91,7 +91,7 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile1)
-  mess1 <- capture_output({
+  mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = FALSE)
   })
   dev.off()
@@ -212,7 +212,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  expect_message(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 
   # make a change in Init function
   xxx <- readLines(fileName)
@@ -229,7 +229,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  expect_message(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
@@ -364,7 +364,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
   # Try again, hi should be there
   expect_true(is.null(mySim$test$hi)) # is not in the
-  mess1 <- capture_output({
+  mess1 <- capture_messages({
     mySim2 <- spades(Copy(mySim))
   })
   expect_true(mySim2$test$hi == 1) # recovered in Cache
@@ -405,7 +405,12 @@ test_that("test showSimilar", {
   params(mySim)$randomLandscapes$nx <- 101
   mess <- capture_messages(out2 <- spades(Copy(mySim)))#, showSimilar = TRUE)
   mySim$a <- 1
-  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  expect_true(any(grepl("This call to cache differs", mess)))
   mySim$a <- 2
-  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  expect_true(any(grepl("This call to cache differs", mess)))
+  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  expect_false(any(grepl("This call to cache differs", mess)))
+
 })

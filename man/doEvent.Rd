@@ -29,8 +29,7 @@ Internal function called from \code{spades}.
 Calls the module corresponding to the event call, and executes the event.
 
 Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).
+submodules to the simulation. We use S4 classes and methods.
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
