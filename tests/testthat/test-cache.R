@@ -283,7 +283,7 @@ test_that("test objSize", {
   expect_true(length(os) == 5) # 4 objects, the environment, the rest
 })
 
-test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
+test_that("Cache sim objs via .Cache attr", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
@@ -364,9 +364,9 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
   # Try again, hi should be there
   expect_true(is.null(mySim$test$hi)) # is not in the
-  mess1 <- capture_messages({
+  mess1 <- capture_messages(
     mySim2 <- spades(Copy(mySim))
-  })
+  )
   expect_true(mySim2$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
