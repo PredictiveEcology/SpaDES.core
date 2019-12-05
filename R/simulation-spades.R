@@ -139,8 +139,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                 on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
               }
             }
-          } else if (!any(debug[[i]] == c("browser"))) {
-            tryCatch(print(do.call(debug[[i]], list(sim))), error = function(x) NULL)
+          } else if (!any(debug[[i]] == c("browser"))) { # any other
+            tryCatch(message(do.call(debug[[i]], list(sim))), error = function(x) NULL)
           }
         }
       }

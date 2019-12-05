@@ -212,7 +212,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_message(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  expect_message(spades(bbb), regexp = "Using cached copy of init", all = FALSE)
 
   # make a change in Init function
   xxx <- readLines(fileName)
@@ -229,7 +229,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_message(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  expect_message(spades(bbb), regexp = "Using cached copy of init", all = FALSE)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
