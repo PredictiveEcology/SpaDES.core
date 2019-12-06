@@ -199,6 +199,29 @@ test_that("simList object initializes correctly (1)", {
   rm(mySim)
 })
 
+test_that("simList object initializes correctly (2)", {
+  testInitOut <- testInit("raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  ## test with outputs
+  ras <- raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
+  abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
+
+  tmpdir <- tempdir()
+  newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
+  obj <- list(abundRasters = abundRasters)#, tempRasters = tempRasters)
+  paths <- list(modulePath = file.path(tmpdir, "modules"))
+
+  ## If start is set to 1.0, there is a warning message and spades doesn't seem to run
+  aa <- (capture_warnings({
+    mySim <- simInit(times = list(start = 1.0, end = 2.0),
+                     modules = list("test"), paths = paths,
+                     objects = obj)
+    }))
+  expect_length(aa, 0)
+})
+
 test_that("simList test all signatures", {
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
   on.exit({
@@ -284,29 +307,6 @@ test_that("simList test all signatures", {
     # needs paths and params; many defaults are fine
     expect_equal(sum(successes, na.rm = TRUE), 256)
   }
-})
-
-test_that("simList object initializes correctly (2)", {
-  testInitOut <- testInit("raster")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-  ## test with outputs
-  ras <- raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
-  abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
-
-  tmpdir <- tempdir()
-  newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
-  obj <- list(abundRasters = abundRasters)#, tempRasters = tempRasters)
-  paths <- list(modulePath = file.path(tmpdir, "modules"))
-
-  ## If start is set to 1.0, there is a warning message and spades doesn't seem to run
-  aa <- (capture_warnings({
-    mySim <- simInit(times = list(start = 1.0, end = 2.0),
-                     modules = list("test"), paths = paths,
-                     objects = obj)
-    }))
-  expect_length(aa, 0)
 })
 
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
