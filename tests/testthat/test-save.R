@@ -289,3 +289,46 @@ test_that("restart does not work correctly", {
   unlink(unique(dirname(outputs(sim)$file)), recursive = TRUE, force = TRUE)
   options("spades.restartRInterval" = 0)
 })
+
+test_that("restart with logging", {
+  skip("restartR with logging not possible in automated tests")
+
+  # Must be run manually
+  setwd("~/GitHub/SpaDES.core")
+  library(SpaDES.core)
+  #devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
+  options("spades.restartRInterval" = 0, "spades.saveSimList.fileBackend" = 0,
+          "spades.restartR.clearFiles" = FALSE)
+
+  tmpdir <- "~"
+  testNum = 3
+    interval = 1
+    mapPath <- system.file("maps", package = "quickPlot")
+
+    times <- list(start = 0, end = 1)
+    parameters <- list(
+      .globals = list(stackName = "landscape"),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    )
+    modules <- list("randomLandscapes", "caribouMovement")
+    paths <- list(
+      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      inputPath = mapPath,
+      outputPath = tmpdir
+    )
+
+    options("spades.restartRInterval" = interval)
+    times <- list(start = 0, end = 3)
+    mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+                     outputs = data.frame(objectName = "landscape", saveTime = times$end))
+    mySim$tesRas <- raster(extent(0,10,0,10), vals = 1, res = 1)
+    tmpFilename <- "~/tmpRas.tif"
+    mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+    mySim <- spades(mySim, debug = list("file" = list("file" = "log.txt")))
+    sim$tesRas + 1
+    file.exists(tmpFilename)
+
+  unlink(unique(dirname(outputs(sim)$file)), recursive = TRUE, force = TRUE)
+  options("spades.restartRInterval" = 0)
+})

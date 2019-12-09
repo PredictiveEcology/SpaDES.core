@@ -573,6 +573,8 @@ First <- function(...) {
     load(file.path(.newDir, ".RData"))
   }
 
+  setwd(.oldWd)
+
   #attachedPkgsFilename <- file.path("~", paste0(".", .rndString), '.attachedPkgs.RData')
   load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
@@ -615,7 +617,6 @@ First <- function(...) {
     message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
                           " named 'sim' (which may not be the same as the original assignment)"))
   }
-  setwd(.oldWd)
   return(sim)
 }
 
