@@ -469,7 +469,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = 'package:', replacement = '')))
-  .newDir <- file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))
+  .newDir <- file.path(restartDir, "restartR", gsub(":| ", "_", paste0(sim$._startClockTime, "_", .rndString)))
   checkPath(.newDir, create = TRUE)
   .attachedPkgsFilename <- file.path(.newDir, '.attachedPkgs.RData')
   save(file = .attachedPkgsFilename, attached)
