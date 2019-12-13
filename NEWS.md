@@ -1,5 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+
+version 0.2.8
+=============
+
+## new features
+
+* Changed all internal `print` and `cat` statements to message to allow use of `suppressMessages`, as recommended by CRAN
+* added file based logging via `logging` package, invoked by setting `debug` argument in `spades` function call to a `list(...)`. `?spades` describes details
+
+## bug fixes
+
+* `restartR` minor bug fixes
+
+
 version 0.2.7
 =============
 
