@@ -25,9 +25,9 @@ test_that("simulation runs with simInit and spades with set.seed", {
     spades(debug = FALSE, .plotInitialTime = NA)
 
   ## simtime
-  expect_equivalent(time(mySim), 10.0)
+  expect_equivalent(time(mySim), 1.0)
   expect_equivalent(start(mySim), 0.0)
-  expect_equivalent(end(mySim), 10.0)
+  expect_equivalent(end(mySim), 1.0)
   expect_true(all.equal(mySim2, mySim))
 
 })
