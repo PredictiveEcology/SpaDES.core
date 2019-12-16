@@ -781,6 +781,7 @@ setMethod(
 
     newDebugging <- is.list(debug)
     debug <- setupDebugger(debug)
+    useNormalMessaging <- !newDebugging || all(!grepl("writeToConsole", names(getLogger()[["handlers"]])))
 
 
     sim <- withCallingHandlers({
@@ -987,9 +988,11 @@ setMethod(
     message = function(m) {
       if (newDebugging) {
         loginfo(m$message)
-      } else {
+      }
+      if (useNormalMessaging) {
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
       }
+      # This will "muffle" the original message
       tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
@@ -1237,6 +1240,7 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
   if (!missing(debug)) {
     if (!isFALSE(debug)) {
       if (is.list(debug)) {
+        logReset()
         if (is.null(names(debug))) stop("debug must be a named list if it is a list. See ?spades")
         hasConsole <- grepl("console", names(debug))
         if (any(hasConsole)) {
@@ -1247,14 +1251,16 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
           } else {
             "INFO"
           }
-          if (!"basic.stdout" %in% names(getLogger()[["handlers"]])) {
-            #basicConfig()
-            addHandler(writeToConsole, level = consoleLevel#,
-                     #formatter = spadesDefaultFormatter
-                     )
+          if (!any(grepl("20|INFO", consoleLevel))) {
+            if (!"basic.stdout" %in% names(getLogger()[["handlers"]])) {
+              #basicConfig()
+              addHandler(writeToConsole, level = consoleLevel#,
+                         #formatter = spadesDefaultFormatter
+              )
+            }
+            setLevel(consoleLevel, getHandler('writeToConsole'))
+            #setLevel(consoleLevel, getHandler('basic.stdout'))
           }
-          setLevel(consoleLevel, getHandler('writeToConsole'))
-          #setLevel(consoleLevel, getHandler('basic.stdout'))
 
         }
         hasFile <- grepl("file", names(debug))
