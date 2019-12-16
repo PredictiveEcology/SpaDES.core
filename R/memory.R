@@ -30,9 +30,9 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
 #'
 #' This will give a slightly different estimate than \code{pryr::mem_used},
 #' which uses \code{gc()} internally. The purpose of this function is
-#' to allow continuous monitoring, external to the R session. Normally,
-#' this is run in a different session.
-#' @param thisPid Numeric or Integer, the PID of the process. If omitted, it will
+#' to allow continuous monitoring, external to the R session.
+#' Normally, this is run in a different session.
+#' @param thisPid Numeric or integer, the PID of the process. If omitted, it will
 #'   be found with \code{Sys.getpid()}
 #' @export
 #' @rdname memoryUse
@@ -103,9 +103,10 @@ memoryUse <- function(sim, max = TRUE) {
     if (isTRUE(max)) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
     } else {
-      a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType", "eventTime")]
+      a <- a[, list(maxMemory = max(memory, na.rm = TRUE)),
+             by = c("moduleName", "eventType", "eventTime")]
     }
-    a[is.infinite(maxMemory), maxMemory:=NA]
+    a[is.infinite(maxMemory), maxMemory := NA]
     return(a[])
   }
 }
@@ -119,7 +120,8 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
     # originalFuturePlan <- future::plan()
     if (!is(originalFuturePlan, "sequential") && !identical(thePlan, "sequential") &&
         !is.null(thePlan) && !is(originalFuturePlan, thePlan))
-      stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...) to something other than sequential")
+      stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...)",
+           " to something other than sequential")
     if (!is(originalFuturePlan, thePlan)) {
       if (grepl("callr", thePlan)) {
         future::plan(future.callr::callr)
@@ -152,5 +154,4 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
     message("Memory use saved in simList; see memoryUse(sim)")
   }
   return(sim)
-
 }
