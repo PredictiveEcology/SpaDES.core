@@ -856,7 +856,7 @@ test_that("debug using logging", {
   times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .useCache = "init"),
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
@@ -902,7 +902,7 @@ test_that("debug using logging", {
   unlink(tmpfile)
 
   logReset()
-  mess1 <- capture.output(type = "message",
+  mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",
                             mySim2 <- spades(Copy(mySim),
                                              debug = 1,
@@ -915,8 +915,7 @@ test_that("debug using logging", {
   expect_true(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
 
   # Test whether suppressMessages works
-  mess1 <- capture.output(
-    type = "message",
+  mess1 <- capture_messages(
     mess2 <- capture.output(
       type = "output",
       suppressMessages(mySim2 <- spades(Copy(mySim),
@@ -927,8 +926,7 @@ test_that("debug using logging", {
   expect_true(length(mess1) == 0)
 
   # Test whether suppressMessages works
-  mess1 <- capture.output(
-    type = "message",
+  mess1 <- capture_messages(
     mess2 <- capture.output(
       type = "output",
       suppressMessages(mySim2 <- spades(Copy(mySim),
