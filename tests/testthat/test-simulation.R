@@ -853,7 +853,7 @@ test_that("debug using logging", {
 
   set.seed(42)
 
-  times <- list(start = 0.0, end = 10, timeunit = "year")
+  times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
@@ -873,7 +873,7 @@ test_that("debug using logging", {
   mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",
                             mySim2 <- spades(Copy(mySim),
-                                             debug = list("console" = list(), debug = 1),
+                                             debug = list("console" = list(level = 10), debug = 1),
                                              .plotInitialTime = NA)
     )
   )
@@ -887,7 +887,7 @@ test_that("debug using logging", {
   mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",
                             mySim2 <- spades(Copy(mySim),
-                                             debug = list("console" = list(),
+                                             debug = list("console" = list(level = 5),
                                                           "file" = list(file = tmpfile),
                                                           debug = 1),
                                              .plotInitialTime = NA)
@@ -909,11 +909,32 @@ test_that("debug using logging", {
                                              .plotInitialTime = NA)
     )
   )
-
   expect_false(file.exists(tmpfile))
   expect_true(length(mess2) == 0)
-  expect_false(any(grepl("total elpsd", mess1)))
-  expect_false(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+  expect_true(any(grepl("total elpsd", mess1)))
+  expect_true(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
 
+  # Test whether suppressMessages works
+  mess1 <- capture.output(
+    type = "message",
+    mess2 <- capture.output(
+      type = "output",
+      suppressMessages(mySim2 <- spades(Copy(mySim),
+                                        debug = list("console" = list(level = "INFO"), debug = 1),
+                                        .plotInitialTime = NA))
+    )
+  )
+  expect_true(length(mess1) == 0)
 
+  # Test whether suppressMessages works
+  mess1 <- capture.output(
+    type = "message",
+    mess2 <- capture.output(
+      type = "output",
+      suppressMessages(mySim2 <- spades(Copy(mySim),
+                                        debug = 1,
+                                        .plotInitialTime = NA))
+    )
+  )
+  expect_true(length(mess1) == 0)
 })
