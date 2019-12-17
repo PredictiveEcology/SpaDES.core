@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
       </span>
     </div>
 
@@ -159,8 +159,8 @@
     </tr>
     <tr>
       <th>debug</th>
-      <td><p>Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+      <td><p>Optional tools for invoking debugging. Supplying a <code>list</code>
+will invoke the more powerful <code>logging</code> package. See details.
 Default is to use the value in <code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.debug")</a></code>.</p></td>
     </tr>
     <tr>
@@ -180,8 +180,7 @@ Ignored if <code>cache</code> is <code>FALSE</code>.</p></td>
 
     <p>Calls the module corresponding to the event call, and executes the event.</p>
 <p>Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).</p>
+submodules to the simulation. We use S4 classes and methods.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).

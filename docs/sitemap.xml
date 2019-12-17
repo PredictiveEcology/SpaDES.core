@@ -4,15 +4,6 @@
     <loc>http://spades-core.predictiveecology.org//index.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/Copy.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/Plot.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/SpaDES.core-package.html</loc>
-  </url>
-  <url>
     <loc>http://spades-core.predictiveecology.org//reference/addChangedAttr.html</loc>
   </url>
   <url>
@@ -56,6 +47,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/clearCache.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/Copy.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/copyModule.html</loc>
@@ -229,19 +223,19 @@
     <loc>http://spades-core.predictiveecology.org//reference/newProjectCode.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objSize.simList.html</loc>
-  </url>
-  <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objSizeInclEnviros.html</loc>
-  </url>
-  <url>
     <loc>http://spades-core.predictiveecology.org//reference/objectDiagram.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/objects.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/objectSynonyms.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objects.html</loc>
+    <loc>http://spades-core.predictiveecology.org//reference/objSize.simList.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/objSizeInclEnviros.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/openModules.html</loc>
@@ -266,6 +260,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/pkgEnv.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/Plot.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/preDigestByClass.html</loc>
@@ -346,13 +343,16 @@
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-events.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-inout.html</loc>
+    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-inputs.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-metadata.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-modules.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-outputs.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-paths.html</loc>
@@ -365,6 +365,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/spades-classes.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/SpaDES.core-package.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/spades.html</loc>

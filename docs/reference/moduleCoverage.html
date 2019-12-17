@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
       </span>
     </div>
 
@@ -195,10 +195,10 @@ To accurately test your module, the test filename must follow the format
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
- <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for </span>
+ <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for %&gt;%</span>
  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>SpaDES.core</span>)
  <span class='no'>tmpdir</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"coverage"</span>)
- <span class='no'>modulePath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"Modules"</span>)
+ <span class='no'>modulePath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"Modules"</span>) <span class='kw'>%&gt;%</span> <span class='fu'>checkPath</span>(<span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
  <span class='no'>moduleName</span> <span class='kw'>&lt;-</span> <span class='st'>"forestAge"</span> <span class='co'># sample module to test</span>
  <span class='fu'><a href='downloadModule.html'>downloadModule</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>) <span class='co'># download sample module</span>
  <span class='no'>testResults</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleCoverage</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>)

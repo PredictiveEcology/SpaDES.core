@@ -80,7 +80,7 @@ params has a replace method, so can be used to update a parameter value." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
       </span>
     </div>
 
@@ -221,7 +221,7 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 <code><a href='simList-accessors-envir.html'>envir</a>()</code>,
 <code><a href='simList-accessors-events.html'>events</a>()</code>,
 <code><a href='globals.html'>globals</a>()</code>,
-<code><a href='simList-accessors-inout.html'>inputs</a>()</code>,
+<code><a href='simList-accessors-inputs.html'>inputs</a>()</code>,
 <code><a href='simList-accessors-modules.html'>modules</a>()</code>,
 <code><a href='objects.html'>objs</a>()</code>,
 <code><a href='packages.html'>packages</a>()</code>,
@@ -235,15 +235,15 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>modules</span> <span class='kw'>=</span> <span class='no'>modules</span>, <span class='kw'>paths</span> <span class='kw'>=</span> <span class='no'>paths</span>,
                  <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpNg41q7/temp_libpath171d02af00ddb/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = 'C:/Users/emcintir/AppData/Local/Temp/RtmpwZRE8g/temp_libpath24ec3d572bc0/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmp8niZsE/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmp8niZsE/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp8niZsE/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp8niZsE/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpNg41q7/temp_libpath171d02af00ddb/SpaDES.core/sampleModules'</span>
-#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='output co'>#&gt; <span class='message'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></div><div class='input'>
+#&gt; <span class='message'>    rasterTmpDir = 'C:/Users/emcintir/AppData/Local/Temp/RtmpSYhwOV/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = 'C:/Users/emcintir/AppData/Local/Temp/RtmpSYhwOV/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = 'C:/Users/emcintir/AppData/Local/Temp/RtmpSYhwOV/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = 'C:/Users/emcintir/AppData/Local/Temp/RtmpSYhwOV/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = 'C:/Users/emcintir/AppData/Local/Temp/RtmpwZRE8g/temp_libpath24ec3d572bc0/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span><span></span></div><div class='input'>
 <span class='co'># update some parameters using assignment -- currently only params will work</span>
 <span class='fu'>params</span>(<span class='no'>mySim</span>)$<span class='no'>randomLandscapes</span>$<span class='no'>nx</span> <span class='kw'>&lt;-</span> <span class='fl'>200</span>
 <span class='fu'>params</span>(<span class='no'>mySim</span>)$<span class='no'>randomLandscapes</span>$<span class='no'>ny</span> <span class='kw'>&lt;-</span> <span class='fl'>200</span>
@@ -527,7 +527,7 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; $randomLandscapes$stackName
 #&gt; [1] "landscape"
 #&gt; 
-#&gt; </div></pre>
+#&gt; </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

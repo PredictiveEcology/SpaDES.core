@@ -1,6 +1,7 @@
 ## Updated release
 
-This is a maintenance release with several package improvements and bug fixes.
+This is a maintenance release with most user-visible changes concern the converting of print and cat statements to messages. This enables a user suppressing these more easily, a feature requested by CRAN for one of our downstream package submissions.
+
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
