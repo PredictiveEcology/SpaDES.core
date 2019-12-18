@@ -6,14 +6,15 @@ test_that("simulation runs with simInit and spades with set.seed", {
 
   set.seed(42)
 
-  times <- list(start = 0.0, end = 10, timeunit = "year")
+  times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes", #"caribouMovement",
+                  "fireSpread")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
   set.seed(123)
@@ -24,9 +25,9 @@ test_that("simulation runs with simInit and spades with set.seed", {
     spades(debug = FALSE, .plotInitialTime = NA)
 
   ## simtime
-  expect_equivalent(time(mySim), 10.0)
+  expect_equivalent(time(mySim), 1.0)
   expect_equivalent(start(mySim), 0.0)
-  expect_equivalent(end(mySim), 10.0)
+  expect_equivalent(end(mySim), 1.0)
   expect_true(all.equal(mySim2, mySim))
 
 })
@@ -860,15 +861,13 @@ test_that("debug using logging", {
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
   set.seed(123)
-  #mess <- capture.output(type = "output",
   mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
   logReset()
   unlink(tmpfile)
-  # mess <- capture_messages(mySim2 <- spades(Copy(mySim), debug = list("console" = list(), debug = 1),
   expect_false(file.exists(tmpfile))
   mess1 <- capture_messages(
     mess2 <- capture.output(type = "output",

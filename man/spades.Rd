@@ -135,8 +135,11 @@ higher number for less information. Errors in code will be shown if \code{level}
 is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if
 \code{level} is set to \code{"WARN"} or \code{30} or above;
 normal messages in code will
-be shown if \code{level} is set to \code{"INFO"} or \code{20} or above. Some
-functions in the SpaDES ecosystem may have information at the lower levels,
+be shown if \code{level} is set to \code{"INFO"} or \code{20} or above. For
+consistency with base R messaging, if default level is used, then normal
+messaging via \code{message} will be shown; this means that \code{suppressMessages}
+will work to suppress messaging only when level is set to \code{"INFO"} or \code{20}.
+Some functions in the SpaDES ecosystem may have information at the lower levels,
 but currently, there are few to none.
 
 \code{debug} can be a logical, character vector or a numeric scalar (currently

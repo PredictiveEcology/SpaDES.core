@@ -224,14 +224,29 @@ test_that("simList object initializes correctly (2)", {
 
 test_that("simList test all signatures", {
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
+
   on.exit({
     testOnExit(testInitOut)
+    if (!curPathIsPkgPath) {
+      setPaths(modulePath = origDir)
+    }
   }, add = TRUE)
   # times
   times <- list(start = 0.0, end = 10)
 
   # modules
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes")#, "caribouMovement", "fireSpread")
+  curPathIsPkgPath <- (identical(
+    normPath(system.file("sampleModules", package = "SpaDES.core")),
+    normPath(getwd())))
+  if (!curPathIsPkgPath) { # on a R CMD check, these paths are same, so don't copy
+    modPaths <- dir(system.file("sampleModules", package = "SpaDES.core"),
+                    recursive = TRUE, full.names = TRUE)
+    modPaths <- grep(paste(modules, collapse = "|"), modPaths, value = TRUE)
+    file.copy(dirname(modPaths), recursive = TRUE, to = ".")
+    origDir <- getOption("spades.modulePath", getwd())
+    setPaths(modulePath = getwd())
+  }
 
   # paths
   mapPath <- system.file("maps", package = "quickPlot")
@@ -274,7 +289,7 @@ test_that("simList test all signatures", {
     )
 
     # loadOrder
-    loadOrder <- c("randomLandscapes", "caribouMovement", "fireSpread")
+    loadOrder <- c("randomLandscapes")#, "caribouMovement", "fireSpread")
 
     # test all argument combinations to simInit
     N <- 256L
@@ -296,16 +311,19 @@ test_that("simList test all signatures", {
                     "outputs", "loadOrder")
       names(li) <- argNames
       li <- li[!sapply(li, is.null)]
-      successes[i] <- tryCatch(
+      messes <- capture_messages(successes[i] <- tryCatch(
         is(do.call(simInit, args = li), "simList"),
         error = function(e) { FALSE },
         warning = function(w) { FALSE }
-      )
+      ))
       argsTested[[i]] <- names(li)
     }
 
     # needs paths and params; many defaults are fine
     expect_equal(sum(successes, na.rm = TRUE), 256)
+    if (FALSE) {
+      dt <- data.table(lapply(argsTested, paste, collapse = "_"), successes)
+    }
   }
 })
 

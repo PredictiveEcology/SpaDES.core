@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
       </span>
     </div>
 
@@ -141,9 +141,30 @@
       <small>Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="version-0-2-8" class="section level1">
+<h1 class="page-header">
+<a href="#version-0-2-8" class="anchor"></a>version 0.2.8<small> Unreleased </small>
+</h1>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>new features</h2>
+<ul>
+<li>Changed all internal <code>print</code> and <code>cat</code> statements to message to allow use of <code>suppressMessages</code>, as recommended by CRAN</li>
+<li>added file based logging via <code>logging</code> package, invoked by setting <code>debug</code> argument in <code>spades</code> function call to a <code><a href="https://rdrr.io/r/base/list.html">list(...)</a></code>. <code><a href="../reference/spades.html">?spades</a></code> describes details</li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>
+<code>restartR</code> minor bug fixes</li>
+</ul>
+</div>
+</div>
     <div id="version-0-2-7" class="section level1">
 <h1 class="page-header">
-<a href="#version-0-2-7" class="anchor"></a>version 0.2.7<small> Unreleased </small>
+<a href="#version-0-2-7" class="anchor"></a>version 0.2.7<small> 2019-11-25 </small>
 </h1>
 <div id="dependencies" class="section level2">
 <h2 class="hasAnchor">
@@ -153,18 +174,18 @@
 <li>added <code>whisker</code> to Imports to facilitate module file templating (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/100'>#100</a>)</li>
 </ul>
 </div>
-<div id="new-features" class="section level2">
+<div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>new features</h2>
+<a href="#new-features-1" class="anchor"></a>new features</h2>
 <ul>
 <li>memory and peak memory estimation is now available for *nix-type systems, when <code>future</code> is installed. See new vignette <code>iv-advanced</code> and <code><a href="../reference/memoryUse.html">?memoryUse</a></code>.</li>
 <li>new function and capacity: <code>restartR</code>. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <a href="https://github.com/r-lib/fastmap" class="uri">https://github.com/r-lib/fastmap</a>). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See <code><a href="../reference/restartR.html">?restartR</a></code> for instructions.</li>
 <li>new function <code>newProject</code> to initialize a SpaDES project with subdirectories <code>cache/</code>, <code>inputs/</code>, <code>modules/</code>, and <code>outputs/</code>, and <code><a href="../reference/setPaths.html">setPaths()</a></code> accordingly.</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/newModule.html">newModule()</a></code> now uses <code>open = interactive()</code> as default to prevent files being left open during tests.</li>
@@ -200,9 +221,9 @@
 <li>improved documentation for <code>P</code>, <code>params</code>, and <code>parameters</code>, thanks to Louis-Etienne Robert.</li>
 </ul>
 </div>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>new features</h2>
+<a href="#new-features-2" class="anchor"></a>new features</h2>
 <ul>
 <li>update <code>objSize.simList</code> method with 2 new arguments from <code>reproducible</code> package</li>
 <li>
@@ -223,9 +244,9 @@
 <a href="#user-visible-changes-to-default-options" class="anchor"></a>User visible changes to default options</h2>
 <p><code>spades.debug</code> is now set to 1 <code>spades.recoveryMode</code> is new and set to 1 (i.e., the current event will be kept at its initial state)</p>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>Internal bugs during <code>simInit</code> especially in some weird cases of <code>childModules</code>.</li>
 <li>packages listed in <code>reqdPkgs</code> not being loaded when only listed in child modules. Fixed in <code>5cd79ac95bc8d190e954313f125928458b0108d2</code>.</li>
@@ -256,9 +277,9 @@
 <li>minimium <code>reproducible</code> version 0.2.6</li>
 </ul>
 </div>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>new features</h2>
+<a href="#new-features-3" class="anchor"></a>new features</h2>
 <ul>
 <li>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</li>
 <li>
@@ -280,13 +301,13 @@
 <code>simInit</code> and <code>spades</code> now call <code><a href="../reference/setPaths.html">setPaths(paths)</a></code> or <code><a href="../reference/setPaths.html">setPaths(sim$paths)</a></code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="http://reproducible.predictiveecology.org/reference/cache.html">reproducible::Cache</a></code> to use the correct path</li>
 <li>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</li>
 <li>improved default path settings in <code>.inputObjects</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/83'>#83</a>)</li>
-<li>following <code>reproducible</code> package updates, now uses <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on simList objects)</li>
+<li>following <code>reproducible</code> package updates, now uses <code><a href="https://rdrr.io/pkg/data.table/man/setattr.html">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on simList objects)</li>
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix to work with latest <code>data.table</code> v1.12.0 (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/85'>#85</a>, <a href='https://github.com/mattdowle'>@mattdowle</a>)</li>
 <li>several minor, including to <code>Copy</code> (error existed because function inheritance persisted even though the location of the function was moved)</li>
@@ -304,9 +325,9 @@
 <li>add <code>RandomFields</code> to Suggests, as it is in the Suggests of <code>SpaDES.tools</code> and used in examples/tests.</li>
 </ul>
 </div>
-<div id="new-features-3" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>new features</h2>
+<a href="#new-features-4" class="anchor"></a>new features</h2>
 <ul>
 <li>new option and default setting: <code><a href="https://rdrr.io/r/base/options.html">options("spades.saveSimOnExit" = TRUE)</a></code>. This will save the state of the <code>simList</code> to an object as <code>SpaDES.core:::.pkgEnv$.sim</code>, with a message, if there is a hard exist. There is virtually no computational cost to this, as the object is already in RAM.</li>
 <li>
@@ -323,9 +344,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>resolved <code>.inputObjects()</code> name conflict (internal <code>.inputObjects</code> renamed to <code>._inputObjectsDF</code>; <code>.outputObjects</code> renamed to <code>._outputObjectsDF</code>)</li>
 <li>module <code>.inputObjects</code> evaluated based on module load order (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/72'>#72</a>)</li>
@@ -346,16 +367,16 @@
 <li>remove <code>sp</code> from imports</li>
 </ul>
 </div>
-<div id="new-features-4" class="section level2">
+<div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-4" class="anchor"></a>new features</h2>
+<a href="#new-features-5" class="anchor"></a>new features</h2>
 <ul>
 <li>none</li>
 </ul>
 </div>
-<div id="bug-fixes-4" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix issues with failing tests on macOS</li>
 </ul>
@@ -372,9 +393,9 @@
 <li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
 </ul>
 </div>
-<div id="new-features-5" class="section level2">
+<div id="new-features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-5" class="anchor"></a>new features</h2>
+<a href="#new-features-6" class="anchor"></a>new features</h2>
 <ul>
 <li>new option <code>spades.useRequire</code>: a logical which causes <code>simInit</code> to load packages with <code>Require</code> or <code>require</code>. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.</li>
 <li><ul>
@@ -391,9 +412,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-5" class="section level2">
+<div id="bug-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-5" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-6" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <p>Improvements to caching of functions with <code>simList</code> objects:</p>
@@ -410,9 +431,9 @@
 <h1 class="page-header">
 <a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
 </h1>
-<div id="new-features-6" class="section level2">
+<div id="new-features-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-6" class="anchor"></a>new features</h2>
+<a href="#new-features-7" class="anchor"></a>new features</h2>
 <ul>
 <li>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code>
 </li>
@@ -447,9 +468,9 @@
 <li>remove <code>fileExt</code> – use <code><a href="https://rdrr.io/r/tools/fileutils.html">tools::file_ext</a></code> instead</li>
 </ul>
 </div>
-<div id="bug-fixes-6" class="section level2">
+<div id="bug-fixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-6" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-7" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix tests based on <code>data.table</code> changes (<a href='https://github.com/mattdowle'>@mattdowle</a>, <a href='https://github.com/PredictiveEcology/SpaDES.core/issues/64'>#64</a>).</li>
 <li>re-export <code>start</code> and <code>end</code>.</li>
@@ -554,6 +575,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#version-0-2-8">0.2.8</a></li>
         <li><a href="#version-0-2-7">0.2.7</a></li>
         <li><a href="#version-0-2-6">0.2.6</a></li>
         <li><a href="#version-0-2-5">0.2.5</a></li>
