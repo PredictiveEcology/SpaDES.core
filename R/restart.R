@@ -204,7 +204,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' greater than 0, which is the default,
 #' e.g., \code{options("spades.restartRInterval" = 100)}.
 #' This is only intended to restart a simulation in exactly the same place as it was
-#' (i.e., can\'t change machines), and because of the restart, the assignment of the \code{spades}
+#' (i.e., cannot change machines), and because of the restart, the assignment of the \code{spades}
 #' call will be either to \code{sim} or the user must make such an assignment manually,
 #' e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}.
 #' This is stated in a message.
@@ -297,16 +297,18 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     basename(.RDataFile), "_time",
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
   sim$._restartRList$simFilename <- gsub(".RData", "", sim$._restartRList$simFilename)
-  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename,".RData")
+  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename, ".RData") ## ensure correct file ext
+
   # sim$._restartRList$endOrig <- end(sim)
   sim$._restartRList$startOrig <- start(sim)
+
   sim$._restartRList$wd <- asPath(getwd())
+
   withTmpPaths <- grepl(tempdir(), paths(sim))
   if (any(withTmpPaths)) {
     message("Some paths in the simList, ",
-            paste(names(paths(sim))[withTmpPaths], collapse = ", "),
-            ", are in temporary locations. These will not",
-            " persist after restart as these locations disappear.")
+            paste(names(paths(sim))[withTmpPaths], collapse = ", "), ", are in temporary locations.",
+            "These will not persist after restart as these locations disappear.")
   }
   saveSimListFormals <- formals(saveSimList)
   saveSimList(sim,

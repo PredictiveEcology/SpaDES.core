@@ -58,7 +58,7 @@ setting the equivalent parameter in the \code{restartR} core module via:
 greater than 0, which is the default,
 e.g., \code{options("spades.restartRInterval" = 100)}.
 This is only intended to restart a simulation in exactly the same place as it was
-(i.e., can\'t change machines), and because of the restart, the assignment of the \code{spades}
+(i.e., cannot change machines), and because of the restart, the assignment of the \code{spades}
 call will be either to \code{sim} or the user must make such an assignment manually,
 e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}.
 This is stated in a message.
