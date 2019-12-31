@@ -5,13 +5,13 @@ if (getRversion() >= "3.1.0") {
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    if (is.null(P(sim, "restartR")$.restartRInterval))
+    if (is.null(P(sim, ".restartR")$.restartRInterval))
       params(sim)$restartR$.restartRInterval <- getOption("spades.restartRInterval")
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval,
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, ".restartR")$.restartRInterval,
                          "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    nextTime <- time(sim, timeunit(sim)) + P(sim, "restartR")$.restartRInterval
+    nextTime <- time(sim, timeunit(sim)) + P(sim, ".restartR")$.restartRInterval
 
     # This next step of creating this list is critical -- it is the trigger for on.exit in spades
     sim$._restartRList <- list()
@@ -199,7 +199,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' It has been tested to work Linux within Rstudio and at a terminal R session.
 #' The way to initiate restarting of R is simply setting the \code{spades.restartRInterval} or
 #' setting the equivalent parameter in the \code{restartR} core module via:
-#' \code{simInit(..., params = list(restartR = list(.restartRInterval = 1)), ...)}
+#' \code{simInit(..., params = list(.restartR = list(.restartRInterval = 1)), ...)}
 #' greater than 0, which is the default,
 #' e.g., \code{options("spades.restartRInterval" = 100)}.
 #' This is only intended to restart a simulation in exactly the same place as it was
