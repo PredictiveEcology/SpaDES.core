@@ -293,6 +293,17 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   setwd(restartDir)
 
   if (is.null(sim$._restartRList)) sim$._restartRList <- list()
+  sim$._restartRList$envvars <- as.list(Sys.getenv())
+
+  sim$._restartRList$opts <- options()
+  if ("raster" %in% attached) {
+    invisible(capture.output({
+      sim$._restartRList$optsRaster <- raster::rasterOptions()
+    }))
+    sim$._restartRList$optsRaster$depracatedwarnings <- sim$._restartRList$optsRaster$depwarning
+    sim$._restartRList$optsRaster$depwarning <- NULL
+  }
+
   sim$._restartRList$simFilename <- file.path(.newDir, paste0(
     basename(.RDataFile), "_time",
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
@@ -391,6 +402,13 @@ First <- function(...) {
   load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
   load(.spades.simFilename)  # load "sim" here
+
+  do.call(Sys.setenv, sim$._restartRList$envvars)
+
+  do.call(options, sim$._restartRList$opts)
+  if ("raster" %in% attached)
+    do.call(raster::rasterOptions, sim$._restartRList$optsRaster)
+
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
     if (!dir.exists(p)) {
       newPath <- file.path(tempdir(), n)
