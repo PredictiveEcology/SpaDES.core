@@ -857,11 +857,13 @@ setMethod(
           restartFormals <- formals(restartR)
           # can change end(sim) back to original now because we are already ending
           end(sim) <- sim$._restartRList$endOrig
-          restartR(sim = sim,
-                   reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
-                   .First = getOption("spades.restartR..First", restartFormals$.First),
-                   .RDataFile = getOption("spades.restartR.RDataFilename", sim$._restartRList$simFilename),
-                   restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir))
+          restartR(
+            sim = sim,
+            reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
+            .First = getOption("spades.restartR..First", restartFormals$.First),
+            .RDataFile = getOption("spades.restartR.RDataFilename", sim$._restartRList$simFilename),
+            restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
+          )
         }
       }, add = TRUE)
 

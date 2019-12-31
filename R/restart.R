@@ -23,7 +23,6 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 
     # This triggers the end of the spades call
     end(sim) <- time(sim)
-
   }
 
   return(invisible(sim))
@@ -50,7 +49,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @note
 #' This will only work reliably
-#' \emph{if the simList was not modified yet during the event which caused the error}.
+#' \emph{if the \code{simList} was not modified yet during the event which caused the error}.
 #' The \code{simList} will be in the state it was at the time of the error.
 #'
 #' @param sim A simList. If not supplied (the default), this will take the sim from
@@ -195,7 +194,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' pieces for using inside a \code{spades} call.
 #' The main purpose for doing this is to clear memory leaks (possibly deep
 #' in R \url{https://github.com/r-lib/fastmap}) that are not fully diagnosed.
-#' This is still very experimental. USE AT YOUR OWN RISK.
+#' \emph{This is still very experimental}.
 #' This should only be used if there are RAM limitations being hit with long running simulations.
 #' It has been tested to work Linux within Rstudio and at a terminal R session.
 #' The way to initiate restarting of R is simply setting the \code{spades.restartRInterval} or
@@ -264,6 +263,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' The default is to treat these files as temporary files and so will be removed.
 #'
 #' @export
+#' @importFrom crayon bgBlue white
 #' @importFrom reproducible checkPath
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
@@ -307,8 +307,9 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   sim$._restartRList$simFilename <- file.path(.newDir, paste0(
     basename(.RDataFile), "_time",
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
-  sim$._restartRList$simFilename <- gsub(".RData", "", sim$._restartRList$simFilename)
-  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename, ".RData") ## ensure correct file ext
+
+  ## ensure correct file extension
+  sim$._restartRList$simFilename <- raster::extension(sim$._restartRList$simFilename, ".RData")
 
   # sim$._restartRList$endOrig <- end(sim)
   sim$._restartRList$startOrig <- start(sim)
@@ -322,16 +323,17 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
             "These will not persist after restart as these locations disappear.")
   }
   saveSimListFormals <- formals(saveSimList)
-  saveSimList(sim,
-              filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename),
-              fileBackend = getOption("spades.saveSimList.fileBackend", 0),
-              filebackedDir = getOption("spades.saveSimList.filebackedDir",
-                                        saveSimListFormals$filebackedDir))
+  saveSimList(
+    sim,
+    filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename),
+    fileBackend = getOption("spades.saveSimList.fileBackend", 0),
+    filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir)
+  )
 
   # from pryr::mem_used
   #if (requireNamespace("pryr")) {
   mu <- sum(gc()[, 1] * c(as.integer(8 * .Machine$sizeof.pointer - .Machine$sizeof.pointer),
-                         as.integer(8)))
+                          as.integer(8)))
   class(mu) <- "object_size"
   message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
   #}

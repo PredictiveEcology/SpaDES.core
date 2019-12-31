@@ -49,7 +49,7 @@ Currently, this is not intended for general use: it has many specialized
 pieces for using inside a \code{spades} call.
 The main purpose for doing this is to clear memory leaks (possibly deep
 in R \url{https://github.com/r-lib/fastmap}) that are not fully diagnosed.
-This is still very experimental. USE AT YOUR OWN RISK.
+\emph{This is still very experimental}.
 This should only be used if there are RAM limitations being hit with long running simulations.
 It has been tested to work Linux within Rstudio and at a terminal R session.
 The way to initiate restarting of R is simply setting the \code{spades.restartRInterval} or
