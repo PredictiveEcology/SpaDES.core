@@ -8,7 +8,7 @@ restartR(
   sim,
   reloadPkgs = TRUE,
   .First = NULL,
-  .RDataFile = getOption("spades.restartR.RDataFilename"),
+  file = getOption("spades.restartR.filename"),
   restartDir = getOption("spades.restartR.restartDir", NULL)
 )
 }
@@ -19,15 +19,15 @@ restartR(
 as they were in previous session, in the same order. If \code{FALSE}, it will
 load no packages beyond normal R startup. Default \code{TRUE}}
 
-\item{.First}{A function to save to \code{~/.RData} which will
-be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
+\item{.First}{A function to save to \file{~/.qs} which will
+be loaded at restart from \file{~/.qs} and run. Default is \code{NULL},
 meaning it will use the non-exported \code{SpaDES.core:::First}. If a
 user wants to make a custom \code{First} file, it should built off that one.}
 
-\item{.RDataFile}{A filename for saving the \code{simList}.
-Defaults to \code{getOption("spades.restartR.RDataFilename")}, and the directory will
+\item{file}{A filename for saving the \code{simList}.
+Defaults to \code{getOption("spades.restartR.filename")}, and the directory will
 be in \code{restartDir}. The simulation time will be mid-pended to this
-name, as in: \code{basename(.RDataFile), "_time",}
+name, as in: \code{basename(file), "_time",}
 \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
 
 \item{restartDir}{A character string indicating root directory to

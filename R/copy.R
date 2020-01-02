@@ -127,5 +127,3 @@ setMethod("Copy",
             sim_@.envir <- sim_@.xData
             return(sim_)
 })
-
-

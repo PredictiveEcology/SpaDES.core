@@ -130,7 +130,7 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
-  testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"))
+  testInitOut <- testInit(libraries = c("qs", "raster"), tmpFileExt = c("grd", "qs", "qs"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -156,7 +156,7 @@ test_that("saveSimList does not work correctly", {
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[2], fileBackend = 2)
-  reloadedObjName <- load(file = tmpfile[2], envir = environment())
+  sim <- qread(file = tmpfile[2])
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
 
@@ -169,23 +169,23 @@ test_that("saveSimList does not work correctly", {
   # Now try to keep filename intact
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 0, filebackedDir = NULL)
 
-  load(file = tmpfile[3], envir = environment())
+  sim <- qread(file = tmpfile[3])
   expect_true(identical(gsub("\\\\", "/", filename(sim$landscape)), tmpfile[1]))
-  expect_true(bindingIsActive("mod", sim$caribouMovement))
+  expect_true(bindingIsActive("mod", sim$caribouMovement)) ## TODO: active binding failing
 
   # Now keep as file-backed, but change name
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 1, filebackedDir = tmpCache)
 
-  load(file = tmpfile[3], envir = environment())
+  sim <- qread(file = tmpfile[3])
   expect_false(identical(filename(sim$landscape), tmpfile[1]))
 
   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
   # rm(mySim)
 
   assign("a", 1, envir = mySim$caribouMovement$mod)
-  assign("a", 2, envir = sim$caribouMovement$mod)
+  assign("a", 2, envir = sim$caribouMovement$mod) ## TODO: active binding failing
 
-  expect_true(bindingIsActive("mod", sim$caribouMovement))
+  expect_true(bindingIsActive("mod", sim$caribouMovement)) ## TODO: active binding failing
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 

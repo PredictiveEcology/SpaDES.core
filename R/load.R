@@ -10,17 +10,19 @@ if (getRversion() >= "3.1.0") {
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
+    "asc", "raster", "raster",
+    "csv", "read.csv", "utils",
+    "png", "raster", "raster",
+    "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "tif", "raster", "raster",
-    "png", "raster", "raster",
-    "csv", "read.csv", "utils",
     "shp", "readOGR", "rgdal",
-    "txt", "read.table", "utils",
-    "asc", "raster", "raster")),
+    "tif", "raster", "raster",
+    "txt", "read.table", "utils"
+    )),
     stringsAsFactors = FALSE)
   colnames(.fE) <- c("exts", "fun", "package")
   return(.fE)

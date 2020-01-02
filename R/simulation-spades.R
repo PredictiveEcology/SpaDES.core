@@ -861,7 +861,7 @@ setMethod(
             sim = sim,
             reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
             .First = getOption("spades.restartR..First", restartFormals$.First),
-            .RDataFile = getOption("spades.restartR.RDataFilename", sim$._restartRList$simFilename),
+            file = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
             restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
           )
         }
@@ -871,10 +871,8 @@ setMethod(
         if (!is.numeric(.plotInitialTime))
           .plotInitialTime <- as.numeric(.plotInitialTime)
         paramsLocal <- sim@params
-        whNonHiddenModules <-
-          !grepl(names(paramsLocal), pattern = "\\.")
-        paramsLocal[whNonHiddenModules] <-
-          lapply(paramsLocal[whNonHiddenModules], function(x) {
+        whNonHiddenModules <- !grepl(names(paramsLocal), pattern = "\\.")
+        paramsLocal[whNonHiddenModules] <- lapply(paramsLocal[whNonHiddenModules], function(x) {
             x$.plotInitialTime <- .plotInitialTime
             x
           })

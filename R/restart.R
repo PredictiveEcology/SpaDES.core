@@ -212,14 +212,14 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
 #'    as they were in previous session, in the same order. If \code{FALSE}, it will
 #'    load no packages beyond normal R startup. Default \code{TRUE}
-#' @param .First A function to save to \code{~/.RData} which will
-#'    be loaded at restart from \code{~/.RData} and run. Default is \code{NULL},
+#' @param .First A function to save to \file{~/.qs} which will
+#'    be loaded at restart from \file{~/.qs} and run. Default is \code{NULL},
 #'    meaning it will use the non-exported \code{SpaDES.core:::First}. If a
 #'    user wants to make a custom \code{First} file, it should built off that one.
-#' @param .RDataFile A filename for saving the \code{simList}.
-#'     Defaults to \code{getOption("spades.restartR.RDataFilename")}, and the directory will
+#' @param file A filename for saving the \code{simList}.
+#'     Defaults to \code{getOption("spades.restartR.filename")}, and the directory will
 #'     be in \code{restartDir}. The simulation time will be mid-pended to this
-#'     name, as in: \code{basename(.RDataFile), "_time",}
+#'     name, as in: \code{basename(file), "_time",}
 #'     \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}
 #'
 #' @param restartDir A character string indicating root directory to
@@ -266,7 +266,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' @importFrom crayon bgBlue white
 #' @importFrom reproducible checkPath
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
-                     .RDataFile = getOption("spades.restartR.RDataFilename"),
+                     file = getOption("spades.restartR.filename"),
                      restartDir = getOption("spades.restartR.restartDir", NULL)) {
   if (missing(sim)) stop("sim is currently a required argument")
   restartDir <- checkAndSetRestartDir(restartDir, sim = sim)
@@ -305,11 +305,11 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   }
 
   sim$._restartRList$simFilename <- file.path(.newDir, paste0(
-    basename(.RDataFile), "_time",
+    basename(file), "_time",
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
 
   ## ensure correct file extension
-  sim$._restartRList$simFilename <- raster::extension(sim$._restartRList$simFilename, ".RData")
+  sim$._restartRList$simFilename <- raster::extension(sim$._restartRList$simFilename, ".qs")
 
   # sim$._restartRList$endOrig <- end(sim)
   sim$._restartRList$startOrig <- start(sim)
@@ -319,7 +319,8 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   withTmpPaths <- grepl(tempdir(), paths(sim))
   if (any(withTmpPaths)) {
     message("Some paths in the simList, ",
-            paste(names(paths(sim))[withTmpPaths], collapse = ", "), ", are in temporary locations.",
+            paste(names(paths(sim))[withTmpPaths], collapse = ", "),
+            ", are in temporary locations.",
             "These will not persist after restart as these locations disappear.")
   }
   saveSimListFormals <- formals(saveSimList)
@@ -345,8 +346,8 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   # save .First function and the .oldWd
   #if (isTRUE(reloadPkgs))
   .reloadPkgs <- reloadPkgs
-  .RDataFile <- file.path(.newDir, ".RData")
-  save(file = .RDataFile, .First, .oldWd, .spadesCall, .spades.restartRInterval, .spades.simFilename,
+  file <- file.path(.newDir, ".RData")
+  save(file = file, .First, .oldWd, .spadesCall, .spades.restartRInterval, .spades.simFilename,
        .reloadPkgs, .rndString, .attachedPkgsFilename, eval.promises = TRUE)
 
   if (isTRUE(Sys.getenv("RSTUDIO") == "1")) {
@@ -356,7 +357,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
       rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
 
       # Need load to get custom .First fn
-      rstudioapi::restartSession(paste0("{load('", .RDataFile, "'); ",
+      rstudioapi::restartSession(paste0("{load('", file, "'); ",
                                         "sim <- .First(); ",
                                         "sim <- eval(.spadesCall)}"))
     } else {
@@ -403,7 +404,7 @@ First <- function(...) {
   #attachedPkgsFilename <- file.path("~", paste0(".", .rndString), '.attachedPkgs.RData')
   load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  load(.spades.simFilename)  # load "sim" here
+  sim <- qs::qread(.spades.simFilename, nthreads = getOption("spades.nThreads", 1))  # load "sim" here
 
   do.call(Sys.setenv, sim$._restartRList$envvars)
 

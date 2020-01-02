@@ -1,5 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 0.2.8.9000
+=============
+
+## dependencies
+
+* `qs` now used for improved object serialization to disk
+
+## new features
+
+* `restartR` saves simulation objects using `qs::qsave()` which is faster and creates smaller file sizes.
+
+## bug fixes
+
+* none
 
 version 0.2.8
 =============
@@ -12,7 +26,6 @@ version 0.2.8
 ## bug fixes
 
 * `restartR` minor bug fixes
-
 
 version 0.2.7
 =============

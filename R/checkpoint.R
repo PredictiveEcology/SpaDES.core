@@ -43,7 +43,7 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
   ### determine checkpoint file location, for use in events below
   if (useChkpnt) {
     if (is.null(checkpointFile(sim))) {
-      checkpointFile <- "checkpoint.RData"
+      checkpointFile <- "checkpoint.qs"
     } else {
       checkpointFile <- checkpointFile(sim)
     }
@@ -81,21 +81,23 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 #' @param file The checkpoint file.
-#' @inheritParams base::load
 #' @rdname checkpoint
 #' @export
-checkpointLoad <- function(file, envir = parent.frame()) {
+#' @importFrom qs qread
+#' @importFrom raster extension
+checkpointLoad <- function(file) {
+  stopifnot(raster::extension(file) == ".qs")
+
   # check for previous checkpoint files
   if (file.exists(file)) {
-    simListName <- load(file, envir = envir)
-    sim <- get(simListName, envir = envir)
+    sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
     rm(list = c("._rng.kind", "._rng.state", "._timestamp"), envir = sim@.xData)
-    return(invisible(TRUE))
+    return(invisible(sim))
   } else {
-    return(invisible(FALSE))
+    stop("checkpoint file ", file, " not found.")
   }
 }
 
