@@ -120,9 +120,7 @@ setMethod("Copy",
                     makeModActiveBinding(sim = sim_, mod = mod)
                   }
                 }
-
               })
-
             }
             sim_@.envir <- sim_@.xData
             return(sim_)

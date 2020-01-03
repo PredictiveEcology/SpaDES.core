@@ -39,7 +39,6 @@ fileName <- function(x) {
   return(unlist(strsplit(basename(unlist(x)), "\\..*$")))
 }
 
-
 # The load doEvent
 doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
   if (eventType == "inputs") {
@@ -326,3 +325,21 @@ setMethod("rasterToMemory",
             r <- setValues(r, getValues(r))
             return(r)
 })
+
+#' Load a saved \code{simList} from file
+#'
+#' @param file Character giving the name of a saved simulation file
+#'
+#' @export
+#' @importFrom qs qread
+loadSimList <- function(file) {
+  sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
+
+  mods <- setdiff(sim@modules, .coreModules())
+  lapply(mods, function(mod) {
+    rm("mod", envir = sim[[mod]], inherits = FALSE)
+    makeModActiveBinding(sim = sim, mod = mod)
+  })
+
+  return(sim)
+}

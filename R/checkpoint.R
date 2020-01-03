@@ -83,14 +83,13 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param file The checkpoint file.
 #' @rdname checkpoint
 #' @export
-#' @importFrom qs qread
 #' @importFrom raster extension
 checkpointLoad <- function(file) {
   stopifnot(raster::extension(file) == ".qs")
 
   # check for previous checkpoint files
   if (file.exists(file)) {
-    sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
+    sim <- loadSimList(file)
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)

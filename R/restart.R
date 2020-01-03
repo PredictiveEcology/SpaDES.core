@@ -160,9 +160,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
       #ee <- new.env()
       #ee$sim <- sim
       # sim@.xData[[module]]$sim <- sim
-      lapply(pp, function(pp1) evalWithActiveCode(pp1,
-                                                  sim@.xData[[module]],
-                                                  sim = sim))
+      lapply(pp, function(pp1) evalWithActiveCode(pp1, sim@.xData[[module]], sim = sim))
       message(crayon::blue("Reparsing", module, "source code"))
     }
     #rm(list = "sim", envir = ee)
@@ -404,7 +402,7 @@ First <- function(...) {
   #attachedPkgsFilename <- file.path("~", paste0(".", .rndString), '.attachedPkgs.RData')
   load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
-  sim <- qs::qread(.spades.simFilename, nthreads = getOption("spades.nThreads", 1))  # load "sim" here
+  sim <- loadSimList(.spades.simFilename)
 
   do.call(Sys.setenv, sim$._restartRList$envvars)
 
