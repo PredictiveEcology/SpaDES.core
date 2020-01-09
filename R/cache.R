@@ -797,7 +797,7 @@ unmakeMemoisable.simList_ <- function(x) {
 if (!isGeneric("clearCache")) {
   setGeneric(
     "clearCache",
-    function(x, userTags = character(), after, before,
+    function(x, userTags = character(), after = NULL, before = NULL,
              ask = getOption("reproducible.ask"),
              useCloud = FALSE,
              cloudFolderID = NULL, ...) {
@@ -818,7 +818,7 @@ if (!isGeneric("clearCache")) {
 setMethod(
   "clearCache",
   signature = "simList",
-  definition = function(x, userTags, after, before, ask, useCloud = FALSE,
+  definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
                         cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
                         ...) {
     x <- x@paths$cachePath
@@ -829,7 +829,8 @@ setMethod(
 })
 
 if (!isGeneric("showCache")) {
-  setGeneric("showCache", function(x, userTags = character(), after, before, ...) {
+  setGeneric("showCache", function(x, userTags = character(),
+                                   after = NULL, before = NULL, ...) {
     standardGeneric("showCache")
   })
 }
@@ -845,14 +846,15 @@ if (!isGeneric("showCache")) {
 setMethod(
   "showCache",
   signature = "simList",
-  definition = function(x, userTags, after, before, ...) {
+  definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
     showCache(x = x, userTags = userTags, after = after, before = before,
                ...)
   })
 
 if (!isGeneric("keepCache")) {
-  setGeneric("keepCache", function(x, userTags = character(), after, before, ...) {
+  setGeneric("keepCache", function(x, userTags = character(),
+                                   after = NULL, before = NULL, ...) {
     standardGeneric("keepCache")
   })
 }
@@ -868,7 +870,7 @@ if (!isGeneric("keepCache")) {
 setMethod(
   "keepCache",
   signature = "simList",
-  definition = function(x, userTags, after, before, ...) {
+  definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
     keepCache(x = x, userTags = userTags, after = after, before = before,
                ...)
