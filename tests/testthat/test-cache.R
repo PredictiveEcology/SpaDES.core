@@ -180,7 +180,9 @@ test_that("test .robustDigest for simLists", {
   expect_true(all(grepl(msgGrep, mess1)))
 
   msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
-  a <- capture.output(expect_message(do.call(simInit, args), regexp = msgGrep))
+  #a <- capture.output(
+  expect_message(do.call(simInit, args), regexp = msgGrep)
+  #)
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -191,7 +193,8 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
-  expect_message(do.call(simInit, args), regexp = msgGrep, all = TRUE)
+  mess1 <- capture_messages(do.call(simInit, args))
+  expect_true(all(grepl(msgGrep, mess1)))
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
   xxx <- readLines(fileName)
@@ -244,32 +247,33 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # accepts character string
   aa <- .checkCacheRepo(tmpCache, create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # uses .getPaths during simInit
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   justAPath <- tmpCache ;
   options("reproducible.cachePath" = justAPath)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # accepts character string
   aa <- .checkCacheRepo(tmpCache, create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # uses .getPaths during simInit
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
+
 })
 
 test_that("test objSize", {
