@@ -174,16 +174,14 @@ In addition, there are several helpers in the `reproducible` package, including 
 Also, one can access cached items manually (rather than simply rerunning the same `Cache` function again).
 
 ```{r manual-cache}
+cacheDB <- showCache(mySim)
 # examine a part of the Cache
-showCache(mySim)[tagKey == "function", -c("artifact")]
+cacheDB[tagKey == "function"]
+# get the RasterLayer that was produced with the gaussMap function:
+map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "gaussMap"]$cacheId)
 
-if (requireNamespace("archivist")) {
-  # get the RasterLayer that was produced with the gaussMap function:
-  map <- unique(showCache(mySim, userTags = "gaussMap")$artifact) %>%
-    archivist::loadFromLocalRepo(repoDir = cachePath(mySim), value = TRUE)
-  clearPlot()
-  Plot(map)
-}
+clearPlot()
+Plot(map)
 ```
 
 # Reproducible Workflow
