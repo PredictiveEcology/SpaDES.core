@@ -76,9 +76,8 @@ The warning will have the \code{cloudFolderID} that should be used in subsequent
 It will also be added to \code{options("reproducible.cloudFolderID")},
 but this will not persist across sessions.}
 
-\item{drv}{an object that inherits from \linkS4class{DBIDriver},
-or an existing \linkS4class{DBIConnection}
-object (in order to clone an existing connection).}
+\item{drv}{an object that inherits from DBIDriver, or an existing
+DBIConnection object (in order to clone an existing connection).}
 
 \item{conn}{A DBIConnection object, as returned by dbConnect()}
 
