@@ -693,7 +693,7 @@ if (!exists("objSize")) {
 #' Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
 #' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-#' \code{object.size(completed(sim))}.
+#' \code{objSize(completed(sim))}.
 #'
 #' @export
 #' @importFrom reproducible objSize
@@ -702,14 +702,14 @@ if (!exists("objSize")) {
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
-#' object.size(a)
+#' utils::object.size(a)
 objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE),
                             enclosingEnvs = TRUE, .prevEnvirs = list(), ...) {
   xObjName <- deparse(substitute(x))
   aa <- objSize(x@.xData, quick = quick, ...)
   bb <- as(x, "simList_")
   bb@.Data <- list()
-  bbOs <- list(simList = object.size(bb))
+  bbOs <- list(simListWithoutObjects = objSize(bb))
   aa <- append(aa, bbOs)
   return(aa)
 }
@@ -785,6 +785,7 @@ if (!isGeneric("clearCache")) {
 #' This will take the \code{cachePath(object)} and pass
 #' @export
 #'
+#' @param conn A DBIConnection object, as returned by dbConnect()
 #' @inheritParams reproducible::clearCache
 #' @importFrom reproducible clearCache
 #' @importMethodsFrom reproducible clearCache
