@@ -38,6 +38,7 @@ jobs:
     r_binary_packages:
       - BH
       - rlang
+      - qs
   - os: linux
     dist: xenial
     r: release
@@ -75,6 +76,7 @@ jobs:
       - git2r
       - igraph
       - later
+      - qs
       - RCurl
       - rlang
       - stringi
@@ -112,6 +114,7 @@ jobs:
       - BH
       - dplyr
       - igraph
+      - qs
       - rlang
       - stringi
   - os: osx
@@ -133,7 +136,7 @@ jobs:
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
-      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'install.packages(c("digest", "igraph", "qs", "rgdal", "rgeos"), type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
   - os: osx
     osx_image: xcode9.4
@@ -153,7 +156,7 @@ jobs:
     r_check_args: "--as-cran --ignore-vignettes --no-examples"
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
-      - Rscript -e 'install.packages(c("digest", "igraph", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'install.packages(c("digest", "igraph", "qs", "rgdal", "rgeos"), type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
 r_build_args: " "
 r_check_args: "--as-cran"
