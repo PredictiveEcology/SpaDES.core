@@ -659,32 +659,6 @@ setMethod(
     outputToSave
 })
 
-if (!isGeneric(".objSizeInclEnviros")) {
-  setGeneric(".objSizeInclEnviros", function(object) {
-    standardGeneric(".objSizeInclEnviros")
-  })
-}
-
-#' \code{.objSizeInclEnviros} for \code{simList} objects
-#'
-#' See \code{\link[reproducible]{.objSizeInclEnviros}}.
-#'
-#' @inheritParams reproducible::.objSizeInclEnviros
-#'
-#' @export
-#' @exportMethod .objSizeInclEnviros
-#' @importFrom reproducible .objSizeInclEnviros
-#' @importFrom utils object.size
-#' @importMethodsFrom reproducible .objSizeInclEnviros
-#' @include simList-class.R
-#' @rdname objSizeInclEnviros
-#' @seealso \code{\link[reproducible]{.objSizeInclEnviros}}
-setMethod(
-  ".objSizeInclEnviros",
-  signature = "simList",
-  definition = function(object) {
-    object.size(as.list(object@.xData, all.names = TRUE)) + object.size(object)
-})
 
 #' Find \code{simList} in a nested list
 #'
