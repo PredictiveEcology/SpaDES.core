@@ -128,11 +128,28 @@ These sample modules, respectively, highlight several keys features of the packa
 ```{r SpaDES-demo, eval=FALSE, echo=TRUE}
 library("SpaDES.core")
 
-demo <- suppressMessages(simInit(
+demoSim <- suppressMessages(simInit(
+  times = list(start = 0, end = 100),
   modules = "SpaDES_sampleModules",
+  params = list(
+    .globals = list(burnStats = "nPixelsBurned"),
+    randomLandscapes = list(
+      nx = 1e2, ny = 1e2, .saveObjects = "landscape",
+      .plotInitialTime = NA, .plotInterval = NA, inRAM = TRUE
+    ),
+    caribouMovement = list(
+      N = 1e2, .saveObjects = c("caribou"),
+      .plotInitialTime = 1, .plotInterval = 1, moveInterval = 1
+    ),
+    fireSpread = list(
+      nFires = 1e1, spreadprob = 0.235, persistprob = 0, its = 1e6,
+      returnInterval = 10, startTime = 0,
+      .plotInitialTime = 0, .plotInterval = 10
+    )
+  ),
   path = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 ))
-spades(demo)
+spades(demoSim)
 ```
 
 Additional `SpaDES` modules are available via a GitHub repository:  [https://github.com/PredictiveEcology/SpaDES-modules](https://github.com/PredictiveEcology/SpaDES-modules).
