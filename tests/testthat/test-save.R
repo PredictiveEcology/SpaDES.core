@@ -24,6 +24,8 @@ test_that("saving files does not work correctly", {
     modulePath = system.file("sampleModules", package = "SpaDES.core"),
     outputPath = tmpdir
   )
+  # innerClasses <<- 1
+
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
 
