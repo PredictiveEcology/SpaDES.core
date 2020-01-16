@@ -38,6 +38,8 @@ test_that("spades calls - diff't signatures", {
     testOnExit(testInitOut)
   }, add = TRUE)
 
+  #innerClasses <<- 1
+  #browser()
   a <- simInit()
   a1 <- Copy(a)
   opts <- options(spades.saveSimOnExit = FALSE)
@@ -93,6 +95,15 @@ test_that("spades calls - diff't signatures", {
     paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
     assign(paste0("st", i), system.time(spades(a, cache = TRUE, .plotInitialTime = NA)))
   }
+  params1 <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = c(nx = 20, ny = 20)
+  )
+  expect_error(a <- simInit(times, params1, modules, paths = paths))
+  expect_error(a <- simInit(list(3, "a", "s"), params, modules, paths = paths))
+  err <- capture_error(a <- simInit(list(3, "years", start = 1), params, modules, paths = paths))
+  expect_true(is.null(err))
+
   #expect_gt(st1[1], st2[1]) ## no longer true on R >= 3.5.1 ??
   file.remove(dir(paths(a)$cachePath, full.names = TRUE, recursive = TRUE))
 })
