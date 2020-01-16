@@ -13,18 +13,30 @@
   before = NULL,
   ask = getOption("reproducible.ask"),
   useCloud = FALSE,
-  cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
+  cloudFolderID = NULL,
+  drv = getOption("reproducible.drv", RSQLite::SQLite()),
+  conn = getOption("reproducible.conn", NULL),
   ...
 )
 
-\S4method{showCache}{simList}(x, userTags = character(), after = NULL, before = NULL, ...)
+\S4method{showCache}{simList}(
+  x,
+  userTags = character(),
+  after = NULL,
+  before = NULL,
+  drv = getOption("reproducible.drv", RSQLite::SQLite()),
+  conn = getOption("reproducible.conn", NULL),
+  ...
+)
 
 \S4method{keepCache}{simList}(
   x,
   userTags = character(),
-  after,
-  before,
+  after = NULL,
+  before = NULL,
   ask = getOption("reproducible.ask"),
+  drv = getOption("reproducible.drv", RSQLite::SQLite()),
+  conn = getOption("reproducible.conn", NULL),
   ...
 )
 }
@@ -63,6 +75,13 @@ If left as \code{NULL}, the function will create a cloud folder with a warning.
 The warning will have the \code{cloudFolderID} that should be used in subsequent calls.
 It will also be added to \code{options("reproducible.cloudFolderID")},
 but this will not persist across sessions.}
+
+\item{drv}{an object that inherits from \linkS4class{DBIDriver},
+or an existing \linkS4class{DBIConnection}
+object (in order to clone an existing connection).}
+
+\item{conn}{A \linkS4class{DBIConnection} object, as returned by
+\code{\link[DBI:dbConnect]{dbConnect()}}.}
 
 \item{...}{Other arguments. Currently, \code{regexp}, a logical, can be provided.
 This must be \code{TRUE} if the use is passing a regular expression.

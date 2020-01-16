@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching SpaDES simulations}
-  %\VignetteDepends{archivist, igraph, raster, reproducible, SpaDES.core}
+  %\VignetteDepends{igraph, raster, reproducible, SpaDES.core}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
