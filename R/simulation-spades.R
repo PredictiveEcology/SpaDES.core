@@ -1059,8 +1059,7 @@ setMethod(
 })
 
 #' @keywords internal
-.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                      showSimilar) {
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
