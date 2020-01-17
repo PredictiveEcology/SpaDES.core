@@ -904,7 +904,7 @@ setMethod(
     namesInner <- lapply(neic, function(x) NULL)
     correctArgsInner <- unlist(lapply(1:length(li), function(x) {
       if (isTRUE(is(li[[x]], "list")) &&
-          (expectedInnerClasses[[x]] != "ANY")) {
+          isTRUE(expectedInnerClasses[[x]] != "ANY"))) {
         if (is(expectedInnerClasses[[x]], "list")) {
           items <- if (length(names(li[[x]])) > 0) {
             names(expectedInnerClasses[[x]])[match(names(li[[x]]),
