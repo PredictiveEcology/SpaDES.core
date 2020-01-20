@@ -479,6 +479,7 @@ setMethod(
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
                                sim) {
 
+  browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
   tmpEnvir <- new.env(parent = envir)
@@ -494,6 +495,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   rm(tmpEnvir)
 
   if (any(activeCode)) {
+    browser(expr = exists("._evalWithActiveCode_2"))
     env <- new.env(parent = parentFrame);
     aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
       eval(ac, envir = env)
