@@ -444,6 +444,7 @@ setMethod(
   signature = "simList",
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
+    browser(expr = exists("._prepareOutput_5"))
     tmpl <- .findSimList(tmpl)
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
@@ -555,6 +556,16 @@ setMethod(
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.xData, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.xData)
+
+        if (exists("objectSynonyms", envir = object2@.xData)) {
+          objSyns <- lapply(attr(object2$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+          # must remove the "other ones" first
+          objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
+          if (any(exists(objNonCanonical)))
+            rm(list = objNonCanonical)
+          suppressMessages(objectSynonyms(synonyms = objSyns, envir = object2@.xData))
+        }
+
       }
       if (!is.null(attr(object, "removedObjs"))) {
         if (length(attr(object, "removedObjs"))) {
