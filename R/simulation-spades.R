@@ -117,8 +117,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
               }
             }
           } else if (debug[[i]] == 1) {
-            message(paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
-                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " ")))
+            message(crayon::green(paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
+                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
           } else if (debug[[i]] == 2) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                                attr(sim, "completedCounter") == 1) {
@@ -126,12 +126,12 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             } else {
               .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
             }
-            message(paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
-                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " ")))
+            message(crayon::green(paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
+                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
           } else if (debug[[i]] == "simList") {
             print(sim)
           } else if (grepl(debug[[i]], pattern = "\\(")) {
-            message(eval(parse(text = debug[[i]])))
+            message(crayon::green(eval(parse(text = debug[[i]]))))
           } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
             if (is.environment(fnEnv)) {
               if (all(debug %in% cur[c("moduleName", "eventType")])) {
@@ -140,7 +140,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
               }
             }
           } else if (!any(debug[[i]] == c("browser"))) { # any other
-            tryCatch(message(do.call(debug[[i]], list(sim))), error = function(x) NULL)
+            tryCatch(message(crayon::green(do.call(debug[[i]], list(sim)))), error = function(x) NULL)
           }
         }
       }
