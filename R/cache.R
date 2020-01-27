@@ -638,7 +638,7 @@ setMethod(
   definition = function(object, outputObjects, FUN, preDigestByClass) {
     if (!is.null(outputObjects)) {
       outputToSave <- object
-      outputToSave@.xData <- new.env()
+      outputToSave@.xData <- new.env(parent = emptyenv())
       outputToSave@.envir <- outputToSave@.xData
       # Some objects are conditionally produced from a module's outputObject
       whExist <- outputObjects %in% ls(object@.xData, all.names = TRUE)
