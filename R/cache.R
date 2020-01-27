@@ -561,8 +561,9 @@ setMethod(
           objSyns <- lapply(attr(object2$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
-          if (any(exists(objNonCanonical)))
-            rm(list = objNonCanonical)
+          objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = object2@.xData))
+          if (any(objNonCanonicalExist))
+            rm(list = objNonCanonical[objNonCanonicalExist], envir = object2@.xData)
           suppressMessages(objectSynonyms(synonyms = objSyns, envir = object2@.xData))
         }
 

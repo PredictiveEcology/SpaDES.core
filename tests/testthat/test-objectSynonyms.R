@@ -18,7 +18,7 @@ test_that("test objectSynonyms", {
 
   # Check maintenance
   set.seed(123)
-  times <- list(start = 1, end = 1)
+  times <- list(start = 1, end = 2)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     caribouMovement = list(N = 3),
@@ -75,9 +75,11 @@ test_that("test objectSynonyms", {
       documentation = list("README.txt", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
+        defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")
       ),
       inputObjects = bind_rows(
-        expectsInput("age", "numeric", "")
+        expectsInput("age", "numeric", ""),
+        expectsInput("age2", "numeric", "") # need a dummy one that isn not supplied in simInit below
       ),
       outputObjects = bind_rows(
       )
@@ -88,10 +90,10 @@ test_that("test objectSynonyms", {
       eventType,
       init = {
       #sim$dp <- dataPath(sim)
-      #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       },
       event1 = {
-      #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       })
       return(invisible(sim))
       }
@@ -105,9 +107,24 @@ test_that("test objectSynonyms", {
       ', fill = TRUE)
   modules <- "test"
   sim <- simInit(times, params, modules = modules,
-                 objects = list(objectSynonyms = os),
+                 objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
                  paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
 
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+                         objects = list(objectSynonyms = os),
+                         paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
 
 })

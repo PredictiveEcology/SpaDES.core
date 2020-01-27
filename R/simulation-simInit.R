@@ -429,13 +429,6 @@ setMethod(
       }
     }
 
-    # if (which(search() %in% "package:SpaDES.core") != 2) {
-    #   # Must move it to 2nd position, because simList fns have this as parent
-    #   detach("package:SpaDES.core")
-    #   suppressMessages(attachNamespace(asNamespace("SpaDES.core")))
-    # }
-    #
-
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
     # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
