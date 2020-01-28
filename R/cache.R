@@ -444,6 +444,7 @@ setMethod(
   signature = "simList",
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
+    browser(expr = exists("._prepareOutput_5"))
     tmpl <- .findSimList(tmpl)
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
@@ -555,6 +556,17 @@ setMethod(
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.xData, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.xData)
+
+        if (exists("objectSynonyms", envir = object2@.xData)) {
+          objSyns <- lapply(attr(object2$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+          # must remove the "other ones" first
+          objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
+          objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = object2@.xData))
+          if (any(objNonCanonicalExist))
+            rm(list = objNonCanonical[objNonCanonicalExist], envir = object2@.xData)
+          suppressMessages(objectSynonyms(synonyms = objSyns, envir = object2@.xData))
+        }
+
       }
       if (!is.null(attr(object, "removedObjs"))) {
         if (length(attr(object, "removedObjs"))) {
@@ -627,7 +639,7 @@ setMethod(
   definition = function(object, outputObjects, FUN, preDigestByClass) {
     if (!is.null(outputObjects)) {
       outputToSave <- object
-      outputToSave@.xData <- new.env()
+      outputToSave@.xData <- new.env(parent = emptyenv())
       outputToSave@.envir <- outputToSave@.xData
       # Some objects are conditionally produced from a module's outputObject
       whExist <- outputObjects %in% ls(object@.xData, all.names = TRUE)
