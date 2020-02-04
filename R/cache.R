@@ -33,6 +33,8 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
+    browser(expr = exists("._robustDigest_1"))
+
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
