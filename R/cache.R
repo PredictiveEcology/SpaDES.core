@@ -485,8 +485,11 @@ setMethod(
 
         currModules <- currentModule(tmpl[[whSimList]])
         # Convert to numeric index, as some modules don't have names
-        hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
-        if (length(currModules) == 0) currModules <- modules(tmpl[[whSimList]])
+
+        # hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
+        namesAllMods <- names(tmpl[[whSimList]]@depends@dependencies)
+        hasCurrModule <- match(currModules, names(tmpl[[whSimList]]@depends@dependencies))
+        if (length(currModules) == 0) currModules <- namesAllMods
 
         createOutputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
