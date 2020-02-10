@@ -107,7 +107,6 @@ test_that("test checkpointing with disk-backed raster", {
   simB$ras[] <- simB$ras[]
   # Because they did have different file-backed file names, their "names" attribute is different
   names(simA$ras) <- names(simB$ras) <- "tmp"
-  attributes(simA$ras)$legend@names <- NA_character_
 
   ## both versions above should yield identical results
   expect_equal(simA, simB)
