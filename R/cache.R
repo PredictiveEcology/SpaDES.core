@@ -814,7 +814,8 @@ setMethod(
   signature = "simList",
   definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
                         cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
-                        ...) {
+                        drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                        conn = getOption("reproducible.conn", NULL), ...) {
     x <- x@paths$cachePath
     clearCache(x = x, userTags = userTags, after = after, before = before,
                ask = ask, useCloud = useCloud,
