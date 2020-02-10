@@ -39,14 +39,6 @@ test_that("test checkpointing", {
   rm("._timestamp", envir = envir(simB))
   rm("._timestamp", envir = envir(simA))
 
-  ## TODO: fix weird failure:
-  # attributes(simA$landscape[[1]])$legend@names ## logical(0)
-  # attributes(simB$landscape[[1]])$legend@names ## NA
-  attributes(simA$landscape[[1]])$legend@names <- NA_character_
-  attributes(simA$landscape[[2]])$legend@names <- NA_character_
-  attributes(simA$landscape[[3]])$legend@names <- NA_character_
-  attributes(simA$landscape[[4]])$legend@names <- NA_character_
-
   ## both versions above should yield identical results
   expect_equal(simA, simB)
 })
@@ -116,14 +108,6 @@ test_that("test checkpointing with disk-backed raster", {
   # Because they did have different file-backed file names, their "names" attribute is different
   names(simA$ras) <- names(simB$ras) <- "tmp"
   attributes(simA$ras)$legend@names <- NA_character_
-
-  ## TODO: fix weird failure:
-  # attributes(simA$landscape[[1]])$legend@names ## logical(0)
-  # attributes(simB$landscape[[1]])$legend@names ## NA
-  attributes(simA$landscape[[1]])$legend@names <- NA_character_
-  attributes(simA$landscape[[2]])$legend@names <- NA_character_
-  attributes(simA$landscape[[3]])$legend@names <- NA_character_
-  attributes(simA$landscape[[4]])$legend@names <- NA_character_
 
   ## both versions above should yield identical results
   expect_equal(simA, simB)
