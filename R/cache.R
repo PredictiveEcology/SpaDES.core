@@ -33,6 +33,8 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
+    browser(expr = exists("._robustDigest_1"))
+
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -812,7 +814,8 @@ setMethod(
   signature = "simList",
   definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
                         cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
-                        ...) {
+                        drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                        conn = getOption("reproducible.conn", NULL), ...) {
     x <- x@paths$cachePath
     clearCache(x = x, userTags = userTags, after = after, before = before,
                ask = ask, useCloud = useCloud,
