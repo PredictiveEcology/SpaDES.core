@@ -53,7 +53,6 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @importFrom tcltk tkProgressBar
 #' @include environment.R
 #' @rdname progressBar
 #'
@@ -63,12 +62,22 @@ newProgressBar <- function(sim) {
   }
   tu <- sim@simtimes[["timeunit"]]
   OS <- tolower(Sys.info()["sysname"])
-  if (P(sim, ".progress")$type == "graphical") {
+  wantGraphical <- isTRUE(P(sim, ".progress")$type == "graphical")
+  if (!requireNamespace("tcltk")) {
+    if (wantGraphical && (OS != "windows")) {
+      warning("Can't use graphical progress bar without tcltk package: ",
+              "install.packages('tcltk')\n",
+              "Using text progress bar")
+      wantGraphical <- FALSE
+    }
+
+  }
+  if (wantGraphical) {
     if (OS == "windows") {
       pb <- utils::winProgressBar(min = start(sim, tu), max = end(sim, tu),
                            initial = start(sim, tu))
     } else {
-      pb <- tkProgressBar(min = start(sim, tu), max = end(sim, tu),
+      pb <- tcltk::tkProgressBar(min = start(sim, tu), max = end(sim, tu),
                           initial = start(sim, tu))
     }
   } else if (P(sim, ".progress")$type == "shiny") {
@@ -81,14 +90,23 @@ newProgressBar <- function(sim) {
   assign(".pb", pb, envir = .pkgEnv)
 }
 
-#' @importFrom tcltk setTkProgressBar
 #' @importFrom utils globalVariables
 #' @rdname progressBar
 setProgressBar <- function(sim) {
   OS <- tolower(Sys.info()["sysname"])
   tu <- sim@simtimes[["timeunit"]]
   pb <- get(".pb", envir = .pkgEnv)
-  if (P(sim, ".progress")$type == "graphical") {
+  wantGraphical <- isTRUE(P(sim, ".progress")$type == "graphical")
+  if (!requireNamespace("tcltk")) {
+    if (wantGraphical && (OS != "windows")) {
+      warning("Can't use graphical progress bar without tcltk package: ",
+              "install.packages('tcltk')\n",
+              "Using text progress bar")
+      wantGraphical <- FALSE
+    }
+
+  }
+  if (wantGraphical) {
     if (OS == "windows") {
       utils::setWinProgressBar(
         pb, time(sim, tu),
@@ -96,7 +114,7 @@ setProgressBar <- function(sim) {
                       "of total", end(sim, tu))
       )
     } else {
-      setTkProgressBar(pb, time(sim, tu),
+      tcltk::setTkProgressBar(pb, time(sim, tu),
                        title = paste("Current simulation time:", tu,
                                      round(time(sim, tu), 3),
                                      "of total", end(sim, tu)))

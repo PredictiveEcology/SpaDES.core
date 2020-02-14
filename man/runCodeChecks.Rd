@@ -19,8 +19,9 @@
 A message with that starts with paste0(m, ":", message)
 }
 \description{
-This uses codetools::codeCheck for function consistency, and
-codetools::findGlobals to check for function collisions with known,
-common function collisions (raster::stack, raster::scale)
+This uses custom tools and some optional tools in \code{codetools}
+package to check for function collisions with known,
+common function collisions (raster::stack, raster::scale).
+All outputs will be sent as messages.
 }
 \keyword{internal}

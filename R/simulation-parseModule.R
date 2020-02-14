@@ -156,7 +156,6 @@ setMethod(
 #' @return A \code{simList} simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @importFrom codetools checkUsageEnv findGlobals
 #' @importFrom reproducible Cache
 #' @include environment.R
 #' @include module-dependencies-class.R

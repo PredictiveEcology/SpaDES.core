@@ -8,6 +8,10 @@ version 0.2.9
 
 * Updates to deal with new backend with `reproducible`
 
+## dependencies
+
+* moved packages from Imports to Suggests: `codetools`, `future`, `httr`, `logging`, and `tcltk`
+* removed `archivist`
 
 version 0.2.8
 =============
