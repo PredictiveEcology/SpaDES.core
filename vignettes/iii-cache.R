@@ -76,16 +76,15 @@ system.time({
 all.equal(map, mapCached) 
 
 ## ----manual-cache-------------------------------------------------------------
-# examine a part of the Cache
-showCache(mySim)[tagKey == "function", -c("artifact")]
+cacheDB <- showCache(mySim)
+# examine only the functions that have been cached
+cacheDB[tagKey == "function"]
 
-if (requireNamespace("archivist")) {
-  # get the RasterLayer that was produced with the gaussMap function:
-  map <- unique(showCache(mySim, userTags = "gaussMap")$artifact) %>%
-    archivist::loadFromLocalRepo(repoDir = cachePath(mySim), value = TRUE)
-  clearPlot()
-  Plot(map)
-}
+# get the RasterLayer that was produced with the gaussMap function:
+map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "gaussMap"]$cacheId)
+
+clearPlot()
+Plot(map)
 
 ## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 #  simInit --> many .inputObjects calls

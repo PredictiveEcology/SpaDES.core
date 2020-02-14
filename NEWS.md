@@ -1,6 +1,14 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
 
+version 0.2.9
+=============
+
+## new features
+
+* Updates to deal with new backend with `reproducible`
+
+
 version 0.2.8
 =============
 

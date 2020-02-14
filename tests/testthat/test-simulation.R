@@ -73,7 +73,8 @@ test_that("spades calls - diff't signatures", {
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
   a <- Copy(a1)
   expect_message(spades(a, cache = TRUE, debug = TRUE, notOlderThan = Sys.time()), "eventTime")
-  expect_true(all(c("backpack.db", "gallery") %in% dir(paths(a)$cachePath)))
+  expect_true(all(basename2(c(CacheDBFile(paths(a)$cachePath), CacheStorageDir(paths(a)$cachePath))) %in%
+                    dir(paths(a)$cachePath)))
   file.remove(dir(paths(a)$cachePath, full.names = TRUE, recursive = TRUE))
 
   # test for system time ... in this case, the first time through loop is slow

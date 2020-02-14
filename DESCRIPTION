@@ -12,8 +12,8 @@ Description: Provide the core framework for a discrete event system (DES) to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2019-12-31
-Version: 0.2.8
+Date: 2020-02-09
+Version: 0.2.9.9000
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 3.5),
     quickPlot (>= 0.1.4),
-    reproducible (>= 0.2.11)
+    reproducible (>= 1.0.0)
 Imports:
     backports,
     codetools,

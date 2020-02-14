@@ -169,21 +169,20 @@ all.equal(map, mapCached)
 
 ## Working with the Cache manually
 
-Since the cache is simply an `archivist` repository, all `archivist` functions will work as is.
-In addition, there are several helpers in the `reproducible` package, including `showCache`, `keepCache` and `clearCache` that may be useful.
+Since the cache is simply a `DBI` database table, all `DBI` functions will work as is.
+In addition, there are several helpers in the `reproducible` package, including `showCache`, `keepCache` and `clearCache`, and the more advanced `createCache`, `loadFromCache`, `rmFromCache`, and `saveToCache` that may be useful.
 Also, one can access cached items manually (rather than simply rerunning the same `Cache` function again).
 
 ```{r manual-cache}
-# examine a part of the Cache
-showCache(mySim)[tagKey == "function", -c("artifact")]
+cacheDB <- showCache(mySim)
+# examine only the functions that have been cached
+cacheDB[tagKey == "function"]
 
-if (requireNamespace("archivist")) {
-  # get the RasterLayer that was produced with the gaussMap function:
-  map <- unique(showCache(mySim, userTags = "gaussMap")$artifact) %>%
-    archivist::loadFromLocalRepo(repoDir = cachePath(mySim), value = TRUE)
-  clearPlot()
-  Plot(map)
-}
+# get the RasterLayer that was produced with the gaussMap function:
+map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "gaussMap"]$cacheId)
+
+clearPlot()
+Plot(map)
 ```
 
 # Reproducible Workflow

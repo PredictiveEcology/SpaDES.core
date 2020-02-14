@@ -30,10 +30,10 @@ Default \code{TRUE}.}
 Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 so it estimates the correct size of functions stored there (e.g., with their enclosing
 environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-\code{object.size(completed(sim))}.
+\code{objSize(completed(sim))}.
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))
 objSize(a)
-object.size(a)
+utils::object.size(a)
 }

@@ -107,7 +107,7 @@ checkpointLoad <- function(file, envir = parent.frame()) {
   sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE) # nolint
   sim$._rng.kind <- RNGkind() # nolint
 
-  tmpEnv <- new.env()
+  tmpEnv <- new.env(parent = emptyenv())
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,

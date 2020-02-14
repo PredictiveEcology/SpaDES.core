@@ -429,13 +429,6 @@ setMethod(
       }
     }
 
-    # if (which(search() %in% "package:SpaDES.core") != 2) {
-    #   # Must move it to 2nd position, because simList fns have this as parent
-    #   detach("package:SpaDES.core")
-    #   suppressMessages(attachNamespace(asNamespace("SpaDES.core")))
-    # }
-    #
-
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
     # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
@@ -851,6 +844,7 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
+    browser(expr = exists("._simInit_1"))
     namesMatchCall <- names(match.call())
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
@@ -902,9 +896,11 @@ setMethod(
     neic <- names(expectedInnerClasses)
     names(neic) <- neic
     namesInner <- lapply(neic, function(x) NULL)
+    browser(expr = exists("._simInit_2"))
     correctArgsInner <- unlist(lapply(1:length(li), function(x) {
+      browser(expr = exists("._simInit_3"))
       if (isTRUE(is(li[[x]], "list")) &&
-          (expectedInnerClasses[[x]] != "ANY")) {
+          isTRUE(all(expectedInnerClasses[[x]] != "ANY"))) {
         if (is(expectedInnerClasses[[x]], "list")) {
           items <- if (length(names(li[[x]])) > 0) {
             names(expectedInnerClasses[[x]])[match(names(li[[x]]),
