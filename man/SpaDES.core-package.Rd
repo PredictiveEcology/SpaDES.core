@@ -534,13 +534,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 }
 
 \seealso{
-Useful links:
-\itemize{
-  \item \url{https://spades-core.predictiveecology.org/}
-  \item \url{https://github.com/PredictiveEcology/SpaDES.core}
-  \item Report bugs at \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
-}
-
+\code{\link{spadesOptions}}
 }
 \author{
 \strong{Maintainer}: Alex M Chubaty \email{alex.chubaty@gmail.com} (\href{https://orcid.org/0000-0001-7146-8135}{ORCID})

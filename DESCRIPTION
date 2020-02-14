@@ -105,6 +105,7 @@ Collate:
     'moduleCoverage.R'
     'moduleMetadata.R'
     'objectSynonyms.R'
+    'options.R'
     'times.R'
     'simList-accessors.R'
     'plotting-diagrams.R'
