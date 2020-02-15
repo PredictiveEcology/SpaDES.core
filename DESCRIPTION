@@ -54,11 +54,14 @@ Imports:
     utils,
     whisker
 Suggests:
-    archivist,
+    codetools,
     covr,
     devtools,
+    future,
     future.callr,
+    httr,
     knitr,
+    logging,
     magrittr,
     microbenchmark,
     png,
