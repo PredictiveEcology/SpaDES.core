@@ -35,6 +35,7 @@ environment:
 clone_depth: 5
 
 build_script:
+  - travis-tool.sh install_github PredictiveEcology/reproducible@development
   - travis-tool.sh install_deps
 
 test_script:
