@@ -20,7 +20,23 @@ version 0.2.9
 
 ## new features
 
+* several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting `options('spades.recoveryMode' = 0)` may further help
 * Updates to deal with new backend with `reproducible`
+* better assertions inside list elements of `simInit`, e.g., `simInit(times = list(start = "test"))` now fails because times must be a list of 2 `numeric` objects
+
+## dependencies
+
+* moved packages from Imports to Suggests: `codetools`, `future`, `httr`, `logging`, and `tcltk`
+* removed `archivist`
+
+## deprecated
+
+`.objSizeInclEnviros` and removed
+
+## bugfixes
+
+* `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`; fixed in 758b9eb8ee74ef58c5451da1abda260c223a840c
+
 
 
 version 0.2.8

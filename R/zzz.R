@@ -19,38 +19,7 @@
   ## set options using the approach used by devtools
   opts <- options()
   reproCachePath <- getOption("reproducible.cachePath")
-  opts.spades <- list( # nolint
-    spades.browserOnError = FALSE,
-    #spades.cachePath = reproCachePath,
-    spades.debug = 1, # TODO: is this the best default? see discussion in #5
-    spades.futurePlan = "callr",
-    spades.inputPath = file.path(.spadesTempDir, "inputs"),
-    spades.lowMemory = FALSE,
-    spades.memoryUseInterval = 0,
-    spades.moduleCodeChecks = list(
-      skipWith = TRUE,
-      suppressNoLocalFun = TRUE,
-      suppressParamUnused = FALSE,
-      suppressPartialMatchArgs = FALSE,
-      suppressUndefined = TRUE
-    ),
-    spades.modulePath = file.path(.spadesTempDir, "modules"),
-    spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
-    spades.nCompleted = 10000L,
-    spades.nThreads = 1,
-    spades.outputPath = file.path(.spadesTempDir, "outputs"),
-    spades.recoveryMode = 1,
-    spades.restartRInterval = 0,
-    spades.restartR.clearFiles = TRUE,
-    spades.restartR.filename = "sim_restartR.qs",
-    spades.restartR.restartDir = file.path(.spadesTempDir, "outputs"),
-    spades.saveSimOnExit = TRUE,
-    spades.switchPkgNamespaces = FALSE,
-    spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
-    spades.useRequire = TRUE,
-    spades.keepCompleted = TRUE
-  )
+  opts.spades <- spadesOptions()
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
 

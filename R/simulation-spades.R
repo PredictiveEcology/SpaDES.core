@@ -652,7 +652,7 @@ scheduleConditionalEvent <- function(sim,
 #'   }
 #'
 #' \code{level} can be a number from 0 to 100 or a character string matching one
-#' of the values in \code{\link[logging]{loglevels}}. These are hierarchical levels of
+#' of the values in \code{logging::loglevels}. These are hierarchical levels of
 #' information passed to the console. Set a lower number for more information and a
 #' higher number for less information. Errors in code will be shown if \code{level}
 #' is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if
@@ -767,8 +767,6 @@ setGeneric(
   })
 
 #' @rdname spades
-#' @importFrom logging loginfo logwarn logerror getLogger basicConfig getHandler
-#' @importFrom logging setLevel addHandler writeToFile logReset writeToConsole
 #' @importFrom rlang cnd_muffle
 setMethod(
   "spades",
@@ -782,9 +780,15 @@ setMethod(
                         notOlderThan,
                         ...) {
 
+    useNormalMessaging <- TRUE
     newDebugging <- is.list(debug)
-    debug <- setupDebugger(debug)
-    useNormalMessaging <- !newDebugging || all(!grepl("writeToConsole", names(getLogger()[["handlers"]])))
+    if (newDebugging) {
+      if (requireNamespace("logging")) {
+        debug <- setupDebugger(debug)
+        useNormalMessaging <- !newDebugging ||
+          all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
+      }
+    }
 
 
     sim <- withCallingHandlers({
@@ -986,11 +990,20 @@ setMethod(
       .pkgEnv$.cleanEnd <- TRUE
       return(invisible(sim))
     },
-    warning = function(w){ logwarn(paste0(collapse = " ", c(names(w), w))) },
-    error = function(e) { logerror(e) },
+    warning = function(w) { if (requireNamespace("logging")) {
+      logging::logwarn(paste0(collapse = " ", c(names(w), w)))
+      } else {
+        warning(w)
+      }
+    },
+    error = function(e) { if (requireNamespace("logging")) {
+      logging::logerror(e)
+    } else {
+      stop(e)
+    }},
     message = function(m) {
       if (newDebugging) {
-        loginfo(m$message)
+        logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
@@ -1242,54 +1255,60 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
   if (!missing(debug)) {
     if (!isFALSE(debug)) {
       if (is.list(debug)) {
-        logReset()
-        if (is.null(names(debug))) stop("debug must be a named list if it is a list. See ?spades")
-        hasConsole <- grepl("console", names(debug))
-        if (any(hasConsole)) {
-          if (!is.list(debug$console)) stop("debug has an element named 'console', which is not a list.",
-                                            "Try 'debug = list(console = list())'")
-          consoleLevel <- if (!is.null(debug$console$level)) {
-            debug$console$level
-          } else {
-            "INFO"
-          }
-          if (!any(grepl("20|INFO", consoleLevel))) {
-            if (!"basic.stdout" %in% names(getLogger()[["handlers"]])) {
-              #basicConfig()
-              addHandler(writeToConsole, level = consoleLevel#,
-                         #formatter = spadesDefaultFormatter
-              )
+        if (requireNamespace("logging")) {
+
+          logging::logReset()
+          if (is.null(names(debug))) stop("debug must be a named list if it is a list. See ?spades")
+          hasConsole <- grepl("console", names(debug))
+          if (any(hasConsole)) {
+            if (!is.list(debug$console)) stop("debug has an element named 'console', which is not a list.",
+                                              "Try 'debug = list(console = list())'")
+            consoleLevel <- if (!is.null(debug$console$level)) {
+              debug$console$level
+            } else {
+              "INFO"
             }
-            setLevel(consoleLevel, getHandler('writeToConsole'))
-            #setLevel(consoleLevel, getHandler('basic.stdout'))
-          }
+            if (!any(grepl("20|INFO", consoleLevel))) {
+              if (!"basic.stdout" %in% names(logging::getLogger()[["handlers"]])) {
+                #basicConfig()
+                logging::addHandler(logging::writeToConsole, level = consoleLevel#,
+                           #formatter = spadesDefaultFormatter
+                )
+              }
+              logging::setLevel(consoleLevel, logging::getHandler(logging::writeToConsole))
+              #setLevel(consoleLevel, getHandler('basic.stdout'))
+            }
 
-        }
-        hasFile <- grepl("file", names(debug))
-        if (any(hasFile)) {
-          fileLevel <- if (!is.null(debug$file$level)) {
-            debug$file$level
+          }
+          hasFile <- grepl("file", names(debug))
+          if (any(hasFile)) {
+            fileLevel <- if (!is.null(debug$file$level)) {
+              debug$file$level
+            } else {
+              "INFO"
+            }
+            if (!"writeToFile" %in% names(logging::getLogger()[["handlers"]])) {
+              if (is.null(debug$file$file))
+                debug$file$file <- "log.txt"
+              logging::addHandler(logging::writeToFile, file=debug$file$file, level = fileLevel)
+            }
+            logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
+            cat(file = debug$file$file, "##################################\n",
+                append = !isFALSE(debug$file$append)) # default append it TRUE
+          }
+          # with(getLogger(), names(handlers))
+
+          hasDebug <- grepl("debug", names(debug))
+          if (any(hasDebug)) {
+            debug <- debug$debug
           } else {
-            "INFO"
+            debug <- 1
           }
-          if (!"writeToFile" %in% names(getLogger()[["handlers"]])) {
-            if (is.null(debug$file$file))
-              debug$file$file <- "log.txt"
-            addHandler(writeToFile, file=debug$file$file, level = fileLevel)
-          }
-          setLevel(fileLevel, getHandler('writeToFile'))
-          cat(file = debug$file$file, "##################################\n",
-              append = !isFALSE(debug$file$append)) # default append it TRUE
-        }
-        # with(getLogger(), names(handlers))
 
-        hasDebug <- grepl("debug", names(debug))
-        if (any(hasDebug)) {
-          debug <- debug$debug
-        } else {
-          debug <- 1
         }
-
+      } else {
+        stop("debug cannot be a list unless logging package is installed: ",
+             "install.packages('logging')")
       }
     }
   }

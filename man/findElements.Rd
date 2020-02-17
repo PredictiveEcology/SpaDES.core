@@ -48,7 +48,7 @@ the RHS of an assignment operator or when there is no assignment. When
 \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
 LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 scans for all functions (i.e., "globals") being used. This is similar to
-\code{\link[codetools]{findGlobals}}, but faster.
+\code{codetools::findGlobals}, but faster.
 
 \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
 \code{type = "assign"}. Usually this is a test of existence of that object, in

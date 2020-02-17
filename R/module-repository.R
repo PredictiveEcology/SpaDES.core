@@ -1,5 +1,5 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("actualFile", "checksum.x", "checksum.y", "content",
+  utils::globalVariables(c("actualFile", "checksum.x", "checksum.y",
                            "expectedFile", "filesize.x", "filesize.y", "result"))
 }
 
@@ -16,7 +16,6 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'              specified by the global option \code{spades.moduleRepo}.
 #'              Only \code{master} branches can be used at this point.
 #'
-#' @importFrom httr content GET stop_for_status
 #' @export
 #' @rdname getModuleVersion
 #'
@@ -82,9 +81,9 @@ setMethod("getModuleVersion",
 #'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 #'              specified by the global option \code{spades.moduleRepo}.
 #'
-#' @importFrom httr config content GET stop_for_status user_agent
 #' @export
 #' @rdname checkModule
+#' @importFrom utils packageVersion
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #'
@@ -98,32 +97,43 @@ setMethod(
   "checkModule",
   signature = c(name = "character", repo = "character"),
   definition = function(name, repo) {
-    if (length(name) > 1) {
-      warning("name contains more than one module. Only the first will be used.")
-      name <- name[1]
-    }
-    apiurl <- paste0("https://api.github.com/repos/", repo, "/git/trees/master?recursive=1") # nolint
-    ua <- user_agent(getOption("spades.useragent"))
-    pat <- Sys.getenv("GITHUB_PAT")
-    request <- if (identical(pat, "")) {
-      GET(apiurl, ua)
+    goAhead <- FALSE
+    if (requireNamespace("httr")) {
+      if (packageVersion("httr") >= "1.2.1") {
+        goAhead <- TRUE
+      }}
+    if (goAhead) {
+
+      if (length(name) > 1) {
+        warning("name contains more than one module. Only the first will be used.")
+        name <- name[1]
+      }
+      apiurl <- paste0("https://api.github.com/repos/", repo, "/git/trees/master?recursive=1") # nolint
+      ua <- httr::user_agent(getOption("spades.useragent"))
+      pat <- Sys.getenv("GITHUB_PAT")
+      request <- if (identical(pat, "")) {
+        httr::GET(apiurl, ua)
+      } else {
+        message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
+        httr::GET(apiurl, ua, config = list(httr::config(token = pat)))
+      }
+      httr::stop_for_status(request)
+      allFiles <- unlist(lapply(httr::content(request)$tree, "[", "path"), use.names = FALSE)
+      moduleFiles <- grep(paste0("^modules/", name), allFiles, value = TRUE)
+      if (length(moduleFiles) == 0) {
+        agrep(name, allFiles, max.distance = 0.25, value = TRUE,
+              ignore.case = FALSE) %>%
+          strsplit(., split = "/") %>%
+          lapply(., function(x) x[2]) %>%
+          unique() %>%
+          unlist() %>%
+          paste(., collapse = ", ") %>%
+          stop("Module ", name, " does not exist in the repository. ",
+               "Did you mean: ", ., "?")
+      }
     } else {
-      message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
-      GET(apiurl, ua, config = list(config(token = pat)))
-    }
-    stop_for_status(request)
-    allFiles <- unlist(lapply(content(request)$tree, "[", "path"), use.names = FALSE)
-    moduleFiles <- grep(paste0("^modules/", name), allFiles, value = TRUE)
-    if (length(moduleFiles) == 0) {
-      agrep(name, allFiles, max.distance = 0.25, value = TRUE,
-            ignore.case = FALSE) %>%
-        strsplit(., split = "/") %>%
-        lapply(., function(x) x[2]) %>%
-        unique() %>%
-        unlist() %>%
-        paste(., collapse = ", ") %>%
-        stop("Module ", name, " does not exist in the repository. ",
-             "Did you mean: ", ., "?")
+      stop("checkModule does not work without httr package: ",
+              "install.packages('httr')")
     }
     return(invisible(moduleFiles))
 })
@@ -265,7 +275,6 @@ setMethod(
 #'    including whether it was downloaded or not, and whether it was renamed
 #'    (because there was a local copy that had the wrong file name).
 #'
-#' @importFrom httr config GET stop_for_status user_agent write_disk
 #' @export
 #' @rdname downloadModule
 #'
@@ -288,6 +297,7 @@ setMethod(
                 quickCheck = "ANY", overwrite = "logical"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
+    if (requireNamespace("httr")) {
     path <- checkPath(path, create = TRUE)
     checkPath(file.path(path, name), create = TRUE)
 
@@ -304,15 +314,16 @@ setMethod(
                     "/master/modules/", name, "/", name, "_", version, ".zip") # nolint
       localzip <- file.path(path, basename(zip))
 
-      ua <- user_agent(getOption("spades.useragent"))
+      ua <- httr::user_agent(getOption("spades.useragent"))
       pat <- Sys.getenv("GITHUB_PAT")
       request <- if (identical(pat, "")) {
-        GET(zip, ua, write_disk(localzip, overwrite = overwrite))
+        httr::GET(zip, ua, httr::write_disk(localzip, overwrite = overwrite))
       } else {
         message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
-        GET(zip, ua, config = list(config(token = pat)), write_disk(localzip, overwrite = overwrite))
+        httr::GET(zip, ua, config = list(httr::config(token = pat)),
+                  httr::write_disk(localzip, overwrite = overwrite))
       }
-      stop_for_status(request)
+      httr::stop_for_status(request)
 
       files <- unzip(localzip, exdir = file.path(path), overwrite = TRUE)
     } else {
@@ -370,6 +381,10 @@ setMethod(
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
     message(crayon::magenta("Download complete for module ", name, " (v", version, ").", sep = ""))
+    } else{
+      stop("downloadModule does not work without httr package: ",
+           "install.package('httr')")
+    }
 
     return(list(c(files, files2),
                 setDF(rbindlist(list(dataList, dataList2), use.names = TRUE, fill = TRUE))))

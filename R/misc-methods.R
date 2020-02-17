@@ -7,7 +7,7 @@ if (getRversion() >= "3.1.0") {
 #' This can take x as a character string or as a function that returns a character string.
 #'
 #' @inheritParams base::getOption
-#' @rdname spadesOptions
+#' @rdname getOption
 #' @keywords internal
 .getOption <- function(x, default = NULL) {
   optionDefault <- options(x)[[1]]

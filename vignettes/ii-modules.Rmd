@@ -6,7 +6,7 @@ date: '`r strftime(Sys.Date(), "%B %d %Y")`'
 output:
   rmarkdown::html_vignette:
     number_sections: yes
-    self_contained: yes
+    self_contained: false
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building SpaDES modules}
@@ -21,6 +21,16 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(spades.moduleCodeChecks = FALSE)
+```
+
+```{css, echo=FALSE}
+/*********************************************************
+  17 Feb 2020: workaround DiagrammeR css bug 
+  https://github.com/rich-iannone/DiagrammeR/issues/375
+*********************************************************/
+.section {
+  opacity: 1;
+}
 ```
 
 # Introduction
@@ -372,7 +382,7 @@ if (require(SpaDES.tools) && require(RandomFields)) {
 }
 ```
   
-```{r eventDiagram, eval=TRUE, fig.height=10, fig.width=7}
+```{r eventDiagram, echo=FALSE, eval=TRUE, fig.height=10, fig.width=7}
 if (require(SpaDES.tools) && require(RandomFields))  {
   # overview of the events in the simulation
   eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
