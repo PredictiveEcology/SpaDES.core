@@ -12,7 +12,6 @@ version 0.2.8
 ## bug fixes
 
 * `restartR` minor bug fixes
-* removed mention of 'demo' from intro vignette (#110)
 
 version 0.2.7
 =============
