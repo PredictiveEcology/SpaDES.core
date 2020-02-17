@@ -6,7 +6,7 @@ date: '`r strftime(Sys.Date(), "%B %d %Y")`'
 output:
   rmarkdown::html_vignette:
     number_sections: yes
-    self_contained: true
+    self_contained: false
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building SpaDES modules}
