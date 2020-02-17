@@ -410,22 +410,17 @@ cantCodeCheckMessage <- ": line could not be checked "
     getOption("spades.moduleCodeChecks")
   }
 
-  if (requireNamespace("codetools")) {
-    checkUsageMsg <- capture.output(
-      do.call(codetools::checkUsageEnv, args = append(list(env = sim@.xData[[m]]), checks))
-    )
-    checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
-                          invert = TRUE, value = TRUE)
-    if (length(checkUsageMsg)) {
-      hadPrevMessage <- unique(unlist(lapply(checkUsageMsg, function(x)
-        .parseMessage(m, "module code", message = x))))
-    }
-  } else {
-    message("Some code checking can't be done with codetools package: ",
-            "install.packages('codetools')")
+  needInstall("codetools",
+              messageStart = "Some code checking can't be done with codetools package: ")
+  checkUsageMsg <- capture.output(
+    do.call(codetools::checkUsageEnv, args = append(list(env = sim@.xData[[m]]), checks))
+  )
+  checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
+                        invert = TRUE, value = TRUE)
+  if (length(checkUsageMsg)) {
+    hadPrevMessage <- unique(unlist(lapply(checkUsageMsg, function(x)
+      .parseMessage(m, "module code", message = x))))
   }
-
-
 
   #############################################################
   #######  Conflicting Functions ##############################

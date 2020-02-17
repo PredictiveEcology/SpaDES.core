@@ -1258,57 +1258,58 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
   if (!missing(debug)) {
     if (!isFALSE(debug)) {
       if (is.list(debug)) {
-        if (requireNamespace("logging")) {
+        needInstall("logging",
+                    messageStart = "debug cannot be a list unless logging package is installed: ")
 
-          logging::logReset()
-          if (is.null(names(debug))) stop("debug must be a named list if it is a list. See ?spades")
-          hasConsole <- grepl("console", names(debug))
-          if (any(hasConsole)) {
-            if (!is.list(debug$console)) stop("debug has an element named 'console', which is not a list.",
-                                              "Try 'debug = list(console = list())'")
-            consoleLevel <- if (!is.null(debug$console$level)) {
-              debug$console$level
-            } else {
-              "INFO"
-            }
-            if (!any(grepl("20|INFO", consoleLevel))) {
-              if (!"basic.stdout" %in% names(logging::getLogger()[["handlers"]])) {
-                #basicConfig()
-                logging::addHandler(logging::writeToConsole, level = consoleLevel#,
-                           #formatter = spadesDefaultFormatter
-                )
-              }
-              logging::setLevel(consoleLevel, logging::getHandler(logging::writeToConsole))
-              #setLevel(consoleLevel, getHandler('basic.stdout'))
-            }
-
-          }
-          hasFile <- grepl("file", names(debug))
-          if (any(hasFile)) {
-            fileLevel <- if (!is.null(debug$file$level)) {
-              debug$file$level
-            } else {
-              "INFO"
-            }
-            if (!"writeToFile" %in% names(logging::getLogger()[["handlers"]])) {
-              if (is.null(debug$file$file))
-                debug$file$file <- "log.txt"
-              logging::addHandler(logging::writeToFile, file=debug$file$file, level = fileLevel)
-            }
-            logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
-            cat(file = debug$file$file, "##################################\n",
-                append = !isFALSE(debug$file$append)) # default append it TRUE
-          }
-          # with(getLogger(), names(handlers))
-
-          hasDebug <- grepl("debug", names(debug))
-          if (any(hasDebug)) {
-            debug <- debug$debug
+        logging::logReset()
+        if (is.null(names(debug))) stop("debug must be a named list if it is a list. See ?spades")
+        hasConsole <- grepl("console", names(debug))
+        if (any(hasConsole)) {
+          if (!is.list(debug$console)) stop("debug has an element named 'console', which is not a list.",
+                                            "Try 'debug = list(console = list())'")
+          consoleLevel <- if (!is.null(debug$console$level)) {
+            debug$console$level
           } else {
-            debug <- 1
+            "INFO"
+          }
+          if (!any(grepl("20|INFO", consoleLevel))) {
+            if (!"basic.stdout" %in% names(logging::getLogger()[["handlers"]])) {
+              #basicConfig()
+              logging::addHandler(logging::writeToConsole, level = consoleLevel#,
+                                  #formatter = spadesDefaultFormatter
+              )
+            }
+            logging::setLevel(consoleLevel, logging::getHandler(logging::writeToConsole))
+            #setLevel(consoleLevel, getHandler('basic.stdout'))
           }
 
         }
+        hasFile <- grepl("file", names(debug))
+        if (any(hasFile)) {
+          fileLevel <- if (!is.null(debug$file$level)) {
+            debug$file$level
+          } else {
+            "INFO"
+          }
+          if (!"writeToFile" %in% names(logging::getLogger()[["handlers"]])) {
+            if (is.null(debug$file$file))
+              debug$file$file <- "log.txt"
+            logging::addHandler(logging::writeToFile, file=debug$file$file, level = fileLevel)
+          }
+          logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
+          cat(file = debug$file$file, "##################################\n",
+              append = !isFALSE(debug$file$append)) # default append it TRUE
+        }
+        # with(getLogger(), names(handlers))
+
+        hasDebug <- grepl("debug", names(debug))
+        if (any(hasDebug)) {
+          debug <- debug$debug
+        } else {
+          debug <- 1
+        }
+
+
       } else {
         stop("debug cannot be a list unless logging package is installed: ",
              "install.packages('logging')")

@@ -316,3 +316,18 @@ Message <- function(mess, sim = NULL, file = NULL, ...) {
     cat(mess, file = file, append = TRUE, fill = TRUE, ...)
   }
 }
+
+needInstall <- function(pkg = "methods", minVersion = NULL,
+                        messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {
+  need <- FALSE
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    need <- TRUE
+  } else {
+    if (isTRUE(packageVersion(pkg) < minVersion))
+      need <- TRUE
+  }
+  if (need) {
+    stop(messageStart,
+         "install.packages('",pkg,"')")
+  }
+}

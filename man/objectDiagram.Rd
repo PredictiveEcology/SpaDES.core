@@ -13,11 +13,12 @@ objectDiagram(sim, ...)
 \item{sim}{A \code{simList} object (typically corresponding to a
 completed simulation).}
 
-\item{...}{Additional arguments passed to \code{mermaid}.
+\item{...}{Additional arguments passed to \code{DiagrammeR::mermaid}.
 Useful for specifying \code{height} and \code{width}.}
 }
 \value{
-Plots a sequence diagram, invisibly returning a \code{mermaid} object.
+Plots a sequence diagram, invisibly returning a
+  \code{DiagrammeR::mermaid} object.
 }
 \description{
 Create a sequence diagram illustrating the data object dependencies of a
@@ -25,7 +26,7 @@ simulation. Offers a more detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link{moduleDiagram}}.
 }
 \seealso{
-\code{\link[DiagrammeR]{mermaid}}.
+\code{DiagrammeR::mermaid}.
 }
 \author{
 Alex Chubaty
