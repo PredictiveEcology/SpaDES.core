@@ -1,6 +1,5 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-
 version 0.2.9
 =============
 
@@ -23,8 +22,6 @@ version 0.2.9
 
 * `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`; fixed in 758b9eb8ee74ef58c5451da1abda260c223a840c
 
-
-
 version 0.2.8
 =============
 
@@ -36,7 +33,6 @@ version 0.2.8
 ## bug fixes
 
 * `restartR` minor bug fixes
-
 
 version 0.2.7
 =============
