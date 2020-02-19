@@ -349,18 +349,17 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
        .reloadPkgs, .rndString, .attachedPkgsFilename, eval.promises = TRUE)
 
   if (isTRUE(Sys.getenv("RSTUDIO") == "1")) {
-    if (requireNamespace("rstudioapi")) {
-      lapply(setdiff(srch, vanillaPkgs), function(pkg)
-        detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
-      rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
+    needInstall("rstudioapi",
+                messageStart = "Running RStudio. To restart it this way, you must install: ")
 
-      # Need load to get custom .First fn
-      rstudioapi::restartSession(paste0("{load('", file, "'); ",
-                                        "sim <- .First(); ",
-                                        "sim <- eval(.spadesCall)}"))
-    } else {
-      message("Running RStudio. To restart it this way, you must run: install.packages('rstudioapi')")
-    }
+    lapply(setdiff(srch, vanillaPkgs), function(pkg)
+      detach(pkg, character.only = TRUE, unload = TRUE, force = TRUE))
+    rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
+
+    # Need load to get custom .First fn
+    rstudioapi::restartSession(paste0("{load('", .RDataFile, "'); ",
+                                      "sim <- .First(); ",
+                                      "sim <- eval(.spadesCall)}"))
   } else {
     #reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
     # R cmd line loads .RData first, then .First, if there is one.

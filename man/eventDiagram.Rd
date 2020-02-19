@@ -49,7 +49,7 @@ A red vertical line corresponding to the current date may appear on the figure.
 This is useful for Gantt Charts generally but can be considered a 'bug' here.
 }
 \seealso{
-\code{\link[DiagrammeR]{mermaid}}.
+\code{DiagrammeR::mermaid}.
 }
 \author{
 Alex Chubaty

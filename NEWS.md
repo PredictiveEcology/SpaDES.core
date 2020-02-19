@@ -1,21 +1,6 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 0.2.9.9000
-=============
-
-## dependencies
-
-* `qs` now used for improved object serialization to disk
-
-## new features
-
-* `restartR` saves simulation objects using `qs::qsave()` which is faster and creates smaller file sizes.
-
-## bug fixes
-
-* none
-
-version 0.2.9
+version 1.0.0
 =============
 
 ## new features
@@ -23,11 +8,16 @@ version 0.2.9
 * several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting `options('spades.recoveryMode' = 0)` may further help
 * Updates to deal with new backend with `reproducible`
 * better assertions inside list elements of `simInit`, e.g., `simInit(times = list(start = "test"))` now fails because times must be a list of 2 `numeric` objects
+* messaging is now all with `message` instead of a mixture of `message`, `cat` and `print`.
+  This allows for easier suppressing of messaging, e.g., via `suppressMessages`.
+  This was requested in a downstream package, `SpaDES.experiment` that was submitted to CRAN but rejected due to the now former inability to suppress messages.
+* `restartR` saves simulation objects using `qs::qsave()` which is faster and creates smaller file sizes.
 
 ## dependencies
 
 * moved packages from Imports to Suggests: `codetools`, `future`, `httr`, `logging`, and `tcltk`
 * removed `archivist`
+* `qs` now used for improved object serialization to disk
 
 ## deprecated
 
