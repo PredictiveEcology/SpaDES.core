@@ -509,7 +509,7 @@ test_that(\"test Event1 and Event2.\", {
 #' @rdname openModules
 #'
 #' @examples
-#' \dontrun{openModules("~\SpaDESModules")}
+#' \dontrun{openModules("~/path/to/my/modules")}
 #'
 setGeneric("openModules", function(name, path) {
   standardGeneric("openModules")
