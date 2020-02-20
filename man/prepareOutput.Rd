@@ -12,7 +12,7 @@
 \item{cacheRepo}{A repository used for storing cached objects.
 This is optional if \code{Cache} is used inside a SpaDES module.}
 
-\item{...}{Arguments of \code{FUN} function .}
+\item{...}{Arguments passed to \code{FUN}}
 }
 \description{
 See \code{\link[reproducible]{.prepareOutput}}.

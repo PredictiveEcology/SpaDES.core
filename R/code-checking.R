@@ -48,7 +48,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
 #' LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 #' scans for all functions (i.e., "globals") being used. This is similar to
-#' \code{\link[codetools]{findGlobals}}, but faster.
+#' \code{codetools::findGlobals}, but faster.
 #'
 #' @return
 #' A character string with all sim objects found
@@ -247,9 +247,10 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' Runs a series of code checks during simInit
 #'
-#' This uses codetools::codeCheck for function consistency, and
-#' codetools::findGlobals to check for function collisions with known,
-#' common function collisions (raster::stack, raster::scale)
+#' This uses custom tools and some optional tools in \code{codetools}
+#' package to check for function collisions with known,
+#' common function collisions (raster::stack, raster::scale).
+#' All outputs will be sent as messages.
 #'
 #' @param sim simList
 #' @param m module name
@@ -409,8 +410,10 @@ cantCodeCheckMessage <- ": line could not be checked "
     getOption("spades.moduleCodeChecks")
   }
 
+  needInstall("codetools",
+              messageStart = "Some code checking can't be done with codetools package: ")
   checkUsageMsg <- capture.output(
-    do.call(checkUsageEnv, args = append(list(env = sim@.xData[[m]]), checks))
+    do.call(codetools::checkUsageEnv, args = append(list(env = sim@.xData[[m]]), checks))
   )
   checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
                         invert = TRUE, value = TRUE)
@@ -418,8 +421,6 @@ cantCodeCheckMessage <- ": line could not be checked "
     hadPrevMessage <- unique(unlist(lapply(checkUsageMsg, function(x)
       .parseMessage(m, "module code", message = x))))
   }
-
-
 
   #############################################################
   #######  Conflicting Functions ##############################

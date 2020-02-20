@@ -85,7 +85,7 @@ See more details below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -272,7 +272,7 @@ in the first <code>modulePath</code>, then if it doesn't find it, in the second 
 columns with following column names: <code>objectName</code> (character, required),
 <code>file</code> (character), <code>fun</code> (character), <code>package</code> (character),
 <code>interval</code> (numeric), <code>loadTime</code> (numeric).
-See <code><a href='simList-accessors-inout.html'>inputs</a></code> and vignette("ii-modules") section about inputs.</p></td>
+See <code><a href='simList-accessors-inputs.html'>inputs</a></code> and vignette("ii-modules") section about inputs.</p></td>
     </tr>
     <tr>
       <th>outputs</th>
@@ -283,7 +283,7 @@ columns with following column names: <code>objectName</code> (character, require
 <code>eventPriority</code> is not set, it defaults to <code><a href='priority.html'>.last()</a></code>. If <code>eventPriority</code>
 is set to a low value, e.g., 0, 1, 2 and <code>saveTime</code> is <code><a href='simList-accessors-times.html'>start(sim)</a></code>,
 it should give "initial conditions".</p>
-<p>See <code><a href='simList-accessors-inout.html'>outputs</a></code> and
+<p>See <code><a href='simList-accessors-outputs.html'>outputs</a></code> and
 <code><a href='../articles/ii-modules.html'>vignette("ii-modules")</a></code> section about outputs.</p></td>
     </tr>
     <tr>
@@ -415,7 +415,7 @@ Please see the vignette dedicated to this topic.</p>
 
     <div class='dont-index'><p><code><a href='spades.html'>spades</a></code>,
 <code><a href='simList-accessors-times.html'>times</a></code>, <code><a href='params.html'>params</a></code>, <code><a href='objects.html'>objs</a></code>, <code><a href='simList-accessors-paths.html'>paths</a></code>,
-<code><a href='simList-accessors-modules.html'>modules</a></code>, <code><a href='simList-accessors-inout.html'>inputs</a></code>, <code><a href='simList-accessors-inout.html'>outputs</a></code></p></div>
+<code><a href='simList-accessors-modules.html'>modules</a></code>, <code><a href='simList-accessors-inputs.html'>inputs</a></code>, <code><a href='simList-accessors-outputs.html'>outputs</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -476,13 +476,13 @@ Please see the vignette dedicated to this topic.</p>
  )
 
  <span class='co'># add by accessor is equivalent</span>
- <span class='fu'><a href='simList-accessors-inout.html'>inputs</a></span>(<span class='no'>mySim2</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
+ <span class='fu'><a href='simList-accessors-inputs.html'>inputs</a></span>(<span class='no'>mySim2</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
      <span class='kw'>files</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>mapPath</span>), <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"tif"</span>)[<span class='fl'>1</span>:<span class='fl'>2</span>],
      <span class='kw'>functions</span> <span class='kw'>=</span> <span class='st'>"raster"</span>,
      <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"raster"</span>,
      <span class='kw'>loadTime</span> <span class='kw'>=</span> <span class='fl'>1</span>,
      <span class='kw'>stringsAsFactors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
- <span class='fu'><a href='simList-accessors-inout.html'>outputs</a></span>(<span class='no'>mySim2</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
+ <span class='fu'><a href='simList-accessors-outputs.html'>outputs</a></span>(<span class='no'>mySim2</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
      <span class='fu'><a href='https://rdrr.io/r/base/expand.grid.html'>expand.grid</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"caribou"</span>, <span class='st'>"landscape"</span>),
      <span class='kw'>saveTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>2</span>,
      <span class='kw'>stringsAsFactors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))

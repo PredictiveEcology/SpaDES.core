@@ -10,7 +10,7 @@ memoryUseThisSession(thisPid)
 memoryUse(sim, max = TRUE)
 }
 \arguments{
-\item{thisPid}{Numeric or Integer, the PID of the process. If omitted, it will
+\item{thisPid}{Numeric or integer, the PID of the process. If omitted, it will
 be found with \code{Sys.getpid()}}
 
 \item{sim}{A completed simList}
@@ -22,8 +22,8 @@ the raw memory used during each event will be shown.}
 \description{
 This will give a slightly different estimate than \code{pryr::mem_used},
 which uses \code{gc()} internally. The purpose of this function is
-to allow continuous monitoring, external to the R session. Normally,
-this is run in a different session.
+to allow continuous monitoring, external to the R session.
+Normally, this is run in a different session.
 
 This will only work if the user has specified before running
 the \code{spades} call, set the interval, in seconds, that ps is

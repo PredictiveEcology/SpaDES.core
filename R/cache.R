@@ -33,6 +33,8 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
+    browser(expr = exists("._robustDigest_1"))
+
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -259,25 +261,25 @@ setMethod(
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
-          cat(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
         } else if (!is.na(fromMemoise)) {
-          cat(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
+          message(crayon::blue("  Using cached copy of", cur$moduleName, "module\n",
                            "adding to memoised copy\n"))
         } else {
-          cat(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("  Using ", fromWhere," copy of", cur$moduleName, "module\n"))
         }
       } else {
         if (isTRUE(fromMemoise)) {
-          cat(crayon::blue("  Using memoised copy of", cur$eventType, "event in",
+          message(crayon::blue("  Using memoised copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
 
         } else if (!is.na(fromMemoise)) {
-          cat(crayon::blue("  Using cached copy of", cur$eventType, "event in",
+          message(crayon::blue("  Using cached copy of", cur$eventType, "event in",
                            cur$moduleName, "module. ",
                            if (fromMemoise) "Adding to memoised copy.",
                            "\n"))
         } else {
-          cat(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
+          message(crayon::blue("  Using ", fromWhere," copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
         }
 
@@ -444,6 +446,7 @@ setMethod(
   signature = "simList",
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
+    browser(expr = exists("._prepareOutput_5"))
     tmpl <- .findSimList(tmpl)
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
@@ -484,8 +487,11 @@ setMethod(
 
         currModules <- currentModule(tmpl[[whSimList]])
         # Convert to numeric index, as some modules don't have names
-        hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
-        if (length(currModules) == 0) currModules <- modules(tmpl[[whSimList]])
+
+        # hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
+        namesAllMods <- names(tmpl[[whSimList]]@depends@dependencies)
+        hasCurrModule <- match(currModules, names(tmpl[[whSimList]]@depends@dependencies))
+        if (length(currModules) == 0) currModules <- namesAllMods
 
         createOutputs <- if (length(hasCurrModule)) {
           tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
@@ -555,6 +561,17 @@ setMethod(
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
         keepFromOrig <- !(lsOrigEnv %in% ls(object2@.xData, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.xData)
+
+        if (exists("objectSynonyms", envir = object2@.xData)) {
+          objSyns <- lapply(attr(object2$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+          # must remove the "other ones" first
+          objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
+          objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = object2@.xData))
+          if (any(objNonCanonicalExist))
+            rm(list = objNonCanonical[objNonCanonicalExist], envir = object2@.xData)
+          suppressMessages(objectSynonyms(synonyms = objSyns, envir = object2@.xData))
+        }
+
       }
       if (!is.null(attr(object, "removedObjs"))) {
         if (length(attr(object, "removedObjs"))) {
@@ -627,7 +644,7 @@ setMethod(
   definition = function(object, outputObjects, FUN, preDigestByClass) {
     if (!is.null(outputObjects)) {
       outputToSave <- object
-      outputToSave@.xData <- new.env()
+      outputToSave@.xData <- new.env(parent = emptyenv())
       outputToSave@.envir <- outputToSave@.xData
       # Some objects are conditionally produced from a module's outputObject
       whExist <- outputObjects %in% ls(object@.xData, all.names = TRUE)
@@ -659,32 +676,6 @@ setMethod(
     outputToSave
 })
 
-if (!isGeneric(".objSizeInclEnviros")) {
-  setGeneric(".objSizeInclEnviros", function(object) {
-    standardGeneric(".objSizeInclEnviros")
-  })
-}
-
-#' \code{.objSizeInclEnviros} for \code{simList} objects
-#'
-#' See \code{\link[reproducible]{.objSizeInclEnviros}}.
-#'
-#' @inheritParams reproducible::.objSizeInclEnviros
-#'
-#' @export
-#' @exportMethod .objSizeInclEnviros
-#' @importFrom reproducible .objSizeInclEnviros
-#' @importFrom utils object.size
-#' @importMethodsFrom reproducible .objSizeInclEnviros
-#' @include simList-class.R
-#' @rdname objSizeInclEnviros
-#' @seealso \code{\link[reproducible]{.objSizeInclEnviros}}
-setMethod(
-  ".objSizeInclEnviros",
-  signature = "simList",
-  definition = function(object) {
-    object.size(as.list(object@.xData, all.names = TRUE)) + object.size(object)
-})
 
 #' Find \code{simList} in a nested list
 #'
@@ -719,7 +710,7 @@ if (!exists("objSize")) {
 #' Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
 #' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-#' \code{object.size(completed(sim))}.
+#' \code{objSize(completed(sim))}.
 #'
 #' @export
 #' @importFrom reproducible objSize
@@ -728,14 +719,14 @@ if (!exists("objSize")) {
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
-#' object.size(a)
+#' utils::object.size(a)
 objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE),
                             enclosingEnvs = TRUE, .prevEnvirs = list(), ...) {
   xObjName <- deparse(substitute(x))
   aa <- objSize(x@.xData, quick = quick, ...)
   bb <- as(x, "simList_")
   bb@.Data <- list()
-  bbOs <- list(simList = object.size(bb))
+  bbOs <- list(simListWithoutObjects = objSize(bb))
   aa <- append(aa, bbOs)
   return(aa)
 }
@@ -797,7 +788,7 @@ unmakeMemoisable.simList_ <- function(x) {
 if (!isGeneric("clearCache")) {
   setGeneric(
     "clearCache",
-    function(x, userTags = character(), after, before,
+    function(x, userTags = character(), after = NULL, before = NULL,
              ask = getOption("reproducible.ask"),
              useCloud = FALSE,
              cloudFolderID = NULL, ...) {
@@ -811,6 +802,9 @@ if (!isGeneric("clearCache")) {
 #' This will take the \code{cachePath(object)} and pass
 #' @export
 #'
+#' @param conn A \code{DBIConnection} object, as returned by \code{dbConnect()}.
+#' @param drv an object that inherits from \code{DBIDriver}, or an existing
+#'     \code{DBIConnection} object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #' @importFrom reproducible clearCache
 #' @importMethodsFrom reproducible clearCache
@@ -818,9 +812,10 @@ if (!isGeneric("clearCache")) {
 setMethod(
   "clearCache",
   signature = "simList",
-  definition = function(x, userTags, after, before, ask, useCloud = FALSE,
+  definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
                         cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
-                        ...) {
+                        drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                        conn = getOption("reproducible.conn", NULL), ...) {
     x <- x@paths$cachePath
     clearCache(x = x, userTags = userTags, after = after, before = before,
                ask = ask, useCloud = useCloud,
@@ -829,7 +824,8 @@ setMethod(
 })
 
 if (!isGeneric("showCache")) {
-  setGeneric("showCache", function(x, userTags = character(), after, before, ...) {
+  setGeneric("showCache", function(x, userTags = character(),
+                                   after = NULL, before = NULL, ...) {
     standardGeneric("showCache")
   })
 }
@@ -845,14 +841,15 @@ if (!isGeneric("showCache")) {
 setMethod(
   "showCache",
   signature = "simList",
-  definition = function(x, userTags, after, before, ...) {
+  definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
     showCache(x = x, userTags = userTags, after = after, before = before,
                ...)
   })
 
 if (!isGeneric("keepCache")) {
-  setGeneric("keepCache", function(x, userTags = character(), after, before, ...) {
+  setGeneric("keepCache", function(x, userTags = character(),
+                                   after = NULL, before = NULL, ...) {
     standardGeneric("keepCache")
   })
 }
@@ -868,7 +865,7 @@ if (!isGeneric("keepCache")) {
 setMethod(
   "keepCache",
   signature = "simList",
-  definition = function(x, userTags, after, before, ...) {
+  definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
     keepCache(x = x, userTags = userTags, after = after, before = before,
                ...)

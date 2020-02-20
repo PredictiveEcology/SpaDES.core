@@ -1,4 +1,4 @@
-## ----examples, echo=TRUE, message=FALSE----------------------------------
+## ----examples, echo=TRUE, message=FALSE---------------------------------------
 library(magrittr)
 library(raster)
 library(reproducible)
@@ -16,20 +16,20 @@ mySim <- simInit(
   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
 options(opts)
 
-## ----spades--------------------------------------------------------------
+## ----spades-------------------------------------------------------------------
 # compare caching ... run once to create cache
 system.time({
   outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
 })
 
-## ----spades-cached-------------------------------------------------------
+## ----spades-cached------------------------------------------------------------
 # vastly faster 2nd time
 system.time({
   outSimCached <- spades(Copy(mySim), cache = TRUE)
 })
 all.equal(outSim, outSimCached) 
 
-## ----module-level, echo=TRUE---------------------------------------------
+## ----module-level, echo=TRUE--------------------------------------------------
 # Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
 system.time({
@@ -42,14 +42,14 @@ system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
 
-## ----test-module-level---------------------------------------------------
+## ----test-module-level--------------------------------------------------------
 layers <- list("DEM", "forestAge", "habitatQuality", "percentPine", "Fires")
 same <- lapply(layers, function(l)
   identical(randomSim$landscape[[l]], randomSimCached$landscape[[l]]))
 names(same) <- layers
 print(same) # Fires is not same because all non-init events in fireSpread are not cached
 
-## ----event-level, echo=TRUE----------------------------------------------
+## ----event-level, echo=TRUE---------------------------------------------------
 params(mySim)$fireSpread$.useCache <- "init"
 system.time({
   randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
@@ -61,7 +61,7 @@ system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
 
-## ----function-level, echo=TRUE-------------------------------------------
+## ----function-level, echo=TRUE------------------------------------------------
 ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
 system.time({
   map <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim),
@@ -75,25 +75,24 @@ system.time({
 
 all.equal(map, mapCached) 
 
-## ----manual-cache--------------------------------------------------------
-# examine a part of the Cache
-showCache(mySim)[tagKey == "function", -c("artifact")]
+## ----manual-cache-------------------------------------------------------------
+cacheDB <- showCache(mySim)
+# examine only the functions that have been cached
+cacheDB[tagKey == "function"]
 
-if (requireNamespace("archivist")) {
-  # get the RasterLayer that was produced with the gaussMap function:
-  map <- unique(showCache(mySim, userTags = "gaussMap")$artifact) %>%
-    archivist::loadFromLocalRepo(repoDir = cachePath(mySim), value = TRUE)
-  clearPlot()
-  Plot(map)
-}
+# get the RasterLayer that was produced with the gaussMap function:
+map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "gaussMap"]$cacheId)
 
-## ---- eval=FALSE, echo=TRUE----------------------------------------------
+clearPlot()
+Plot(map)
+
+## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 #  simInit --> many .inputObjects calls
 #  
 #  spades call --> many module calls --> many event calls --> many function calls
 #  
 
-## ---- eval=FALSE, echo=TRUE----------------------------------------------
+## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 #  parameters = list(
 #    FireModule = list(.useCache = TRUE)
 #  )

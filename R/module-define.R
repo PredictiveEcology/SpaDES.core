@@ -10,10 +10,15 @@ moduleDefaults <- list(
   name = NA_character_,
   description = "",
   keywords = "",
-  authors = getOption("devtools.desc.author",
+  authors = {
+    pers = getOption("devtools.desc.author",
                       person(c("First", "Middle"), "Last",
                              email = "email@example.com",
-                             role = c("aut", "cre"))),
+                             role = c("aut", "cre")))
+    if (!is(pers, "person"))
+      pers <- tryCatch(eval(parse(text = pers)), error = function(e) pers)
+    pers
+    },
   childModules = character(0),
   version = "0.0.0.9000", ## numeric_versions don't deparse well
   extent = quote(raster::extent(rep(NA_real_, 4))),

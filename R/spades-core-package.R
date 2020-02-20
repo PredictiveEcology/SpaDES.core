@@ -506,6 +506,8 @@
 #'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
 #' }
 #'
+#' @seealso \code{\link{spadesOptions}}
+#'
 #' @import igraph
 #' @import methods
 #' @rdname SpaDES.core-package

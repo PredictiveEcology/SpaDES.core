@@ -81,7 +81,7 @@ This will take the cachePath(object) and pass" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -156,24 +156,36 @@ This will take the cachePath(object) and pass" />
 <span class='fu'>clearCache</span>(
   <span class='no'>x</span>,
   <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='no'>after</span>,
-  <span class='no'>before</span>,
+  <span class='kw'>after</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>before</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ask</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.ask"</span>),
   <span class='kw'>useCloud</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>cloudFolderID</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.cloudFolderID"</span>, <span class='kw'>NULL</span>),
+  <span class='kw'>drv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>()),
+  <span class='kw'>conn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
   <span class='no'>...</span>
 )
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>showCache</span>(<span class='no'>x</span>, <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='no'>after</span>, <span class='no'>before</span>, <span class='no'>...</span>)
+<span class='fu'>showCache</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>after</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>before</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>drv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>()),
+  <span class='kw'>conn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for simList</span>
 <span class='fu'>keepCache</span>(
   <span class='no'>x</span>,
   <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='no'>after</span>,
-  <span class='no'>before</span>,
+  <span class='kw'>after</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>before</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ask</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.ask"</span>),
+  <span class='kw'>drv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>()),
+  <span class='kw'>conn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
   <span class='no'>...</span>
 )</pre>
 
@@ -228,6 +240,15 @@ If left as <code>NULL</code>, the function will create a cloud folder with a war
 The warning will have the <code>cloudFolderID</code> that should be used in subsequent calls.
 It will also be added to <code><a href='https://rdrr.io/r/base/options.html'>options("reproducible.cloudFolderID")</a></code>,
 but this will not persist across sessions.</p></td>
+    </tr>
+    <tr>
+      <th>drv</th>
+      <td><p>an object that inherits from <code>DBIDriver</code>, or an existing
+<code>DBIConnection</code> object (in order to clone an existing connection).</p></td>
+    </tr>
+    <tr>
+      <th>conn</th>
+      <td><p>A <code>DBIConnection</code> object, as returned by <code>dbConnect()</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>

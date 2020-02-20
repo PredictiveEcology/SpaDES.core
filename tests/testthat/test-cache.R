@@ -25,13 +25,13 @@ test_that("test event-level cache", {
 
   set.seed(1123)
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output({
+                capture_messages({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                 }))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
-  mess1 <- capture_output({
+  mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = FALSE)
   })
   expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
@@ -77,7 +77,7 @@ test_that("test module-level cache", {
   set.seed(1123)
   pdf(tmpfile)
   expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output({
+                  capture_messages({
                     sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                   })))
   dev.off()
@@ -91,7 +91,7 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile1)
-  mess1 <- capture_output({
+  mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = FALSE)
   })
   dev.off()
@@ -180,7 +180,9 @@ test_that("test .robustDigest for simLists", {
   expect_true(all(grepl(msgGrep, mess1)))
 
   msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
-  a <- capture.output(expect_message(do.call(simInit, args), regexp = msgGrep))
+  #a <- capture.output(
+  expect_message(do.call(simInit, args), regexp = msgGrep)
+  #)
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -191,7 +193,8 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
-  expect_message(do.call(simInit, args), regexp = msgGrep, all = TRUE)
+  mess1 <- capture_messages(do.call(simInit, args))
+  expect_true(all(grepl(msgGrep, mess1)))
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
   xxx <- readLines(fileName)
@@ -212,7 +215,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  expect_message(spades(bbb), regexp = "Using cached copy of init", all = FALSE)
 
   # make a change in Init function
   xxx <- readLines(fileName)
@@ -229,7 +232,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  expect_message(spades(bbb), regexp = "Using cached copy of init", all = FALSE)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
@@ -244,32 +247,33 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # accepts character string
   aa <- .checkCacheRepo(tmpCache, create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # uses .getPaths during simInit
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   justAPath <- tmpCache ;
   options("reproducible.cachePath" = justAPath)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # accepts character string
   aa <- .checkCacheRepo(tmpCache, create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # uses .getPaths during simInit
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
+
 })
 
 test_that("test objSize", {
@@ -283,7 +287,7 @@ test_that("test objSize", {
   expect_true(length(os) == 5) # 4 objects, the environment, the rest
 })
 
-test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
+test_that("Cache sim objs via .Cache attr", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
@@ -364,13 +368,13 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
   # Try again, hi should be there
   expect_true(is.null(mySim$test$hi)) # is not in the
-  mess1 <- capture_output({
+  mess1 <- capture_messages(
     mySim2 <- spades(Copy(mySim))
-  })
+  )
   expect_true(mySim2$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
-  expect_true(grepl("Using cached copy", mess1))
+  expect_true(any(grepl("Using cached copy", mess1)))
 })
 
 
@@ -405,7 +409,12 @@ test_that("test showSimilar", {
   params(mySim)$randomLandscapes$nx <- 101
   mess <- capture_messages(out2 <- spades(Copy(mySim)))#, showSimilar = TRUE)
   mySim$a <- 1
-  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  expect_true(any(grepl("This call to cache differs", mess)))
   mySim$a <- 2
-  out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  expect_true(any(grepl("This call to cache differs", mess)))
+  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  expect_false(any(grepl("This call to cache differs", mess)))
+
 })

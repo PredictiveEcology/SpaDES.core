@@ -81,7 +81,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -196,8 +196,8 @@ instead of `data.frame` to implement the event queue (because it is much faster)
     </tr>
     <tr>
       <th>debug</th>
-      <td><p>Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+      <td><p>Optional tools for invoking debugging. Supplying a <code>list</code>
+will invoke the more powerful <code>logging</code> package. See details.
 Default is to use the value in <code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.debug")</a></code>.</p></td>
     </tr>
     <tr>
@@ -226,7 +226,7 @@ parameter for all modules. See Details.</p></td>
     </tr>
     <tr>
       <th>notOlderThan</th>
-      <td><p>Date or time. Passed to <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>reproducible::Cache</a></code> to update the cache.
+      <td><p>Date or time. Passed to <code><a href='https://reproducible.predictiveecology.org/reference/cache.html'>reproducible::Cache</a></code> to update the cache.
 Default is <code>NULL</code>, meaning don't update the cache.
 If <code><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time()</a></code> is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
@@ -276,6 +276,34 @@ See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https:/
     
 
 
+<p>The most powerful way to use debug is to invoke the <code>logging</code>
+R package. To invoke this, <code>debug</code> must be a list with up to 3
+named elements:
+<code>console</code>, <code>file</code>, and <code>debug</code>. Each of these list elements
+must be a list (including empty <code><a href='https://rdrr.io/r/base/list.html'>list()</a></code> for defaults) with the
+sub-list elements here:</p><table class='table'>
+<tr><td><code>console</code></td><td><code>level</code></td><td>The <code>level</code>, see below, of information shown</td></tr>
+<tr><td><code>file</code></td><td><code>append</code></td><td>Logical. If <code>TRUE</code>, the default, then
+                                      log entries are appended to file, if it exists</td></tr>
+<tr><td></td><td><code>file</code></td><td>A filename. Defaults to <code>log.txt</code></td></tr>
+<tr><td></td><td><code>level</code></td><td>The <code>level</code>, see below, of information shown</td></tr>
+<tr><td><code>debug</code></td><td>See possible values below</td><td></td></tr>
+</table>
+
+
+<p><code>level</code> can be a number from 0 to 100 or a character string matching one
+of the values in <code><a href='https://rdrr.io/pkg/logging/man/loglevels.html'>logging::loglevels</a></code>. These are hierarchical levels of
+information passed to the console. Set a lower number for more information and a
+higher number for less information. Errors in code will be shown if <code>level</code>
+is set to <code>"ERROR"</code> or <code>40</code> or above; warnings in code will be shown if
+<code>level</code> is set to <code>"WARN"</code> or <code>30</code> or above;
+normal messages in code will
+be shown if <code>level</code> is set to <code>"INFO"</code> or <code>20</code> or above. For
+consistency with base R messaging, if default level is used, then normal
+messaging via <code>message</code> will be shown; this means that <code>suppressMessages</code>
+will work to suppress messaging only when level is set to <code>"INFO"</code> or <code>20</code>.
+Some functions in the SpaDES ecosystem may have information at the lower levels,
+but currently, there are few to none.</p>
 <p><code>debug</code> can be a logical, character vector or a numeric scalar (currently
 1 or 2).
 If <code>debug</code> is specified and is not <code>FALSE</code>, 2 things could happen:
@@ -321,7 +349,7 @@ runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>,
 <code><a href='simInit.html'>simInit</a></code>, and the caching vignette (very important for reproducibility):
 <a href='https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html</a> which
-uses <code><a href='http://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code>.</p></div>
+uses <code><a href='https://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

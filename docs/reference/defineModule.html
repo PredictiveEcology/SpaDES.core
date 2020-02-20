@@ -81,7 +81,7 @@ values set to defaults" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -230,9 +230,9 @@ in which to replace element(s).</p></td>
 <tr><td></td><td><code>reqdPkgs</code></td></tr>
 <tr><td>List of R package names required by the module. These
                         packages will be loaded when <code>simInit</code> is called.
-                        <code><a href='http://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
+                        <code><a href='https://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
                         to load if available, and install if not available.
-                        Because <code><a href='http://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
+                        Because <code><a href='https://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
                         GitHub.com, these packages can specify package names stored
                         on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr>
 <tr><td>A data.frame specifying the parameters used in the module.
@@ -241,7 +241,7 @@ in which to replace element(s).</p></td>
                           the default values that will be used unless a module user
                           overrides them with the <code>params</code> argument in the
                           <code><a href='simInit.html'>simInit</a></code> call. The minimum and maximum are
-                          currently used by the <code><a href='http://spades-shiny.predictiveecology.org/reference/shine.html'>SpaDES.shiny::shine</a></code> function and the
+                          currently used by the <code>SpaDES.shiny::shine</code> function and the
                           <code>POM</code> function, and they should indicate the range
                           of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr>
 <tr><td>A <code>data.frame</code> specifying the data objects expected as

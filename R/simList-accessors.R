@@ -835,19 +835,22 @@ setReplaceMethod("progressType",
 })
 
 ################################################################################
-#' Inputs and outputs
+#' Simulation inputs
 #'
-#' These functions are one of three mechanisms to add the information about which
-#' input files to load in a \code{spades} call and the information about which
-#' output files to save. 1) As arguments to a \code{simInit} call. Specifically, \code{inputs}
-#' or \code{outputs}. See \code{?simInit}. 2) With the \code{inputs(simList)} or \code{outputs(simList)}
-#' function call.
-#' 3) By adding a function called \code{.inputObjects} inside a module, which will be executed
-#' during the \code{simInit} call. This last way is the most "modular" way to create
-#' default data sets for your model. See below for more details.
+#' Accessor functions for the \code{inputs} slots in a \code{simList} object.
 #'
-#' Accessor functions for the \code{inputs} and \code{outputs} slots in a
-#' \code{simList} object.
+#' These functions are one of three mechanisms to add the information about which input files
+#' to load in a \code{spades} call.
+#' \enumerate{
+#'   \item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
+#'         See \code{?simInit}.
+#'   \item With the \code{outputs(simList)} function call.
+#'   \item By adding a function called \code{.inputObjects} inside a module, which will be executed
+#'         during the \code{simInit} call. This last way is the most "modular" way to create
+#'         default data sets for your model.
+#' }
+#'
+#' See below for more details.
 #'
 #' @section inputs function or argument in \code{simInit}:
 #'
@@ -932,91 +935,14 @@ setReplaceMethod("progressType",
 #' @export
 #' @name inputs
 #' @aliases simList-accessors-inout
-#' @rdname simList-accessors-inout
-#' @examples
-#' #######################
-#' # inputs
-#' #######################
-#'
-#' # Start with a basic empty simList
-#' sim <- simInit()
-#'
-#' test <- 1:10
-#' library(igraph) # for %>%
-#' library(reproducible) # for checkPath
-#' tmpdir <- file.path(tempdir(), "inputs") %>% checkPath(create = TRUE)
-#' tmpFile <- file.path(tmpdir, "test.rds")
-#' saveRDS(test, file = tmpFile)
-#' inputs(sim) <- data.frame(file = tmpFile) # using only required column, "file"
-#' inputs(sim) # see that it is not yet loaded, but when it is scheduled to be loaded
-#' simOut <- spades(sim)
-#' inputs(simOut) # confirm it was loaded
-#' simOut$test
-#'
-#' # can put data.frame for inputs directly inside simInit call
-#' allTifs <- dir(system.file("maps", package = "quickPlot"),
-#'                full.names = TRUE, pattern = "tif")
-#'
-#' # next: .objectNames are taken from the filenames (without the extension)
-#' # This will load all 5 tifs in the SpaDES sample directory, using
-#' #   the raster fuction in the raster package, all at time = 0
-#' if (require("rgdal", quietly = TRUE)) {
-#'   sim <- simInit(
-#'     inputs = data.frame(
-#'       files = allTifs,
-#'       functions = "raster",
-#'       package = "raster",
-#'       loadTime = 0,
-#'       stringsAsFactors = FALSE)
-#'     )
-#'
-#'   ##############################
-#'   #A fully described inputs object, including arguments:
-#'   files <- dir(system.file("maps", package = "quickPlot"),
-#'                full.names = TRUE, pattern = "tif")
-#'   # arguments must be a list of lists. This may require I() to keep it as a list
-#'   #   once it gets coerced into the data.frame.
-#'   arguments = I(rep(list(native = TRUE), length(files)))
-#'   filelist = data.frame(
-#'      objectName = paste0("Maps", 1:5),
-#'      files = files,
-#'      functions = "raster::raster",
-#'      arguments = arguments,
-#'      loadTime = 0,
-#'      intervals = c(rep(NA, length(files) - 1), 10)
-#'   )
-#'   inputs(sim) <- filelist
-#'   spades(sim)
-#' }
-#'
-#'   # Example showing loading multiple objects from global environment onto the
-#'   #   same object in the simList, but at different load times
-#'   a1 <- 1
-#'   a2 <- 2
-#'   # Note arguments must be a list of NROW(inputs), with each element itself being a list,
-#'   #  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time
-#'   args <- lapply(1:2, function(x) {
-#'                  list(x = paste0("a", x),
-#'                       envir = environment()) # may be necessary to specify in which envir a1, a2
-#'                                              # are located, if not in an interactive sessino
-#'                  })
-#'   inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
-#'   a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
-#'   a <- spades(a)
-#'   identical(a1, a$a)
-#'
-#'   end(a) <- 3
-#'   a <- spades(a) # different object (a2) loaded onto a$a
-#'   identical(a2, a$a)
-#'
-#' # Clean up after
-#' unlink(tmpdir, recursive = TRUE)
+#' @rdname simList-accessors-inputs
+#' @example inst/examples/example_inputs.R
 setGeneric("inputs", function(sim) {
   standardGeneric("inputs")
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 setMethod("inputs",
           signature = "simList",
           definition = function(sim) {
@@ -1046,7 +972,7 @@ setMethod("inputs",
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 setGeneric("inputs<-",
            function(sim, value) {
              standardGeneric("inputs<-")
@@ -1054,7 +980,7 @@ setGeneric("inputs<-",
 
 #' @name inputs<-
 #' @aliases inputs<-,simList-method
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 #' @export
 setReplaceMethod(
   "inputs",
@@ -1125,6 +1051,22 @@ setReplaceMethod(
 })
 
 ################################################################################
+#' Simulation outputs
+#'
+#' Accessor functions for the \code{outputs} slots in a \code{simList} object.
+#'
+#' These functions are one of three mechanisms to add information about which output files to save.
+#' \enumerate{
+#'   \item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
+#'         See \code{?simInit}.
+#'   \item With the \code{outputs(simList)} function call.
+#'   \item By adding a function called \code{.inputObjects} inside a module, which will be executed
+#'         during the \code{simInit} call. This last way is the most "modular" way to create
+#'         default data sets for your model.
+#' }
+#'
+#' See below for more details.
+#'
 #' @section outputs function or argument in \code{simInit}:
 #'
 #' \code{outputs} accepts a data.frame similar to the \code{inputs} data.frame, but
@@ -1172,85 +1114,15 @@ setReplaceMethod(
 #' @importFrom stats na.omit
 #' @importFrom tools file_ext file_path_sans_ext
 #' @name outputs
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-outputs
 #'
-#' @examples
-#'
-#' #######################
-#' # outputs
-#' #######################
-#'
-#' library(igraph) # for %>%
-#' tmpdir <- file.path(tempdir(), "outputs") %>% checkPath(create = TRUE)
-#' tmpFile <- file.path(tmpdir, "temp.rds")
-#' tempObj <- 1:10
-#'
-#' # Can add data.frame of outputs directly into simInit call
-#' sim <- simInit(objects = c("tempObj"),
-#'                outputs = data.frame(objectName = "tempObj"),
-#'                paths = list(outputPath = tmpdir))
-#' outputs(sim) # To see what will be saved, when, what filename
-#' sim <- spades(sim)
-#' outputs(sim) # To see that it was saved, when, what filename
-#'
-#' # Also can add using assignment after a simList object has been made
-#' sim <- simInit(objects = c("tempObj"), paths = list(outputPath = tmpdir))
-#' outputs(sim) <- data.frame(objectName = "tempObj", saveTime = 1:10)
-#' sim <- spades(sim)
-#' outputs(sim) # To see that it was saved, when, what filename.
-#'
-#' # can do highly variable saving
-#' tempObj2 <- paste("val",1:10)
-#' df1 <- data.frame(col1 = tempObj, col2 = tempObj2)
-#' sim <- simInit(objects = c("tempObj", "tempObj2", "df1"),
-#'   paths=list(outputPath = tmpdir))
-#' outputs(sim) = data.frame(
-#'      objectName = c(rep("tempObj", 2), rep("tempObj2", 3), "df1"),
-#'      saveTime = c(c(1,4), c(2,6,7), end(sim)),
-#'      fun = c(rep("saveRDS", 5), "write.csv"),
-#'      package = c(rep("base", 5), "utils"),
-#'      stringsAsFactors = FALSE)
-#' # since write.csv has a default of adding a column, x, with rownames, must add additional
-#' #   argument for 6th row in data.frame (corresponding to the write.csv function)
-#' outputArgs(sim)[[6]] <- list(row.names=FALSE)
-#' sim <- spades(sim)
-#' outputs(sim)
-#'
-#' # read one back in just to test it all worked as planned
-#' newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
-#' newObj
-#'
-#' # using saving with SpaDES-aware methods
-#' # To see current ones SpaDES can do
-#' .saveFileExtensions()
-#'
-#' library(raster)
-#' if (require(rgdal)) {
-#'   ras <- raster(ncol = 4, nrow = 5)
-#'   ras[] <- 1:20
-#'
-#'   sim <- simInit(objects = c("ras"), paths = list(outputPath = tmpdir))
-#'   outputs(sim) = data.frame(
-#'     file = "test",
-#'     fun = "writeRaster",
-#'     package = "raster",
-#'     objectName = "ras",
-#'     stringsAsFactors = FALSE)
-#'
-#'   outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
-#'   simOut <- spades(sim)
-#'   outputs(simOut)
-#'   newRas <- raster(dir(tmpdir, full.name = TRUE, pattern = ".tif"))
-#'   all.equal(newRas, ras) # Should be TRUE
-#' }
-#' # Clean up after
-#' unlink(tmpdir, recursive = TRUE)
+#' @example inst/examples/example_outputs.R
 setGeneric("outputs", function(sim) {
   standardGeneric("outputs")
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-outputs
 setMethod(
   "outputs",
   signature = "simList",
@@ -1279,17 +1151,17 @@ setMethod(
   })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-outputs
 setGeneric("outputs<-",
            function(sim, value) {
              standardGeneric("outputs<-")
 })
 
-#' @name outputs<-
 #' @aliases outputs<-,simList-method
-#' @rdname simList-accessors-inout
-#' @importFrom data.table setDT
 #' @export
+#' @importFrom data.table setDT
+#' @name outputs<-
+#' @rdname simList-accessors-outputs
 setReplaceMethod(
   "outputs",
   signature = "simList",
@@ -1372,21 +1244,20 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' \code{inputArgs} and \code{outputArgs} are ways to specify any
-#' arguments that are needed for file loading and file saving. This
-#' is still somewhat experimental.
+#' \code{inputArgs} and \code{outputArgs} are ways to specify any arguments that are needed for
+#' file loading and file saving. This is still somewhat experimental.
 #'
 #' @inheritParams inputs
 #' @include simList-class.R
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 #'
 setGeneric("inputArgs", function(sim) {
   standardGeneric("inputArgs")
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 setMethod("inputArgs",
           signature = "simList",
           definition = function(sim) {
@@ -1394,7 +1265,7 @@ setMethod("inputArgs",
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 setGeneric("inputArgs<-",
            function(sim, value) {
              standardGeneric("inputArgs<-")
@@ -1402,7 +1273,7 @@ setGeneric("inputArgs<-",
 
 #' @name inputArgs<-
 #' @aliases inputArgs<-,simList-method
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-inputs
 #' @export
 setReplaceMethod(
   "inputArgs",
@@ -1423,14 +1294,13 @@ setReplaceMethod(
 #' @inheritParams inputs
 #' @include simList-class.R
 #' @export
-#' @rdname simList-accessors-inout
-#'
+#' @rdname simList-accessors-outputs
 setGeneric("outputArgs", function(sim) {
   standardGeneric("outputArgs")
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-outputs
 setMethod("outputArgs",
           signature = "simList",
           definition = function(sim) {
@@ -1438,7 +1308,7 @@ setMethod("outputArgs",
 })
 
 #' @export
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-outputs
 setGeneric("outputArgs<-",
            function(sim, value) {
              standardGeneric("outputArgs<-")
@@ -1446,7 +1316,7 @@ setGeneric("outputArgs<-",
 
 #' @name outputArgs<-
 #' @aliases outputArgs<-,simList-method
-#' @rdname simList-accessors-inout
+#' @rdname simList-accessors-outputs
 #' @export
 setReplaceMethod(
   "outputArgs",

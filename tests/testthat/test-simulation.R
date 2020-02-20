@@ -6,14 +6,15 @@ test_that("simulation runs with simInit and spades with set.seed", {
 
   set.seed(42)
 
-  times <- list(start = 0.0, end = 10, timeunit = "year")
+  times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes", #"caribouMovement",
+                  "fireSpread")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
   set.seed(123)
@@ -24,35 +25,37 @@ test_that("simulation runs with simInit and spades with set.seed", {
     spades(debug = FALSE, .plotInitialTime = NA)
 
   ## simtime
-  expect_equivalent(time(mySim), 10.0)
+  expect_equivalent(time(mySim), 1.0)
   expect_equivalent(start(mySim), 0.0)
-  expect_equivalent(end(mySim), 10.0)
+  expect_equivalent(end(mySim), 1.0)
   expect_true(all.equal(mySim2, mySim))
 
 })
 
-test_that("spades calls with different signatures don't work", {
+test_that("spades calls - diff't signatures", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
 
+  #innerClasses <<- 1
+  #browser()
   a <- simInit()
   a1 <- Copy(a)
   opts <- options(spades.saveSimOnExit = FALSE)
-  expect_output(spades(a, debug = TRUE), "eventTime")
+  expect_message(spades(a, debug = TRUE), "eventTime")
   expect_silent(spades(a, debug = FALSE))
   expect_silent(spades(a, debug = FALSE, .plotInitialTime = NA))
   expect_silent(spades(a, debug = FALSE, .saveInitialTime = NA))
   opts <- options(opts)
-  expect_output(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
-  expect_output(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
+  expect_message(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
+  expect_message(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
                     capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
 
-  expect_output(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
-                "This is the current event")
-  expect_output(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
+  expect_message(spades(Copy(a), debug = c("current", "events"), .plotInitialTime = NA),
+        "This is the current event")
+  expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
                 "moduleName")
   expect_output(spades(a, debug = "simList", .plotInitialTime = NA),
                 "Completed Events")
@@ -69,8 +72,9 @@ test_that("spades calls with different signatures don't work", {
 
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
   a <- Copy(a1)
-  expect_output(spades(a, cache = TRUE, debug = TRUE, notOlderThan = Sys.time()), "eventTime")
-  expect_true(all(c("backpack.db", "gallery") %in% dir(paths(a)$cachePath)))
+  expect_message(spades(a, cache = TRUE, debug = TRUE, notOlderThan = Sys.time()), "eventTime")
+  expect_true(all(basename2(c(CacheDBFile(paths(a)$cachePath), CacheStorageDir(paths(a)$cachePath))) %in%
+                    dir(paths(a)$cachePath)))
   file.remove(dir(paths(a)$cachePath, full.names = TRUE, recursive = TRUE))
 
   # test for system time ... in this case, the first time through loop is slow
@@ -92,6 +96,15 @@ test_that("spades calls with different signatures don't work", {
     paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
     assign(paste0("st", i), system.time(spades(a, cache = TRUE, .plotInitialTime = NA)))
   }
+  params1 <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = c(nx = 20, ny = 20)
+  )
+  expect_error(a <- simInit(times, params1, modules, paths = paths))
+  expect_error(a <- simInit(list(3, "a", "s"), params, modules, paths = paths))
+  err <- capture_error(a <- simInit(list(3, "years", start = 1), params, modules, paths = paths))
+  expect_true(is.null(err))
+
   #expect_gt(st1[1], st2[1]) ## no longer true on R >= 3.5.1 ??
   file.remove(dir(paths(a)$cachePath, full.names = TRUE, recursive = TRUE))
 })
@@ -843,4 +856,96 @@ test_that("scheduleEvent with invalid values for eventTime", {
   expect_error({
     s <- scheduleEvent(s, eventTime = 0, eventType = "test1", moduleName = "test")
   })
+})
+
+test_that("debug using logging", {
+  testInitOut <- testInit(tmpFileExt = "log")
+  if (requireNamespace("logging")) {
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
+
+    set.seed(42)
+
+    times <- list(start = 0.0, end = 1, timeunit = "year")
+    params <- list(
+      .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .useCache = "init"),
+      caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    )
+    modules <- list("randomLandscapes")
+    paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+
+    set.seed(123)
+    mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
+    logging::logReset()
+    unlink(tmpfile)
+    expect_false(file.exists(tmpfile))
+    mess1 <- capture_messages(
+      mess2 <- capture.output(type = "output",
+                              mySim2 <- spades(Copy(mySim),
+                                               debug = list("console" = list(level = 10), debug = 1),
+                                               .plotInitialTime = NA)
+      )
+    )
+    expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
+    expect_true(any(grepl("total elpsd", mess2)))
+    expect_true(any(grepl(Sys.Date(), mess2))) # the loginfo does have date
+    expect_false(any(grepl(Sys.Date(), mess1))) # original debug has date added
+
+
+    logging::logReset()
+    mess1 <- capture_messages(
+      mess2 <- capture.output(type = "output",
+                              mySim2 <- spades(Copy(mySim),
+                                               debug = list("console" = list(level = 5),
+                                                            "file" = list(file = tmpfile),
+                                                            debug = 1),
+                                               .plotInitialTime = NA)
+      )
+    )
+
+    expect_true(file.exists(tmpfile))
+    log1 <- readLines(tmpfile)
+    expect_true(any(grepl("total elpsd", log1)))
+    expect_true(any(grepl(Sys.Date(), log1)))
+    expect_false(any(grepl("total elpsd", mess1)))  # messages not produced with debug as list
+    unlink(tmpfile)
+
+    logging::logReset()
+    mess1 <- capture_messages(
+      mess2 <- capture.output(type = "output",
+                              mySim2 <- spades(Copy(mySim),
+                                               debug = 1,
+                                               .plotInitialTime = NA)
+      )
+    )
+    expect_false(file.exists(tmpfile))
+    expect_true(length(mess2) == 0)
+    expect_true(any(grepl("total elpsd", mess1)))
+    expect_true(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+
+    # Test whether suppressMessages works
+    mess1 <- capture_messages(
+      mess2 <- capture.output(
+        type = "output",
+        suppressMessages(mySim2 <- spades(Copy(mySim),
+                                          debug = list("console" = list(level = "INFO"), debug = 1),
+                                          .plotInitialTime = NA))
+      )
+    )
+    expect_true(length(mess1) == 0)
+
+    # Test whether suppressMessages works
+    mess1 <- capture_messages(
+      mess2 <- capture.output(
+        type = "output",
+        suppressMessages(mySim2 <- spades(Copy(mySim),
+                                          debug = 1,
+                                          .plotInitialTime = NA))
+      )
+    )
+    expect_true(length(mess1) == 0)
+  }
 })

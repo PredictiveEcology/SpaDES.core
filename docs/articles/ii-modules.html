@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -95,15 +95,15 @@
       
 
       </header><script src="ii-modules_files/htmlwidgets-1.5.1/htmlwidgets.js"></script><script src="ii-modules_files/d3-3.3.8/d3.min.js"></script><script src="ii-modules_files/dagre-0.4.0/dagre-d3.min.js"></script><link href="ii-modules_files/mermaid-0.3.0/dist/mermaid.css" rel="stylesheet">
-<script src="ii-modules_files/mermaid-0.3.0/dist/mermaid.slim.min.js"></script><link href="ii-modules_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-<script src="ii-modules_files/chromatography-0.1/chromatography.js"></script><script src="ii-modules_files/DiagrammeR-binding-1.0.1/DiagrammeR.js"></script><div class="row">
+<script src="ii-modules_files/mermaid-0.3.0/dist/mermaid.js"></script><link href="ii-modules_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="ii-modules_files/chromatography-0.1/chromatography.js"></script><script src="ii-modules_files/DiagrammeR-binding-1.0.5/DiagrammeR.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>02 Building modules in <code>SpaDES</code>
 </h1>
                         <h4 class="author">Alex M. Chubaty</h4>
             
-            <h4 class="date">November 21 2019</h4>
+            <h4 class="date">February 20 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/ii-modules.Rmd"><code>vignettes/ii-modules.Rmd</code></a></small>
       <div class="hidden name"><code>ii-modules.Rmd</code></div>
@@ -112,6 +112,15 @@
 
     
     
+<style type="text/css">
+/*********************************************************
+  17 Feb 2020: workaround DiagrammeR css bug 
+  https://github.com/rich-iannone/DiagrammeR/issues/375
+*********************************************************/
+.section {
+  opacity: 1;
+}
+</style>
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
@@ -438,13 +447,13 @@
 <a class="sourceLine" id="cb5-15" data-line-number="15">                <span class="dt">ymn =</span> <span class="op">-</span>ny<span class="op">/</span><span class="dv">2</span>, <span class="dt">ymx =</span> ny<span class="op">/</span><span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb5-16" data-line-number="16">    speedup &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="dv">1</span>, nx<span class="op">/</span><span class="fl">5e2</span>)</a>
 <a class="sourceLine" id="cb5-17" data-line-number="17">    <span class="co"># Make dummy maps for testing of models</span></a>
-<a class="sourceLine" id="cb5-18" data-line-number="18">    DEM &lt;-<span class="st"> </span><span class="kw"><a href="http://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">300</span>, <span class="dt">var =</span> <span class="fl">0.03</span>,</a>
+<a class="sourceLine" id="cb5-18" data-line-number="18">    DEM &lt;-<span class="st"> </span><span class="kw"><a href="https://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">300</span>, <span class="dt">var =</span> <span class="fl">0.03</span>,</a>
 <a class="sourceLine" id="cb5-19" data-line-number="19">                    <span class="dt">speedup =</span> speedup, <span class="dt">inMemory =</span> inMemory)</a>
 <a class="sourceLine" id="cb5-20" data-line-number="20">    DEM[] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/getValues.html">getValues</a></span>(DEM), <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1000</span></a>
-<a class="sourceLine" id="cb5-21" data-line-number="21">    forestAge &lt;-<span class="st"> </span><span class="kw"><a href="http://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">10</span>, <span class="dt">var =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb5-21" data-line-number="21">    forestAge &lt;-<span class="st"> </span><span class="kw"><a href="https://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">10</span>, <span class="dt">var =</span> <span class="fl">0.1</span>,</a>
 <a class="sourceLine" id="cb5-22" data-line-number="22">                          <span class="dt">speedup =</span> speedup, <span class="dt">inMemory =</span> inMemory)</a>
 <a class="sourceLine" id="cb5-23" data-line-number="23">    forestAge[] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/getValues.html">getValues</a></span>(forestAge), <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="dv">20</span></a>
-<a class="sourceLine" id="cb5-24" data-line-number="24">    percentPine &lt;-<span class="st"> </span><span class="kw"><a href="http://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">50</span>, <span class="dt">var =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb5-24" data-line-number="24">    percentPine &lt;-<span class="st"> </span><span class="kw"><a href="https://spades-tools.predictiveecology.org/reference/gaussmap.html">gaussMap</a></span>(template, <span class="dt">scale =</span> <span class="dv">50</span>, <span class="dt">var =</span> <span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb5-25" data-line-number="25">                            <span class="dt">speedup =</span> speedup, <span class="dt">inMemory =</span> inMemory)</a>
 <a class="sourceLine" id="cb5-26" data-line-number="26">    percentPine[] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/getValues.html">getValues</a></span>(percentPine), <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb5-27" data-line-number="27">  </a>
@@ -473,64 +482,8 @@
 <a href="#event-diagram" class="anchor"></a>Event diagram</h3>
 <p>To better understand how events are scheduled within a simulation, a visual representation called an <code>eventDiagram</code> illustrates the sequences of events within a simulation.</p>
 <p>Simulation time is presented on the x-axis, starting at date <code>startDate</code>. Each module appears in a color-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module. Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module’s event corresponds to the module’s timestep unit, not the event’s “duration”.</p>
-<pre><code>## [1] "2019-11-21 09:42:28 | total elpsd: 0.0026 secs | 0 checkpoint init 0"
-## [1] "2019-11-21 09:42:28 | total elpsd: 0.0056 secs | 0 save init 0"
-## [1] "2019-11-21 09:42:28 | total elpsd: 0.0072 secs | 0 progress init 0"
-## [1] "2019-11-21 09:42:28 | total elpsd: 0.0089 secs | 0 load init 0"
-## [1] "2019-11-21 09:42:28 | total elpsd: 0.01 secs | 0 randomLandscapes init 1"
-## [1] "2019-11-21 09:42:29 | total elpsd: 1.2 secs | 0 fireSpread init 1"
-## [1] "2019-11-21 09:42:29 | total elpsd: 1.2 secs | 0 caribouMovement init 1"
-## [1] "2019-11-21 09:42:29 | total elpsd: 1.3 secs | 0 fireSpread burn 5"
-## [1] "2019-11-21 09:42:29 | total elpsd: 1.3 secs | 0 fireSpread stats 5"
-## [1] "2019-11-21 09:42:29 | total elpsd: 1.4 secs | 0 randomLandscapes plot 10"
-## [1] "2019-11-21 09:42:29 | total elpsd: 1.6 secs | 0 fireSpread plot.init 10"</code></pre>
-<pre><code>## [1] "2019-11-21 09:42:30 | total elpsd: 1.8 secs | 0.0833333333333333 caribouMovement plot.init 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 1.8 secs | 0.166666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 1.9 secs | 0.25 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2 secs | 0.333333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.1 secs | 0.416666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.2 secs | 0.5 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.3 secs | 0.583333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.4 secs | 0.666666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.5 secs | 0.75 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.6 secs | 0.833333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:30 | total elpsd: 2.7 secs | 0.916666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 2.8 secs | 1 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 2.8 secs | 1 fireSpread burn 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 2.9 secs | 1 fireSpread stats 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 2.9 secs | 1 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3 secs | 1.08333333333333 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3 secs | 1.08333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.1 secs | 1.16666666666667 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.1 secs | 1.16666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.2 secs | 1.25 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.2 secs | 1.25 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.3 secs | 1.33333333333333 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.3 secs | 1.33333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.4 secs | 1.41666666666667 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.4 secs | 1.41666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.5 secs | 1.5 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.6 secs | 1.5 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.7 secs | 1.58333333333333 caribouMovement move 5"
-## [1] "2019-11-21 09:42:31 | total elpsd: 3.7 secs | 1.58333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:32 | total elpsd: 3.8 secs | 1.66666666666667 caribouMovement move 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 3.8 secs | 1.66666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:32 | total elpsd: 3.9 secs | 1.75 caribouMovement move 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 3.9 secs | 1.75 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4 secs | 1.83333333333333 caribouMovement move 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4 secs | 1.83333333333333 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4.1 secs | 1.91666666666667 caribouMovement move 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4.1 secs | 1.91666666666667 caribouMovement plot 10"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4.2 secs | 2 fireSpread burn 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4.2 secs | 2 caribouMovement move 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4.3 secs | 2 fireSpread stats 5"
-## [1] "2019-11-21 09:42:32 | total elpsd: 4.3 secs | 2 caribouMovement plot 10"</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(SpaDES.tools) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(RandomFields))  {</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">  <span class="co"># overview of the events in the simulation</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">  <span class="kw"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(mySim, <span class="st">"0000-06-01"</span>, <span class="dt">n =</span> <span class="dv">200</span>, <span class="dt">width =</span> <span class="dv">720</span>)</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">}</a></code></pre></div>
-<div id="htmlwidget-57cb15034f83fd445a30" style="width:720px;height:1326px;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-57cb15034f83fd445a30">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nburn:active,fireSpread7,2-06-01,2-06-07\nstats:active,fireSpread8,2-06-01,2-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\nmove:active,caribouMovement15,1-07-01,1-07-07\nplot:crit,caribouMovement16,1-07-01,1-07-07\nmove:active,caribouMovement17,1-08-01,1-08-07\nplot:crit,caribouMovement18,1-08-01,1-08-07\nmove:active,caribouMovement19,1-08-31,1-09-06\nplot:crit,caribouMovement20,1-08-31,1-09-06\nmove:active,caribouMovement21,1-10-01,1-10-07\nplot:crit,caribouMovement22,1-10-01,1-10-07\nmove:active,caribouMovement23,1-10-31,1-11-06\nplot:crit,caribouMovement24,1-10-31,1-11-06\nmove:active,caribouMovement25,1-11-30,1-12-07\nplot:crit,caribouMovement26,1-11-30,1-12-07\nmove:active,caribouMovement27,1-12-31,2-01-06\nplot:crit,caribouMovement28,1-12-31,2-01-06\nmove:active,caribouMovement29,2-01-30,2-02-06\nplot:crit,caribouMovement30,2-01-30,2-02-06\nmove:active,caribouMovement31,2-03-02,2-03-08\nplot:crit,caribouMovement32,2-03-02,2-03-08\nmove:active,caribouMovement33,2-04-01,2-04-07\nplot:crit,caribouMovement34,2-04-01,2-04-07\nmove:active,caribouMovement35,2-05-02,2-05-08\nplot:crit,caribouMovement36,2-05-02,2-05-08\nmove:active,caribouMovement37,2-06-01,2-06-07\nplot:crit,caribouMovement38,2-06-01,2-06-07\n"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5ebb167247ec27b6c1fe" style="width:720px;height:1326px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5ebb167247ec27b6c1fe">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nburn:active,fireSpread7,2-06-01,2-06-07\nstats:active,fireSpread8,2-06-01,2-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\nmove:active,caribouMovement15,1-07-01,1-07-07\nplot:crit,caribouMovement16,1-07-01,1-07-07\nmove:active,caribouMovement17,1-08-01,1-08-07\nplot:crit,caribouMovement18,1-08-01,1-08-07\nmove:active,caribouMovement19,1-08-31,1-09-06\nplot:crit,caribouMovement20,1-08-31,1-09-06\nmove:active,caribouMovement21,1-10-01,1-10-07\nplot:crit,caribouMovement22,1-10-01,1-10-07\nmove:active,caribouMovement23,1-10-31,1-11-06\nplot:crit,caribouMovement24,1-10-31,1-11-06\nmove:active,caribouMovement25,1-11-30,1-12-07\nplot:crit,caribouMovement26,1-11-30,1-12-07\nmove:active,caribouMovement27,1-12-31,2-01-06\nplot:crit,caribouMovement28,1-12-31,2-01-06\nmove:active,caribouMovement29,2-01-30,2-02-06\nplot:crit,caribouMovement30,2-01-30,2-02-06\nmove:active,caribouMovement31,2-03-02,2-03-08\nplot:crit,caribouMovement32,2-03-02,2-03-08\nmove:active,caribouMovement33,2-04-01,2-04-07\nplot:crit,caribouMovement34,2-04-01,2-04-07\nmove:active,caribouMovement35,2-05-02,2-05-08\nplot:crit,caribouMovement36,2-05-02,2-05-08\nmove:active,caribouMovement37,2-06-01,2-06-07\nplot:crit,caribouMovement38,2-06-01,2-06-07\n"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="module-documentation-modulename-rmd" class="section level2">
@@ -552,25 +505,25 @@
 <h2 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h2>
 <p>All module data are located in the module’s <code>data/</code> subdirectory. Also included in this folder is a <code>CHECKSUMS.txt</code> file that contains the expected checksums for each data file. Checksums can be verified (and optionally written) using <code><a href="../reference/checksums.html">checksums()</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co">## 1. specify your module here</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">moduleName &lt;-<span class="st"> "my_module"</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">## 2. use a temp dir to ensure all modules get fresh copies of the data</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">tmpdir &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"SpaDES_modules"</span>)</a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">## 3. download your module's data to the temp dir</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="kw"><a href="../reference/downloadData.html">downloadData</a></span>(moduleName, tmpdir)</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">modules =</span> moduleName)</a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">## 5. recalculate your checksums and overwrite the file</span></a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="kw"><a href="../reference/checksums.html">checksums</a></span>(moduleName, tmpdir, <span class="dt">write =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb9-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb9-16" data-line-number="16"><span class="co">## 6. copy the new checksums file to your working module directory (the one not in the temp dir)</span></a>
-<a class="sourceLine" id="cb9-17" data-line-number="17"><span class="kw"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="dt">from =</span> <span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(tmpdir, moduleName, <span class="st">'data'</span>, <span class="st">'CHECKSUMS.txt'</span>),</a>
-<a class="sourceLine" id="cb9-18" data-line-number="18">          <span class="dt">to =</span> <span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="st">'path/to/my/moduleDir'</span>, moduleName, <span class="st">'data'</span>, <span class="st">'CHECKSUMS.txt'</span>),</a>
-<a class="sourceLine" id="cb9-19" data-line-number="19">          <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co">## 1. specify your module here</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">moduleName &lt;-<span class="st"> "my_module"</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">## 2. use a temp dir to ensure all modules get fresh copies of the data</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">tmpdir &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"SpaDES_modules"</span>)</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">## 3. download your module's data to the temp dir</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="kw"><a href="../reference/downloadData.html">downloadData</a></span>(moduleName, tmpdir)</a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">modules =</span> moduleName)</a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">## 5. recalculate your checksums and overwrite the file</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="kw"><a href="../reference/checksums.html">checksums</a></span>(moduleName, tmpdir, <span class="dt">write =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">## 6. copy the new checksums file to your working module directory (the one not in the temp dir)</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="kw"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="dt">from =</span> <span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(tmpdir, moduleName, <span class="st">'data'</span>, <span class="st">'CHECKSUMS.txt'</span>),</a>
+<a class="sourceLine" id="cb6-18" data-line-number="18">          <span class="dt">to =</span> <span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="st">'path/to/my/moduleDir'</span>, moduleName, <span class="st">'data'</span>, <span class="st">'CHECKSUMS.txt'</span>),</a>
+<a class="sourceLine" id="cb6-19" data-line-number="19">          <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Modules may require data that for various reasons cannot be distributed with the module source code. In these cases, the module developer should ensure that the module downloads and extracts the data required. It is useful to not only check that the data files exist locally but that their checksums match those expected (see <code><a href="../reference/checksums.html">checksums()</a></code>).</p>
 </div>
 <div id="versioned-zip-archives-modulename_x-y-z-zip" class="section level2">
@@ -608,35 +561,35 @@
 <p>As noted above, modules should not depend on one another for event scheduling. However, it is often useful to develop collections of modules that interact indirectly and are dependent on shared data objects. Modules can be designed to rely on outputs (data objects) from other modules. When objects are shared between modules, it is important to state these dependencies explicitly. To check whether objects upon which a model depends exist, a call to <code>checkObject</code> is made during module initialization.</p>
 <p>Note that modules need not be inter-dependent on one another: module B may depend on module A (for example to initialize a data object), without module A depending on module B.</p>
 <p>To view the dependencies for a simulation:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(SpaDES.core)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">times &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="dv">20</span>)</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">  <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>)</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb10-7" data-line-number="7">modules &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"SpaDES_sampleModules"</span>)</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>))</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> times, <span class="dt">params =</span> parameters, <span class="dt">modules =</span> modules, <span class="dt">paths =</span> paths)</a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">## examine simulation module (object) dependencies</span></a>
-<a class="sourceLine" id="cb10-13" data-line-number="13"><span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)      <span class="co"># all object dependency relationships</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(SpaDES.core)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">times &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>)</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">modules &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"SpaDES_sampleModules"</span>)</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>))</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> times, <span class="dt">params =</span> parameters, <span class="dt">modules =</span> modules, <span class="dt">paths =</span> paths)</a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">## examine simulation module (object) dependencies</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)      <span class="co"># all object dependency relationships</span></a></code></pre></div>
 <pre><code>##                from              to       objName    objClass
 ## 1:       fireSpread caribouMovement     landscape RasterStack
 ## 2:       fireSpread      fireSpread     landscape RasterStack
 ## 3:       fireSpread      fireSpread nPixelsBurned     numeric
 ## 4: randomLandscapes caribouMovement     landscape RasterStack
 ## 5: randomLandscapes      fireSpread     landscape RasterStack</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">clearPlot</span>()</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)            <span class="co"># simplified visual representation of modules</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">clearPlot</span>()</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)            <span class="co"># simplified visual representation of modules</span></a></code></pre></div>
 <p><img src="ii-modules_files/figure-html/module-object-diagrams-1.png" width="672"></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">clearPlot</span>()</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim, <span class="dt">showParents =</span> <span class="ot">TRUE</span>) <span class="co"># similar, but showing parent module grouping</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">clearPlot</span>()</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim, <span class="dt">showParents =</span> <span class="ot">TRUE</span>) <span class="co"># similar, but showing parent module grouping</span></a></code></pre></div>
 <p><img src="ii-modules_files/figure-html/module-object-diagrams-2.png" width="672"></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># detailed visual representation of objects</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim, <span class="dt">width =</span> <span class="dv">720</span>)</a></code></pre></div>
-<div id="htmlwidget-727b316114387514644f" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-727b316114387514644f">{"x":{"diagram":"sequenceDiagram\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing the relationships between each module. In the example above, line 2 of the output indicates that the <code>fireSpread</code> module relies on an object <code>landscape</code> provided by the <code>caribouMovement</code> module. This edgelist is used inside the <code>depsGraph</code> function to produce a dependency graph (network), where each module corresponds to a vertex (node), and object dependencies are denoted by the arrows. When plotting the dependency graph, it’s often useful to use the <code>plot=TRUE</code> argument to simplify the network by showing no more than one object dependency between modules.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># detailed visual representation of objects</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim, <span class="dt">width =</span> <span class="dv">720</span>)</a></code></pre></div>
+<div id="htmlwidget-9e770f81da2988654a65" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9e770f81da2988654a65">{"x":{"diagram":"sequenceDiagram\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing the relationships between each module. In the example above, line 2 of the output indicates that the <code>fireSpread</code> module relies on an object <code>landscape</code> provided by the <code>caribouMovement</code> module. This edgelist is used inside the <code>depsGraph</code> function to produce a dependency graph (network), where each module corresponds to a vertex (node), and object dependencies are denoted by the arrows. When plotting the dependency graph, it’s often useful to use the <code>plot=TRUE</code> argument to simplify the network by showing no more than one object dependency between modules.</p>
 </div>
 </div>
 <div id="core-modules" class="section level1">
@@ -718,7 +671,7 @@
 <td>
 <code>inputs</code>: data.frame</td>
 <td>
-<code><a href="../reference/simList-accessors-inout.html">inputs()</a></code> or passed as <code>inputs</code> argument to <code>simList</code>
+<code><a href="../reference/simList-accessors-inputs.html">inputs()</a></code> or passed as <code>inputs</code> argument to <code>simList</code>
 </td>
 </tr>
 <tr class="even">
@@ -731,7 +684,7 @@
 <td>
 <code>outputs</code>: data.frame</td>
 <td>
-<code><a href="../reference/simList-accessors-inout.html">outputs()</a></code> or passed as <code>outputs</code> argument to <code>simList</code>
+<code><a href="../reference/simList-accessors-outputs.html">outputs()</a></code> or passed as <code>outputs</code> argument to <code>simList</code>
 </td>
 </tr>
 <tr class="even">
@@ -764,40 +717,40 @@
 <h2 class="hasAnchor">
 <a href="#checkpoint-module" class="anchor"></a><code>.checkpoint</code> module</h2>
 <p>Schedule automatic simulation checkpointing to allow you to resume a previously saved simulation. All objects in the global environment including the state of the random number generator are saved and can be reloaded. Checkpoint frequency and filename can be passed as parameters to the simulation object as illustrated below. By default, checkpointing is not used unless the <code>interval</code> parameter is provided; the simulation checkpoint file (if one exists) is loaded if the <code>file</code> parameter is specified.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the checkpoint interval and filename.</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2">times &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="dv">0</span>, <span class="dt">end =</span> <span class="dv">30</span>)</a>
-<a class="sourceLine" id="cb15-3" data-line-number="3">parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb15-4" data-line-number="4">  <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
-<a class="sourceLine" id="cb15-5" data-line-number="5">  <span class="dt">.checkpoint =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">interval =</span> <span class="dv">10</span>, <span class="dt">file =</span> <span class="st">"chkpnt.RData"</span>)</a>
-<a class="sourceLine" id="cb15-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb15-7" data-line-number="7">modules &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>, <span class="st">"caribouMovement"</span>)</a>
-<a class="sourceLine" id="cb15-8" data-line-number="8">paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb15-9" data-line-number="9">  <span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)</a>
-<a class="sourceLine" id="cb15-10" data-line-number="10">)</a>
-<a class="sourceLine" id="cb15-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb15-12" data-line-number="12">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> times, <span class="dt">params =</span> parameters, <span class="dt">modules =</span> modules, <span class="dt">paths =</span> paths)</a>
-<a class="sourceLine" id="cb15-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb15-14" data-line-number="14"><span class="co"># retrieve the checkpoint params from the simulation object</span></a>
-<a class="sourceLine" id="cb15-15" data-line-number="15"><span class="kw"><a href="../reference/checkpoint.html">checkpointFile</a></span>(mySim)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the checkpoint interval and filename.</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">times &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="dv">0</span>, <span class="dt">end =</span> <span class="dv">30</span>)</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">  <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">  <span class="dt">.checkpoint =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">interval =</span> <span class="dv">10</span>, <span class="dt">file =</span> <span class="st">"chkpnt.RData"</span>)</a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">modules &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>, <span class="st">"caribouMovement"</span>)</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8">paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb12-9" data-line-number="9">  <span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)</a>
+<a class="sourceLine" id="cb12-10" data-line-number="10">)</a>
+<a class="sourceLine" id="cb12-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb12-12" data-line-number="12">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> times, <span class="dt">params =</span> parameters, <span class="dt">modules =</span> modules, <span class="dt">paths =</span> paths)</a>
+<a class="sourceLine" id="cb12-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb12-14" data-line-number="14"><span class="co"># retrieve the checkpoint params from the simulation object</span></a>
+<a class="sourceLine" id="cb12-15" data-line-number="15"><span class="kw"><a href="../reference/checkpoint.html">checkpointFile</a></span>(mySim)</a></code></pre></div>
 <pre><code>## [1] "chkpnt.RData"</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw"><a href="../reference/checkpoint.html">checkpointInterval</a></span>(mySim)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="../reference/checkpoint.html">checkpointInterval</a></span>(mySim)</a></code></pre></div>
 <pre><code>## [1] 10</code></pre>
 </div>
 <div id="progress-module" class="section level2">
 <h2 class="hasAnchor">
 <a href="#progress-module" class="anchor"></a><code>.progress</code> module</h2>
 <p>Schedule updates to the simulation progress bar.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the progress parameters</span></a>
-<a class="sourceLine" id="cb19-2" data-line-number="2">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">100.0</span>),</a>
-<a class="sourceLine" id="cb19-3" data-line-number="3">                 <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
-<a class="sourceLine" id="cb19-4" data-line-number="4">                               <span class="dt">.progress =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">type =</span> <span class="st">"text"</span>, <span class="dt">interval =</span> <span class="dv">10</span>)),</a>
-<a class="sourceLine" id="cb19-5" data-line-number="5">                 <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>),</a>
-<a class="sourceLine" id="cb19-6" data-line-number="6">                 <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)))</a>
-<a class="sourceLine" id="cb19-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co"># retrieve the checkpoint params from the simulation object</span></a>
-<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="kw"><a href="../reference/progress.html">progressType</a></span>(mySim)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the progress parameters</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">100.0</span>),</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">                 <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4">                               <span class="dt">.progress =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">type =</span> <span class="st">"text"</span>, <span class="dt">interval =</span> <span class="dv">10</span>)),</a>
+<a class="sourceLine" id="cb16-5" data-line-number="5">                 <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>),</a>
+<a class="sourceLine" id="cb16-6" data-line-number="6">                 <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)))</a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="co"># retrieve the checkpoint params from the simulation object</span></a>
+<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="kw"><a href="../reference/progress.html">progressType</a></span>(mySim)</a></code></pre></div>
 <pre><code>## [1] "text"</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw"><a href="../reference/progress.html">progressInterval</a></span>(mySim)</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw"><a href="../reference/progress.html">progressInterval</a></span>(mySim)</a></code></pre></div>
 <pre><code>## [1] 10</code></pre>
 </div>
 <div id="load-and--save-modules" class="section level2">
@@ -835,7 +788,7 @@
 <div id="inputs-argument-to-siminit" class="section level3">
 <h3 class="hasAnchor">
 <a href="#inputs-argument-to-siminit" class="anchor"></a><code>inputs</code> argument to simInit</h3>
-<p>Alternatively, objects can be read in during the <code>simInit</code> function call by passing a data.frame to the <code>input</code> argument. For <code><a href="../reference/simList-accessors-inout.html">inputs()</a></code>, the <code>data.frame</code> must consist of, minimally, a column named <code>file</code> listing the absolute or relative filepaths of the files to be loaded. Additional columns can also be provided:</p>
+<p>Alternatively, objects can be read in during the <code>simInit</code> function call by passing a data.frame to the <code>input</code> argument. For <code><a href="../reference/simList-accessors-inputs.html">inputs()</a></code>, the <code>data.frame</code> must consist of, minimally, a column named <code>file</code> listing the absolute or relative filepaths of the files to be loaded. Additional columns can also be provided:</p>
 <table class="table">
 <colgroup>
 <col width="20%">
@@ -944,89 +897,70 @@
 </tbody>
 </table>
 <p>SpaDES will add a sixth column, <code>saved</code>, a logical, which will become <code>TRUE</code> when (immediately following) the successful save occurs.<br>
-Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">outputs(mySim)</a></code> will indicate which objects have been saved.</p>
-<p>There is partial string matching of these names, so if the <code>fun</code> requires arguments to be passed to it, use <code><a href="../reference/simList-accessors-inout.html">outputArgs()</a></code>, and it must be the same length as the <code><a href="../reference/simList-accessors-inout.html">outputs()</a></code> <code>data.frame</code>.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the load and save parameters</span></a>
-<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(data.table)</a>
-<a class="sourceLine" id="cb23-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb23-4" data-line-number="4">outputDir &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"simOutputs"</span>)</a>
-<a class="sourceLine" id="cb23-5" data-line-number="5">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="dv">10</span>),</a>
-<a class="sourceLine" id="cb23-6" data-line-number="6">                 <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb23-7" data-line-number="7">                   <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
-<a class="sourceLine" id="cb23-8" data-line-number="8">                   <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb23-9" data-line-number="9">                     <span class="dt">.saveInitialTime =</span> <span class="dv">0</span>, <span class="dt">.saveInterval =</span> <span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb23-10" data-line-number="10">                     <span class="dt">.saveObjects =</span> <span class="kw"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"landscape"</span>),</a>
-<a class="sourceLine" id="cb23-11" data-line-number="11">                     <span class="dt">.savePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(outputDir, <span class="st">"randomLandscapes"</span>))</a>
-<a class="sourceLine" id="cb23-12" data-line-number="12">                   ),</a>
-<a class="sourceLine" id="cb23-13" data-line-number="13">                 <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>),</a>
-<a class="sourceLine" id="cb23-14" data-line-number="14">                 <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),</a>
-<a class="sourceLine" id="cb23-15" data-line-number="15">                              <span class="dt">outputPath =</span> outputDir),</a>
-<a class="sourceLine" id="cb23-16" data-line-number="16">                 <span class="dt">outputs =</span> <span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">objectName =</span> <span class="st">"landscape"</span>)</a>
-<a class="sourceLine" id="cb23-17" data-line-number="17">)</a>
-<a class="sourceLine" id="cb23-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb23-19" data-line-number="19"><span class="co"># retrieve the load and save params from the simulation object</span></a>
-<a class="sourceLine" id="cb23-20" data-line-number="20"><span class="kw"><a href="../reference/simList-accessors-inout.html">inputs</a></span>(mySim)    <span class="co"># shows all files and objects that are "inputs"</span></a></code></pre></div>
+Therefore, a call to <code><a href="../reference/simList-accessors-outputs.html">outputs(mySim)</a></code> will indicate which objects have been saved.</p>
+<p>There is partial string matching of these names, so if the <code>fun</code> requires arguments to be passed to it, use <code><a href="../reference/simList-accessors-outputs.html">outputArgs()</a></code>, and it must be the same length as the <code><a href="../reference/simList-accessors-outputs.html">outputs()</a></code> <code>data.frame</code>.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the load and save parameters</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(data.table)</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">outputDir &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"simOutputs"</span>)</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="dv">10</span>),</a>
+<a class="sourceLine" id="cb20-6" data-line-number="6">                 <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb20-7" data-line-number="7">                   <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
+<a class="sourceLine" id="cb20-8" data-line-number="8">                   <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb20-9" data-line-number="9">                     <span class="dt">.saveInitialTime =</span> <span class="dv">0</span>, <span class="dt">.saveInterval =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb20-10" data-line-number="10">                     <span class="dt">.saveObjects =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"landscape"</span>),</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11">                     <span class="dt">.savePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(outputDir, <span class="st">"randomLandscapes"</span>))</a>
+<a class="sourceLine" id="cb20-12" data-line-number="12">                   ),</a>
+<a class="sourceLine" id="cb20-13" data-line-number="13">                 <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>),</a>
+<a class="sourceLine" id="cb20-14" data-line-number="14">                 <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),</a>
+<a class="sourceLine" id="cb20-15" data-line-number="15">                              <span class="dt">outputPath =</span> outputDir),</a>
+<a class="sourceLine" id="cb20-16" data-line-number="16">                 <span class="dt">outputs =</span> <span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">objectName =</span> <span class="st">"landscape"</span>)</a>
+<a class="sourceLine" id="cb20-17" data-line-number="17">)</a>
+<a class="sourceLine" id="cb20-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb20-19" data-line-number="19"><span class="co"># retrieve the load and save params from the simulation object</span></a>
+<a class="sourceLine" id="cb20-20" data-line-number="20"><span class="kw"><a href="../reference/simList-accessors-inputs.html">inputs</a></span>(mySim)    <span class="co"># shows all files and objects that are "inputs"</span></a></code></pre></div>
 <pre><code>## [1] file       fun        package    objectName loadTime   loaded     arguments 
 ## [8] intervals 
 ## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim)   <span class="co"># shows all files and objects that are "outputs"</span></a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw"><a href="../reference/simList-accessors-outputs.html">outputs</a></span>(mySim)   <span class="co"># shows all files and objects that are "outputs"</span></a></code></pre></div>
 <pre><code>##   objectName                                            file     fun package
-## 1  landscape /tmp/Rtmp1UmHMC/simOutputs/landscape_year10.rds saveRDS    base
+## 1  landscape /tmp/RtmpGsb3SH/simOutputs/landscape_year10.rds saveRDS    base
 ##   saveTime saved arguments
 ## 1       10    NA        NA</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInitialTime</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInitialTime</a></code></pre></div>
 <pre><code>## [1] 0</code></pre>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInterval</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInterval</a></code></pre></div>
 <pre><code>## [1] 10</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveObjects</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveObjects</a></code></pre></div>
 <pre><code>## [1] "landscape"</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.savePath</a></code></pre></div>
-<pre><code>## [1] "/tmp/Rtmp1UmHMC/simOutputs/randomLandscapes"</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">ftmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"spades_vignetteOutputs"</span>)</a>
-<a class="sourceLine" id="cb35-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/grDevices/pdf.html">pdf</a></span>(ftmp)</a>
-<a class="sourceLine" id="cb35-3" data-line-number="3"><span class="kw">clearPlot</span>()</a>
-<a class="sourceLine" id="cb35-4" data-line-number="4">mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a></code></pre></div>
-<pre><code>## [1] "2019-11-21 09:42:33 | total elpsd: 0.0012 secs | 0 checkpoint init 0"
-## [1] "2019-11-21 09:42:33 | total elpsd: 0.0027 secs | 0 save init 0"
-## [1] "2019-11-21 09:42:33 | total elpsd: 0.0043 secs | 0 progress init 0"
-## [1] "2019-11-21 09:42:33 | total elpsd: 0.0056 secs | 0 load init 0"
-## [1] "2019-11-21 09:42:33 | total elpsd: 0.0067 secs | 0 randomLandscapes init 1"
-## [1] "2019-11-21 09:42:34 | total elpsd: 0.98 secs | 0 randomLandscapes plot 10"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.1 secs | 0 randomLandscapes save 11"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.1 secs | 10 save spades 10"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 10 save later 10"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 10 randomLandscapes save 11"</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="co"># More sophisticated, passing arguments to outputs()</span></a>
-<a class="sourceLine" id="cb37-2" data-line-number="2"><span class="kw"><a href="../reference/simList-accessors-inout.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb37-3" data-line-number="3">  <span class="dt">objectName =</span> <span class="st">"landscape"</span>, <span class="dt">fun =</span> <span class="st">"writeRaster"</span>, <span class="dt">package =</span> <span class="st">"raster"</span>,</a>
-<a class="sourceLine" id="cb37-4" data-line-number="4">  <span class="dt">saveTime =</span> <span class="kw"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="dv">3</span>,<span class="dv">6</span>), <span class="dt">arguments =</span> <span class="kw"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="dv">3</span>,<span class="dv">6</span>), <span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb37-5" data-line-number="5">    <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">dataType =</span> <span class="st">"FLT4S"</span>, <span class="dt">format =</span> <span class="st">"raster"</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb37-6" data-line-number="6">})))</a>
-<a class="sourceLine" id="cb37-7" data-line-number="7">mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a></code></pre></div>
-<pre><code>## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 checkpoint init 0"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 save init 0"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 progress init 0"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 load init 0"
-## [1] "2019-11-21 09:42:35 | total elpsd: 1.4 secs | 0 randomLandscapes init 1"
-## [1] "2019-11-21 09:42:36 | total elpsd: 2.4 secs | 0 randomLandscapes plot 10"
-## [1] "2019-11-21 09:42:36 | total elpsd: 2.5 secs | 0 randomLandscapes save 11"
-## [1] "2019-11-21 09:42:36 | total elpsd: 2.6 secs | 3 save spades 10"</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.savePath</a></code></pre></div>
+<pre><code>## [1] "/tmp/RtmpGsb3SH/simOutputs/randomLandscapes"</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">ftmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"spades_vignetteOutputs"</span>)</a>
+<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/grDevices/pdf.html">pdf</a></span>(ftmp)</a>
+<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="kw">clearPlot</span>()</a>
+<a class="sourceLine" id="cb32-4" data-line-number="4">mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a>
+<a class="sourceLine" id="cb32-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb32-6" data-line-number="6"><span class="co"># More sophisticated, passing arguments to outputs()</span></a>
+<a class="sourceLine" id="cb32-7" data-line-number="7"><span class="kw"><a href="../reference/simList-accessors-outputs.html">outputs</a></span>(mySim) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
+<a class="sourceLine" id="cb32-8" data-line-number="8">  <span class="dt">objectName =</span> <span class="st">"landscape"</span>, <span class="dt">fun =</span> <span class="st">"writeRaster"</span>, <span class="dt">package =</span> <span class="st">"raster"</span>,</a>
+<a class="sourceLine" id="cb32-9" data-line-number="9">  <span class="dt">saveTime =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">3</span>,<span class="dv">6</span>), <span class="dt">arguments =</span> <span class="kw"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">3</span>,<span class="dv">6</span>), <span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb32-10" data-line-number="10">    <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">dataType =</span> <span class="st">"FLT4S"</span>, <span class="dt">format =</span> <span class="st">"raster"</span>, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb32-11" data-line-number="11">})))</a>
+<a class="sourceLine" id="cb32-12" data-line-number="12">mySim2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)</a></code></pre></div>
+<pre><code>## 2020-02-20 12:42:22 WARNING::message call argument "datatype" misspelled as "dataType" .datatype(...)</code></pre>
 <pre><code>## Warning in .datatype(...): argument "datatype" misspelled as "dataType"</code></pre>
-<pre><code>## [1] "2019-11-21 09:42:36 | total elpsd: 2.6 secs | 3 save later 10"
-## [1] "2019-11-21 09:42:36 | total elpsd: 2.6 secs | 6 save later 10"</code></pre>
+<pre><code>## 2020-02-20 12:42:22 WARNING::message call argument "datatype" misspelled as "dataType" .datatype(...)</code></pre>
 <pre><code>## Warning in .datatype(...): argument "datatype" misspelled as "dataType"</code></pre>
-<pre><code>## [1] "2019-11-21 09:42:36 | total elpsd: 2.8 secs | 6 save later 10"
-## [1] "2019-11-21 09:42:36 | total elpsd: 2.8 secs | 10 randomLandscapes save 11"</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/grDevices/dev.html">dev.off</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/grDevices/dev.html">dev.off</a></span>()</a></code></pre></div>
 <pre><code>## png 
 ##   2</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span>(ftmp)</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span>(ftmp)</a></code></pre></div>
 <p>Saving within a module – scheduling save events.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="co">### WITHIN A MODULE:</span></a>
-<a class="sourceLine" id="cb46-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb46-3" data-line-number="3"><span class="co"># schedule a recurring save event</span></a>
-<a class="sourceLine" id="cb46-4" data-line-number="4">nextSave &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/time.html">time</a></span>(mySim) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInterval</a>
-<a class="sourceLine" id="cb46-5" data-line-number="5">sim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span>(mySim, nextSave, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co">### WITHIN A MODULE:</span></a>
+<a class="sourceLine" id="cb40-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="co"># schedule a recurring save event</span></a>
+<a class="sourceLine" id="cb40-4" data-line-number="4">nextSave &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/time.html">time</a></span>(mySim) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.saveInterval</a>
+<a class="sourceLine" id="cb40-5" data-line-number="5">sim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span>(mySim, nextSave, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="plotting" class="section level2">
@@ -1039,24 +973,24 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <li>
 <code>.plotInterval</code>: The interval at which objects will be plotted. Used to schedule plot events.</li>
 </ul>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the load and save parameters</span></a>
-<a class="sourceLine" id="cb47-2" data-line-number="2">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb47-3" data-line-number="3">                 <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb47-4" data-line-number="4">                   <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
-<a class="sourceLine" id="cb47-5" data-line-number="5">                   <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.plotInitialTime =</span> <span class="dv">0</span>, <span class="dt">.plotInterval =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb47-6" data-line-number="6">                 ),</a>
-<a class="sourceLine" id="cb47-7" data-line-number="7">                 <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>),</a>
-<a class="sourceLine" id="cb47-8" data-line-number="8">                 <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>))</a>
-<a class="sourceLine" id="cb47-9" data-line-number="9">)</a>
-<a class="sourceLine" id="cb47-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb47-11" data-line-number="11"><span class="co"># retrieve the plotting params from the simulation object</span></a>
-<a class="sourceLine" id="cb47-12" data-line-number="12"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.plotInitialTime</a>
-<a class="sourceLine" id="cb47-13" data-line-number="13"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.plotInterval</a></code></pre></div>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="co">### WITHIN A MODULE:</span></a>
-<a class="sourceLine" id="cb48-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb48-3" data-line-number="3"><span class="co"># schedule a recurring plot event</span></a>
-<a class="sourceLine" id="cb48-4" data-line-number="4">nextPlot &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/time.html">time</a></span>(mySim) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.plotInterval</a>
-<a class="sourceLine" id="cb48-5" data-line-number="5">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span>(mySim, nextPlot, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="co"># initialize a new simulation, setting the load and save parameters</span></a>
+<a class="sourceLine" id="cb41-2" data-line-number="2">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb41-3" data-line-number="3">                 <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb41-4" data-line-number="4">                   <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>),</a>
+<a class="sourceLine" id="cb41-5" data-line-number="5">                   <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">.plotInitialTime =</span> <span class="dv">0</span>, <span class="dt">.plotInterval =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb41-6" data-line-number="6">                 ),</a>
+<a class="sourceLine" id="cb41-7" data-line-number="7">                 <span class="dt">modules =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"randomLandscapes"</span>),</a>
+<a class="sourceLine" id="cb41-8" data-line-number="8">                 <span class="dt">paths =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>))</a>
+<a class="sourceLine" id="cb41-9" data-line-number="9">)</a>
+<a class="sourceLine" id="cb41-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb41-11" data-line-number="11"><span class="co"># retrieve the plotting params from the simulation object</span></a>
+<a class="sourceLine" id="cb41-12" data-line-number="12"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.plotInitialTime</a>
+<a class="sourceLine" id="cb41-13" data-line-number="13"><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.plotInterval</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co">### WITHIN A MODULE:</span></a>
+<a class="sourceLine" id="cb42-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb42-3" data-line-number="3"><span class="co"># schedule a recurring plot event</span></a>
+<a class="sourceLine" id="cb42-4" data-line-number="4">nextPlot &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/time.html">time</a></span>(mySim) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/params.html">params</a></span>(mySim)<span class="op">$</span>randomLandscapes<span class="op">$</span>.plotInterval</a>
+<a class="sourceLine" id="cb42-5" data-line-number="5">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span>(mySim, nextPlot, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="using-existing-spades-modules" class="section level1">
@@ -1075,7 +1009,7 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <h2 class="hasAnchor">
 <a href="#included-sample-modules" class="anchor"></a>Included sample modules</h2>
 <p>Use <code><a href="https://rdrr.io/r/base/system.file.html">system.file("sampleModules", package = "SpaDES.core")</a></code> to get the path to the <code>sampleModules</code> directory. To view the contents of a module, use the <code>openModules</code> function. Note that you should not edit the sample modules directly, but save them as a copy in another location.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw"><a href="../reference/openModules.html">openModules</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>), <span class="st">"moduleName"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw"><a href="../reference/openModules.html">openModules</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>), <span class="st">"moduleName"</span>)</a></code></pre></div>
 <ol style="list-style-type: decimal">
 <li><p><code>randomLandscapes</code>: Generate RasterStack of random maps representative of a forest landscape (<code>DEM</code>, <code>forestAge</code>, <code>habitatQuality</code>, <code>percentPine</code>). Requires a global simulation parameter <code>stackName</code> be set.</p></li>
 <li><p><code>fireSpread</code>: Simulate fire ignition and spread on a landscape, where spread probability varies according to percent pine. Fire size statistics are collected immediately after each burn event. Requires a global simulation parameter <code>stackName</code> be set.</p></li>
@@ -1087,7 +1021,7 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <a href="#spades-module-repository" class="anchor"></a><code>SpaDES</code> module repository</h2>
 <p><strong>Website:</strong> <a href="https://github.com/PredictiveEcology/SpaDES-modules">https://github.com/PredictiveEcology/SpaDES-modules</a></p>
 <p>Modules from this (or another suitable GitHub repository) can be downloaded using:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="st">"moduleName"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="st">"moduleName"</span>)</a></code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved to the directory specified by the <code>spades.modulesPath</code>. An alternate path can be provided to <code>downloadModule</code> directly via the <code>path</code> argument, or specified using <code><a href="https://rdrr.io/r/base/options.html">options(spades.modulesPath = "path/to/my/modules")</a></code>.</p>
 </div>
 </div>
@@ -1104,9 +1038,9 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <a href="#using-the-module-template" class="anchor"></a>Using the module template</h2>
 <p>Code for new modules can be developed quickly using the template generator function <code>newModule</code>(also available as an RStudio add-in) which accepts as arguments the name of the new module, a directory path in which to create the new module, and a logical indicating whether to open the newly created module code file for editing.</p>
 <p>Module developers can set the <code>devtools.desc.author</code> option (<em>e.g.</em>, in their <code>.Rprofile</code> to automatically supply a default module author). See <code>package?devtools</code> for more details.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="co"># create a new module called "randomLandscape" in the "custom-modules" subdirectory</span></a>
-<a class="sourceLine" id="cb51-2" data-line-number="2"><span class="co"># and open the resulting file immediately for editing.</span></a>
-<a class="sourceLine" id="cb51-3" data-line-number="3"><span class="kw"><a href="../reference/newModule.html">newModule</a></span>(<span class="dt">name =</span> <span class="st">"randomLandscapes"</span>, <span class="dt">path =</span> <span class="st">"custom-modules"</span>, <span class="dt">open =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="co"># create a new module called "randomLandscape" in the "custom-modules" subdirectory</span></a>
+<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="co"># and open the resulting file immediately for editing.</span></a>
+<a class="sourceLine" id="cb45-3" data-line-number="3"><span class="kw"><a href="../reference/newModule.html">newModule</a></span>(<span class="dt">name =</span> <span class="st">"randomLandscapes"</span>, <span class="dt">path =</span> <span class="st">"custom-modules"</span>, <span class="dt">open =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>The newly created file can now be modified in the identified sections and customized to your module. However, it is very important that you do not edit portions of the file outside of the designated sections or your module may fail to work properly within a simulation.</p>
 </div>
 <div id="module-groups" class="section level2">
@@ -1119,38 +1053,38 @@ Therefore, a call to <code><a href="../reference/simList-accessors-inout.html">o
 <li><code>randomLandscapes</code></li>
 </ul>
 <p>Module groups make loading multiple modules easier: only the name of the module group needs to be specified in the <code>simInit</code> call, which will then initialize the simulation with the child modules.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DiagrammeR)</a>
-<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(SpaDES.core)</a>
-<a class="sourceLine" id="cb52-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb52-4" data-line-number="4">outputDir &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"simOutputs"</span>)</a>
-<a class="sourceLine" id="cb52-5" data-line-number="5">times &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">20.0</span>)</a>
-<a class="sourceLine" id="cb52-6" data-line-number="6">parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb52-7" data-line-number="7">  <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>),</a>
-<a class="sourceLine" id="cb52-8" data-line-number="8">  <span class="dt">.progress =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="ot">NA</span>),</a>
-<a class="sourceLine" id="cb52-9" data-line-number="9">  <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">nx =</span> 100L, <span class="dt">ny =</span> 100L, <span class="dt">inRAM =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb52-10" data-line-number="10">  <span class="dt">fireSpread =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb52-11" data-line-number="11">    <span class="dt">nFires =</span> 10L, <span class="dt">spreadprob =</span> <span class="fl">0.225</span>, <span class="dt">its =</span> <span class="fl">1e6</span>, <span class="dt">persistprob =</span> <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb52-12" data-line-number="12">    <span class="dt">returnInterval =</span> <span class="dv">10</span>, <span class="dt">startTime =</span> <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb52-13" data-line-number="13">    <span class="dt">.plotInitialTime =</span> <span class="dv">0</span>, <span class="dt">.plotInterval =</span> <span class="dv">10</span></a>
-<a class="sourceLine" id="cb52-14" data-line-number="14">  ),</a>
-<a class="sourceLine" id="cb52-15" data-line-number="15">  <span class="dt">caribouMovement =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb52-16" data-line-number="16">    <span class="dt">N =</span> 100L, <span class="dt">moveInterval =</span> <span class="dv">1</span>, <span class="dt">torus =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb52-17" data-line-number="17">    <span class="dt">.plotInitialTime =</span> <span class="dv">1</span>, <span class="dt">.plotInterval =</span> <span class="dv">1</span></a>
-<a class="sourceLine" id="cb52-18" data-line-number="18">  )</a>
-<a class="sourceLine" id="cb52-19" data-line-number="19">)</a>
-<a class="sourceLine" id="cb52-20" data-line-number="20">modules &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"SpaDES_sampleModules"</span>)</a>
-<a class="sourceLine" id="cb52-21" data-line-number="21">objects &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>()</a>
-<a class="sourceLine" id="cb52-22" data-line-number="22">paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb52-23" data-line-number="23">  <span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),</a>
-<a class="sourceLine" id="cb52-24" data-line-number="24">  <span class="dt">outputPath =</span> outputDir</a>
-<a class="sourceLine" id="cb52-25" data-line-number="25">)</a>
-<a class="sourceLine" id="cb52-26" data-line-number="26"></a>
-<a class="sourceLine" id="cb52-27" data-line-number="27">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> times, <span class="dt">params =</span> parameters, <span class="dt">modules =</span> modules,</a>
-<a class="sourceLine" id="cb52-28" data-line-number="28">                 <span class="dt">objects =</span> objects, <span class="dt">paths =</span> paths)</a>
-<a class="sourceLine" id="cb52-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb52-30" data-line-number="30"><span class="kw"><a href="../reference/simList-accessors-modules.html">modules</a></span>(mySim) <span class="co"># note the child modules are initialized</span></a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DiagrammeR)</a>
+<a class="sourceLine" id="cb46-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(SpaDES.core)</a>
+<a class="sourceLine" id="cb46-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb46-4" data-line-number="4">outputDir &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"simOutputs"</span>)</a>
+<a class="sourceLine" id="cb46-5" data-line-number="5">times &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="fl">0.0</span>, <span class="dt">end =</span> <span class="fl">20.0</span>)</a>
+<a class="sourceLine" id="cb46-6" data-line-number="6">parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb46-7" data-line-number="7">  <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">stackName =</span> <span class="st">"landscape"</span>, <span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>),</a>
+<a class="sourceLine" id="cb46-8" data-line-number="8">  <span class="dt">.progress =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="ot">NA</span>),</a>
+<a class="sourceLine" id="cb46-9" data-line-number="9">  <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">nx =</span> 100L, <span class="dt">ny =</span> 100L, <span class="dt">inRAM =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb46-10" data-line-number="10">  <span class="dt">fireSpread =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb46-11" data-line-number="11">    <span class="dt">nFires =</span> 10L, <span class="dt">spreadprob =</span> <span class="fl">0.225</span>, <span class="dt">its =</span> <span class="fl">1e6</span>, <span class="dt">persistprob =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb46-12" data-line-number="12">    <span class="dt">returnInterval =</span> <span class="dv">10</span>, <span class="dt">startTime =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb46-13" data-line-number="13">    <span class="dt">.plotInitialTime =</span> <span class="dv">0</span>, <span class="dt">.plotInterval =</span> <span class="dv">10</span></a>
+<a class="sourceLine" id="cb46-14" data-line-number="14">  ),</a>
+<a class="sourceLine" id="cb46-15" data-line-number="15">  <span class="dt">caribouMovement =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb46-16" data-line-number="16">    <span class="dt">N =</span> 100L, <span class="dt">moveInterval =</span> <span class="dv">1</span>, <span class="dt">torus =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb46-17" data-line-number="17">    <span class="dt">.plotInitialTime =</span> <span class="dv">1</span>, <span class="dt">.plotInterval =</span> <span class="dv">1</span></a>
+<a class="sourceLine" id="cb46-18" data-line-number="18">  )</a>
+<a class="sourceLine" id="cb46-19" data-line-number="19">)</a>
+<a class="sourceLine" id="cb46-20" data-line-number="20">modules &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"SpaDES_sampleModules"</span>)</a>
+<a class="sourceLine" id="cb46-21" data-line-number="21">objects &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>()</a>
+<a class="sourceLine" id="cb46-22" data-line-number="22">paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb46-23" data-line-number="23">  <span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>),</a>
+<a class="sourceLine" id="cb46-24" data-line-number="24">  <span class="dt">outputPath =</span> outputDir</a>
+<a class="sourceLine" id="cb46-25" data-line-number="25">)</a>
+<a class="sourceLine" id="cb46-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb46-27" data-line-number="27">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(<span class="dt">times =</span> times, <span class="dt">params =</span> parameters, <span class="dt">modules =</span> modules,</a>
+<a class="sourceLine" id="cb46-28" data-line-number="28">                 <span class="dt">objects =</span> objects, <span class="dt">paths =</span> paths)</a>
+<a class="sourceLine" id="cb46-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb46-30" data-line-number="30"><span class="kw"><a href="../reference/simList-accessors-modules.html">modules</a></span>(mySim) <span class="co"># note the child modules are initialized</span></a></code></pre></div>
 <p>Module groups can also be used to simplify the download of multiple modules:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="st">"SpaDES_sampleModules"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="st">"SpaDES_sampleModules"</span>)</a></code></pre></div>
 </div>
 <div id="debugging" class="section level2">
 <h2 class="hasAnchor">

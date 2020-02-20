@@ -82,7 +82,7 @@ to spades." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -220,7 +220,7 @@ in the first <code>modulePath</code>, then if it doesn't find it, in the second 
 columns with following column names: <code>objectName</code> (character, required),
 <code>file</code> (character), <code>fun</code> (character), <code>package</code> (character),
 <code>interval</code> (numeric), <code>loadTime</code> (numeric).
-See <code><a href='simList-accessors-inout.html'>inputs</a></code> and vignette("ii-modules") section about inputs.</p></td>
+See <code><a href='simList-accessors-inputs.html'>inputs</a></code> and vignette("ii-modules") section about inputs.</p></td>
     </tr>
     <tr>
       <th>outputs</th>
@@ -231,7 +231,7 @@ columns with following column names: <code>objectName</code> (character, require
 <code>eventPriority</code> is not set, it defaults to <code><a href='priority.html'>.last()</a></code>. If <code>eventPriority</code>
 is set to a low value, e.g., 0, 1, 2 and <code>saveTime</code> is <code><a href='simList-accessors-times.html'>start(sim)</a></code>,
 it should give "initial conditions".</p>
-<p>See <code><a href='simList-accessors-inout.html'>outputs</a></code> and
+<p>See <code><a href='simList-accessors-outputs.html'>outputs</a></code> and
 <code><a href='../articles/ii-modules.html'>vignette("ii-modules")</a></code> section about outputs.</p></td>
     </tr>
     <tr>
@@ -253,8 +253,8 @@ i.e., rerun.</p></td>
     </tr>
     <tr>
       <th>debug</th>
-      <td><p>Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+      <td><p>Optional tools for invoking debugging. Supplying a <code>list</code>
+will invoke the more powerful <code>logging</code> package. See details.
 Default is to use the value in <code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.debug")</a></code>.</p></td>
     </tr>
     <tr>

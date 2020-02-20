@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">November 21 2019</h4>
+            <h4 class="date">February 20 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/iv-advanced.Rmd"><code>vignettes/iv-advanced.Rmd</code></a></small>
       <div class="hidden name"><code>iv-advanced.Rmd</code></div>
@@ -116,7 +116,7 @@
 <div id="memory-monitoring" class="section level2">
 <h2 class="hasAnchor">
 <a href="#memory-monitoring" class="anchor"></a>Memory monitoring</h2>
-<p>While <code><a href="https://rdrr.io/pkg/profvis/man/profvis.html">profvis::profvis</a></code> is an essential tool for memory monitoring using deep R internals, it is often not sufficient for a discrete event situation. For example, it may be useful to know the <em>peak memory use</em> of an event, as this may be the limiting step for setting up many parallel instances. There is an experimental tool that gets triggered with <code><a href="https://rdrr.io/r/base/options.html">options("spades.memoryUseInterval" = xxx)</a></code> where <code>xxx</code> is a <code>numeric</code> in seconds, e.g., <code>0.2</code>. If this is set, and <code>future</code> and <code>future.callr</code> are installed, then whenever a <code>spades</code> call is made, the memory use will be assessed at that regular interval. The procedure is:</p>
+<p>While <code>profvis::profvis</code> is an essential tool for memory monitoring using deep R internals, it is often not sufficient for a discrete event situation. For example, it may be useful to know the <em>peak memory use</em> of an event, as this may be the limiting step for setting up many parallel instances. There is an experimental tool that gets triggered with <code><a href="https://rdrr.io/r/base/options.html">options("spades.memoryUseInterval" = xxx)</a></code> where <code>xxx</code> is a <code>numeric</code> in seconds, e.g., <code>0.2</code>. If this is set, and <code>future</code> and <code>future.callr</code> are installed, then whenever a <code>spades</code> call is made, the memory use will be assessed at that regular interval. The procedure is:</p>
 <ol style="list-style-type: decimal">
 <li><p>spawn a future session (i.e., a parallel session) that runs <code><a href="https://rdrr.io/r/base/system.html">system('ps')</a></code> which lists all processes. It only keeps the process that represents the process ID of the main R session.</p></li>
 <li><p>that <code>ps</code> call writes to a text file every <code><a href="https://rdrr.io/r/base/options.html">getOption('spades.memoryUseInterval')</a></code></p></li>

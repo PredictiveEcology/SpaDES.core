@@ -42,10 +42,10 @@ To accurately test your module, the test filename must follow the format
 }
 \examples{
 \dontrun{
- library(igraph) # for %>%
+ library(igraph) # for \%>\%
  library(SpaDES.core)
  tmpdir <- file.path(tempdir(), "coverage")
- modulePath <- file.path(tmpdir, "Modules") %>% checkPath(create = TRUE)
+ modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
  moduleName <- "forestAge" # sample module to test
  downloadModule(name = moduleName, path = modulePath) # download sample module
  testResults <- moduleCoverage(name = moduleName, path = modulePath)

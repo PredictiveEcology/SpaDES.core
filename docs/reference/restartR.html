@@ -41,21 +41,20 @@ saving and reloading the simList.
 Currently, this is not intended for general use: it has many specialized
 pieces for using inside a spades call.
 The main purpose for doing this is to clear memory leaks (possibly deep
-in R https://github.com/r-lib/fastmap) that are not
-fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
-should only be used if there are RAM limitations being hit with long running
-simulations. It has been tested to work Linux within Rstudio and at a
-terminal R session. The way to initiate
-restarting of R is simply setting the spades.restartRInterval or
+in R https://github.com/r-lib/fastmap) that are not fully diagnosed.
+This is still very experimental.
+This should only be used if there are RAM limitations being hit with long running simulations.
+It has been tested to work Linux within Rstudio and at a terminal R session.
+The way to initiate restarting of R is simply setting the spades.restartRInterval or
 setting the equivalent parameter in the restartR core module via:
-simInit(..., params = list(restartR = list(.restartRInterval = 1)), ...)
+simInit(..., params = list(.restartR = list(.restartRInterval = 1)), ...)
 greater than 0, which is the default,
-e.g., options(&quot;spades.restartRInterval&quot; = 100). This is only intended
-to restart a simulation in exactly the same place as it was (i.e., can\'t change
-machines), and because of the restart, the assignment of the spades call
-will be either to sim or the user must make such an assignment
-manually, e.g., sim &amp;lt;- SpaDES.core:::.pkgEnv$.sim. This is stated in
-a message." />
+e.g., options(&quot;spades.restartRInterval&quot; = 100).
+This is only intended to restart a simulation in exactly the same place as it was
+(i.e., cannot change machines), and because of the restart, the assignment of the spades
+call will be either to sim or the user must make such an assignment manually,
+e.g., sim &amp;lt;- SpaDES.core:::.pkgEnv$.sim.
+This is stated in a message." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -98,7 +97,7 @@ a message." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -159,7 +158,7 @@ a message." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Restart R programmatically</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/save.R'><code>R/save.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/restart.R'><code>R/restart.R</code></a></small>
     <div class="hidden name"><code>restartR.Rd</code></div>
     </div>
 
@@ -169,21 +168,20 @@ saving and reloading the <code>simList</code>.
 Currently, this is not intended for general use: it has many specialized
 pieces for using inside a <code>spades</code> call.
 The main purpose for doing this is to clear memory leaks (possibly deep
-in R <a href='https://github.com/r-lib/fastmap'>https://github.com/r-lib/fastmap</a>) that are not
-fully diagnosed. This is still very experimental. USE AT YOUR OWN RISK. This
-should only be used if there are RAM limitations being hit with long running
-simulations. It has been tested to work Linux within Rstudio and at a
-terminal R session. The way to initiate
-restarting of R is simply setting the <code>spades.restartRInterval</code> or
+in R <a href='https://github.com/r-lib/fastmap'>https://github.com/r-lib/fastmap</a>) that are not fully diagnosed.
+<em>This is still very experimental</em>.
+This should only be used if there are RAM limitations being hit with long running simulations.
+It has been tested to work Linux within Rstudio and at a terminal R session.
+The way to initiate restarting of R is simply setting the <code>spades.restartRInterval</code> or
 setting the equivalent parameter in the <code>restartR</code> core module via:
-<code><a href='simInit.html'>simInit(..., params = list(restartR = list(.restartRInterval = 1)), ...)</a></code>
+<code><a href='simInit.html'>simInit(..., params = list(.restartR = list(.restartRInterval = 1)), ...)</a></code>
 greater than 0, which is the default,
-e.g., <code><a href='https://rdrr.io/r/base/options.html'>options("spades.restartRInterval" = 100)</a></code>. This is only intended
-to restart a simulation in exactly the same place as it was (i.e., can\'t change
-machines), and because of the restart, the assignment of the <code>spades</code> call
-will be either to <code>sim</code> or the user must make such an assignment
-manually, e.g., <code>sim &lt;- SpaDES.core:::.pkgEnv$.sim</code>. This is stated in
-a message.</p>
+e.g., <code><a href='https://rdrr.io/r/base/options.html'>options("spades.restartRInterval" = 100)</a></code>.
+This is only intended to restart a simulation in exactly the same place as it was
+(i.e., cannot change machines), and because of the restart, the assignment of the <code>spades</code>
+call will be either to <code>sim</code> or the user must make such an assignment manually,
+e.g., <code>sim &lt;- SpaDES.core:::.pkgEnv$.sim</code>.
+This is stated in a message.</p>
     </div>
 
     <pre class="usage"><span class='fu'>restartR</span>(
@@ -216,11 +214,11 @@ user wants to make a custom <code>First</code> file, it should built off that on
     </tr>
     <tr>
       <th>.RDataFile</th>
-      <td><p>A filename for saving simList. Defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.restartR.RDataFilename")</a></code>, and the directory will
-    be in <code>restartDir</code>. The simulation time will be mid-pended to this
-    name, as in: <code>basename(.RDataFile), "_time",</code>
-    <code>paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))</code></p></td>
+      <td><p>A filename for saving the <code>simList</code>.
+Defaults to <code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.restartR.RDataFilename")</a></code>, and the directory will
+be in <code>restartDir</code>. The simulation time will be mid-pended to this
+name, as in: <code>basename(.RDataFile), "_time",</code>
+<code>paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))</code></p></td>
     </tr>
     <tr>
       <th>restartDir</th>

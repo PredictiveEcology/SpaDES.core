@@ -728,7 +728,7 @@ setMethod(
     }
 
     tryOut <- try(zip(zipFileName, files = allFiles, ...))
-    if (is(tryOut, "try-error")) {
+    if (is(tryOut, "try-error") || isTRUE(tryOut == 127)) {
       if (Sys.info()["sysname"] == "Windows") {
         if (is.null(dots$zip) & all(Sys.getenv(c("R_ZIPCMD", "zip")) %in% ""))
           stop("External zip command paths missing.\nAdd 'zip = \"path/to/zip.exe\"' specifying path to zip.exe")

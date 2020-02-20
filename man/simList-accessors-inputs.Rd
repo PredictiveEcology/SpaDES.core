@@ -6,19 +6,11 @@
 \alias{inputs,simList-method}
 \alias{inputs<-}
 \alias{inputs<-,simList-method}
-\alias{outputs}
-\alias{outputs,simList-method}
-\alias{outputs<-}
-\alias{outputs<-,simList-method}
 \alias{inputArgs}
 \alias{inputArgs,simList-method}
 \alias{inputArgs<-}
 \alias{inputArgs<-,simList-method}
-\alias{outputArgs}
-\alias{outputArgs,simList-method}
-\alias{outputArgs<-}
-\alias{outputArgs<-,simList-method}
-\title{Inputs and outputs}
+\title{Simulation inputs}
 \usage{
 inputs(sim)
 
@@ -28,14 +20,6 @@ inputs(sim) <- value
 
 \S4method{inputs}{simList}(sim) <- value
 
-outputs(sim)
-
-\S4method{outputs}{simList}(sim)
-
-outputs(sim) <- value
-
-\S4method{outputs}{simList}(sim) <- value
-
 inputArgs(sim)
 
 \S4method{inputArgs}{simList}(sim)
@@ -43,14 +27,6 @@ inputArgs(sim)
 inputArgs(sim) <- value
 
 \S4method{inputArgs}{simList}(sim) <- value
-
-outputArgs(sim)
-
-\S4method{outputArgs}{simList}(sim)
-
-outputArgs(sim) <- value
-
-\S4method{outputArgs}{simList}(sim) <- value
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -63,23 +39,21 @@ Returns or sets the value(s) of the \code{input} or \code{output} slots
 in the \code{simList} object.
 }
 \description{
-These functions are one of three mechanisms to add the information about which
-input files to load in a \code{spades} call and the information about which
-output files to save. 1) As arguments to a \code{simInit} call. Specifically, \code{inputs}
-or \code{outputs}. See \code{?simInit}. 2) With the \code{inputs(simList)} or \code{outputs(simList)}
-function call.
-3) By adding a function called \code{.inputObjects} inside a module, which will be executed
-during the \code{simInit} call. This last way is the most "modular" way to create
-default data sets for your model. See below for more details.
+Accessor functions for the \code{inputs} slots in a \code{simList} object.
 }
 \details{
-Accessor functions for the \code{inputs} and \code{outputs} slots in a
-\code{simList} object.
+These functions are one of three mechanisms to add the information about which input files
+to load in a \code{spades} call.
+\enumerate{
+  \item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
+        See \code{?simInit}.
+  \item With the \code{outputs(simList)} function call.
+  \item By adding a function called \code{.inputObjects} inside a module, which will be executed
+        during the \code{simInit} call. This last way is the most "modular" way to create
+        default data sets for your model.
 }
-\note{
-The automatic file type handling only adds the correct extension from a given
-\code{fun} and \code{package}. It does not do the inverse, from a given extension find the
-correct \code{fun} and \code{package}.
+
+See below for more details.
 }
 \section{inputs function or argument in \code{simInit}}{
 
@@ -151,42 +125,6 @@ the module will get it here:
 \}}
 }
 
-\section{outputs function or argument in \code{simInit}}{
-
-
-\code{outputs} accepts a data.frame similar to the \code{inputs} data.frame, but
-with up to 6 columns.
-
-\tabular{ll}{
-\code{objectName} \tab required, character string indicating the name of the object
-in the \code{simList} that will be saved to disk (without the \code{sim$} prefix).\cr
-
-\code{file} \tab optional, a character string indicating the file path to save to.
-The default is to concatenate \code{objectName} with the model timeunit and
-\code{saveTime}, separated by underscore, '\code{_}'. So a default filename would be
-\code{"Fires_year1.rds"}.\cr
-
-\code{fun} \tab optional, a character string indicating the function to use to
-save that file. The default is \code{\link{saveRDS}} \cr
-
-\code{package} \tab optional character string indicating the package in
-which to find the \code{fun});\cr
-
-\code{saveTime} \tab optional numeric, indicating when in simulation time the file
-should be saved. The default is the lowest priority at \code{end(sim)},
-i.e., at the very end. \cr
-
-\code{arguments} \tab is a list of lists of named arguments, one list for each
-\code{fun}. For example, if \code{fun = "write.csv"},
-\code{arguments = list(row.names = TRUE)} will pass the argument
-\code{row.names = TRUE} to \code{write.csv}  If there is only one list,
-then it is assumed to apply to all files and will be recycled as per normal R
-rules of recycling for each \code{fun}.\cr
-}
-
-See the modules vignette for more details (\code{browseVignettes("SpaDES.core")}).
-}
-
 \examples{
 #######################
 # inputs
@@ -243,96 +181,26 @@ if (require("rgdal", quietly = TRUE)) {
   spades(sim)
 }
 
-  # Example showing loading multiple objects from global environment onto the
-  #   same object in the simList, but at different load times
-  a1 <- 1
-  a2 <- 2
-  # Note arguments must be a list of NROW(inputs), with each element itself being a list,
-  #  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time
-  args <- lapply(1:2, function(x) {
-                 list(x = paste0("a", x),
-                      envir = environment()) # may be necessary to specify in which envir a1, a2
-                                             # are located, if not in an interactive sessino
-                 })
-  inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
-  a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
-  a <- spades(a)
-  identical(a1, a$a)
+# Example showing loading multiple objects from global environment onto the
+#   same object in the simList, but at different load times
+a1 <- 1
+a2 <- 2
+# Note arguments must be a list of NROW(inputs), with each element itself being a list,
+#  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time
+args <- lapply(1:2, function(x) {
+               list(x = paste0("a", x),
+                    envir = environment()) # may be necessary to specify in which envir a1, a2
+                                           # are located, if not in an interactive sessino
+               })
+inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
+a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
+a <- spades(a)
+identical(a1, a$a)
 
-  end(a) <- 3
-  a <- spades(a) # different object (a2) loaded onto a$a
-  identical(a2, a$a)
+end(a) <- 3
+a <- spades(a) # different object (a2) loaded onto a$a
+identical(a2, a$a)
 
-# Clean up after
-unlink(tmpdir, recursive = TRUE)
-
-#######################
-# outputs
-#######################
-
-library(igraph) # for \%>\%
-tmpdir <- file.path(tempdir(), "outputs") \%>\% checkPath(create = TRUE)
-tmpFile <- file.path(tmpdir, "temp.rds")
-tempObj <- 1:10
-
-# Can add data.frame of outputs directly into simInit call
-sim <- simInit(objects = c("tempObj"),
-               outputs = data.frame(objectName = "tempObj"),
-               paths = list(outputPath = tmpdir))
-outputs(sim) # To see what will be saved, when, what filename
-sim <- spades(sim)
-outputs(sim) # To see that it was saved, when, what filename
-
-# Also can add using assignment after a simList object has been made
-sim <- simInit(objects = c("tempObj"), paths = list(outputPath = tmpdir))
-outputs(sim) <- data.frame(objectName = "tempObj", saveTime = 1:10)
-sim <- spades(sim)
-outputs(sim) # To see that it was saved, when, what filename.
-
-# can do highly variable saving
-tempObj2 <- paste("val",1:10)
-df1 <- data.frame(col1 = tempObj, col2 = tempObj2)
-sim <- simInit(objects = c("tempObj", "tempObj2", "df1"),
-  paths=list(outputPath = tmpdir))
-outputs(sim) = data.frame(
-     objectName = c(rep("tempObj", 2), rep("tempObj2", 3), "df1"),
-     saveTime = c(c(1,4), c(2,6,7), end(sim)),
-     fun = c(rep("saveRDS", 5), "write.csv"),
-     package = c(rep("base", 5), "utils"),
-     stringsAsFactors = FALSE)
-# since write.csv has a default of adding a column, x, with rownames, must add additional
-#   argument for 6th row in data.frame (corresponding to the write.csv function)
-outputArgs(sim)[[6]] <- list(row.names=FALSE)
-sim <- spades(sim)
-outputs(sim)
-
-# read one back in just to test it all worked as planned
-newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
-newObj
-
-# using saving with SpaDES-aware methods
-# To see current ones SpaDES can do
-.saveFileExtensions()
-
-library(raster)
-if (require(rgdal)) {
-  ras <- raster(ncol = 4, nrow = 5)
-  ras[] <- 1:20
-
-  sim <- simInit(objects = c("ras"), paths = list(outputPath = tmpdir))
-  outputs(sim) = data.frame(
-    file = "test",
-    fun = "writeRaster",
-    package = "raster",
-    objectName = "ras",
-    stringsAsFactors = FALSE)
-
-  outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
-  simOut <- spades(sim)
-  outputs(simOut)
-  newRas <- raster(dir(tmpdir, full.name = TRUE, pattern = ".tif"))
-  all.equal(newRas, ras) # Should be TRUE
-}
 # Clean up after
 unlink(tmpdir, recursive = TRUE)
 }

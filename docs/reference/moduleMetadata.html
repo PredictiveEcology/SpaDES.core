@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -192,7 +192,7 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 <span class='no'>opts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='st'>"spades.moduleCodeChecks"</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
                 <span class='st'>"spades.useRequire"</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleMetadata</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>)</div><div class='output co'>#&gt; <span class='message'>Assuming sim is a module name</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span></div><div class='output co'>#&gt; <span class='message'>defineParameter: '.useCache' is not of specified type 'logical'.</span></div><div class='input'>
+<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleMetadata</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>)</div><div class='output co'>#&gt; <span class='message'>Assuming sim is a module name</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
 <span class='co'># using simList</span>
 <span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
    <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>2000.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2001.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
@@ -203,14 +203,14 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
    <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
 )</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmplnBpLx/temp_libpath168b310a8809c/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpgNEPrZ/temp_libpath1590a172fd6b9/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpsU1PUh/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpsU1PUh/reproducible/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp9AsuiQ/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp9AsuiQ/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmplnBpLx/temp_libpath168b310a8809c/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpJgaorZ/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpJgaorZ/reproducible/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpO3UVu7/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpO3UVu7/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpgNEPrZ/temp_libpath1590a172fd6b9/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: grid</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘grid’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:quickPlot’:</span>
 #&gt; <span class='message'></span>
@@ -305,7 +305,7 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 #&gt; 1    caribou SpatialPointsDataFrame &lt;NA&gt;
 #&gt; </div><div class='input'>
 <span class='co'># turn code checking back on -- don't need it here</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>opts</span>)</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>opts</span>)</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

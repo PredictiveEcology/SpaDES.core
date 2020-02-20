@@ -1,6 +1,9 @@
 ## Updated release
 
-This is a maintenance release with several package improvements and bug fixes.
+This is a major, i.e., backwards incompatible, release that works with new backend of `reproducible` package. 
+Other user-visible changes concern the converting of `print` and `cat` statements to messages. 
+This enables a user suppressing these more easily, a feature requested by CRAN for one of our downstream package submissions, `SpaDES.experiment`.
+
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
@@ -11,18 +14,18 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 3.5.3
 
 ### Current R versions
-* macOS 10.13.3 High Sierra (travis-ci), R 3.6.1
-* macOS 10.15.1 Catalina        (local), R 3.6.1
-* Ubuntu 16.04              (travis-ci), R 3.6.1
-* Ubuntu 18.04                  (local), R 3.6.1
-* Windows                    (appveyor), R 3.6.1
-* Windows                 (win-builder), R 3.6.1
+* macOS 10.13.3 High Sierra (travis-ci), R 3.6.2
+* macOS 10.15.1 Catalina        (local), R 3.6.2
+* Ubuntu 16.04              (travis-ci), R 3.6.2
+* Ubuntu 18.04                  (local), R 3.6.2
+* Windows                    (appveyor), R 3.6.2
+* Windows                 (win-builder), R 3.6.2
 
 ### Development R version
-* Ubuntu 16.04              (travis-ci), R 4.0.0 (2019-11-21 r77446)
-* Ubuntu 18.04                  (local), R 4.0.0 (2019-11-21 r77446)
-* Windows                    (appveyor), R 4.0.0 (2019-11-20 r77445)
-* Windows                 (win-builder), R 4.0.0 (2019-11-21 r77446)
+* Ubuntu 16.04              (travis-ci), R 4.0.0 (2020-02-20 r77834)
+* Ubuntu 18.04                  (local), R 4.0.0 (2020-02-20 r77834)
+* Windows                    (appveyor), R 4.0.0 (2020-02-16 r77813)
+* Windows                 (win-builder), R 4.0.0 (2020-02-16 r77813)
 
 ## R CMD check results
 

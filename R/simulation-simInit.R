@@ -429,13 +429,6 @@ setMethod(
       }
     }
 
-    # if (which(search() %in% "package:SpaDES.core") != 2) {
-    #   # Must move it to 2nd position, because simList fns have this as parent
-    #   detach("package:SpaDES.core")
-    #   suppressMessages(attachNamespace(asNamespace("SpaDES.core")))
-    # }
-    #
-
     ## timeunit is needed before all parsing of modules.
     ## It could be used within modules within defineParameter statements.
     # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
@@ -539,7 +532,8 @@ setMethod(
     # remove the restartR module if it is not used. This is easier than adding it because
     #   the simInit is not run again during restarts, so it won't hit this again. That
     #   is problematic for restartR situation, but not for "normal" situation.
-    if (is.null(params$.restartR$.restartRInterval) && getOption("spades.restartRInterval", 0) == 0) {
+    if (is.null(params$.restartR$.restartRInterval) &&
+        getOption("spades.restartRInterval", 0) == 0) {
       core <- setdiff(core, "restartR")
       # .pkgEnv$.coreModules <- core
     } else {
@@ -850,6 +844,7 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
+    browser(expr = exists("._simInit_1"))
     namesMatchCall <- names(match.call())
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
@@ -886,6 +881,78 @@ setMethod(
            c("", "s")[plural], " ", c("is", "are")[plural], " specified incorrectly.",
            c(" It is", " They are")[plural], " expected to be ",
            paste(expectedDF[!correctArgs], collapse = ", "))
+    }
+
+    expectedInnerClasses <- list(times = list(start = "numeric",
+                                              end = "numeric",
+                                              timeunit = "character"),
+                         params = "list",
+                         modules = "character",
+                         objects = "ANY",
+                         paths = "character",
+                         inputs = "ANY",
+                         outputs = "ANY",
+                         loadOrder = "ANY")
+    neic <- names(expectedInnerClasses)
+    names(neic) <- neic
+    namesInner <- lapply(neic, function(x) NULL)
+    browser(expr = exists("._simInit_2"))
+    correctArgsInner <- unlist(lapply(1:length(li), function(x) {
+      browser(expr = exists("._simInit_3"))
+      if (isTRUE(is(li[[x]], "list")) &&
+          isTRUE(all(expectedInnerClasses[[x]] != "ANY"))) {
+        if (is(expectedInnerClasses[[x]], "list")) {
+          items <- if (length(names(li[[x]])) > 0) {
+            names(expectedInnerClasses[[x]])[match(names(li[[x]]),
+                                        names(expectedInnerClasses[[x]]))]
+          } else {
+            seq(length(li[[x]]))
+          }
+          NAItems <- is.na(items)
+          if (any(NAItems)) { # fill in unnamed list elements
+            browser(expr = exists("innerClasses"))
+            items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
+              !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
+            names(li[[x]])[NAItems] <- items[NAItems]
+
+          }
+          namesInner[[x]] <<- items
+
+          all(sapply(items, function(y) {
+            is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+          }))
+        } else {
+          if (length(li[[x]]) > 0)
+            all(sapply(seq(length(li[[x]])), function(y) {
+              is(li[[x]][[y]], expectedInnerClasses[[x]])
+            }))
+        }
+      } else {
+        TRUE
+      }
+    }))
+    browser(expr = exists("innerClasses"))
+    # give names to inner elements if they were only done by order
+    nulls <- sapply(namesInner, is.null)
+    eic <- expectedInnerClasses[!nulls]
+    namesInner <- namesInner[!nulls]
+    if (length(namesInner) > 0) {
+      li[names(namesInner)] <- Map(lis = li[names(namesInner)],
+                                   nam = namesInner,
+                                   expected = expectedInnerClasses[names(namesInner)],
+                                   function(lis, nam, expected) {
+                                     out <- setNames(lis, nam)
+                                     out[names(expected)]
+                                     })
+    }
+
+    if (!all(correctArgsInner)) {
+      plural <- (sum(!correctArgsInner) > 1) + 1
+      expectedList <- append(list(arg = names(li)), list(expectedInnerClasses))
+      stop("simInit is incorrectly specified. ", " The ", paste(names(li)[!correctArgsInner], collapse = ", "), " argument",
+           c("", "s")[plural], " ", c("is", "are")[plural], " specified incorrectly.",
+           c(" It is", " They are")[plural], " expected to be a list of ",
+           paste(expectedList[[2]][!correctArgsInner], collapse = ", "), " objects")
     }
 
     sim <- simInit(times = li$times, params = li$params,

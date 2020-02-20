@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -102,7 +102,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">November 21 2019</h4>
+            <h4 class="date">February 20 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -167,10 +167,32 @@
 <div id="spades-demos-and-sample-modules" class="section level2">
 <h2 class="hasAnchor">
 <a href="#spades-demos-and-sample-modules" class="anchor"></a><code>SpaDES</code> demos and sample modules</h2>
-<p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to check out the included demos, to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
-<p>A simple demo is provided with the package that highlights the ‘real time’ graphics capabilities of package’s <code>Plot</code> function. This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
+<p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
+<p>This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"SpaDES.core"</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/utils/demo.html">demo</a></span>(<span class="st">"spades-simulation"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">demoSim &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="kw"><a href="../reference/simInit.html">simInit</a></span>(</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">  <span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="dv">0</span>, <span class="dt">end =</span> <span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">  <span class="dt">modules =</span> <span class="st">"SpaDES_sampleModules"</span>,</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">  <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">    <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>),</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">    <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">      <span class="dt">nx =</span> <span class="fl">1e2</span>, <span class="dt">ny =</span> <span class="fl">1e2</span>, <span class="dt">.saveObjects =</span> <span class="st">"landscape"</span>,</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">      <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>, <span class="dt">.plotInterval =</span> <span class="ot">NA</span>, <span class="dt">inRAM =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">    ),</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">    <span class="dt">caribouMovement =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">      <span class="dt">N =</span> <span class="fl">1e2</span>, <span class="dt">.saveObjects =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"caribou"</span>),</a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">      <span class="dt">.plotInitialTime =</span> <span class="dv">1</span>, <span class="dt">.plotInterval =</span> <span class="dv">1</span>, <span class="dt">moveInterval =</span> <span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15">    ),</a>
+<a class="sourceLine" id="cb1-16" data-line-number="16">    <span class="dt">fireSpread =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb1-17" data-line-number="17">      <span class="dt">nFires =</span> <span class="fl">1e1</span>, <span class="dt">spreadprob =</span> <span class="fl">0.235</span>, <span class="dt">persistprob =</span> <span class="dv">0</span>, <span class="dt">its =</span> <span class="fl">1e6</span>,</a>
+<a class="sourceLine" id="cb1-18" data-line-number="18">      <span class="dt">returnInterval =</span> <span class="dv">10</span>, <span class="dt">startTime =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">      <span class="dt">.plotInitialTime =</span> <span class="dv">0</span>, <span class="dt">.plotInterval =</span> <span class="dv">10</span></a>
+<a class="sourceLine" id="cb1-20" data-line-number="20">    )</a>
+<a class="sourceLine" id="cb1-21" data-line-number="21">  ),</a>
+<a class="sourceLine" id="cb1-22" data-line-number="22">  <span class="dt">path =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>))</a>
+<a class="sourceLine" id="cb1-23" data-line-number="23">))</a>
+<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="kw"><a href="../reference/spades.html">spades</a></span>(demoSim)</a></code></pre></div>
 <p>Additional <code>SpaDES</code> modules are available via a GitHub repository: <a href="https://github.com/PredictiveEcology/SpaDES-modules">https://github.com/PredictiveEcology/SpaDES-modules</a>. Modules from this repository can be downloaded to a local directory using:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="dt">name =</span> <span class="st">"moduleName"</span>)</a></code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved to the directory specified by the <code>spades.modulesPath</code>. An alternate path can be provided to <code>downloadModule</code> directly via the <code>path</code> argument, or specified using <code><a href="https://rdrr.io/r/base/options.html">options(spades.modulesPath = "path/to/my/modules")</a></code>.</p>
@@ -214,9 +236,10 @@
 <a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(mySim)</a></code></pre></div>
 <p>Simulation module object dependencies can be viewed using:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(igraph)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)        <span class="co"># plots simplified module (object) dependency graph</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim)        <span class="co"># plots object dependency diagram</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DiagrammeR)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)        <span class="co"># plots simplified module (object) dependency graph</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim)        <span class="co"># plots object dependency diagram</span></a></code></pre></div>
 <p>They can viewed directly by printing the output of the <code>depsEdgeList</code> function.</p>
 </div>
 <div id="running-a-simulation-the-spades-function" class="section level2">

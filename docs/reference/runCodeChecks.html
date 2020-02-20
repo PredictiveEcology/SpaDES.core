@@ -36,9 +36,10 @@
 
 
 <meta property="og:title" content="Runs a series of code checks during simInit — .runCodeChecks" />
-<meta property="og:description" content="This uses codetools::codeCheck for function consistency, and
-codetools::findGlobals to check for function collisions with known,
-common function collisions (raster::stack, raster::scale)" />
+<meta property="og:description" content="This uses custom tools and some optional tools in codetools
+package to check for function collisions with known,
+common function collisions (raster::stack, raster::scale).
+All outputs will be sent as messages." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -81,7 +82,7 @@ common function collisions (raster::stack, raster::scale)" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -147,9 +148,10 @@ common function collisions (raster::stack, raster::scale)" />
     </div>
 
     <div class="ref-description">
-    <p>This uses codetools::codeCheck for function consistency, and
-codetools::findGlobals to check for function collisions with known,
-common function collisions (raster::stack, raster::scale)</p>
+    <p>This uses custom tools and some optional tools in <code>codetools</code>
+package to check for function collisions with known,
+common function collisions (raster::stack, raster::scale).
+All outputs will be sent as messages.</p>
     </div>
 
     <pre class="usage"><span class='fu'>.runCodeChecks</span>(<span class='no'>sim</span>, <span class='no'>m</span>, <span class='no'>k</span>, <span class='kw'>hadPrevMessage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>

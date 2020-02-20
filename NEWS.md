@@ -1,5 +1,41 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.0
+=============
+
+## new features
+
+* several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting `options('spades.recoveryMode' = 0)` may further help
+* Updates to deal with new backend with `reproducible`
+* better assertions inside list elements of `simInit`, e.g., `simInit(times = list(start = "test"))` now fails because times must be a list of 2 `numeric` objects
+* messaging is now all with `message` instead of a mixture of `message`, `cat` and `print`. This allows for easier suppressing of messaging, e.g., via `suppressMessages`. This was requested in a downstream package, `SpaDES.experiment` that was submitted to CRAN but rejected due to the now former inability to suppress messages.
+
+## dependencies
+
+* moved packages from Imports to Suggests: `codetools`, `future`, `httr`, `logging`, and `tcltk`
+* removed `archivist`
+
+## deprecated
+
+`.objSizeInclEnviros` and removed
+
+## bug fixes
+
+* removed mention of 'demo' from intro vignette (#110)
+* `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`.
+
+version 0.2.8
+=============
+
+## new features
+
+* Changed all internal `print` and `cat` statements to message to allow use of `suppressMessages`, as recommended by CRAN
+* added file based logging via `logging` package, invoked by setting `debug` argument in `spades` function call to a `list(...)`. `?spades` describes details
+
+## bug fixes
+
+* `restartR` minor bug fixes
+
 version 0.2.7
 =============
 

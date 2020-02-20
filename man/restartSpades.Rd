@@ -48,7 +48,7 @@ trajectory.
 }
 \note{
 This will only work reliably
-\emph{if the simList was not modified yet during the event which caused the error}.
+\emph{if the \code{simList} was not modified yet during the event which caused the error}.
 The \code{simList} will be in the state it was at the time of the error.
 }
 \examples{
