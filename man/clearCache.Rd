@@ -76,10 +76,10 @@ The warning will have the \code{cloudFolderID} that should be used in subsequent
 It will also be added to \code{options("reproducible.cloudFolderID")},
 but this will not persist across sessions.}
 
-\item{drv}{an object that inherits from DBIDriver, or an existing
-DBIConnection object (in order to clone an existing connection).}
+\item{drv}{an object that inherits from \code{DBIDriver}, or an existing
+\code{DBIConnection} object (in order to clone an existing connection).}
 
-\item{conn}{A DBIConnection object, as returned by dbConnect()}
+\item{conn}{A \code{DBIConnection} object, as returned by \code{dbConnect()}.}
 
 \item{...}{Other arguments. Currently, \code{regexp}, a logical, can be provided.
 This must be \code{TRUE} if the use is passing a regular expression.

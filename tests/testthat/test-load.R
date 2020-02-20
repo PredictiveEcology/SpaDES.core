@@ -431,6 +431,7 @@ test_that("Filenames for simList", {
 
   Fns <- Filenames(s)
 
+  #fnsGrd <- c(filename(s$b), gsub("grd$", "gri", filename(s$b)))
   expect_true(identical(Fns$b, filename(s$b)))
   expect_true(identical(Fns$r, filename(s$r)))
   expect_true(identical(Fns$r2, filename(s$r2)))

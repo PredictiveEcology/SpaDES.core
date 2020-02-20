@@ -802,9 +802,9 @@ if (!isGeneric("clearCache")) {
 #' This will take the \code{cachePath(object)} and pass
 #' @export
 #'
-#' @param conn A DBIConnection object, as returned by dbConnect()
-#' @param drv an object that inherits from DBIDriver, or an existing
-#'     DBIConnection object (in order to clone an existing connection).
+#' @param conn A \code{DBIConnection} object, as returned by \code{dbConnect()}.
+#' @param drv an object that inherits from \code{DBIDriver}, or an existing
+#'     \code{DBIConnection} object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #' @importFrom reproducible clearCache
 #' @importMethodsFrom reproducible clearCache

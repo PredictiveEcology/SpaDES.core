@@ -1,7 +1,7 @@
 ## Updated release
 
 This is a major, i.e., backwards incompatible, release that works with new backend of `reproducible` package. 
-Other user-visible changes concern the converting of print and cat statements to messages. 
+Other user-visible changes concern the converting of `print` and `cat` statements to messages. 
 This enables a user suppressing these more easily, a feature requested by CRAN for one of our downstream package submissions, `SpaDES.experiment`.
 
 See `NEWS.md` for a full list of changes.
@@ -22,8 +22,8 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 3.6.2
 
 ### Development R version
-* Ubuntu 16.04              (travis-ci), R 4.0.0 (2020-02-17 r77819)
-* Ubuntu 18.04                  (local), R 4.0.0 (2020-02-17 r77819)
+* Ubuntu 16.04              (travis-ci), R 4.0.0 (2020-02-20 r77834)
+* Ubuntu 18.04                  (local), R 4.0.0 (2020-02-20 r77834)
 * Windows                    (appveyor), R 4.0.0 (2020-02-16 r77813)
 * Windows                 (win-builder), R 4.0.0 (2020-02-16 r77813)
 

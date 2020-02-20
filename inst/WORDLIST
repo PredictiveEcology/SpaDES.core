@@ -14,13 +14,13 @@ basedir
 benchmarking
 checkpointing
 Checkpointing
+checksum
 checksums
 Checksums
 checkUsage
 childModule
 choosealicense
 clockTime
-codeCheck
 codetools
 color
 colored
@@ -51,15 +51,16 @@ feedbacks
 filelist
 filepath
 fileTable
-findGlobals
 franca
 functionCoverage
 Gantt
 ganttStatus
 getOption
 github
+GitHub
 globals
 GLPK
+google
 googledrive
 http
 https
@@ -74,6 +75,7 @@ inputObjects
 julia
 Landis
 lingua
+login
 macOS
 Matloff
 memoisable
@@ -101,6 +103,7 @@ NetLogo
 novo
 Oauth
 oldrel
+optimizations
 ORCID
 outputObjects
 overplot
@@ -135,6 +138,7 @@ S3
 S4
 scalable
 SELES
+sim
 sim2gantt
 simInit
 simList
@@ -159,3 +163,8 @@ useCache
 userSuppliedObjNames
 v1
 vectorized
+Versioned
+versioning
+workflow
+Workflow
+workflows

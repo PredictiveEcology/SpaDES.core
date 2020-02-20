@@ -23,10 +23,10 @@ version 1.0.0
 
 `.objSizeInclEnviros` and removed
 
-## bugfixes
+## bug fixes
 
 * removed mention of 'demo' from intro vignette (#110)
-* `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`; fixed in 758b9eb8ee74ef58c5451da1abda260c223a840c
+* `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`.
 
 version 0.2.8
 =============
