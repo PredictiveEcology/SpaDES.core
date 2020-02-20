@@ -1,7 +1,7 @@
 ## Updated release
 
 This is a major, i.e., backwards incompatible, release that works with new backend of `reproducible` package. 
-Other user-visible changes concern the converting of print and cat statements to messages. 
+Other user-visible changes concern the converting of `print` and `cat` statements to messages. 
 This enables a user suppressing these more easily, a feature requested by CRAN for one of our downstream package submissions, `SpaDES.experiment`.
 
 See `NEWS.md` for a full list of changes.
