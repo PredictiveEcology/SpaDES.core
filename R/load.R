@@ -37,7 +37,6 @@ fileName <- function(x) {
   return(unlist(strsplit(basename(unlist(x)), "\\..*$")))
 }
 
-
 # The load doEvent
 doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
   if (eventType == "inputs") {
