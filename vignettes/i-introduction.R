@@ -42,6 +42,7 @@
 
 ## ----view-dependencies, eval=FALSE, echo=TRUE---------------------------------
 #  library(igraph)
+#  library(DiagrammeR)
 #  depsEdgeList(mySim, FALSE)  # data.frame of all object dependencies
 #  moduleDiagram(mySim)        # plots simplified module (object) dependency graph
 #  objectDiagram(mySim)        # plots object dependency diagram
