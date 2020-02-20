@@ -865,7 +865,7 @@ setMethod(
             sim = sim,
             reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
             .First = getOption("spades.restartR..First", restartFormals$.First),
-            file = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
+            .RDataFile = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
             restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
           )
         }
