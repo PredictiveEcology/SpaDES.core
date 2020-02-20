@@ -422,8 +422,8 @@ test_that("Filenames for simList", {
   }, add = TRUE)
 
   s <- simInit()
-  s$r <- raster(extent(0,10,0,10), vals = 1, res = 1)
-  s$r2 <- raster(extent(0,10,0,10), vals = 1, res = 1)
+  s$r <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  s$r2 <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
   s$r <- writeRaster(s$r, filename = tmpfile[1], overwrite = TRUE)
   s$r2 <- writeRaster(s$r2, filename = tmpfile[3], overwrite = TRUE)
   s$s <- stack(s$r, s$r2)
@@ -431,8 +431,7 @@ test_that("Filenames for simList", {
 
   Fns <- Filenames(s)
 
-  fnsGrd <- c(filename(s$b), gsub("grd$", "gri", filename(s$b)))
-  expect_true(identical(Fns$b, fnsGrd))
+  expect_true(identical(Fns$b, filename(s$b)))
   expect_true(identical(Fns$r, filename(s$r)))
   expect_true(identical(Fns$r2, filename(s$r2)))
   expect_true(identical(Fns$s, sapply(seq_len(nlayers(s$s)), function(rInd) filename(s$s[[rInd]]))))

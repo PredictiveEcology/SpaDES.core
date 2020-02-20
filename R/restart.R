@@ -1,6 +1,6 @@
 if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".", ".attachedPkgsFilename",  ".First", ".oldWd", ".spadesCall",
-                         ".spades.restartRInterval", ".spades.simFilename"))
+  utils::globalVariables(c(".", ".attachedPkgsFilename",  ".First", ".oldWd",
+                           ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"))
 }
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
@@ -214,7 +214,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #'    be loaded at restart from \file{~/.qs} and run. Default is \code{NULL},
 #'    meaning it will use the non-exported \code{SpaDES.core:::First}. If a
 #'    user wants to make a custom \code{First} file, it should built off that one.
-#' @param file A filename for saving the \code{simList}.
+#' @param .RDataFile A filename for saving the \code{simList}.
 #'     Defaults to \code{getOption("spades.restartR.filename")}, and the directory will
 #'     be in \code{restartDir}. The simulation time will be mid-pended to this
 #'     name, as in: \code{basename(file), "_time",}
@@ -264,7 +264,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #' @importFrom crayon bgBlue white
 #' @importFrom reproducible checkPath
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
-                     file = getOption("spades.restartR.filename"),
+                     .RDataFile = getOption("spades.restartR.RDataFilename"),
                      restartDir = getOption("spades.restartR.restartDir", NULL)) {
   if (missing(sim)) stop("sim is currently a required argument")
   restartDir <- checkAndSetRestartDir(restartDir, sim = sim)
