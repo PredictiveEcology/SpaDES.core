@@ -1,5 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.0.9000
+=============
+
+## new features
+
+## dependencies
+
+## deprecated
+
+## bug fixes
+* tests for `Filenames` function coming from `reproducible` pkg
+
+
+
 version 1.0.0
 =============
 
