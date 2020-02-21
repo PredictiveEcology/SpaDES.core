@@ -9,6 +9,7 @@ version 1.0.0
 * Updates to deal with new backend with `reproducible`
 * better assertions inside list elements of `simInit`, e.g., `simInit(times = list(start = "test"))` now fails because times must be a list of 2 `numeric` objects
 * messaging is now all with `message` instead of a mixture of `message`, `cat` and `print`. This allows for easier suppressing of messaging, e.g., via `suppressMessages`. This was requested in a downstream package, `SpaDES.experiment` that was submitted to CRAN but rejected due to the now former inability to suppress messages.
+* logging to file is now possible via `debug` arg in `simInit`, using `logging` package. See `?simInit`
 
 ## dependencies
 
