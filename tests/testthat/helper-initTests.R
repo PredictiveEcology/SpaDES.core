@@ -16,16 +16,12 @@ cleanMessage <- function(mm) {
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
-                     opts = list(reproducible.inputPaths = NULL,
-                                 reproducible.showSimilar = FALSE), tmpFileExt = "") {
-  opts1 <- #if (smcc)
-    list(spades.moduleCodeChecks = smcc)
-  #else
-    #list()
-
-  if (length(opts)) {
-    opts1 <- append( opts1, opts)
-  }
+                     opts = list(), tmpFileExt = "") {
+  a <- list(reproducible.inputPaths = NULL,
+            reproducible.showSimilar = FALSE,
+            spades.moduleCodeChecks = smcc)
+  a[names(opts)] <- opts
+  opts1 <- a
 
   optsDebug <- if (!debug)
     list(spades.debug = debug)
