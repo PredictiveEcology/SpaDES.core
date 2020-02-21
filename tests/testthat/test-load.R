@@ -431,8 +431,12 @@ test_that("Filenames for simList", {
 
   Fns <- Filenames(s)
 
-  #fnsGrd <- c(filename(s$b), gsub("grd$", "gri", filename(s$b)))
-  expect_true(identical(Fns$b, filename(s$b)))
+  fnsGrd <- c(filename(s$b), gsub("grd$", "gri", filename(s$b)))
+  if (length(Fns$b) == 1) {
+    expect_true(identical(Fns$b, fnsGrd[[1]])) ## TODO: it should never be length 1 -- solve this!
+  } else {
+    expect_true(identical(Fns$b, fnsGrd))
+  }
   expect_true(identical(Fns$r, filename(s$r)))
   expect_true(identical(Fns$r2, filename(s$r2)))
   expect_true(identical(Fns$s, sapply(seq_len(nlayers(s$s)), function(rInd) filename(s$s[[rInd]]))))
