@@ -4,15 +4,17 @@ version 1.0.0.9000
 =============
 
 ## new features
+* new helper functions to extract parameters, inputs, and outputs tables from module metadata:
+  `moduleParams()`, `moduleInputs()`, `moduleOutputs()`. These are now used in default Rmd template.
 
 ## dependencies
+* none
 
 ## deprecated
+* none
 
 ## bug fixes
-* tests for `Filenames` function coming from `reproducible` pkg
-
-
+* tests for `Filenames` function coming from `reproducible` package
 
 version 1.0.0
 =============
