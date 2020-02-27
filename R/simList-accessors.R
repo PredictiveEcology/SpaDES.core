@@ -2789,7 +2789,7 @@ elapsedTime <- function(x, ...) UseMethod("elapsedTime")
 #' @inheritParams base::difftime
 #' @export
 #' @rdname simList-accessors-times
-elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto") {
+elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   comp <- completed(x)
 
   if (!is.null(comp)) {
@@ -2800,7 +2800,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto") {
     } else {
       c("moduleName")
     }
-    ret <- comp[, list(elapsedTime = as.difftime(as.double(sum(diffTime), units = units), units = units)), by = theBy]
+    ret <- comp[, list(elapsedTime = as.difftime(as.double(sum(diffTime), units = units), units = units)), by = theBy] #nolint
   } else {
     ret <- NULL
   }

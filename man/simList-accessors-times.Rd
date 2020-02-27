@@ -71,7 +71,7 @@ timeunits(x)
 
 elapsedTime(x, ...)
 
-\method{elapsedTime}{simList}(x, byEvent = TRUE, units = "auto")
+\method{elapsedTime}{simList}(x, byEvent = TRUE, units = "auto", ...)
 }
 \arguments{
 \item{x}{A \code{simList}}
