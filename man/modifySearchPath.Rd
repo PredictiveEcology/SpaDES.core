@@ -13,7 +13,8 @@
 \arguments{
 \item{pkgs}{The packages that are to be placed at the beginning of the search path,}
 
-\item{removeOthers}{Logical. If \code{TRUE}, then only the packages in \code{pkgs}
+\item{removeOthers}{Logical. If \code{TRUE}, then only the packages in
+\code{c(pkgs, SpaDES.core:::.corePackages)}
 will remain in the search path, i.e., all others will be removed.}
 
 \item{skipNamespacing}{Logical. If \code{FALSE}, then the running of an event in a module
@@ -30,7 +31,7 @@ such that the packages required by the current module are placed first in the
 search path. Note, several "core" packages are not touched; or more specifically,
 they will remain in the search path, but may move down if packages are rearranged.
 The current set of these core packages used by SpaDES can be found here:
-\code{SpaDES.core:::.pkgEnv$corePackages}
+\code{SpaDES.core:::.corePackages}
 }
 \author{
 Eliot McIntire
