@@ -13,7 +13,6 @@ jobs:
     dist: xenial
     r: oldrel
     env:
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       apt:
@@ -42,7 +41,6 @@ jobs:
     dist: xenial
     r: release
     env:
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       apt:
@@ -86,7 +84,6 @@ jobs:
     dist: xenial
     r: devel
     env:
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       apt:
@@ -118,7 +115,6 @@ jobs:
     osx_image: xcode9.4
     env:
       - GLPK=true
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       homebrew:
@@ -139,7 +135,6 @@ jobs:
     osx_image: xcode9.4
     env:
       - GLPK=false
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       homebrew:
