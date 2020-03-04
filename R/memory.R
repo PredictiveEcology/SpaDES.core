@@ -118,17 +118,23 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
 
     thePlan <- getOption("spades.futurePlan", NULL)
     # originalFuturePlan <- future::plan()
-    if (!is(originalFuturePlan, "sequential") && !identical(thePlan, "sequential") &&
-        !is.null(thePlan) && !is(originalFuturePlan, thePlan))
+    if (!is(originalFuturePlan, "sequential")) {
+      theActualPlan <- originalFuturePlan
+      message("getOption('spades.futurePlan') disagreed with future::plan(); ",
+              "using future::plan() and setting options('spades.futurePlan' = future::plan())")
+      options("spades.futurePlan" = theActualPlan)
+    } else if (!identical(thePlan, "sequential") && is.null(thePlan)) {
       stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...)",
            " to something other than sequential")
-    if (!is(originalFuturePlan, thePlan)) {
-      if (grepl("callr", thePlan)) {
-        future::plan(future.callr::callr)
-      } else {
-        future::plan(thePlan)
-      }
     }
+    if (is.character(thePlan))
+      if (!is(originalFuturePlan, thePlan)) {
+        if (grepl("callr", thePlan)) {
+          future::plan(future.callr::callr)
+        } else {
+          future::plan(thePlan)
+        }
+      }
 
     # Set up element in simList for recording the memory use stuff
     sim@.xData$.memoryUse <- list()
