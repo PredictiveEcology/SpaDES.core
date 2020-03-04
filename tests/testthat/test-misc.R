@@ -56,3 +56,23 @@ test_that("modify search path", {
 
 
 })
+
+test_that("test all.equal.simList", {
+  testInitOut <- testInit(smcc = FALSE, "fastdigest")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  s1 <- simInit()
+  s2 <- simInit()
+  s1 <- spades(s1)
+  s2 <- spades(s2)
+  a1 <- s1$._firstEventClockTime
+  a2 <- s2$._firstEventClockTime
+  expect_true(all.equal(s1, s2)) # the all.equal method used to remove these permanently
+  b1 <- s1$._firstEventClockTime
+  b2 <- s2$._firstEventClockTime
+  expect_true(all.equal(a1, b1))
+  expect_true(all.equal(a2, b2))
+
+})

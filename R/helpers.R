@@ -280,10 +280,16 @@ all.equal.simList <- function(target, current, ...) {
     completed(current) <- completed(current, times = FALSE)
 
   # remove all objects starting with ._ in the simList@.xData
-  objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
-  objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
-  rm(list = objsTarget, envir = envir(target))
-  rm(list = objsCurrent, envir = envir(current))
+  objNamesTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
+  objNamesCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  objsTarget <- mget(objNamesTarget, envir = envir(target))
+  objsCurrent <- mget(objNamesCurrent, envir = envir(current))
+  on.exit({
+    list2env(objsTarget, envir = envir(target))
+    list2env(objsCurrent, envir = envir(current))
+  })
+  rm(list = objNamesTarget, envir = envir(target))
+  rm(list = objNamesCurrent, envir = envir(current))
   # suppressWarnings(rm("._startClockTime", envir = envir(target)))
   # suppressWarnings(rm("._startClockTime", envir = envir(current)))
   # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
