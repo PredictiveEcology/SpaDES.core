@@ -73,7 +73,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' \dontrun{
 #' # options("spades.recoveryMode" = 1) # now the default
 #' s <- simInit()
-#' s <- spades(s) # this this is interrupted or fails
+#' s <- spades(s) # if this is interrupted or fails
 #' s <- restartSpades() # don't need to put simList
 #'                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
 #' }
