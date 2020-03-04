@@ -1,4 +1,4 @@
-test_that("saving files does not work correctly", {
+test_that("saving files (and memoryUse)", {
   testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
                           "data.table")
   on.exit({
