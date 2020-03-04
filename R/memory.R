@@ -137,6 +137,13 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       futureOngoingMemoryThisPid(seconds = Inf,
                                  interval = getOption("spades.memoryUseInterval", 0.2),
                                  outputFile = sim@.xData$.memoryUse$filename)
+    if (!file.exists(sim@.xData$.memoryUse$filename))
+      message("Pausing while memoryUse infrastructure is set up")
+
+    while (!file.exists(sim@.xData$.memoryUse$filename)) {
+      Sys.sleep(0.4)
+      message("... setting up memoryUse infrastructure")
+    }
   } else {
     message("Can't use spades.memoryUseInterval without future (and optionally future.callr) packages")
   }
@@ -144,14 +151,19 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
   return(sim)
 }
 
+#' @importFrom tools pskill
 memoryUseOnExit <- function(sim, originalFuturePlan) {
   future::plan("sequential") # kill all processes
   future::plan(originalFuturePlan) # reset to original
+  # May not have killed it ... kill it manually
+  if (identical("running", sim$.memoryUse$futureObj$state))
+    tools::pskill(sim$.memoryUse$futureObj$process$get_pid())
 
   if (file.exists(sim@.xData$.memoryUse$filename)) {
     sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
-    file.remove(sim@.xData$.memoryUse$filename)
-    message("Memory use saved in simList; see memoryUse(sim)")
+    unlink(sim@.xData$.memoryUse$filename)
+    sim@.xData$.memoryUse$futureObj <- NULL
+    message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
   }
   return(sim)
 }

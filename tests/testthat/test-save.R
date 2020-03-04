@@ -1,5 +1,6 @@
 test_that("saving files does not work correctly", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
+                          "data.table")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -29,7 +30,18 @@ test_that("saving files does not work correctly", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
 
-  mySim <- spades(mySim)
+  mess <- capture_messages(mySim <- spades(mySim))
+
+  options("spades.memoryUseInterval" = 0)
+  outputFile <- mySim$.memoryUse$filename
+  expect_false(file.exists(outputFile))
+  obj <- mySim$.memoryUse$obj
+  expect_true(NROW(obj) > 0)
+  aa <- memoryUse(mySim)
+  expect_true(NROW(aa) > 0)
+
+  a <- memoryUseThisSession()
+  expect_true(is.numeric(a))
 
   # test spades-level mechanism
   expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))
