@@ -175,6 +175,9 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   out <- lapply(modules, function(mod) {
     makeModActiveBinding(sim = sim, mod = mod)
   })
+  out <- lapply(modules, function(mod) {
+    makeParActiveBinding(sim = sim, mod = mod)
+  })
 
   # Remove all added events that occurred during the events, i.e., via scheduleEvent
   sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))

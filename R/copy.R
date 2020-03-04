@@ -122,6 +122,15 @@ setMethod("Copy",
                 }
 
               })
+              lapply(modules(sim_), function(mod) {
+                if (exists("mod", object[[mod]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object[[mod]])) {
+                    rm(list = "Par", envir = sim_[[mod]], inherits = FALSE)
+                    makeParActiveBinding(sim = sim_, mod = mod)
+                  }}
+              })
+
+
 
             }
             sim_@.envir <- sim_@.xData

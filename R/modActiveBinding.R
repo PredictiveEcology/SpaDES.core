@@ -9,3 +9,15 @@ makeModActiveBinding <- function(sim, mod) {
                     },
                     env = sim@.xData[[mod]])
 }
+
+makeParActiveBinding <- function(sim, mod) {
+  makeActiveBinding(sym = "Par",
+                    fun = function(value){
+                      if (missing(value)) {
+                        sim@params[[mod]]
+                      } else {
+                        stop("Can't overwrite Par")
+                      }
+                    },
+                    env = sim@.xData[[mod]])
+}
