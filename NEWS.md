@@ -4,6 +4,7 @@ version 1.0.0.9000
 =============
 
 ## new features
+* `Par` is now an activeBinding (similar to `mod`) pointing to `P(sim)`; this allows for tab autocomplete to function correctly.
 * new helper functions to extract parameters, inputs, and outputs tables from module metadata:
   `moduleParams()`, `moduleInputs()`, `moduleOutputs()`. These are now used in default Rmd template.
 
