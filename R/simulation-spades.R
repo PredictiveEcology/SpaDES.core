@@ -794,6 +794,8 @@ setMethod(
     sim <- withCallingHandlers({
 
       .pkgEnv$.sim <- NULL # Clear anything that was here.
+      .pkgEnv$.sim <- sim # set up pointer
+
       # set the options("spades.xxxPath") to the values in the sim@paths
       oldGetPaths <- getPaths()
       do.call(setPaths, append(sim@paths, list(silent = TRUE)))
