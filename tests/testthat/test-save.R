@@ -42,7 +42,7 @@ test_that("saving files (and memoryUse)", {
 
   mess <- capture_messages(mySim <- spades(mySim))
 
-  cc <- ongoingMemoryThisPid(0.1, interval = 0.1)
+  cc <- ongoingMemoryThisPid(0.2, interval = 0.1)
   expect_true(file.exists(cc))
   ff <- fread(cc)
   expect_true(NROW(ff)>0)
