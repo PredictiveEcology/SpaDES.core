@@ -1,8 +1,20 @@
-test_that("saving files does not work correctly", {
-  testInitOut <- testInit(smcc = FALSE)
+test_that("saving files (and memoryUse)", {
+  if (!requireNamespace("future", quietly = TRUE)) {
+    skip("future package required")
+  }
+  testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
+                          c("data.table", "future.callr", "future"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
+
+  origPlan <- future::plan()
+  if (is(origPlan, "sequential"))
+    pl <- future::plan("multiprocess", workers = 2)
+  on.exit({
+    future::plan(origPlan)
+  }, add = TRUE)
+
 
   times <- list(start = 0, end = 6, "month")
   parameters <- list(
@@ -24,12 +36,27 @@ test_that("saving files does not work correctly", {
     modulePath = system.file("sampleModules", package = "SpaDES.core"),
     outputPath = tmpdir
   )
-  # innerClasses <<- 1
 
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
 
-  mySim <- spades(mySim)
+  mess <- capture_messages(mySim <- spades(mySim))
+
+  cc <- ongoingMemoryThisPid(0.2, interval = 0.1)
+  expect_true(file.exists(cc))
+  ff <- fread(cc)
+  expect_true(NROW(ff)>0)
+
+  options("spades.memoryUseInterval" = 0)
+  outputFile <- mySim$.memoryUse$filename
+  expect_false(file.exists(outputFile))
+  obj <- mySim$.memoryUse$obj
+  expect_true(NROW(obj) > 0)
+  aa <- memoryUse(mySim)
+  expect_true(NROW(aa) > 0)
+
+  a <- memoryUseThisSession()
+  expect_true(is.numeric(a))
 
   # test spades-level mechanism
   expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))

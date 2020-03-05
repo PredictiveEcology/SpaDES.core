@@ -621,6 +621,10 @@ setMethod(
       makeModActiveBinding(sim = sim, mod = mod)
     })
 
+    lapply(sim@modules, function(mod) {
+      makeParActiveBinding(sim = sim, mod = mod)
+    })
+
     ## load user-defined modules
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]

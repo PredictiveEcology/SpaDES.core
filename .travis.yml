@@ -13,7 +13,6 @@ jobs:
     dist: xenial
     r: oldrel
     env:
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       apt:
@@ -34,7 +33,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
-      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
       - rlang
@@ -42,7 +41,6 @@ jobs:
     dist: xenial
     r: release
     env:
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       apt:
@@ -63,7 +61,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
-      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
     after_success:
@@ -86,7 +84,6 @@ jobs:
     dist: xenial
     r: devel
     env:
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       apt:
@@ -107,7 +104,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
-      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
       - dplyr
@@ -118,7 +115,6 @@ jobs:
     osx_image: xcode9.4
     env:
       - GLPK=true
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       homebrew:
@@ -134,12 +130,11 @@ jobs:
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'install.packages(c("digest", "igraph", "qs", "rgdal", "rgeos"), type = "source")'
-      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
   - os: osx
     osx_image: xcode9.4
     env:
       - GLPK=false
-      - R_FUTURE_FORKS_ENABLED=false
       - R_FUTURE_PLAN=multisession
     addons:
       homebrew:
@@ -154,7 +149,7 @@ jobs:
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'install.packages(c("digest", "igraph", "qs", "rgdal", "rgeos"), type = "source")'
-      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@DBI", dependencies = FALSE)'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
 r_build_args: " "
 r_check_args: "--as-cran"
 warnings_are_errors: true

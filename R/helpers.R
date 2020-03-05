@@ -167,11 +167,12 @@ setMethod(
 #' search path. Note, several "core" packages are not touched; or more specifically,
 #' they will remain in the search path, but may move down if packages are rearranged.
 #' The current set of these core packages used by SpaDES can be found here:
-#' \code{SpaDES.core:::.pkgEnv$corePackages}
+#' \code{SpaDES.core:::.corePackages}
 #'
 #' @param pkgs The packages that are to be placed at the beginning of the search path,
 #'
-#' @param removeOthers Logical. If \code{TRUE}, then only the packages in \code{pkgs}
+#' @param removeOthers Logical. If \code{TRUE}, then only the packages in
+#'                     \code{c(pkgs, SpaDES.core:::.corePackages)}
 #'                     will remain in the search path, i.e., all others will be removed.
 #'
 #' @param skipNamespacing Logical. If \code{FALSE}, then the running of an event in a module
@@ -188,49 +189,54 @@ setMethod(
                               skipNamespacing = !getOption("spades.switchPkgNamespaces")) {
   if (!skipNamespacing) {
     pkgs <- c("SpaDES.core", pkgs)
-    pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
-    pkgPositions <- pmatch(paste0("package:", unlist(pkgs)), search())
+    pkgs <- unlist(pkgs)[!(pkgs %in% .corePackages)]
+    pkgsWithPrefix <- paste0("package:", unlist(pkgs))
+    pkgPositions <- pmatch(pkgsWithPrefix, search())
 
     # Find all packages that are not in the first sequence after .GlobalEnv
     whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
 
     if (any(whNotAtTop)) {
+      whAdd <- which(is.na(pkgPositions))
       if (removeOthers) {
-        pkgs <- setdiff(search(), pkgs)
-        pkgs <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
-        whRm <- seq_along(pkgs)
+        pkgsToRm <- setdiff(search(), pkgsWithPrefix)
+        pkgsToRm <- grep(pkgsToRm, pattern = .corePackagesGrep, invert = TRUE, value = TRUE)
+        whRm <- seq_along(pkgsToRm)
       } else {
         whRm <- which(pkgPositions > min(which(whNotAtTop)))
-        whAdd <- which(is.na(pkgPositions))
+        pkgsToRm <- pkgs[whRm]
       }
 
       if (length(whRm) > 0) {
         # i.e,. ones that need reordering
         suppressWarnings(
-          lapply(unique(gsub(pkgs, pattern = "package:", replacement = "")[whRm]), function(pack) {
+          lapply(unique(gsub(pkgsToRm, pattern = "package:", replacement = "")[whRm]), function(pack) {
             try(detach(paste0("package:", pack), character.only = TRUE), silent = TRUE)
           })
         )
       }
-      if (!removeOthers) {
-        if (length(c(whAdd, whRm))) {
-          suppressMessages(
-            lapply(rev(pkgs[c(whAdd, whRm)]), function(pack) {
-              try(attachNamespace(pack), silent = TRUE)
-            })
-          )
-        }
+      #if (!removeOthers) {
+      if (length(whAdd)) {
+        suppressMessages(
+          lapply(rev(pkgs[whAdd]), function(pack) {
+            try(attachNamespace(pack), silent = TRUE)
+          })
+        )
       }
+      #}
     }
   }
 }
 
 #' @keywords internal
-.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats" # nolint
+.corePackages <- c(".GlobalEnv","Autoloads","SpaDES.core","base","grDevices",
+                   "rstudio","devtools_shims",
+                   "methods","utils","graphics","datasets","stats", "testthat") # nolint
+.corePackagesGrep <- paste(.corePackages, collapse = "|")
 
-.pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
-.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
-                             paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
+# .pkgEnv$corePackagesVec <- unlist(strsplit(.corePackagesGrep, split = "\\|"))
+.corePackagesVec <- c(.corePackages[(1:2)],
+                      paste0("package:", .corePackages[-(1:2)]))
 
 #' tryCatch that keeps warnings, errors and value (result)
 #'
@@ -274,10 +280,16 @@ all.equal.simList <- function(target, current, ...) {
     completed(current) <- completed(current, times = FALSE)
 
   # remove all objects starting with ._ in the simList@.xData
-  objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
-  objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
-  rm(list = objsTarget, envir = envir(target))
-  rm(list = objsCurrent, envir = envir(current))
+  objNamesTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
+  objNamesCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  objsTarget <- mget(objNamesTarget, envir = envir(target))
+  objsCurrent <- mget(objNamesCurrent, envir = envir(current))
+  on.exit({
+    list2env(objsTarget, envir = envir(target))
+    list2env(objsCurrent, envir = envir(current))
+  })
+  rm(list = objNamesTarget, envir = envir(target))
+  rm(list = objNamesCurrent, envir = envir(current))
   # suppressWarnings(rm("._startClockTime", envir = envir(target)))
   # suppressWarnings(rm("._startClockTime", envir = envir(current)))
   # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
@@ -289,33 +301,6 @@ all.equal.simList <- function(target, current, ...) {
 }
 
 
-Message <- function(mess, sim = NULL, file = NULL, ...) {
-  needFile <- !is.null(file) || !isFALSE(getOption("spades.messageFile", FALSE))
-  if (needFile) {
-    if (!is.null(sim)) {
-      file <- file.path(outputPath(sim), "messages.txt")
-    } else {
-      if (is.null(file)) {
-        if (isTRUE(getOption("spades.messageFile")))
-          stop("options('spades.messageFile') is TRUE, which only works if sim is provided. ",
-               "Please provide a sim or file name")
-        file <- getOption("spades.messageFile")
-      }
-    }
-  }
-  if (is(mess, "data.frame")) {
-    mess <- paste0(capture.output(mess), collapse = "\n")
-    message(mess)
-  } else{
-    message(mess)
-  }
-  if (!is.null(file)) {
-    if (any(grepl("\x1b\\[.{3}", mess))) {
-      mess <- gsub("\x1b\\[.{3}", "", mess)
-    }
-    cat(mess, file = file, append = TRUE, fill = TRUE, ...)
-  }
-}
 
 needInstall <- function(pkg = "methods", minVersion = NULL,
                         messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {

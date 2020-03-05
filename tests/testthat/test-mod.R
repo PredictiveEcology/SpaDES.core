@@ -23,11 +23,13 @@ test_that("local mod object", {
       documentation = list("README.txt", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
+        defineParameter("testParA", "numeric", 1, NA, NA, "")
       ),
       inputObjects = bind_rows(
         expectsInput("sdf", "sdf", "sdfd")
       ),
       outputObjects = bind_rows(
+        createsOutput("testPar1", "numeric", "")
       )
       ))
 
@@ -36,6 +38,7 @@ test_that("local mod object", {
       eventType,
       init = {
       mod$a <- 2
+      sim$testPar1 <- Par$testParA
 
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       },
@@ -67,11 +70,13 @@ test_that("local mod object", {
       documentation = list("README.txt", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
+        defineParameter("testParB", "numeric", 2, NA, NA, "")
       ),
       inputObjects = bind_rows(
         expectsInput("sdf", "sdf", "sdfd")
       ),
       outputObjects = bind_rows(
+        createsOutput("testPar2", "numeric", "")
       )
       ))
 
@@ -80,6 +85,7 @@ test_that("local mod object", {
       eventType,
       init = {
       mod$a <- 1
+      sim$testPar2 <- Par$testParB
       sim <- scheduleEvent(sim, start(sim), "test2", "event1", .skipChecks = TRUE)
       },
       event1 = {
@@ -103,6 +109,16 @@ test_that("local mod object", {
   out3 <- Cache(spades, Copy(mySim))
   mess <- capture_messages(out4 <- Cache(spades, Copy(mySim))) # should get cached
   out <- spades(mySim)
+
+  # Test the Par stuff
+  expect_true(identical(out2$testPar1, params(out2)$test$testParA))
+  expect_true(identical(out2$testPar2, params(out2)$test2$testParB))
+  expect_true(identical(out$testPar1, params(out)$test$testParA))
+  expect_true(identical(out$testPar2, params(out)$test2$testParB))
+  expect_true(identical(out3$testPar1, params(out3)$test$testParA))
+  expect_true(identical(out3$testPar2, params(out3)$test2$testParB))
+  expect_true(identical(out4$testPar1, params(out4)$test$testParA))
+  expect_true(identical(out4$testPar2, params(out4)$test2$testParB))
 
   # Test the results
   expect_true(out$test$.objects$a == 2) # object that results from addition
