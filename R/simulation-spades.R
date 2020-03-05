@@ -827,12 +827,16 @@ setMethod(
       # Memory Use
       # memory estimation of each event/sim
       if (getOption("spades.memoryUseInterval", 0) > 0) {
+        if (requireNamespace("future", quietly = TRUE)) {
         originalPlan <- future::plan()
         sim <- memoryUseSetup(sim, originalPlan)
         # Do the on.exit stuff
         on.exit({
           sim <- memoryUseOnExit(sim, originalPlan)
         }, add = TRUE)
+        } else {
+          message(futureMessage)
+        }
       }
 
       # timeunits gets accessed every event -- this should only be needed once per simList

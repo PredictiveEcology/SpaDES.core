@@ -155,7 +155,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       message("... setting up memoryUse infrastructure")
     }
   } else {
-    message("Can't use spades.memoryUseInterval without future (and optionally future.callr) packages")
+    message(futureMessage)
   }
 
   return(sim)
@@ -164,23 +164,27 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
 #' @importFrom tools pskill
 #' @importFrom data.table fwrite
 memoryUseOnExit <- function(sim, originalFuturePlan) {
-  # May not have killed it ... kill it manually
-  x <- data.frame(x = 1)
-  data.table::fwrite(x = x, file = stopFilename(sim$.memoryUse$filename))
-  while (!resolved(sim$.memoryUse$futureObj)) {
-    Sys.sleep(0.1)
-  }
-  unlink(stopFilename(sim$.memoryUse$filename))
-  #  tryCatch(tools::pskill(sim$.memoryUse$futureObj$process$get_pid()),
-  #           error = function(x) message("Future being used for memoryUse did not close correctly"))
-  future::plan("sequential") # kill all processes
-  future::plan(originalFuturePlan) # reset to original
+  if (requireNamespace("future", quietly = TRUE)) {
+    # May not have killed it ... kill it manually
+    x <- data.frame(x = 1)
+    data.table::fwrite(x = x, file = stopFilename(sim$.memoryUse$filename))
+    while (!future::resolved(sim$.memoryUse$futureObj)) {
+      Sys.sleep(0.1)
+    }
+    unlink(stopFilename(sim$.memoryUse$filename))
+    #  tryCatch(tools::pskill(sim$.memoryUse$futureObj$process$get_pid()),
+    #           error = function(x) message("Future being used for memoryUse did not close correctly"))
+    future::plan("sequential") # kill all processes
+    future::plan(originalFuturePlan) # reset to original
 
-  if (file.exists(sim@.xData$.memoryUse$filename)) {
-    sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
-    unlink(sim@.xData$.memoryUse$filename, force = TRUE)
-    sim@.xData$.memoryUse$futureObj <- NULL
-    message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
+    if (file.exists(sim@.xData$.memoryUse$filename)) {
+      sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
+      unlink(sim@.xData$.memoryUse$filename, force = TRUE)
+      sim@.xData$.memoryUse$futureObj <- NULL
+      message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
+    }
+  } else {
+    message(futureMessage)
   }
   return(sim)
 }
@@ -192,3 +196,6 @@ stopFilename <- function(outputFile) {
 outputFilename <- function(thisPid) {
   reproducible::tempfile2("memoryUse", fileext = paste0("..memAvail", "_", thisPid, ".txt"))
 }
+
+futureMessage <- message("To use spades.memoryUseInterval, 'future' and 'future.callr' ",
+"packages must be installed; install.packages(c('future', 'future.callr')")

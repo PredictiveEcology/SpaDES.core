@@ -1,4 +1,7 @@
 test_that("saving files (and memoryUse)", {
+  if (!requireNamespace("future", quietly = TRUE)) {
+    skip("future package required")
+  }
   testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
                           c("data.table", "future.callr", "future"))
   on.exit({
@@ -39,7 +42,7 @@ test_that("saving files (and memoryUse)", {
 
   mess <- capture_messages(mySim <- spades(mySim))
 
-  cc <- ongoingMemoryThisPid(0.5, interval = 0.1)
+  cc <- ongoingMemoryThisPid(0.1, interval = 0.1)
   expect_true(file.exists(cc))
   ff <- fread(cc)
   expect_true(NROW(ff)>0)
