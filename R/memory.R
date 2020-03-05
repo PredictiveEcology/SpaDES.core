@@ -2,18 +2,22 @@ if (getRversion() >= "3.1.0") {
   utils::globalVariables(c("memory", "maxMemory"))
 }
 
+#' @importFrom reproducible tempfile2
 ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
                                  thisPid, outputFile) {
   numTimes = 1
   if (missing(thisPid)) thisPid <- Sys.getpid()
-  if (missing(outputFile))
-    outputFile <- paste0("..memAvail", "_", thisPid, ".txt")
+  if (missing(outputFile)) {
+    outputFile <- outputFilename(thisPid)
+    # outputFile <-
+  }
   #cat("memory,  time", "\n", file = outputFile, append = FALSE)
   suppressWarnings(file.remove(outputFile))
   #data.table::fwrite(list(a, Sys.time()), dateTimeAs = "ISO", append = FALSE, file = outputFile)
   #data.table::fwrite(list("mem", "time"), append = FALSE, file = outputFile)
   op <- options(digits.secs = 5)
-  while(numTimes < (seconds/interval)) { # will go infinitely long!
+  stopFilename <- stopFilename(outputFile)
+  while(numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
     Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
     a <- memoryUseThisSession(thisPid)
     #cat(a, ", ", format(Sys.time()), "\n", file = outputFile, append = TRUE)
@@ -59,7 +63,7 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
                                        interval = getOption("spades.memoryUseInterval", 0.5)) {
   thisPid <- Sys.getpid()
   if (is.null(outputFile))
-    outputFile <- paste0("..memAvail", "_", thisPid, ".txt")
+    outputFile <- outputFilename(thisPid)
   message("Writing memory to ", outputFile)
   a <- future::future(
     getFromNamespace("ongoingMemoryThisPid", "SpaDES.core")(seconds = seconds,
@@ -158,18 +162,33 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
 }
 
 #' @importFrom tools pskill
+#' @importFrom data.table fwrite
 memoryUseOnExit <- function(sim, originalFuturePlan) {
+  # May not have killed it ... kill it manually
+  x <- data.frame(x = 1)
+  data.table::fwrite(x = x, file = stopFilename(sim$.memoryUse$filename))
+  while (!resolved(sim$.memoryUse$futureObj)) {
+    Sys.sleep(0.1)
+  }
+  unlink(stopFilename(sim$.memoryUse$filename))
+  #  tryCatch(tools::pskill(sim$.memoryUse$futureObj$process$get_pid()),
+  #           error = function(x) message("Future being used for memoryUse did not close correctly"))
   future::plan("sequential") # kill all processes
   future::plan(originalFuturePlan) # reset to original
-  # May not have killed it ... kill it manually
-  if (identical("running", sim$.memoryUse$futureObj$state))
-    tools::pskill(sim$.memoryUse$futureObj$process$get_pid())
 
   if (file.exists(sim@.xData$.memoryUse$filename)) {
     sim@.xData$.memoryUse$obj <- data.table::fread(sim@.xData$.memoryUse$filename)
-    unlink(sim@.xData$.memoryUse$filename)
+    unlink(sim@.xData$.memoryUse$filename, force = TRUE)
     sim@.xData$.memoryUse$futureObj <- NULL
     message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
   }
   return(sim)
+}
+
+stopFilename <- function(outputFile) {
+  gsub("\\.txt", "done.txt", outputFile)
+}
+
+outputFilename <- function(thisPid) {
+  reproducible::tempfile2("memoryUse", fileext = paste0("..memAvail", "_", thisPid, ".txt"))
 }
