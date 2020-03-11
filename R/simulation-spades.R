@@ -69,7 +69,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
   } else {
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
-      fnEnv <- sim@.xData[[curModuleName]]
+      fnEnv <- sim@.xData$.mods[[curModuleName]]
       # update current simulated time
       # Test replacement for speed
       #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
@@ -171,6 +171,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             }
           }
 
+          browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
             isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
               isTRUE(getOption("reproducible.showSimilar", FALSE))
@@ -186,19 +187,20 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                            showSimilar = showSimilar)
 
-          if (!exists(curModuleName, envir = sim, inherits = FALSE))
+          browser(expr = exists("._doEvent_3"))
+          if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!is.environment(get(curModuleName, envir = sim)))
+          if (!is.environment(get(curModuleName, envir = sim@.xData$.mods)))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!exists("mod", envir = sim@.envir[[curModuleName]], inherits = FALSE))
+          if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE))
             stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
                  "sim$", curModuleName, ". ",
                  "Please remove the section of code that does this in the event named: ",
@@ -1087,11 +1089,11 @@ setMethod(
     fns <- ls(fnEnv, all.names = TRUE)
     moduleSpecificObjects <-
       c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
-        fns, # functions in the namespaced location
+        paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
         na.omit(createsOutputs)) # objects outputted by module
     #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
     #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
-    moduleSpecificOutputObjects <- c(createsOutputs, cur[["moduleName"]])
+    moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
     classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                          params = sim@params[[cur[["moduleName"]]]],
                          modules = cur[["moduleName"]])
@@ -1129,9 +1131,9 @@ setMethod(
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
-        tmp <- .parseConditional(filename = sim@.xData[[cur$moduleName]]$._sourceFilename)
+        tmp <- .parseConditional(filename = sim@.xData$.mods[[cur$moduleName]]$._sourceFilename)
         eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-             envir = sim@.xData[[cur[["moduleName"]]]])
+             envir = sim@.xData$.mods[[cur[["moduleName"]]]])
         numTries <- 0
       } else {
         message("There was an error in the code in the ", moduleCall, ".\n",

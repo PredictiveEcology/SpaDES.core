@@ -24,6 +24,8 @@ test_that("test event-level cache", {
   )
 
   set.seed(1123)
+  # ._robustDigest_2 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<- ._Cache_11 <<- ._Cache_13 <<- 1
+  #._addTagsToOutput_2 <<- 1
   expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
                 capture_messages({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
@@ -31,6 +33,7 @@ test_that("test event-level cache", {
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
+  #._doEvent_3 <<- ._prepareOutput_5 <<- 1
   mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = FALSE)
   })
@@ -226,7 +229,7 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   bbb <- do.call(simInit, args)
-  expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
+  expect_true(any(grepl(format(bbb@.xData$.mods$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
   opts <- options(spades.saveSimOnExit = FALSE)
@@ -284,7 +287,7 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os) == 5) # 4 objects, the environment, the rest
+  expect_true(length(os) == 6) # 4 objects, the environment, the rest
 })
 
 test_that("Cache sim objs via .Cache attr", {
@@ -326,7 +329,7 @@ test_that("Cache sim objs via .Cache attr", {
       sim$co1 <- 1
       sim$co2 <- 1
       sim$co3 <- 1
-      sim$test$hi <- 1
+      sim$.mods$test$hi <- 1
       mod$hello <- 2
       ",
       xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
@@ -348,7 +351,7 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim2$co5 == 6)
 
   # Test mod
-  expect_true(mySim2$test$.objects$hello == 2)
+  expect_true(mySim2$.mods$test$.objects$hello == 2)
 
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
@@ -356,9 +359,9 @@ test_that("Cache sim objs via .Cache attr", {
 
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
-  expect_true(is.null(mySim$test$hi)) # will be changed by init
+  expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
   mySim2 <- spades(Copy(mySim))
-  expect_true(mySim2$test$hi == 1) # was affected
+  expect_true(mySim2$.mods$test$hi == 1) # was affected
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
   expect_true(mySim2$co3 == 1) # was affected
@@ -367,13 +370,14 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(is.null(mySim2$co5)) # wan't affected, and isn't there
 
   # Try again, hi should be there
-  expect_true(is.null(mySim$test$hi)) # is not in the
+  expect_true(is.null(mySim$.mods$test$hi)) # is not in the
+  # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
   mess1 <- capture_messages(
     mySim2 <- spades(Copy(mySim))
   )
-  expect_true(mySim2$test$hi == 1) # recovered in Cache
+  expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
-  expect_true(mySim2$test$.objects$hello == 2) # recovered in Cache
+  expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
   expect_true(any(grepl("Using cached copy", mess1)))
 })
 

@@ -549,6 +549,7 @@ setMethod(
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
+    browser(expr = exists("._simInit_5"))
     while (!all_parsed) {
       sim <- .parseModule(sim,
                           as.list(sim@modules),
@@ -626,6 +627,8 @@ setMethod(
     })
 
     ## load user-defined modules
+    browser(expr = exists("._simInit_4"))
+
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]
       ## run .inputObjects() for each module
@@ -1113,11 +1116,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
+  browser(expr = exists("._runModuleInputObjects_1"))
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
-    if (!is.null(sim@.xData[[mBase]][[".inputObjects"]])) {
+    if (!is.null(sim@.xData$.mods[[mBase]][[".inputObjects"]])) {
+      browser(expr = exists("._runModuleInputObjects_2"))
       list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
       a <- P(sim, mBase, ".useCache")
@@ -1144,6 +1149,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
         } else {
+          browser()
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = mBase, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))
@@ -1168,7 +1174,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           }
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
-          showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          # showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          browser(expr = exists("._runModuleInputObjects_2"))
+          showSimilar <- if (is.null(sim@params[[mBase]][[".showSimilar"]]) ||
+                             isTRUE(is.na(sim@params[[mBase]][[".showSimilar"]]))) {
+            isTRUE(getOption("reproducible.showSimilar", FALSE))
+          } else {
+            isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          }
 
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,

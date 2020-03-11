@@ -205,7 +205,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
            inputs = from@inputs,
            outputs = from@outputs,
            paths = from@paths)
-  x@.xData <- new.env(new.env(parent = emptyenv()))
+  x@.xData <- new.env(parent = emptyenv())
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)
   list2env(from@completed, envir = x@completed)
