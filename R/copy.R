@@ -59,6 +59,7 @@ setMethod("Copy",
             sim_@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
             attr(sim_@.xData, "name") <- "sim"
             if (objects) {
+              browser(expr = exists("._Copy_6"))
               objNames <- ls(object@.xData$.mods, all.names = TRUE)
               names(objNames) <- objNames
               isEnv <- unlist(lapply(objNames,

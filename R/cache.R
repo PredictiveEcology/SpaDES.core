@@ -198,7 +198,7 @@ setMethod(
       if (FALSE %in% classOptions$completed) obj$completed <- NULL
     if (!is.null(classOptions$simtimes))
       if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
-    browser(expr = exists("._robustDigest_3"))
+    browser(expr = exists("._robustDigest_4"))
     obj
 })
 
