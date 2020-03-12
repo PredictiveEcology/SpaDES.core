@@ -618,7 +618,7 @@ setMethod(
     }
 
     # Make local activeBindings to mod
-    lapply(sim@modules, function(mod) {
+    lapply(as.character(sim@modules), function(mod) {
       makeModActiveBinding(sim = sim, mod = mod)
     })
 

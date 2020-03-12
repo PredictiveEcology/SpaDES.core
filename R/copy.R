@@ -65,32 +65,6 @@ setMethod("Copy",
                                      function(obj)
                                        is.environment(get(obj, envir = object@.xData$.mods))))
               # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
-              # list2env(Copy(mget(objNames[!isEnv], envir = object@.xData), filebackedDir = filebackedDir),
-              #          envir = sim_@.xData)
-              # list2env(lapply(objNames[isEnv], function(x) {
-              #   e <- new.env(parent = asNamespace("SpaDES.core"))
-              #   attr(e, "name") <- x
-              #   e
-              # }
-              # ),
-              # envir = sim_@.xData)
-              #
-              # lapply(objNames[isEnv], function(en) {
-              #   list2env(as.list(object@.xData[[en]], all.names = TRUE),
-              #            envir = sim_@.xData[[en]])
-              #   isFn <- unlist(lapply(ls(sim_@.xData[[en]]), function(obj)
-              #     if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
-              #       environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
-              #     }
-              #   ))
-              # })
-              #
-              # # Deal with data.table objects
-              # anyDataTables <- unlist(lapply(objs(sim_), is.data.table))
-              # anyDataTables <- anyDataTables[anyDataTables]
-              # lapply(names(anyDataTables), function(dt) {
-              #   sim_@.xData[[dt]] <- data.table::copy(sim_@.xData[[dt]])
-              # })
 
               # Copy the whole environment, recursively through environments
               sim_@.xData <- Copy(object@.xData, filebackedDir = filebackedDir)

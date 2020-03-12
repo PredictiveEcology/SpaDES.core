@@ -180,7 +180,7 @@ setMethod(
     parent_ids <- integer()
     dots <- list(...)
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
-    sim@.xData$.mods <- new.env(parent = emptyenv())
+    sim@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
 
     for (j in .unparsed(modules)) {
       m <- names(modules)[[j]][1]
@@ -489,11 +489,12 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
-  tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
+  #tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
+  tmpEnvir <- new.env(parent = envir)
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
-  simCopy <- Copy(sim, objects = FALSE)
-  tmpEnvir$sim <- simCopy
+  #simCopy <- Copy(sim, objects = FALSE)
+  tmpEnvir$sim <- sim#simCopy
 
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = tmpEnvir),
@@ -506,8 +507,8 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   if (any(activeCode)) {
     browser(expr = exists("._evalWithActiveCode_2"))
-    # env <- new.env(parent = parentFrame);
-    env <- new.env(parent = asNamespace("SpaDES.core"));
+    env <- new.env(parent = parentFrame);
+    # env <- new.env(parent = asNamespace("SpaDES.core"));
     env$sim <- simCopy
     aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
       eval(ac, envir = env)
