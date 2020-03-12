@@ -5,29 +5,33 @@ if (getRversion() >= "3.1.0") {
 #' @importFrom reproducible tempfile2
 ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
                                  thisPid, outputFile) {
-  numTimes = 1
-  if (missing(thisPid)) thisPid <- Sys.getpid()
-  if (missing(outputFile)) {
-    outputFile <- outputFilename(thisPid)
-    # outputFile <-
-  }
-  #cat("memory,  time", "\n", file = outputFile, append = FALSE)
-  suppressWarnings(file.remove(outputFile))
-  #data.table::fwrite(list(a, Sys.time()), dateTimeAs = "ISO", append = FALSE, file = outputFile)
-  #data.table::fwrite(list("mem", "time"), append = FALSE, file = outputFile)
-  op <- options(digits.secs = 5)
-  stopFilename <- stopFilename(outputFile)
-  while(numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
-    Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
-    a <- memoryUseThisSession(thisPid)
-    #cat(a, ", ", format(Sys.time()), "\n", file = outputFile, append = TRUE)
-    data.table::fwrite(list(memory = a, time = Sys.time()),
-                       dateTimeAs = "write.csv",
-                       append = file.exists(outputFile), file = outputFile)
-    numTimes <- numTimes + 1
-  }
-  options(op)
-  invisible(outputFile)
+    numTimes = 1
+    if (missing(thisPid)) thisPid <- Sys.getpid()
+    if (missing(outputFile)) {
+      outputFile <- outputFilename(thisPid)
+      # outputFile <-
+    }
+    #cat("memory,  time", "\n", file = outputFile, append = FALSE)
+    suppressWarnings(file.remove(outputFile))
+    if (interval > 0) {
+      #data.table::fwrite(list(a, Sys.time()), dateTimeAs = "ISO", append = FALSE, file = outputFile)
+      #data.table::fwrite(list("mem", "time"), append = FALSE, file = outputFile)
+      op <- options(digits.secs = 5)
+      stopFilename <- stopFilename(outputFile)
+      while(numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
+        Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
+        a <- memoryUseThisSession(thisPid)
+        #cat(a, ", ", format(Sys.time()), "\n", file = outputFile, append = TRUE)
+        data.table::fwrite(list(memory = a, time = Sys.time()),
+                           dateTimeAs = "write.csv",
+                           append = file.exists(outputFile), file = outputFile)
+        numTimes <- numTimes + 1
+      }
+      options(op)
+    } else {
+      message("interval is 0; no memoryUse activated")
+    }
+    invisible(outputFile)
 }
 
 #' Estimate memory used with \code{system("ps")}
