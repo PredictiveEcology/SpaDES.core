@@ -39,6 +39,7 @@ jobs:
       - ellipsis
       - lifecycle
       - rlang
+      - vctrs
   - os: linux
     dist: xenial
     r: release
