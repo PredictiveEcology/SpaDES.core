@@ -19,6 +19,7 @@ version 1.0.0.9000
 
 ## bug fixes
 * tests for `Filenames` function coming from `reproducible` package
+* `options('spades.recoverMode')` was creating temp folders every event and not removing them; now it does.
 
 version 1.0.0
 =============
