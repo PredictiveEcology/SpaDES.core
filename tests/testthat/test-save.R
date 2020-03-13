@@ -200,7 +200,7 @@ test_that("saveSimList does not work correctly", {
 
   load(file = tmpfile[3], envir = environment())
   expect_true(identical(gsub("\\\\", "/", filename(sim$landscape)), tmpfile[1]))
-  expect_true(bindingIsActive("mod", sim$caribouMovement))
+  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
 
   # Now keep as file-backed, but change name
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 1, filebackedDir = tmpCache)
@@ -211,10 +211,10 @@ test_that("saveSimList does not work correctly", {
   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
   # rm(mySim)
 
-  assign("a", 1, envir = mySim$caribouMovement$mod)
-  assign("a", 2, envir = sim$caribouMovement$mod)
+  assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$mod)
+  assign("a", 2, envir = sim@.xData$.mods$caribouMovement$mod)
 
-  expect_true(bindingIsActive("mod", sim$caribouMovement))
+  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 

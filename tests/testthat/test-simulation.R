@@ -119,13 +119,13 @@ test_that("simInit with R subfolder scripts", {
   cat(file = file.path("child1", "R", "script.R"),
       "a <- function(poiuoiu) {
       poiuoiu + 1
-}", sep = "\n")
+  }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
-  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
-    if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
+  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData$.mods, all.names = TRUE), function(x) {
+    if (is.environment(mySim@.xData$.mods[[x]])) ls(envir = mySim@.xData$.mods[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.xData$child1$a(2) == 3) # Fns
-  })
+  expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
+})
 
 test_that("simulation runs with simInit with duplicate modules named", {
   testInitOut <- testInit()
