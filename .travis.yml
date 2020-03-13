@@ -37,6 +37,7 @@ jobs:
     r_binary_packages:
       - BH
       - ellipsis
+      - lifecycle
       - rlang
   - os: linux
     dist: xenial
