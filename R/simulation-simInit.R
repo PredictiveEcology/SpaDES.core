@@ -1168,7 +1168,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           }
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
-          showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          # showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          browser(expr = exists("._runModuleInputObjects_3"))
+          showSimilar <- if (is.null(sim@params[[mBase]][[".showSimilar"]]) ||
+                             isTRUE(is.na(sim@params[[mBase]][[".showSimilar"]]))) {
+            isTRUE(getOption("reproducible.showSimilar", FALSE))
+          } else {
+            isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          }
 
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
