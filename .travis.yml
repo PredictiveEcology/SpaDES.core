@@ -36,6 +36,7 @@ jobs:
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     r_binary_packages:
       - BH
+      - ellipsis
       - rlang
   - os: linux
     dist: xenial
