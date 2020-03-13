@@ -1200,8 +1200,29 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
   if (length(rmo$randomSeed) > (recoverMode - 1))
     rmo$randomSeed <- rmo$randomSeed[seq_len(recoverMode - 1)]
   startTime <- Sys.time()
-  if (length(rmo$recoverableObjs) > (recoverMode - 1))
+  if (length(rmo$recoverableObjs) > (recoverMode - 1)) {
+    toClear <- rmo$recoverableObjs[[as.numeric(recoverMode)]]
+    if (length(toClear)) {
+      out <- lapply(toClear, function(x) {
+        if (is(x, "Raster")) {
+          Filenames(x)
+        }
+      })
+      files <- unname(unlist(out))
+      files <- files[nzchar(files)]
+      if (length(files) != 0 ) {
+        unlink(files)
+        dirs <- unique(dirname(files))
+        filesLeft <- dir(dirs, full.names = TRUE)
+        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
+          unlink(dirs, recursive = TRUE)
+        }
+      }
+    }
+
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
+  }
+
 
   if (length(sim@events) > 0) {
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
