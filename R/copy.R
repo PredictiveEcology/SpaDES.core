@@ -42,8 +42,10 @@ setMethod("Copy",
           definition = function(object, filebackedDir,
                                 objects, queues) {
             if (missing(filebackedDir)) {
-              if (isTRUE(objects)) {
-                filebackedDir <- tempdir2(rndstr(1, 8))
+              if (!missing(objects)) {
+                if (isTRUE(objects)) {
+                  filebackedDir <- tempdir2(rndstr(1, 8))
+                }
               }
             }
             if (missing(objects)) objects <- TRUE
