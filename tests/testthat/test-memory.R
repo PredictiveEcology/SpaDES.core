@@ -1,5 +1,8 @@
 test_that("testing memoryUse", {
   if (!interactive()) skip("This memoryUse is still very experimental")
+  if (!requireNamespace("future", quietly = TRUE)) {
+    skip("future package required")
+  }
   testInitOut <- testInit(c("raster", "future.callr", "future"),
                           opts = list("spades.moduleCodeChecks" = FALSE,
                                       "spades.memoryUseInterval" = 0.2,

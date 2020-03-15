@@ -73,7 +73,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' \dontrun{
 #' # options("spades.recoveryMode" = 1) # now the default
 #' s <- simInit()
-#' s <- spades(s) # this this is interrupted or fails
+#' s <- spades(s) # if this is interrupted or fails
 #' s <- restartSpades() # don't need to put simList
 #'                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
 #' }
@@ -172,6 +172,9 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   # reset activeBinding mod
   out <- lapply(modules, function(mod) {
     makeModActiveBinding(sim = sim, mod = mod)
+  })
+  out <- lapply(modules, function(mod) {
+    makeParActiveBinding(sim = sim, mod = mod)
   })
 
   # Remove all added events that occurred during the events, i.e., via scheduleEvent

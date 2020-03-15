@@ -4,8 +4,12 @@ version 1.0.0.9000
 =============
 
 ## new features
+
+* `Par` is now an activeBinding (similar to `mod`) pointing to `P(sim)`; this allows for tab autocomplete to function correctly.
 * new helper functions to extract parameters, inputs, and outputs tables from module metadata:
   `moduleParams()`, `moduleInputs()`, `moduleOutputs()`. These are now used in default Rmd template.
+* better testing of `memoryUse` functionality
+* A pointer to `sim` is now created at `.pkgEnv$.sim` at the start of `spades` call, rather than `on.exit`; failures due to "out of memory" were not completing the `on.exit`
 
 ## dependencies
 * none
@@ -15,6 +19,7 @@ version 1.0.0.9000
 
 ## bug fixes
 * tests for `Filenames` function coming from `reproducible` package
+* `options('spades.recoverMode')` was creating temp folders every event and not removing them; now it does.
 
 version 1.0.0
 =============

@@ -42,7 +42,11 @@ setMethod("Copy",
           definition = function(object, filebackedDir,
                                 objects, queues) {
             if (missing(filebackedDir)) {
-              filebackedDir <- tempdir2(rndstr(1, 8))
+              if (!missing(objects)) {
+                if (isTRUE(objects)) {
+                  filebackedDir <- tempdir2(rndstr(1, 8))
+                }
+              }
             }
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
@@ -120,6 +124,13 @@ setMethod("Copy",
                     makeModActiveBinding(sim = sim_, mod = mod)
                   }
                 }
+              })
+              lapply(modules(sim_), function(mod) {
+                if (exists("mod", object[[mod]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object[[mod]])) {
+                    rm(list = "Par", envir = sim_[[mod]], inherits = FALSE)
+                    makeParActiveBinding(sim = sim_, mod = mod)
+                  }}
               })
             }
             sim_@.envir <- sim_@.xData
