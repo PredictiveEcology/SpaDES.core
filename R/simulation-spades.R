@@ -793,6 +793,15 @@ setMethod(
 
     sim <- withCallingHandlers({
 
+      recoverModeWrong <- getOption("spades.recoverMode")
+      if (!is.null(recoverModeWrong))
+        warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+      recoverMode <- getOption("spades.recoveryMode", FALSE)
+
+      # If there already is a sim object saved in the .pkgEnv, it may have objects,
+      #   and those objects may have temporary files from file-backed objects stored.
+      #   This will remove those file-backed temp files
+      clearFileBackedObjs(.pkgEnv$.sim$.recoverableObjs, recoverMode)
       .pkgEnv$.sim <- NULL # Clear anything that was here.
       .pkgEnv$.sim <- sim # set up pointer
 
@@ -944,11 +953,6 @@ setMethod(
              start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
           sim@completed <- new.env(parent = emptyenv())
       }
-
-      recoverModeWrong <- getOption("spades.recoverMode")
-      if (!is.null(recoverModeWrong))
-        warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
-      recoverMode <- getOption("spades.recoveryMode", FALSE)
 
       if (recoverMode > 0) {
         rmo <- NULL # The recovery mode object
@@ -1198,25 +1202,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo$randomSeed <- rmo$randomSeed[seq_len(recoverMode - 1)]
   startTime <- Sys.time()
   if (length(rmo$recoverableObjs) > (recoverMode - 1)) {
-    toClear <- rmo$recoverableObjs[[as.numeric(recoverMode)]]
-    if (length(toClear)) {
-      out <- lapply(toClear, function(x) {
-        if (is(x, "Raster")) {
-          Filenames(x)
-        }
-      })
-      files <- unname(unlist(out))
-      files <- files[nzchar(files)]
-      if (length(files) != 0 ) {
-        unlink(files)
-        dirs <- unique(dirname(files))
-        filesLeft <- dir(dirs, full.names = TRUE)
-        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
-          unlink(dirs, recursive = TRUE)
-        }
-      }
-    }
-
+    clearFileBackedObjs(rmo$recoverableObjs, recoverMode)
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
   }
 
@@ -1345,4 +1331,29 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
 
 spadesDefaultFormatter <- function(record) {
   text <- paste(record$timestamp, paste(record$levelname, record$logger, gsub("\n$", "", record$msg), sep=':'), sep = "")
+}
+
+
+clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
+  if (isTRUE(recoverMode > 0)) {
+    toClear <- recoverableObjs[[as.numeric(recoverMode)]]
+    if (length(toClear)) {
+      out <- lapply(toClear, function(x) {
+        if (is(x, "Raster")) {
+          Filenames(x)
+        }
+      })
+      files <- unname(unlist(out))
+      files <- files[nzchar(files)]
+      if (length(files) != 0 ) {
+        unlink(files)
+        dirs <- unique(dirname(files))
+        filesLeft <- dir(dirs, full.names = TRUE)
+        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
+          unlink(dirs, recursive = TRUE)
+        }
+      }
+    }
+  }
+  return(invisible())
 }
