@@ -137,6 +137,7 @@ setClass(
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object, ...) {
+            browser(expr = exists("._initialize_1"))
             sn <- slotNames(.Object)
             dots <- list(...)
             slotsProvided <- sn %in% names(dots)
@@ -171,6 +172,7 @@ setMethod("initialize",
             .Object@completed <- new.env(parent = emptyenv())
 
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            browser(expr = exists("._initialize_2"))
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
