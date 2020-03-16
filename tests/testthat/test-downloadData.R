@@ -18,7 +18,7 @@ test_that("downloadData downloads and unzips module data", {
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- getRversion()
-  if (Rversion > "3.4.2") { ## TODO: need o test on earlier versions too!
+  if (Rversion > "3.4.2") {
     # write checksums
     chksums <- structure(
       list(

@@ -10,17 +10,19 @@ if (getRversion() >= "3.1.0") {
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
+    "asc", "raster", "raster",
+    "csv", "read.csv", "utils",
+    "png", "raster", "raster",
+    "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "tif", "raster", "raster",
-    "png", "raster", "raster",
-    "csv", "read.csv", "utils",
     "shp", "readOGR", "rgdal",
-    "txt", "read.table", "utils",
-    "asc", "raster", "raster")),
+    "tif", "raster", "raster",
+    "txt", "read.table", "utils"
+    )),
     stringsAsFactors = FALSE)
   colnames(.fE) <- c("exts", "fun", "package")
   return(.fE)
@@ -323,3 +325,21 @@ setMethod("rasterToMemory",
             r <- setValues(r, getValues(r))
             return(r)
 })
+
+#' Load a saved \code{simList} from file
+#'
+#' @param file Character giving the name of a saved simulation file
+#'
+#' @export
+#' @importFrom qs qread
+loadSimList <- function(file) {
+  sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
+
+  mods <- setdiff(sim@modules, .coreModules())
+  lapply(mods, function(mod) { ## TODO: was this fixed in qs 0.21.1 ??
+    rm("mod", envir = sim[[mod]], inherits = FALSE)
+    makeModActiveBinding(sim = sim, mod = mod)
+  })
+
+  return(sim)
+}

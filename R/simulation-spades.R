@@ -795,6 +795,15 @@ setMethod(
 
     sim <- withCallingHandlers({
 
+      recoverModeWrong <- getOption("spades.recoverMode")
+      if (!is.null(recoverModeWrong))
+        warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+      recoverMode <- getOption("spades.recoveryMode", FALSE)
+
+      # If there already is a sim object saved in the .pkgEnv, it may have objects,
+      #   and those objects may have temporary files from file-backed objects stored.
+      #   This will remove those file-backed temp files
+      clearFileBackedObjs(.pkgEnv$.sim$.recoverableObjs, recoverMode)
       .pkgEnv$.sim <- NULL # Clear anything that was here.
       .pkgEnv$.sim <- sim # set up pointer
 
@@ -872,7 +881,7 @@ setMethod(
             sim = sim,
             reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
             .First = getOption("spades.restartR..First", restartFormals$.First),
-            .RDataFile = getOption("spades.restartR.RDataFilename", sim$._restartRList$simFilename),
+            .RDataFile = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
             restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
           )
         }
@@ -882,10 +891,8 @@ setMethod(
         if (!is.numeric(.plotInitialTime))
           .plotInitialTime <- as.numeric(.plotInitialTime)
         paramsLocal <- sim@params
-        whNonHiddenModules <-
-          !grepl(names(paramsLocal), pattern = "\\.")
-        paramsLocal[whNonHiddenModules] <-
-          lapply(paramsLocal[whNonHiddenModules], function(x) {
+        whNonHiddenModules <- !grepl(names(paramsLocal), pattern = "\\.")
+        paramsLocal[whNonHiddenModules] <- lapply(paramsLocal[whNonHiddenModules], function(x) {
             x$.plotInitialTime <- .plotInitialTime
             x
           })
@@ -947,11 +954,6 @@ setMethod(
              start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
           sim@completed <- new.env(parent = emptyenv())
       }
-
-      recoverModeWrong <- getOption("spades.recoverMode")
-      if (!is.null(recoverModeWrong))
-        warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
-      recoverMode <- getOption("spades.recoveryMode", FALSE)
 
       if (recoverMode > 0) {
         rmo <- NULL # The recovery mode object
@@ -1081,8 +1083,7 @@ setMethod(
 })
 
 #' @keywords internal
-.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                      showSimilar) {
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
@@ -1202,25 +1203,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo$randomSeed <- rmo$randomSeed[seq_len(recoverMode - 1)]
   startTime <- Sys.time()
   if (length(rmo$recoverableObjs) > (recoverMode - 1)) {
-    toClear <- rmo$recoverableObjs[[as.numeric(recoverMode)]]
-    if (length(toClear)) {
-      out <- lapply(toClear, function(x) {
-        if (is(x, "Raster")) {
-          Filenames(x)
-        }
-      })
-      files <- unname(unlist(out))
-      files <- files[nzchar(files)]
-      if (length(files) != 0 ) {
-        unlink(files)
-        dirs <- unique(dirname(files))
-        filesLeft <- dir(dirs, full.names = TRUE)
-        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
-          unlink(dirs, recursive = TRUE)
-        }
-      }
-    }
-
+    clearFileBackedObjs(rmo$recoverableObjs, recoverMode)
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
   }
 
@@ -1349,4 +1332,29 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
 
 spadesDefaultFormatter <- function(record) {
   text <- paste(record$timestamp, paste(record$levelname, record$logger, gsub("\n$", "", record$msg), sep=':'), sep = "")
+}
+
+
+clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
+  if (isTRUE(recoverMode > 0)) {
+    toClear <- recoverableObjs[[as.numeric(recoverMode)]]
+    if (length(toClear)) {
+      out <- lapply(toClear, function(x) {
+        if (is(x, "Raster")) {
+          Filenames(x)
+        }
+      })
+      files <- unname(unlist(out))
+      files <- files[nzchar(files)]
+      if (length(files) != 0 ) {
+        unlink(files)
+        dirs <- unique(dirname(files))
+        filesLeft <- dir(dirs, full.names = TRUE)
+        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
+          unlink(dirs, recursive = TRUE)
+        }
+      }
+    }
+  }
+  return(invisible())
 }

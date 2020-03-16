@@ -4,7 +4,7 @@ test_that("test checkpointing", {
     testOnExit(testInitOut)
   }, add = TRUE)
 
-  file <- file.path("chkpnt.RData")
+  file <- file.path("chkpnt.qs")
   ## save checkpoints; no load/restore
   set.seed(1234)
   times <- list(start = 0, end = 2, timeunit = "second")
@@ -19,20 +19,18 @@ test_that("test checkpointing", {
     modulePath = system.file("sampleModules", package = "SpaDES.core"),
     outputPath = tmpdir
   )
-  simA <- simInit(times = times, params = parameters, modules = modules,
-                  paths = paths)
+  simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   simA <- suppressWarnings(spades(simA))
 
   ## save checkpoints; with load/restore
   set.seed(1234)
   times <- list(start = 0, end = 2, timeunit = "second")
-  simB <- simInit(times = times, params = parameters, modules = modules,
-                  paths = paths)
+  simB <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   end(simB) <- 1
   simB <- suppressWarnings(spades(simB))
   rm(simB)
 
-  checkpointLoad(file = file.path(paths$outputPath, file))
+  simB <- checkpointLoad(file = file.path(paths$outputPath, file))
   end(simB) <- 2
   simB <- spades(simB)
 
@@ -40,8 +38,9 @@ test_that("test checkpointing", {
   rm("._startClockTime", envir = envir(simA))
   rm("._timestamp", envir = envir(simB))
   rm("._timestamp", envir = envir(simA))
+
   ## both versions above should yield identical results
-  expect_true(all.equal(simA, simB))
+  expect_equal(simA, simB)
 })
 
 test_that("test checkpointing with disk-backed raster", {
@@ -53,7 +52,7 @@ test_that("test checkpointing with disk-backed raster", {
   # library(raster)
   # tmpdir <- file.path(tempdir(), rndstr(1,6)) %>% checkPath(create = TRUE)
   # try(unlink(tmpdir, recursive = TRUE), silent = TRUE)
-  file <- file.path("chkpnt.RData")
+  file <- file.path("chkpnt.qs")
   # opts <- options("spades.moduleCodeChecks" = FALSE)
   # on.exit({
   #   detach("package:igraph")
@@ -75,9 +74,8 @@ test_that("test checkpointing with disk-backed raster", {
     modulePath = system.file("sampleModules", package = "SpaDES.core"),
     outputPath = tmpdir
   )
-  simA <- simInit(times = times, params = parameters, modules = modules,
-                  paths = paths)
-  simA$ras <- raster(extent(0,10,0,10), vals = 1)
+  simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
+  simA$ras <- raster(extent(0, 10, 0, 10), vals = 1)
   tmpRasFilename <- tempfile("tmpRas", fileext = ".tif") %T>%
     file.create() %>%
     normPath()
@@ -86,13 +84,11 @@ test_that("test checkpointing with disk-backed raster", {
 
   ## save checkpoints; with load/restore
   set.seed(1234)
-  simB <- simInit(times = times, params = parameters, modules = modules,
-                  paths = paths)
+  simB <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   simB$ras <- raster(extent(0,10,0,10), vals = 1)
   expect_error(simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename))
 
-  # Eliot uncommented this next line Sept 17, 2019
-  # b/c writeRaster next line newly failed
+  # Eliot uncommented this next line Sept 17, 2019 b/c writeRaster next line newly failed
   # filenames of source and target should be different
   tmpRasFilename <- tempfile("tmpRas", fileext = ".tif")
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
@@ -100,7 +96,7 @@ test_that("test checkpointing with disk-backed raster", {
   simB <- spades(simB)
   rm(simB)
 
-  checkpointLoad(file = file.path(paths$outputPath, file))
+  simB <- checkpointLoad(file = file.path(paths$outputPath, file))
   end(simB) <- 2
   simB <- spades(simB)
 
@@ -111,6 +107,7 @@ test_that("test checkpointing with disk-backed raster", {
   simB$ras[] <- simB$ras[]
   # Because they did have different file-backed file names, their "names" attribute is different
   names(simA$ras) <- names(simB$ras) <- "tmp"
+
   ## both versions above should yield identical results
-  expect_true(all.equal(simA, simB))
+  expect_equal(simA, simB)
 })

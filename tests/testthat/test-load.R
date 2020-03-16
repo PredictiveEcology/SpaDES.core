@@ -422,8 +422,8 @@ test_that("Filenames for simList", {
   }, add = TRUE)
 
   s <- simInit()
-  s$r <- raster(extent(0,10,0,10), vals = 1, res = 1)
-  s$r2 <- raster(extent(0,10,0,10), vals = 1, res = 1)
+  s$r <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  s$r2 <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
   s$r <- writeRaster(s$r, filename = tmpfile[1], overwrite = TRUE)
   s$r2 <- writeRaster(s$r2, filename = tmpfile[3], overwrite = TRUE)
   s$s <- stack(s$r, s$r2)

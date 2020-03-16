@@ -223,8 +223,7 @@ saveFiles <- function(sim) {
 #'        \code{simList}, so when it is recovered it will be given that
 #'        name.
 #' @param envir If \code{sim} is a character string, then this must be provided.
-#'        It is the environment where the object named \code{sim} can
-#'        be found.
+#'        It is the environment where the object named \code{sim} can be found.
 #'
 #' @param filename Character string with the path for saving \code{simList}
 #'
@@ -232,7 +231,7 @@ saveFiles <- function(sim) {
 #'        file backed rasters. Leave their file intact as is, in its place.
 #'        \code{1} means save a copy of the file backed rasters in \code{fileBackedDir}.
 #'        \code{2} means move all data in file-backed rasters to memory. This
-#'        means that the objects will be part of the main \code{RData} file
+#'        means that the objects will be part of the main \code{qs} file
 #'        of the \code{simList}. Default is \code{0}.
 #' @param filebackedDir Only used if \code{fileBackend} is 1.
 #'        \code{NULL}, the default, or Character string. If \code{NULL}, then then the
@@ -241,9 +240,10 @@ saveFiles <- function(sim) {
 #'        will be interpreted as a path to copy all rasters to.
 #' @param ... Passed to \code{save}, e.g., \code{compression}
 #'
-#' @return A saved \code{.RData} file in \code{filename} location.
+#' @return A saved \code{.qs} file in \code{filename} location.
 #'
 #' @export
+#' @importFrom qs qsave
 #' @importFrom stats runif
 #' @rdname saveSimList
 #' @seealso \code{\link{zipSimList}}
@@ -284,9 +284,11 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
     assign(simName, sim, envir = tmpEnv)
-    save(list = simName, envir = tmpEnv, file = filename)
+    #save(list = simName, envir = tmpEnv, file = filename)
+    qs::qsave(get(simName, envir = tmpEnv), file = filename)
   } else {
-    save(sim, file = filename)
+    #save(sim, file = filename)
+    qs::qsave(sim, file = filename)
   }
   return(invisible())
 }
@@ -314,13 +316,13 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' zipping, to include only cache elements that are relevant.
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   dots <- list(...)
-  if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".RData")
+  if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".qs")
   tmpDir <- file.path(tempdir(), rndstr(1, 6))
-  tmpRData <- file.path(tmpDir, basename(dots$filename))
+  tmpf <- file.path(tmpDir, basename(dots$filename))
   if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("rasters")
   if (is.null(dots$fileBackend)) dots$fileBackend <- formals(saveSimList)$fileBackend
   tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
-  saveSimList(sim, filename = tmpRData, filebackedDir = tmpRasters, fileBackend = dots$fileBackend)
+  saveSimList(sim, filename = tmpf, filebackedDir = tmpRasters, fileBackend = dots$fileBackend)
 
   newnamesOutputs <- NULL
   if (isTRUE(outputs)) {
@@ -344,6 +346,6 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
       file.symlink(inputs(sim)$file, newnamesInputs)
     }
   }
-  zip(zipfile = zipfile, files = c(tmpRData, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
+  zip(zipfile = zipfile, files = c(tmpf, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
                                    newnamesOutputs, newnamesInputs))
 }
