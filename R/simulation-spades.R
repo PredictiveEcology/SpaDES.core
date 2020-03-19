@@ -782,6 +782,10 @@ setMethod(
                         notOlderThan,
                         ...) {
 
+    oldWd <- getwd()
+    on.exit({
+      setwd(oldWd)
+    }, add = TRUE)
     useNormalMessaging <- TRUE
     newDebugging <- is.list(debug)
     if (newDebugging) {
