@@ -425,7 +425,7 @@ setMethod(
         allPkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", allPkgs)
         allPkgs <- gsub(".*\\/+(.+)",  "\\1", allPkgs)
 
-        loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
+        loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
       }
     }
 
