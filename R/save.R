@@ -203,6 +203,7 @@ saveFiles <- function(sim) {
 .saveFileExtensions <- function() {
   .sFE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
     "rds", "saveRDS", "base",
+    "qs", "qsave", "qs",
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
     "grd", "writeRaster", "raster"

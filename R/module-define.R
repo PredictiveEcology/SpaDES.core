@@ -707,8 +707,8 @@ setMethod(
       outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
     }
     if (any(is.na(outputDF[, "fun"]))) {
-      exts <- na.omit(match(exts, .fileExts[, "exts"]))
-      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[exts, "fun"]
+      extsAvail <- checkKnownExts(exts, .fileExts)
+      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
     }
   }
 
@@ -720,9 +720,20 @@ setMethod(
       outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
     }
     if (any(is.na(outputDF[, "package"]))) {
-      exts <- na.omit(match(file_ext(fl), .fileExts[, "exts"]) )
-      outputDF$package[is.na(outputDF$package)] <- .fileExts[exts, "package"]
+      exts <- file_ext(fl)
+      extsAvail <- checkKnownExts(exts, .fileExts)
+      outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
     }
   }
   return(outputDF)
+}
+
+checkKnownExts <- function(exts, knownFileExts) {
+  if (missing(knownFileExts))
+    knownFileExts <- .saveFileExtensions()
+  extsAvail <- na.omit(match(exts, knownFileExts[, "exts"]))
+  extsMissing <- setdiff(exts, exts[extsAvail])
+  if (length(extsMissing) > 0)
+    stop("No known save method is available for class ", extsMissing)
+  extsAvail
 }
