@@ -513,13 +513,7 @@ setMethod(
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc, sourceURL),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (length(templist) > 0) {
-      for (i in 1:length(templist)) {
-        returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
-                                            stringsAsFactors = FALSE))
-        names(returnDataframe)[ncol(returnDataframe)] <- names(templist)[i]
-      }
-    }
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "expectsInput")
     return(returnDataframe)
 })
 
@@ -589,13 +583,7 @@ setMethod(
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (length(templist) > 0) {
-      for (i in 1:length(templist)) {
-        returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
-                                            stringsAsFactors = FALSE))
-        names(returnDataframe)[ncol(returnDataframe)] <- names(templist)[i]
-      }
-    }
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "createsOutput")
     return(returnDataframe)
 })
 
@@ -736,4 +724,19 @@ checkKnownExts <- function(exts, knownFileExts) {
   if (length(extsMissing) > 0)
     stop("No known save method is available for class ", extsMissing)
   extsAvail
+}
+
+
+addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
+  if (length(templist) > 0) {
+    for (i in 1:length(templist)) {
+      returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
+                                          stringsAsFactors = FALSE))
+      nam <- names(templist)[i]
+      if (is.null(nam))
+        stop(fn, " for ", objectName, " has too many unnamed fields; perhaps forgot to use paste(...)?")
+      names(returnDataframe)[ncol(returnDataframe)] <- nam
+    }
+  }
+  returnDataframe
 }
