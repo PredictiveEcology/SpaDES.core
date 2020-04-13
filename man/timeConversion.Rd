@@ -10,7 +10,9 @@
 \alias{checkTimeunit,character,missing-method}
 \alias{checkTimeunit,character,environment-method}
 \title{Convert time units}
-\format{An object of class \code{character} of length 12.}
+\format{
+An object of class \code{character} of length 12.
+}
 \usage{
 inSeconds(unit, envir, skipChecks = FALSE)
 

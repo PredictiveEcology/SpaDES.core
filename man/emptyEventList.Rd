@@ -10,7 +10,13 @@
 \alias{.emptyEventList,missing,missing,missing,missing-method}
 \alias{.emptyEventListCols}
 \title{Blank (template) event list}
-\format{An object of class \code{data.table} (inherits from \code{data.frame}) with 0 rows and 4 columns.}
+\format{
+An object of class \code{data.table} (inherits from \code{data.frame}) with 0 rows and 4 columns.
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 1 rows and 4 columns.
+
+An object of class \code{character} of length 4.
+}
 \usage{
 .emptyEventListDT
 

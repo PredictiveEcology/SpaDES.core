@@ -11,7 +11,15 @@
 \alias{.fileTableOutCols}
 \alias{.fileTableOutDF}
 \title{Create empty fileTable for inputs and outputs}
-\format{An object of class \code{character} of length 8.}
+\format{
+An object of class \code{character} of length 8.
+
+An object of class \code{data.frame} with 0 rows and 8 columns.
+
+An object of class \code{character} of length 7.
+
+An object of class \code{data.frame} with 0 rows and 7 columns.
+}
 \usage{
 .fileTableIn(x)
 
