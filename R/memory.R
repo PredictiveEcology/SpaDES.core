@@ -198,4 +198,4 @@ outputFilename <- function(thisPid) {
 }
 
 futureMessage <- message("To use spades.memoryUseInterval, 'future' and 'future.callr' ",
-"packages must be installed; install.packages(c('future', 'future.callr')")
+                         "packages must be installed; install.packages(c('future', 'future.callr'))")
