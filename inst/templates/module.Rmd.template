@@ -7,6 +7,10 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 # Overview
 
 Provide an overview of what the module does / how to use the module.
