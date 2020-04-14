@@ -20,17 +20,20 @@ The default is the current working directory.}
 
 \item{...}{Additional arguments. Currently, only the following are supported:\cr\cr
 
+             \code{children}. Required when \code{type = "parent"}. A character vector
+             specifying the names of child modules.
+
              \code{open}. Logical. Should the new module file be opened after creation?
              Default \code{TRUE}.\cr\cr
-
-             \code{unitTests}. Logical. Should the new module include unit test files?
-             Default \code{TRUE}. Unit testing relies on the \code{testthat} package.\cr\cr
 
              \code{type}. Character string specifying one of \code{"child"} (default),
              or \code{"parent"}.\cr\cr
 
-             \code{children}. Required when \code{type = "parent"}. A character vector
-             specifying the names of child modules.}
+             \code{unitTests}. Logical. Should the new module include unit test files?
+             Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\cr\cr
+
+             \code{useGitHub}. Logical. Is module development happening on GitHub?
+             Default \code{TRUE}. Setting up GitHub projects relies on the \pkg{usethis} package.\cr\cr}
 }
 \value{
 Nothing is returned. The new module file is created at
