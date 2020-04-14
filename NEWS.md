@@ -13,7 +13,7 @@ version 1.0.0.9000
 * improved templating of new modules, including support for automated module code checking using GitHub Actions (`newModule()` sets `useGitHub = TRUE` by default).
 
 ## dependencies
-* add `usethat` to Suggests for use with GitHub Actions
+* add `usethis` to Suggests for use with GitHub Actions
 
 ## deprecated
 * none
