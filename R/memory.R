@@ -201,5 +201,7 @@ outputFilename <- function(thisPid) {
   reproducible::tempfile2("memoryUse", fileext = paste0("..memAvail", "_", thisPid, ".txt"))
 }
 
-futureMessage <- message("To use spades.memoryUseInterval, 'future' and 'future.callr' ",
-"packages must be installed; install.packages(c('future', 'future.callr')")
+futureMessage <- message(
+  "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
+  "  install.packages(c('future', 'future.callr'))"
+)

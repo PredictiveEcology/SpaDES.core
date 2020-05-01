@@ -1338,7 +1338,7 @@ spadesDefaultFormatter <- function(record) {
   text <- paste(record$timestamp, paste(record$levelname, record$logger, gsub("\n$", "", record$msg), sep=':'), sep = "")
 }
 
-
+#' @importFrom reproducible Filenames
 clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
   if (isTRUE(recoverMode > 0)) {
     toClear <- recoverableObjs[[as.numeric(recoverMode)]]

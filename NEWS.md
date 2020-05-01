@@ -10,9 +10,10 @@ version 1.0.0.9000
   `moduleParams()`, `moduleInputs()`, `moduleOutputs()`. These are now used in default Rmd template.
 * better testing of `memoryUse` functionality
 * A pointer to `sim` is now created at `.pkgEnv$.sim` at the start of `spades` call, rather than `on.exit`; failures due to "out of memory" were not completing the `on.exit`
+* improved templating of new modules, including support for automated module code checking using GitHub Actions (`newModule()` sets `useGitHub = TRUE` by default).
 
 ## dependencies
-* none
+* add `usethis` to Suggests for use with GitHub Actions
 
 ## deprecated
 * none

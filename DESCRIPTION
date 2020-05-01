@@ -73,7 +73,8 @@ Suggests:
     sf,
     SpaDES.tools (>= 0.2.0),
     rmarkdown,
-    testthat (>= 1.0.2)
+    testthat (>= 1.0.2),
+    usethis (>= 1.6.0)
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
@@ -120,4 +121,4 @@ Collate:
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

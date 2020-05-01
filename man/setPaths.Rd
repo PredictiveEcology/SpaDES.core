@@ -7,7 +7,9 @@
 \alias{getPaths}
 \alias{Paths}
 \title{Get and set default working directories}
-\format{An object of class \code{list} of length 5.}
+\format{
+An object of class \code{list} of length 5.
+}
 \usage{
 .paths()
 

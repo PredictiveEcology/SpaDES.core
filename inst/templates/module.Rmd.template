@@ -3,7 +3,13 @@ title: "{{{name}}}"
 author: "{{{author}}}"
 date: "{{{date}}}"
 output: pdf_document
+editor_options:
+  chunk_output_type: console
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = "hold")
+```
 
 # Overview
 
@@ -49,7 +55,7 @@ mySimOut <- spades(mySim)
 
 Provide a summary of user-visible parameters.
 
-```{r moduleParams}
+```{r moduleParams, echo = FALSE}
 df_params <- moduleParams("{{{name}}}", "..")
 knitr::kable(df_params)
 ```
@@ -73,7 +79,7 @@ Write what is saved.
 How to obtain input data, and a description of the data required by the module.
 If `sourceURL` is specified, `downloadData("{{{name}}}", "path/to/modules/dir")` may be sufficient.
 
-```{r moduleInputs}
+```{r moduleInputs, echo = FALSE}
 df_inputs <- moduleInputs("{{{name}}}", "..")
 knitr::kable(df_inputs)
 ```
@@ -82,7 +88,7 @@ knitr::kable(df_inputs)
 
 Description of the module outputs.
 
-```{r moduleOutputs}
+```{r moduleOutputs, echo = FALSE}
 df_outputs <- moduleOutputs("{{{name}}}", "..")
 knitr::kable(df_outputs)
 ```
