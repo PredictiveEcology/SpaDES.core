@@ -500,7 +500,7 @@ test_that("conflicting function types", {
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
-      expectsInput('ei4', 'numeric', '', '')
+      expectsInput('ei4', 'numeric', '', 'test.com')
       ",
       xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
@@ -521,6 +521,15 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
+      url1 <- extractURL('ei4')
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without sim or module fails')
+      url1 <- extractURL('ei4', sim = sim)
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without module fails')",
+paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
+      if (!identical(url1, 'test.com'))
+        stop('extractURL fails')
       sim$g <- 1
       sim$ei1 <- 4
       fff <- sim$ei1

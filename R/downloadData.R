@@ -34,12 +34,14 @@ setMethod(
   definition = function(objectName, sim, module) {
     i <- 0
     lenSC <- length(sys.calls())
+    # This will get the simList that is closest in the call stack, noting that
+    #  in this first one (i.e., this function), sim will be missing
     while (missing(sim) && i < lenSC) {
       i <- i + 1
       simEnv <- whereInStack("sim", -i)
       sim <- simEnv$sim
     }
-    extractURL(objectName = objectName, sim = sim)
+    extractURL(objectName = objectName, sim = sim, module = module)
 })
 
 #' @export
