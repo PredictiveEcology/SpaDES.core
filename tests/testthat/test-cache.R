@@ -4,6 +4,15 @@ test_that("test event-level cache", {
     testOnExit(testInitOut)
   }, add = TRUE)
 
+  modPath <- system.file("sampleModules", package = "SpaDES.core")
+
+  mods <- c("caribouMovement", "randomLandscapes", "fireSpread")
+  pkgs <- reqdPkgs(module = mods,
+          modulePath = modPath)
+  expect_true(length(pkgs) == 3)
+  expect_true(all(names(pkgs) == mods))
+  expect_true(all(c("raster", "sp", "SpaDES.tools", "RColorBrewer") %in% unlist(pkgs)))
+
   # Example of changing parameter values
   mySim <- simInit(
     times = list(start = 0.0, end = 1.0, timeunit = "year"),
@@ -14,8 +23,8 @@ test_that("test event-level cache", {
       caribouMovement = list(.plotInitialTime = NA),
       randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
     ),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modules = mods,
+    paths = list(modulePath = modPath,
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou
@@ -26,7 +35,7 @@ test_that("test event-level cache", {
   set.seed(1123)
   # ._robustDigest_2 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<- ._Cache_11 <<- ._Cache_13 <<- 1
   #._addTagsToOutput_2 <<- 1
-  expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
+  expect_true(!"loaded cached copy of init event in randomLandscapes module" %in%
                 capture_messages({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                 }))
@@ -37,7 +46,7 @@ test_that("test event-level cache", {
   mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = FALSE)
   })
-  expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
+  expect_true(any(grepl(pattern = "loaded cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
 
@@ -79,7 +88,7 @@ test_that("test module-level cache", {
 
   set.seed(1123)
   pdf(tmpfile)
-  expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
+  expect_true(!("loaded cached copy of init event in randomLandscapes module" %in%
                   capture_messages({
                     sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                   })))
@@ -104,7 +113,7 @@ test_that("test module-level cache", {
 
   unlink(tmpfile1)
 
-  expect_true(any(grepl(pattern = "Using cached copy of randomLandscapes module", mess1)))
+  expect_true(any(grepl(pattern = "loaded cached copy of randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
 
@@ -182,7 +191,7 @@ test_that("test .robustDigest for simLists", {
   msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
   expect_true(all(grepl(msgGrep, mess1)))
 
-  msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
+  msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
   #a <- capture.output(
   expect_message(do.call(simInit, args), regexp = msgGrep)
   #)
@@ -218,7 +227,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_message(spades(bbb), regexp = "Using cached copy of init", all = FALSE)
+  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 
   # make a change in Init function
   xxx <- readLines(fileName)
@@ -235,7 +244,7 @@ test_that("test .robustDigest for simLists", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
   options(opts)
-  expect_message(spades(bbb), regexp = "Using cached copy of init", all = FALSE)
+  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
@@ -378,7 +387,7 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
-  expect_true(any(grepl("Using cached copy", mess1)))
+  expect_true(any(grepl("loaded cached copy", mess1)))
 })
 
 
