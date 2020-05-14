@@ -1,7 +1,6 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("actualFile", "checksum.x", "checksum.y",
-                           "expectedFile", "filesize.x", "filesize.y", "result"))
-}
+utils::globalVariables(c(
+  "actualFile", "checksum.x", "checksum.y", "expectedFile", "filesize.x", "filesize.y", "result"
+))
 
 defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 

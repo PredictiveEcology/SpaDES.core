@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("fun", "loadTime", "package"))
-}
+utils::globalVariables(c("fun", "loadTime", "package"))
 
 #' File extensions map
 #'

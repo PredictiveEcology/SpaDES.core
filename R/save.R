@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("saved", "saveTime", "fun", "package", "attached"))
-}
+utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 
 # Just checks for paths, creates them if they do not exist
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {

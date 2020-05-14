@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("memory", "maxMemory"))
-}
+utils::globalVariables(c("memory", "maxMemory"))
 
 #' @importFrom reproducible tempfile2
 ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
