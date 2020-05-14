@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("expectedFile", "result"))
-}
+utils::globalVariables(c("expectedFile", "result"))
 
 #' Extract a url from module metadata
 #'

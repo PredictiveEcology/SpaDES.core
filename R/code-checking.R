@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(".")
-}
+utils::globalVariables(".")
 
 # These are known functions that will definitely cause conflicts unless they are
 # prefixed by their packages.

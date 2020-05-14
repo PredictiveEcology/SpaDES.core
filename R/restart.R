@@ -1,7 +1,7 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".", ".attachedPkgsFilename",  ".First", ".oldWd",
-                           ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"))
-}
+utils::globalVariables(c(
+  ".", ".attachedPkgsFilename",  ".First", ".oldWd",
+  ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"
+))
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {

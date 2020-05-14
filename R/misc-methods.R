@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
-}
+utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 
 #' A slightly modified version of getOption
 #'
