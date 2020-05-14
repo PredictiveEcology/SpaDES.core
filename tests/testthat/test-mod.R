@@ -147,12 +147,11 @@ test_that("local mod object", {
   expect_true(out3$test2$.objects$y == "This module is test2")
 
   # Cached copy
-  expect_true(grepl("loading cached", mess))
+  expect_true(any(grepl("loaded cached", mess)))
   expect_true(out4$test$.objects$a == 2)
   expect_true(out4$test2$.objects$a == 1)
   expect_true(out4$test2$.objects$b == 2)
   expect_true(is.null(out4$test2$.objects$x))
   expect_true(!is.null(out4$test$.objects$x)) # was made in .inputObjects, copies fine
   expect_true(out4$test2$.objects$y == "This module is test2")
-
 })
