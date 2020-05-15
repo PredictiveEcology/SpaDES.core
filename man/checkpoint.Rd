@@ -16,7 +16,7 @@
 \usage{
 doEvent.checkpoint(sim, eventTime, eventType, debug = FALSE)
 
-checkpointLoad(file, envir = parent.frame())
+checkpointLoad(file)
 
 .checkpointSave(sim, file)
 
@@ -48,8 +48,6 @@ either \code{"init"}, \code{"load"}, or \code{"save"}.}
 will be printed (default \code{debug = FALSE}).}
 
 \item{file}{The checkpoint file.}
-
-\item{envir}{the environment where the data should be loaded.}
 
 \item{value}{The object to be stored at the slot.}
 }

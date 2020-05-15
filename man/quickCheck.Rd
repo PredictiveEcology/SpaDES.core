@@ -4,7 +4,9 @@
 \name{.quickCheck}
 \alias{.quickCheck}
 \title{The \code{SpaDES.core} variable to switch between quick and robust checking}
-\format{An object of class \code{logical} of length 1.}
+\format{
+An object of class \code{logical} of length 1.
+}
 \usage{
 .quickCheck
 }

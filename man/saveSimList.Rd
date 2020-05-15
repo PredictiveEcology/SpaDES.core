@@ -19,7 +19,7 @@ name.}
 file backed rasters. Leave their file intact as is, in its place.
 \code{1} means save a copy of the file backed rasters in \code{fileBackedDir}.
 \code{2} means move all data in file-backed rasters to memory. This
-means that the objects will be part of the main \code{RData} file
+means that the objects will be part of the main \code{qs} file
 of the \code{simList}. Default is \code{0}.}
 
 \item{filebackedDir}{Only used if \code{fileBackend} is 1.
@@ -29,13 +29,12 @@ files will be copied to the directory:
 will be interpreted as a path to copy all rasters to.}
 
 \item{envir}{If \code{sim} is a character string, then this must be provided.
-It is the environment where the object named \code{sim} can
-be found.}
+It is the environment where the object named \code{sim} can be found.}
 
 \item{...}{Passed to \code{save}, e.g., \code{compression}}
 }
 \value{
-A saved \code{.RData} file in \code{filename} location.
+A saved \code{.qs} file in \code{filename} location.
 }
 \description{
 Because of the environment slot, this is not quite as straightforward as

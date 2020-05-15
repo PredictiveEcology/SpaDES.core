@@ -1,8 +1,22 @@
-test_that("saving files does not work correctly", {
-  testInitOut <- testInit(smcc = FALSE)
+test_that("saving files (and memoryUse)", {
+  skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+
+  if (!requireNamespace("future", quietly = TRUE)) {
+    skip("future package required")
+  }
+  testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
+                          c("data.table", "future.callr", "future"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
+
+  origPlan <- future::plan()
+  if (is(origPlan, "sequential"))
+    pl <- future::plan("multiprocess", workers = 2)
+  on.exit({
+    future::plan(origPlan)
+  }, add = TRUE)
+
 
   times <- list(start = 0, end = 6, "month")
   parameters <- list(
@@ -24,12 +38,29 @@ test_that("saving files does not work correctly", {
     modulePath = system.file("sampleModules", package = "SpaDES.core"),
     outputPath = tmpdir
   )
-  # innerClasses <<- 1
 
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
 
-  mySim <- spades(mySim)
+  mess <- capture_messages({
+    mySim <- spades(mySim)
+  })
+
+  cc <- ongoingMemoryThisPid(0.2, interval = 0.1)
+  expect_true(file.exists(cc))
+  ff <- fread(cc)
+  expect_true(NROW(ff)>0)
+
+  options("spades.memoryUseInterval" = 0)
+  outputFile <- mySim$.memoryUse$filename
+  expect_false(file.exists(outputFile))
+  obj <- mySim$.memoryUse$obj
+  expect_true(NROW(obj) > 0)
+  aa <- memoryUse(mySim)
+  expect_true(NROW(aa) > 0)
+
+  a <- memoryUseThisSession()
+  expect_true(is.numeric(a))
 
   # test spades-level mechanism
   expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))
@@ -128,11 +159,10 @@ test_that("saving csv files does not work correctly", {
    # read one back in just to test it all worked as planned
    newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
    expect_false(identical(df1, newObj))
-
 })
 
 test_that("saveSimList does not work correctly", {
-  testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"))
+  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -158,7 +188,7 @@ test_that("saveSimList does not work correctly", {
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[2], fileBackend = 2)
-  reloadedObjName <- load(file = tmpfile[2], envir = environment())
+  sim <- loadSimList(file = tmpfile[2])
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
 
@@ -171,14 +201,14 @@ test_that("saveSimList does not work correctly", {
   # Now try to keep filename intact
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 0, filebackedDir = NULL)
 
-  load(file = tmpfile[3], envir = environment())
+  sim <- loadSimList(file = tmpfile[3])
   expect_true(identical(gsub("\\\\", "/", filename(sim$landscape)), tmpfile[1]))
   expect_true(bindingIsActive("mod", sim$caribouMovement))
 
   # Now keep as file-backed, but change name
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 1, filebackedDir = tmpCache)
 
-  load(file = tmpfile[3], envir = environment())
+  sim <- loadSimList(file = tmpfile[3])
   expect_false(identical(filename(sim$landscape), tmpfile[1]))
 
   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))

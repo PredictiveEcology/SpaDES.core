@@ -1,5 +1,27 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.0.9000
+=============
+
+## new features
+
+* `Par` is now an `activeBinding` (similar to `mod`) pointing to `P(sim)`; this allows for tab autocomplete to function correctly.
+* new helper functions to extract parameters, inputs, and outputs tables from module metadata:
+  `moduleParams()`, `moduleInputs()`, `moduleOutputs()`. These are now used in default `.Rmd` template.
+* better testing of `memoryUse` functionality
+* A pointer to `sim` is now created at `.pkgEnv$.sim` at the start of `spades` call, rather than `on.exit`; failures due to "out of memory" were not completing the `on.exit`
+* improved templating of new modules, including support for automated module code checking using GitHub Actions (`newModule()` sets `useGitHub = TRUE` by default).
+
+## dependencies
+* add `usethis` to Suggests for use with GitHub Actions
+
+## deprecated
+* none
+
+## bug fixes
+* tests for `Filenames` function coming from `reproducible` package
+* `options('spades.recoverMode')` was creating temp folders every event and not removing them; now it does.
+
 version 1.0.0
 =============
 
@@ -8,13 +30,16 @@ version 1.0.0
 * several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting `options('spades.recoveryMode' = 0)` may further help
 * Updates to deal with new backend with `reproducible`
 * better assertions inside list elements of `simInit`, e.g., `simInit(times = list(start = "test"))` now fails because times must be a list of 2 `numeric` objects
-* messaging is now all with `message` instead of a mixture of `message`, `cat` and `print`. This allows for easier suppressing of messaging, e.g., via `suppressMessages`. This was requested in a downstream package, `SpaDES.experiment` that was submitted to CRAN but rejected due to the now former inability to suppress messages.
-* logging to file is now possible via `debug` arg in `simInit`, using `logging` package. See `?simInit`
+* messaging is now all with `message` instead of a mixture of `message`, `cat` and `print`.
+  This allows for easier suppressing of messaging, e.g., via `suppressMessages`.
+  This was requested in a downstream package, `SpaDES.experiment` that was submitted to CRAN but rejected due to the now former inability to suppress messages.
+* `restartR` saves simulation objects using `qs::qsave()` which is faster and creates smaller file sizes.
 
 ## dependencies
 
 * moved packages from Imports to Suggests: `codetools`, `future`, `httr`, `logging`, and `tcltk`
 * removed `archivist`
+* `qs` now used for improved object serialization to disk
 
 ## deprecated
 

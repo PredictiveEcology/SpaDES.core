@@ -2,12 +2,12 @@
 % Please edit documentation in R/module-template.R
 \name{newModuleTests}
 \alias{newModuleTests}
-\alias{newModuleTests,character,character,logical-method}
+\alias{newModuleTests,character,character,logical,logical-method}
 \title{Create template testing structures for new modules}
 \usage{
-newModuleTests(name, path, open)
+newModuleTests(name, path, open, useGitHub)
 
-\S4method{newModuleTests}{character,character,logical}(name, path, open)
+\S4method{newModuleTests}{character,character,logical,logical}(name, path, open, useGitHub)
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}
@@ -17,6 +17,10 @@ The default is the current working directory.}
 
 \item{open}{Logical. Should the new module file be opened after creation?
 Default \code{TRUE} in an interactive session.}
+
+\item{useGitHub}{Logical indicating whether GitHub will be used.
+If \code{TRUE} (default), creates suitable configuration files (e.g.,
+\file{.gitignore}) and configures basic GitHub actions for module code checking.}
 }
 \description{
 Create template testing structures for new modules

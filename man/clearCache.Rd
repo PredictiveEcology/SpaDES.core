@@ -41,7 +41,7 @@
 )
 }
 \arguments{
-\item{x}{A simList or a directory containing a valid archivist repository. Note:
+\item{x}{A simList or a directory containing a valid Cache repository. Note:
 For compatibility with \code{Cache} argument, \code{cacheRepo} can also be
 used instead of \code{x}, though \code{x} will take precedence.}
 

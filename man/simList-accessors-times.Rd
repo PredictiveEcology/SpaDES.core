@@ -71,7 +71,7 @@ timeunits(x)
 
 elapsedTime(x, ...)
 
-\method{elapsedTime}{simList}(x, byEvent = TRUE, ...)
+\method{elapsedTime}{simList}(x, byEvent = TRUE, units = "auto", ...)
 }
 \arguments{
 \item{x}{A \code{simList}}
@@ -86,6 +86,9 @@ time units (if used within a module).}
 
 \item{byEvent}{Logical. If \code{TRUE}, the elapsed time will be by module and event;
 \code{FALSE} will report only by module. Default is \code{TRUE}.}
+
+\item{units}{character string.  Units in which the results are
+    desired.  Can be abbreviated.}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.
@@ -149,8 +152,17 @@ of the simulation:
    \code{times} \tab List of all simulation times (current, start, end, timeunit).\cr
 }
 }
+\examples{
+
+# Elapsed Time
+s1 <- simInit()
+s2 <- spades(s1)
+elapsedTime(s2)
+elapsedTime(s2, units = "mins")
+}
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
+\code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times;
+  \code{\link{elapsedTime}},
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

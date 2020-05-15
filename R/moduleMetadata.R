@@ -185,3 +185,68 @@ setMethod(
       as.numeric_version(v[[module]])  ## SpaDES >= 1.3.1.9044
     }
 })
+
+################################################################################
+#' Extract a module's parameters, inputs, or outputs
+#'
+#' These are simply wrappers around \code{moduleMetadata}.
+#'
+#' @param module Character string. Your module's name.
+#'
+#' @param path   Character string specifying the file path to modules directory.
+#'               Default is to use the \code{spades.modulePath} option.
+#'
+#' @return \code{data.frame}
+#'
+#' @author Alex Chubaty
+#' @export
+#' @rdname moduleParamsInputsOuputs
+#' @seealso \code{\link{moduleMetadata}}
+#'
+#' @example inst/examples/example_moduleParamsInputsOuputs.R
+#'
+setGeneric("moduleParams", function(module, path) {
+  standardGeneric("moduleParams")
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleParams",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    md[["parameters"]]
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setGeneric("moduleInputs", function(module, path) {
+  standardGeneric("moduleInputs")
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleInputs",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    md[["inputObjects"]]
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setGeneric("moduleOutputs", function(module, path) {
+  standardGeneric("moduleOutputs")
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleOutputs",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    md[["outputObjects"]]
+})

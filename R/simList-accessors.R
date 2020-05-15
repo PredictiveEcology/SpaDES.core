@@ -1,7 +1,7 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".SD", "clockTime", "diffTime", "eventNumber", "eventTime", "eventType",
-                           "exts", "minEventTime", "maxEventTime", "savetime", "unit"))
-}
+utils::globalVariables(c(
+  ".SD", "clockTime", "diffTime", "eventNumber", "eventTime", "eventType", "exts",
+  "minEventTime", "maxEventTime", "savetime", "unit"
+))
 
 ### `show` generic is already defined in the methods package
 #' Show an Object
@@ -1727,7 +1727,8 @@ setMethod("dataPath",
 #'
 #' @return Returns or sets the value of the slot from the \code{simList} object.
 #'
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times.
+#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times;
+#'   \code{\link{elapsedTime}},
 #'
 #' @aliases simList-accessors-times
 #' @author Alex Chubaty and Eliot McIntire
@@ -2785,9 +2786,17 @@ elapsedTime <- function(x, ...) UseMethod("elapsedTime")
 #' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
 #'                \code{FALSE} will report only by module. Default is \code{TRUE}.
 #'
+#' @inheritParams base::difftime
 #' @export
 #' @rdname simList-accessors-times
-elapsedTime.simList <- function(x, byEvent = TRUE, ...) {
+#' @examples
+#'
+#' # Elapsed Time
+#' s1 <- simInit()
+#' s2 <- spades(s1)
+#' elapsedTime(s2)
+#' elapsedTime(s2, units = "mins")
+elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   comp <- completed(x)
 
   if (!is.null(comp)) {
@@ -2798,9 +2807,19 @@ elapsedTime.simList <- function(x, byEvent = TRUE, ...) {
     } else {
       c("moduleName")
     }
-    ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy]
+    ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy] #nolint
+    a <- ret$elapsedTime
+    if (identical(units, "auto")) {
+      st <- Sys.time()
+      a <- a + st - st # work around for forcing a non seconds unit, allowing "auto"
+    } else {
+      # This one won't allow "auto"
+      units(a) <- units
+    }
+    ret[, elapsedTime := a]
+
   } else {
     ret <- NULL
   }
-  return(ret)
+  return(ret[])
 }

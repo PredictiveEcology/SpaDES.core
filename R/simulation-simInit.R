@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(".")
-}
+utils::globalVariables(".")
 
 #' Initialize a new simulation
 #'
@@ -621,6 +619,10 @@ setMethod(
       makeModActiveBinding(sim = sim, mod = mod)
     })
 
+    lapply(sim@modules, function(mod) {
+      makeParActiveBinding(sim = sim, mod = mod)
+    })
+
     ## load user-defined modules
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]
@@ -1164,7 +1166,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           }
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
-          showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          # showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          browser(expr = exists("._runModuleInputObjects_3"))
+          showSimilar <- if (is.null(sim@params[[mBase]][[".showSimilar"]]) ||
+                             isTRUE(is.na(sim@params[[mBase]][[".showSimilar"]]))) {
+            isTRUE(getOption("reproducible.showSimilar", FALSE))
+          } else {
+            isTRUE(sim@params[[mBase]][[".showSimilar"]])
+          }
 
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
