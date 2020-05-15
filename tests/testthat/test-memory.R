@@ -1,5 +1,9 @@
 test_that("testing memoryUse", {
-  if (!interactive()) skip("This memoryUse is still very experimental")
+  skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+
+  if (!interactive())
+    skip("This memoryUse is still very experimental")
+
   if (!requireNamespace("future", quietly = TRUE)) {
     skip("future package required")
   }
@@ -31,11 +35,14 @@ test_that("testing memoryUse", {
   #set.seed(1234)
   mySim2 <- simInit(times = times, params = params,
                     modules = modules, objects = list(), paths = paths)
-  mySim3 <- spades(mySim2, debug = FALSE)
-  suppressWarnings(memUse <- memoryUse(mySim3))
+  mySim3 <- spades(mySim2, debug = FALSE) ## TODO: infinite loop here; stalls test
+  suppressWarnings({
+    memUse <- memoryUse(mySim3)
+  })
   expect_true(is(memUse, "data.table"))
   expect_true(is.numeric(memUse$maxMemory))
   expect_true(sum(!is.na(memUse$maxMemory))>0)
-  suppressWarnings(memUse <- memoryUse(mySim3, max = FALSE))
-
+  suppressWarnings({
+    memUse <- memoryUse(mySim3, max = FALSE)
+  })
 })

@@ -45,7 +45,9 @@ as necessary. Default is \code{FALSE}. This currently works best if
 there is only one object being plotted in a given Plot call. However,
 it is possible to pass a list of logicals to this, matching the
 length of the ... objects. Use \code{clearPlot} to clear the whole
-plotting device.}
+plotting device. NOTE if \code{TRUE}: \emph{Everything that was there,
+including the legend and the end points of the color palette, will
+be removed and re-initiated}.}
 
 \item{addTo}{Character vector, with same length as \code{...}.
 This is for overplotting, when the overplot is not to occur on

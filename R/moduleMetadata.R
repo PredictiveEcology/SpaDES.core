@@ -189,7 +189,7 @@ setMethod(
 ################################################################################
 #' Extract a module's parameters, inputs, or outputs
 #'
-#' Thess are simply wrappers around \code{moduleMetadata}.
+#' These are simply wrappers around \code{moduleMetadata}.
 #'
 #' @param module Character string. Your module's name.
 #'

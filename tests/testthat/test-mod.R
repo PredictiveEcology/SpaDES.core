@@ -107,7 +107,9 @@ test_that("local mod object", {
   expect_true(mySim$test2$.objects$y == "This module")
   out2 <- spades(Copy(mySim))
   out3 <- Cache(spades, Copy(mySim))
-  mess <- capture_messages(out4 <- Cache(spades, Copy(mySim))) # should get cached
+  mess <- capture_messages({
+    out4 <- Cache(spades, Copy(mySim)) # should get cached
+  })
   out <- spades(mySim)
 
   # Test the Par stuff

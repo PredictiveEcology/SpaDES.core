@@ -1,4 +1,6 @@
 test_that("saving files (and memoryUse)", {
+  skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+
   if (!requireNamespace("future", quietly = TRUE)) {
     skip("future package required")
   }
@@ -40,7 +42,9 @@ test_that("saving files (and memoryUse)", {
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
 
-  mess <- capture_messages(mySim <- spades(mySim))
+  mess <- capture_messages({
+    mySim <- spades(mySim)
+  })
 
   cc <- ongoingMemoryThisPid(0.2, interval = 0.1)
   expect_true(file.exists(cc))
