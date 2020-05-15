@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -63,7 +67,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -77,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -119,7 +123,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/PredictiveEcology/SpaDES.core">
+  <a href="https://github.com/PredictiveEcology/SpaDES.core/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -155,6 +159,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -237,7 +246,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="checkpoint.html">doEvent.checkpoint()</a></code> <code><a href="checkpoint.html">checkpointLoad()</a></code> <code><a href="checkpoint.html">.checkpointSave()</a></code> <code><a href="checkpoint.html">checkpointFile()</a></code> <code><a href="checkpoint.html">`checkpointFile<-`()</a></code> <code><a href="checkpoint.html">checkpointInterval()</a></code> <code><a href="checkpoint.html">`checkpointInterval<-`()</a></code> </p>
+          <p><code><a href="checkpoint.html">doEvent.checkpoint()</a></code> <code><a href="checkpoint.html">checkpointLoad()</a></code> <code><a href="checkpoint.html">.checkpointSave()</a></code> <code><a href="checkpoint.html">checkpointFile()</a></code> <code><a href="checkpoint.html">`checkpointFile&lt;-`()</a></code> <code><a href="checkpoint.html">checkpointInterval()</a></code> <code><a href="checkpoint.html">`checkpointInterval&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation checkpoints.</p></td>
       </tr><tr>
@@ -351,7 +360,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="globals.html">globals()</a></code> <code><a href="globals.html">`globals<-`()</a></code> <code><a href="globals.html">G()</a></code> <code><a href="globals.html">`G<-`()</a></code> </p>
+          <p><code><a href="globals.html">globals()</a></code> <code><a href="globals.html">`globals&lt;-`()</a></code> <code><a href="globals.html">G()</a></code> <code><a href="globals.html">`G&lt;-`()</a></code> </p>
         </td>
         <td><p>Get and set global simulation parameters</p></td>
       </tr><tr>
@@ -372,6 +381,12 @@
           <p><code><a href="loadPackages.html">loadPackages()</a></code> </p>
         </td>
         <td><p>Load packages.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="loadSimList.html">loadSimList()</a></code> </p>
+        </td>
+        <td><p>Load a saved <code>simList</code> from file</p></td>
       </tr><tr>
         
         <td>
@@ -426,6 +441,12 @@
           <p><code><a href="moduleMetadata.html">moduleMetadata()</a></code> </p>
         </td>
         <td><p>Parse and extract module metadata</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="moduleParamsInputsOuputs.html">moduleParams()</a></code> <code><a href="moduleParamsInputsOuputs.html">moduleInputs()</a></code> <code><a href="moduleParamsInputsOuputs.html">moduleOutputs()</a></code> </p>
+        </td>
+        <td><p>Extract a module's parameters, inputs, or outputs</p></td>
       </tr><tr>
         
         <td>
@@ -489,7 +510,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="objects.html">objs()</a></code> <code><a href="objects.html">`objs<-`()</a></code> </p>
+          <p><code><a href="objects.html">objs()</a></code> <code><a href="objects.html">`objs&lt;-`()</a></code> </p>
         </td>
         <td><p>Extract or replace an object from the simulation environment</p></td>
       </tr><tr>
@@ -513,7 +534,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="params.html">params()</a></code> <code><a href="params.html">`params<-`()</a></code> <code><a href="params.html">P()</a></code> <code><a href="params.html">parameters()</a></code> </p>
+          <p><code><a href="params.html">params()</a></code> <code><a href="params.html">`params&lt;-`()</a></code> <code><a href="params.html">P()</a></code> <code><a href="params.html">parameters()</a></code> </p>
         </td>
         <td><p>Get and set simulation parameters</p></td>
       </tr><tr>
@@ -543,7 +564,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="progress.html">progressInterval()</a></code> <code><a href="progress.html">`progressInterval<-`()</a></code> <code><a href="progress.html">progressType()</a></code> <code><a href="progress.html">`progressType<-`()</a></code> </p>
+          <p><code><a href="progress.html">progressInterval()</a></code> <code><a href="progress.html">`progressInterval&lt;-`()</a></code> <code><a href="progress.html">progressType()</a></code> <code><a href="progress.html">`progressType&lt;-`()</a></code> </p>
         </td>
         <td><p>Get and set simulation progress bar details</p></td>
       </tr><tr>
@@ -639,19 +660,19 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-envir.html">envir()</a></code> <code><a href="simList-accessors-envir.html">`envir<-`()</a></code> </p>
+          <p><code><a href="simList-accessors-envir.html">envir()</a></code> <code><a href="simList-accessors-envir.html">`envir&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation environment</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-events.html">events()</a></code> <code><a href="simList-accessors-events.html">`events<-`()</a></code> <code><a href="simList-accessors-events.html">conditionalEvents()</a></code> <code><a href="simList-accessors-events.html">current()</a></code> <code><a href="simList-accessors-events.html">`current<-`()</a></code> <code><a href="simList-accessors-events.html">completed()</a></code> <code><a href="simList-accessors-events.html">`completed<-`()</a></code> </p>
+          <p><code><a href="simList-accessors-events.html">events()</a></code> <code><a href="simList-accessors-events.html">`events&lt;-`()</a></code> <code><a href="simList-accessors-events.html">conditionalEvents()</a></code> <code><a href="simList-accessors-events.html">current()</a></code> <code><a href="simList-accessors-events.html">`current&lt;-`()</a></code> <code><a href="simList-accessors-events.html">completed()</a></code> <code><a href="simList-accessors-events.html">`completed&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation event lists</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-inputs.html">inputs()</a></code> <code><a href="simList-accessors-inputs.html">`inputs<-`()</a></code> <code><a href="simList-accessors-inputs.html">inputArgs()</a></code> <code><a href="simList-accessors-inputs.html">`inputArgs<-`()</a></code> </p>
+          <p><code><a href="simList-accessors-inputs.html">inputs()</a></code> <code><a href="simList-accessors-inputs.html">`inputs&lt;-`()</a></code> <code><a href="simList-accessors-inputs.html">inputArgs()</a></code> <code><a href="simList-accessors-inputs.html">`inputArgs&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation inputs</p></td>
       </tr><tr>
@@ -663,25 +684,25 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-modules.html">modules()</a></code> <code><a href="simList-accessors-modules.html">`modules<-`()</a></code> <code><a href="simList-accessors-modules.html">depends()</a></code> <code><a href="simList-accessors-modules.html">`depends<-`()</a></code> </p>
+          <p><code><a href="simList-accessors-modules.html">modules()</a></code> <code><a href="simList-accessors-modules.html">`modules&lt;-`()</a></code> <code><a href="simList-accessors-modules.html">depends()</a></code> <code><a href="simList-accessors-modules.html">`depends&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation modules and dependencies</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-outputs.html">outputs()</a></code> <code><a href="simList-accessors-outputs.html">`outputs<-`()</a></code> <code><a href="simList-accessors-outputs.html">outputArgs()</a></code> <code><a href="simList-accessors-outputs.html">`outputArgs<-`()</a></code> </p>
+          <p><code><a href="simList-accessors-outputs.html">outputs()</a></code> <code><a href="simList-accessors-outputs.html">`outputs&lt;-`()</a></code> <code><a href="simList-accessors-outputs.html">outputArgs()</a></code> <code><a href="simList-accessors-outputs.html">`outputArgs&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation outputs</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-paths.html">paths()</a></code> <code><a href="simList-accessors-paths.html">`paths<-`()</a></code> <code><a href="simList-accessors-paths.html">cachePath()</a></code> <code><a href="simList-accessors-paths.html">`cachePath<-`()</a></code> <code><a href="simList-accessors-paths.html">inputPath()</a></code> <code><a href="simList-accessors-paths.html">`inputPath<-`()</a></code> <code><a href="simList-accessors-paths.html">outputPath()</a></code> <code><a href="simList-accessors-paths.html">`outputPath<-`()</a></code> <code><a href="simList-accessors-paths.html">modulePath()</a></code> <code><a href="simList-accessors-paths.html">`modulePath<-`()</a></code> <code><a href="simList-accessors-paths.html">rasterPath()</a></code> <code><a href="simList-accessors-paths.html">`rasterPath<-`()</a></code> <code><a href="simList-accessors-paths.html">dataPath()</a></code> </p>
+          <p><code><a href="simList-accessors-paths.html">paths()</a></code> <code><a href="simList-accessors-paths.html">`paths&lt;-`()</a></code> <code><a href="simList-accessors-paths.html">cachePath()</a></code> <code><a href="simList-accessors-paths.html">`cachePath&lt;-`()</a></code> <code><a href="simList-accessors-paths.html">inputPath()</a></code> <code><a href="simList-accessors-paths.html">`inputPath&lt;-`()</a></code> <code><a href="simList-accessors-paths.html">outputPath()</a></code> <code><a href="simList-accessors-paths.html">`outputPath&lt;-`()</a></code> <code><a href="simList-accessors-paths.html">modulePath()</a></code> <code><a href="simList-accessors-paths.html">`modulePath&lt;-`()</a></code> <code><a href="simList-accessors-paths.html">rasterPath()</a></code> <code><a href="simList-accessors-paths.html">`rasterPath&lt;-`()</a></code> <code><a href="simList-accessors-paths.html">dataPath()</a></code> </p>
         </td>
         <td><p>Specify paths for modules, inputs, outputs, and temporary rasters</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="simList-accessors-times.html">times()</a></code> <code><a href="simList-accessors-times.html">`times<-`()</a></code> <code><a href="simList-accessors-times.html">time(<i>&lt;simList&gt;</i>)</a></code> <code><a href="simList-accessors-times.html">`time<-`()</a></code> <code><a href="simList-accessors-times.html">end()</a></code> <code><a href="simList-accessors-times.html">`end<-`()</a></code> <code><a href="simList-accessors-times.html">start()</a></code> <code><a href="simList-accessors-times.html">`start<-`()</a></code> <code><a href="simList-accessors-times.html">timeunit()</a></code> <code><a href="simList-accessors-times.html">`timeunit<-`()</a></code> <code><a href="simList-accessors-times.html">timeunits()</a></code> <code><a href="simList-accessors-times.html">elapsedTime()</a></code> </p>
+          <p><code><a href="simList-accessors-times.html">times()</a></code> <code><a href="simList-accessors-times.html">`times&lt;-`()</a></code> <code><a href="simList-accessors-times.html">time(<i>&lt;simList&gt;</i>)</a></code> <code><a href="simList-accessors-times.html">`time&lt;-`()</a></code> <code><a href="simList-accessors-times.html">end()</a></code> <code><a href="simList-accessors-times.html">`end&lt;-`()</a></code> <code><a href="simList-accessors-times.html">start()</a></code> <code><a href="simList-accessors-times.html">`start&lt;-`()</a></code> <code><a href="simList-accessors-times.html">timeunit()</a></code> <code><a href="simList-accessors-times.html">`timeunit&lt;-`()</a></code> <code><a href="simList-accessors-times.html">timeunits()</a></code> <code><a href="simList-accessors-times.html">elapsedTime()</a></code> </p>
         </td>
         <td><p>Time usage in <code>SpaDES</code></p></td>
       </tr><tr>
@@ -755,11 +776,10 @@
     </table>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
-    </ul>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -770,7 +790,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

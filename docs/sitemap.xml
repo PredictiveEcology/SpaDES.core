@@ -175,6 +175,9 @@
     <loc>http://spades-core.predictiveecology.org//reference/loadPackages.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/loadSimList.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/makeMemoisable.html</loc>
   </url>
   <url>
@@ -206,6 +209,9 @@
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/moduleMetadata.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/moduleParamsInputsOuputs.html</loc>
   </url>
   <url>
     <loc>http://spades-core.predictiveecology.org//reference/moduleVersion.html</loc>

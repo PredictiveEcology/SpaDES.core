@@ -1,11 +1,12 @@
-pandoc: 2.3.1
-pkgdown: 1.4.1
+pandoc: 2.7.3
+pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   i-introduction: i-introduction.html
   ii-modules: ii-modules.html
   iii-cache: iii-cache.html
   iv-advanced: iv-advanced.html
+last_built: 2020-05-15T15:59Z
 urls:
   reference: http://spades-core.predictiveecology.org//reference
   article: http://spades-core.predictiveecology.org//articles

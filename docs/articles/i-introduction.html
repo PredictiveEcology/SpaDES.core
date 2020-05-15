@@ -6,13 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>01 Introduction to `SpaDES` • SpaDES.core</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="01 Introduction to `SpaDES`">
-<meta property="og:description" content="">
-<meta name="twitter:card" content="summary">
+<meta property="og:description" content="SpaDES.core">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -24,7 +24,7 @@
   gtag('config', 'UA-58633549-6');
 </script>
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/PredictiveEcology/SpaDES.core">
+  <a href="https://github.com/PredictiveEcology/SpaDES.core/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -97,12 +97,12 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>01 Introduction to <code>SpaDES</code>
+      <h1 data-toc-skip>01 Introduction to <code>SpaDES</code>
 </h1>
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">February 20 2020</h4>
+            <h4 class="date">May 15 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -169,32 +169,32 @@
 <a href="#spades-demos-and-sample-modules" class="anchor"></a><code>SpaDES</code> demos and sample modules</h2>
 <p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
 <p>This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"SpaDES.core"</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">demoSim &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="kw"><a href="../reference/simInit.html">simInit</a></span>(</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">  <span class="dt">times =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">start =</span> <span class="dv">0</span>, <span class="dt">end =</span> <span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">  <span class="dt">modules =</span> <span class="st">"SpaDES_sampleModules"</span>,</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">  <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">    <span class="dt">.globals =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">burnStats =</span> <span class="st">"nPixelsBurned"</span>),</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">    <span class="dt">randomLandscapes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">      <span class="dt">nx =</span> <span class="fl">1e2</span>, <span class="dt">ny =</span> <span class="fl">1e2</span>, <span class="dt">.saveObjects =</span> <span class="st">"landscape"</span>,</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">      <span class="dt">.plotInitialTime =</span> <span class="ot">NA</span>, <span class="dt">.plotInterval =</span> <span class="ot">NA</span>, <span class="dt">inRAM =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">    ),</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">    <span class="dt">caribouMovement =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">      <span class="dt">N =</span> <span class="fl">1e2</span>, <span class="dt">.saveObjects =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"caribou"</span>),</a>
-<a class="sourceLine" id="cb1-14" data-line-number="14">      <span class="dt">.plotInitialTime =</span> <span class="dv">1</span>, <span class="dt">.plotInterval =</span> <span class="dv">1</span>, <span class="dt">moveInterval =</span> <span class="dv">1</span></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">    ),</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16">    <span class="dt">fireSpread =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb1-17" data-line-number="17">      <span class="dt">nFires =</span> <span class="fl">1e1</span>, <span class="dt">spreadprob =</span> <span class="fl">0.235</span>, <span class="dt">persistprob =</span> <span class="dv">0</span>, <span class="dt">its =</span> <span class="fl">1e6</span>,</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">      <span class="dt">returnInterval =</span> <span class="dv">10</span>, <span class="dt">startTime =</span> <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">      <span class="dt">.plotInitialTime =</span> <span class="dv">0</span>, <span class="dt">.plotInterval =</span> <span class="dv">10</span></a>
-<a class="sourceLine" id="cb1-20" data-line-number="20">    )</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21">  ),</a>
-<a class="sourceLine" id="cb1-22" data-line-number="22">  <span class="dt">path =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">modulePath =</span> <span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="dt">package =</span> <span class="st">"SpaDES.core"</span>))</a>
-<a class="sourceLine" id="cb1-23" data-line-number="23">))</a>
-<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="kw"><a href="../reference/spades.html">spades</a></span>(demoSim)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"SpaDES.core"</span>)
+
+<span class="no">demoSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="../reference/simInit.html">simInit</a></span>(
+  <span class="kw">times</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="fl">100</span>),
+  <span class="kw">modules</span> <span class="kw">=</span> <span class="st">"SpaDES_sampleModules"</span>,
+  <span class="kw">params</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+    <span class="kw">.globals</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">burnStats</span> <span class="kw">=</span> <span class="st">"nPixelsBurned"</span>),
+    <span class="kw">randomLandscapes</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      <span class="kw">nx</span> <span class="kw">=</span> <span class="fl">1e2</span>, <span class="kw">ny</span> <span class="kw">=</span> <span class="fl">1e2</span>, <span class="kw">.saveObjects</span> <span class="kw">=</span> <span class="st">"landscape"</span>,
+      <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">.plotInterval</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">inRAM</span> <span class="kw">=</span> <span class="fl">TRUE</span>
+    ),
+    <span class="kw">caribouMovement</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      <span class="kw">N</span> <span class="kw">=</span> <span class="fl">1e2</span>, <span class="kw">.saveObjects</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"caribou"</span>),
+      <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">.plotInterval</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">moveInterval</span> <span class="kw">=</span> <span class="fl">1</span>
+    ),
+    <span class="kw">fireSpread</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      <span class="kw">nFires</span> <span class="kw">=</span> <span class="fl">1e1</span>, <span class="kw">spreadprob</span> <span class="kw">=</span> <span class="fl">0.235</span>, <span class="kw">persistprob</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">its</span> <span class="kw">=</span> <span class="fl">1e6</span>,
+      <span class="kw">returnInterval</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">startTime</span> <span class="kw">=</span> <span class="fl">0</span>,
+      <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">.plotInterval</span> <span class="kw">=</span> <span class="fl">10</span>
+    )
+  ),
+  <span class="kw">path</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">modulePath</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"SpaDES.core"</span>))
+))
+<span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="no">demoSim</span>)</pre></body></html></div>
 <p>Additional <code>SpaDES</code> modules are available via a GitHub repository: <a href="https://github.com/PredictiveEcology/SpaDES-modules">https://github.com/PredictiveEcology/SpaDES-modules</a>. Modules from this repository can be downloaded to a local directory using:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="dt">name =</span> <span class="st">"moduleName"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="st">"moduleName"</span>)</pre></body></html></div>
 <p><strong>Note:</strong> by default, modules and their data are saved to the directory specified by the <code>spades.modulesPath</code>. An alternate path can be provided to <code>downloadModule</code> directly via the <code>path</code> argument, or specified using <code><a href="https://rdrr.io/r/base/options.html">options(spades.modulesPath = "path/to/my/modules")</a></code>.</p>
 <p>A detailed guide to module development is provided in the <a href="ii-modules.html">modules vignette</a>.</p>
 </div>
@@ -223,33 +223,33 @@
 <p>The details of each simulation are stored in a <code>simList</code> object, including the simulation parameters and modules used, as well as storing the current state of the simulation and the future event queue. A list of completed events is also stored, which can provide useful debugging information. This <code>simList</code> object contains a unique <code>unique</code> object, along with data used/created during the simulation. The <code>envir</code> object is simply an environment, which means objects stored in it are updated using reference semantics (so objects don’t need to be copied). You can access objects stored in environments using the same syntax as for lists (<em>e.g.</em>, <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>, <code><a href="https://rdrr.io/r/base/Extract.html">[[</a></code>), in addition to <code>get</code>, which makes working with simulated data easy to do inside modules.</p>
 <p>A new simulation is initialized using the <code>simInit</code> function, which does all the work of creating the <code>envir</code> and <code>simList</code> objects for your simulation. This function also attempts to provide additional feedback to the user regarding parameters that may be improperly specified.</p>
 <p>Once a simulation is initialized you can inspect the contents of a <code>envir</code> object using:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># full simulation details:</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#  simList object info + simulation data</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">mySim</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co"># less detail:</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co"># simList object isn't shown; object details are</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/r/utils/ls_str.html">ls.str</a></span>(mySim)                 </a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co"># least detail:</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co"># simList object isn't shown; object names only </span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(mySim)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># full simulation details:</span>
+<span class="co">#  simList object info + simulation data</span>
+<span class="no">mySim</span>
+
+<span class="co"># less detail:</span>
+<span class="co"># simList object isn't shown; object details are</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/ls_str.html">ls.str</a></span>(<span class="no">mySim</span>)
+
+<span class="co"># least detail:</span>
+<span class="co"># simList object isn't shown; object names only </span>
+<span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(<span class="no">mySim</span>)</pre></body></html></div>
 <p>Simulation module object dependencies can be viewed using:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(igraph)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DiagrammeR)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(mySim, <span class="ot">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(mySim)        <span class="co"># plots simplified module (object) dependency graph</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(mySim)        <span class="co"># plots object dependency diagram</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">igraph</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">DiagrammeR</span>)
+<span class="fu"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(<span class="no">mySim</span>, <span class="fl">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span>
+<span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(<span class="no">mySim</span>)        <span class="co"># plots simplified module (object) dependency graph</span>
+<span class="fu"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(<span class="no">mySim</span>)        <span class="co"># plots object dependency diagram</span></pre></body></html></div>
 <p>They can viewed directly by printing the output of the <code>depsEdgeList</code> function.</p>
 </div>
 <div id="running-a-simulation-the-spades-function" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-a-simulation-the-spades-function" class="anchor"></a>Running a simulation: the <code>spades</code> function</h2>
 <p>Once a simulation is properly initialized it is executed using the <code>spades</code> function. By default in an interactive session, a progress bar is displayed in the console (this can be customized), and any specified files are loaded (via including an <code>input</code> <code>data.frame</code> or <code>data.table</code>, see examples). Debugging mode, <em>i.e.</em>, setting <code><a href="../reference/spades.html">spades(mySim, debug = TRUE)</a></code>, prints the contents of the <code>simList</code> object after the completion of every event during simulation. See the <a href="https://github.com/PredictiveEcology/SpaDES/wiki/Debugging">wiki entry on debugging</a> for more details on debugging SpaDES models.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">spades.nCompleted =</span> <span class="dv">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/simInit.html">simInit</a></span>(...)             <span class="co"># initialize a simulation using valid parameters</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">mySim &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spades.html">spades</a></span>(mySim)            <span class="co"># run the simulation, returning the completed sim object</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(mySim)               <span class="co"># visualize the sequence of events for all modules</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">spades.nCompleted</span> <span class="kw">=</span> <span class="fl">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span>
+<span class="no">mySim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span>(<span class="no">...</span>)             <span class="co"># initialize a simulation using valid parameters</span>
+<span class="no">mySim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="no">mySim</span>)            <span class="co"># run the simulation, returning the completed sim object</span>
+<span class="fu"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(<span class="no">mySim</span>)               <span class="co"># visualize the sequence of events for all modules</span></pre></body></html></div>
 </div>
 </div>
 <div id="types-of-models" class="section level1">
@@ -395,52 +395,17 @@
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p><a href="http://julialang.org" class="uri">http://julialang.org</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p><a href="http://PredictiveEcology.org/benchmarking" class="uri">http://PredictiveEcology.org/benchmarking</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p><a href="http://julialang.org" class="uri">http://julialang.org</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p><a href="http://PredictiveEcology.org/benchmarking" class="uri">http://PredictiveEcology.org/benchmarking</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li>
-<a href="#introduction-to-spades">Introduction to <code>SpaDES</code></a><ul class="nav nav-pills nav-stacked">
-<li><a href="#package-description">Package description</a></li>
-      <li><a href="#objectives-and-motivations">Objectives and motivations</a></li>
-      <li><a href="#discrete-event-simulation-and-spades">Discrete event simulation and <code>SpaDES</code></a></li>
-      <li><a href="#spades-modules"><code>SpaDES</code> modules</a></li>
-      <li><a href="#spades-demos-and-sample-modules"><code>SpaDES</code> demos and sample modules</a></li>
-      </ul>
-</li>
-      <li><a href="#simulation-and-data">Simulation and data</a></li>
-      <li>
-<a href="#using-spades">Using <code>SpaDES</code></a><ul class="nav nav-pills nav-stacked">
-<li><a href="#initializing-a-simulation-the-siminit-function">Initializing a simulation: the <code>simInit</code> function</a></li>
-      <li><a href="#running-a-simulation-the-spades-function">Running a simulation: the <code>spades</code> function</a></li>
-      </ul>
-</li>
-      <li>
-<a href="#types-of-models">Types of models</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#modelling-spread-processes">Modelling spread processes</a></li>
-      <li><a href="#agent-based-models">Agent based models</a></li>
-      </ul>
-</li>
-      <li><a href="#simulation-experiments">Simulation experiments</a></li>
-      <li>
-<a href="#additional-resources">Additional resources</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#spades-documentation-and-vignettes"><code>SpaDES</code> documentation and vignettes</a></li>
-      <li><a href="#spades-module-repository"><code>SpaDES</code> module repository</a></li>
-      <li><a href="#reporting-bugs">Reporting bugs</a></li>
-      </ul>
-</li>
-      <li><a href="#references">References</a></li>
-      </ul>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
 
@@ -451,7 +416,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

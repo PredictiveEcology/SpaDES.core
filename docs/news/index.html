@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -63,7 +67,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -77,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -119,7 +123,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/PredictiveEcology/SpaDES.core">
+  <a href="https://github.com/PredictiveEcology/SpaDES.core/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -137,43 +141,88 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
       <small>Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-1-0-0" class="section level1">
-<h1 class="page-header">
-<a href="#version-1-0-0" class="anchor"></a>version 1.0.0<small> Unreleased </small>
+    <div id="version-101" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.1">
+<a href="#version-101" class="anchor"></a>version 1.0.1<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
-<li>several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting <code><a href="https://rdrr.io/r/base/options.html">options('spades.recoveryMode' = 0)</a></code> may further help</li>
-<li>Updates to deal with new backend with <code>reproducible</code>
+<li>
+<code>Par</code> is now an <code>activeBinding</code> (similar to <code>mod</code>) pointing to <code><a href="../reference/params.html">P(sim)</a></code>; this allows for tab autocomplete to function correctly.</li>
+<li>new helper functions to extract parameters, inputs, and outputs tables from module metadata: <code><a href="../reference/moduleParamsInputsOuputs.html">moduleParams()</a></code>, <code><a href="../reference/moduleParamsInputsOuputs.html">moduleInputs()</a></code>, <code><a href="../reference/moduleParamsInputsOuputs.html">moduleOutputs()</a></code>. These are now used in default <code>.Rmd</code> template.</li>
+<li>better testing of <code>memoryUse</code> functionality</li>
+<li>A pointer to <code>sim</code> is now created at <code>.pkgEnv$.sim</code> at the start of <code>spades</code> call, rather than <code>on.exit</code>; failures due to “out of memory” were not completing the <code>on.exit</code>
 </li>
-<li>better assertions inside list elements of <code>simInit</code>, e.g., <code><a href="../reference/simInit.html">simInit(times = list(start = "test"))</a></code> now fails because times must be a list of 2 <code>numeric</code> objects</li>
-<li>messaging is now all with <code>message</code> instead of a mixture of <code>message</code>, <code>cat</code> and <code>print</code>. This allows for easier suppressing of messaging, e.g., via <code>suppressMessages</code>. This was requested in a downstream package, <code>SpaDES.experiment</code> that was submitted to CRAN but rejected due to the now former inability to suppress messages.</li>
+<li>improved templating of new modules, including support for automated module code checking using GitHub Actions (<code><a href="../reference/newModule.html">newModule()</a></code> sets <code>useGitHub = TRUE</code> by default).</li>
 </ul>
 </div>
 <div id="dependencies" class="section level2">
 <h2 class="hasAnchor">
 <a href="#dependencies" class="anchor"></a>dependencies</h2>
 <ul>
-<li>moved packages from Imports to Suggests: <code>codetools</code>, <code>future</code>, <code>httr</code>, <code>logging</code>, and <code>tcltk</code>
-</li>
-<li>removed <code>archivist</code>
-</li>
+<li>add <code>usethis</code> to Suggests for use with GitHub Actions</li>
 </ul>
 </div>
 <div id="deprecated" class="section level2">
 <h2 class="hasAnchor">
 <a href="#deprecated" class="anchor"></a>deprecated</h2>
-<p><code>.objSizeInclEnviros</code> and removed</p>
+<ul>
+<li>none</li>
+</ul>
 </div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>tests for <code>Filenames</code> function coming from <code>reproducible</code> package</li>
+<li>
+<code><a href="https://rdrr.io/r/base/options.html">options('spades.recoverMode')</a></code> was creating temp folders every event and not removing them; now it does.</li>
+</ul>
+</div>
+</div>
+    <div id="version-100" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.0">
+<a href="#version-100" class="anchor"></a>version 1.0.0<small> 2020-02-21 </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>new features</h2>
+<ul>
+<li>several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting <code><a href="https://rdrr.io/r/base/options.html">options('spades.recoveryMode' = 0)</a></code> may further help</li>
+<li>Updates to deal with new backend with <code>reproducible</code>
+</li>
+<li>better assertions inside list elements of <code>simInit</code>, e.g., <code><a href="../reference/simInit.html">simInit(times = list(start = "test"))</a></code> now fails because times must be a list of 2 <code>numeric</code> objects</li>
+<li>messaging is now all with <code>message</code> instead of a mixture of <code>message</code>, <code>cat</code> and <code>print</code>. This allows for easier suppressing of messaging, e.g., via <code>suppressMessages</code>. This was requested in a downstream package, <code>SpaDES.experiment</code> that was submitted to CRAN but rejected due to the now former inability to suppress messages.</li>
+<li>
+<code>restartR</code> saves simulation objects using <code><a href="https://rdrr.io/pkg/qs/man/qsave.html">qs::qsave()</a></code> which is faster and creates smaller file sizes.</li>
+</ul>
+</div>
+<div id="dependencies-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#dependencies-1" class="anchor"></a>dependencies</h2>
+<ul>
+<li>moved packages from Imports to Suggests: <code>codetools</code>, <code>future</code>, <code>httr</code>, <code>logging</code>, and <code>tcltk</code>
+</li>
+<li>removed <code>archivist</code>
+</li>
+<li>
+<code>qs</code> now used for improved object serialization to disk</li>
+</ul>
+</div>
+<div id="deprecated-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#deprecated-1" class="anchor"></a>deprecated</h2>
+<p><code>.objSizeInclEnviros</code> and removed</p>
+</div>
+<div id="bug-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>removed mention of ‘demo’ from intro vignette (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/110'>#110</a>)</li>
 <li>
@@ -181,46 +230,16 @@
 </ul>
 </div>
 </div>
-    <div id="version-0-2-8" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-8" class="anchor"></a>version 0.2.8<small> Unreleased </small>
+    <div id="version-028" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.8">
+<a href="#version-028" class="anchor"></a>version 0.2.8<small> Unreleased </small>
 </h1>
-<div id="new-features-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>new features</h2>
-<ul>
-<li>Changed all internal <code>print</code> and <code>cat</code> statements to message to allow use of <code>suppressMessages</code>, as recommended by CRAN</li>
-<li>added file based logging via <code>logging</code> package, invoked by setting <code>debug</code> argument in <code>spades</code> function call to a <code><a href="https://rdrr.io/r/base/list.html">list(...)</a></code>. <code><a href="../reference/spades.html">?spades</a></code> describes details</li>
-</ul>
-</div>
-<div id="bug-fixes-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>bug fixes</h2>
-<ul>
-<li>
-<code>restartR</code> minor bug fixes</li>
-</ul>
-</div>
-</div>
-    <div id="version-0-2-7" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-7" class="anchor"></a>version 0.2.7<small> 2019-11-25 </small>
-</h1>
-<div id="dependencies-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#dependencies-1" class="anchor"></a>dependencies</h2>
-<ul>
-<li>Removed dependency packages <code>DEoptim</code>, <code>future.apply</code>, <code>Matrix</code>, <code>parallel</code>, <code>pryr</code>, <code>purrr</code>, and <code>rgenoud</code>, which are no longer required. See “deprecated” info below.</li>
-<li>added <code>whisker</code> to Imports to facilitate module file templating (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/100'>#100</a>)</li>
-</ul>
-</div>
 <div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-2" class="anchor"></a>new features</h2>
 <ul>
-<li>memory and peak memory estimation is now available for *nix-type systems, when <code>future</code> is installed. See new vignette <code>iv-advanced</code> and <code><a href="../reference/memoryUse.html">?memoryUse</a></code>.</li>
-<li>new function and capacity: <code>restartR</code>. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <a href="https://github.com/r-lib/fastmap" class="uri">https://github.com/r-lib/fastmap</a>). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See <code><a href="../reference/restartR.html">?restartR</a></code> for instructions.</li>
-<li>new function <code>newProject</code> to initialize a SpaDES project with subdirectories <code>cache/</code>, <code>inputs/</code>, <code>modules/</code>, and <code>outputs/</code>, and <code><a href="../reference/setPaths.html">setPaths()</a></code> accordingly.</li>
+<li>Changed all internal <code>print</code> and <code>cat</code> statements to message to allow use of <code>suppressMessages</code>, as recommended by CRAN</li>
+<li>added file based logging via <code>logging</code> package, invoked by setting <code>debug</code> argument in <code>spades</code> function call to a <code><a href="https://rdrr.io/r/base/list.html">list(...)</a></code>. <code><a href="../reference/spades.html">?spades</a></code> describes details</li>
 </ul>
 </div>
 <div id="bug-fixes-2" class="section level2">
@@ -228,26 +247,56 @@
 <a href="#bug-fixes-2" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
+<code>restartR</code> minor bug fixes</li>
+</ul>
+</div>
+</div>
+    <div id="version-027" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.7">
+<a href="#version-027" class="anchor"></a>version 0.2.7<small> 2019-11-25 </small>
+</h1>
+<div id="dependencies-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#dependencies-2" class="anchor"></a>dependencies</h2>
+<ul>
+<li>Removed dependency packages <code>DEoptim</code>, <code>future.apply</code>, <code>Matrix</code>, <code>parallel</code>, <code>pryr</code>, <code>purrr</code>, and <code>rgenoud</code>, which are no longer required. See “deprecated” info below.</li>
+<li>added <code>whisker</code> to Imports to facilitate module file templating (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/100'>#100</a>)</li>
+</ul>
+</div>
+<div id="new-features-3" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-3" class="anchor"></a>new features</h2>
+<ul>
+<li>memory and peak memory estimation is now available for *nix-type systems, when <code>future</code> is installed. See new vignette <code>iv-advanced</code> and <code><a href="../reference/memoryUse.html">?memoryUse</a></code>.</li>
+<li>new function and capacity: <code>restartR</code>. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <a href="https://github.com/r-lib/fastmap" class="uri">https://github.com/r-lib/fastmap</a>). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See <code><a href="../reference/restartR.html">?restartR</a></code> for instructions.</li>
+<li>new function <code>newProject</code> to initialize a SpaDES project with subdirectories <code>cache/</code>, <code>inputs/</code>, <code>modules/</code>, and <code>outputs/</code>, and <code><a href="../reference/setPaths.html">setPaths()</a></code> accordingly.</li>
+</ul>
+</div>
+<div id="bug-fixes-3" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
+<ul>
+<li>
 <code><a href="../reference/newModule.html">newModule()</a></code> now uses <code>open = interactive()</code> as default to prevent files being left open during tests.</li>
 <li>various bug fixes and improvements.</li>
 </ul>
 </div>
-<div id="deprecated-1" class="section level2">
+<div id="deprecated-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#deprecated-1" class="anchor"></a>deprecated</h2>
+<a href="#deprecated-2" class="anchor"></a>deprecated</h2>
 <ul>
 <li>
 <code><a href="../reference/deprecated.html">experiment()</a></code>, <code><a href="../reference/deprecated.html">experiment2()</a></code>, and <code><a href="../reference/deprecated.html">POM()</a></code> have been moved to the <code>SpaDES.experiment</code> package</li>
 </ul>
 </div>
 </div>
-    <div id="version-0-2-6" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-6" class="anchor"></a>version 0.2.6<small> 2019-09-13 </small>
+    <div id="version-026" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.6">
+<a href="#version-026" class="anchor"></a>version 0.2.6<small> 2019-09-13 </small>
 </h1>
-<div id="dependencies-2" class="section level2">
+<div id="dependencies-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#dependencies-2" class="anchor"></a>dependencies</h2>
+<a href="#dependencies-3" class="anchor"></a>dependencies</h2>
 <ul>
 <li>R 3.5.0 is the minimum version required for <code>SpaDES.core</code>. Too many dependency packages are not maintaining their backwards compatibility.</li>
 <li>added <code>backports</code> to Imports for R-oldrel support</li>
@@ -261,9 +310,9 @@
 <li>improved documentation for <code>P</code>, <code>params</code>, and <code>parameters</code>, thanks to Louis-Etienne Robert.</li>
 </ul>
 </div>
-<div id="new-features-3" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>new features</h2>
+<a href="#new-features-4" class="anchor"></a>new features</h2>
 <ul>
 <li>update <code>objSize.simList</code> method with 2 new arguments from <code>reproducible</code> package</li>
 <li>
@@ -284,9 +333,9 @@
 <a href="#user-visible-changes-to-default-options" class="anchor"></a>User visible changes to default options</h2>
 <p><code>spades.debug</code> is now set to 1 <code>spades.recoveryMode</code> is new and set to 1 (i.e., the current event will be kept at its initial state)</p>
 </div>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>Internal bugs during <code>simInit</code> especially in some weird cases of <code>childModules</code>.</li>
 <li>packages listed in <code>reqdPkgs</code> not being loaded when only listed in child modules. Fixed in <code>5cd79ac95bc8d190e954313f125928458b0108d2</code>.</li>
@@ -294,9 +343,9 @@
 </ul>
 </div>
 </div>
-    <div id="version-0-2-5" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-5" class="anchor"></a>version 0.2.5<small> 2019-03-19 </small>
+    <div id="version-025" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.5">
+<a href="#version-025" class="anchor"></a>version 0.2.5<small> 2019-03-19 </small>
 </h1>
 <ul>
 <li>improved messaging and fixed test failures when GLPK installed but not used by <code>igraph</code>
@@ -304,9 +353,9 @@
 <li>compatibility with <code>RandomFields</code> &gt;= 3.3.4</li>
 </ul>
 </div>
-    <div id="version-0-2-4" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-4" class="anchor"></a>version 0.2.4<small> 2019-02-03 </small>
+    <div id="version-024" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.4">
+<a href="#version-024" class="anchor"></a>version 0.2.4<small> 2019-02-03 </small>
 </h1>
 <div id="package-dependencies" class="section level2">
 <h2 class="hasAnchor">
@@ -317,11 +366,11 @@
 <li>minimium <code>reproducible</code> version 0.2.6</li>
 </ul>
 </div>
-<div id="new-features-4" class="section level2">
+<div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-4" class="anchor"></a>new features</h2>
+<a href="#new-features-5" class="anchor"></a>new features</h2>
 <ul>
-<li>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</li>
+<li><p>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</p></li>
 <li>
 <p><code>simList</code> environment now has <code><a href="https://rdrr.io/r/base/environment.html">emptyenv()</a></code> as its <code>parent.env</code>. The biggest user-facing changes are:</p>
 <ul>
@@ -329,34 +378,31 @@
 <li>lighter memory footprint, as functions take RAM due to the objects in the <code>parent.env</code> in which they are defined (little know fact identified here: <a href="http://adv-r.had.co.nz/memory.html#gc" class="uri">http://adv-r.had.co.nz/memory.html#gc</a> identified as a possible source of memory leaks).</li>
 </ul>
 </li>
-<li>module’s function environment in the simList now has its parent <code><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace("SpaDES.core")</a></code> instead of the <code><a href="../reference/simList-accessors-envir.html">envir(sim)</a></code> (as mentioned above), i.e,. <code><a href="https://rdrr.io/r/base/environment.html">parent.env(sim[[currentModule(sim)]])</a></code> is <code><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace("SpaDES.core")</a></code>. The main user-noticeable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</li>
-<li>New active binding, <code>mod</code> that works as a module-specific variable, similar to a private object, <em>i.e.</em>, <code>mod$a</code> is a local object inside the module that persists across events. It is a pointer to <code>sim[[currentModule(sim)]]$a</code>
-</li>
-<li>New function <code>scheduleConditionalEvent</code>, which allows an event to be scheduled based on a condition. Still experimental.</li>
-<li>An experimental new function and feature, <code>objectSynonyms</code>, which will create active bindings of two names to a single object</li>
-<li>User can now specify <code>modulePath</code> as a character vector, e.g., <code><a href="../reference/simInit.html">simInit(..., paths = list(modulePath = c(".", "test")))</a></code>. This means that a user can organize the modules in different locations.</li>
-<li>
-<code>modulePath</code> now has a new argument, <code>module</code>, where user can specify (a) specific module(s)’s path. Modifications were implemented to <code>dataPath</code> to utilize this new feature</li>
-<li>
-<code>simInit</code> and <code>spades</code> now call <code><a href="../reference/setPaths.html">setPaths(paths)</a></code> or <code><a href="../reference/setPaths.html">setPaths(sim$paths)</a></code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="https://reproducible.predictiveecology.org/reference/cache.html">reproducible::Cache</a></code> to use the correct path</li>
-<li>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</li>
-<li>improved default path settings in <code>.inputObjects</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/83'>#83</a>)</li>
-<li>following <code>reproducible</code> package updates, now uses <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on simList objects)</li>
+<li><p>module’s function environment in the simList now has its parent <code><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace("SpaDES.core")</a></code> instead of the <code><a href="../reference/simList-accessors-envir.html">envir(sim)</a></code> (as mentioned above), i.e,. <code><a href="https://rdrr.io/r/base/environment.html">parent.env(sim[[currentModule(sim)]])</a></code> is <code><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace("SpaDES.core")</a></code>. The main user-noticeable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</p></li>
+<li><p>New active binding, <code>mod</code> that works as a module-specific variable, similar to a private object, <em>i.e.</em>, <code>mod$a</code> is a local object inside the module that persists across events. It is a pointer to <code>sim[[currentModule(sim)]]$a</code></p></li>
+<li><p>New function <code>scheduleConditionalEvent</code>, which allows an event to be scheduled based on a condition. Still experimental.</p></li>
+<li><p>An experimental new function and feature, <code>objectSynonyms</code>, which will create active bindings of two names to a single object</p></li>
+<li><p>User can now specify <code>modulePath</code> as a character vector, e.g., <code><a href="../reference/simInit.html">simInit(..., paths = list(modulePath = c(".", "test")))</a></code>. This means that a user can organize the modules in different locations.</p></li>
+<li><p><code>modulePath</code> now has a new argument, <code>module</code>, where user can specify (a) specific module(s)’s path. Modifications were implemented to <code>dataPath</code> to utilize this new feature</p></li>
+<li><p><code>simInit</code> and <code>spades</code> now call <code><a href="../reference/setPaths.html">setPaths(paths)</a></code> or <code><a href="../reference/setPaths.html">setPaths(sim$paths)</a></code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="https://reproducible.predictiveecology.org/reference/cache.html">reproducible::Cache</a></code> to use the correct path</p></li>
+<li><p>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</p></li>
+<li><p>improved default path settings in <code>.inputObjects</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/83'>#83</a>)</p></li>
+<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on simList objects)</p></li>
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul>
 </div>
-<div id="bug-fixes-4" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-4" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix to work with latest <code>data.table</code> v1.12.0 (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/85'>#85</a>, <a href='https://github.com/mattdowle'>@mattdowle</a>)</li>
 <li>several minor, including to <code>Copy</code> (error existed because function inheritance persisted even though the location of the function was moved)</li>
 </ul>
 </div>
 </div>
-    <div id="version-0-2-3" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-3" class="anchor"></a>version 0.2.3<small> 2018-11-18 </small>
+    <div id="version-023" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.3">
+<a href="#version-023" class="anchor"></a>version 0.2.3<small> 2018-11-18 </small>
 </h1>
 <div id="package-dependencies-1" class="section level2">
 <h2 class="hasAnchor">
@@ -365,9 +411,9 @@
 <li>add <code>RandomFields</code> to Suggests, as it is in the Suggests of <code>SpaDES.tools</code> and used in examples/tests.</li>
 </ul>
 </div>
-<div id="new-features-5" class="section level2">
+<div id="new-features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-5" class="anchor"></a>new features</h2>
+<a href="#new-features-6" class="anchor"></a>new features</h2>
 <ul>
 <li>new option and default setting: <code><a href="https://rdrr.io/r/base/options.html">options("spades.saveSimOnExit" = TRUE)</a></code>. This will save the state of the <code>simList</code> to an object as <code>SpaDES.core:::.pkgEnv$.sim</code>, with a message, if there is a hard exist. There is virtually no computational cost to this, as the object is already in RAM.</li>
 <li>
@@ -384,9 +430,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-5" class="section level2">
+<div id="bug-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-5" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-6" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>resolved <code>.inputObjects()</code> name conflict (internal <code>.inputObjects</code> renamed to <code>._inputObjectsDF</code>; <code>.outputObjects</code> renamed to <code>._outputObjectsDF</code>)</li>
 <li>module <code>.inputObjects</code> evaluated based on module load order (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/72'>#72</a>)</li>
@@ -396,9 +442,9 @@
 </ul>
 </div>
 </div>
-    <div id="version-0-2-2" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-2" class="anchor"></a>version 0.2.2<small> 2018-08-13 </small>
+    <div id="version-022" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.2">
+<a href="#version-022" class="anchor"></a>version 0.2.2<small> 2018-08-13 </small>
 </h1>
 <div id="package-dependencies-2" class="section level2">
 <h2 class="hasAnchor">
@@ -407,24 +453,24 @@
 <li>remove <code>sp</code> from imports</li>
 </ul>
 </div>
-<div id="new-features-6" class="section level2">
+<div id="new-features-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-6" class="anchor"></a>new features</h2>
+<a href="#new-features-7" class="anchor"></a>new features</h2>
 <ul>
 <li>none</li>
 </ul>
 </div>
-<div id="bug-fixes-6" class="section level2">
+<div id="bug-fixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-6" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-7" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix issues with failing tests on macOS</li>
 </ul>
 </div>
 </div>
-    <div id="version-0-2-1" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-1" class="anchor"></a>version 0.2.1<small> 2018-08-09 </small>
+    <div id="version-021" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.1">
+<a href="#version-021" class="anchor"></a>version 0.2.1<small> 2018-08-09 </small>
 </h1>
 <div id="package-dependencies-3" class="section level2">
 <h2 class="hasAnchor">
@@ -433,9 +479,9 @@
 <li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
 </ul>
 </div>
-<div id="new-features-7" class="section level2">
+<div id="new-features-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-7" class="anchor"></a>new features</h2>
+<a href="#new-features-8" class="anchor"></a>new features</h2>
 <ul>
 <li>new option <code>spades.useRequire</code>: a logical which causes <code>simInit</code> to load packages with <code>Require</code> or <code>require</code>. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.</li>
 <li><ul>
@@ -452,9 +498,9 @@
 </li>
 </ul>
 </div>
-<div id="bug-fixes-7" class="section level2">
+<div id="bug-fixes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-7" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-8" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>
 <p>Improvements to caching of functions with <code>simList</code> objects:</p>
@@ -467,17 +513,16 @@
 </ul>
 </div>
 </div>
-    <div id="version-0-2-0" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-2-0" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
+    <div id="version-020" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.0">
+<a href="#version-020" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
 </h1>
-<div id="new-features-8" class="section level2">
+<div id="new-features-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-8" class="anchor"></a>new features</h2>
+<a href="#new-features-9" class="anchor"></a>new features</h2>
 <ul>
-<li>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code>
-</li>
-<li>new debugging – if debug is not <code>FALSE</code>, then any error will trigger a <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code> call inside the event function. User can continue (<code>c</code>) or quit (<code>Q</code>) as per normal. <code>c</code> will trigger a reparse and events will continue as scheduled.</li>
+<li><p>module metadata now in <em>named</em> lists inside <code><a href="../reference/simList-accessors-modules.html">depends(sim)</a></code></p></li>
+<li><p>new debugging – if debug is not <code>FALSE</code>, then any error will trigger a <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code> call inside the event function. User can continue (<code>c</code>) or quit (<code>Q</code>) as per normal. <code>c</code> will trigger a reparse and events will continue as scheduled.</p></li>
 <li>
 <p>introduction of code checking for modules, currently turned on or off by an option <code>spades.moduleCodeChecks</code>, which is <code>TRUE</code> by default. Code checking includes various types:</p>
 <ul>
@@ -489,15 +534,11 @@
 <li>messages colour coded, and separated by file with absolute path explicit</li>
 </ul>
 </li>
-<li>option <code>spades.debug</code> set to <code>TRUE</code> by default, instead of <code>FALSE</code>. This is better for new users.</li>
-<li>
-<code>moduleMetadata</code> argument order changed, so <code>sim</code> is first, more consistent with all other <code>simList</code> accessors.</li>
-<li>
-<code>downloadData</code> has changed dramatically, now it is a wrapper around <code><a href="https://reproducible.predictiveecology.org/reference/prepInputs.html">reproducible::prepInputs</a></code> which does more checking.</li>
-<li>
-<code>extractURL</code> will extract the sourceURL from metadata, given an object name.</li>
-<li>
-<code>makeMemoiseable</code> and <code>unmakeMemoisable</code>, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of <code>simList</code>.</li>
+<li><p>option <code>spades.debug</code> set to <code>TRUE</code> by default, instead of <code>FALSE</code>. This is better for new users.</p></li>
+<li><p><code>moduleMetadata</code> argument order changed, so <code>sim</code> is first, more consistent with all other <code>simList</code> accessors.</p></li>
+<li><p><code>downloadData</code> has changed dramatically, now it is a wrapper around <code><a href="https://reproducible.predictiveecology.org/reference/prepInputs.html">reproducible::prepInputs</a></code> which does more checking.</p></li>
+<li><p><code>extractURL</code> will extract the sourceURL from metadata, given an object name.</p></li>
+<li><p><code>makeMemoiseable</code> and <code>unmakeMemoisable</code>, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of <code>simList</code>.</p></li>
 <li><p>new option, <code>spades.keepCompleted</code>, <code>TRUE</code> by default, which can be useful for dramatically speeding up the DES when there are many (&gt;10,000) events.</p></li>
 </ul>
 </div>
@@ -508,9 +549,9 @@
 <li>remove <code>fileExt</code> – use <code><a href="https://rdrr.io/r/tools/fileutils.html">tools::file_ext</a></code> instead</li>
 </ul>
 </div>
-<div id="bug-fixes-8" class="section level2">
+<div id="bug-fixes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-8" class="anchor"></a>bug fixes</h2>
+<a href="#bug-fixes-9" class="anchor"></a>bug fixes</h2>
 <ul>
 <li>fix tests based on <code>data.table</code> changes (<a href='https://github.com/mattdowle'>@mattdowle</a>, <a href='https://github.com/PredictiveEcology/SpaDES.core/issues/64'>#64</a>).</li>
 <li>re-export <code>start</code> and <code>end</code>.</li>
@@ -533,13 +574,12 @@
 </ul>
 </div>
 </div>
-    <div id="version-0-1-1" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-1-1" class="anchor"></a>version 0.1.1<small> 2018-01-29 </small>
+    <div id="version-011" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.1">
+<a href="#version-011" class="anchor"></a>version 0.1.1<small> 2018-01-29 </small>
 </h1>
 <ul>
-<li>uses <code><a href="https://reproducible.predictiveecology.org/reference/Require.html">reproducible::Require</a></code> instead of <code><a href="../reference/loadPackages.html">SpaDES.core::loadPackages</a></code> to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. <code>achubaty/amc@development</code>
-</li>
+<li><p>uses <code><a href="https://reproducible.predictiveecology.org/reference/Require.html">reproducible::Require</a></code> instead of <code><a href="../reference/loadPackages.html">SpaDES.core::loadPackages</a></code> to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. <code>achubaty/amc@development</code></p></li>
 <li>
 <p>environments in modules are now as follows:</p>
 <ul>
@@ -565,16 +605,14 @@
 <code>.parseModule</code> and <code>.parseModuePartial</code> now put their parsed content into a temporary environment (<code>sim@.envir$.parsedFiles$&lt;Full Filename&gt;)</code> during the <code>simInit</code>, which gets re-used. Previously, files were parsed multiple times in a given <code>simInit</code> call. Several functions now have <code>envir</code> argument to pass this through (including <code>moduleVersion</code>, <code>packages</code>, <code>checkParams</code>)</li>
 </ul>
 </li>
-<li>parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the sim object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., <code>startSimPlus1 &lt;- start(sim) + 1</code> can be defined in the module and used in <code>defineModule</code>
-</li>
-<li>remove <code>grDevices</code> from Imports as it was not used (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/1'>#1</a>)</li>
-<li>remove <code>chron</code> and <code>CircStats</code> dependencies</li>
-<li>remove functions <code>dwrpnorm2</code> and move to package <code>SpaDES.tools</code>
-</li>
-<li>remove unused function <code><a href="https://rdrr.io/r/base/logical.html">F()</a></code> due to conflicts with <code>F</code>/<code>FALSE</code>.</li>
-<li>improved download of module data: added new <code>quickCheck</code> argument</li>
-<li>improved download of modules: use fuzzy matching</li>
-<li>new option: <code>spades.switchPkgNamespaces</code> which allows the user to turn off the <code>SpaDES</code> feature that loads and unloads libraries specific to each module. While useful, it slows down computations, in some cases, by a lot.</li>
+<li><p>parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the sim object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., <code>startSimPlus1 &lt;- start(sim) + 1</code> can be defined in the module and used in <code>defineModule</code></p></li>
+<li><p>remove <code>grDevices</code> from Imports as it was not used (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/1'>#1</a>)</p></li>
+<li><p>remove <code>chron</code> and <code>CircStats</code> dependencies</p></li>
+<li><p>remove functions <code>dwrpnorm2</code> and move to package <code>SpaDES.tools</code></p></li>
+<li><p>remove unused function <code><a href="https://rdrr.io/r/base/logical.html">F()</a></code> due to conflicts with <code>F</code>/<code>FALSE</code>.</p></li>
+<li><p>improved download of module data: added new <code>quickCheck</code> argument</p></li>
+<li><p>improved download of modules: use fuzzy matching</p></li>
+<li><p>new option: <code>spades.switchPkgNamespaces</code> which allows the user to turn off the <code>SpaDES</code> feature that loads and unloads libraries specific to each module. While useful, it slows down computations, in some cases, by a lot.</p></li>
 <li>
 <p>bug fixes:</p>
 <ul>
@@ -582,22 +620,20 @@
 <li>caching of <code>.inputObjects</code> functions was evaluating outputObjects instead of inputObjects. Now corrected.</li>
 </ul>
 </li>
-<li>If <code>.inputObjects</code> contains arguments other than just sim, these will be evaluated as function inputs by the Cache mechanism (via .useCache), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in <code>asPath</code>, then any change to the underlying file will cause a re-cache. e.g., <code>.inputObjects &lt;- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }</code>
-</li>
-<li>default <code>debug</code> option in <code><a href="../reference/spades.html">spades()</a></code> now uses the package option <code>spades.debug</code> and default is set to <code>FALSE</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/5'>#5</a>)</li>
-<li>various other speed improvements and bug fixes</li>
-<li>convert <code>P</code> to a function, rather than S4 generic and method, for speed.</li>
-<li>importFrom only used functions from <code>utils</code> due to name conflicts with <code><a href="https://rdrr.io/pkg/raster/man/stack.html">raster::stack</a></code> and <code><a href="https://rdrr.io/r/utils/stack.html">utils::stack</a></code>
-</li>
-<li>new function <code>remoteFileSize</code> to check the size of remote files</li>
-<li>new namespaced function <code>dataPath</code> will return <code><a href="https://rdrr.io/r/base/file.path.html">file.path(modulePath(sim), currentModule(sim), "data")</a></code>, which will return a different path, depending on which module it is placed inside.</li>
-<li>add crayon to imports – now messages are more colour coded</li>
+<li><p>If <code>.inputObjects</code> contains arguments other than just sim, these will be evaluated as function inputs by the Cache mechanism (via .useCache), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in <code>asPath</code>, then any change to the underlying file will cause a re-cache. e.g., <code>.inputObjects &lt;- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }</code></p></li>
+<li><p>default <code>debug</code> option in <code><a href="../reference/spades.html">spades()</a></code> now uses the package option <code>spades.debug</code> and default is set to <code>FALSE</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/5'>#5</a>)</p></li>
+<li><p>various other speed improvements and bug fixes</p></li>
+<li><p>convert <code>P</code> to a function, rather than S4 generic and method, for speed.</p></li>
+<li><p>importFrom only used functions from <code>utils</code> due to name conflicts with <code><a href="https://rdrr.io/pkg/raster/man/stack.html">raster::stack</a></code> and <code><a href="https://rdrr.io/r/utils/stack.html">utils::stack</a></code></p></li>
+<li><p>new function <code>remoteFileSize</code> to check the size of remote files</p></li>
+<li><p>new namespaced function <code>dataPath</code> will return <code><a href="https://rdrr.io/r/base/file.path.html">file.path(modulePath(sim), currentModule(sim), "data")</a></code>, which will return a different path, depending on which module it is placed inside.</p></li>
+<li><p>add crayon to imports – now messages are more colour coded</p></li>
 <li><p>bug fix in ‘inputs’ for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object</p></li>
 </ul>
 </div>
-    <div id="version-0-1-0" class="section level1">
-<h1 class="page-header">
-<a href="#version-0-1-0" class="anchor"></a>version 0.1.0<small> 2017-08-30 </small>
+    <div id="version-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0">
+<a href="#version-010" class="anchor"></a>version 0.1.0<small> 2017-08-30 </small>
 </h1>
 <ul>
 <li>
@@ -611,24 +647,10 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#version-1-0-0">1.0.0</a></li>
-        <li><a href="#version-0-2-8">0.2.8</a></li>
-        <li><a href="#version-0-2-7">0.2.7</a></li>
-        <li><a href="#version-0-2-6">0.2.6</a></li>
-        <li><a href="#version-0-2-5">0.2.5</a></li>
-        <li><a href="#version-0-2-4">0.2.4</a></li>
-        <li><a href="#version-0-2-3">0.2.3</a></li>
-        <li><a href="#version-0-2-2">0.2.2</a></li>
-        <li><a href="#version-0-2-1">0.2.1</a></li>
-        <li><a href="#version-0-2-0">0.2.0</a></li>
-        <li><a href="#version-0-1-1">0.1.1</a></li>
-        <li><a href="#version-0-1-0">0.1.0</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -640,7 +662,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
