@@ -844,9 +844,8 @@ setMethod(
   signature = "simList",
   definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
-    showCache(x = x, userTags = userTags, after = after, before = before,
-               ...)
-  })
+    showCache(x = x, userTags = userTags, after = after, before = before, ...)
+})
 
 if (!isGeneric("keepCache")) {
   setGeneric("keepCache", function(x, userTags = character(),

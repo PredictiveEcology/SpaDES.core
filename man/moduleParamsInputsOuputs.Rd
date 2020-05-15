@@ -31,7 +31,7 @@ Default is to use the \code{spades.modulePath} option.}
 \code{data.frame}
 }
 \description{
-Thess are simply wrappers around \code{moduleMetadata}.
+These are simply wrappers around \code{moduleMetadata}.
 }
 \examples{
 path <- system.file("sampleModules", package = "SpaDES.core")
