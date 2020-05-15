@@ -800,12 +800,13 @@ if (!isGeneric("clearCache")) {
 #' \code{clearCache} for \code{simList} objects
 #'
 #' This will take the \code{cachePath(object)} and pass
-#' @export
 #'
 #' @param conn A \code{DBIConnection} object, as returned by \code{dbConnect()}.
 #' @param drv an object that inherits from \code{DBIDriver}, or an existing
 #'     \code{DBIConnection} object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
+#'
+#' @export
 #' @importFrom reproducible clearCache
 #' @importMethodsFrom reproducible clearCache
 #' @rdname clearCache
