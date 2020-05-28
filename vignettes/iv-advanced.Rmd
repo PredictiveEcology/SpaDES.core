@@ -1,5 +1,5 @@
 ---
-title: "04 Advanced `SpaDES` use -- in progress"
+title: "04 Advanced `SpaDES` use"
 author:
   - "Alex M. Chubaty"
   - "Eliot J. B. McIntire"
@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{02 Advanced SpaDES use}
+  %\VignetteIndexEntry{04 Advanced SpaDES use}
   %\VignetteDepends{SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{discrete event simulation, spatial simulation models}
   %\VignetteEncoding{UTF-8}
@@ -20,22 +20,20 @@ bibliography: bibliography.bib
 
 # Advanced `SpaDES` use
 
+_This vignette is still a work in progress._
+
 ## Memory monitoring
 
 While `profvis::profvis` is an essential tool for memory monitoring using deep R internals, it is often not sufficient for a discrete event situation.
 For example, it may be useful to know the *peak memory use* of an event, as this may be the limiting step for setting up many parallel instances. 
-There is an experimental tool that gets triggered with `options("spades.memoryUseInterval" = xxx)` where `xxx` is a `numeric` in seconds, e.g., `0.2`. If this is set, and `future` and `future.callr` are installed, then whenever a `spades` call is made, the memory use will be assessed at that regular interval. The procedure is:
+There is an experimental tool that gets triggered with `options("spades.memoryUseInterval" = xxx)` where `xxx` is a `numeric` in seconds, e.g., `0.2`. If this is set, and `future` and `future.callr` are installed, then whenever a `spades` call is made, the memory use will be assessed at that regular interval.
+The procedure is:
+1. spawn a future session (i.e., a parallel session) that runs `system('ps')` which lists all processes. It only keeps the process that represents the process ID of the main R session;
+2. that `ps` call writes to a text file every `getOption('spades.memoryUseInterval')`;
+3. if you ran this with a `spades` call, setting `options("spades.memoryUseInterval" = 0.5)` or some other interval (in seconds), it will read that text file into the `simList` at the end (`on.exit`) of the `spades` call (_doing this triggers a file deletion of the text file_);
+4. the object is then in `sim$.memoryUse$obj`.
 
-1) spawn a future session (i.e., a parallel session) that runs `system('ps')` which lists all processes. It only keeps the process that represents the process ID of the main R session.
-
-2) that `ps` call writes to a text file every `getOption('spades.memoryUseInterval')`
-
-3) if you ran this with a `spades` call, setting `options("spades.memoryUseInterval" = 0.5)` or some other interval (in seconds), it will read that txt file into the simList at the end/`on.exit` of the `spades` call. _Doing this triggers a file deletion of the txt file_.
-
-4) the object is then in `sim$.memoryUse$obj`
-
-At that point, the function `memoryUse` can be called on the `simList` and it will do a join on the `sim$.memoryUse$obj` with the `completed(sim)` *by* time stamp, so each event shows its memory use.
-
+At that point, the function `memoryUse` can be called on the `simList` and it will do a join on the `sim$.memoryUse$obj` with the `completed(sim)` _by_ time stamp, so each event shows its memory use.
 
 ```{r memoryUse, eval=FALSE, echo=TRUE}
 if (requireNamespace("future")) && requireNamespace("future.callr")) {
@@ -49,6 +47,5 @@ if (requireNamespace("future")) && requireNamespace("future.callr")) {
   memoryUse(sim, max = FALSE) # this should show peak memory use by event
 }
 ```
-
 
 # References
