@@ -35,10 +35,8 @@ test_that("testing memoryUse", {
   #set.seed(1234)
   mySim2 <- simInit(times = times, params = params,
                     modules = modules, objects = list(), paths = paths)
-  mySim3 <- spades(mySim2, debug = FALSE) ## TODO: infinite loop here; stalls test
-  suppressWarnings({
-    memUse <- memoryUse(mySim3)
-  })
+  mySim3 <- spades(mySim2, debug = TRUE)
+  suppressWarnings(memUse <- memoryUse(mySim3))
   expect_true(is(memUse, "data.table"))
   expect_true(is.numeric(memUse$maxMemory))
   expect_true(sum(!is.na(memUse$maxMemory))>0)

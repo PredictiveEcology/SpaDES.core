@@ -60,39 +60,16 @@ setMethod("Copy",
             #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
             sim_@.xData <- new.env(parent = emptyenv())
+            sim_@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
             attr(sim_@.xData, "name") <- "sim"
             if (objects) {
-              objNames <- ls(object, all.names = TRUE)
+              browser(expr = exists("._Copy_6"))
+              objNames <- ls(object@.xData$.mods, all.names = TRUE)
               names(objNames) <- objNames
               isEnv <- unlist(lapply(objNames,
-                                     function(obj) is.environment(get(obj, envir = object))))
+                                     function(obj)
+                                       is.environment(get(obj, envir = object@.xData$.mods))))
               # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
-              # list2env(Copy(mget(objNames[!isEnv], envir = object@.xData), filebackedDir = filebackedDir),
-              #          envir = sim_@.xData)
-              # list2env(lapply(objNames[isEnv], function(x) {
-              #   e <- new.env(parent = asNamespace("SpaDES.core"))
-              #   attr(e, "name") <- x
-              #   e
-              # }
-              # ),
-              # envir = sim_@.xData)
-              #
-              # lapply(objNames[isEnv], function(en) {
-              #   list2env(as.list(object@.xData[[en]], all.names = TRUE),
-              #            envir = sim_@.xData[[en]])
-              #   isFn <- unlist(lapply(ls(sim_@.xData[[en]]), function(obj)
-              #     if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
-              #       environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
-              #     }
-              #   ))
-              # })
-              #
-              # # Deal with data.table objects
-              # anyDataTables <- unlist(lapply(objs(sim_), is.data.table))
-              # anyDataTables <- anyDataTables[anyDataTables]
-              # lapply(names(anyDataTables), function(dt) {
-              #   sim_@.xData[[dt]] <- data.table::copy(sim_@.xData[[dt]])
-              # })
 
               # Copy the whole environment, recursively through environments
               sim_@.xData <- Copy(object@.xData, filebackedDir = filebackedDir)
@@ -101,11 +78,11 @@ setMethod("Copy",
               #   the module itself. This is unique to functions in `simList` objs
               #   i.e., can't rely on generic reproducible::Copy
               lapply(objNames[isEnv], function(en) {
-                list2env(as.list(object@.xData[[en]], all.names = TRUE),
-                         envir = sim_@.xData[[en]])
-                isFn <- unlist(lapply(ls(sim_@.xData[[en]]), function(obj) {
-                  if (is.function(get(obj, envir = sim_@.xData[[en]]))) {
-                    environment(sim_@.xData[[en]][[obj]]) <- sim_@.xData[[en]]
+                list2env(as.list(object@.xData$.mods[[en]], all.names = TRUE),
+                         envir = sim_@.xData$.mods[[en]])
+                isFn <- unlist(lapply(ls(sim_@.xData$.mods[[en]]), function(obj) {
+                  if (is.function(get(obj, envir = sim_@.xData$.mods[[en]]))) {
+                    environment(sim_@.xData$.mods[[en]][[obj]]) <- sim_@.xData$.mods[[en]]
                   }
                 }
                 ))
@@ -113,22 +90,22 @@ setMethod("Copy",
 
               # Deal with activeBinding for mod
               lapply(objNames[isEnv], function(mod) {
-                if (exists("mod", object[[mod]], inherits = FALSE)) {
-                  if (bindingIsActive("mod", object[[mod]])) {
-                    rm(list = "mod", envir = sim_[[mod]], inherits = FALSE)
-                    rm(list = ".objects", envir = sim_[[mod]], inherits = FALSE)
-                    sim_[[mod]]$.objects <- new.env(parent = emptyenv())
-                    list2env(as.list(object@.xData[[mod]]$.objects, all.names = TRUE),
-                             envir = sim_@.xData[[mod]]$.objects)
+                if (exists("mod", object@.xData$.mods[[mod]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object@.xData$.mods[[mod]])) {
+                    rm(list = "mod", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
+                    rm(list = ".objects", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
+                    sim_@.xData$.mods[[mod]]$.objects <- new.env(parent = emptyenv())
+                    list2env(as.list(object@.xData$.mods[[mod]]$.objects, all.names = TRUE),
+                             envir = sim_@.xData$.mods[[mod]]$.objects)
 
                     makeModActiveBinding(sim = sim_, mod = mod)
                   }
                 }
               })
               lapply(modules(sim_), function(mod) {
-                if (exists("mod", object[[mod]], inherits = FALSE)) {
-                  if (bindingIsActive("mod", object[[mod]])) {
-                    rm(list = "Par", envir = sim_[[mod]], inherits = FALSE)
+                if (exists("mod", object@.xData$.mods[[mod]], inherits = FALSE)) {
+                  if (bindingIsActive("mod", object@.xData$.mods[[mod]])) {
+                    rm(list = "Par", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
                     makeParActiveBinding(sim = sim_, mod = mod)
                   }}
               })

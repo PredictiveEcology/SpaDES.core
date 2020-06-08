@@ -2673,12 +2673,23 @@ setMethod("outputObjectNames",
 
 ################################################################################
 #' @inheritParams P
+#' @param module Character vector of module name(s)
+#' @param modulePath That path where \code{module} can be found. If set already
+#'   using \code{setPaths}, it will use that. This will be ignored if \code{sim}
+#'   is supplied and is required if \code{sim} not supplied
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 #'
-setGeneric("reqdPkgs", function(sim, module) {
+#' @examples
+#' # To pre-install and pre-load all packages prior to simInit
+#'
+#' # set modulePath
+#' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#' # use Require and reqdPkgs
+#' Require(unlist(reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))))
+setGeneric("reqdPkgs", function(sim, module, modulePath) {
   standardGeneric("reqdPkgs")
 })
 
@@ -2687,7 +2698,7 @@ setGeneric("reqdPkgs", function(sim, module) {
 #' @aliases simList-accessors-metadata
 setMethod("reqdPkgs",
           signature = "simList",
-          definition = function(sim, module) {
+          definition = function(sim, module, modulePath) {
             if (missing(module)) {
               module <- current(sim)
               if (NROW(module) == 0)
@@ -2701,6 +2712,22 @@ setMethod("reqdPkgs",
             }
             return(out)
 })
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("reqdPkgs",
+          signature = "missing",
+          definition = function(sim, module, modulePath) {
+            if (missing(modulePath))
+              modulePath <- getOption("spades.modulePath")
+            names(module) <- module
+            out <- lapply(module, function(mod) {
+              unlist(.parseModulePartial(filename = file.path(modulePath, mod, paste0(mod, ".R")),
+                                  defineModuleElement = "reqdPkgs") )
+            })
+            return(out)
+          })
 
 ################################################################################
 #' @inheritParams P

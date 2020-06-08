@@ -1,5 +1,17 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+
+version 1.0.2
+=============
+
+## new features
+## dependencies
+
+## deprecated
+
+## bug fixes
+* minor bugfixes in sample modules
+
 version 1.0.1
 =============
 

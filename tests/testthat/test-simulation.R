@@ -119,13 +119,13 @@ test_that("simInit with R subfolder scripts", {
   cat(file = file.path("child1", "R", "script.R"),
       "a <- function(poiuoiu) {
       poiuoiu + 1
-}", sep = "\n")
+  }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
-  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
-    if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
+  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData$.mods, all.names = TRUE), function(x) {
+    if (is.environment(mySim@.xData$.mods[[x]])) ls(envir = mySim@.xData$.mods[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.xData$child1$a(2) == 3) # Fns
-  })
+  expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
+})
 
 test_that("simulation runs with simInit with duplicate modules named", {
   testInitOut <- testInit()
@@ -500,7 +500,7 @@ test_that("conflicting function types", {
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
-      expectsInput('ei4', 'numeric', '', '')
+      expectsInput('ei4', 'numeric', '', 'test.com')
       ",
       xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
@@ -521,6 +521,15 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
+      url1 <- extractURL('ei4')
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without sim or module fails')
+      url1 <- extractURL('ei4', sim = sim)
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without module fails')",
+paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
+      if (!identical(url1, 'test.com'))
+        stop('extractURL fails')
       sim$g <- 1
       sim$ei1 <- 4
       fff <- sim$ei1
