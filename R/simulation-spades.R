@@ -87,10 +87,14 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
         }
       }
       if (attr(sim, "needDebug")) {
+        if (!is(debug, "list")) debug <- list(debug)
         for (i in seq_along(debug)) {
-          if (isTRUE(debug[[i]]) | debug[[i]] == "current" | debug[[i]] == "step") {
+          if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
             if (length(cur) > 0) {
-              if (debug[[i]] == "step") readline("Press any key to continue...")
+              if (debug[[i]] == "step") {
+                if (is.interactive())
+                  readline("Press any key to continue...")
+              }
 
               evnts1 <- data.frame(current(sim))
               widths <- stri_length(format(evnts1))
@@ -114,10 +118,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                 message(paste(unname(evnts1), collapse = ' '))
               }
             }
-          } else if (debug[[i]] == 1) {
+          } else if (identical(debug[[i]], 1)) {
             message(crayon::green(paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
-                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
-          } else if (debug[[i]] == 2) {
+                                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
+          } else if (identical(debug[[i]], 2)) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                                attr(sim, "completedCounter") == 1) {
               sim@.xData$._startClockTime
@@ -125,21 +129,29 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
               .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
             }
             message(crayon::green(paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
-                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
-          } else if (debug[[i]] == "simList") {
-            print(sim)
-          } else if (grepl(debug[[i]], pattern = "\\(")) {
-            message(crayon::green(eval(parse(text = debug[[i]]))))
-          } else if (any(debug[[i]] %in% cur[c("moduleName", "eventType")])) {
-            if (is.environment(fnEnv)) {
-              if (all(debug %in% cur[c("moduleName", "eventType")])) {
-                debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
-                on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+                                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
+          } else {
+            if (is(debug[[i]], "call")) {
+              message(crayon::green(eval(debug[[i]])))
+            } else if (identical(debug[[i]], "simList")) {
+              print(sim)
+            } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
+              message(crayon::green(eval(parse(text = debug[[i]]))))
+            } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
+              if (is.environment(fnEnv)) {
+                if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
+                  debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+                  on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+                }
               }
+            } else if (!any(debug[[i]] %in% c("browser"))) { # any other
+              if (is.function(debug[[i]]))
+                tryCatch(message(crayon::green(do.call(debug[[i]], list(sim)))), error = function(x) NULL)
+              else
+                stop("Did not understand argument supplied to debug; see ?spades")
             }
-          } else if (!any(debug[[i]] == c("browser"))) { # any other
-            tryCatch(message(crayon::green(do.call(debug[[i]], list(sim)))), error = function(x) NULL)
           }
+
         }
       }
 
@@ -665,26 +677,16 @@ scheduleConditionalEvent <- function(sim,
 #' Some functions in the SpaDES ecosystem may have information at the lower levels,
 #' but currently, there are few to none.
 #'
-#' \code{debug} can be a logical, character vector or a numeric scalar (currently
-#' 1 or 2).
-#' If \code{debug} is specified and is not \code{FALSE}, 2 things could happen:
-#' 1) there can be messages sent to console, such as events as they pass by, and
-#' 2) if \code{options("spades.browserOnError" = TRUE)} (experimental still) if
-#' there is an error, it will attempt to open a browser
-#' in the event where the error occurred. You can edit, and then press \code{c} to continue
-#' or \code{Q} to quit, plus all other normal interactive browser tools.
-#' \code{c} will trigger a reparse and events will continue as scheduled, starting
-#' with the one just edited. There may be some unexpected consequences if the
-#' \code{simList} objects had already been changed before the error occurred.
-#'
-#' If not specified in the function call, the package
-#' option \code{spades.debug} is used. The following
-#' options for debug are available:
+#' \code{debug} is specified as a non-list argument to \code{spades} or as
+#' \code{list(debug = ...)}, then it can be a logical, a quoted call, a character vector
+#' or a numeric scalar (currently 1 or 2) or a list of any of these to get multiple
+#' outputs. This will be run at the start of every event. The following options for debug
+#' are available. Each of these can also be in a list to get multiple outputs:
 #'
 #' \tabular{ll}{
-#'   \code{TRUE} \tab the event immediately following will be printed as it
-#' runs (equivalent to \code{current(sim)}).\cr
-#'   function name (as character string) \tab If a function, then it will be run on the
+#'   \code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
+#'                     it runs\cr
+#'   a function name (as character string) \tab If a function, then it will be run on the
 #'                                            simList, e.g., "time" will run
 #'                                            \code{time(sim)} at each event.\cr
 #'   moduleName (as character string) \tab All calls to that module will be entered
@@ -693,15 +695,25 @@ scheduleConditionalEvent <- function(sim,
 #'                                        will be entered interactively\cr
 #'   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
 #'                                             will be entered into. \cr
-#'   Any other R expression expressed as a character string  \tab
+#'   Any other R expression expressed as a character string or quoted call \tab
 #'                                 Will be evaluated with access to the simList as 'sim'.
 #'                                If this is more than one character string, then all will
 #'                                be printed to the screen in their sequence. \cr
 #'   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
 #'                                           information that users may find useful \cr
-#'                                           information that users may find useful \cr
 #'
 #' }
+#'
+#' If not specified in the function call, the package
+#' option \code{spades.debug} is used.
+#'
+#' If \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+#' there is an error, it will attempt to open a browser
+#' in the event where the error occurred. You can edit, and then press \code{c} to continue
+#' or \code{Q} to quit, plus all other normal interactive browser tools.
+#' \code{c} will trigger a reparse and events will continue as scheduled, starting
+#' with the one just edited. There may be some unexpected consequences if the
+#' \code{simList} objects had already been changed before the error occurred.
 #'
 #'
 #'
