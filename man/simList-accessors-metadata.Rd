@@ -10,6 +10,7 @@
 \alias{outputObjectNames,simList-method}
 \alias{reqdPkgs}
 \alias{reqdPkgs,simList-method}
+\alias{reqdPkgs,missing-method}
 \alias{documentation}
 \alias{documentation,simList-method}
 \alias{citation}
@@ -29,9 +30,11 @@ outputObjectNames(sim, module)
 
 \S4method{outputObjectNames}{simList}(sim, module)
 
-reqdPkgs(sim, module)
+reqdPkgs(sim, module, modulePath)
 
-\S4method{reqdPkgs}{simList}(sim, module)
+\S4method{reqdPkgs}{simList}(sim, module, modulePath)
+
+\S4method{reqdPkgs}{missing}(sim, module, modulePath)
 
 documentation(sim, module)
 
@@ -47,7 +50,11 @@ citation(package, lib.loc = NULL, auto = NULL, module = character())
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{module}{Optional character string indicating which module params should come from.}
+\item{module}{Character vector of module name(s)}
+
+\item{modulePath}{That path where \code{module} can be found. If set already
+using \code{setPaths}, it will use that. This will be ignored if \code{sim}
+is supplied and is required if \code{sim} not supplied}
 
 \item{package}{For compatibility with \code{\link[utils]{citation}}. This can be
 a \code{simList} or a character string for a package name.}
@@ -68,4 +75,12 @@ a \code{simList} or a character string for a package name.}
 \description{
 These accessors extract the metadata for a module (if specified) or all modules
 in a \code{simList} if not specified.
+}
+\examples{
+# To pre-install and pre-load all packages prior to simInit
+
+# set modulePath
+setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+# use Require and reqdPkgs
+Require(unlist(reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))))
 }

@@ -178,6 +178,7 @@ setMethod(
     parent_ids <- integer()
     dots <- list(...)
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
+    sim@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
 
     for (j in .unparsed(modules)) {
       m <- names(modules)[[j]][1]
@@ -207,23 +208,26 @@ setMethod(
 
         # duplicate -- put in namespaces location
         # If caching is being used, it is possible that exists
-        if (!is.null(sim@.xData[[mBase]])) {
-          rm(list = mBase, envir = sim@.xData)
+        if (!is.null(sim@.xData$.mods[[mBase]])) {
+          rm(list = mBase, envir = sim@.xData$.mods)
         }
+        browser(expr = exists("._parseModule_2"))
 
-        #sim@.xData[[mBase]] <- new.env(parent = sim@.xData)
-        sim@.xData[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
-        attr(sim@.xData[[mBase]], "name") <- mBase
-        sim@.xData[[mBase]]$.objects <- new.env(parent = emptyenv())
+        #sim@.xData$.mods[[mBase]] <- new.env(parent = sim@.xData$.mods)
+        # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        # sim@.xData$.mods[[mBase]] <- new.env(parent = emptyenv())
+        attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+        sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         # load all code into simList@.xData[[moduleName]]
         # The simpler line commented below will not allow actual code to be put into module,
         #  e.g., startSim <- start(sim)
         #  The more complex one following will allow that.
-        # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData[[mBase]])
+        # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
         activeCode <- list()
         activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                                                   sim@.xData[[mBase]],
+                                                   sim@.xData$.mods[[mBase]],
                                                    sim = sim)
 
         # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
@@ -238,7 +242,7 @@ setMethod(
                   "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
           #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
           out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                             sim@.xData,
+                             sim@.xData$.mods,
                              sim = sim)
           #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
         }
@@ -247,8 +251,9 @@ setMethod(
         opt <- getOption("spades.moduleCodeChecks")
 
         if (isTRUE(opt) || length(names(opt)) > 1)
-          list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.xData[[mBase]])
-        sim@.xData[[mBase]][["._sourceFilename"]] <- grep(paste0(mBase,".R"), ls(sim@.xData[[".parsedFiles"]]), value = TRUE)
+          list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.xData$.mods[[mBase]])
+        sim@.xData$.mods[[mBase]][["._sourceFilename"]] <- grep(paste0(mBase,".R"),
+                                                                ls(sim@.xData[[".parsedFiles"]]), value = TRUE)
 
         # parse any scripts in R subfolder
         RSubFolder <- file.path(dirname(filename), "R")
@@ -258,13 +263,13 @@ setMethod(
             parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
             if (doesntUseNamespacing) {
               #eval(parsedFile1, envir = sim@.xData)
-              evalWithActiveCode(parsedFile1, sim@.xData,
+              evalWithActiveCode(parsedFile1, sim@.xData$.mods,
                                  sim = sim)
             }
 
             # duplicate -- put in namespaces location
-            #eval(parsedFile1, envir = sim@.xData[[mBase]])
-            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData[[mBase]],
+            #eval(parsedFile1, envir = sim@.xData$.mods[[mBase]])
+            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData$.mods[[mBase]],
                                                        sim = sim)
           }
         }
@@ -284,9 +289,12 @@ setMethod(
         #  inside of the defineModule.
         #  First, load anything that is active code into an environment whose parent
         #  is here (and thus has access to sim), then move the depends (only) back to main sim
+        browser(expr = exists("._parseModule_3"))
         env <- new.env(parent = parent.frame())
+        # env <- new.env(parent = asNamespace("SpaDES.core"))
+        # env$sim <- Copy(sim, objects = FALSE)
         if (any(unlist(activeCode)))  {
-            list2env(as.list(sim@.xData[[mBase]]), env)
+            list2env(as.list(sim@.xData$.mods[[mBase]]), env)
         }
 
         # Evaluate defineModule into the sim environment
@@ -388,7 +396,7 @@ setMethod(
           codeCheckMsgs <- c(codeCheckMsgs, mess)
         } ## End of code checking
 
-        lockBinding(mBase, sim@.xData)
+        lockBinding(mBase, sim@.xData$.mods)
         names(sim@depends@dependencies)[[k]] <- mBase
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% mBase
@@ -479,10 +487,12 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
+  #tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
   tmpEnvir <- new.env(parent = envir)
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
-  tmpEnvir$sim <- Copy(sim, objects = FALSE)
+  #simCopy <- Copy(sim, objects = FALSE)
+  tmpEnvir$sim <- sim#simCopy
 
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = tmpEnvir),
@@ -496,10 +506,12 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   if (any(activeCode)) {
     browser(expr = exists("._evalWithActiveCode_2"))
     env <- new.env(parent = parentFrame);
+    # env <- new.env(parent = asNamespace("SpaDES.core"));
+    env$sim <- simCopy
     aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
       eval(ac, envir = env)
     })
-    list2env(as.list(env), envir)
+    list2env(as.list(env, all.names = TRUE), envir)
   }
   activeCode
 }
@@ -509,7 +521,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #' @keywords internal
 #' @rdname getModuleInputObjects
 .getModuleInputObjects <- function(sim, m) {
-  sim@.xData[[basename(m)]][[".inputObjects"]]
+  sim@.xData$.mods[[basename(m)]][[".inputObjects"]]
 }
 
 #' Check is module uses module namespacing
@@ -519,5 +531,5 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #' @keywords internal
 #' @rdname isNamespaced
 .isNamespaced <- function(sim, m) {
-  !isTRUE(any(grepl(paste0("^", basename(m)), ls(sim@.xData[[basename(m)]]))))
+  !isTRUE(any(grepl(paste0("^", basename(m)), ls(sim@.xData$.mods[[basename(m)]]))))
 }

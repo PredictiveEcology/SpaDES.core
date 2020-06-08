@@ -40,7 +40,7 @@ test_that("simList object initializes correctly (1)", {
 
   # data.table v1.11.0 no longer prints "NULL" data.table.
   # See bug fix 8 in https://github.com/Rdatatable/data.table/blob/master/NEWS.md
-  nline <- if (out[60] == "NULL") 75 else 73
+  nline <- if (out[60] == "NULL") 72 else 70
 
   expect_equal(length(out), nline)
   options(width = w); rm(w)
