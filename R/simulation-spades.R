@@ -132,11 +132,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                                          " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
           } else {
             if (is(debug[[i]], "call")) {
-              message(crayon::green(eval(debug[[i]])))
+              tryCatch(message(crayon::green(eval(debug[[i]]))), error = function(x) NULL)
             } else if (identical(debug[[i]], "simList")) {
               print(sim)
             } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
-              message(crayon::green(eval(parse(text = debug[[i]]))))
+              tryCatch(message(crayon::green(eval(parse(text = debug[[i]])))), error = function(x) NULL)
             } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
               if (is.environment(fnEnv)) {
                 if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
