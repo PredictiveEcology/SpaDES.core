@@ -491,8 +491,8 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   tmpEnvir <- new.env(parent = envir)
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
-  #simCopy <- Copy(sim, objects = FALSE)
-  tmpEnvir$sim <- sim#simCopy
+  simCopy <- Copy(sim, objects = FALSE)
+  tmpEnvir$sim <- simCopy
 
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = tmpEnvir),
