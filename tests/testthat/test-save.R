@@ -49,7 +49,7 @@ test_that("saving files (and memoryUse)", {
   cc <- ongoingMemoryThisPid(0.2, interval = 0.1)
   expect_true(file.exists(cc))
   ff <- fread(cc)
-  expect_true(NROW(ff)>0)
+  expect_true(NROW(ff) > 0)
 
   options("spades.memoryUseInterval" = 0)
   outputFile <- mySim$.memoryUse$filename
@@ -171,8 +171,8 @@ test_that("saveSimList does not work correctly", {
   times <- list(start = 0, end = 1)
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    caribouMovement = list(.plotInitialTime = NA_integer_),
+    randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(

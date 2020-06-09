@@ -1,6 +1,6 @@
 makeModActiveBinding <- function(sim, mod) {
   makeActiveBinding(sym = "mod",
-                    fun = function(value){
+                    fun = function(value) {
                       if (missing(value)) {
                         get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
                       } else {
@@ -12,7 +12,7 @@ makeModActiveBinding <- function(sim, mod) {
 
 makeParActiveBinding <- function(sim, mod) {
   makeActiveBinding(sym = "Par",
-                    fun = function(value){
+                    fun = function(value) {
                       if (missing(value)) {
                         sim@params[[mod]]
                       } else {

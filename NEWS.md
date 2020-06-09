@@ -1,7 +1,7 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
 
-version 1.0.2
+version 1.0.1.9000
 =============
 
 ## new features
@@ -13,8 +13,10 @@ version 1.0.2
 ## deprecated
 
 ## bug fixes
+
 * minor bugfixes in sample modules
 * module template has full path instead of .. for moduleParams etc. This is more accurate. 
+* address changes to active bindings in R-devel
 
 version 1.0.1
 =============
