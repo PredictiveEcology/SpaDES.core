@@ -53,11 +53,11 @@ test_that("spades calls - diff't signatures", {
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
                     capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
 
-  expect_message(spades(Copy(a), debug = c("current", "events"), .plotInitialTime = NA),
-        "This is the current event")
+  expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+        "eventTime *moduleName *eventType *eventPriority")
   expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
                 "moduleName")
-  expect_output(spades(a, debug = "simList", .plotInitialTime = NA),
+  expect_message(spades(a, debug = "simList", .plotInitialTime = NA),
                 "Completed Events")
 
   if (interactive()) {

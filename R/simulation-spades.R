@@ -87,12 +87,12 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
         }
       }
       if (attr(sim, "needDebug")) {
-        if (!is(debug, "list")) debug <- list(debug)
+        if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
         for (i in seq_along(debug)) {
           if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
             if (length(cur) > 0) {
               if (debug[[i]] == "step") {
-                if (is.interactive())
+                if (interactive())
                   readline("Press any key to continue...")
               }
 
@@ -107,20 +107,19 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                 evnts2[1L:2L, ] <- names(evnts1) %>%
                   stri_pad(., .pkgEnv[[".spadesDebugWidth"]]) %>%
                   rbind(., evnts1)
-                message("This is the current event, printed as it is happening:\n")
-                message(paste(unname(evnts2[1, ]), collapse = ' '))
-                message(paste(unname(evnts2[2, ]), collapse = ' '))
+                outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
+                outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
                 # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
                 .pkgEnv[[".spadesDebugFirst"]] <- FALSE
               } else {
                 colnames(evnts1) <- NULL
                 # write.table(evnts1, quote = FALSE, row.names = FALSE)
-                message(paste(unname(evnts1), collapse = ' '))
+                outMess <- paste(unname(evnts1), collapse = ' ')
               }
             }
           } else if (identical(debug[[i]], 1)) {
-            message(crayon::green(paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
-                                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
+            outMess <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
+                                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
           } else if (identical(debug[[i]], 2)) {
             compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                                attr(sim, "completedCounter") == 1) {
@@ -128,15 +127,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             } else {
               .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
             }
-            message(crayon::green(paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
-                                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))))
+            outMess <- paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
+                                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
           } else {
             if (is(debug[[i]], "call")) {
-              tryCatch(message(crayon::green(eval(debug[[i]]))), error = function(x) NULL)
+              outMess <- try(eval(debug[[i]]))
             } else if (identical(debug[[i]], "simList")) {
-              print(sim)
+              outMess <- try(capture.output(sim))
             } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
-              tryCatch(message(crayon::green(eval(parse(text = debug[[i]])))), error = function(x) NULL)
+              outMess <- try(eval(parse(text = debug[[i]])))
             } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
               if (is.environment(fnEnv)) {
                 if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
@@ -145,13 +144,20 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
                 }
               }
             } else if (!any(debug[[i]] %in% c("browser"))) { # any other
-              if (is.function(debug[[i]]))
-                tryCatch(message(crayon::green(do.call(debug[[i]], list(sim)))), error = function(x) NULL)
-              else
-                stop("Did not understand argument supplied to debug; see ?spades")
+              if (!is.function(debug[[i]])) {
+                outMess <- try(do.call(debug[[i]], list(sim)))
+              } else  {
+                outMess <- try(debug[[i]](sim))
+              }
             }
           }
+          if (is.data.frame(outMess)) {
+            reproducible::messageDF(outMess, colour = "green", colnames = FALSE)
+          } else {
+            w <- getOption("width")
+            suppress <- lapply(outMess, function(x) message(crayon::green(substring(x, first = 1, last = w - 30))))
 
+          }
         }
       }
 
@@ -1041,7 +1047,7 @@ setMethod(
   })
 
 #' @rdname spades
-#' @importFrom reproducible Cache
+#' @importFrom reproducible Cache messageDF
 setMethod(
   "spades",
   signature(cache = "logical"),
