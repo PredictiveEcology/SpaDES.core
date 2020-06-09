@@ -29,15 +29,26 @@ test_that("defineModule correctly handles different inputs", {
     documentation = list(),
     reqdPkgs = list("grid", "raster", "sp"),
     parameters = rbind(
-      defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description")
+      defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description
+                      with spaces")
     ),
     inputObjects = bind_rows(
-      expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_)
+      expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_),
+      expectsInput(objectName = "testInput2", objectClass = "list", sourceURL = "", desc = "another vague
+                   description with spaces")
     ),
     outputObjects = bind_rows(
-      createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_)
+      createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_),
+      createsOutput(objectName = "testOutput", objectClass = "list", desc = "another vague
+                   description with spaces for outputs   another space")
     )
   )
+
+  expect_true(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- rmExtraSpacesEOLList(x1)
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
 
   ## check name
   x2 <- x1

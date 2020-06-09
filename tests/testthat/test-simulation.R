@@ -497,14 +497,16 @@ test_that("conflicting function types", {
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
   lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1]
   cat(xxx[1:(lineWithInputObjects - 1)], "
-      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei1', 'numeric', desc = 'This is a test with    spaces
+                    and EOL', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', 'test.com')
       ",
       xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
-      createsOutput('co2', 'numeric', ''),
+      createsOutput('co2', 'numeric', desc = 'This is a test with    spaces
+                    and EOL on the      createsOutputs'),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
@@ -555,7 +557,7 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
     "child4: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects"
   )
 
-  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- capture_messages(mySim <- simInit(paths = list(modulePath = tmpdir), modules = m))
   mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
   # for (x in seq(fullMessage)) {
@@ -567,6 +569,30 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
   #   }
   #   expect_true(theGrep)
   # }
+  x1 <- moduleMetadata(mySim)
+  sns <- slotNames(mySim@depends@dependencies[[m]])
+  names(sns) <- sns
+  x2 <- lapply(sns, function(sn) {
+    slot(mySim@depends@dependencies[[m]], sn)
+  })
+  expect_true(any(unlist(lapply(x2, function(v)
+    grepl("  |\n", v)))))
+  x2 <- rmExtraSpacesEOLList(x2)
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x2, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleParams(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleInputs(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleOutputs(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+
+
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
