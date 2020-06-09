@@ -329,8 +329,11 @@ loadSimList <- function(file) {
   sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
 
   mods <- setdiff(sim@modules, .coreModules())
-  lapply(mods, function(mod) { ## TODO: was this fixed in qs 0.21.1 ??
-    rm("mod", envir = sim[[mod]], inherits = FALSE)
+
+  ## TODO: remove this once activeBindings fixed
+  lapply(mods, function(mod) {
+    if (!is.null(sim[[mod]]))
+      rm("mod", envir = sim[[mod]], inherits = FALSE)
     makeModActiveBinding(sim = sim, mod = mod)
   })
 

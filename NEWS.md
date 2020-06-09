@@ -1,16 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
 
-version 1.0.2
+version 1.0.1.9000
 =============
 
 ## new features
+
 ## dependencies
 
 ## deprecated
 
 ## bug fixes
+
 * minor bugfixes in sample modules
+* address changes to active bindings in R-devel
 
 version 1.0.1
 =============
