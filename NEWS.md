@@ -6,13 +6,15 @@ version 1.0.2
 
 ## new features
 
-- `desc` argument in `defineParameter`, `expectsInput`, and `createsOutput` can now have extraneous spaces and End-of-Line characters. This means that they can now be written more easily with a single set of quotes, without needing `paste`. The accessor functions, `moduleParams`, `moduleInputs`, and `moduleOutputs` all will strip extraneous spaces and End-of-Line characters. 
+- `desc` argument in `defineParameter`, `expectsInput`, and `createsOutput` can now have extraneous spaces and End-of-Line characters. This means that they can now be written more easily with a single set of quotes, without needing `paste`. The accessor functions, `moduleParams`, `moduleInputs`, and `moduleOutputs` all will strip extraneous spaces and End-of-Line characters.
+
 ## dependencies
 
 ## deprecated
 
 ## bug fixes
 * minor bugfixes in sample modules
+* module template has full path instead of .. for moduleParams etc. This is more accurate. 
 
 version 1.0.1
 =============
