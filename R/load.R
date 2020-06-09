@@ -171,11 +171,9 @@ setMethod(
                   stop("'inputs' often requires (like now) that package be specified",
                        " explicitly in the 'fun' column, e.g., base::load")
                 }
-
               } else {
                 objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
               }
-
             } else {
               objListEnv <- quickPlot::whereInStack(filelist$objectName[y])
               objList <- list(get(filelist$objectName[y], objListEnv))
@@ -219,7 +217,6 @@ setMethod(
             if (identical(loadFun[y], "load")) {
               do.call(getFromNamespace(loadFun[y], loadPackage[y]),
                       args = argument, envir = sim@.xData)
-
             } else {
               sim[[filelist[y, "objectName"]]] <-
                 if (is.na(loadPackage[y])) {
@@ -228,8 +225,6 @@ setMethod(
                   do.call(getFromNamespace(loadFun[y], loadPackage[y]),
                           args = argument)
                 }
-
-
             }
             filelist[y, "loaded"] <- TRUE
 

@@ -183,7 +183,7 @@ utils::globalVariables(".")
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
-#' @importFrom reproducible Require basename2
+#' @importFrom reproducible basename2 Require trimVersionNumber
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -333,7 +333,7 @@ setMethod(
     #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
     # })
     paths <- lapply(paths, function(p)
-        checkPath(p, create = TRUE)
+      checkPath(p, create = TRUE)
     )
 
     objNames <- names(objects)

@@ -294,7 +294,7 @@ setMethod(
         # env <- new.env(parent = asNamespace("SpaDES.core"))
         # env$sim <- Copy(sim, objects = FALSE)
         if (any(unlist(activeCode)))  {
-            list2env(as.list(sim@.xData$.mods[[mBase]]), env)
+          list2env(as.list(sim@.xData$.mods[[mBase]]), env)
         }
 
         # Evaluate defineModule into the sim environment
@@ -304,20 +304,23 @@ setMethod(
             try(mess)
         })
 
-        mess <- capture.output(type = "message",
-                               out <- try(suppressWarnings(eval(pf, envir = env))))
+        mess <- capture.output({
+          out <- try(suppressWarnings(eval(pf, envir = env)))
+        }, type = "message")
         if (is(out, "try-error")) stop(out)
         opt <- getOption("spades.moduleCodeChecks")
         if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {
           messFile <- capture.output(type = "message",
-                                               message(grep(paste0(mBase, ".R"),
-                                                            ls(sim@.xData$.parsedFiles), value = TRUE)))
+                                     message(grep(paste0(mBase, ".R"),
+                                                  ls(sim@.xData$.parsedFiles), value = TRUE)))
           codeCheckMsgs <- c(
             codeCheckMsgs,
             messFile,
-            capture.output(type = "message",
-                           hasMessage <- unique(unlist(lapply(mess, function(x)
-                             .parseMessage(mBase, "", x))))))
+            capture.output({
+              hasMessage <- unique(unlist(lapply(mess, function(x)
+                .parseMessage(mBase, "", x))))
+            }, type = "message")
+          )
         }
 
         for (dep in out@depends@dependencies) {
@@ -507,7 +510,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     browser(expr = exists("._evalWithActiveCode_2"))
     env <- new.env(parent = parentFrame);
     # env <- new.env(parent = asNamespace("SpaDES.core"));
-    env$sim <- simCopy
+    env$sim <- sim#simCopy
     aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
       eval(ac, envir = env)
     })
