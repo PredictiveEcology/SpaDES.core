@@ -200,6 +200,8 @@ spades(mySim)
 spades(mySim, debug = TRUE) # Fastest
 spades(mySim, debug = "simList")
 spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
+# To get a combination -- use list(debug = list(..., ...))
+spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
 
 # Can turn off plotting, and inspect the output simList instead
 out <- spades(mySim, .plotInitialTime = NA) # much faster
