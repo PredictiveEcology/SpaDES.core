@@ -277,5 +277,4 @@ rmExtraSpacesEOLList <- function(xx) {
       elem
   })
   xx
-
 }
