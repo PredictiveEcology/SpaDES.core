@@ -74,7 +74,6 @@ test_that("downloadModule downloads and unzips a parent module", {
   }
 })
 
-
 test_that("downloadModule can overwrite existing modules", {
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
