@@ -51,6 +51,7 @@ test_that("downloadModule downloads and unzips a parent module", {
 
   m <- "LCC2005"
 
+  ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
   if (!is.null(f$error)) {
     if (grepl("Forbidden", f$error)) {
@@ -59,7 +60,6 @@ test_that("downloadModule downloads and unzips a parent module", {
   }
   f <- f$value[[1]] %>% unlist() %>% as.character()
 
-  #f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
   d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
 
   d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%

@@ -272,9 +272,14 @@ rmExtraSpacesEOL <- function(x) gsub(" +|[ *\n]+", " ", x)
 rmExtraSpacesEOLList <- function(xx) {
   toRmESEOL <- grepl(c("parameters|inputObjects|outputObjects"), names(xx))
   xx[toRmESEOL] <- lapply(xx[toRmESEOL], function(elem) {
+    if (any(grepl("desc", tolower(names(elem))))) {
       whCol <- grep("desc", tolower(names(elem)))
       elem[[whCol]] <- rmExtraSpacesEOL(elem[[whCol]])
       elem
+    } else {
+      elem
+    }
   })
+
   xx
 }
