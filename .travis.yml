@@ -64,16 +64,6 @@ jobs:
     after_success:
       - travis_wait 15 Rscript -e 'covr::coveralls(type = "all", quiet = FALSE)'
       - Rscript -e 'lintr::lint_package()'
-    r_binary_packages:
-      - BH
-      - dplyr
-      - git2r
-      - igraph
-      - later
-      - RCurl
-      - rlang
-      - stringi
-      - XML
     r_github_packages:
       - jimhester/lintr
       - r-lib/covr
@@ -102,12 +92,6 @@ jobs:
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
-    r_binary_packages:
-      - BH
-      - dplyr
-      - igraph
-      - rlang
-      - stringi
   - os: osx
     osx_image: xcode9.4
     env:
