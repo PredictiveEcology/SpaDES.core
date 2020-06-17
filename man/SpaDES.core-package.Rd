@@ -376,7 +376,7 @@ See example in \code{\link{spades}}, achieved by using \code{cache = TRUE} argum
 
 \tabular{ll}{
   \code{\link[reproducible]{Cache}} \tab Caches a function, but often accessed as arg in \code{\link{spades}}\cr
-  \code{\link[reproducible]{cache}} \tab deprecated. Please use \code{Cache}\cr
+  \code{cache} \tab deprecated. Please use \code{Cache}\cr
   \code{\link[reproducible:cache-tools]{showCache}} \tab Shows information about the objects in the cache\cr
   \code{\link[reproducible:cache-tools]{clearCache}} \tab Removes objects from the cache\cr
   \code{\link[reproducible:cache-tools]{keepCache}} \tab Keeps only the objects described\cr
