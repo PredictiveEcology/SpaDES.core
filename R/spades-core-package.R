@@ -248,7 +248,7 @@
 #'   \tabular{ll}{
 #'     \code{\link[SpaDES.tools]{adj}} \tab An optimized (i.e., faster) version of \code{\link[raster]{adjacent}}\cr
 #'     \code{\link[SpaDES.tools]{cir}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*}} object\cr
-#'     \code{\link[SpaDES.tools]{directionFromEachPoint}} \tab Fast calculation of direction and distance surfaces\cr
+#'     \code{\link[SpaDES.tools:distanceFromEachPoint]{directionFromEachPoint}} \tab Fast calculation of direction and distance surfaces\cr
 #'     \code{\link[SpaDES.tools]{distanceFromEachPoint}} \tab Fast calculation of distance surfaces\cr
 #'     \code{\link[SpaDES.tools]{rings}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
 #'     \code{\link[SpaDES.tools]{spokes}} \tab Identify outward radiating spokes from initial points\cr
@@ -264,8 +264,8 @@
 #'     \code{\link[SpaDES.tools]{crw}} \tab Simple correlated random walk function\cr
 #'     \code{\link[SpaDES.tools]{heading}} \tab Determines the heading between \code{SpatialPoints*}\cr
 #'     \code{\link[quickPlot]{makeLines}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
-#'     \code{\link[SpaDES.tools]{move}} \tab A meta function that can currently only take "crw"\cr
-#'     \code{\link[SpaDES.tools]{specificNumPerPatch}} \tab Initiate a specific number of agents per patch\cr
+#'     \code{\link[SpaDES.tools:crw]{move}} \tab A meta function that can currently only take "crw"\cr
+#'     \code{\link[SpaDES.tools:specnumperpatch-probs]{specificNumPerPatch}} \tab Initiate a specific number of agents per patch\cr
 #'   }
 #' }
 #'
@@ -294,9 +294,9 @@
 #'   Here are several helper functions to add to, set and get colors of \code{Raster*} objects:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[quickPlot:setColors<-]{setColors}} \tab Set colours for plotting \code{Raster*} objects\cr
+#'     \code{\link[quickPlot:getSetColors]{setColors}} \tab Set colours for plotting \code{Raster*} objects\cr
 #'     \code{\link{getColors}} \tab Get colours in a \code{Raster*} objects\cr
-#'     \code{\link{divergentColors}} \tab Create a color palette with diverging colors around a middle\cr
+#'     \code{\link{divergentColors}} \tab Create a colour palette with diverging colours around a middle\cr
 #'   }
 #' }
 #'
@@ -326,11 +326,11 @@
 #'   You must know how to use SELES for these to be useful:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools]{agentLocation}} \tab Agent location\cr
+#'     \code{\link[SpaDES.tools:SELESagentLocation]{agentLocation}} \tab Agent location\cr
 #'     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
-#'     \code{\link[SpaDES.tools]{numAgents}} \tab Number of agents\cr
-#'     \code{\link[SpaDES.tools]{probInit}} \tab Probability of initiating an agent or event\cr
-#'     \code{\link[SpaDES.tools]{transitions}} \tab Transition probability\cr
+#'     \code{\link[SpaDES.tools:SELESnumAgents]{numAgents}} \tab Number of agents\cr
+#'     \code{\link[SpaDES.tools:SELESprobInit]{probInit}} \tab Probability of initiating an agent or event\cr
+#'     \code{\link[SpaDES.tools:SELEStransitions]{transitions}} \tab Transition probability\cr
 #'   }
 #' }
 #'
@@ -363,9 +363,9 @@
 #' \tabular{ll}{
 #'   \code{\link[reproducible]{Cache}} \tab Caches a function, but often accessed as arg in \code{\link{spades}}\cr
 #'   \code{\link[reproducible]{cache}} \tab deprecated. Please use \code{Cache}\cr
-#'   \code{\link[reproducible]{showCache}} \tab Shows information about the objects in the cache\cr
-#'   \code{\link[reproducible]{clearCache}} \tab Removes objects from the cache\cr
-#'   \code{\link[reproducible]{keepCache}} \tab Keeps only the objects described\cr
+#'   \code{\link[reproducible:cache-tools]{showCache}} \tab Shows information about the objects in the cache\cr
+#'   \code{\link[reproducible:cache-tools]{clearCache}} \tab Removes objects from the cache\cr
+#'   \code{\link[reproducible:cache-tools]{keepCache}} \tab Keeps only the objects described\cr
 #'   \code{\link[reproducible]{clearStubArtifacts}} \tab Removes any erroneous items in a cache repository\cr
 #' }
 #'
@@ -375,8 +375,7 @@
 #' ------------------------------------------------------------------------------------------
 #' @section 7 Plotting:
 #'
-#' \emph{Much of the underlying plotting functionality is provided by the \code{quickPlot}
-#' package.}
+#' \emph{Much of the underlying plotting functionality is provided by \pkg{quickPlot}.}
 #'
 #' There are several user-accessible plotting functions that are optimized for modularity
 #' and speed of plotting:

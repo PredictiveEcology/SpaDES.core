@@ -12,15 +12,12 @@ if (!isGeneric("Plot")) {
 #'
 #' Extends \code{\link[quickPlot]{Plot}} for \code{simList} objects.
 #'
-#' Plot for simList class objects
+#' See \code{\link[quickPlot]{Plot}}.
+#' This method strips out stuff from a \code{simList} class object that would make it otherwise not
+#' reproducibly digestible between sessions, operating systems, or machines.
+#' This will likely still not allow identical digest results across R versions.
 #'
-#' See \code{\link[quickPlot]{Plot}}. This method strips out stuff
-#' from a simList class object that would make it otherwise not
-#' reproducibly digestible between sessions, operating systems,
-#' or machines. This will likely still not allow identical digest
-#' results across R versions.
-#'
-#' @importFrom quickPlot Plot gpar
+#' @importFrom quickPlot gpar Plot
 #' @importMethodsFrom quickPlot Plot
 #' @inheritParams quickPlot::Plot
 #' @include simList-class.R
@@ -56,18 +53,19 @@ if (!isGeneric(".parseElems")) {
   })
 }
 
-#' .parseElems for simList class objects
+#' \code{.parseElems} for \code{simList} class objects
 #'
-#' See \code{\link[quickPlot]{.parseElems}}.
+#' See \code{\link[quickPlot:parseElems]{.parseElems}}.
 #'
-#' @importFrom quickPlot .parseElems
-#' @importMethodsFrom quickPlot .parseElems
 #' @inheritParams quickPlot::.parseElems
-#' @rdname parseElems
-#' @include simList-class.R
-#' @seealso \code{\link[quickPlot]{.parseElems}}
+#'
 #' @exportMethod .parseElems
 #' @export
+#' @importFrom quickPlot .parseElems
+#' @importMethodsFrom quickPlot .parseElems
+#' @include simList-class.R
+#' @rdname parseElems
+#' @seealso \code{\link[quickPlot:parseElems]{.parseElems}}
 setMethod(
   ".parseElems",
   signature = "simList",

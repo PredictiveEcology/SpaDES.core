@@ -210,7 +210,7 @@ if (!isGeneric(".tagsByClass")) {
 
 #' \code{.tagsByClass} for \code{simList} objects
 #'
-#' See \code{\link[reproducible]{.tagsByClass}}. Adds current \code{moduleName},
+#' See \code{\link[reproducible:tagsByClass]{.tagsByClass}}. Adds current \code{moduleName},
 #' \code{eventType}, \code{eventTime}, and \code{function:spades} as \code{userTags}.
 #'
 #' @inheritParams reproducible::.tagsByClass
@@ -221,7 +221,7 @@ if (!isGeneric(".tagsByClass")) {
 #' @importFrom reproducible .grepSysCalls
 #' @importMethodsFrom reproducible .tagsByClass
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible]{.tagsByClass}}
+#' @seealso \code{\link[reproducible:tagsByClass]{.tagsByClass}}
 #' @rdname tagsByClass
 setMethod(
   ".tagsByClass",
@@ -261,7 +261,7 @@ if (!isGeneric(".cacheMessage")) {
 
 #' \code{.cacheMessage} for \code{simList} objects
 #'
-#' See \code{\link[reproducible]{.cacheMessage}}.
+#' See \code{\link[reproducible:cacheMessage]{.cacheMessage}}.
 #'
 #' @exportMethod .cacheMessage
 #' @importFrom crayon blue
@@ -270,7 +270,7 @@ if (!isGeneric(".cacheMessage")) {
 #' @inheritParams reproducible::.cacheMessage
 #' @include simList-class.R
 #' @rdname cacheMessage
-#' @seealso \code{\link[reproducible]{.cacheMessage}}
+#' @seealso \code{\link[reproducible:cacheMessage]{.cacheMessage}}
 setMethod(
   ".cacheMessage",
   signature = "simList",
@@ -324,7 +324,7 @@ if (!isGeneric(".checkCacheRepo")) {
 
 #' \code{.checkCacheRepo} for \code{simList} objects
 #'
-#' See \code{\link[reproducible]{.checkCacheRepo}}.
+#' See \code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}.
 #'
 #' @inheritParams reproducible::.checkCacheRepo
 #'
@@ -334,7 +334,7 @@ if (!isGeneric(".checkCacheRepo")) {
 #' @importMethodsFrom reproducible .checkCacheRepo
 #' @include simList-class.R
 #' @rdname checkCacheRepo
-#' @seealso \code{\link[reproducible]{.checkCacheRepo}}
+#' @seealso \code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}
 setMethod(
   ".checkCacheRepo",
   signature = "list",
@@ -375,7 +375,7 @@ if (!isGeneric(".addChangedAttr")) {
 #'
 #' @inheritParams reproducible::.addChangedAttr
 #'
-#' @seealso \code{\link[reproducible]{.addChangedAttr}}.
+#' @seealso \code{\link[reproducible:addChangedAttr]{.addChangedAttr}}.
 #'
 #' @export
 #' @exportMethod .addChangedAttr
@@ -383,7 +383,7 @@ if (!isGeneric(".addChangedAttr")) {
 #' @importMethodsFrom reproducible .addChangedAttr
 #' @include simList-class.R
 #' @rdname addChangedAttr
-#' @seealso \code{\link[reproducible]{.addChangedAttr}}
+#' @seealso \code{\link[reproducible:addChangedAttr]{.addChangedAttr}}
 setMethod(
   ".addChangedAttr",
   signature = "simList",
@@ -457,7 +457,7 @@ if (!isGeneric(".prepareOutput")) {
 
 #' \code{.prepareOutput} for \code{simList} objects
 #'
-#' See \code{\link[reproducible]{.prepareOutput}}.
+#' See \code{\link[reproducible:prepareOutput]{.prepareOutput}}.
 #'
 #' @inheritParams reproducible::.prepareOutput
 #'
@@ -468,7 +468,7 @@ if (!isGeneric(".prepareOutput")) {
 #' @importFrom reproducible .prepareOutput
 #' @importMethodsFrom reproducible .prepareOutput
 #' @rdname prepareOutput
-#' @seealso \code{\link[reproducible]{.prepareOutput}}
+#' @seealso \code{\link[reproducible:prepareOutput]{.prepareOutput}}
 setMethod(
   ".prepareOutput",
   signature = "simList",
@@ -637,7 +637,7 @@ setMethod(
 #'
 #' Takes a snapshot of \code{simList} objects.
 #'
-#' See \code{\link[reproducible]{.preDigestByClass}}.
+#' See \code{\link[reproducible:preDigestByClass]{.preDigestByClass}}.
 #'
 #' @inheritParams reproducible::.preDigestByClass
 #'
@@ -648,7 +648,7 @@ setMethod(
 #' @importMethodsFrom reproducible .preDigestByClass
 #' @include simList-class.R
 #' @rdname preDigestByClass
-#' @seealso \code{\link[reproducible]{.preDigestByClass}}
+#' @seealso \code{\link[reproducible:preDigestByClass]{.preDigestByClass}}
 setMethod(
   ".preDigestByClass",
   signature = "simList",
@@ -665,7 +665,7 @@ if (!isGeneric(".addTagsToOutput")) {
 
 #' \code{.addTagsToOutput} for \code{simList} objects
 #'
-#' See \code{\link[reproducible]{.addTagsToOutput}}.
+#' See \code{\link[reproducible:addTagsToOutput]{.addTagsToOutput}}.
 #'
 #' @inheritParams reproducible::.addTagsToOutput
 #'
@@ -677,7 +677,7 @@ if (!isGeneric(".addTagsToOutput")) {
 #' @importMethodsFrom reproducible .addTagsToOutput
 #' @include simList-class.R
 #' @rdname addTagsToOutput
-#' @seealso \code{\link[reproducible]{.addTagsToOutput}}
+#' @seealso \code{\link[reproducible:addTagsToOutput]{.addTagsToOutput}}
 setMethod(
   ".addTagsToOutput",
   signature = "simList",

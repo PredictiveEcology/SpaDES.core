@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{.parseElems,simList-method}
 \alias{.parseElems,simList-method}
-\title{.parseElems for simList class objects}
+\title{\code{.parseElems} for \code{simList} class objects}
 \usage{
 \S4method{.parseElems}{simList}(tmp, elems, envir)
 }
@@ -14,8 +14,8 @@
 \item{envir}{An environment}
 }
 \description{
-See \code{\link[quickPlot]{.parseElems}}.
+See \code{\link[quickPlot:parseElems]{.parseElems}}.
 }
 \seealso{
-\code{\link[quickPlot]{.parseElems}}
+\code{\link[quickPlot:parseElems]{.parseElems}}
 }

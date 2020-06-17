@@ -17,10 +17,10 @@ return. This is only relevant for list, environment (or similar) objects}
 \item{preDigestByClass}{A list, usually from \code{.preDigestByClass}}
 }
 \description{
-See \code{\link[reproducible]{.addTagsToOutput}}.
+See \code{\link[reproducible:addTagsToOutput]{.addTagsToOutput}}.
 }
 \seealso{
-\code{\link[reproducible]{.addTagsToOutput}}
+\code{\link[reproducible:addTagsToOutput]{.addTagsToOutput}}
 }
 \author{
 Eliot McIntire

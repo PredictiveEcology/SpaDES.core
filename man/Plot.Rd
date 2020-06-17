@@ -135,13 +135,10 @@ let Plot function do it automatically.}
 Extends \code{\link[quickPlot]{Plot}} for \code{simList} objects.
 }
 \details{
-Plot for simList class objects
-
-See \code{\link[quickPlot]{Plot}}. This method strips out stuff
-from a simList class object that would make it otherwise not
-reproducibly digestible between sessions, operating systems,
-or machines. This will likely still not allow identical digest
-results across R versions.
+See \code{\link[quickPlot]{Plot}}.
+This method strips out stuff from a \code{simList} class object that would make it otherwise not
+reproducibly digestible between sessions, operating systems, or machines.
+This will likely still not allow identical digest results across R versions.
 }
 \seealso{
 \code{\link[quickPlot]{Plot}}
