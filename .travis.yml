@@ -90,6 +90,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/quickPlot@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/SpaDES.tools@development", dependencies = FALSE)'
   - os: osx
