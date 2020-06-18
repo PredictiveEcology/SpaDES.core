@@ -46,6 +46,7 @@ Imports:
     RCurl,
     R.utils (>= 2.5.0),
     raster (>= 2.5-8),
+    Require,
     rlang,
     stats,
     stringi (>= 1.1.3),
