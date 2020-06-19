@@ -36,7 +36,9 @@ clone_depth: 5
 
 build_script:
   - Rscript -e "install.packages(c('data.table', 'utf8'), repos = 'https://cran.rstudio.com', type = 'source')"
+  - travis-tool.sh install_github PredictiveEcology/quickPlot@development
   - travis-tool.sh install_github PredictiveEcology/reproducible@development
+  - travis-tool.sh install_github PredictiveEcology/SpaDES.tool@development
   - travis-tool.sh install_deps
 
 test_script:
