@@ -2688,6 +2688,7 @@ setMethod("outputObjectNames",
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' # use Require and reqdPkgs
+#' if (!interactive()) chooseCRANmirror(ind = 1) #
 #' Require(unlist(reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))))
 setGeneric("reqdPkgs", function(sim, module, modulePath) {
   standardGeneric("reqdPkgs")
