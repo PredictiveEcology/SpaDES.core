@@ -237,7 +237,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   N <- 5000
 
   moduleDir <- file.path(tmpdir)
-  inputDir <- file.path(moduleDir, "inputs") %>% reproducible::checkPath(create = TRUE)
+  inputDir <- file.path(moduleDir, "inputs") %>% checkPath(create = TRUE)
   outputDir <- file.path(moduleDir, "outputs")
   cacheDir <- file.path(outputDir, "cache")
   times <- list(start = 0, end = N)

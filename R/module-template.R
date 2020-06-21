@@ -109,7 +109,7 @@ setGeneric("newModule", function(name, path, ...) {
 
 #' @export
 #' @rdname newModule
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 setMethod(
   "newModule",
   signature = c(name = "character", path = "character"),
@@ -200,7 +200,7 @@ setGeneric("newModuleCode", function(name, path, open, type, children) {
 
 #' @export
 #' @family module creation helpers
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @importFrom whisker whisker.render
 #' @rdname newModuleCode
 # igraph exports %>% from magrittr
@@ -276,7 +276,7 @@ setMethod(
 #' @inheritParams newModuleCode
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @export
 #' @family module creation helpers
 #' @rdname newModuleDocumentation
@@ -378,7 +378,7 @@ setMethod("newModuleDocumentation",
 #'                  \file{.gitignore}) and configures basic GitHub actions for module code checking.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @export
 #' @family module creation helpers
 #' @rdname newModuleTests
@@ -447,7 +447,7 @@ setMethod(
 #' @author Eliot McIntire
 #' @export
 #' @importFrom raster extension
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @rdname openModules
 #'
 #' @examples
@@ -635,7 +635,7 @@ setMethod("copyModule",
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @importFrom utils zip
 #' @rdname zipModule
 #'

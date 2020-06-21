@@ -286,7 +286,7 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 })
 
 #' @rdname downloadModule
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @importFrom utils unzip zip
 #' @importFrom data.table setDF rbindlist
 setMethod(

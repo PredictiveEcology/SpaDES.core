@@ -29,7 +29,7 @@
 #' @include priority.R
 #' @importFrom R.utils isAbsolutePath
 #' @importFrom quickPlot .objectNames
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @export
 #' @rdname checkpoint
 #'
