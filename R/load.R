@@ -64,7 +64,6 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist
-#' @importFrom stringi stri_detect_fixed
 #' @importFrom raster inMemory
 #' @importFrom utils getFromNamespace
 #' @include simulation-simInit.R

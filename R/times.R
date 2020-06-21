@@ -218,7 +218,6 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #'
 #' @author Eliot McIntire
 #' @export
-#' @importFrom stringi stri_detect_fixed
 #' @include simList-class.R
 #' @rdname timeConversion
 convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {

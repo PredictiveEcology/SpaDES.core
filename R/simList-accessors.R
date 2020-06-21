@@ -1222,7 +1222,7 @@ setReplaceMethod(
          ceiling(log10(end(sim, sim@simtimes[["timeunit"]]) + 1))
        )
        # Add time unit and saveTime to filename, without stripping extension
-       wh <- !stri_detect_fixed(str = sim@outputs$file, pattern = txtTimeA)
+       wh <- !grepl(txtTimeA, sim@outputs$file)
        sim@outputs[wh, "file"] <- paste0(
          file_path_sans_ext(sim@outputs[wh, "file"]),
          "_", txtTimeA, txtTimeB[wh],

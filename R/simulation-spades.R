@@ -22,7 +22,6 @@ utils::globalVariables(".")
 #' @author Alex Chubaty
 #' @export
 #' @importFrom data.table data.table rbindlist setkey fread
-#' @importFrom stringi stri_pad_right stri_pad stri_length
 #' @importFrom reproducible Cache
 #' @importFrom utils write.table
 #' @include helpers.R
@@ -97,16 +96,16 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
               }
 
               evnts1 <- data.frame(current(sim))
-              widths <- stri_length(format(evnts1))
+              evnts1new <- data.frame(current(sim))
+              widths <- unname(unlist(lapply(format(evnts1), nchar)))
               .pkgEnv[[".spadesDebugWidth"]] <- pmax(widths, .pkgEnv[[".spadesDebugWidth"]])
-              evnts1[1L, ] <- format(evnts1) %>%
-                stri_pad_right(., .pkgEnv[[".spadesDebugWidth"]])
-
+              evnts1[1L, ] <- sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), evnts1)
               if (.pkgEnv[[".spadesDebugFirst"]]) {
                 evnts2 <- evnts1
-                evnts2[1L:2L, ] <- names(evnts1) %>%
-                  stri_pad(., .pkgEnv[[".spadesDebugWidth"]]) %>%
-                  rbind(., evnts1)
+                evnts2 <- evnts1
+                evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), names(evnts2)),
+                                            sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), evnts2))
+
                 outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
                 outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
                 # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)

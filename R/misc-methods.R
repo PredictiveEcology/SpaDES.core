@@ -239,30 +239,22 @@ setMethod("loadPackages",
 #'              If not enough, \code{pad} will be used to pad.
 #'
 #' @param pad character to use as padding (\code{nchar(pad) == 1} must be \code{TRUE}).
-#'            Passed to \code{\link[stringi]{stri_pad}}
 #'
 #' @return Character string representing the filename.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom fpCompare %==%
-#' @importFrom stringi stri_pad_left stri_pad_right
 #' @rdname paddedFloatToChar
 #'
 #' @examples
 #' paddedFloatToChar(1.25)
 #' paddedFloatToChar(1.25, padL = 3, padR = 5)
 paddedFloatToChar <- function(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "0") {
-  xIC <- x %/% 1 %>%
-    format(., trim = TRUE, digits = 5, scientific = FALSE) %>%
-    stri_pad_left(., pad = pad, width = padL)
   xf <- x %% 1
-  xFC <- ifelse(xf %==% 0, "",
-    strsplit(format(xf, digits = padR, scientific = FALSE), split = "\\.")[[1]][2] %>%
-      stri_pad_right(., width = padR, pad = pad) %>%
-      paste0(".", .))
-
-  return(paste0(xIC, xFC))
+  newPadR <- if (xf %==% 0) 0 else padR
+  xFCEnd <- sprintf(paste0("%0", padL+newPadR+1*(newPadR > 0),".", newPadR, "f"), x)
+  return(xFCEnd)
 }
 
 ###############################################################################
