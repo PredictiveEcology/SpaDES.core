@@ -1243,8 +1243,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
   rmo$randomSeed <- append(list(get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)),
                            rmo$randomSeed)
 
-  timeElapsedHere <- (endTime - startTime)
-  browser()
+  timeElapsedHere <- difftime(endTime, startTime, units = "secs")
   if (timeElapsedHere > 1)
     message(crayon::magenta(paste0("... spades.recoveryMode used ",
                                    format(timeElapsedHere, units = "auto", digits = 3))))
