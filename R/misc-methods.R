@@ -230,6 +230,11 @@ setMethod("loadPackages",
 ################################################################################
 #' Convert numeric to character with padding
 #'
+#' This will pad floating point numbers, right or left. For integers, either class
+#' integer or functionally integer (e.g., 1.0), it will not pad right of the decimal.
+#' For more specific control or to get exact padding right and left of decimal,
+#' try the \code{stringi} package. It will also not do any rounding. See examples.
+#'
 #' @param x numeric. Number to be converted to character with padding
 #'
 #' @param padL numeric. Desired number of digits on left side of decimal.
@@ -250,9 +255,11 @@ setMethod("loadPackages",
 #' @examples
 #' paddedFloatToChar(1.25)
 #' paddedFloatToChar(1.25, padL = 3, padR = 5)
+#' paddedFloatToChar(1.25, padL = 3, padR = 1) # no rounding, so keeps 2 right of decimal
 paddedFloatToChar <- function(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "0") {
   xf <- x %% 1
-  newPadR <- if (xf %==% 0) 0 else padR
+  numDecimals <- nchar(gsub("(.*)(\\.)|([0]*$)","",xf))
+  newPadR <- ifelse(xf %==% 0, 0, pmax(numDecimals, padR))
   xFCEnd <- sprintf(paste0("%0", padL+newPadR+1*(newPadR > 0),".", newPadR, "f"), x)
   return(xFCEnd)
 }

@@ -21,11 +21,15 @@ If not enough, \code{pad} will be used to pad.}
 Character string representing the filename.
 }
 \description{
-Convert numeric to character with padding
+This will pad floating point numbers, right or left. For integers, either class
+integer or functionally integer (e.g., 1.0), it will not pad right of the decimal.
+For more specific control or to get exact padding right and left of decimal,
+try the \code{stringi} package. It will also not do any rounding. See examples.
 }
 \examples{
 paddedFloatToChar(1.25)
 paddedFloatToChar(1.25, padL = 3, padR = 5)
+paddedFloatToChar(1.25, padL = 3, padR = 1) # no rounding, so keeps 2 right of decimal
 }
 \author{
 Eliot McIntire and Alex Chubaty
