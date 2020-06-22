@@ -45,14 +45,16 @@ as necessary. Default is \code{FALSE}. This currently works best if
 there is only one object being plotted in a given Plot call. However,
 it is possible to pass a list of logicals to this, matching the
 length of the ... objects. Use \code{clearPlot} to clear the whole
-plotting device.}
+plotting device. NOTE if \code{TRUE}: \emph{Everything that was there,
+including the legend and the end points of the color palette, will
+be removed and re-initiated}.}
 
 \item{addTo}{Character vector, with same length as \code{...}.
 This is for overplotting, when the overplot is not to occur on
 the plot with the same name, such as plotting a
 \code{SpatialPoints*} object on a \code{RasterLayer}.}
 
-\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot]{gpar}} function,
+\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot:grid-functions]{gpar}},
 to change plotting parameters (see \pkg{grid} package).}
 
 \item{gpText}{A \code{gpar} object for the title text.
@@ -61,8 +63,7 @@ Default \code{gpar(col = "black")}.}
 \item{gpAxis}{A \code{gpar} object for the axes.
 Default \code{gpar(col = "black")}.}
 
-\item{axes}{Logical or \code{"L"}, representing the left and bottom axes,
-over all plots.}
+\item{axes}{Logical or \code{"L"}, representing the left and bottom axes, over all plots.}
 
 \item{speedup}{Numeric. The factor by which the number of pixels is divided
 by to plot rasters. See Details.}
