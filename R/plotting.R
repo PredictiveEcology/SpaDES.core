@@ -12,7 +12,7 @@ if (!isGeneric("Plot")) {
 #'
 #' Extends \code{quickPlot::Plot} for \code{simList} objects.
 #'
-#' See \code{\link[quickPlot]{Plot}}.
+#' See \code{quickPlot::Plot}.
 #' This method strips out stuff from a \code{simList} class object that would make it otherwise not
 #' reproducibly digestible between sessions, operating systems, or machines.
 #' This will likely still not allow identical digest results across R versions.
@@ -21,7 +21,7 @@ if (!isGeneric("Plot")) {
 #' @importMethodsFrom quickPlot Plot
 #' @inheritParams quickPlot::Plot
 #' @include simList-class.R
-#' @seealso \code{\link[quickPlot]{Plot}}
+#' @seealso \code{quickPlot::Plot}
 #' @exportMethod Plot
 #' @rdname Plot
 #' @export

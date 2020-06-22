@@ -76,9 +76,9 @@ values set to defaults
                              it is for human readers only.\cr\cr
    \code{reqdPkgs} \tab List of R package names required by the module. These
                         packages will be loaded when \code{simInit} is called.
-                        \code{\link[reproducible]{Require}} will be used internally
+                        \code{\link[Require]{Require}} will be used internally
                         to load if available, and install if not available.
-                        Because \code{\link[reproducible]{Require}} can also download from
+                        Because \code{\link[Require]{Require}} can also download from
                         GitHub.com, these packages can specify package names stored
                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
    \code{parameters} \tab A data.frame specifying the parameters used in the module.
