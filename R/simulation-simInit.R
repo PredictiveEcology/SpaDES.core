@@ -183,7 +183,8 @@ utils::globalVariables(".")
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
-#' @importFrom reproducible basename2 Require trimVersionNumber
+#' @importFrom reproducible basename2
+#' @importFrom Require Require trimVersionNumber
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).

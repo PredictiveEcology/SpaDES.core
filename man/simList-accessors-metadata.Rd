@@ -82,5 +82,6 @@ in a \code{simList} if not specified.
 # set modulePath
 setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 # use Require and reqdPkgs
+if (!interactive()) chooseCRANmirror(ind = 1) #
 Require(unlist(reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))))
 }

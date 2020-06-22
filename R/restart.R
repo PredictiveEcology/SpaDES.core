@@ -269,7 +269,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #'
 #' @export
 #' @importFrom crayon bgBlue white
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
                      restartDir = getOption("spades.restartR.restartDir", NULL)) {
