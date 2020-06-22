@@ -130,7 +130,7 @@ let Plot function do it automatically.}
 "barplot" to get a barplot() call. Default "plot".}
 }
 \description{
-Extends \code{\link[quickPlot]{Plot}} for \code{simList} objects.
+Extends \code{quickPlot::Plot} for \code{simList} objects.
 }
 \details{
 See \code{\link[quickPlot]{Plot}}.

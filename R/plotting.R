@@ -10,7 +10,7 @@ if (!isGeneric("Plot")) {
 
 #' Plot method for \code{simList} objects
 #'
-#' Extends \code{\link[quickPlot]{Plot}} for \code{simList} objects.
+#' Extends \code{quickPlot::Plot} for \code{simList} objects.
 #'
 #' See \code{\link[quickPlot]{Plot}}.
 #' This method strips out stuff from a \code{simList} class object that would make it otherwise not
