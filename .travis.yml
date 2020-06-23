@@ -32,6 +32,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs", "BH", "rlang"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/Require@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
   - os: linux
     dist: xenial
@@ -57,6 +58,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/Require@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
     after_failure:
       - cat ./SpaDES.core.Rcheck/tests/test-all.Rout
@@ -90,6 +92,7 @@ jobs:
       - echo -e 'max_size = 5.0G\nsloppiness = include_file_ctime\nhash_dir=false' > $HOME/.ccache/ccache.conf
     before_script:
       - Rscript -e 'install.packages(c("devtools", "qs"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/Require@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/quickPlot@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/SpaDES.tools@development", dependencies = FALSE)'
@@ -112,6 +115,7 @@ jobs:
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'install.packages(c("digest", "igraph", "qs", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/Require@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
   - os: osx
     osx_image: xcode9.4
@@ -131,6 +135,7 @@ jobs:
     before_script:
       - Rscript -e 'install.packages("devtools", type = "source")'
       - Rscript -e 'install.packages(c("digest", "igraph", "qs", "rgdal", "rgeos"), type = "source")'
+      - Rscript -e 'devtools::install_github("PredictiveEcology/Require@development", dependencies = FALSE)'
       - Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development", dependencies = FALSE)'
 r_build_args: " "
 r_check_args: "--as-cran"
