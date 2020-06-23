@@ -253,6 +253,7 @@
 #'     \code{\link[SpaDES.tools]{rings}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
 #'     \code{\link[SpaDES.tools]{spokes}} \tab Identify outward radiating spokes from initial points\cr
 #'     \code{\link[SpaDES.tools]{spread}} \tab Contagious cellular automata\cr
+#'     \code{\link[SpaDES.tools]{spread2}} \tab Contagious cellular automata, different algorithm, more robust\cr
 #'     \code{\link[SpaDES.tools]{wrap}} \tab Create a torus from a grid\cr
 #'   }
 #' }
