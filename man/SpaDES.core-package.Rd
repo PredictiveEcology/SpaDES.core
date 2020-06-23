@@ -327,7 +327,7 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
 
   \tabular{ll}{
     \code{\link{checkObject}} \tab Check for a existence of an object within a \code{simList} \cr
-    \code{\link[reproducible]{checkPath}} \tab Checks the specified filepath for formatting consistencies\cr
+    \code{\link[Require]{checkPath}} \tab Checks the specified filepath for formatting consistencies\cr
   }
 }
 
@@ -376,11 +376,9 @@ See example in \code{\link{spades}}, achieved by using \code{cache = TRUE} argum
 
 \tabular{ll}{
   \code{\link[reproducible]{Cache}} \tab Caches a function, but often accessed as arg in \code{\link{spades}}\cr
-  \code{cache} \tab deprecated. Please use \code{Cache}\cr
   \code{\link[reproducible:cache-tools]{showCache}} \tab Shows information about the objects in the cache\cr
   \code{\link[reproducible:cache-tools]{clearCache}} \tab Removes objects from the cache\cr
   \code{\link[reproducible:cache-tools]{keepCache}} \tab Keeps only the objects described\cr
-  \code{\link[reproducible]{clearStubArtifacts}} \tab Removes any erroneous items in a cache repository\cr
 }
 
 A module developer can build caching into their module by creating cached versions of their
