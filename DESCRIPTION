@@ -93,6 +93,7 @@ Collate:
     'checkpoint.R'
     'code-checking.R'
     'copy.R'
+    'debugging.R'
     'downloadData.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
@@ -121,4 +122,4 @@ Collate:
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
