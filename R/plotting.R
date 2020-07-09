@@ -1,4 +1,3 @@
-
 if (!isGeneric("Plot")) {
   setGeneric("Plot", function(..., new, addTo, gp, gpText, gpAxis, axes,
                               speedup, size, cols, zoomExtent, visualSqueeze,
