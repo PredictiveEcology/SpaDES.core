@@ -204,8 +204,6 @@ setMethod(
         #  for (pathPoss in sim@paths[["modulePath"]]) {
         filename <- paste(m, "/", mBase, ".R", sep = "")
 
-        tmp <- .parseConditional(envir = envir, filename = filename)
-
         # duplicate -- put in namespaces location
         # If caching is being used, it is possible that exists
         if (!is.null(sim@.xData$.mods[[mBase]])) {
@@ -219,6 +217,8 @@ setMethod(
         # sim@.xData$.mods[[mBase]] <- new.env(parent = emptyenv())
         attr(sim@.xData$.mods[[mBase]], "name") <- mBase
         sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
+
+        tmp <- .parseConditional(envir = envir, filename = filename)
 
         # load all code into simList@.xData[[moduleName]]
         # The simpler line commented below will not allow actual code to be put into module,
