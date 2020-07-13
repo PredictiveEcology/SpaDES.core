@@ -29,22 +29,22 @@ simInitAndSpades(
 \item{params}{A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 See details.}
 
-\item{modules}{A named list of character strings specifying the names
-of modules to be loaded for the simulation. Note: the module name
-should correspond to the R source file from which the module is loaded.
-Example: a module named "caribou" will be sourced form the file
-\file{caribou.R}, located at the specified \code{modulePath(simList)} (see below).}
+\item{modules}{A named list of character strings specifying the names of modules to be loaded
+for the simulation.
+Note: the module name should correspond to the R source file from which the module is loaded.
+Example: a module named "caribou" will be sourced form the file \file{caribou.R},
+located at the specified \code{modulePath(simList)} (see below).}
 
 \item{objects}{(optional) A vector of object names (naming objects
 that are in the calling environment of
 the \code{simInit}, which is often the
-\code{.GlobalEnv} unless used programmatically
--- NOTE: this mechanism will
+\code{.GlobalEnv} unless used programmatically.
+NOTE: this mechanism will
 fail if object name is in a package dependency), or
 a named list of data objects to be
-passed into the simList (more reliable).
+passed into the \code{simList} (more reliable).
 These objects will be accessible
-from the simList as a normal list, e.g,. \code{mySim$obj}.}
+from the \code{simList} as a normal list, e.g,. \code{mySim$obj}.}
 
 \item{paths}{An optional named list with up to 4 named elements,
 \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
