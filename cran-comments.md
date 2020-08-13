@@ -10,22 +10,22 @@ See `NEWS.md` for a full list of changes.
 
 ### Previous R versions
 * Ubuntu 16.04              (travis-ci), R 3.6.3
-* Windows                    (appveyor), R 3.6.3
+* Windows                      (GitHub), R 3.6.3
 * Windows                 (win-builder), R 3.6.3
 
 ### Current R versions
-* macOS 10.13.3 High Sierra (travis-ci), R 4.0.0
-* macOS 10.15.4 Catalina        (local), R 4.0.0
-* Ubuntu 16.04              (travis-ci), R 4.0.0
-* Ubuntu 18.04                  (local), R 4.0.0
-* Windows                    (appveyor), R 4.0.0
+* macOS 10.15.6 Catalina       (GitHub), R 4.0.0
+* macOS 10.15.5 Catalina        (local), R 4.0.0
+* Ubuntu 18.04                 (GitHub), R 4.0.0
+* Ubuntu 20.04                  (local), R 4.0.0
+* Windows                      (GitHub), R 4.0.0
 * Windows                 (win-builder), R 4.0.0
 
 ### Development R version
-* Ubuntu 16.04              (travis-ci), R 4.1.0 (2020-05-13 r78453)
-* Ubuntu 18.04                  (local), R 4.1.0 (2020-05-13 r78456)
-* Windows                    (appveyor), R 4.1.0 (2020-05-12 r78431)
-* Windows                 (win-builder), R 4.1.0 (2020-05-11 r78411)
+* Ubuntu 18.04                 (GitHub), R 4.1.0 (2020-08-11 r79010)
+* Ubuntu 20.04                  (local), R 4.1.0 (2020-08-13 r79016)
+* Windows                      (GitHub), R 4.1.0 (2020-08-12 r79011)
+* Windows                 (win-builder), R 4.1.0 (2020-08-12 r79011)
 
 ## R CMD check results
 
