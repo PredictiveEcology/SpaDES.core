@@ -14,7 +14,7 @@ version 1.0.2
 
 ## bug fixes
 
-* minor bugfixes in sample modules
+* minor bug fixes in sample modules
 * module template has full path instead of `..` for `moduleParams` etc. This is more accurate. 
 * address changes to active bindings in R-devel
 * fix CRAN check errors

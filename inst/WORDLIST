@@ -4,7 +4,6 @@ activeBindings
 ageMap
 amongst
 Amongst
-Appveyor
 aren
 arg
 autocomplete
@@ -14,13 +13,13 @@ basedir
 benchmarking
 checkpointing
 Checkpointing
-checksum
 checksums
 Checksums
 checkUsage
 childModule
 choosealicense
 clockTime
+Codecov
 codetools
 color
 colored
@@ -57,10 +56,8 @@ Gantt
 ganttStatus
 getOption
 github
-GitHub
 globals
 GLPK
-google
 googledrive
 GoogleDrive
 http
@@ -76,7 +73,6 @@ inputObjects
 julia
 Landis
 lingua
-login
 macOS
 Matloff
 memoisable
@@ -104,13 +100,11 @@ NetLogo
 novo
 Oauth
 oldrel
-optimizations
 ORCID
 outputObjects
 overplot
 paramName
 params
-parseElems
 paste0
 PID
 pixelated
@@ -120,7 +114,6 @@ Pre
 PredictiveEcology
 programmatically
 ps
-quickPlot
 RasterLayer
 rasters
 Rasters
@@ -139,7 +132,6 @@ S3
 S4
 scalable
 SELES
-sim
 sim2gantt
 simInit
 simList
@@ -164,8 +156,3 @@ useCache
 userSuppliedObjNames
 v1
 vectorized
-Versioned
-versioning
-workflow
-Workflow
-workflows
