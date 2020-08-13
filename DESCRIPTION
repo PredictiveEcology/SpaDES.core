@@ -29,9 +29,9 @@ Authors@R: c(
     role = "cph")
     )
 Depends:
-    R (>= 3.5),
+    R (>= 3.6),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.1.1.9003)
+    reproducible (>= 1.2.0)
 Imports:
     backports,
     crayon,
@@ -74,8 +74,7 @@ Suggests:
     sf,
     SpaDES.tools (>= 0.2.0),
     rmarkdown,
-    testthat (>= 1.0.2),
-    usethis (>= 1.6.0)
+    testthat (>= 1.0.2)
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3

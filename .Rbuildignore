@@ -5,9 +5,6 @@
 .*\.toc$
 .*\.zip$
 ^\.lintr$
-^\.travis\.yml$
-^appveyor\.yml$
-^appveyor_cache.txt$
 CONTRIBUTING\.md
 cran-comments\.md
 ^docs$
@@ -16,3 +13,5 @@ vignettes/.*_cache$
 vignettes/.*\.log$
 ^\.httr-oauth$
 ^revdep$
+^\.github$
+^codecov\.yml$
