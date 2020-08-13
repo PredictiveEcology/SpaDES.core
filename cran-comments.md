@@ -9,7 +9,7 @@ See `NEWS.md` for a full list of changes.
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 16.04              (travis-ci), R 3.6.3
+* Ubuntu 18.04                 (GitHub), R 3.6.3
 * Windows                      (GitHub), R 3.6.3
 * Windows                 (win-builder), R 3.6.3
 
