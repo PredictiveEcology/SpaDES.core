@@ -330,7 +330,8 @@ loadSimList <- function(file) {
   mods <- setdiff(sim@modules, .coreModules())
   ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
   lapply(mods, function(mod) {
-    rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
+    if (!is.null(sim$.mods[[mod]]))
+      rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
     makeModActiveBinding(sim = sim, mod = mod)
   })
 
