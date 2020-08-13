@@ -125,4 +125,4 @@ spadesOptions <- function() {
     spades.useRequire = TRUE,
     spades.keepCompleted = TRUE
   )
-  }
+}
