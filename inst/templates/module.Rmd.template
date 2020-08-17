@@ -22,7 +22,7 @@ This is a template for module documentation, and should be changed to reflect yo
 
 R Markdown syntax allows R code, outputs, and figures to be rendered in the documentation.
 
-For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
+For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 
 # Usage
 

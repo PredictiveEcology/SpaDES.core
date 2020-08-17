@@ -119,7 +119,7 @@ Every module requires complete metadata, structured as a named list, and passed 
 **`keywords`**        | Character vector containing a module's keywords.
 **`childModules`**    | Character vector containing the names of the child modules that are part of this module.
 **`authors`**         | The author(s) of the module as a `person` object.
-**`version`**         | The module version as a character, numeric, or `numeric_version`. [Semantic versioning](http://semver.org/) is assumed.
+**`version`**         | The module version as a character, numeric, or `numeric_version`. [Semantic versioning](https://semver.org/) is assumed.
 **`spatialExtent`**   | Specifies the module's spatial extent as an `Extent` object.
 **`timeframe`**       | Specifies the valid timeframe for which the module was designed to simulate.
 &nbsp;                | Must be a `POSIXt` object of length `2`, specifying the start and end times.
@@ -396,7 +396,7 @@ As such, this documentation should include a high-level overview of the module a
 
 We strongly recommend using R Markdown (`.Rmd`) for this documentation, as it is easily human-readable while also being machine-readable and easily converted to a wide variety of file formats including `PDF`, `HTML`, and `DOCX`.
 Another benefit of using a text-based file format is to facilitate transparent document versioning and history using version control systems like `git`.
-For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
+For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 
 ## Citation, LICENSE, and README files
 
@@ -404,7 +404,7 @@ For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
 Most citation management software can read and output `.bib` format.
 
 - `LICENSE.txt` describes how your module can be redistributed and used by others.
-For help selecting a license, see [choosealicense.com](http://choosealicense.com).
+For help selecting a license, see [choosealicense.com](https://choosealicense.com).
 
 - `README.txt` is used to briefly document module metadata and version change information.
 
@@ -442,7 +442,7 @@ It is useful to not only check that the data files exist locally but that their 
 
 ## Versioned zip archives (`moduleName_x.y.z.zip`)
 
-Use [semantic versioning](http://semver.org), such that a version number `x.y.z` corresponds to:
+Use [semantic versioning](https://semver.org), such that a version number `x.y.z` corresponds to:
 
 - `x` is the **major** version (incremented when you make incompatible API changes)
 - `y` is the **minor** version (incremented when you add functionality in a backwards-compatible manner)

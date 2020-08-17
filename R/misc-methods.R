@@ -369,7 +369,7 @@ setMethod("rndstr",
 ################################################################################
 #' Filter objects by class
 #'
-#' Based on \url{http://stackoverflow.com/a/5158978/1380598}.
+#' Based on \url{https://stackoverflow.com/a/5158978/1380598}.
 #'
 #' @param x Character vector of object names to filter, possibly from \code{ls}.
 #'
@@ -384,7 +384,7 @@ setMethod("rndstr",
 #'
 #' @note \code{\link{inherits}} is used internally to check the object class,
 #' which can, in some cases, return results inconsistent with \code{is}.
-#' See \url{http://stackoverflow.com/a/27923346/1380598}.
+#' See \url{https://stackoverflow.com/a/27923346/1380598}.
 #' These (known) cases are checked manually and corrected.
 #'
 #' @export

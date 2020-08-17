@@ -21,7 +21,7 @@ specified by the global option \code{spades.moduleRepo}.
 Only \code{master} branches can be used at this point.}
 }
 \description{
-Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
+Modified from \url{https://stackoverflow.com/a/25485782/1380598}.
 }
 \details{
 \code{getModuleVersion} extracts a module's most recent version by
@@ -29,7 +29,7 @@ Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
          It takes the most recent version, based on the name of the zip file.
 
          See the modules vignette for details of module directory structure
-         (\url{http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+         (\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
          and see our SpaDES-modules repo for details of module repository structure
          (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 }

@@ -87,10 +87,9 @@ clearPlot()
 Plot(map)
 
 ## ---- eval=FALSE, echo=TRUE---------------------------------------------------
-#  simInit --> many .inputObjects calls
+#  simInit() --> many .inputObjects calls
 #  
-#  spades call --> many module calls --> many event calls --> many function calls
-#  
+#  spades() call --> many module calls --> many event calls --> many function calls
 
 ## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 #  parameters = list(

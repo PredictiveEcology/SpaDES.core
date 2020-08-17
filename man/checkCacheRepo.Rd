@@ -4,7 +4,7 @@
 \alias{.checkCacheRepo,list-method}
 \title{\code{.checkCacheRepo} for \code{simList} objects}
 \usage{
-\S4method{.checkCacheRepo}{list}(object, create = FALSE)
+\S4method{.checkCacheRepo}{list}(object, create)
 }
 \arguments{
 \item{object}{An R object}

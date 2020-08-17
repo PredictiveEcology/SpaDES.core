@@ -93,7 +93,7 @@ The following options are likely of interest to most users
     \tab  The default tolerance value used for floating
     point number comparisons. \cr
 
-  \code{spades.useragent} \tab \code{"http://github.com/PredictiveEcology/SpaDES"}.
+  \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
     \tab : The default user agent to use for downloading modules from GitHub.com. \cr
 
 }

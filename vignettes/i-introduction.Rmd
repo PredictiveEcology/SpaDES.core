@@ -77,9 +77,9 @@ However, there are various simple optimizations for `R` code, such as explicitly
 In cases were further improvements are required, the `Rcpp` package [@Eddelbuettel:2011Rcpp; @Eddelbuettel:2013Rcpp] allows easy writing of low memory footprint `C++` code that can then be called in `R`.
 Likewise, numerous upgrades to R, including minimizing object copying since `R` version `3.0`, and extremely powerful user developed packages, like `data.table` and `dplyr` are eliminating many of these concerns.
 
-[^julia]: http://julialang.org
+[^julia]: https://julialang.org
 
-[^benchmarks]: http://PredictiveEcology.org/benchmarking
+[^benchmarks]: https://PredictiveEcology.org/benchmarking
 
 ## Discrete event simulation and `SpaDES`
 
@@ -310,7 +310,7 @@ To view available vignettes use `browseVignettes(package = "SpaDES.core")` (this
 
 ### Website
 
-[http://SpaDES.PredictiveEcology.org](http://SpaDES.PredictiveEcology.org)
+[https://SpaDES.PredictiveEcology.org](https://SpaDES.PredictiveEcology.org)
 
 ### Wiki
 

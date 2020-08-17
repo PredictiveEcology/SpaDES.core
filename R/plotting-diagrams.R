@@ -114,7 +114,7 @@ setMethod(
 #' the width of the bar associated with a particular module's event DOES NOT
 #' correspond to an event's "duration".
 #'
-#' Based on this StackOverflow answer: \url{http://stackoverflow.com/a/29999300/1380598}.
+#' Based on this StackOverflow answer: \url{https://stackoverflow.com/a/29999300/1380598}.
 #'
 #' @note
 #' A red vertical line corresponding to the current date may appear on the figure.

@@ -323,7 +323,7 @@
 #'
 #' \subsection{5.8 SELES-type approach to simulation}{
 #'   These functions are essentially skeletons and are not fully implemented.
-#'   They are intended to make translations from \href{http://www.gowlland.ca/}{SELES}.
+#'   They are intended to make translations from SELES (https://www.gowlland.ca/).
 #'   You must know how to use SELES for these to be useful:
 #'
 #'   \tabular{ll}{
@@ -501,7 +501,7 @@
 #'     point number comparisons. Default \code{.Machine$double.eps^0.5}.
 #'
 #'   \item \code{spades.useragent}: The default user agent to use for downloading
-#'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
+#'     modules from GitHub.com. Default \code{"https://github.com/PredictiveEcology/SpaDES"}.
 #' }
 #'
 #' @seealso \code{\link{spadesOptions}}
