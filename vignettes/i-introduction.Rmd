@@ -79,7 +79,7 @@ Likewise, numerous upgrades to R, including minimizing object copying since `R` 
 
 [^julia]: https://julialang.org
 
-[^benchmarks]: https://PredictiveEcology.org/benchmarking
+[^benchmarks]: https://PredictiveEcology.org/benchmarking/
 
 ## Discrete event simulation and `SpaDES`
 

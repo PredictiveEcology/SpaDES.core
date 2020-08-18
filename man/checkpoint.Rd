@@ -62,7 +62,7 @@ by scheduling checkpoint events.
 \details{
 RNG save code adapted from:
 \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
-and \url{https://stackoverflow.com/questions/13997444/}
+and \url{https://stackoverflow.com/q/13997444/1380598}
 }
 \seealso{
 \code{\link{.Random.seed}}.

@@ -17,7 +17,7 @@ utils::globalVariables(".")
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @author Alex Chubaty
 #' @export
@@ -327,7 +327,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @examples
 #' \dontrun{
@@ -465,7 +465,7 @@ scheduleEvent <- function(sim,
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @examples
 #'   sim <- simInit(times = list(start = 0, end = 2))
@@ -734,7 +734,7 @@ scheduleConditionalEvent <- function(sim,
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @examples
 #' \dontrun{

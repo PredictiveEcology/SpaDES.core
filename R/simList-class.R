@@ -95,7 +95,7 @@
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @aliases simList
 #' @author Alex Chubaty and Eliot McIntire
