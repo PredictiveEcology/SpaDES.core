@@ -10,6 +10,7 @@ version 1.0.2
 * new helper functions for debugging: `writeEventInfo()` and `writeRNGInfo()` to write info to file.
 
 ## dependencies
+* drop support for R < 3.6
 * removed imports from `stringi`
 
 ## bug fixes
