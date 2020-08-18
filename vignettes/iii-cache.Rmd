@@ -1,5 +1,5 @@
 ---
-title: "03 Caching SpaDES simulations"
+title: "03 Caching `SpaDES` simulations"
 author:
   - "Eliot J. B. McIntire"
 date: '`r strftime(Sys.Date(), "%B %d %Y")`'
@@ -10,7 +10,7 @@ output:
     self_contained: yes
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{03 Caching SpaDES simulations}
+  %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
   %\VignetteDepends{igraph, raster, reproducible, SpaDES.core}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}

@@ -1,5 +1,5 @@
 ---
-title: "02 Building modules in `SpaDES`"
+title: "02 Building `SpaDES` modules"
 author:
   - "Alex M. Chubaty"
 date: '`r strftime(Sys.Date(), "%B %d %Y")`'
@@ -9,7 +9,7 @@ output:
     self_contained: false
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{02 Building SpaDES modules}
+  %\VignetteIndexEntry{02 Building `SpaDES` modules}
   %\VignetteDepends{data.table, DiagrammeR, igraph, RandomFields, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}

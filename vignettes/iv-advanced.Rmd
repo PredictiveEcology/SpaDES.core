@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{04 Advanced SpaDES use}
+  %\VignetteIndexEntry{04 Advanced `SpaDES` use}
   %\VignetteDepends{SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{discrete event simulation, spatial simulation models}
   %\VignetteEncoding{UTF-8}
