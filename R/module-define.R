@@ -61,7 +61,7 @@ moduleDefaults <- list(
 #'    \code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
 #'                        if a character or numeric are supplied).
 #'                        The module developer should update manually this with each change
-#'                        that is made to the module. See \url{http://semver.org/}
+#'                        that is made to the module. See \url{https://semver.org/}
 #'                        for a widely accepted standard for version numbering.\cr
 #'    \code{spatialExtent} \tab The spatial extent of the module supplied via
 #'                              \code{raster::extent}. This is currently unimplemented.

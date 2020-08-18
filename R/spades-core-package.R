@@ -488,7 +488,7 @@
 #'   > 1 event in the past, i.e., redo some of the "completed" events. Default is
 #'   \code{TRUE}, i.e., it will keep the state of the \code{simList}
 #'   at the start of the current event. This can be recovered with \code{restartSpades}
-#'   and the differences can be seen in a hidden object in the stashed simList.
+#'   and the differences can be seen in a hidden object in the stashed \code{simList.}
 #'   There is a message which describes how to find that.
 #'
 #'   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
@@ -501,7 +501,7 @@
 #'     point number comparisons. Default \code{.Machine$double.eps^0.5}.
 #'
 #'   \item \code{spades.useragent}: The default user agent to use for downloading
-#'     modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
+#'     modules from GitHub.com. Default \code{"https://github.com/PredictiveEcology/SpaDES"}.
 #' }
 #'
 #' @seealso \code{\link{spadesOptions}}

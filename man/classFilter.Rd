@@ -32,12 +32,12 @@ Default is the calling environment.}
 Vector of object names matching the class filter.
 }
 \description{
-Based on \url{http://stackoverflow.com/a/5158978/1380598}.
+Based on \url{https://stackoverflow.com/a/5158978/1380598}.
 }
 \note{
 \code{\link{inherits}} is used internally to check the object class,
 which can, in some cases, return results inconsistent with \code{is}.
-See \url{http://stackoverflow.com/a/27923346/1380598}.
+See \url{https://stackoverflow.com/a/27923346/1380598}.
 These (known) cases are checked manually and corrected.
 }
 \examples{

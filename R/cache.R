@@ -338,7 +338,7 @@ if (!isGeneric(".checkCacheRepo")) {
 setMethod(
   ".checkCacheRepo",
   signature = "list",
-  definition = function(object, create) {
+  definition = function(object, create = FALSE) {
     object <- .findSimList(object)
     whSimList <- unlist(lapply(object, is, "simList"))
 
