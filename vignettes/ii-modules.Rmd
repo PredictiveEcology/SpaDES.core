@@ -442,7 +442,7 @@ It is useful to not only check that the data files exist locally but that their 
 
 ## Versioned zip archives (`moduleName_x.y.z.zip`)
 
-Use [semantic versioning](https://semver.org), such that a version number `x.y.z` corresponds to:
+Use [semantic versioning](https://semver.org/), such that a version number `x.y.z` corresponds to:
 
 - `x` is the **major** version (incremented when you make incompatible API changes)
 - `y` is the **minor** version (incremented when you add functionality in a backwards-compatible manner)
