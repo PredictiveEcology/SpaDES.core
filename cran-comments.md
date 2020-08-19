@@ -20,10 +20,10 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.0.0
 
 ### Development R version
-* Ubuntu 18.04                 (GitHub), R 4.1.0 (2020-08-11 r79010)
+* Ubuntu 18.04                 (GitHub), R 4.1.0 (2020-08-17 r79033)
 * Ubuntu 20.04                  (local), R 4.1.0 (2020-08-18 r79041)
-* Windows                      (GitHub), R 4.1.0 (2020-08-12 r79011)
-* Windows                 (win-builder), R 4.1.0 (2020-08-17 r79033)
+* Windows                      (GitHub), R 4.1.0 (2020-08-17 r79033)
+* Windows                 (win-builder), R 4.1.0 (2020-08-18 r79041)
 
 ## R CMD check results
 
