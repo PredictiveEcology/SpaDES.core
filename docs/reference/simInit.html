@@ -88,7 +88,7 @@ See more details below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -114,13 +114,13 @@ See more details below." />
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -242,24 +242,24 @@ See details.</p></td>
     </tr>
     <tr>
       <th>modules</th>
-      <td><p>A named list of character strings specifying the names
-of modules to be loaded for the simulation. Note: the module name
-should correspond to the R source file from which the module is loaded.
-Example: a module named "caribou" will be sourced form the file
-<code class="file">caribou.R</code>, located at the specified <code><a href='simList-accessors-paths.html'>modulePath(simList)</a></code> (see below).</p></td>
+      <td><p>A named list of character strings specifying the names of modules to be loaded
+for the simulation.
+Note: the module name should correspond to the R source file from which the module is loaded.
+Example: a module named "caribou" will be sourced form the file <code class="file">caribou.R</code>,
+located at the specified <code><a href='simList-accessors-paths.html'>modulePath(simList)</a></code> (see below).</p></td>
     </tr>
     <tr>
       <th>objects</th>
       <td><p>(optional) A vector of object names (naming objects
 that are in the calling environment of
 the <code>simInit</code>, which is often the
-<code>.GlobalEnv</code> unless used programmatically
--- NOTE: this mechanism will
+<code>.GlobalEnv</code> unless used programmatically.
+NOTE: this mechanism will
 fail if object name is in a package dependency), or
 a named list of data objects to be
-passed into the simList (more reliable).
+passed into the <code>simList</code> (more reliable).
 These objects will be accessible
-from the simList as a normal list, e.g,. <code>mySim$obj</code>.</p></td>
+from the <code>simList</code> as a normal list, e.g,. <code>mySim$obj</code>.</p></td>
     </tr>
     <tr>
       <th>paths</th>
@@ -378,7 +378,7 @@ This ensures you retain access to the original objects, which would otherwise
 be overwritten/modified during the simulation.</p>
 <p>The user can opt to run a simpler <code>simInit</code> call without inputs, outputs, and times.
 These can be added later with the accessor methods (See example).
-These are not required for initializing the simulation via simInit.
+These are not required for initializing the simulation via <code>simInit</code>.
 All of <code>modules</code>, <code>paths</code>, <code>params</code>, and <code>objects</code> are needed
 for successful initialization.</p>
     <h2 class="hasAnchor" id="parsing-and-checking-code"><a class="anchor" href="#parsing-and-checking-code"></a>Parsing and Checking Code</h2>
@@ -386,22 +386,19 @@ for successful initialization.</p>
     
 
 
-<p>The <code>simInit</code> function will attempt to find usage of sim$xxx
-or sim[['xxx']] on either side of the assignment "&lt;-" operator.
-It will compare these to the module metadata, specifically
-<code>inputObjects</code> for cases where objects or "gotten" from the
-simList and <code>outputObjects</code> for cases where objects are
-assigned to the simList.</p>
-<p>It will also attempt to find potential, common function name conflicts
-with things like scale and stack (both in base and raster), and
-Plot (in quickPlot and some modules).</p>
-<p><em>This code checking is young and may get false positives and
-false negatives -- i.e., miss things</em>. It also takes computational
-time, which may be undesirable in operational code.
-To turn off checking (i.e.,
-if there are too many false positives and negatives), set
-the option <code>spades.moduleCodeChecks</code> to <code>FALSE</code>,
-e.g., <code><a href='https://rdrr.io/r/base/options.html'>options(spades.moduleCodeChecks = FALSE)</a></code></p>
+<p>The <code>simInit</code> function will attempt to find usage of <code>sim$xxx</code> or <code>sim[['xxx']]</code>
+ on either side of the assignment (<code>&lt;-</code>) operator.
+It will compare these to the module metadata, specifically <code>inputObjects</code> for cases where
+objects or "gotten" from the <code>simList</code> and <code>outputObjects</code> for cases where objects are
+assigned to the <code>simList.</code></p>
+<p>It will also attempt to find potential, common function name conflicts with things like
+<code>scale</code> and <code>stack</code> (both in <span class="pkg">base</span> and <span class="pkg">raster</span>), and
+<code>Plot</code> (in <span class="pkg">quickPlot</span> and some modules).</p>
+<p><em>This code checking is young and may get false positives and false negatives,
+i.e., miss things</em>.
+It also takes computational time, which may be undesirable in operational code.
+To turn off checking (i.e., if there are too many false positives and negatives), set
+<code><a href='https://rdrr.io/r/base/options.html'>options(spades.moduleCodeChecks = FALSE)</a></code>.</p>
     <h2 class="hasAnchor" id="caching"><a class="anchor" href="#caching"></a>Caching</h2>
 
     
@@ -413,7 +410,7 @@ Please see the vignette dedicated to this topic.</p>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
-            Retrieved from <a href='https://www.nostarch.com/artofr.htm'>https://www.nostarch.com/artofr.htm</a></p>
+            Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='spades.html'>spades</a></code>,

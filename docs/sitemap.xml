@@ -406,6 +406,12 @@
     <loc>http://spades-core.predictiveecology.org//reference/verb.html</loc>
   </url>
   <url>
+    <loc>http://spades-core.predictiveecology.org//reference/writeEventInfo.html</loc>
+  </url>
+  <url>
+    <loc>http://spades-core.predictiveecology.org//reference/writeRNGInfo.html</loc>
+  </url>
+  <url>
     <loc>http://spades-core.predictiveecology.org//reference/zipModule.html</loc>
   </url>
   <url>

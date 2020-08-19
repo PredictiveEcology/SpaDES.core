@@ -40,7 +40,10 @@
 
 
 <meta property="og:title" content="Extract a module's parameters, inputs, or outputs — moduleParams" />
-<meta property="og:description" content="These are simply wrappers around moduleMetadata." />
+<meta property="og:description" content="These are more or less wrappers around moduleMetadata, with the exception
+that extraneous spaces and End-Of-Line characters will be removed from the
+desc arguments in defineParameters, defineInputs, and
+defineOutputs" />
 
 
 
@@ -82,7 +85,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -108,13 +111,13 @@
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -148,7 +151,10 @@
     </div>
 
     <div class="ref-description">
-    <p>These are simply wrappers around <code>moduleMetadata</code>.</p>
+    <p>These are more or less wrappers around <code>moduleMetadata</code>, with the exception
+that extraneous spaces and End-Of-Line characters will be removed from the
+<code>desc</code> arguments in <code>defineParameters</code>, <code>defineInputs</code>, and
+<code>defineOutputs</code></p>
     </div>
 
     <pre class="usage"><span class='fu'>moduleParams</span>(<span class='no'>module</span>, <span class='no'>path</span>)
@@ -196,17 +202,17 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 <span class='co'>## easily include these tables in Rmd files using knitr</span>
 <span class='kw pkg'>knitr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='no'>p</span>)</div><div class='output co'>#&gt; 
 #&gt; 
-#&gt; |paramName        |paramClass |default    |min               |max   |paramDesc                                         |
-#&gt; |:----------------|:----------|:----------|:-----------------|:-----|:-------------------------------------------------|
-#&gt; |inRAM            |logical    |FALSE      |TRUE              |FALSE |should the raster be stored in memory?            |
-#&gt; |nx               |numeric    |100        |10                |500   |size of map (number of pixels) in the x dimension |
-#&gt; |ny               |numeric    |100        |10                |500   |size of map (number of pixels) in the y dimension |
-#&gt; |stackName        |character  |landscape  |NA                |NA    |name of the RasterStack                           |
-#&gt; |.plotInitialTime |numeric    |start(sim) |start(sim)        |NA    |time to schedule first plot event                 |
-#&gt; |.plotInterval    |numeric    |NA         |NA                |NA    |time interval between plot events                 |
-#&gt; |.saveInitialTime |numeric    |NA         |NA                |NA    |time to schedule first save event                 |
-#&gt; |.saveInterval    |numeric    |NA         |NA                |NA    |time interval between save events                 |
-#&gt; |.useCache        |logical    |FALSE      |c("init", "plot") |NA    |should the module result be cached for future use |</div><div class='input'><span class='kw pkg'>knitr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='no'>i</span>)</div><div class='output co'>#&gt; 
+#&gt; |paramName        |paramClass |default    |min        |max   |paramDesc                                         |
+#&gt; |:----------------|:----------|:----------|:----------|:-----|:-------------------------------------------------|
+#&gt; |inRAM            |logical    |FALSE      |TRUE       |FALSE |should the raster be stored in memory?            |
+#&gt; |nx               |numeric    |100        |10         |500   |size of map (number of pixels) in the x dimension |
+#&gt; |ny               |numeric    |100        |10         |500   |size of map (number of pixels) in the y dimension |
+#&gt; |stackName        |character  |landscape  |NA         |NA    |name of the RasterStack                           |
+#&gt; |.plotInitialTime |numeric    |start(sim) |start(sim) |NA    |time to schedule first plot event                 |
+#&gt; |.plotInterval    |numeric    |NA         |NA         |NA    |time interval between plot events                 |
+#&gt; |.saveInitialTime |numeric    |NA         |NA         |NA    |time to schedule first save event                 |
+#&gt; |.saveInterval    |numeric    |NA         |NA         |NA    |time interval between save events                 |
+#&gt; |.useCache        |logical    |FALSE      |init, plot |NA    |should the module result be cached for future use |</div><div class='input'><span class='kw pkg'>knitr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='no'>i</span>)</div><div class='output co'>#&gt; 
 #&gt; 
 #&gt; |objectName |objectClass |desc |sourceURL |other |
 #&gt; |:----------|:-----------|:----|:---------|:-----|

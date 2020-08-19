@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Plot method for <code>simList</code> objects — Plot,simList-method" />
-<meta property="og:description" content="Extends Plot for simList objects." />
+<meta property="og:description" content="Extends quickPlot::Plot for simList objects." />
 
 
 
@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -108,13 +108,13 @@
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -148,7 +148,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Extends <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>Plot</a></code> for <code>simList</code> objects.</p>
+    <p>Extends <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>quickPlot::Plot</a></code> for <code>simList</code> objects.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
@@ -212,7 +212,7 @@ the plot with the same name, such as plotting a
     </tr>
     <tr>
       <th>gp</th>
-      <td><p>A <code>gpar</code> object, created by <code><a href='http://quickplot.predictiveecology.org//reference/grid-functions.html'>gpar</a></code> function,
+      <td><p>A <code>gpar</code> object, created by <code>gpar</code>,
 to change plotting parameters (see <span class="pkg">grid</span> package).</p></td>
     </tr>
     <tr>
@@ -227,8 +227,7 @@ Default <code>gpar(col = "black")</code>.</p></td>
     </tr>
     <tr>
       <th>axes</th>
-      <td><p>Logical or <code>"L"</code>, representing the left and bottom axes,
-over all plots.</p></td>
+      <td><p>Logical or <code>"L"</code>, representing the left and bottom axes, over all plots.</p></td>
     </tr>
     <tr>
       <th>speedup</th>
@@ -331,15 +330,13 @@ let Plot function do it automatically.</p></td>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Plot for simList class objects</p>
-<p>See <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>Plot</a></code>. This method strips out stuff
-from a simList class object that would make it otherwise not
-reproducibly digestible between sessions, operating systems,
-or machines. This will likely still not allow identical digest
-results across R versions.</p>
+    <p>See <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>quickPlot::Plot</a></code>.
+This method strips out stuff from a <code>simList</code> class object that would make it otherwise not
+reproducibly digestible between sessions, operating systems, or machines.
+This will likely still not allow identical digest results across R versions.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>Plot</a></code></p></div>
+    <div class='dont-index'><p><code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>quickPlot::Plot</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

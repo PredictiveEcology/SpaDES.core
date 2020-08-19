@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Determine the size of a remotely hosted file — remoteFileSize" />
-<meta property="og:description" content="Query a remote web server to determine the size of a remote file." />
+<meta property="og:description" content="Deprecated." />
 
 
 
@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -108,13 +108,13 @@
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -148,7 +148,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Query a remote web server to determine the size of a remote file.</p>
+    <p>Deprecated.</p>
     </div>
 
     <pre class="usage"><span class='fu'>remoteFileSize</span>(<span class='no'>url</span>)</pre>
@@ -166,17 +166,6 @@
 
     <p>A numeric indicating the size of the remote file in bytes.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>urls</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl"</span>,
-          <span class='st'>"https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip"</span>,
-          <span class='st'>"http://example.com/doesntexist.csv"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/try.html'>try</a></span>(<span class='fu'>remoteFileSize</span>(<span class='no'>urls</span>)) <span class='co'>## 5429, 3997384, 0</span></div><div class='output co'>#&gt; https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl 
-#&gt;                                                                        5429 
-#&gt;       https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip 
-#&gt;                                                                     3997384 
-#&gt;                                          http://example.com/doesntexist.csv 
-#&gt;                                                                           0 </div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

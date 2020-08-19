@@ -84,7 +84,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -110,13 +110,13 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -229,7 +229,7 @@ parameter for all modules. See Details.</p></td>
     </tr>
     <tr>
       <th>notOlderThan</th>
-      <td><p>Date or time. Passed to <code><a href='https://reproducible.predictiveecology.org/reference/cache.html'>reproducible::Cache</a></code> to update the cache.
+      <td><p>Date or time. Passed to <code><a href='https://reproducible.predictiveecology.org/reference/Cache.html'>reproducible::Cache</a></code> to update the cache.
 Default is <code>NULL</code>, meaning don't update the cache.
 If <code><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time()</a></code> is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
@@ -307,24 +307,15 @@ messaging via <code>message</code> will be shown; this means that <code>suppress
 will work to suppress messaging only when level is set to <code>"INFO"</code> or <code>20</code>.
 Some functions in the SpaDES ecosystem may have information at the lower levels,
 but currently, there are few to none.</p>
-<p><code>debug</code> can be a logical, character vector or a numeric scalar (currently
-1 or 2).
-If <code>debug</code> is specified and is not <code>FALSE</code>, 2 things could happen:
-1) there can be messages sent to console, such as events as they pass by, and
-2) if <code><a href='https://rdrr.io/r/base/options.html'>options("spades.browserOnError" = TRUE)</a></code> (experimental still) if
-there is an error, it will attempt to open a browser
-in the event where the error occurred. You can edit, and then press <code>c</code> to continue
-or <code>Q</code> to quit, plus all other normal interactive browser tools.
-<code>c</code> will trigger a reparse and events will continue as scheduled, starting
-with the one just edited. There may be some unexpected consequences if the
-<code>simList</code> objects had already been changed before the error occurred.</p>
-<p>If not specified in the function call, the package
-option <code>spades.debug</code> is used. The following
-options for debug are available:</p>
+<p><code>debug</code> is specified as a non-list argument to <code>spades</code> or as
+<code><a href='https://rdrr.io/r/base/list.html'>list(debug = ...)</a></code>, then it can be a logical, a quoted call, a character vector
+or a numeric scalar (currently 1 or 2) or a list of any of these to get multiple
+outputs. This will be run at the start of every event. The following options for debug
+are available. Each of these can also be in a list to get multiple outputs:</p>
 <table class='table'>
-<tr><td><code>TRUE</code></td><td>the event immediately following will be printed as it
-runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</a></code>).</td></tr>
-<tr><td>function name (as character string)</td><td>If a function, then it will be run on the
+<tr><td><code>TRUE</code></td><td><code><a href='simList-accessors-events.html'>current(sim)</a></code> will be printed at the start of each event as
+                    it runs</td></tr>
+<tr><td>a function name (as character string)</td><td>If a function, then it will be run on the
                                            simList, e.g., "time" will run
                                            <code><a href='https://rdrr.io/r/stats/time.html'>time(sim)</a></code> at each event.</td></tr>
 <tr><td>moduleName (as character string)</td><td>All calls to that module will be entered
@@ -333,26 +324,34 @@ runs (equivalent to <code><a href='simList-accessors-events.html'>current(sim)</
                                        will be entered interactively</td></tr>
 <tr><td><code>c(&lt;moduleName&gt;, &lt;eventName&gt;)</code></td><td>Only the event in that specified module
                                             will be entered into.</td></tr>
-<tr><td>Any other R expression expressed as a character string</td><td>Will be evaluated with access to the simList as 'sim'.
+<tr><td>Any other R expression expressed as a character string or quoted call</td><td>Will be evaluated with access to the simList as 'sim'.
                                If this is more than one character string, then all will
                                be printed to the screen in their sequence.</td></tr>
 <tr><td>A numeric scalar, currently 1 or 2 (maybe others)</td><td>This will print out alternative forms of event
                                           information that users may find useful</td></tr>
-<tr><td>information that users may find useful</td><td></td></tr>
 </table>
 
 
+<p>If not specified in the function call, the package
+option <code>spades.debug</code> is used.</p>
+<p>If <code><a href='https://rdrr.io/r/base/options.html'>options("spades.browserOnError" = TRUE)</a></code> (experimental still) if
+there is an error, it will attempt to open a browser
+in the event where the error occurred. You can edit, and then press <code>c</code> to continue
+or <code>Q</code> to quit, plus all other normal interactive browser tools.
+<code>c</code> will trigger a reparse and events will continue as scheduled, starting
+with the one just edited. There may be some unexpected consequences if the
+<code>simList</code> objects had already been changed before the error occurred.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
-            Retrieved from <a href='https://www.nostarch.com/artofr.htm'>https://www.nostarch.com/artofr.htm</a></p>
+            Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>,
 <code><a href='simInit.html'>simInit</a></code>, and the caching vignette (very important for reproducibility):
 <a href='https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html</a> which
-uses <code><a href='https://reproducible.predictiveecology.org/reference/cache.html'>Cache</a></code>.</p></div>
+uses <code><a href='https://reproducible.predictiveecology.org/reference/Cache.html'>Cache</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -373,6 +372,8 @@ uses <code><a href='https://reproducible.predictiveecology.org/reference/cache.h
 <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='co'># Fastest</span>
 <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='st'>"simList"</span>)
 <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='st'>"print(table(sim$landscape$Fires[]))"</span>)
+<span class='co'># To get a combination -- use list(debug = list(..., ...))</span>
+<span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>debug</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>sim</span>$<span class='no'>landscape</span>$<span class='no'>Fires</span>[]))))))
 
 <span class='co'># Can turn off plotting, and inspect the output simList instead</span>
 <span class='no'>out</span> <span class='kw'>&lt;-</span> <span class='fu'>spades</span>(<span class='no'>mySim</span>, <span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='fl'>NA</span>) <span class='co'># much faster</span>

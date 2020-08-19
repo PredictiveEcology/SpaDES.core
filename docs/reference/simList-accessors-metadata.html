@@ -83,7 +83,7 @@ in a simList if not specified." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -109,13 +109,13 @@ in a simList if not specified." />
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -168,10 +168,13 @@ in a <code>simList</code> if not specified.</p>
 <span class='co'># S4 method for simList</span>
 <span class='fu'>outputObjectNames</span>(<span class='no'>sim</span>, <span class='no'>module</span>)
 
-<span class='fu'>reqdPkgs</span>(<span class='no'>sim</span>, <span class='no'>module</span>)
+<span class='fu'>reqdPkgs</span>(<span class='no'>sim</span>, <span class='no'>module</span>, <span class='no'>modulePath</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>reqdPkgs</span>(<span class='no'>sim</span>, <span class='no'>module</span>)
+<span class='fu'>reqdPkgs</span>(<span class='no'>sim</span>, <span class='no'>module</span>, <span class='no'>modulePath</span>)
+
+<span class='co'># S4 method for missing</span>
+<span class='fu'>reqdPkgs</span>(<span class='no'>sim</span>, <span class='no'>module</span>, <span class='no'>modulePath</span>)
 
 <span class='fu'>documentation</span>(<span class='no'>sim</span>, <span class='no'>module</span>)
 
@@ -196,7 +199,13 @@ in which to replace element(s).</p></td>
     </tr>
     <tr>
       <th>module</th>
-      <td><p>Optional character string indicating which module params should come from.</p></td>
+      <td><p>Character vector of module name(s)</p></td>
+    </tr>
+    <tr>
+      <th>modulePath</th>
+      <td><p>That path where <code>module</code> can be found. If set already
+using <code>setPaths</code>, it will use that. This will be ignored if <code>sim</code>
+is supplied and is required if <code>sim</code> not supplied</p></td>
     </tr>
     <tr>
       <th>package</th>
@@ -223,6 +232,24 @@ a <code>simList</code> or a character string for a package name.</p></td>
     </table>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># To pre-install and pre-load all packages prior to simInit</span>
+
+<span class='co'># set modulePath</span>
+<span class='fu'><a href='setPaths.html'>setPaths</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+#&gt; <span class='message'>  options(</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
+#&gt; <span class='message'>  options(</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpPhltyE/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpPhltyE/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpPhltyE/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpPhltyE/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='input'><span class='co'># use Require and reqdPkgs</span>
+<span class='kw'>if</span> (!<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/chooseCRANmirror.html'>chooseCRANmirror</a></span>(<span class='kw'>ind</span> <span class='kw'>=</span> <span class='fl'>1</span>) <span class='co'>#</span>
+<span class='fu'>Require</span>(<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span>(<span class='fu'>reqdPkgs</span>(<span class='kw'>module</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"caribouMovement"</span>, <span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>))))</div><div class='output co'>#&gt; <span class='message'>Installing packages into ‘/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: packages ‘caribouMovement1’, ‘caribouMovement3’, ‘caribouMovement4’, ‘fireSpread1’, ‘randomLandscapes1’, ‘randomLandscapes2’, ‘randomLandscapes3’ are not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; named logical(0)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

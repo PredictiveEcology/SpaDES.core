@@ -85,7 +85,7 @@ objSize(completed(sim))." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -111,13 +111,13 @@ objSize(completed(sim))." />
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -198,11 +198,11 @@ Default <code>TRUE</code>.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>d</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='fl'>2</span>:<span class='fl'>20</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpZLO6Zz/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpZLO6Zz/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpZLO6Zz/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpZLO6Zz/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpZLO6Zz/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpPhltyE/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpPhltyE/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpPhltyE/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpPhltyE/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpPhltyE/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>objSize</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; $`x@.xData$b`
 #&gt; 176 bytes
 #&gt; 
@@ -212,11 +212,150 @@ Default <code>TRUE</code>.</p></td>
 #&gt; $`x@.xData$.userSuppliedObjNames`
 #&gt; 176 bytes
 #&gt; 
+#&gt; $`x@.xData$.mods`
+#&gt; $`x@.xData$.mods`$y
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
 #&gt; $`x@.xData`
 #&gt; 280 bytes
 #&gt; 
 #&gt; $simListWithoutObjects
-#&gt; named list()
+#&gt; $simListWithoutObjects[[1]]
+#&gt; $simListWithoutObjects[[1]][[1]]
+#&gt; 120 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[1]][[2]]
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[1]][[3]]
+#&gt; 120 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[1]][[4]]
+#&gt; 112 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[2]]
+#&gt; $simListWithoutObjects[[2]]$.checkpoint
+#&gt; $simListWithoutObjects[[2]]$.checkpoint$file
+#&gt; 0 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[2]]$.checkpoint$interval
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[2]]$.progress
+#&gt; $simListWithoutObjects[[2]]$.progress$interval
+#&gt; 56 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[2]]$.progress$type
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[3]]
+#&gt; $simListWithoutObjects[[3]][[1]]
+#&gt; $simListWithoutObjects[[3]][[1]]$eventTime
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[1]]$moduleName
+#&gt; 120 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[1]]$eventType
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[1]]$eventPriority
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[2]]
+#&gt; $simListWithoutObjects[[3]][[2]]$eventTime
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[2]]$moduleName
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[2]]$eventType
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[2]]$eventPriority
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[3]]
+#&gt; $simListWithoutObjects[[3]][[3]]$eventTime
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[3]]$moduleName
+#&gt; 120 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[3]]$eventType
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[3]]$eventPriority
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[4]]
+#&gt; $simListWithoutObjects[[3]][[4]]$eventTime
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[4]]$moduleName
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[4]]$eventType
+#&gt; 112 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[3]][[4]]$eventPriority
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[4]]
+#&gt; $simListWithoutObjects[[4]]$y
+#&gt; 56 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[5]]
+#&gt; 688 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[6]]
+#&gt; $simListWithoutObjects[[6]]$current
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[6]]$start
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[6]]$end
+#&gt; 280 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[6]]$timeunit
+#&gt; 112 bytes
+#&gt; 
+#&gt; 
+#&gt; $simListWithoutObjects[[7]]
+#&gt; 1792 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[8]]
+#&gt; 1704 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[9]]
+#&gt; $simListWithoutObjects[[9]]$cachePath
+#&gt; 136 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[9]]$inputPath
+#&gt; 152 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[9]]$modulePath
+#&gt; 152 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[9]]$outputPath
+#&gt; 152 bytes
+#&gt; 
+#&gt; $simListWithoutObjects[[9]]$rasterPath
+#&gt; 136 bytes
+#&gt; 
+#&gt; 
 #&gt; </div><div class='input'><span class='kw pkg'>utils</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/utils/object.size.html'>object.size</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; 16712 bytes</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

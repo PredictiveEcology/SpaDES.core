@@ -84,7 +84,7 @@ values set to defaults" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -110,13 +110,13 @@ values set to defaults" />
       <a href="../articles/i-introduction.html">01 Introduction to `SpaDES`</a>
     </li>
     <li>
-      <a href="../articles/ii-modules.html">02 Building modules in `SpaDES`</a>
+      <a href="../articles/ii-modules.html">02 Building `SpaDES` modules</a>
     </li>
     <li>
-      <a href="../articles/iii-cache.html">03 Using `Cache` with `SpaDES`</a>
+      <a href="../articles/iii-cache.html">03 Caching `SpaDES` simulations</a>
     </li>
     <li>
-      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use -- in progress</a>
+      <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
   </ul>
 </li>
@@ -206,7 +206,7 @@ in which to replace element(s).</p></td>
 <tr><td><code>version</code></td><td>Module version number (will be coerced to <code><a href='https://rdrr.io/r/base/numeric_version.html'>numeric_version</a></code>
                        if a character or numeric are supplied).
                        The module developer should update manually this with each change
-                       that is made to the module. See <a href='http://semver.org/'>http://semver.org/</a>
+                       that is made to the module. See <a href='https://semver.org/'>https://semver.org/</a>
                        for a widely accepted standard for version numbering.</td></tr>
 <tr><td><code>spatialExtent</code></td><td>The spatial extent of the module supplied via
                              <code><a href='https://rdrr.io/pkg/raster/man/extent.html'>raster::extent</a></code>. This is currently unimplemented.
@@ -233,9 +233,9 @@ in which to replace element(s).</p></td>
 <tr><td></td><td><code>reqdPkgs</code></td></tr>
 <tr><td>List of R package names required by the module. These
                         packages will be loaded when <code>simInit</code> is called.
-                        <code><a href='https://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
+                        <code><a href='https://Require.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
                         to load if available, and install if not available.
-                        Because <code><a href='https://reproducible.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
+                        Because <code><a href='https://Require.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
                         GitHub.com, these packages can specify package names stored
                         on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr>
 <tr><td>A data.frame specifying the parameters used in the module.
