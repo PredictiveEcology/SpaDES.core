@@ -142,26 +142,16 @@ will work to suppress messaging only when level is set to \code{"INFO"} or \code
 Some functions in the SpaDES ecosystem may have information at the lower levels,
 but currently, there are few to none.
 
-\code{debug} can be a logical, character vector or a numeric scalar (currently
-1 or 2).
-If \code{debug} is specified and is not \code{FALSE}, 2 things could happen:
-1) there can be messages sent to console, such as events as they pass by, and
-2) if \code{options("spades.browserOnError" = TRUE)} (experimental still) if
-there is an error, it will attempt to open a browser
-in the event where the error occurred. You can edit, and then press \code{c} to continue
-or \code{Q} to quit, plus all other normal interactive browser tools.
-\code{c} will trigger a reparse and events will continue as scheduled, starting
-with the one just edited. There may be some unexpected consequences if the
-\code{simList} objects had already been changed before the error occurred.
-
-If not specified in the function call, the package
-option \code{spades.debug} is used. The following
-options for debug are available:
+\code{debug} is specified as a non-list argument to \code{spades} or as
+\code{list(debug = ...)}, then it can be a logical, a quoted call, a character vector
+or a numeric scalar (currently 1 or 2) or a list of any of these to get multiple
+outputs. This will be run at the start of every event. The following options for debug
+are available. Each of these can also be in a list to get multiple outputs:
 
 \tabular{ll}{
-  \code{TRUE} \tab the event immediately following will be printed as it
-runs (equivalent to \code{current(sim)}).\cr
-  function name (as character string) \tab If a function, then it will be run on the
+  \code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
+                    it runs\cr
+  a function name (as character string) \tab If a function, then it will be run on the
                                            simList, e.g., "time" will run
                                            \code{time(sim)} at each event.\cr
   moduleName (as character string) \tab All calls to that module will be entered
@@ -170,15 +160,25 @@ runs (equivalent to \code{current(sim)}).\cr
                                        will be entered interactively\cr
   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
                                             will be entered into. \cr
-  Any other R expression expressed as a character string  \tab
+  Any other R expression expressed as a character string or quoted call \tab
                                 Will be evaluated with access to the simList as 'sim'.
                                If this is more than one character string, then all will
                                be printed to the screen in their sequence. \cr
   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
                                           information that users may find useful \cr
-                                          information that users may find useful \cr
 
 }
+
+If not specified in the function call, the package
+option \code{spades.debug} is used.
+
+If \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+there is an error, it will attempt to open a browser
+in the event where the error occurred. You can edit, and then press \code{c} to continue
+or \code{Q} to quit, plus all other normal interactive browser tools.
+\code{c} will trigger a reparse and events will continue as scheduled, starting
+with the one just edited. There may be some unexpected consequences if the
+\code{simList} objects had already been changed before the error occurred.
 }
 
 \examples{
@@ -200,6 +200,8 @@ spades(mySim)
 spades(mySim, debug = TRUE) # Fastest
 spades(mySim, debug = "simList")
 spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
+# To get a combination -- use list(debug = list(..., ...))
+spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
 
 # Can turn off plotting, and inspect the output simList instead
 out <- spades(mySim, .plotInitialTime = NA) # much faster
@@ -225,7 +227,7 @@ for (i in 1:2) {
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://www.nostarch.com/artofr.htm}
+            Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
 \code{\link{SpaDES.core-package}},

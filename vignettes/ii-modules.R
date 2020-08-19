@@ -78,7 +78,7 @@ options(spades.moduleCodeChecks = FALSE)
 #  # If used within the module source code, then module name can be omitted:
 #  # This will return NULL here, but will return the actual value if used
 #  # in a module
-#  P(sim)$N  # Only one parameter
+#  P(mySim)$N  # Only one parameter
 
 ## ----event-types, echo=TRUE, eval=FALSE---------------------------------------
 #  ## sample event type definitions from the default `randomLandscapes` module

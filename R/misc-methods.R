@@ -230,6 +230,11 @@ setMethod("loadPackages",
 ################################################################################
 #' Convert numeric to character with padding
 #'
+#' This will pad floating point numbers, right or left. For integers, either class
+#' integer or functionally integer (e.g., 1.0), it will not pad right of the decimal.
+#' For more specific control or to get exact padding right and left of decimal,
+#' try the \code{stringi} package. It will also not do any rounding. See examples.
+#'
 #' @param x numeric. Number to be converted to character with padding
 #'
 #' @param padL numeric. Desired number of digits on left side of decimal.
@@ -239,30 +244,24 @@ setMethod("loadPackages",
 #'              If not enough, \code{pad} will be used to pad.
 #'
 #' @param pad character to use as padding (\code{nchar(pad) == 1} must be \code{TRUE}).
-#'            Passed to \code{\link[stringi]{stri_pad}}
 #'
 #' @return Character string representing the filename.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom fpCompare %==%
-#' @importFrom stringi stri_pad_left stri_pad_right
 #' @rdname paddedFloatToChar
 #'
 #' @examples
 #' paddedFloatToChar(1.25)
 #' paddedFloatToChar(1.25, padL = 3, padR = 5)
+#' paddedFloatToChar(1.25, padL = 3, padR = 1) # no rounding, so keeps 2 right of decimal
 paddedFloatToChar <- function(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "0") {
-  xIC <- x %/% 1 %>%
-    format(., trim = TRUE, digits = 5, scientific = FALSE) %>%
-    stri_pad_left(., pad = pad, width = padL)
   xf <- x %% 1
-  xFC <- ifelse(xf %==% 0, "",
-    strsplit(format(xf, digits = padR, scientific = FALSE), split = "\\.")[[1]][2] %>%
-      stri_pad_right(., width = padR, pad = pad) %>%
-      paste0(".", .))
-
-  return(paste0(xIC, xFC))
+  numDecimals <- nchar(gsub("(.*)(\\.)|([0]*$)","",xf))
+  newPadR <- ifelse(xf %==% 0, 0, pmax(numDecimals, padR))
+  xFCEnd <- sprintf(paste0("%0", padL+newPadR+1*(newPadR > 0),".", newPadR, "f"), x)
+  return(xFCEnd)
 }
 
 ###############################################################################
@@ -370,7 +369,7 @@ setMethod("rndstr",
 ################################################################################
 #' Filter objects by class
 #'
-#' Based on \url{http://stackoverflow.com/a/5158978/1380598}.
+#' Based on \url{https://stackoverflow.com/a/5158978/1380598}.
 #'
 #' @param x Character vector of object names to filter, possibly from \code{ls}.
 #'
@@ -385,7 +384,7 @@ setMethod("rndstr",
 #'
 #' @note \code{\link{inherits}} is used internally to check the object class,
 #' which can, in some cases, return results inconsistent with \code{is}.
-#' See \url{http://stackoverflow.com/a/27923346/1380598}.
+#' See \url{https://stackoverflow.com/a/27923346/1380598}.
 #' These (known) cases are checked manually and corrected.
 #'
 #' @export
@@ -581,7 +580,7 @@ setMethod(
 #'                    If not specified, defaults to \code{getOption("spades.outputPath")}.
 #'
 #' @param rasterPath  The default local directory in which to save transient raster files.
-#'                    If not specified, defaults to \code{\link[raster]{tmpDir}}.
+#'                    If not specified, defaults to \code{\link[raster:rasterOptions]{tmpDir}}.
 #'                    \emph{Important note:} this location may not be cleaned up automatically,
 #'                    so be sure to monitor this directory and remove unnecessary temp files
 #'                    that may contribute to excessive disk usage.
@@ -642,7 +641,7 @@ Paths <- .paths()
 #' @export
 #' @rdname setPaths
 #' @importFrom raster tmpDir
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @importFrom R.utils getOption
 #' @param silent Logical. Should the messaging occur.
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {

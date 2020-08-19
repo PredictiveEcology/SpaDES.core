@@ -1,5 +1,5 @@
 ---
-title: "02 Building modules in `SpaDES`"
+title: "02 Building `SpaDES` modules"
 author:
   - "Alex M. Chubaty"
 date: '`r strftime(Sys.Date(), "%B %d %Y")`'
@@ -9,7 +9,7 @@ output:
     self_contained: false
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{02 Building SpaDES modules}
+  %\VignetteIndexEntry{02 Building `SpaDES` modules}
   %\VignetteDepends{data.table, DiagrammeR, igraph, RandomFields, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
@@ -231,7 +231,7 @@ P(mySim)$caribouMovement$N  # Only one parameter
 # If used within the module source code, then module name can be omitted:
 # This will return NULL here, but will return the actual value if used
 # in a module
-P(sim)$N  # Only one parameter
+P(mySim)$N  # Only one parameter
 ```
 
 ### Event types
@@ -348,7 +348,7 @@ if (require(SpaDES.tools)) {
 To better understand how events are scheduled within a simulation, a visual representation called an `eventDiagram` illustrates the sequences of events within a simulation.
 
 Simulation time is presented on the x-axis, starting at date `startDate`.
-Each module appears in a color-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module.
+Each module appears in a colour-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module.
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
 ```{r sim-eventDiagram, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -396,7 +396,7 @@ As such, this documentation should include a high-level overview of the module a
 
 We strongly recommend using R Markdown (`.Rmd`) for this documentation, as it is easily human-readable while also being machine-readable and easily converted to a wide variety of file formats including `PDF`, `HTML`, and `DOCX`.
 Another benefit of using a text-based file format is to facilitate transparent document versioning and history using version control systems like `git`.
-For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
+For help writing in R Markdown, see <https://rmarkdown.rstudio.com/>.
 
 ## Citation, LICENSE, and README files
 
@@ -404,7 +404,7 @@ For help writing in R Markdown, see http://rmarkdown.rstudio.com/.
 Most citation management software can read and output `.bib` format.
 
 - `LICENSE.txt` describes how your module can be redistributed and used by others.
-For help selecting a license, see [choosealicense.com](http://choosealicense.com).
+For help selecting a license, see [choosealicense.com](https://choosealicense.com).
 
 - `README.txt` is used to briefly document module metadata and version change information.
 
@@ -442,7 +442,7 @@ It is useful to not only check that the data files exist locally but that their 
 
 ## Versioned zip archives (`moduleName_x.y.z.zip`)
 
-Use [semantic versioning](http://semver.org), such that a version number `x.y.z` corresponds to:
+Use [semantic versioning](https://semver.org/), such that a version number `x.y.z` corresponds to:
 
 - `x` is the **major** version (incremented when you make incompatible API changes)
 - `y` is the **minor** version (incremented when you add functionality in a backwards-compatible manner)

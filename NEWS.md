@@ -1,5 +1,25 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.2
+=============
+
+## new features
+* `desc` argument in `defineParameter`, `expectsInput`, and `createsOutput` can now have extraneous spaces and End-of-Line characters.
+  This means that they can now be written more easily with a single set of quotes, without needing `paste`.
+  The accessor functions, `moduleParams`, `moduleInputs`, and `moduleOutputs` all will strip extraneous spaces and End-of-Line characters.
+* new helper functions for debugging: `writeEventInfo()` and `writeRNGInfo()` to write info to file.
+
+## dependencies
+* drop support for R < 3.6
+* removed imports from `stringi`
+
+## bug fixes
+
+* minor bug fixes in sample modules
+* module template has full path instead of `..` for `moduleParams` etc. This is more accurate. 
+* address changes to active bindings in R-devel
+* fix CRAN check errors
+
 version 1.0.1
 =============
 

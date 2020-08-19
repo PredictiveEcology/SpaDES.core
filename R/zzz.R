@@ -30,8 +30,7 @@
   for (u in .spadesTimes) {
     bbs[[u]] <- bb
     attr(bbs[[u]], "unit") <- u
-    bbs[[u]] <- round(as.numeric(convertTimeunit(bbs[[u]], "seconds",
-                                                 skipChecks = TRUE)), 0)
+    bbs[[u]] <- round(as.numeric(convertTimeunit(bbs[[u]], "seconds", skipChecks = TRUE)), 0)
   }
   .pkgEnv[["unitConversions"]] <- as.matrix(as.data.frame(bbs))
 

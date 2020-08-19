@@ -88,8 +88,8 @@
 #'     \tab  The default tolerance value used for floating
 #'     point number comparisons. \cr
 #'
-#'   \code{spades.useragent} \tab \code{"http://github.com/PredictiveEcology/SpaDES"}.
-#'     \tab : The default user agent to use for downloading modules from GitHub.com. \cr
+#'   \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
+#'     \tab : The default user agent to use for downloading modules from GitHub. \cr
 #'
 #' }
 #'
@@ -121,8 +121,8 @@ spadesOptions <- function() {
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
+    spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
     spades.useRequire = TRUE,
     spades.keepCompleted = TRUE
   )
-  }
+}

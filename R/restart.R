@@ -82,6 +82,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   message("This is very experimental and will only work if the event that caused the error has not yet changed the simList.\n",
           "This should be used with caution")
 
+  browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
     sim <- .pkgEnv$.sim
   }
@@ -115,6 +116,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   # move objects back in place
   eventIndices <- seq_len(NROW(eventsToReplayDT))
   eventIndicesRev <- rev(eventIndices)
+  browser(expr = exists("._restartSpades_2"))
   out <- lapply(eventIndices, function(event) {
     objNames <- names(sim$.recoverableObjs[[event]])
     if (!is.null(objNames)) {
@@ -160,7 +162,9 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
       #ee <- new.env()
       #ee$sim <- sim
       # sim@.xData[[module]]$sim <- sim
-      lapply(pp, function(pp1) evalWithActiveCode(pp1, sim@.xData[[module]], sim = sim))
+      lapply(pp, function(pp1) evalWithActiveCode(pp1,
+                                                  sim@.xData$.mods[[module]],
+                                                  sim = sim))
       message(crayon::blue("Reparsing", module, "source code"))
     }
     #rm(list = "sim", envir = ee)
@@ -265,7 +269,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 #'
 #' @export
 #' @importFrom crayon bgBlue white
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
                      restartDir = getOption("spades.restartR.restartDir", NULL)) {

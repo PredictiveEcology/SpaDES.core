@@ -6,7 +6,7 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 
 #' Find the latest module version from a SpaDES module repository
 #'
-#' Modified from \url{http://stackoverflow.com/a/25485782/1380598}.
+#' Modified from \url{https://stackoverflow.com/a/25485782/1380598}.
 #'
 #' @param name  Character string giving the module name.
 #'
@@ -23,7 +23,7 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'          It takes the most recent version, based on the name of the zip file.
 #'
 #'          See the modules vignette for details of module directory structure
-#'          (\url{http://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+#'          (\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
 #'          and see our SpaDES-modules repo for details of module repository structure
 #'          (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 #'
@@ -286,7 +286,7 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 })
 
 #' @rdname downloadModule
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @importFrom utils unzip zip
 #' @importFrom data.table setDF rbindlist
 setMethod(

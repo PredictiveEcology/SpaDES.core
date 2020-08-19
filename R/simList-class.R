@@ -95,7 +95,7 @@
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @aliases simList
 #' @author Alex Chubaty and Eliot McIntire
@@ -137,6 +137,7 @@ setClass(
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object, ...) {
+            browser(expr = exists("._initialize_1"))
             sn <- slotNames(.Object)
             dots <- list(...)
             slotsProvided <- sn %in% names(dots)
@@ -171,6 +172,7 @@ setMethod("initialize",
             .Object@completed <- new.env(parent = emptyenv())
 
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            browser(expr = exists("._initialize_2"))
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
@@ -205,7 +207,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
            inputs = from@inputs,
            outputs = from@outputs,
            paths = from@paths)
-  x@.xData <- new.env(new.env(parent = emptyenv()))
+  x@.xData <- new.env(parent = emptyenv())
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)
   list2env(from@completed, envir = x@completed)

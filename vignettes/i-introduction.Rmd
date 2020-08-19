@@ -10,7 +10,7 @@ output:
     self_contained: yes
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{01 Introduction to SpaDES}
+  %\VignetteIndexEntry{01 Introduction to `SpaDES`}
   %\VignetteDepends{SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{discrete event simulation, spatial simulation models}
   %\VignetteEncoding{UTF-8}
@@ -77,9 +77,9 @@ However, there are various simple optimizations for `R` code, such as explicitly
 In cases were further improvements are required, the `Rcpp` package [@Eddelbuettel:2011Rcpp; @Eddelbuettel:2013Rcpp] allows easy writing of low memory footprint `C++` code that can then be called in `R`.
 Likewise, numerous upgrades to R, including minimizing object copying since `R` version `3.0`, and extremely powerful user developed packages, like `data.table` and `dplyr` are eliminating many of these concerns.
 
-[^julia]: http://julialang.org
+[^julia]: https://julialang.org
 
-[^benchmarks]: http://PredictiveEcology.org/benchmarking
+[^benchmarks]: https://PredictiveEcology.org/benchmarking/
 
 ## Discrete event simulation and `SpaDES`
 

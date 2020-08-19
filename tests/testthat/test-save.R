@@ -49,7 +49,7 @@ test_that("saving files (and memoryUse)", {
   cc <- ongoingMemoryThisPid(0.2, interval = 0.1)
   expect_true(file.exists(cc))
   ff <- fread(cc)
-  expect_true(NROW(ff)>0)
+  expect_true(NROW(ff) > 0)
 
   options("spades.memoryUseInterval" = 0)
   outputFile <- mySim$.memoryUse$filename
@@ -171,8 +171,8 @@ test_that("saveSimList does not work correctly", {
   times <- list(start = 0, end = 1)
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    caribouMovement = list(.plotInitialTime = NA_integer_),
+    randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
@@ -203,7 +203,7 @@ test_that("saveSimList does not work correctly", {
 
   sim <- loadSimList(file = tmpfile[3])
   expect_true(identical(gsub("\\\\", "/", filename(sim$landscape)), tmpfile[1]))
-  expect_true(bindingIsActive("mod", sim$caribouMovement))
+  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
 
   # Now keep as file-backed, but change name
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 1, filebackedDir = tmpCache)
@@ -214,10 +214,10 @@ test_that("saveSimList does not work correctly", {
   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
   # rm(mySim)
 
-  assign("a", 1, envir = mySim$caribouMovement$mod)
-  assign("a", 2, envir = sim$caribouMovement$mod)
+  assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$mod)
+  assign("a", 2, envir = sim@.xData$.mods$caribouMovement$mod)
 
-  expect_true(bindingIsActive("mod", sim$caribouMovement))
+  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 

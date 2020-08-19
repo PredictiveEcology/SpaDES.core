@@ -116,7 +116,8 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot = {
       # do stuff for this event
-      Plot(sim[[SpaDES.core::P(sim)$stackName]]$Fires, new = FALSE)
+      stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long names -- create local variable
+      Plot(sim[[stackName]]$Fires, new = FALSE)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval,

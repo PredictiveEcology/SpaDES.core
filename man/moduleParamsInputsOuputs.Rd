@@ -31,7 +31,10 @@ Default is to use the \code{spades.modulePath} option.}
 \code{data.frame}
 }
 \description{
-These are simply wrappers around \code{moduleMetadata}.
+These are more or less wrappers around \code{moduleMetadata}, with the exception
+that extraneous spaces and End-Of-Line characters will be removed from the
+\code{desc} arguments in \code{defineParameters}, \code{defineInputs}, and
+\code{defineOutputs}
 }
 \examples{
 path <- system.file("sampleModules", package = "SpaDES.core")

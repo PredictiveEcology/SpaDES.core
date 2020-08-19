@@ -37,6 +37,7 @@ setMethod(
     }
 
     ## store metadata as list
+
     defineModuleListItems <- c(
       "name", "description", "keywords", "childModules", "authors",
       "version", "spatialExtent", "timeframe", "timeunit", "citation",
@@ -64,6 +65,7 @@ setMethod(
 
         out2 <- as.call(inner2)
       }
+      # Remove extra spaces
       aa <- capture.output(type = "message", {bb <- eval(out2)})
       return(bb)
     })
@@ -72,6 +74,7 @@ setMethod(
 
     #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
 
+    metadata <- rmExtraSpacesEOLList(metadata)
     return(metadata)
 })
 
@@ -99,6 +102,7 @@ setMethod(
       }
 
     } else {
+
       if (!missing(path)) message("path not used with sim provided")
       if (missing(module)) {
         module <- unlist(modules(sim))
@@ -112,6 +116,9 @@ setMethod(
         lapply(sn, function(element) {
           slot(mod, name = element)
         })
+      })
+      metadataList <- lapply(metadataList, function(moduleMetadata) {
+        rmExtraSpacesEOLList(moduleMetadata)
       })
       if (numModules == 1)
         metadataList <- metadataList[[module]]
@@ -189,7 +196,10 @@ setMethod(
 ################################################################################
 #' Extract a module's parameters, inputs, or outputs
 #'
-#' These are simply wrappers around \code{moduleMetadata}.
+#' These are more or less wrappers around \code{moduleMetadata}, with the exception
+#' that extraneous spaces and End-Of-Line characters will be removed from the
+#' \code{desc} arguments in \code{defineParameters}, \code{defineInputs}, and
+#' \code{defineOutputs}
 #'
 #' @param module Character string. Your module's name.
 #'
@@ -216,6 +226,8 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    # remove spaces and EOL
+    md[["parameters"]][["paramDesc"]] <- rmExtraSpacesEOL(md[["parameters"]][["paramDesc"]])
     md[["parameters"]]
 })
 
@@ -232,6 +244,8 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    # remove spaces and EOL
+    md[["inputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["inputObjects"]][["desc"]])
     md[["inputObjects"]]
 })
 
@@ -248,5 +262,24 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    # remove spaces and EOL
+    md[["outputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["outputObjects"]][["desc"]])
     md[["outputObjects"]]
 })
+
+rmExtraSpacesEOL <- function(x) gsub(" +|[ *\n]+", " ", x)
+
+rmExtraSpacesEOLList <- function(xx) {
+  toRmESEOL <- grepl(c("parameters|inputObjects|outputObjects"), names(xx))
+  xx[toRmESEOL] <- lapply(xx[toRmESEOL], function(elem) {
+    if (any(grepl("desc", tolower(names(elem))))) {
+      whCol <- grep("desc", tolower(names(elem)))
+      elem[[whCol]] <- rmExtraSpacesEOL(elem[[whCol]])
+      elem
+    } else {
+      elem
+    }
+  })
+
+  xx
+}

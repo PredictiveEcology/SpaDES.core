@@ -64,7 +64,6 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist
-#' @importFrom stringi stri_detect_fixed
 #' @importFrom raster inMemory
 #' @importFrom utils getFromNamespace
 #' @include simulation-simInit.R
@@ -171,11 +170,9 @@ setMethod(
                   stop("'inputs' often requires (like now) that package be specified",
                        " explicitly in the 'fun' column, e.g., base::load")
                 }
-
               } else {
                 objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
               }
-
             } else {
               objListEnv <- quickPlot::whereInStack(filelist$objectName[y])
               objList <- list(get(filelist$objectName[y], objListEnv))
@@ -219,7 +216,6 @@ setMethod(
             if (identical(loadFun[y], "load")) {
               do.call(getFromNamespace(loadFun[y], loadPackage[y]),
                       args = argument, envir = sim@.xData)
-
             } else {
               sim[[filelist[y, "objectName"]]] <-
                 if (is.na(loadPackage[y])) {
@@ -228,8 +224,6 @@ setMethod(
                   do.call(getFromNamespace(loadFun[y], loadPackage[y]),
                           args = argument)
                 }
-
-
             }
             filelist[y, "loaded"] <- TRUE
 
@@ -334,8 +328,10 @@ loadSimList <- function(file) {
   sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
 
   mods <- setdiff(sim@modules, .coreModules())
-  lapply(mods, function(mod) { ## TODO: was this fixed in qs 0.21.1 ??
-    rm("mod", envir = sim[[mod]], inherits = FALSE)
+  ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
+  lapply(mods, function(mod) {
+    if (!is.null(sim$.mods[[mod]]))
+      rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
     makeModActiveBinding(sim = sim, mod = mod)
   })
 

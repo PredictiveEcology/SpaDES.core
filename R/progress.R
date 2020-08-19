@@ -81,7 +81,7 @@ newProgressBar <- function(sim) {
                           initial = start(sim, tu))
     }
   } else if (P(sim, ".progress")$type == "shiny") {
-    ## see http://shiny.rstudio.com/articles/progress.html
+    ## see https://shiny.rstudio.com/articles/progress.html
     stop("shiny progress bar not yet implemented")
   } else  if (P(sim, ".progress")$type == "text") {
     pb <- utils::txtProgressBar(min = start(sim, tu), max = end(sim, tu),
@@ -120,7 +120,7 @@ setProgressBar <- function(sim) {
                                      "of total", end(sim, tu)))
     }
   } else if (P(sim, ".progress")$type == "shiny") {
-    ## see http://shiny.rstudio.com/articles/progress.html
+    ## see https://shiny.rstudio.com/articles/progress.html
     stop("shiny progress bar not yet implemented")
   } else if (P(sim, ".progress")$type == "text") {
     utils::setTxtProgressBar(pb, round(time(sim, tu), 3))

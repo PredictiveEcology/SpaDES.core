@@ -7,7 +7,7 @@
 #'
 #' RNG save code adapted from:
 #' \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
-#' and \url{https://stackoverflow.com/questions/13997444/}
+#' and \url{https://stackoverflow.com/q/13997444/1380598}
 #'
 #' @param sim           A \code{simList} simulation object.
 #'
@@ -29,7 +29,7 @@
 #' @include priority.R
 #' @importFrom R.utils isAbsolutePath
 #' @importFrom quickPlot .objectNames
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @export
 #' @rdname checkpoint
 #'

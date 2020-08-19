@@ -53,11 +53,11 @@ test_that("spades calls - diff't signatures", {
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
                     capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
 
-  expect_message(spades(Copy(a), debug = c("current", "events"), .plotInitialTime = NA),
-        "This is the current event")
+  expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+        "eventTime *moduleName *eventType *eventPriority")
   expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
                 "moduleName")
-  expect_output(spades(a, debug = "simList", .plotInitialTime = NA),
+  expect_message(spades(a, debug = "simList", .plotInitialTime = NA),
                 "Completed Events")
 
   if (interactive()) {
@@ -119,13 +119,13 @@ test_that("simInit with R subfolder scripts", {
   cat(file = file.path("child1", "R", "script.R"),
       "a <- function(poiuoiu) {
       poiuoiu + 1
-}", sep = "\n")
+  }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
-  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
-    if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
+  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData$.mods, all.names = TRUE), function(x) {
+    if (is.environment(mySim@.xData$.mods[[x]])) ls(envir = mySim@.xData$.mods[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.xData$child1$a(2) == 3) # Fns
-  })
+  expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
+})
 
 test_that("simulation runs with simInit with duplicate modules named", {
   testInitOut <- testInit()
@@ -237,7 +237,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   N <- 5000
 
   moduleDir <- file.path(tmpdir)
-  inputDir <- file.path(moduleDir, "inputs") %>% reproducible::checkPath(create = TRUE)
+  inputDir <- file.path(moduleDir, "inputs") %>% checkPath(create = TRUE)
   outputDir <- file.path(moduleDir, "outputs")
   cacheDir <- file.path(outputDir, "cache")
   times <- list(start = 0, end = N)
@@ -497,14 +497,16 @@ test_that("conflicting function types", {
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
   lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1]
   cat(xxx[1:(lineWithInputObjects - 1)], "
-      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei1', 'numeric', desc = 'This is a test with    spaces
+                    and EOL', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
-      expectsInput('ei4', 'numeric', '', '')
+      expectsInput('ei4', 'numeric', '', 'test.com')
       ",
       xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
-      createsOutput('co2', 'numeric', ''),
+      createsOutput('co2', 'numeric', desc = 'This is a test with    spaces
+                    and EOL on the      createsOutputs'),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
@@ -521,6 +523,15 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
+      url1 <- extractURL('ei4')
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without sim or module fails')
+      url1 <- extractURL('ei4', sim = sim)
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without module fails')",
+paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
+      if (!identical(url1, 'test.com'))
+        stop('extractURL fails')
       sim$g <- 1
       sim$ei1 <- 4
       fff <- sim$ei1
@@ -546,7 +557,7 @@ test_that("conflicting function types", {
     "child4: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects"
   )
 
-  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- capture_messages(mySim <- simInit(paths = list(modulePath = tmpdir), modules = m))
   mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
   # for (x in seq(fullMessage)) {
@@ -558,6 +569,30 @@ test_that("conflicting function types", {
   #   }
   #   expect_true(theGrep)
   # }
+  x1 <- moduleMetadata(mySim)
+  sns <- slotNames(mySim@depends@dependencies[[m]])
+  names(sns) <- sns
+  x2 <- lapply(sns, function(sn) {
+    slot(mySim@depends@dependencies[[m]], sn)
+  })
+  expect_true(any(unlist(lapply(x2, function(v)
+    grepl("  |\n", v)))))
+  x2 <- rmExtraSpacesEOLList(x2)
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x2, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleParams(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleInputs(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleOutputs(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+
+
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {

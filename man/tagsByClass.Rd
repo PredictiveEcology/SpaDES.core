@@ -10,11 +10,11 @@
 \item{object}{Any R object.}
 }
 \description{
-See \code{\link[reproducible]{.tagsByClass}}. Adds current \code{moduleName},
+See \code{\link[reproducible:tagsByClass]{.tagsByClass}}. Adds current \code{moduleName},
 \code{eventType}, \code{eventTime}, and \code{function:spades} as \code{userTags}.
 }
 \seealso{
-\code{\link[reproducible]{.tagsByClass}}
+\code{\link[reproducible:tagsByClass]{.tagsByClass}}
 }
 \author{
 Eliot McIntire

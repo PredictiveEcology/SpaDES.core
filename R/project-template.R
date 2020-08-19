@@ -25,7 +25,7 @@ setGeneric("newProject", function(name, path, open) {
 
 #' @export
 #' @rdname newProject
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 setMethod(
   "newProject",
   signature = c(name = "character", path = "character", open = "logical"),
@@ -50,7 +50,7 @@ setMethod(
 
 #' @export
 #' @rdname newProject
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 setMethod(
   "newProject",
   signature = c(name = "character", path = "character", open = "missing"),
@@ -71,7 +71,7 @@ setGeneric("newProjectCode", function(name, path, open) {
 })
 
 #' @export
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @importFrom whisker whisker.render
 #' @rdname newProjectCode
 setMethod(

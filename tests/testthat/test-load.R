@@ -432,8 +432,9 @@ test_that("Filenames for simList", {
   Fns <- Filenames(s)
 
   fnsGrd <- normPath(c(filename(s$b), gsub("grd$", "gri", filename(s$b))))
-  expect_true(identical(Fns$b, fnsGrd))
-  expect_true(identical(Fns$r, normPath(filename(s$r))))
-  expect_true(identical(Fns$r2, normPath(filename(s$r2))))
-  expect_true(identical(Fns$s, sapply(seq_len(nlayers(s$s)), function(rInd) normPath(filename(s$s[[rInd]])))))
+  expect_true(identical(c(Fns[["b1"]], Fns[["b2"]]), fnsGrd))
+  expect_true(identical(Fns[["r"]], normPath(filename(s$r))))
+  expect_true(identical(Fns[["r2"]], normPath(filename(s$r2))))
+  expect_true(identical(c(Fns[["s1"]], Fns[["s2"]]),
+              sapply(seq_len(nlayers(s$s)), function(rInd) normPath(filename(s$s[[rInd]])))))
 })

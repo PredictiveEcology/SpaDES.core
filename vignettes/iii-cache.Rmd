@@ -1,5 +1,5 @@
 ---
-title: "03 Using `Cache` with `SpaDES`"
+title: "03 Caching `SpaDES` simulations"
 author:
   - "Eliot J. B. McIntire"
 date: '`r strftime(Sys.Date(), "%B %d %Y")`'
@@ -10,7 +10,7 @@ output:
     self_contained: yes
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{03 Caching SpaDES simulations}
+  %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
   %\VignetteDepends{igraph, raster, reproducible, SpaDES.core}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
@@ -38,7 +38,7 @@ Similarly, if no `cacheRepo` argument is specified, then it will use `getOption(
 To persist between sessions, use `SpaDES::setPaths()` every session.
 
 In a `SpaDES` context, there are several levels of caching that can be used as part of a reproducible workflow.
-Each level can be used to a modeler's advantage; and, all can be -- and are often -- used concurrently.
+Each level can be used to a modeller's advantage; and, all can be -- and are often -- used concurrently.
 
 ## At the `spades` level
 
@@ -84,11 +84,10 @@ system.time({
 all.equal(outSim, outSimCached) 
 ```
 
-
 ## Module-level caching
 
 If the parameter `.useCache` in the module's metadata is set to `TRUE`, then *every* event in the module will be cached. 
-That means that every time that module is called from within a spades call, `Cache` will be called. 
+That means that every time that module is called from within a `spades()` call, `Cache` will be called. 
 Only the objects inside the `simList` that correspond to the `inputObjects` or the `outputObjects` from the module metadata will be assessed for caching. 
 For general use, module-level caching would be mostly useful for modules that have no stochasticity, such as data-preparation modules, GIS modules etc.
 
@@ -197,10 +196,9 @@ Indeed, much of the difficulty in managing data sets and saving them for future 
 - To run this would have a nested structure with the following functions:
 
 ```{r, eval=FALSE, echo=TRUE}
-simInit --> many .inputObjects calls
+simInit() --> many .inputObjects calls
 
-spades call --> many module calls --> many event calls --> many function calls
-
+spades() call --> many module calls --> many event calls --> many function calls
 ```
 
 Lets say we start to introduce caching to this structure.
@@ -208,7 +206,7 @@ We start from the "inner" most functions that we could imaging Caching would be 
 We can Cache the `projectRaster` call to make this much faster, since it will always be the same result for a given input raster. 
 
 If we look back at our structure above, we see that we still have LOTS of places that are not Cached.
-That means that the spades call will still spawn many module calls, and many event calls, just to get to the one `Cache(projectRaster)` call which is Cached.
+That means that the `spades()` call will still spawn many module calls, and many event calls, just to get to the one `Cache(projectRaster)` call which is cached.
 This function will likely be called many times.
 This is good, but **`Cache` does take some time**.
 So, even if `Cache(projectRaster)` takes only 0.02 seconds, calling it hundreds of times means maybe 4 seconds.

@@ -15,8 +15,8 @@ This is optional if \code{Cache} is used inside a SpaDES module.}
 \item{...}{Arguments passed to \code{FUN}}
 }
 \description{
-See \code{\link[reproducible]{.prepareOutput}}.
+See \code{\link[reproducible:prepareOutput]{.prepareOutput}}.
 }
 \seealso{
-\code{\link[reproducible]{.prepareOutput}}
+\code{\link[reproducible:prepareOutput]{.prepareOutput}}
 }

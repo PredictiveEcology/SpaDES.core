@@ -72,24 +72,21 @@ utils::globalVariables(".")
 #'
 #' @section Parsing and Checking Code:
 #'
-#' The \code{simInit} function will attempt to find usage of sim$xxx
-#' or sim[['xxx']] on either side of the assignment "<-" operator.
-#' It will compare these to the module metadata, specifically
-#' \code{inputObjects} for cases where objects or "gotten" from the
-#' simList and \code{outputObjects} for cases where objects are
-#' assigned to the simList.
+#' The \code{simInit} function will attempt to find usage of \code{sim$xxx} or \code{sim[['xxx']]}
+#'  on either side of the assignment (\code{<-}) operator.
+#' It will compare these to the module metadata, specifically \code{inputObjects} for cases where
+#' objects or "gotten" from the \code{simList} and \code{outputObjects} for cases where objects are
+#' assigned to the \code{simList.}
 #'
-#' It will also attempt to find potential, common function name conflicts
-#' with things like scale and stack (both in base and raster), and
-#' Plot (in quickPlot and some modules).
+#' It will also attempt to find potential, common function name conflicts with things like
+#' \code{scale} and \code{stack} (both in \pkg{base} and \pkg{raster}), and
+#' \code{Plot} (in \pkg{quickPlot} and some modules).
 #'
-#' \emph{This code checking is young and may get false positives and
-#' false negatives -- i.e., miss things}. It also takes computational
-#' time, which may be undesirable in operational code.
-#' To turn off checking (i.e.,
-#' if there are too many false positives and negatives), set
-#' the option \code{spades.moduleCodeChecks} to \code{FALSE},
-#' e.g., \code{options(spades.moduleCodeChecks = FALSE)}
+#' \emph{This code checking is young and may get false positives and false negatives,
+#' i.e., miss things}.
+#' It also takes computational time, which may be undesirable in operational code.
+#' To turn off checking (i.e., if there are too many false positives and negatives), set
+#' \code{options(spades.moduleCodeChecks = FALSE)}.
 #'
 #' @section Caching:
 #'
@@ -106,7 +103,7 @@ utils::globalVariables(".")
 #' @note
 #' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
 #' These can be added later with the accessor methods (See example).
-#' These are not required for initializing the simulation via simInit.
+#' These are not required for initializing the simulation via \code{simInit}.
 #' All of \code{modules}, \code{paths}, \code{params}, and \code{objects} are needed
 #' for successful initialization.
 #'
@@ -116,22 +113,22 @@ utils::globalVariables(".")
 #' @param params A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 #' See details.
 #'
-#' @param modules A named list of character strings specifying the names
-#' of modules to be loaded for the simulation. Note: the module name
-#' should correspond to the R source file from which the module is loaded.
-#' Example: a module named "caribou" will be sourced form the file
-#' \file{caribou.R}, located at the specified \code{modulePath(simList)} (see below).
+#' @param modules A named list of character strings specifying the names of modules to be loaded
+#' for the simulation.
+#' Note: the module name should correspond to the R source file from which the module is loaded.
+#' Example: a module named "caribou" will be sourced form the file \file{caribou.R},
+#' located at the specified \code{modulePath(simList)} (see below).
 #'
 #' @param objects (optional) A vector of object names (naming objects
 #'                that are in the calling environment of
 #'                the \code{simInit}, which is often the
-#'                \code{.GlobalEnv} unless used programmatically
-#'                -- NOTE: this mechanism will
+#'                \code{.GlobalEnv} unless used programmatically.
+#'                NOTE: this mechanism will
 #'                fail if object name is in a package dependency), or
 #'                a named list of data objects to be
-#'                passed into the simList (more reliable).
+#'                passed into the \code{simList} (more reliable).
 #'                These objects will be accessible
-#'                from the simList as a normal list, e.g,. \code{mySim$obj}.
+#'                from the \code{simList} as a normal list, e.g,. \code{mySim$obj}.
 #'
 #' @param paths  An optional named list with up to 4 named elements,
 #' \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
@@ -183,12 +180,13 @@ utils::globalVariables(".")
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
-#' @importFrom reproducible Require basename2
+#' @importFrom reproducible basename2
+#' @importFrom Require Require trimVersionNumber
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
 #' @examples
 #' \dontrun{
@@ -333,7 +331,7 @@ setMethod(
     #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
     # })
     paths <- lapply(paths, function(p)
-        checkPath(p, create = TRUE)
+      checkPath(p, create = TRUE)
     )
 
     objNames <- names(objects)
@@ -423,7 +421,7 @@ setMethod(
         allPkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", allPkgs)
         allPkgs <- gsub(".*\\/+(.+)",  "\\1", allPkgs)
 
-        loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
+        loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
       }
     }
 
@@ -547,6 +545,7 @@ setMethod(
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
+    browser(expr = exists("._simInit_5"))
     while (!all_parsed) {
       sim <- .parseModule(sim,
                           as.list(sim@modules),
@@ -615,7 +614,7 @@ setMethod(
     }
 
     # Make local activeBindings to mod
-    lapply(sim@modules, function(mod) {
+    lapply(as.character(sim@modules), function(mod) {
       makeModActiveBinding(sim = sim, mod = mod)
     })
 
@@ -624,6 +623,8 @@ setMethod(
     })
 
     ## load user-defined modules
+    browser(expr = exists("._simInit_4"))
+
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]
       ## run .inputObjects() for each module
@@ -1010,7 +1011,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
-  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals]) # quote is so that entire simList is not serialized in do.call
+  ## quote is so that entire simList is not serialized in do.call
+  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals])
   sim <- do.call(spades, objsSpades)
 }
 
@@ -1111,11 +1113,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
+  browser(expr = exists("._runModuleInputObjects_1"))
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
-    if (!is.null(sim@.xData[[mBase]][[".inputObjects"]])) {
+    if (!is.null(sim@.xData$.mods[[mBase]][[".inputObjects"]])) {
+      browser(expr = exists("._runModuleInputObjects_2"))
       list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
       a <- P(sim, mBase, ".useCache")
@@ -1142,6 +1146,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
         } else {
+          browser()
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = mBase, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))

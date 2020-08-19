@@ -50,7 +50,7 @@ values set to defaults
    \code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
                        if a character or numeric are supplied).
                        The module developer should update manually this with each change
-                       that is made to the module. See \url{http://semver.org/}
+                       that is made to the module. See \url{https://semver.org/}
                        for a widely accepted standard for version numbering.\cr
    \code{spatialExtent} \tab The spatial extent of the module supplied via
                              \code{raster::extent}. This is currently unimplemented.
@@ -76,9 +76,9 @@ values set to defaults
                              it is for human readers only.\cr\cr
    \code{reqdPkgs} \tab List of R package names required by the module. These
                         packages will be loaded when \code{simInit} is called.
-                        \code{\link[reproducible]{Require}} will be used internally
+                        \code{\link[Require]{Require}} will be used internally
                         to load if available, and install if not available.
-                        Because \code{\link[reproducible]{Require}} can also download from
+                        Because \code{\link[Require]{Require}} can also download from
                         GitHub.com, these packages can specify package names stored
                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
    \code{parameters} \tab A data.frame specifying the parameters used in the module.

@@ -61,7 +61,7 @@ moduleDefaults <- list(
 #'    \code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
 #'                        if a character or numeric are supplied).
 #'                        The module developer should update manually this with each change
-#'                        that is made to the module. See \url{http://semver.org/}
+#'                        that is made to the module. See \url{https://semver.org/}
 #'                        for a widely accepted standard for version numbering.\cr
 #'    \code{spatialExtent} \tab The spatial extent of the module supplied via
 #'                              \code{raster::extent}. This is currently unimplemented.
@@ -87,9 +87,9 @@ moduleDefaults <- list(
 #'                              it is for human readers only.\cr\cr
 #'    \code{reqdPkgs} \tab List of R package names required by the module. These
 #'                         packages will be loaded when \code{simInit} is called.
-#'                         \code{\link[reproducible]{Require}} will be used internally
+#'                         \code{\link[Require]{Require}} will be used internally
 #'                         to load if available, and install if not available.
-#'                         Because \code{\link[reproducible]{Require}} can also download from
+#'                         Because \code{\link[Require]{Require}} can also download from
 #'                         GitHub.com, these packages can specify package names stored
 #'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
 #'    \code{parameters} \tab A data.frame specifying the parameters used in the module.
@@ -513,13 +513,7 @@ setMethod(
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc, sourceURL),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (length(templist) > 0) {
-      for (i in 1:length(templist)) {
-        returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
-                                            stringsAsFactors = FALSE))
-        names(returnDataframe)[ncol(returnDataframe)] <- names(templist)[i]
-      }
-    }
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "expectsInput")
     return(returnDataframe)
 })
 
@@ -589,13 +583,7 @@ setMethod(
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (length(templist) > 0) {
-      for (i in 1:length(templist)) {
-        returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
-                                            stringsAsFactors = FALSE))
-        names(returnDataframe)[ncol(returnDataframe)] <- names(templist)[i]
-      }
-    }
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "createsOutput")
     return(returnDataframe)
 })
 
@@ -707,8 +695,8 @@ setMethod(
       outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
     }
     if (any(is.na(outputDF[, "fun"]))) {
-      exts <- na.omit(match(exts, .fileExts[, "exts"]))
-      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[exts, "fun"]
+      extsAvail <- checkKnownExts(exts, .fileExts)
+      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
     }
   }
 
@@ -720,9 +708,35 @@ setMethod(
       outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
     }
     if (any(is.na(outputDF[, "package"]))) {
-      exts <- na.omit(match(file_ext(fl), .fileExts[, "exts"]) )
-      outputDF$package[is.na(outputDF$package)] <- .fileExts[exts, "package"]
+      exts <- file_ext(fl)
+      extsAvail <- checkKnownExts(exts, .fileExts)
+      outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
     }
   }
   return(outputDF)
+}
+
+checkKnownExts <- function(exts, knownFileExts) {
+  if (missing(knownFileExts))
+    knownFileExts <- .saveFileExtensions()
+  extsAvail <- na.omit(match(exts, knownFileExts[, "exts"]))
+  extsMissing <- setdiff(exts, exts[extsAvail])
+  if (length(extsMissing) > 0)
+    stop("No known save method is available for class ", extsMissing)
+  extsAvail
+}
+
+
+addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
+  if (length(templist) > 0) {
+    for (i in 1:length(templist)) {
+      returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
+                                          stringsAsFactors = FALSE))
+      nam <- names(templist)[i]
+      if (is.null(nam))
+        stop(fn, " for ", objectName, " has too many unnamed fields; perhaps forgot to use paste(...)?")
+      names(returnDataframe)[ncol(returnDataframe)] <- nam
+    }
+  }
+  returnDataframe
 }
