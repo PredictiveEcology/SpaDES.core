@@ -381,15 +381,14 @@ test_that("Cache sim objs via .Cache attr", {
   # Try again, hi should be there
   expect_true(is.null(mySim$.mods$test$hi)) # is not in the
   # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
-  mess1 <- capture_messages(
+  mess1 <- capture_messages({
     mySim2 <- spades(Copy(mySim))
-  )
+  })
   expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
   expect_true(any(grepl("loaded cached copy", mess1)))
 })
-
 
 test_that("test showSimilar", {
   testInitOut <- testInit(smcc = FALSE, "raster")
@@ -420,14 +419,21 @@ test_that("test showSimilar", {
 
   out1 <- spades(Copy(mySim))#, showSimilar = TRUE)
   params(mySim)$randomLandscapes$nx <- 101
-  mess <- capture_messages(out2 <- spades(Copy(mySim)))#, showSimilar = TRUE)
+  mess <- capture_messages({
+    out2 <- spades(Copy(mySim))#, showSimilar = TRUE)
+  })
   mySim$a <- 1
-  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  mess <- capture_messages({
+    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  })
   expect_true(any(grepl("This call to cache differs", mess)))
   mySim$a <- 2
-  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  mess <- capture_messages({
+    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  })
   expect_true(any(grepl("This call to cache differs", mess)))
-  mess <- capture_messages(out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE))
+  mess <- capture_messages({
+    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  })
   expect_false(any(grepl("This call to cache differs", mess)))
-
 })

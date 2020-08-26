@@ -351,11 +351,19 @@ test_that("test-load.R: more tests", {
        loadTime = 0,
        intervals = c(rep(NA, length(files) - 1), 10)
     )
-    expect_message(sim2 <- loadFiles(filelist = filelist), "DEM read from")
-    expect_message(sim2 <- loadFiles(filelist = filelist), "forestAge read from")
+    expect_message({
+      sim2 <- loadFiles(filelist = filelist)
+    }, "DEM read from")
+    expect_message({
+      sim2 <- loadFiles(filelist = filelist)
+    }, "forestAge read from")
     end(sim2) <- 20
-    expect_message(sim3 <- spades(sim2), "time 10")
-    expect_message(sim3 <- spades(sim2), "time 20")
+    expect_message({
+      sim3 <- spades(sim2)
+    }, "time 10")
+    expect_message({
+      sim3 <- spades(sim2)
+    }, "time 20")
   }
 })
 
