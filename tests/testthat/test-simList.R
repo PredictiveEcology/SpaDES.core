@@ -1,6 +1,4 @@
 test_that("simList object initializes correctly (1)", {
-  skip_on_cran()
-
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -202,8 +200,6 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
-  skip_on_cran()
-
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
@@ -227,6 +223,8 @@ test_that("simList object initializes correctly (2)", {
 })
 
 test_that("simList test all signatures", {
+  skip_on_cran()
+
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
 
   on.exit({

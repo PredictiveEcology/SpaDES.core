@@ -1,7 +1,8 @@
 test_that("downloadData downloads and unzips module data", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")

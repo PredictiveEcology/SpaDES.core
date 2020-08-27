@@ -3,12 +3,6 @@ test_that("test-load.R: loading inputs does not work correctly", {
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
-  # library(igraph)
-  # tmpdir <- file.path(tempdir(), "test_load", rndstr()) %>% checkPath(create = TRUE)
-  # on.exit({
-  #   detach("package:igraph")
-  #   unlink(tmpdir, recursive = TRUE)
-  # }, add = TRUE)
 
   mapPath <- system.file("maps", package = "quickPlot")
 
@@ -197,17 +191,10 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
       functions = "fread",
       stringsAsFactors = FALSE
     )
-    if (getRversion() < "3.5.2") {
-      try(detach("package:data.table"), silent = TRUE)
-      expect_error(simInit(times = times, params = parameters, modules = modules,
-                           paths = paths, inputs = inputs), "'inputs' often requires")
-    }
     require(data.table)
     mess <- capture_messages(simInit(times = times, params = parameters, modules = modules,
-                         paths = paths, inputs = inputs))
-
+                                     paths = paths, inputs = inputs))
     expect_true(any(grepl(paste(basename(tmpFile)), mess)))
-
   }
 })
 
@@ -317,6 +304,8 @@ test_that("test-load.R: passing nearly empty file to simInit does not work corre
 })
 
 test_that("test-load.R: more tests", {
+  skip_on_cran()
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)

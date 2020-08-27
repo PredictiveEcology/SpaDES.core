@@ -23,7 +23,6 @@ test_that("test objectSynonyms", {
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     caribouMovement = list(N = 3),
     randomLandscapes = list(inRAM = TRUE, nx = 15, ny = 15)
-
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -45,10 +44,10 @@ test_that("test objectSynonyms", {
               c("systime", "systime2"),
               c("vegMap", "veg"))
   sim <- objectSynonyms(sim, os)
-  expect_true(length(sim$objectSynonyms)==length(os))
+  expect_true(length(sim$objectSynonyms) == length(os))
   sim <- objectSynonyms(sim, os2)
 
-  expect_true(length(sim$objectSynonyms)==4)
+  expect_true(length(sim$objectSynonyms) == 4)
   expect_true(identical(sim$objectSynonyms[[2]], unique(c(os[[1]], os2[[1]]))))
 
   e <- new.env(parent = emptyenv())
@@ -114,8 +113,8 @@ test_that("test objectSynonyms", {
   expect_equal(sim$studyArea, sim$studyArea2)
 
   sim <- Cache(simInitAndSpades, times, params, modules = modules,
-                         objects = list(objectSynonyms = os),
-                         paths = list(modulePath = tmpdir))
+               objects = list(objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
@@ -126,5 +125,4 @@ test_that("test objectSynonyms", {
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
-
 })

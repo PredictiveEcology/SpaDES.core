@@ -1,4 +1,6 @@
 test_that("test checkpointing", {
+  skip_on_cran()
+
   testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
@@ -44,21 +46,14 @@ test_that("test checkpointing", {
 })
 
 test_that("test checkpointing with disk-backed raster", {
+  skip_on_cran()
+
   testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
-  # library(igraph)
-  # library(raster)
-  # tmpdir <- file.path(tempdir(), rndstr(1,6)) %>% checkPath(create = TRUE)
-  # try(unlink(tmpdir, recursive = TRUE), silent = TRUE)
+
   file <- file.path("chkpnt.qs")
-  # opts <- options("spades.moduleCodeChecks" = FALSE)
-  # on.exit({
-  #   detach("package:igraph")
-  #   options("spades.moduleCodeChecks" = opts[[1]])
-  #   unlink(tmpdir, recursive = TRUE)
-  # }, add = TRUE)
 
   ## save checkpoints; no load/restore
   set.seed(1234)
