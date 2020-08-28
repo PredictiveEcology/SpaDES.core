@@ -1,7 +1,8 @@
 test_that("downloadData downloads and unzips module data", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -9,8 +10,7 @@ test_that("downloadData downloads and unzips module data", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  testInitOut <- testInit(smcc = FALSE,
-                          opts = list(reproducible.inputPaths = NULL))
+  testInitOut <- testInit(smcc = FALSE, opts = list(reproducible.inputPaths = NULL))
   on.exit(testOnExit(testInitOut), add = TRUE)
 
   m <- "test"
@@ -40,16 +40,19 @@ test_that("downloadData downloads and unzips module data", {
       stringsAsFactors = FALSE
     )
 
-    a <- capture.output(t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
-                                   files = c("DEM.tif", "habitatQuality.tif"))))
+    a <- capture.output({
+      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+                                     files = c("DEM.tif", "habitatQuality.tif")))
+    })
     result <- checksums(m, tmpdir)$result
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))
 
-
     # shouldn't need a redownload because file exists
-    a <- capture.output(t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
-                                   files = c("DEM.tif", "habitatQuality.tif"))))
+    a <- capture.output({
+      t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
+                                     files = c("DEM.tif", "habitatQuality.tif")))
+    })
     expect_true(t1[3] > t2[3]) # compare elapsed times
 
     # if one file is missing, will fill in correctly

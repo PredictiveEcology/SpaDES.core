@@ -19,6 +19,7 @@ version 1.0.2
 * module template has full path instead of `..` for `moduleParams` etc. This is more accurate. 
 * address changes to active bindings in R-devel
 * fix CRAN check errors
+* reduced the number of tests run on CRAN (extended tests still run on GitHub Actions)
 
 version 1.0.1
 =============

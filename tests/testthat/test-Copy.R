@@ -21,5 +21,4 @@ test_that("Copy does not work correctly", {
   s2$dt[, a := 6]
   expect_true(identical(s2$dt, s$dt))
   expect_true(identical(s2$dt1, s$dt1))
-
 })

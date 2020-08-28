@@ -1,6 +1,8 @@
 ## Updated release
 
 This is a maintenance release that fixes some bugs and CRAN check errors.
+Per CRAN's request, we have reduced the number of tests run on CRAN.
+(However, we still run these extended tests using GitHub actions for multiple platforms.)
 
 See `NEWS.md` for a full list of changes.
 

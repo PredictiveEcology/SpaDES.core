@@ -13,15 +13,15 @@ test_that("test userSuppliedObj", {
   lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1] ## second line is false positive
   xxx1 <- xxx
 
-  cat(xxx1[1:(lineWithInputObjects-1)], "
+  cat(xxx1[1:(lineWithInputObjects - 1)], "
         expectsInput('ei1', 'numeric', '', ''),
         expectsInput('ei2', 'numeric', '', ''),
       ",
-      xxx1[(lineWithInputObjects+1):lineWithDotInputObjects], "
+      xxx1[(lineWithInputObjects + 1):lineWithDotInputObjects], "
       sim$ei1 <- 4
       sim$ei1 <- sim$ei3
       ",
-      xxx1[(lineWithDotInputObjects+1):length(xxx1)],
+      xxx1[(lineWithDotInputObjects + 1):length(xxx1)],
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c(
@@ -32,9 +32,13 @@ test_that("test userSuppliedObj", {
   )
 
   ei1 <- 10
-  mm2 <- capture_output(mm1 <- capture_messages(mySim <- simInit(modules = m, paths = list(modulePath = tmpdir),
-                                                                 params = list(test = list(.useCache = ".inputObjects")),
-                                                                 objects = list(ei1 = ei1))))
+  mm2 <- capture_output({
+    mm1 <- capture_messages({
+      mySim <- simInit(modules = m, paths = list(modulePath = tmpdir),
+                       params = list(test = list(.useCache = ".inputObjects")),
+                       objects = list(ei1 = ei1))
+    })
+  })
   if (nzchar(mm2)) mm1 <- c(mm2, mm1)
   mm1 <- cleanMessage(mm1)
 
@@ -42,19 +46,25 @@ test_that("test userSuppliedObj", {
 
   # Run again, but with changed ei11 -- so should be no cache
   ei1 <- 11
-  mm2 <- capture_output(mm1 <- capture_messages(mySim <- simInit(modules = m, paths = list(modulePath = tmpdir),
-                                                                 params = list(test = list(.useCache = ".inputObjects")),
-                                                                 objects = list(ei1 = ei1))))
+  mm2 <- capture_output({
+    mm1 <- capture_messages({
+      mySim <- simInit(modules = m, paths = list(modulePath = tmpdir),
+                       params = list(test = list(.useCache = ".inputObjects")),
+                       objects = list(ei1 = ei1))
+    })
+  })
   if (nzchar(mm2)) mm1 <- c(mm2, mm1)
   mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
 
   # Run 3rd time, should use cache
-  mm2 <- capture_output(mm1 <- capture_messages(
-    mySim <- simInit(modules = m, paths = list(modulePath = tmpdir),
-                     params = list(test = list(.useCache = ".inputObjects")),
-                     objects = list(ei1 = ei1)))
-  )
+  mm2 <- capture_output({
+    mm1 <- capture_messages({
+      mySim <- simInit(modules = m, paths = list(modulePath = tmpdir),
+                       params = list(test = list(.useCache = ".inputObjects")),
+                       objects = list(ei1 = ei1))
+    })
+  })
   if (nzchar(mm2)) mm1 <- c(mm2, mm1)
   mm1 <- cleanMessage(mm1)
 

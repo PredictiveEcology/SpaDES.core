@@ -143,9 +143,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
   modules <- list("randomLandscapes", "randomLandscapes", "caribouMovement")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
-  expect_true(any(grepl(capture_messages(
+  expect_true(any(grepl(capture_messages({
     mySim <- simInit(times, params, modules, objects = list(), paths)
-  ), pattern = "Duplicate module")))
+  }), pattern = "Duplicate module")))
   expect_true(length(modules(mySim)) != length(modules))
   expect_true(length(modules(mySim)) == length(unique(modules)))
 })
@@ -458,7 +458,7 @@ test_that("conflicting function types", {
   cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('a', 'numeric', '', '')
       ",
-      xxx[(lineWithInputObjects+1):(lineWithOutputObjects - 1)],
+      xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)],
       "
       createsOutput('b', 'numeric', '')
       ",
@@ -557,7 +557,9 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
     "child4: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects"
   )
 
-  mm <- capture_messages(mySim <- simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- capture_messages({
+    mySim <- simInit(paths = list(modulePath = tmpdir), modules = m)
+  })
   mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
   # for (x in seq(fullMessage)) {
@@ -707,7 +709,7 @@ test_that("messaging with multiple modules", {
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx1[[2]][(lineWithInputObjects+1):(lineWithOutputObjects - 1)], "
+      xxx1[[2]][(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
@@ -917,29 +919,28 @@ test_that("debug using logging", {
     logging::logReset()
     unlink(tmpfile)
     expect_false(file.exists(tmpfile))
-    mess1 <- capture_messages(
-      mess2 <- capture.output(type = "output",
-                              mySim2 <- spades(Copy(mySim),
-                                               debug = list("console" = list(level = 10), debug = 1),
-                                               .plotInitialTime = NA)
-      )
-    )
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        mySim2 <- spades(Copy(mySim),
+                         debug = list("console" = list(level = 10), debug = 1),
+                         .plotInitialTime = NA)
+      })
+    })
     expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
     expect_true(any(grepl("total elpsd", mess2)))
     expect_true(any(grepl(Sys.Date(), mess2))) # the loginfo does have date
     expect_false(any(grepl(Sys.Date(), mess1))) # original debug has date added
 
-
     logging::logReset()
-    mess1 <- capture_messages(
-      mess2 <- capture.output(type = "output",
-                              mySim2 <- spades(Copy(mySim),
-                                               debug = list("console" = list(level = 5),
-                                                            "file" = list(file = tmpfile),
-                                                            debug = 1),
-                                               .plotInitialTime = NA)
-      )
-    )
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        mySim2 <- spades(Copy(mySim),
+                         debug = list("console" = list(level = 5),
+                                      "file" = list(file = tmpfile),
+                                      debug = 1),
+                         .plotInitialTime = NA)
+      })
+    })
 
     expect_true(file.exists(tmpfile))
     log1 <- readLines(tmpfile)
@@ -949,38 +950,36 @@ test_that("debug using logging", {
     unlink(tmpfile)
 
     logging::logReset()
-    mess1 <- capture_messages(
-      mess2 <- capture.output(type = "output",
-                              mySim2 <- spades(Copy(mySim),
-                                               debug = 1,
-                                               .plotInitialTime = NA)
-      )
-    )
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        mySim2 <- spades(Copy(mySim), debug = 1, .plotInitialTime = NA)
+      })
+    })
     expect_false(file.exists(tmpfile))
     expect_true(length(mess2) == 0)
     expect_true(any(grepl("total elpsd", mess1)))
     expect_true(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
 
     # Test whether suppressMessages works
-    mess1 <- capture_messages(
-      mess2 <- capture.output(
-        type = "output",
-        suppressMessages(mySim2 <- spades(Copy(mySim),
-                                          debug = list("console" = list(level = "INFO"), debug = 1),
-                                          .plotInitialTime = NA))
-      )
-    )
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        suppressMessages({
+          mySim2 <- spades(Copy(mySim),
+                           debug = list("console" = list(level = "INFO"), debug = 1),
+                           .plotInitialTime = NA)
+          })
+      })
+    })
     expect_true(length(mess1) == 0)
 
     # Test whether suppressMessages works
-    mess1 <- capture_messages(
-      mess2 <- capture.output(
-        type = "output",
-        suppressMessages(mySim2 <- spades(Copy(mySim),
-                                          debug = 1,
-                                          .plotInitialTime = NA))
-      )
-    )
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        suppressMessages({
+          mySim2 <- spades(Copy(mySim), debug = 1, .plotInitialTime = NA)
+        })
+      })
+    })
     expect_true(length(mess1) == 0)
   }
 })
