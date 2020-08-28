@@ -100,7 +100,7 @@
       <h1 data-toc-skip>03 Caching <code>SpaDES</code> simulations</h1>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">August 19 2020</h4>
+            <h4 class="date">August 27 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/iii-cache.Rmd"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -145,37 +145,37 @@
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
   <span class="no">outSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html">Copy</a></span>(<span class="no">mySim</span>), <span class="kw">cache</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">notOlderThan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>())
 })</pre></body></html></div>
-<pre><code>## 2020-08-19 09:38:34 INFO:: total elpsd: 0.0014 secs | 0 checkpoint init 0</code></pre>
-<pre><code>## 2020-08-19 09:38:34 INFO:: total elpsd: 0.23 secs | 0 save init 0</code></pre>
-<pre><code>## 2020-08-19 09:38:34 INFO:: total elpsd: 0.23 secs | 0 progress init 0</code></pre>
-<pre><code>## 2020-08-19 09:38:34 INFO:: total elpsd: 0.23 secs | 0 load init 0</code></pre>
-<pre><code>## 2020-08-19 09:38:34 INFO:: total elpsd: 0.24 secs | 0 randomLandscapes init</code></pre>
-<pre><code>## 2020-08-19 09:38:34 INFO::Loading required namespace: RandomFields</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.1 secs | 0 fireSpread init 1</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.2 secs | 1 fireSpread burn 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.2 secs | 1 fireSpread stats 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.2 secs | 2 fireSpread burn 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 2 fireSpread stats 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 3 fireSpread burn 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 3 fireSpread stats 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 4 fireSpread burn 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 4 fireSpread stats 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 5 fireSpread burn 5</code></pre>
-<pre><code>## 2020-08-19 09:38:35 INFO:: total elpsd: 1.6 secs | 5 fireSpread stats 5</code></pre>
+<pre><code>## 2020-08-27 20:27:58 INFO:: total elpsd: 0.0011 secs | 0 checkpoint init 0</code></pre>
+<pre><code>## 2020-08-27 20:27:58 INFO:: total elpsd: 0.16 secs | 0 save init 0</code></pre>
+<pre><code>## 2020-08-27 20:27:58 INFO:: total elpsd: 0.16 secs | 0 progress init 0</code></pre>
+<pre><code>## 2020-08-27 20:27:58 INFO:: total elpsd: 0.16 secs | 0 load init 0</code></pre>
+<pre><code>## 2020-08-27 20:27:58 INFO:: total elpsd: 0.16 secs | 0 randomLandscapes init</code></pre>
+<pre><code>## 2020-08-27 20:27:58 INFO::Loading required namespace: RandomFields</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 0.82 secs | 0 fireSpread init 1</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 0.82 secs | 1 fireSpread burn 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 0.86 secs | 1 fireSpread stats 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 0.87 secs | 2 fireSpread burn 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 2 fireSpread stats 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 3 fireSpread burn 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 3 fireSpread stats 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 4 fireSpread burn 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 4 fireSpread stats 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 5 fireSpread burn 5</code></pre>
+<pre><code>## 2020-08-27 20:27:59 INFO:: total elpsd: 1.2 secs | 5 fireSpread stats 5</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades() call.</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.884   0.034   2.981</code></pre>
+##   2.092   0.044   2.160</code></pre>
 <p>Note that if there were any visualizations (here we turned them off with <code>.plotInitialTime = NA</code> above) they will happen the first time through, but not the cached times.</p>
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="co"># vastly faster 2nd time</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
   <span class="no">outSimCached</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html">Copy</a></span>(<span class="no">mySim</span>), <span class="kw">cache</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 })</pre></body></html></div>
-<pre><code>##   ...(Object to retrieve (015520eb2af3a95d.rds))</code></pre>
+<pre><code>##   ...(Object to retrieve (e350938abdef61af.rds))</code></pre>
 <pre><code>##      loaded cached result from previous spades call,</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.736   0.000   0.754</code></pre>
+##   0.516   0.004   0.523</code></pre>
 <div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(<span class="no">outSim</span>, <span class="no">outSimCached</span>)</pre></body></html></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -190,56 +190,56 @@
   <span class="no">randomSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html">Copy</a></span>(<span class="no">mySim</span>), <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">NA</span>,
                       <span class="kw">notOlderThan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>(), <span class="kw">debug</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 })</pre></body></html></div>
-<pre><code>## 2020-08-19 09:38:37 INFO::eventTime moduleName eventType eventPriority</code></pre>
-<pre><code>## 2020-08-19 09:38:37 INFO::0         checkpoint init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:37 INFO::0         save       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:37 INFO::0         progress   init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:37 INFO::0         load       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:37 INFO::0         randomLandscapes init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::0         fireSpread       init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::1         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::1         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::2         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::2         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::3         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::3         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::4         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::4         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::5         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::5         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:01 INFO::eventTime moduleName eventType eventPriority</code></pre>
+<pre><code>## 2020-08-27 20:28:01 INFO::0         checkpoint init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:01 INFO::0         save       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:01 INFO::0         progress   init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:01 INFO::0         load       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:01 INFO::0         randomLandscapes init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::0         fireSpread       init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::1         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::1         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::2         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::2         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::3         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::3         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::4         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::4         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::5         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::5         fireSpread       stats     5</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades() call.</code></pre>
 <pre><code>##    user  system elapsed 
-##   2.169   0.007   2.260</code></pre>
+##   1.522   0.004   1.548</code></pre>
 <div class="sourceCode" id="cb48"><html><body><pre class="r"><span class="co"># vastly faster the second time</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
   <span class="no">randomSimCached</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html">Copy</a></span>(<span class="no">mySim</span>), <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">debug</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 })</pre></body></html></div>
-<pre><code>## 2020-08-19 09:38:40 INFO::eventTime moduleName eventType eventPriority</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::0         checkpoint init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::0         save       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::0         progress   init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::0         load       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::0         randomLandscapes init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::  ...(Object to retrieve (01f33dead704cb76.rds))</code></pre>
-<pre><code>## 2020-08-19 09:38:40 INFO::     loaded cached copy of randomLandscapes module adding to memoised copy</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::0         fireSpread       init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::1         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::1         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::2         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::2         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::3         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::3         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::4         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::4         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::5         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::5         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::eventTime moduleName eventType eventPriority</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::0         checkpoint init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::0         save       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::0         progress   init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::0         load       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:02 INFO::0         randomLandscapes init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::  ...(Object to retrieve (01f33dead704cb76.rds))</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::     loaded cached copy of randomLandscapes module adding to memoised copy</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::0         fireSpread       init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::1         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::1         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::2         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::2         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::3         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::3         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::4         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::4         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::5         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::5         fireSpread       stats     5</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades() call.</code></pre>
 <pre><code>##    user  system elapsed 
-##   1.041   0.004   1.117</code></pre>
+##   0.755   0.000   0.758</code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are identical, not <code>fireSpread</code>.</p>
 <div class="sourceCode" id="cb70"><html><body><pre class="r"><span class="no">layers</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span>)
 <span class="no">same</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">layers</span>, <span class="kw">function</span>(<span class="no">l</span>)
@@ -271,58 +271,58 @@
   <span class="no">randomSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html">Copy</a></span>(<span class="no">mySim</span>), <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">NA</span>,
                       <span class="kw">notOlderThan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>(), <span class="kw">debug</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 })</pre></body></html></div>
-<pre><code>## 2020-08-19 09:38:41 INFO::eventTime moduleName eventType eventPriority</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::0         checkpoint init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::0         save       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::0         progress   init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::0         load       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:41 INFO::0         randomLandscapes init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:42 INFO::0         fireSpread       init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::1         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::1         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::2         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::2         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::3         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::3         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::4         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::4         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::5         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::5         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::eventTime moduleName eventType eventPriority</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::0         checkpoint init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::0         save       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::0         progress   init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::0         load       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:03 INFO::0         randomLandscapes init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:04 INFO::0         fireSpread       init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::1         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::1         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::2         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::2         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::3         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::3         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::4         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::4         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::5         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::5         fireSpread       stats     5</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades() call.</code></pre>
 <pre><code>##    user  system elapsed 
-##   1.689   0.022   1.839</code></pre>
+##   1.234   0.012   1.294</code></pre>
 <div class="sourceCode" id="cb92"><html><body><pre class="r"><span class="co"># vastly faster the second time</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
   <span class="no">randomSimCached</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html">Copy</a></span>(<span class="no">mySim</span>), <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">debug</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 })</pre></body></html></div>
-<pre><code>## 2020-08-19 09:38:43 INFO::eventTime moduleName eventType eventPriority</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::0         checkpoint init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::0         save       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::0         progress   init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::0         load       init      0</code></pre>
-<pre><code>## 2020-08-19 09:38:43 INFO::0         randomLandscapes init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::  ...(Object to retrieve (01f33dead704cb76.rds))</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::     loaded cached copy of randomLandscapes module adding to memoised copy</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::0         fireSpread       init      1</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::  ...(Object to retrieve (4ba8570884d24665.rds))</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::     loaded cached copy of init event in fireSpread module.</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::1         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::1         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::2         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::2         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::3         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::3         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::4         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::4         fireSpread       stats     5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::5         fireSpread       burn      5</code></pre>
-<pre><code>## 2020-08-19 09:38:44 INFO::5         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::eventTime moduleName eventType eventPriority</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::0         checkpoint init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::0         save       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::0         progress   init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::0         load       init      0</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::0         randomLandscapes init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::  ...(Object to retrieve (01f33dead704cb76.rds))</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::     loaded cached copy of randomLandscapes module adding to memoised copy</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::0         fireSpread       init      1</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::  ...(Object to retrieve (968908f00d7afe97.rds))</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::     loaded cached copy of init event in fireSpread module.</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::1         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::1         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::2         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::2         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::3         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::3         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::4         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::4         fireSpread       stats     5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::5         fireSpread       burn      5</code></pre>
+<pre><code>## 2020-08-27 20:28:05 INFO::5         fireSpread       stats     5</code></pre>
 <pre><code>## simList saved in
 ##  SpaDES.core:::.pkgEnv$.sim 
 ## It will be deleted at next spades() call.</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.608   0.000   0.679</code></pre>
+##   0.452   0.004   0.461</code></pre>
 </div>
 <div id="function-level-caching" class="section level2">
 <h2 class="hasAnchor">
@@ -335,7 +335,7 @@
                <span class="kw">notOlderThan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span>())
 })</pre></body></html></div>
 <pre><code>##    user  system elapsed 
-##   1.913   0.038   2.084</code></pre>
+##   1.315   0.052   1.381</code></pre>
 <div class="sourceCode" id="cb118"><html><body><pre class="r"><span class="co"># vastly faster the second time</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
   <span class="no">mapCached</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span>(<span class="no">gaussMap</span>, <span class="no">ras</span>, <span class="kw">cacheRepo</span> <span class="kw">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(<span class="no">mySim</span>))
@@ -343,7 +343,7 @@
 <pre><code>##   ...(Object to retrieve (91c3edeaa16817ab.rds) is large: 7.1 Mb)</code></pre>
 <pre><code>##      loaded cached result from previous gaussMap call,</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.064   0.004   0.093</code></pre>
+##   0.052   0.000   0.055</code></pre>
 <div class="sourceCode" id="cb122"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(<span class="no">map</span>, <span class="no">mapCached</span>)</pre></body></html></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
@@ -358,12 +358,12 @@
 <div class="sourceCode" id="cb128"><html><body><pre class="r"><span class="co"># examine only the functions that have been cached</span>
 <span class="no">cacheDB</span>[<span class="no">tagKey</span> <span class="kw">==</span> <span class="st">"function"</span>]</pre></body></html></div>
 <pre><code>##             cacheId   tagKey tagValue         createdDate
-## 1: 015520eb2af3a95d function   spades 2020-08-19 09:38:36
-## 2: 01f33dead704cb76 function   spades 2020-08-19 09:38:42
-## 3: 01f33dead704cb76 function      FUN 2020-08-19 09:38:42
-## 4: 4ba8570884d24665 function   spades 2020-08-19 09:38:43
-## 5: 4ba8570884d24665 function      FUN 2020-08-19 09:38:43
-## 6: 91c3edeaa16817ab function gaussMap 2020-08-19 09:38:46</code></pre>
+## 1: e350938abdef61af function   spades 2020-08-27 20:28:00
+## 2: 01f33dead704cb76 function   spades 2020-08-27 20:28:04
+## 3: 01f33dead704cb76 function      FUN 2020-08-27 20:28:04
+## 4: 968908f00d7afe97 function   spades 2020-08-27 20:28:05
+## 5: 968908f00d7afe97 function      FUN 2020-08-27 20:28:05
+## 6: 91c3edeaa16817ab function gaussMap 2020-08-27 20:28:07</code></pre>
 <div class="sourceCode" id="cb130"><html><body><pre class="r"><span class="co"># get the RasterLayer that was produced with the gaussMap function:</span>
 <span class="no">map</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/cache-tools.html">loadFromCache</a></span>(<span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span>(<span class="no">mySim</span>), <span class="kw">cacheId</span> <span class="kw">=</span> <span class="no">cacheDB</span>[<span class="no">tagValue</span> <span class="kw">==</span> <span class="st">"gaussMap"</span>]$<span class="no">cacheId</span>)
 

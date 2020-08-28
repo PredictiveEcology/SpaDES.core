@@ -238,18 +238,24 @@ a <code>simList</code> or a character string for a package name.</p></td>
 <span class='co'># set modulePath</span>
 <span class='fu'><a href='setPaths.html'>setPaths</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpPhltyE/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpPhltyE/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpPhltyE/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpPhltyE/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='co'># use Require and reqdPkgs</span>
 <span class='kw'>if</span> (!<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/chooseCRANmirror.html'>chooseCRANmirror</a></span>(<span class='kw'>ind</span> <span class='kw'>=</span> <span class='fl'>1</span>) <span class='co'>#</span>
-<span class='fu'>Require</span>(<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span>(<span class='fu'>reqdPkgs</span>(<span class='kw'>module</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"caribouMovement"</span>, <span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>))))</div><div class='output co'>#&gt; <span class='message'>Installing packages into ‘/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4’</span>
-#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: packages ‘caribouMovement1’, ‘caribouMovement3’, ‘caribouMovement4’, ‘fireSpread1’, ‘randomLandscapes1’, ‘randomLandscapes2’, ‘randomLandscapes3’ are not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; named logical(0)</div></pre>
+<span class='fu'>Require</span>(<span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span>(<span class='fu'>reqdPkgs</span>(<span class='kw'>module</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"caribouMovement"</span>, <span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>))))</div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘caribouMovement1’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘caribouMovement3’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘caribouMovement4’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘fireSpread1’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘randomLandscapes3’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘randomLandscapes1’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; <span class='message'>Installing package into ‘/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461’</span>
+#&gt; <span class='message'>(as ‘lib’ is unspecified)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘randomLandscapes2’ is not available (for R version 4.0.2)</span></div><div class='output co'>#&gt; named logical(0)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

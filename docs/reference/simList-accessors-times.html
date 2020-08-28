@@ -324,22 +324,22 @@ of the simulation:</p>
 <span class='co'># Elapsed Time</span>
 <span class='no'>s1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpPhltyE/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpPhltyE/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpPhltyE/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpPhltyE/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpJ44JWF/temp_libpath298d2240f4f2a4/SpaDES.core/sampleModules'</span>
-#&gt; <span class='message'>  )</span></div><div class='input'><span class='no'>s2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>s1</span>)</div><div class='output co'>#&gt; <span class='message'>2020-08-19 09:38:08 INFO::<span style='color: #00BB00;'> total elpsd: 0.00044 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-19 09:38:08 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.002 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-19 09:38:08 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0036 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-19 09:38:08 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.005 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='input'><span class='no'>s2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>s1</span>)</div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::<span style='color: #00BB00;'> total elpsd: 0.00029 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0023 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0031 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
-#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>elapsedTime</span>(<span class='no'>s2</span>)</div><div class='output co'>#&gt;    moduleName eventType      elapsedTime
-#&gt; 1: checkpoint      init 0.001714468 secs
-#&gt; 2:       save      init 0.001580238 secs
-#&gt; 3:   progress      init 0.001396894 secs
-#&gt; 4:       load      init 0.001313686 secs</div><div class='input'><span class='fu'>elapsedTime</span>(<span class='no'>s2</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='st'>"mins"</span>)</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
-#&gt; 1: checkpoint      init 2.857447e-05 mins
-#&gt; 2:       save      init 2.633731e-05 mins
-#&gt; 3:   progress      init 2.328157e-05 mins
-#&gt; 4:       load      init 2.189477e-05 mins</div></span></pre>
+#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>elapsedTime</span>(<span class='no'>s2</span>)</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
+#&gt; 1: checkpoint      init 0.0011005402 secs
+#&gt; 2:       save      init 0.0009534359 secs
+#&gt; 3:   progress      init 0.0008807182 secs
+#&gt; 4:       load      init 0.0008699894 secs</div><div class='input'><span class='fu'>elapsedTime</span>(<span class='no'>s2</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='st'>"mins"</span>)</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
+#&gt; 1: checkpoint      init 1.834234e-05 mins
+#&gt; 2:       save      init 1.589060e-05 mins
+#&gt; 3:   progress      init 1.467864e-05 mins
+#&gt; 4:       load      init 1.449982e-05 mins</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
