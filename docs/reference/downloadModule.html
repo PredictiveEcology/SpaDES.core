@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -152,41 +152,41 @@
     </div>
 
     <pre class="usage"><span class='fu'>downloadModule</span>(
-  <span class='no'>name</span>,
-  <span class='no'>path</span>,
-  <span class='no'>version</span>,
-  <span class='no'>repo</span>,
-  <span class='no'>data</span>,
-  <span class='no'>quiet</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>name</span>,
+  <span class='kw'>path</span>,
+  <span class='kw'>version</span>,
+  <span class='kw'>repo</span>,
+  <span class='kw'>data</span>,
+  <span class='kw'>quiet</span>,
+  quickCheck = <span class='fl'>FALSE</span>,
+  overwrite = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S4 method for character,character,character,character,logical,logical,ANY,logical</span>
 <span class='fu'>downloadModule</span>(
-  <span class='no'>name</span>,
-  <span class='no'>path</span>,
-  <span class='no'>version</span>,
-  <span class='no'>repo</span>,
-  <span class='no'>data</span>,
-  <span class='no'>quiet</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>name</span>,
+  <span class='kw'>path</span>,
+  <span class='kw'>version</span>,
+  <span class='kw'>repo</span>,
+  <span class='kw'>data</span>,
+  <span class='kw'>quiet</span>,
+  quickCheck = <span class='fl'>FALSE</span>,
+  overwrite = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S4 method for character,missing,missing,missing,missing,missing,ANY,ANY</span>
-<span class='fu'>downloadModule</span>(<span class='no'>name</span>, <span class='no'>quickCheck</span>, <span class='no'>overwrite</span>)
+<span class='fu'>downloadModule</span>(<span class='kw'>name</span>, <span class='kw'>quickCheck</span>, <span class='kw'>overwrite</span>)
 
 <span class='co'># S4 method for character,ANY,ANY,ANY,ANY,ANY,ANY,ANY</span>
 <span class='fu'>downloadModule</span>(
-  <span class='no'>name</span>,
-  <span class='no'>path</span>,
-  <span class='no'>version</span>,
-  <span class='no'>repo</span>,
-  <span class='no'>data</span>,
-  <span class='no'>quiet</span>,
-  <span class='kw'>quickCheck</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>name</span>,
+  <span class='kw'>path</span>,
+  <span class='kw'>version</span>,
+  <span class='kw'>repo</span>,
+  <span class='kw'>data</span>,
+  <span class='kw'>quiet</span>,
+  quickCheck = <span class='fl'>FALSE</span>,
+  overwrite = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -259,6 +259,9 @@ as <code>GITHUB_PAT=&lt;your-github-pat-here&gt;</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='zipModule.html'>zipModule</a></code> for creating module .zip folders.</p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -275,7 +278,7 @@ as <code>GITHUB_PAT=&lt;your-github-pat-here&gt;</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

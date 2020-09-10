@@ -87,7 +87,7 @@ attr(time, &quot;unit&quot;), then it simply returns input time." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -161,21 +161,21 @@ If the units passed to argument <code>units</code> are the same as
 <code><a href='https://rdrr.io/r/base/attr.html'>attr(time, "unit")</a></code>, then it simply returns input <code>time</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>inSeconds</span>(<span class='no'>unit</span>, <span class='no'>envir</span>, <span class='kw'>skipChecks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>inSeconds</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>, skipChecks = <span class='fl'>FALSE</span>)
 
-<span class='fu'>convertTimeunit</span>(<span class='no'>time</span>, <span class='no'>unit</span>, <span class='no'>envir</span>, <span class='kw'>skipChecks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>convertTimeunit</span>(<span class='kw'>time</span>, <span class='kw'>unit</span>, <span class='kw'>envir</span>, skipChecks = <span class='fl'>FALSE</span>)
 
-<span class='no'>.spadesTimes</span>
+<span class='kw'>.spadesTimes</span>
 
 <span class='fu'>spadesTimes</span>()
 
-<span class='fu'>checkTimeunit</span>(<span class='no'>unit</span>, <span class='no'>envir</span>)
+<span class='fu'>checkTimeunit</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>)
 
 <span class='co'># S4 method for character,missing</span>
-<span class='fu'>checkTimeunit</span>(<span class='no'>unit</span>, <span class='no'>envir</span>)
+<span class='fu'>checkTimeunit</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>)
 
 <span class='co'># S4 method for character,environment</span>
-<span class='fu'>checkTimeunit</span>(<span class='no'>unit</span>, <span class='no'>envir</span>)</pre>
+<span class='fu'>checkTimeunit</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -223,6 +223,10 @@ This means that a user can override the <code>dyear</code> given in SpaDES, for 
 which is 365.25 days, with <code>dyear &lt;- function(x) lubridate::duration(dday(365))</code>.</p>
 <p>If <code>time</code> has no <code>unit</code> attribute, then it is assumed to be
 seconds.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty &amp; Eliot McIntire</p>
+<p>Eliot McIntire</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -239,7 +243,7 @@ seconds.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

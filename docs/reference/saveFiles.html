@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Save objects using <code>.saveObjects</code> in <code>params</code> slot of <code>simInit</code> — saveFiles • SpaDES.core</title>
+<title>Save objects using .saveObjects in params slot of simInit — saveFiles • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Save objects using <code>.saveObjects</code> in <code>params</code> slot of <code>simInit</code> — saveFiles" />
+<meta property="og:title" content="Save objects using .saveObjects in params slot of simInit — saveFiles" />
 <meta property="og:description" content="In the simInit call, a parameter called .saveObjects can be provided in
 each module.
 This must be a character string vector of all object names to save. These objects will
@@ -85,7 +85,7 @@ then be saved whenever a call to saveFiles is made." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -157,7 +157,7 @@ This must be a character string vector of all object names to save. These object
 then be saved whenever a call to <code>saveFiles</code> is made.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>saveFiles</span>(<span class='no'>sim</span>)</pre>
+    <pre class="usage"><span class='fu'>saveFiles</span>(<span class='kw'>sim</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,38 +213,43 @@ their module.</p>
 standard R functions for saving R objects (e.g., <code>save</code> or <code>saveRDS</code>).
 This is the least modular approach, as it will happen whether a module user
 wants it or not.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Eliot McIntire</p>
+<p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
 
 <span class='co'># This will save the "caribou" object at the save interval of 1 unit of time</span>
 <span class='co'>#  in the outputPath location</span>
-<span class='no'>outputPath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test_save"</span>)
-<span class='no'>times</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='st'>"month"</span>)
-<span class='no'>parameters</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-  <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>),
-  <span class='kw'>caribouMovement</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-    <span class='kw'>.saveObjects</span> <span class='kw'>=</span> <span class='st'>"caribou"</span>,
-    <span class='kw'>.saveInitialTime</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>.saveInterval</span> <span class='kw'>=</span> <span class='fl'>1</span>
+<span class='kw'>outputPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test_save"</span>)
+<span class='kw'>times</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start = <span class='fl'>0</span>, end = <span class='fl'>6</span>, <span class='st'>"month"</span>)
+<span class='kw'>parameters</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+  .globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>),
+  caribouMovement = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+    .saveObjects = <span class='st'>"caribou"</span>,
+    .saveInitialTime = <span class='fl'>1</span>, .saveInterval = <span class='fl'>1</span>
   ),
-  <span class='kw'>randomLandscapes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>.plotInitialTime</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>nx</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>ny</span> <span class='kw'>=</span> <span class='fl'>20</span>))
+  randomLandscapes = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(.plotInitialTime = <span class='fl'>NA</span>, nx = <span class='fl'>20</span>, ny = <span class='fl'>20</span>))
 
-<span class='no'>modules</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"caribouMovement"</span>)
-<span class='no'>paths</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-  <span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>),
-  <span class='kw'>outputPath</span> <span class='kw'>=</span> <span class='no'>savePath</span>
+<span class='kw'>modules</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"caribouMovement"</span>)
+<span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+  modulePath = <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>),
+  outputPath = <span class='kw'>savePath</span>
 )
-<span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>times</span> <span class='kw'>=</span> <span class='no'>times</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='no'>parameters</span>, <span class='kw'>modules</span> <span class='kw'>=</span> <span class='no'>modules</span>,
-                 <span class='kw'>paths</span> <span class='kw'>=</span> <span class='no'>paths</span>)
+<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(times = <span class='kw'>times</span>, params = <span class='kw'>parameters</span>, modules = <span class='kw'>modules</span>,
+                 paths = <span class='kw'>paths</span>)
 
 <span class='co'># The caribou module has a saveFiles(sim) call, so it will save caribou</span>
-<span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>mySim</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='no'>outputPath</span>)
+<span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw'>mySim</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='kw'>outputPath</span>)
 
 <span class='co'># remove the files</span>
-<span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.remove</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='no'>savePath</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
+<span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.remove</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='kw'>savePath</span>, full.names = <span class='fl'>TRUE</span>))
 
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -260,7 +265,7 @@ wants it or not.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

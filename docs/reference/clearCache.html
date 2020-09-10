@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><code>clearCache</code> for <code>simList</code> objects — clearCache,simList-method • SpaDES.core</title>
+<title>clearCache for simList objects — clearCache,simList-method • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="<code>clearCache</code> for <code>simList</code> objects — clearCache,simList-method" />
+<meta property="og:title" content="clearCache for simList objects — clearCache,simList-method" />
 <meta property="og:description" content="This will take the cachePath(object) and pass
 This will take the cachePath(object) and pass
 This will take the cachePath(object) and pass" />
@@ -84,7 +84,7 @@ This will take the cachePath(object) and pass" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -150,46 +150,46 @@ This will take the cachePath(object) and pass" />
     </div>
 
     <div class="ref-description">
-    <p>This will take the <code><a href='simList-accessors-paths.html'>cachePath(object)</a></code> and pass</p>
-<p>This will take the <code><a href='simList-accessors-paths.html'>cachePath(object)</a></code> and pass</p>
-<p>This will take the <code><a href='simList-accessors-paths.html'>cachePath(object)</a></code> and pass</p>
+    <p>This will take the <code><a href='paths.html'>cachePath(object)</a></code> and pass</p>
+<p>This will take the <code><a href='paths.html'>cachePath(object)</a></code> and pass</p>
+<p>This will take the <code><a href='paths.html'>cachePath(object)</a></code> and pass</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
 <span class='fu'>clearCache</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>after</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>before</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ask</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.ask"</span>),
-  <span class='kw'>useCloud</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cloudFolderID</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.cloudFolderID"</span>, <span class='kw'>NULL</span>),
-  <span class='kw'>drv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RSQLite/man/SQLite.html'>SQLite</a></span>()),
-  <span class='kw'>conn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
-  <span class='no'>...</span>
+  <span class='kw'>x</span>,
+  userTags = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  after = <span class='kw'>NULL</span>,
+  before = <span class='kw'>NULL</span>,
+  ask = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.ask"</span>),
+  useCloud = <span class='fl'>FALSE</span>,
+  cloudFolderID = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.cloudFolderID"</span>, <span class='kw'>NULL</span>),
+  drv = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw'>RSQLite</span>::<span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>()),
+  conn = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S4 method for simList</span>
 <span class='fu'>showCache</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>after</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>before</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>drv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RSQLite/man/SQLite.html'>SQLite</a></span>()),
-  <span class='kw'>conn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
-  <span class='no'>...</span>
+  <span class='kw'>x</span>,
+  userTags = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  after = <span class='kw'>NULL</span>,
+  before = <span class='kw'>NULL</span>,
+  drv = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw'>RSQLite</span>::<span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>()),
+  conn = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S4 method for simList</span>
 <span class='fu'>keepCache</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>userTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>after</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>before</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ask</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.ask"</span>),
-  <span class='kw'>drv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RSQLite/man/SQLite.html'>SQLite</a></span>()),
-  <span class='kw'>conn</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
-  <span class='no'>...</span>
+  <span class='kw'>x</span>,
+  userTags = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  after = <span class='kw'>NULL</span>,
+  before = <span class='kw'>NULL</span>,
+  ask = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.ask"</span>),
+  drv = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.drv"</span>, <span class='kw'>RSQLite</span>::<span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>()),
+  conn = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"reproducible.conn"</span>, <span class='kw'>NULL</span>),
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -213,7 +213,7 @@ characters are used.
 Matching will be against any of the 3 columns returned by <code>showCache()</code>,
 i.e., <code>artifact</code>, <code>tagValue</code> or <code>tagName</code>.
 Also, length <code>userTags</code> &gt; 1, then matching is by `and`.
-For `or` matching, use <code>|</code> in a single character string.
+For `or` matching, use <code><a href='https://rdrr.io/r/base/Logic.html'>|</a></code> in a single character string.
 See examples.</p></td>
     </tr>
     <tr>
@@ -282,7 +282,7 @@ passed to <code>clearCache</code>, e.g., <code>ask</code>, <code>userTags</code>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

@@ -100,7 +100,7 @@ This is stated in a message." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -188,11 +188,11 @@ This is stated in a message.</p>
     </div>
 
     <pre class="usage"><span class='fu'>restartR</span>(
-  <span class='no'>sim</span>,
-  <span class='kw'>reloadPkgs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>.First</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.RDataFile</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.restartR.RDataFilename"</span>),
-  <span class='kw'>restartDir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.restartR.restartDir"</span>, <span class='kw'>NULL</span>)
+  <span class='kw'>sim</span>,
+  reloadPkgs = <span class='fl'>TRUE</span>,
+  .First = <span class='kw'>NULL</span>,
+  .RDataFile = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.restartR.RDataFilename"</span>),
+  restartDir = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.restartR.restartDir"</span>, <span class='kw'>NULL</span>)
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -228,8 +228,8 @@ name, as in: <code>basename(file), "_time",</code>
       <td><p>A character string indicating root directory to
 save <code>simList</code> and other ancillary files during restart.
 Defaults to <code><a href='https://rdrr.io/r/base/options.html'>getOption("spades.restartR.restartDir", NULL)</a></code>.
-If <code>NULL</code>, then it will try, in order, <code><a href='simList-accessors-paths.html'>outputPath(sim)</a></code>,
-<code><a href='simList-accessors-paths.html'>modulePath(sim)</a></code>, <code><a href='simList-accessors-paths.html'>inputPath(sim)</a></code>, <code><a href='simList-accessors-paths.html'>cachePath(sim)</a></code>,
+If <code>NULL</code>, then it will try, in order, <code><a href='paths.html'>outputPath(sim)</a></code>,
+<code><a href='paths.html'>modulePath(sim)</a></code>, <code><a href='paths.html'>inputPath(sim)</a></code>, <code><a href='paths.html'>cachePath(sim)</a></code>,
 taking the first one that is not inside the <code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir()</a></code>, which will
 disappear during restart of R.
 The actual directory for a given <code>spades</code> call that is restarting will be:
@@ -281,7 +281,7 @@ The default is to treat these files as temporary files and so will be removed.</
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

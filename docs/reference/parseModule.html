@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,31 +151,31 @@
     <p>Internal function, used during <code><a href='simInit.html'>simInit</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>.parseModulePartial</span>(<span class='no'>sim</span>, <span class='no'>modules</span>, <span class='no'>filename</span>, <span class='no'>defineModuleElement</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>.parseModulePartial</span>(<span class='kw'>sim</span>, <span class='kw'>modules</span>, <span class='kw'>filename</span>, <span class='kw'>defineModuleElement</span>, envir = <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for missing,missing,character,character</span>
-<span class='fu'>.parseModulePartial</span>(<span class='no'>filename</span>, <span class='no'>defineModuleElement</span>, <span class='no'>envir</span>)
+<span class='fu'>.parseModulePartial</span>(<span class='kw'>filename</span>, <span class='kw'>defineModuleElement</span>, <span class='kw'>envir</span>)
 
 <span class='co'># S4 method for simList,list,missing,character</span>
-<span class='fu'>.parseModulePartial</span>(<span class='no'>sim</span>, <span class='no'>modules</span>, <span class='no'>defineModuleElement</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>.parseModulePartial</span>(<span class='kw'>sim</span>, <span class='kw'>modules</span>, <span class='kw'>defineModuleElement</span>, envir = <span class='kw'>NULL</span>)
 
 <span class='fu'>.parseModule</span>(
-  <span class='no'>sim</span>,
-  <span class='no'>modules</span>,
-  <span class='kw'>userSuppliedObjNames</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>notOlderThan</span>,
-  <span class='no'>...</span>
+  <span class='kw'>sim</span>,
+  <span class='kw'>modules</span>,
+  userSuppliedObjNames = <span class='kw'>NULL</span>,
+  envir = <span class='kw'>NULL</span>,
+  <span class='kw'>notOlderThan</span>,
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S4 method for simList,list</span>
 <span class='fu'>.parseModule</span>(
-  <span class='no'>sim</span>,
-  <span class='no'>modules</span>,
-  <span class='kw'>userSuppliedObjNames</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>notOlderThan</span>,
-  <span class='no'>...</span>
+  <span class='kw'>sim</span>,
+  <span class='kw'>modules</span>,
+  userSuppliedObjNames = <span class='kw'>NULL</span>,
+  envir = <span class='kw'>NULL</span>,
+  <span class='kw'>notOlderThan</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -230,6 +230,10 @@ then the <code>.inputObjects</code> code will be skipped.</p></td>
 requested from the module. This can be useful if parsing the whole module
 would cause an error.</p>
 <p>A <code>simList</code> simulation object.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Eliot McIntire</p>
+<p>Alex Chubaty and Eliot McIntire</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -246,7 +250,7 @@ would cause an error.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

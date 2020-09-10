@@ -84,7 +84,7 @@ values set to defaults" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -155,10 +155,10 @@ Packages are loaded during this call. Any or all of these can be missing, with m
 values set to defaults</p>
     </div>
 
-    <pre class="usage"><span class='fu'>defineModule</span>(<span class='no'>sim</span>, <span class='no'>x</span>)
+    <pre class="usage"><span class='fu'>defineModule</span>(<span class='kw'>sim</span>, <span class='kw'>x</span>)
 
 <span class='co'># S4 method for simList,list</span>
-<span class='fu'>defineModule</span>(<span class='no'>sim</span>, <span class='no'>x</span>)</pre>
+<span class='fu'>defineModule</span>(<span class='kw'>sim</span>, <span class='kw'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -281,15 +281,20 @@ in which to replace element(s).</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>moduleDefaults</p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
   <span class='co'>## a default version of the defineModule is created with a call to newModule</span>
-  <span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"test"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>open</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"test"</span>, path = <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), open = <span class='fl'>FALSE</span>)
 
   <span class='co'>## view the resulting module file</span>
-  <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test"</span>, <span class='st'>"test.R"</span>))
-}</div></pre>
+  <span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test"</span>, <span class='st'>"test.R"</span>))
+}
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -305,7 +310,7 @@ in which to replace element(s).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

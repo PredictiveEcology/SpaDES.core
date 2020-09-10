@@ -86,7 +86,7 @@ it returns the other one, unchanged." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -159,19 +159,19 @@ Subelements are not examined and are simply replaced. If one list is empty, then
 it returns the other one, unchanged.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>updateList</span>(<span class='no'>x</span>, <span class='no'>y</span>)
+    <pre class="usage"><span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
 
 <span class='co'># S4 method for list,list</span>
-<span class='fu'>updateList</span>(<span class='no'>x</span>, <span class='no'>y</span>)
+<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
 
 <span class='co'># S4 method for `NULL`,list</span>
-<span class='fu'>updateList</span>(<span class='no'>x</span>, <span class='no'>y</span>)
+<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
 
 <span class='co'># S4 method for list,`NULL`</span>
-<span class='fu'>updateList</span>(<span class='no'>x</span>, <span class='no'>y</span>)
+<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
 
 <span class='co'># S4 method for `NULL`,`NULL`</span>
-<span class='fu'>updateList</span>(<span class='no'>x</span>, <span class='no'>y</span>)</pre>
+<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -191,11 +191,15 @@ it returns the other one, unchanged.</p>
     <p>A named list, with elements sorted by name.
          The values of matching elements in list <code>y</code>
          replace the values in list <code>x</code>.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>L1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='st'>"hst"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>c</span> <span class='kw'>=</span> <span class='fl'>43</span>)
-<span class='no'>L2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='st'>"gst"</span>, <span class='kw'>c</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>d</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>letters</span>))
-<span class='fu'>updateList</span>(<span class='no'>L1</span>, <span class='no'>L2</span>)</div><div class='output co'>#&gt; $a
+    <pre class="examples"><div class='input'><span class='kw'>L1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(a = <span class='st'>"hst"</span>, b = <span class='fl'>NA_character_</span>, c = <span class='fl'>43</span>)
+<span class='kw'>L2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(a = <span class='st'>"gst"</span>, c = <span class='fl'>42</span>, d = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>letters</span>))
+<span class='fu'>updateList</span>(<span class='kw'>L1</span>, <span class='kw'>L2</span>)
+</div><div class='output co'>#&gt; $a
 #&gt; [1] "gst"
 #&gt; 
 #&gt; $b
@@ -210,7 +214,8 @@ it returns the other one, unchanged.</p>
 #&gt; [20] "t" "u" "v" "w" "x" "y" "z"
 #&gt; 
 #&gt; </div><div class='input'>
-<span class='fu'>updateList</span>(<span class='no'>L1</span>, <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; $a
+<span class='fu'>updateList</span>(<span class='kw'>L1</span>, <span class='kw'>NULL</span>)
+</div><div class='output co'>#&gt; $a
 #&gt; [1] "hst"
 #&gt; 
 #&gt; $b
@@ -218,7 +223,8 @@ it returns the other one, unchanged.</p>
 #&gt; 
 #&gt; $c
 #&gt; [1] 43
-#&gt; </div><div class='input'><span class='fu'>updateList</span>(<span class='kw'>NULL</span>, <span class='no'>L2</span>)</div><div class='output co'>#&gt; $a
+#&gt; </div><div class='input'><span class='fu'>updateList</span>(<span class='kw'>NULL</span>, <span class='kw'>L2</span>)
+</div><div class='output co'>#&gt; $a
 #&gt; [1] "gst"
 #&gt; 
 #&gt; $c
@@ -229,7 +235,8 @@ it returns the other one, unchanged.</p>
 #&gt;  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
 #&gt; [20] "t" "u" "v" "w" "x" "y" "z"
 #&gt; 
-#&gt; </div><div class='input'><span class='fu'>updateList</span>(<span class='kw'>NULL</span>, <span class='kw'>NULL</span>) <span class='co'># should return empty list</span></div><div class='output co'>#&gt; list()</div><div class='input'>
+#&gt; </div><div class='input'><span class='fu'>updateList</span>(<span class='kw'>NULL</span>, <span class='kw'>NULL</span>) <span class='co'># should return empty list</span>
+</div><div class='output co'>#&gt; list()</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -246,7 +253,7 @@ it returns the other one, unchanged.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

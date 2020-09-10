@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>The <code>simList</code> class — simList-class • SpaDES.core</title>
+<title>The simList class — simList-class • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="The <code>simList</code> class — simList-class" />
+<meta property="og:title" content="The simList class — simList-class" />
 <meta property="og:description" content="Contains the minimum components of a SpaDES simulation.
 Various slot accessor methods (i.e., get and set functions) are provided
 (see 'Accessor Methods' below)." />
@@ -84,7 +84,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -169,14 +169,14 @@ more efficient).</p>
 
     
 
-<dl'>
+<dl>
 <dt><code>modules</code></dt><dd><p>List of character names specifying which modules to load.</p></dd>
 
 <dt><code>params</code></dt><dd><p>Named list of potentially other lists specifying simulation
 parameters.</p></dd>
 
 <dt><code>events</code></dt><dd><p>The list of scheduled events (i.e., event queue), which can
-be converted to a sorted <code>data.table</code> with <code><a href='simList-accessors-events.html'>events(sim)</a></code>.
+be converted to a sorted <code>data.table</code> with <code><a href='events.html'>events(sim)</a></code>.
 See 'Event Lists' for more information.</p></dd>
 
 <dt><code>current</code></dt><dd><p>The current event, as a <code>data.table</code>.
@@ -191,7 +191,7 @@ See 'Event Lists' for more information. It is kept
 as an environment of individual events for speed. The <code>completed</code>
 method converts it to a sorted <code>data.table</code>.</p></dd>
 
-<dt><code>depends</code></dt><dd><p>A <code>.simDeps</code> list of <code><a href='moduleDeps-class.html'>.moduleDeps</a></code> objects
+<dt><code>depends</code></dt><dd><p>A <code>.simDeps</code> list of <code><a href='.moduleDeps-class.html'>.moduleDeps</a></code> objects
 containing module object dependency information.</p></dd>
 
 <dt><code>simtimes</code></dt><dd><p>List of numerical values describing the simulation start
@@ -210,7 +210,7 @@ and <code>outputPath</code> paths. Partial matching is performed.</p></dd>
 Several "shortcuts" to accessing objects referenced by this
 environment are provided, and can be used on the
 <code>simList</code> object directly instead of specifying the
-<code>.xData</code> slot: <code>$</code>, <code>[[</code>, <code>ls</code>,
+<code>.xData</code> slot: <code><a href='https://rdrr.io/r/base/Extract.html'>$</a></code>, <code><a href='https://rdrr.io/r/base/Extract.html'>[[</a></code>, <code>ls</code>,
 <code>ls.str</code>, <code>objs</code>. See examples.</p></dd>
 
 <dt><code>.envir</code></dt><dd><p>Deprecated. Please do not use any more.</p></dd>
@@ -235,14 +235,14 @@ saving/loading a list behaves more reliably than saving/loading an environment.<
 
 <p>Several slot (and sub-slot) accessor methods are provided for use, and
 categorized into separate help pages:</p><table class='table'>
-<tr><td><code><a href='simList-accessors-envir.html'>simList-accessors-envir</a></code></td><td>Simulation environment.</td></tr>
-<tr><td><code><a href='simList-accessors-events.html'>simList-accessors-events</a></code></td><td>Scheduled and completed events.</td></tr>
-<tr><td><code><a href='simList-accessors-inputs.html'>simList-accessors-inout</a></code></td><td>Passing data in to / out of simulations.</td></tr>
-<tr><td><code><a href='simList-accessors-modules.html'>simList-accessors-modules</a></code></td><td>Modules loaded and used; module dependencies.</td></tr>
-<tr><td><code><a href='objects.html'>simList-accessors-objects</a></code></td><td>Accessing objects used in the simulation.</td></tr>
+<tr><td><code><a href='envir.html'>simList-accessors-envir</a></code></td><td>Simulation environment.</td></tr>
+<tr><td><code><a href='events.html'>simList-accessors-events</a></code></td><td>Scheduled and completed events.</td></tr>
+<tr><td><code><a href='inputs.html'>simList-accessors-inout</a></code></td><td>Passing data in to / out of simulations.</td></tr>
+<tr><td><code><a href='modules.html'>simList-accessors-modules</a></code></td><td>Modules loaded and used; module dependencies.</td></tr>
+<tr><td><code><a href='objs.html'>simList-accessors-objects</a></code></td><td>Accessing objects used in the simulation.</td></tr>
 <tr><td><code><a href='params.html'>simList-accessors-params</a></code></td><td>Global and module-specific parameters.</td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>simList-accessors-paths</a></code></td><td>File paths for modules, inputs, and outputs.</td></tr>
-<tr><td><code><a href='simList-accessors-times.html'>simList-accessors-times</a></code></td><td>Simulation times.</td></tr>
+<tr><td><code><a href='paths.html'>simList-accessors-paths</a></code></td><td>File paths for modules, inputs, and outputs.</td></tr>
+<tr><td><code><a href='times.html'>simList-accessors-times</a></code></td><td>Simulation times.</td></tr>
 </table>
 
 
@@ -267,6 +267,9 @@ Each event is represented by a <code>data.table</code> row consisting of:</p><ta
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
             Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty and Eliot McIntire</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -283,7 +286,7 @@ Each event is represented by a <code>data.table</code> row consisting of:</p><ta
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

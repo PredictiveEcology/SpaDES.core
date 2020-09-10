@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,16 +151,16 @@
     <p>Parse and extract module metadata</p>
     </div>
 
-    <pre class="usage"><span class='fu'>moduleMetadata</span>(<span class='no'>sim</span>, <span class='no'>module</span>, <span class='no'>path</span>)
+    <pre class="usage"><span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span>, <span class='kw'>module</span>, <span class='kw'>path</span>)
 
 <span class='co'># S4 method for missing,character,character</span>
-<span class='fu'>moduleMetadata</span>(<span class='no'>module</span>, <span class='no'>path</span>)
+<span class='fu'>moduleMetadata</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)
 
 <span class='co'># S4 method for missing,character,missing</span>
-<span class='fu'>moduleMetadata</span>(<span class='no'>module</span>)
+<span class='fu'>moduleMetadata</span>(<span class='kw'>module</span>)
 
 <span class='co'># S4 method for ANY,ANY,ANY</span>
-<span class='fu'>moduleMetadata</span>(<span class='no'>sim</span>, <span class='no'>module</span>, <span class='no'>path</span>)</pre>
+<span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span>, <span class='kw'>module</span>, <span class='kw'>path</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,37 +187,43 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='defineModule.html'>defineModule</a></code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
-<span class='no'>sampleModules</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='no'>path</span>)
+    <pre class="examples"><div class='input'><span class='kw'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>)
+<span class='kw'>sampleModules</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='kw'>path</span>)
 <span class='co'># turn off code checking -- don't need it here</span>
-<span class='no'>opts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='st'>"spades.moduleCodeChecks"</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                <span class='st'>"spades.useRequire"</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>opts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='st'>"spades.moduleCodeChecks"</span> = <span class='fl'>FALSE</span>,
+                <span class='st'>"spades.useRequire"</span> = <span class='fl'>FALSE</span>)
 
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleMetadata</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>)</div><div class='output co'>#&gt; <span class='message'>Assuming sim is a module name</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
+<span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'>moduleMetadata</span>(<span class='kw'>sampleModules</span>[<span class='fl'>3</span>], path = <span class='kw'>path</span>)
+</div><div class='output co'>#&gt; <span class='message'>Assuming sim is a module name</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
 <span class='co'># using simList</span>
-<span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-   <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>2000.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>2001.0</span>, <span class='kw'>timeunit</span> <span class='kw'>=</span> <span class='st'>"year"</span>),
-   <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-     <span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>)
+<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
+   times = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start = <span class='fl'>2000.0</span>, end = <span class='fl'>2001.0</span>, timeunit = <span class='st'>"year"</span>),
+   params = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+     .globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>)
    ),
-   <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"caribouMovement"</span>),
-   <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>))
-)</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+   modules = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"caribouMovement"</span>),
+   paths = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>))
+)
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/Require/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp8wsMvA/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp8wsMvA/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/Require/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp3O9MOW/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp3O9MOW/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: grid</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘grid’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:quickPlot’:</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    gpar</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: raster</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: SpaDES.tools</span></div><div class='input'><span class='fu'>moduleMetadata</span>(<span class='kw'>sim</span> <span class='kw'>=</span> <span class='no'>mySim</span>)</div><div class='output co'>#&gt; $name
+#&gt; <span class='message'>    gpar</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: raster</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: SpaDES.tools</span></div><div class='input'><span class='fu'>moduleMetadata</span>(sim = <span class='kw'>mySim</span>)
+</div><div class='output co'>#&gt; $name
 #&gt; [1] "caribouMovement"
 #&gt; 
 #&gt; $description
@@ -303,7 +309,8 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 #&gt; 1    caribou SpatialPointsDataFrame &lt;NA&gt;
 #&gt; </div><div class='input'>
 <span class='co'># turn code checking back on -- don't need it here</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='no'>opts</span>)</div></span></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>opts</span>)
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -319,7 +326,7 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

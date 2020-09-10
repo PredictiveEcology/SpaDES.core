@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Zip many of the files in a <code>simList</code> — zipSimList • SpaDES.core</title>
+<title>Zip many of the files in a simList — zipSimList • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Zip many of the files in a <code>simList</code> — zipSimList" />
+<meta property="og:title" content="Zip many of the files in a simList — zipSimList" />
 <meta property="og:description" content="Currently, this will save the raster-backed files, outputs(sim), inputs(sim).
 It will add these to a temp file, using Copy, where appropriate
 to not affect the original simList.
@@ -85,7 +85,7 @@ VERY experimental; unlikely to work perfectly at the moment." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,13 +151,13 @@ VERY experimental; unlikely to work perfectly at the moment." />
     </div>
 
     <div class="ref-description">
-    <p>Currently, this will save the raster-backed files, <code><a href='simList-accessors-outputs.html'>outputs(sim)</a></code>, <code><a href='simList-accessors-inputs.html'>inputs(sim)</a></code>.
+    <p>Currently, this will save the raster-backed files, <code><a href='outputs.html'>outputs(sim)</a></code>, <code><a href='inputs.html'>inputs(sim)</a></code>.
 It will add these to a temp file, using <code>Copy</code>, where appropriate
 to not affect the original <code>simList</code>.
 VERY experimental; unlikely to work perfectly at the moment.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>zipSimList</span>(<span class='no'>sim</span>, <span class='no'>zipfile</span>, <span class='no'>...</span>, <span class='kw'>outputs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>inputs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>cache</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>zipSimList</span>(<span class='kw'>sim</span>, <span class='kw'>zipfile</span>, <span class='kw'>...</span>, outputs = <span class='fl'>TRUE</span>, inputs = <span class='fl'>TRUE</span>, cache = <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -177,16 +177,16 @@ VERY experimental; unlikely to work perfectly at the moment.</p>
     <tr>
       <th>outputs</th>
       <td><p>Logical. If <code>TRUE</code>, all files identified in
-<code><a href='simList-accessors-outputs.html'>outputs(sim)</a></code> will be included in the zip.</p></td>
+<code><a href='outputs.html'>outputs(sim)</a></code> will be included in the zip.</p></td>
     </tr>
     <tr>
       <th>inputs</th>
       <td><p>Logical. If <code>TRUE</code>, all files identified in
-<code><a href='simList-accessors-inputs.html'>inputs(sim)</a></code> will be included in the zip.</p></td>
+<code><a href='inputs.html'>inputs(sim)</a></code> will be included in the zip.</p></td>
     </tr>
     <tr>
       <th>cache</th>
-      <td><p>Logical. If <code>TRUE</code>, all files in <code><a href='simList-accessors-paths.html'>cachePath(sim)</a></code> will be included in the
+      <td><p>Logical. If <code>TRUE</code>, all files in <code><a href='paths.html'>cachePath(sim)</a></code> will be included in the
 zip archive. Defaults to <code>FALSE</code> as this could be large, and may include many
 out of date elements. See Details. Not yet implemented.</p></td>
     </tr>
@@ -212,7 +212,7 @@ zipping, to include only cache elements that are relevant.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

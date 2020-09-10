@@ -85,7 +85,7 @@ defineOutputs" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -157,20 +157,20 @@ that extraneous spaces and End-Of-Line characters will be removed from the
 <code>defineOutputs</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>moduleParams</span>(<span class='no'>module</span>, <span class='no'>path</span>)
+    <pre class="usage"><span class='fu'>moduleParams</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)
 
 <span class='co'># S4 method for character,character</span>
-<span class='fu'>moduleParams</span>(<span class='no'>module</span>, <span class='no'>path</span>)
+<span class='fu'>moduleParams</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)
 
-<span class='fu'>moduleInputs</span>(<span class='no'>module</span>, <span class='no'>path</span>)
-
-<span class='co'># S4 method for character,character</span>
-<span class='fu'>moduleInputs</span>(<span class='no'>module</span>, <span class='no'>path</span>)
-
-<span class='fu'>moduleOutputs</span>(<span class='no'>module</span>, <span class='no'>path</span>)
+<span class='fu'>moduleInputs</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)
 
 <span class='co'># S4 method for character,character</span>
-<span class='fu'>moduleOutputs</span>(<span class='no'>module</span>, <span class='no'>path</span>)</pre>
+<span class='fu'>moduleInputs</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)
+
+<span class='fu'>moduleOutputs</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)
+
+<span class='co'># S4 method for character,character</span>
+<span class='fu'>moduleOutputs</span>(<span class='kw'>module</span>, <span class='kw'>path</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -192,15 +192,22 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='moduleMetadata.html'>moduleMetadata</a></code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)
-<span class='no'>sampleModules</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='no'>path</span>)
+    <pre class="examples"><div class='input'><span class='kw'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>)
+<span class='kw'>sampleModules</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='kw'>path</span>)
 
-<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleParams</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>)</div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'><span class='no'>i</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleInputs</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>)</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'><span class='no'>o</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleOutputs</span>(<span class='no'>sampleModules</span>[<span class='fl'>3</span>], <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>)</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
+<span class='kw'>p</span> <span class='op'>&lt;-</span> <span class='fu'>moduleParams</span>(<span class='kw'>sampleModules</span>[<span class='fl'>3</span>], path = <span class='kw'>path</span>)
+</div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'><span class='kw'>i</span> <span class='op'>&lt;-</span> <span class='fu'>moduleInputs</span>(<span class='kw'>sampleModules</span>[<span class='fl'>3</span>], path = <span class='kw'>path</span>)
+</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'><span class='kw'>o</span> <span class='op'>&lt;-</span> <span class='fu'>moduleOutputs</span>(<span class='kw'>sampleModules</span>[<span class='fl'>3</span>], path = <span class='kw'>path</span>)
+</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
 <span class='co'>#' \dontrun{</span>
 <span class='co'>## easily include these tables in Rmd files using knitr</span>
-<span class='kw pkg'>knitr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='no'>p</span>)</div><div class='output co'>#&gt; 
+<span class='kw'>knitr</span>::<span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='kw'>p</span>)
+</div><div class='output co'>#&gt; 
 #&gt; 
 #&gt; |paramName        |paramClass |default    |min        |max   |paramDesc                                         |
 #&gt; |:----------------|:----------|:----------|:----------|:-----|:-------------------------------------------------|
@@ -212,15 +219,17 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 #&gt; |.plotInterval    |numeric    |NA         |NA         |NA    |time interval between plot events                 |
 #&gt; |.saveInitialTime |numeric    |NA         |NA         |NA    |time to schedule first save event                 |
 #&gt; |.saveInterval    |numeric    |NA         |NA         |NA    |time interval between save events                 |
-#&gt; |.useCache        |logical    |FALSE      |init, plot |NA    |should the module result be cached for future use |</div><div class='input'><span class='kw pkg'>knitr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='no'>i</span>)</div><div class='output co'>#&gt; 
+#&gt; |.useCache        |logical    |FALSE      |init, plot |NA    |should the module result be cached for future use |</div><div class='input'><span class='kw'>knitr</span>::<span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='kw'>i</span>)
+</div><div class='output co'>#&gt; 
 #&gt; 
 #&gt; |objectName |objectClass |desc |sourceURL |other |
 #&gt; |:----------|:-----------|:----|:---------|:-----|
-#&gt; |NA         |NA          |NA   |NA        |NA    |</div><div class='input'><span class='kw pkg'>knitr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='no'>o</span>)</div><div class='output co'>#&gt; 
+#&gt; |NA         |NA          |NA   |NA        |NA    |</div><div class='input'><span class='kw'>knitr</span>::<span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span>(<span class='kw'>o</span>)
+</div><div class='output co'>#&gt; 
 #&gt; 
 #&gt; |objectName                                        |objectClass |desc |other |
 #&gt; |:-------------------------------------------------|:-----------|:----|:-----|
-#&gt; |SpaDES.core::P(sim, "randomLandscapes")$stackName |RasterStack |NA   |NA    |</div><div class='input'>#' }
+#&gt; |SpaDES.core::P(sim, "randomLandscapes")$stackName |RasterStack |NA   |NA    |</div><div class='input'><span class='co'>#' }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -237,7 +246,7 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

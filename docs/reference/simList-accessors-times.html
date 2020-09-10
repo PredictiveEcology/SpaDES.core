@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Time usage in <code>SpaDES</code> — times • SpaDES.core</title>
+<title>Time usage in SpaDES — times • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Time usage in <code>SpaDES</code> — times" />
+<meta property="og:title" content="Time usage in SpaDES — times" />
 <meta property="og:description" content="Functions for the simtimes slot of a simList object
 and its elements. To maintain modularity, the behaviour of these functions depends
 on where they are used. In other words, different modules can have their own
@@ -86,7 +86,7 @@ shows the user time in the units of the model as shown with timeunit(sim)" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -159,63 +159,63 @@ timeunit. <code>SpaDES</code> converts these to seconds when running a simulatio
 shows the user time in the units of the model as shown with <code>timeunit(sim)</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>times</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>times</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>times</span>(<span class='no'>x</span>)
+<span class='fu'>times</span>(<span class='kw'>x</span>)
 
-<span class='fu'>times</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>times</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>times</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>times</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S3 method for simList</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='no'>x</span>, <span class='no'>unit</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='kw'>x</span>, <span class='kw'>unit</span>, <span class='kw'>...</span>)
 
-<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
-<span class='fu'>end</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>end</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for simList</span>
-<span class='fu'>end</span>(<span class='no'>x</span>, <span class='no'>unit</span>, <span class='no'>...</span>)
+<span class='fu'>end</span>(<span class='kw'>x</span>, <span class='kw'>unit</span>, <span class='kw'>...</span>)
 
-<span class='fu'>end</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>end</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>end</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>end</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
-<span class='fu'>start</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>start</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for simList</span>
-<span class='fu'>start</span>(<span class='no'>x</span>, <span class='kw'>unit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>start</span>(<span class='kw'>x</span>, unit = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
-<span class='fu'>start</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>start</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>timeunit</span>(<span class='no'>x</span>)
+<span class='fu'>start</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>timeunit</span>(<span class='no'>x</span>)
+<span class='fu'>start</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
-<span class='fu'>timeunit</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>timeunit</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>timeunits</span>(<span class='no'>x</span>)
+<span class='fu'>timeunit</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>timeunits</span>(<span class='no'>x</span>)
+<span class='fu'>timeunit</span>(<span class='kw'>x</span>)
 
-<span class='fu'>elapsedTime</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>timeunit</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>timeunit</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+
+<span class='fu'>timeunits</span>(<span class='kw'>x</span>)
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>timeunits</span>(<span class='kw'>x</span>)
+
+<span class='fu'>elapsedTime</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for simList</span>
-<span class='fu'>elapsedTime</span>(<span class='no'>x</span>, <span class='kw'>byEvent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>elapsedTime</span>(<span class='kw'>x</span>, byEvent = <span class='fl'>TRUE</span>, units = <span class='st'>"auto"</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -306,40 +306,47 @@ of the simulation:</p>
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.5 on Simulation times;
   <code>elapsedTime</code>,</p>
 <p>Other functions to access elements of a 'simList' object: 
-<code><a href='addDepends.html'>.addDepends</a>()</code>,
-<code><a href='checkpoint.html'>doEvent.checkpoint</a>()</code>,
-<code><a href='simList-accessors-envir.html'>envir</a>()</code>,
-<code><a href='simList-accessors-events.html'>events</a>()</code>,
+<code><a href='.addDepends.html'>.addDepends</a>()</code>,
+<code><a href='doEvent.checkpoint.html'>doEvent.checkpoint</a>()</code>,
+<code><a href='envir.html'>envir</a>()</code>,
+<code><a href='events.html'>events</a>()</code>,
 <code><a href='globals.html'>globals</a>()</code>,
-<code><a href='simList-accessors-inputs.html'>inputs</a>()</code>,
-<code><a href='simList-accessors-modules.html'>modules</a>()</code>,
-<code><a href='objects.html'>objs</a>()</code>,
+<code><a href='inputs.html'>inputs</a>()</code>,
+<code><a href='modules.html'>modules</a>()</code>,
+<code><a href='objs.html'>objs</a>()</code>,
 <code><a href='packages.html'>packages</a>()</code>,
 <code><a href='params.html'>params</a>()</code>,
-<code><a href='simList-accessors-paths.html'>paths</a>()</code>,
-<code><a href='progress.html'>progressInterval</a>()</code></p></div>
+<code><a href='paths.html'>paths</a>()</code>,
+<code><a href='progressInterval.html'>progressInterval</a>()</code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty and Eliot McIntire</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Elapsed Time</span>
-<span class='no'>s1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+<span class='kw'>s1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp7kGzIZ/temp_libpath3d9d4b71c5d461/SpaDES.core/sampleModules'</span>
-#&gt; <span class='message'>  )</span></div><div class='input'><span class='no'>s2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>s1</span>)</div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::<span style='color: #00BB00;'> total elpsd: 0.00029 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0023 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:39 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0031 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='input'><span class='kw'>s2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw'>s1</span>)
+</div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:45 INFO::<span style='color: #00BB00;'> total elpsd: 3e-04 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:45 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0014 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:45 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:45 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
-#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>elapsedTime</span>(<span class='no'>s2</span>)</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
-#&gt; 1: checkpoint      init 0.0011005402 secs
-#&gt; 2:       save      init 0.0009534359 secs
-#&gt; 3:   progress      init 0.0008807182 secs
-#&gt; 4:       load      init 0.0008699894 secs</div><div class='input'><span class='fu'>elapsedTime</span>(<span class='no'>s2</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='st'>"mins"</span>)</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
-#&gt; 1: checkpoint      init 1.834234e-05 mins
-#&gt; 2:       save      init 1.589060e-05 mins
-#&gt; 3:   progress      init 1.467864e-05 mins
-#&gt; 4:       load      init 1.449982e-05 mins</div></span></pre>
+#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>elapsedTime</span>(<span class='kw'>s2</span>)
+</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
+#&gt; 1: checkpoint      init 0.0011606216 secs
+#&gt; 2:       save      init 0.0010042191 secs
+#&gt; 3:   progress      init 0.0009245872 secs
+#&gt; 4:       load      init 0.0008912086 secs</div><div class='input'><span class='fu'>elapsedTime</span>(<span class='kw'>s2</span>, units = <span class='st'>"mins"</span>)
+</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
+#&gt; 1: checkpoint      init 1.934369e-05 mins
+#&gt; 2:       save      init 1.673698e-05 mins
+#&gt; 3:   progress      init 1.540979e-05 mins
+#&gt; 4:       load      init 1.485348e-05 mins</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -355,7 +362,7 @@ of the simulation:</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

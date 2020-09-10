@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Identify synonyms in a <code>simList</code> — objectSynonyms • SpaDES.core</title>
+<title>Identify synonyms in a simList — objectSynonyms • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Identify synonyms in a <code>simList</code> — objectSynonyms" />
+<meta property="og:title" content="Identify synonyms in a simList — objectSynonyms" />
 <meta property="og:description" content="This will create active bindings amongst the synonyms. To minimize copying,
 the first one that exists in the character vector will become the &quot;canonical&quot;
 object. All others named in the character vector will be activeBindings to
@@ -91,7 +91,7 @@ deletes the object, it will &quot;come back&quot;. This may not always be desire
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -169,7 +169,7 @@ is/are the activeBindings. EXPERIMENTAL: If the objects are removed during a
 deletes the object, it will "come back". This may not always be desired.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>objectSynonyms</span>(<span class='no'>envir</span>, <span class='no'>synonyms</span>)</pre>
+    <pre class="usage"><span class='fu'>objectSynonyms</span>(<span class='kw'>envir</span>, <span class='kw'>synonyms</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -204,48 +204,58 @@ transitivity, i.e., if age and ageMap are synonyms, and ageMap and timeSinceFire
 are synonyms, then age and timeSinceFire must be synonyms.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+    <pre class="examples"><div class='input'><span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBfoYZF/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>
-<span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>;
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='no'>sim</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>)))
+<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span> <span class='op'>&lt;-</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>;
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='kw'>sim</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>)))
 
-<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>4</span>
-<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='no'>sim</span>$<span class='no'>ageMap</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span>:<span class='fl'>5</span>
-<span class='no'>sim</span>$<span class='no'>ageMap</span>[<span class='fl'>3</span>] <span class='kw'>&lt;-</span> <span class='fl'>11</span>
-<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span>, <span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span>)
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span> <span class='op'>&lt;-</span> <span class='fl'>4</span>
+<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span>, <span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span>)
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>5</span>
+<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span>[<span class='fl'>3</span>] <span class='op'>&lt;-</span> <span class='fl'>11</span>
+<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span>, <span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span>)
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'># Also works to pass it in as an object</span>
-<span class='no'>objectSynonyms</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>))
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>objects</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>objectSynonyms</span> <span class='kw'>=</span> <span class='no'>objectSynonyms</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+<span class='kw'>objectSynonyms</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>))
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(objects = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(objectSynonyms = <span class='kw'>objectSynonyms</span>))
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBfoYZF/myProject/modules'</span>
-#&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>) <span class='co'># they are NULL at this point</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='no'>sim</span>$<span class='no'>age</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>
-<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>sim</span>$<span class='no'>ageMap</span>, <span class='no'>sim</span>$<span class='no'>age</span>) <span class='co'># they are not NULL at this point</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
+#&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span>, <span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span>) <span class='co'># they are NULL at this point</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span> <span class='op'>&lt;-</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>
+<span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>ageMap</span>, <span class='kw'>sim</span><span class='op'>$</span><span class='kw'>age</span>) <span class='co'># they are not NULL at this point</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'>## More complicated, with 'updating' i.e., you can add new synonyms to previous</span>
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBfoYZF/myProject/modules'</span>
-#&gt; <span class='message'>  )</span></div><div class='input'><span class='no'>os</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"vegMap"</span>, <span class='st'>"veg"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"studyArea"</span>, <span class='st'>"studyArea2"</span>))
-<span class='no'>os2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ageMap"</span>, <span class='st'>"timeSinceFire"</span>, <span class='st'>"tsf"</span>),
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
+#&gt; <span class='message'>  )</span></div><div class='input'><span class='kw'>os</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"age"</span>, <span class='st'>"ageMap"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"vegMap"</span>, <span class='st'>"veg"</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"studyArea"</span>, <span class='st'>"studyArea2"</span>))
+<span class='kw'>os2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ageMap"</span>, <span class='st'>"timeSinceFire"</span>, <span class='st'>"tsf"</span>),
             <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"systime"</span>, <span class='st'>"systime2"</span>),
             <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"vegMap"</span>, <span class='st'>"veg"</span>))
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='no'>sim</span>, <span class='no'>os</span>)
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='no'>sim</span>, <span class='no'>os2</span>)</div><div class='output co'>#&gt; <span class='message'>age, ageMap already exist; using the first one, age</span></div><div class='output co'>#&gt; <span class='message'>vegMap, veg already exist; using the first one, vegMap</span></div><div class='input'>
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='kw'>sim</span>, <span class='kw'>os</span>)
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'>objectSynonyms</span>(<span class='kw'>sim</span>, <span class='kw'>os2</span>)
+</div><div class='output co'>#&gt; <span class='message'>age, ageMap already exist; using the first one, age</span></div><div class='output co'>#&gt; <span class='message'>vegMap, veg already exist; using the first one, vegMap</span></div><div class='input'>
 <span class='co'># check</span>
-<span class='no'>sim</span>$<span class='no'>objectSynonyms</span></div><div class='output co'>#&gt; [[1]]
+<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>objectSynonyms</span>
+</div><div class='output co'>#&gt; [[1]]
 #&gt; [1] "studyArea"  "studyArea2"
 #&gt; 
 #&gt; [[2]]
@@ -307,7 +317,7 @@ are synonyms, then age and timeSinceFire must be synonyms.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

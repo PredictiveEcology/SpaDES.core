@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,25 +151,25 @@
     <p>Accessor functions for the <code>inputs</code> slots in a <code>simList</code> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>inputs</span>(<span class='no'>sim</span>)
+    <pre class="usage"><span class='fu'>inputs</span>(<span class='kw'>sim</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>inputs</span>(<span class='no'>sim</span>)
+<span class='fu'>inputs</span>(<span class='kw'>sim</span>)
 
-<span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>inputArgs</span>(<span class='no'>sim</span>)
+<span class='fu'>inputs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>inputArgs</span>(<span class='no'>sim</span>)
+<span class='fu'>inputs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
-<span class='fu'>inputArgs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>inputArgs</span>(<span class='kw'>sim</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>inputArgs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+<span class='fu'>inputArgs</span>(<span class='kw'>sim</span>)
+
+<span class='fu'>inputArgs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>inputArgs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,7 +195,7 @@ in the <code>simList</code> object.</p>
 to load in a <code>spades</code> call.</p><ol>
 <li><p>As arguments to a <code>simInit</code> call. Specifically, <code>inputs</code> or <code>outputs</code>.
         See <code><a href='simInit.html'>?simInit</a></code>.</p></li>
-<li><p>With the <code><a href='simList-accessors-outputs.html'>outputs(simList)</a></code> function call.</p></li>
+<li><p>With the <code><a href='outputs.html'>outputs(simList)</a></code> function call.</p></li>
 <li><p>By adding a function called <code>.inputObjects</code> inside a module, which will be executed
         during the <code>simInit</code> call. This last way is the most "modular" way to create
         default data sets for your model.</p></li>
@@ -219,13 +219,13 @@ can therefore be accessed with <code>sim$xxx</code> in any module, where
 directory information.</td></tr>
 <tr><td><code>fun</code></td><td>optional, a character string indicating the function to use to
 load that file. Defaults to the known extensions in <code>SpaDES</code> (found by
-examining <code><a href='loadFiles.html'>.fileExtensions()</a></code>). The <code>package</code> and <code>fun</code> can be
+examining <code><a href='.fileExtensions.html'>.fileExtensions()</a></code>). The <code>package</code> and <code>fun</code> can be
 jointly specified here as <code>"packageName::functionName"</code>, e.g.,
 <code>"raster::raster"</code>.</td></tr>
 <tr><td><code>package</code></td><td>optional character string indicating the package in
 which to find the <code>fun</code>);</td></tr>
 <tr><td><code>loadTime</code></td><td>optional numeric, indicating when in simulation time the file
-should be loaded. The default is the highest priority at <code><a href='simList-accessors-times.html'>start(sim)</a></code>,
+should be loaded. The default is the highest priority at <code><a href='times.html'>start(sim)</a></code>,
 i.e., at the very start.</td></tr>
 <tr><td><code>interval</code></td><td>optional numeric, indicating at what interval should this same
 exact file  be reloaded from disk, e.g,. 10 would mean every 10 time units. The
@@ -268,18 +268,18 @@ the module will get it here:</p>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.2 on loading and saving.</p>
 <p>Other functions to access elements of a 'simList' object: 
-<code><a href='addDepends.html'>.addDepends</a>()</code>,
-<code><a href='checkpoint.html'>doEvent.checkpoint</a>()</code>,
-<code><a href='simList-accessors-envir.html'>envir</a>()</code>,
-<code><a href='simList-accessors-events.html'>events</a>()</code>,
+<code><a href='.addDepends.html'>.addDepends</a>()</code>,
+<code><a href='doEvent.checkpoint.html'>doEvent.checkpoint</a>()</code>,
+<code><a href='envir.html'>envir</a>()</code>,
+<code><a href='events.html'>events</a>()</code>,
 <code><a href='globals.html'>globals</a>()</code>,
-<code><a href='simList-accessors-modules.html'>modules</a>()</code>,
-<code><a href='objects.html'>objs</a>()</code>,
+<code><a href='modules.html'>modules</a>()</code>,
+<code><a href='objs.html'>objs</a>()</code>,
 <code><a href='packages.html'>packages</a>()</code>,
 <code><a href='params.html'>params</a>()</code>,
-<code><a href='simList-accessors-paths.html'>paths</a>()</code>,
-<code><a href='progress.html'>progressInterval</a>()</code>,
-<code><a href='simList-accessors-times.html'>times</a>()</code></p></div>
+<code><a href='paths.html'>paths</a>()</code>,
+<code><a href='progressInterval.html'>progressInterval</a>()</code>,
+<code><a href='times.html'>times</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>#######################</span>
@@ -287,65 +287,71 @@ the module will get it here:</p>
 <span class='co'>#######################</span>
 
 <span class='co'># Start with a basic empty simList</span>
-<span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+<span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>()
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBfoYZF/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>
-<span class='no'>test</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for %&gt;%</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>reproducible</span>) <span class='co'># for checkPath</span>
-<span class='no'>tmpdir</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"inputs"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://reproducible.predictiveecology.org/reference/reexports.html'>checkPath</a></span>(<span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>tmpFile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"test.rds"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span>(<span class='no'>test</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>)
-<span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmpFile</span>) <span class='co'># using only required column, "file"</span>
-<span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='co'># see that it is not yet loaded, but when it is scheduled to be loaded</span></div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
-#&gt; 1 /tmp/RtmpBfoYZF/inputs/test.rds readRDS    base       test        0     NA
+<span class='kw'>test</span> <span class='op'>&lt;-</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>) <span class='co'># for %&gt;%</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://reproducible.predictiveecology.org'>reproducible</a></span>) <span class='co'># for checkPath</span>
+<span class='kw'>tmpdir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"inputs"</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://Require.predictiveecology.org/reference/checkPath.html'>checkPath</a></span>(create = <span class='fl'>TRUE</span>)
+<span class='kw'>tmpFile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>tmpdir</span>, <span class='st'>"test.rds"</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span>(<span class='kw'>test</span>, file = <span class='kw'>tmpFile</span>)
+<span class='fu'>inputs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(file = <span class='kw'>tmpFile</span>) <span class='co'># using only required column, "file"</span>
+<span class='fu'>inputs</span>(<span class='kw'>sim</span>) <span class='co'># see that it is not yet loaded, but when it is scheduled to be loaded</span>
+</div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
+#&gt; 1 /tmp/Rtmpm6ajzj/inputs/test.rds readRDS    base       test        0     NA
 #&gt;   arguments intervals
-#&gt; 1        NA        NA</div><div class='input'><span class='no'>simOut</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)</div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:32 INFO::<span style='color: #00BB00;'> total elpsd: 0.00032 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:32 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0014 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:32 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0023 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:32 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0032 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:32 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0041 secs | 0 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:32 INFO::test read from /tmp/RtmpBfoYZF/inputs/test.rds using readRDS</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; 1        NA        NA</div><div class='input'><span class='kw'>simOut</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw'>sim</span>)
+</div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:41 INFO::<span style='color: #00BB00;'> total elpsd: 0.00031 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:41 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0014 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:41 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:41 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:41 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 0 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:41 INFO::test read from /tmp/Rtmpm6ajzj/inputs/test.rds using readRDS</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
-#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>inputs</span>(<span class='no'>simOut</span>) <span class='co'># confirm it was loaded</span></div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
-#&gt; 1 /tmp/RtmpBfoYZF/inputs/test.rds readRDS    base       test        0   TRUE
+#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>inputs</span>(<span class='kw'>simOut</span>) <span class='co'># confirm it was loaded</span>
+</div><div class='output co'>#&gt;                              file     fun package objectName loadTime loaded
+#&gt; 1 /tmp/Rtmpm6ajzj/inputs/test.rds readRDS    base       test        0   TRUE
 #&gt;   arguments intervals
-#&gt; 1        NA        NA</div><div class='input'><span class='no'>simOut</span>$<span class='no'>test</span></div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'>
+#&gt; 1        NA        NA</div><div class='input'><span class='kw'>simOut</span><span class='op'>$</span><span class='kw'>test</span>
+</div><div class='output co'>#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'>
 <span class='co'># can put data.frame for inputs directly inside simInit call</span>
-<span class='no'>allTifs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"maps"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"quickPlot"</span>),
-               <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"tif"</span>)
+<span class='kw'>allTifs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"maps"</span>, package = <span class='st'>"quickPlot"</span>),
+               full.names = <span class='fl'>TRUE</span>, pattern = <span class='st'>"tif"</span>)
 
 <span class='co'># next: .objectNames are taken from the filenames (without the extension)</span>
 <span class='co'># This will load all 5 tifs in the SpaDES sample directory, using</span>
 <span class='co'>#   the raster fuction in the raster package, all at time = 0</span>
-<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='st'>"rgdal"</span>, <span class='kw'>quietly</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)) {
-  <span class='no'>sim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-    <span class='kw'>inputs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
-      <span class='kw'>files</span> <span class='kw'>=</span> <span class='no'>allTifs</span>,
-      <span class='kw'>functions</span> <span class='kw'>=</span> <span class='st'>"raster"</span>,
-      <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"raster"</span>,
-      <span class='kw'>loadTime</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-      <span class='kw'>stringsAsFactors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='st'><a href='http://rgdal.r-forge.r-project.org'>"rgdal"</a></span>, quietly = <span class='fl'>TRUE</span>)) {
+  <span class='kw'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
+    inputs = <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
+      files = <span class='kw'>allTifs</span>,
+      functions = <span class='st'>"raster"</span>,
+      package = <span class='st'>"raster"</span>,
+      loadTime = <span class='fl'>0</span>,
+      stringsAsFactors = <span class='fl'>FALSE</span>)
     )
 
   <span class='co'>##############################</span>
   <span class='co'>#A fully described inputs object, including arguments:</span>
-  <span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"maps"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"quickPlot"</span>),
-               <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"tif"</span>)
+  <span class='kw'>files</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"maps"</span>, package = <span class='st'>"quickPlot"</span>),
+               full.names = <span class='fl'>TRUE</span>, pattern = <span class='st'>"tif"</span>)
   <span class='co'># arguments must be a list of lists. This may require I() to keep it as a list</span>
   <span class='co'>#   once it gets coerced into the data.frame.</span>
-  <span class='no'>arguments</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>native</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>), <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>files</span>)))
-  <span class='no'>filelist</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
-     <span class='kw'>objectName</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"Maps"</span>, <span class='fl'>1</span>:<span class='fl'>5</span>),
-     <span class='kw'>files</span> <span class='kw'>=</span> <span class='no'>files</span>,
-     <span class='kw'>functions</span> <span class='kw'>=</span> <span class='st'>"raster::raster"</span>,
-     <span class='kw'>arguments</span> <span class='kw'>=</span> <span class='no'>arguments</span>,
-     <span class='kw'>loadTime</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-     <span class='kw'>intervals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>NA</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>files</span>) - <span class='fl'>1</span>), <span class='fl'>10</span>)
+  <span class='kw'>arguments</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(native = <span class='fl'>TRUE</span>), <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>files</span>)))
+  <span class='kw'>filelist</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
+     objectName = <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"Maps"</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>),
+     files = <span class='kw'>files</span>,
+     functions = <span class='st'>"raster::raster"</span>,
+     arguments = <span class='kw'>arguments</span>,
+     loadTime = <span class='fl'>0</span>,
+     intervals = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>NA</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>files</span>) <span class='op'>-</span> <span class='fl'>1</span>), <span class='fl'>10</span>)
   )
-  <span class='fu'>inputs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>filelist</span>
-  <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>sim</span>)
-}</div><div class='output co'>#&gt; <span class='message'>rgdal: version: 1.5-17, (SVN revision (unknown))</span>
+  <span class='fu'>inputs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>filelist</span>
+  <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw'>sim</span>)
+}
+</div><div class='output co'>#&gt; <span class='message'>rgdal: version: 1.5-17, (SVN revision (unknown))</span>
 #&gt; <span class='message'>Geospatial Data Abstraction Library extensions to R successfully loaded</span>
 #&gt; <span class='message'>Loaded GDAL runtime: GDAL 3.0.4, released 2020/01/28</span>
 #&gt; <span class='message'>Path to GDAL shared files: /usr/share/gdal</span>
@@ -356,42 +362,48 @@ the module will get it here:</p>
 #&gt; <span class='message'>To mute warnings of possible GDAL/OSR exportToProj4() degradation,</span>
 #&gt; <span class='message'>use options("rgdal_show_exportToProj4_warnings"="none") before loading rgdal.</span></div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBfoYZF/myProject/modules'</span>
-#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>DEM read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestAge read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestCover read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>habitatQuality read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>percentPine read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00031 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0023 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0032 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0041 secs | 0 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::Maps1 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::Maps2 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::Maps3 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::Maps4 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.027 secs | 10 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)  at time 10</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
+#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>DEM read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestAge read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>forestCover read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>habitatQuality read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>percentPine read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00032 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0014 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 0 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::Maps1 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::Maps2 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::Maps3 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::Maps4 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.028 secs | 10 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.0/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)  at time 10</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'>
 <span class='co'># Example showing loading multiple objects from global environment onto the</span>
 <span class='co'>#   same object in the simList, but at different load times</span>
-<span class='no'>a1</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>
-<span class='no'>a2</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span>
+<span class='kw'>a1</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
+<span class='kw'>a2</span> <span class='op'>&lt;-</span> <span class='fl'>2</span>
 <span class='co'># Note arguments must be a list of NROW(inputs), with each element itself being a list,</span>
 <span class='co'>#  which is passed to do.call(fun[x], arguments[[x]]), where x is row number, one at a time</span>
-<span class='no'>args</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='fl'>1</span>:<span class='fl'>2</span>, <span class='kw'>function</span>(<span class='no'>x</span>) {
-               <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"a"</span>, <span class='no'>x</span>),
-                    <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>environment</a></span>()) <span class='co'># may be necessary to specify in which envir a1, a2</span>
+<span class='kw'>args</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='fu'>function</span>(<span class='kw'>x</span>) {
+               <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"a"</span>, <span class='kw'>x</span>),
+                    envir = <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>environment</a></span>()) <span class='co'># may be necessary to specify in which envir a1, a2</span>
                                            <span class='co'># are located, if not in an interactive sessino</span>
                })
-<span class='no'>inputs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>objectName</span> <span class='kw'>=</span> <span class='st'>"a"</span>, <span class='kw'>loadTime</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>2</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"base::get"</span>, <span class='kw'>arguments</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span>(<span class='no'>args</span>))
-<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(<span class='kw'>inputs</span> <span class='kw'>=</span> <span class='no'>inputs</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>1</span>))</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
+<span class='kw'>inputs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(objectName = <span class='st'>"a"</span>, loadTime = <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, fun = <span class='st'>"base::get"</span>, arguments = <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span>(<span class='kw'>args</span>))
+<span class='kw'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(inputs = <span class='kw'>inputs</span>, times = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start = <span class='fl'>0</span>, end = <span class='fl'>1</span>))
+</div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpBfoYZF/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpBfoYZF/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpBfoYZF/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpBfoYZF/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpBfoYZF/myProject/modules'</span>
-#&gt; <span class='message'>  )</span></div><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 3e-04 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0023 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0032 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0041 secs | 1 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::a loaded into simList</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
+#&gt; <span class='message'>  )</span></div><div class='input'><span class='kw'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw'>a</span>)
+</div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00031 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0015 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0025 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0034 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0043 secs | 1 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::a loaded into simList</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
-#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>a1</span>, <span class='no'>a</span>$<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
-<span class='fu'><a href='simList-accessors-times.html'>end</a></span>(<span class='no'>a</span>) <span class='kw'>&lt;-</span> <span class='fl'>3</span>
-<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='no'>a</span>) <span class='co'># different object (a2) loaded onto a$a</span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.013 secs | 2 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-08-27 20:27:33 INFO::a loaded into simList</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>a1</span>, <span class='kw'>a</span><span class='op'>$</span><span class='kw'>a</span>)
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'><a href='times.html'>end</a></span>(<span class='kw'>a</span>) <span class='op'>&lt;-</span> <span class='fl'>3</span>
+<span class='kw'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span>(<span class='kw'>a</span>) <span class='co'># different object (a2) loaded onto a$a</span>
+</div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.014 secs | 2 load inputs 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2020-09-10 09:20:42 INFO::a loaded into simList</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
-#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>a2</span>, <span class='no'>a</span>$<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+#&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='kw'>a2</span>, <span class='kw'>a</span><span class='op'>$</span><span class='kw'>a</span>)
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'># Clean up after</span>
-<span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div></span></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span>(<span class='kw'>tmpdir</span>, recursive = <span class='fl'>TRUE</span>)
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -407,7 +419,7 @@ the module will get it here:</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

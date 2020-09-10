@@ -93,7 +93,7 @@ weeks as year/52." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -173,37 +173,37 @@ In an astronomical year, leap years are added within each year with an extra
 weeks as year/52.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dyears</span>(<span class='no'>x</span>)
+    <pre class="usage"><span class='fu'>dyears</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for numeric</span>
-<span class='fu'>dyears</span>(<span class='no'>x</span>)
+<span class='fu'>dyears</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dmonths</span>(<span class='no'>x</span>)
-
-<span class='co'># S4 method for numeric</span>
-<span class='fu'>dmonths</span>(<span class='no'>x</span>)
-
-<span class='fu'>dweeks</span>(<span class='no'>x</span>)
+<span class='fu'>dmonths</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for numeric</span>
-<span class='fu'>dweeks</span>(<span class='no'>x</span>)
+<span class='fu'>dmonths</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dweek</span>(<span class='no'>x</span>)
+<span class='fu'>dweeks</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dmonth</span>(<span class='no'>x</span>)
+<span class='co'># S4 method for numeric</span>
+<span class='fu'>dweeks</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dyear</span>(<span class='no'>x</span>)
+<span class='fu'>dweek</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dsecond</span>(<span class='no'>x</span>)
+<span class='fu'>dmonth</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dday</span>(<span class='no'>x</span>)
+<span class='fu'>dyear</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dhour</span>(<span class='no'>x</span>)
+<span class='fu'>dsecond</span>(<span class='kw'>x</span>)
 
-<span class='fu'>dNA</span>(<span class='no'>x</span>)
+<span class='fu'>dday</span>(<span class='kw'>x</span>)
+
+<span class='fu'>dhour</span>(<span class='kw'>x</span>)
+
+<span class='fu'>dNA</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for ANY</span>
-<span class='fu'>dNA</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>dNA</span>(<span class='kw'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -225,6 +225,9 @@ in that unit using the "d" prefix (for duration), following the
 <code>lubridate</code> package standard:
 <code>dfortnight &lt;- function(x) lubridate::duration(dday(14))</code>.
 Then the module developer can use "fortnight" as the module's time unit.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Eliot McIntire</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -241,7 +244,7 @@ Then the module developer can use "fortnight" as the module's time unit.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

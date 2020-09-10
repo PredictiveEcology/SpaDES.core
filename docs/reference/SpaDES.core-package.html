@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Categorized overview of the <code>SpaDES.core</code> package — SpaDES.core-package • SpaDES.core</title>
+<title>Categorized overview of the SpaDES.core package — SpaDES.core-package • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Categorized overview of the <code>SpaDES.core</code> package — SpaDES.core-package" />
+<meta property="og:title" content="Categorized overview of the SpaDES.core package — SpaDES.core-package" />
 <meta property="og:description" content="
 This package allows implementation a variety of simulation-type models,
 with a focus on spatially explicit models.
@@ -99,7 +99,7 @@ Wiki: https://github.com/PredictiveEcology/SpaDES/wiki
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -193,7 +193,7 @@ milliseconds to many seconds each event.</p>
 
 
 <p>A collection of top-level functions for doing spatial discrete event simulation.</p>
-<h3>1.1 Simulations</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>1.1 Simulations</h3>
 <p>There are two workhorse functions that initialize and run a simulation, and
   third function for doing multiple spades runs:</p>
 <p></p><table class='table'>
@@ -207,7 +207,7 @@ milliseconds to many seconds each event.</p>
 
 
 
-<h3>1.2 Events</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>1.2 Events</h3>
 <p>Within a module, important simulation functions include:</p>
 <p></p><table class='table'>
 <tr><td><code><a href='scheduleEvent.html'>scheduleEvent</a></code></td><td>Schedule a simulation event</td></tr>
@@ -237,7 +237,7 @@ All <code>SpaDES</code> simulations operate on this object class.</p>
 
 <p>Collections of commonly used functions to retrieve or set slots (and their elements)
 of a <code><a href='simList-class.html'>simList</a></code> object are summarized further below.</p>
-<h3>3.1 Simulation parameters</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.1 Simulation parameters</h3>
 <p></p><table class='table'>
 <tr><td><code><a href='globals.html'>globals</a></code></td><td>List of global simulation parameters.</td></tr>
 <tr><td><code><a href='params.html'>params</a></code></td><td>Nested list of all simulation parameter.</td></tr>
@@ -247,71 +247,71 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 
 
 
-<h3>3.2 loading from disk, saving to disk</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.2 loading from disk, saving to disk</h3>
 <p></p><table class='table'>
-<tr><td><code><a href='simList-accessors-inputs.html'>inputs</a></code></td><td>List of loaded objects used in simulation. (advanced)</td></tr>
-<tr><td><code><a href='simList-accessors-outputs.html'>outputs</a></code></td><td>List of objects to save during simulation. (advanced)</td></tr>
+<tr><td><code><a href='inputs.html'>inputs</a></code></td><td>List of loaded objects used in simulation. (advanced)</td></tr>
+<tr><td><code><a href='outputs.html'>outputs</a></code></td><td>List of objects to save during simulation. (advanced)</td></tr>
 </table>
 
 
 
-<h3>3.3 objects in the <code>simList</code></h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.3 objects in the <code>simList</code></h3>
 <p></p><table class='table'>
 <tr><td><code><a href='https://rdrr.io/r/base/ls.html'>ls</a></code>, <code><a href='https://rdrr.io/r/base/ls.html'>objects</a></code></td><td>Names of objects referenced by the simulation environment.</td></tr>
 <tr><td><code><a href='https://rdrr.io/r/utils/ls_str.html'>ls.str</a></code></td><td>List the structure of the simList objects.</td></tr>
-<tr><td><code><a href='objects.html'>objs</a></code></td><td>List of objects referenced by the simulation environment.</td></tr>
+<tr><td><code><a href='objs.html'>objs</a></code></td><td>List of objects referenced by the simulation environment.</td></tr>
 </table>
 
 
 
-<h3>3.4 Simulation paths</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.4 Simulation paths</h3>
 <p>Accessor functions for the <code>paths</code> slot and its elements.</p><table class='table'>
-<tr><td><code><a href='simList-accessors-paths.html'>cachePath</a></code></td><td>Global simulation cache path.</td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>modulePath</a></code></td><td>Global simulation module path.</td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>inputPath</a></code></td><td>Global simulation input path.</td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>outputPath</a></code></td><td>Global simulation output path.</td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>rasterPath</a></code></td><td>Global simulation temporary raster path.</td></tr>
-<tr><td><code><a href='simList-accessors-paths.html'>paths</a></code></td><td>Global simulation paths (cache, modules, inputs, outputs, rasters).</td></tr>
+<tr><td><code><a href='paths.html'>cachePath</a></code></td><td>Global simulation cache path.</td></tr>
+<tr><td><code><a href='paths.html'>modulePath</a></code></td><td>Global simulation module path.</td></tr>
+<tr><td><code><a href='paths.html'>inputPath</a></code></td><td>Global simulation input path.</td></tr>
+<tr><td><code><a href='paths.html'>outputPath</a></code></td><td>Global simulation output path.</td></tr>
+<tr><td><code><a href='paths.html'>rasterPath</a></code></td><td>Global simulation temporary raster path.</td></tr>
+<tr><td><code><a href='paths.html'>paths</a></code></td><td>Global simulation paths (cache, modules, inputs, outputs, rasters).</td></tr>
 </table>
 
 
 
-<h3>3.5 Simulation times</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.5 Simulation times</h3>
 <p>Accessor functions for the <code>simtimes</code> slot and its elements.</p>
 <p></p><table class='table'>
 <tr><td><code><a href='https://rdrr.io/r/stats/time.html'>time</a></code></td><td>Current simulation time, in units of longest module.</td></tr>
-<tr><td><code><a href='simList-accessors-times.html'>start</a></code></td><td>Simulation start time, in units of longest module.</td></tr>
-<tr><td><code><a href='simList-accessors-times.html'>end</a></code></td><td>Simulation end time, in units of longest module.</td></tr>
-<tr><td><code><a href='simList-accessors-times.html'>times</a></code></td><td>List of all simulation times (current, start, end), in units of longest module..</td></tr>
+<tr><td><code><a href='times.html'>start</a></code></td><td>Simulation start time, in units of longest module.</td></tr>
+<tr><td><code><a href='times.html'>end</a></code></td><td>Simulation end time, in units of longest module.</td></tr>
+<tr><td><code><a href='times.html'>times</a></code></td><td>List of all simulation times (current, start, end), in units of longest module..</td></tr>
 </table>
 
 
 
-<h3>3.6 Simulation event queues</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.6 Simulation event queues</h3>
 <p>Accessor functions for the <code>events</code> and <code>completed</code> slots.
   By default, the event lists are shown when the <code>simList</code> object is printed,
   thus most users will not require direct use of these methods.</p>
 <p></p><table class='table'>
-<tr><td><code><a href='simList-accessors-events.html'>events</a></code></td><td>Scheduled simulation events (the event queue). (advanced)</td></tr>
-<tr><td><code><a href='simList-accessors-events.html'>current</a></code></td><td>Currently executing event. (advanced)</td></tr>
-<tr><td><code><a href='simList-accessors-events.html'>completed</a></code></td><td>Completed simulation events. (advanced)</td></tr>
-<tr><td><code><a href='simList-accessors-times.html'>elapsedTime</a></code></td><td>The amount of clock time that modules &amp; events use</td></tr>
+<tr><td><code><a href='events.html'>events</a></code></td><td>Scheduled simulation events (the event queue). (advanced)</td></tr>
+<tr><td><code><a href='events.html'>current</a></code></td><td>Currently executing event. (advanced)</td></tr>
+<tr><td><code><a href='events.html'>completed</a></code></td><td>Completed simulation events. (advanced)</td></tr>
+<tr><td><code><a href='times.html'>elapsedTime</a></code></td><td>The amount of clock time that modules &amp; events use</td></tr>
 </table>
 
 
 
-<h3>3.7 Modules, dependencies, packages</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.7 Modules, dependencies, packages</h3>
 <p>Accessor functions for the <code>depends</code>, <code>modules</code>, and <code>.loadOrder</code> slots.
   These are included for advanced users.</p>
 <p></p><table class='table'>
-<tr><td><code><a href='simList-accessors-modules.html'>depends</a></code></td><td>List of simulation module dependencies. (advanced)</td></tr>
-<tr><td><code><a href='simList-accessors-modules.html'>modules</a></code></td><td>List of simulation modules to be loaded. (advanced)</td></tr>
+<tr><td><code><a href='modules.html'>depends</a></code></td><td>List of simulation module dependencies. (advanced)</td></tr>
+<tr><td><code><a href='modules.html'>modules</a></code></td><td>List of simulation modules to be loaded. (advanced)</td></tr>
 <tr><td><code><a href='packages.html'>packages</a></code></td><td>Vector of required R libraries of all modules. (advanced)</td></tr>
 </table>
 
 
 
-<h3>3.8 <code>simList</code> environment</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.8 <code>simList</code> environment</h3>
 <p>The <code><a href='simList-class.html'>simList</a></code> has a slot called <code>.xData</code> which is an environment.
   All objects in the <code>simList</code> are actually in this environment,
   i.e., the <code>simList</code> is not a <code>list</code>.
@@ -321,24 +321,24 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
   The two objects (<code>sim1</code> and <code>sim2</code>) will share identical objects
   within that slot. Sometimes, this not desired, and a true copy is required.</p>
 <p></p><table class='table'>
-<tr><td><code><a href='simList-accessors-envir.html'>envir</a></code></td><td>Access the environment of the simList directly (advanced)</td></tr>
+<tr><td><code><a href='envir.html'>envir</a></code></td><td>Access the environment of the simList directly (advanced)</td></tr>
 <tr><td><code>copy</code></td><td>Deep copy of a simList. (advanced)</td></tr>
 </table>
 
 
 
-<h3>3.9 Checkpointing</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.9 Checkpointing</h3>
 <p></p><table class='table'>
 <tr><td>Accessor method</td><td>Module</td><td>Description</td></tr>
-<tr><td><code><a href='checkpoint.html'>checkpointFile</a></code></td><td><code>.checkpoint</code></td><td>Name of the checkpoint file. (advanced)</td></tr>
-<tr><td><code><a href='checkpoint.html'>checkpointInterval</a></code></td><td><code>.checkpoint</code></td><td>The simulation checkpoint interval. (advanced)</td></tr>
+<tr><td><code><a href='doEvent.checkpoint.html'>checkpointFile</a></code></td><td><code>.checkpoint</code></td><td>Name of the checkpoint file. (advanced)</td></tr>
+<tr><td><code><a href='doEvent.checkpoint.html'>checkpointInterval</a></code></td><td><code>.checkpoint</code></td><td>The simulation checkpoint interval. (advanced)</td></tr>
 </table>
 <p></p>
 
-<h3>3.10 Progress Bar</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>3.10 Progress Bar</h3>
 <p></p><table class='table'>
-<tr><td><code><a href='progress.html'>progressType</a></code></td><td><code>.progress</code></td><td>Type of graphical progress bar used. (advanced)</td></tr>
-<tr><td><code><a href='progress.html'>progressInterval</a></code></td><td><code>.progress</code></td><td>Interval for the progress bar. (advanced)</td></tr>
+<tr><td><code><a href='progressInterval.html'>progressType</a></code></td><td><code>.progress</code></td><td>Type of graphical progress bar used. (advanced)</td></tr>
+<tr><td><code><a href='progressInterval.html'>progressInterval</a></code></td><td><code>.progress</code></td><td>Interval for the progress bar. (advanced)</td></tr>
 </table>
 
 
@@ -349,7 +349,7 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
     
 
 
-<h3>4.1 Creating, distributing, and downloading modules</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>4.1 Creating, distributing, and downloading modules</h3>
 <p>Modules are the basic unit of <code>SpaDES</code>.
   These are generally created and stored locally, or are downloaded from remote
   repositories, including our
@@ -368,7 +368,7 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 
 
 
-<h3>4.2 Module metadata</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>4.2 Module metadata</h3>
 <p>Each module requires several items to be defined.
   These comprise the metadata for that module (including default parameter
   specifications, inputs and outputs), and are currently written at the top of
@@ -382,17 +382,17 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 
 
 <p>There are also accessors for many of the metadata entries:</p><table class='table'>
-<tr><td><code><a href='simList-accessors-times.html'>timeunit</a></code></td><td>Accesses metadata of same name</td></tr>
-<tr><td><code><a href='simList-accessors-metadata.html'>citation</a></code></td><td>Accesses metadata of same name</td></tr>
-<tr><td><code><a href='simList-accessors-metadata.html'>documentation</a></code></td><td>Accesses metadata of same name</td></tr>
-<tr><td><code><a href='simList-accessors-metadata.html'>reqdPkgs</a></code></td><td>Accesses metadata of same name</td></tr>
-<tr><td><code><a href='simList-accessors-metadata.html'>inputObjects</a></code></td><td>Accesses metadata of same name</td></tr>
-<tr><td><code><a href='simList-accessors-metadata.html'>outputObjects</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='times.html'>timeunit</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='inputObjects.html'>citation</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='inputObjects.html'>documentation</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='inputObjects.html'>reqdPkgs</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='inputObjects.html'>inputObjects</a></code></td><td>Accesses metadata of same name</td></tr>
+<tr><td><code><a href='inputObjects.html'>outputObjects</a></code></td><td>Accesses metadata of same name</td></tr>
 </table>
 
 
 
-<h3>4.3 Module dependencies</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>4.3 Module dependencies</h3>
 <p>Once a set of modules have been chosen, the dependency information is automatically
   calculated once simInit is run. There are several functions to assist with dependency
   information:</p>
@@ -411,7 +411,7 @@ of a <code><a href='simList-class.html'>simList</a></code> object are summarized
 
 <p><em>A collection of functions that help with making modules can be found in
 the suggested <code>SpaDES.tools</code> package, and are summarized below.</em></p>
-<h3>5.1 Spatial spreading/distances methods</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.1 Spatial spreading/distances methods</h3>
 <p>Spatial contagion is a key phenomenon for spatially explicit simulation models.
   Contagion can be modelled using discrete approaches or continuous approaches.
   Several <code>SpaDES.tools</code> functions assist with these:</p>
@@ -429,7 +429,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.2 Spatial agent methods</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.2 Spatial agent methods</h3>
 <p>Agents have several methods and functions specific to them:</p>
 <p></p><table class='table'>
 <tr><td><code><a href='https://spades-tools.predictiveecology.org/reference/crw.html'>crw</a></code></td><td>Simple correlated random walk function</td></tr>
@@ -441,7 +441,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.3 GIS operations</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.3 GIS operations</h3>
 <p>In addition to the vast amount of GIS operations available in R (mostly from
   contributed packages such as <code>sp</code>, <code>raster</code>, <code>maps</code>, <code>maptools</code>
   and many others), we provide the following GIS-related functions:</p>
@@ -451,7 +451,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.4 'Map-reduce'--type operations</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.4 'Map-reduce'--type operations</h3>
 <p>These functions convert between reduced and mapped representations of the same data.
   This allows compact representation of, e.g., rasters that have many individual pixels
   that share identical information.</p>
@@ -461,7 +461,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.5 Colors in <code>Raster*</code> objects</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.5 Colors in <code>Raster*</code> objects</h3>
 <p>We likely will not want the default colours for every map.
   Here are several helper functions to add to, set and get colors of <code>Raster*</code> objects:</p>
 <p></p><table class='table'>
@@ -472,7 +472,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.6 Random Map Generation</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.6 Random Map Generation</h3>
 <p>It is often useful to build dummy maps with which to build simulation models before all data are available.
   These dummy maps can later be replaced with actual data maps.</p>
 <p></p><table class='table'>
@@ -482,7 +482,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.7 Checking for the existence of objects</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.7 Checking for the existence of objects</h3>
 <p><code>SpaDES</code> modules will often require the existence of objects in the <code>simList</code>.
   These are helpers for assessing this:</p>
 <p></p><table class='table'>
@@ -492,7 +492,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.8 SELES-type approach to simulation</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.8 SELES-type approach to simulation</h3>
 <p>These functions are essentially skeletons and are not fully implemented.
   They are intended to make translations from <a href='http://www.gowlland.ca/'>SELES</a>.
   You must know how to use SELES for these to be useful:</p>
@@ -506,7 +506,7 @@ the suggested <code>SpaDES.tools</code> package, and are summarized below.</em><
 
 
 
-<h3>5.9 Miscellaneous</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>5.9 Miscellaneous</h3>
 <p>Functions that may be useful within a <code>SpaDES</code> context:</p>
 <p></p><table class='table'>
 <tr><td><code><a href='https://spades-tools.predictiveecology.org/reference/inRange.html'>inRange</a></code></td><td>Test whether a number lies within range [a,b]</td></tr>
@@ -583,7 +583,7 @@ and speed of plotting:</p>
 <p>In addition to R's file operations, we have added several here to aid in bulk
 loading and saving of files for simulation purposes:</p>
 <table class='table'>
-<tr><td><code><a href='loadFiles.html'>loadFiles</a></code></td><td>Load simulation objects according to a filelist</td></tr>
+<tr><td><code><a href='.fileExtensions.html'>loadFiles</a></code></td><td>Load simulation objects according to a filelist</td></tr>
 <tr><td><code><a href='rasterToMemory.html'>rasterToMemory</a></code></td><td>Read a raster from file to RAM</td></tr>
 <tr><td><code><a href='saveFiles.html'>saveFiles</a></code></td><td>Save simulation objects according to outputs and params</td></tr>
 </table>
@@ -674,6 +674,21 @@ These can be found with <code><a href='https://rdrr.io/r/base/file.path.html'>fi
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='spadesOptions.html'>spadesOptions</a></code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p><strong>Maintainer</strong>: Alex M Chubaty <a href='mailto:alex.chubaty@gmail.com'>alex.chubaty@gmail.com</a> (<a href='https://orcid.org/0000-0001-7146-8135'>ORCID</a>)</p>
+<p>Authors:</p><ul>
+<li><p>Eliot J B McIntire <a href='mailto:eliot.mcintire@canada.ca'>eliot.mcintire@canada.ca</a> (<a href='https://orcid.org/0000-0002-6914-8316'>ORCID</a>)</p></li>
+</ul>
+
+<p>Other contributors:</p><ul>
+<li><p>Yong Luo <a href='mailto:yluo1@lakeheadu.ca'>yluo1@lakeheadu.ca</a> [contributor]</p></li>
+<li><p>Steve Cumming <a href='mailto:Steve.Cumming@sbf.ulaval.ca'>Steve.Cumming@sbf.ulaval.ca</a> [contributor]</p></li>
+<li><p>Ceres Barros <a href='mailto:cbarros@mail.ubc.ca'>cbarros@mail.ubc.ca</a> (<a href='https://orcid.org/0000-0003-4036-977X'>ORCID</a>) [contributor]</p></li>
+<li><p>Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]</p></li>
+</ul>
+
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -690,7 +705,7 @@ These can be found with <code><a href='https://rdrr.io/r/base/file.path.html'>fi
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

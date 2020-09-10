@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,31 +151,31 @@
     <p>Generate a vector of random alphanumeric strings each of an arbitrary length.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rndstr</span>(<span class='no'>n</span>, <span class='no'>len</span>, <span class='no'>characterFirst</span>)
+    <pre class="usage"><span class='fu'>rndstr</span>(<span class='kw'>n</span>, <span class='kw'>len</span>, <span class='kw'>characterFirst</span>)
 
 <span class='co'># S4 method for numeric,numeric,logical</span>
-<span class='fu'>rndstr</span>(<span class='no'>n</span>, <span class='no'>len</span>, <span class='no'>characterFirst</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span>, <span class='kw'>len</span>, <span class='kw'>characterFirst</span>)
 
 <span class='co'># S4 method for numeric,numeric,missing</span>
-<span class='fu'>rndstr</span>(<span class='no'>n</span>, <span class='no'>len</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span>, <span class='kw'>len</span>)
 
 <span class='co'># S4 method for numeric,missing,logical</span>
-<span class='fu'>rndstr</span>(<span class='no'>n</span>, <span class='no'>characterFirst</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span>, <span class='kw'>characterFirst</span>)
 
 <span class='co'># S4 method for missing,numeric,logical</span>
-<span class='fu'>rndstr</span>(<span class='no'>len</span>, <span class='no'>characterFirst</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>len</span>, <span class='kw'>characterFirst</span>)
 
 <span class='co'># S4 method for numeric,missing,missing</span>
-<span class='fu'>rndstr</span>(<span class='no'>n</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>n</span>)
 
 <span class='co'># S4 method for missing,numeric,missing</span>
-<span class='fu'>rndstr</span>(<span class='no'>len</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>len</span>)
 
 <span class='co'># S4 method for missing,missing,logical</span>
-<span class='fu'>rndstr</span>(<span class='no'>characterFirst</span>)
+<span class='fu'>rndstr</span>(<span class='kw'>characterFirst</span>)
 
 <span class='co'># S4 method for missing,missing,missing</span>
-<span class='fu'>rndstr</span>(<span class='no'>n</span>, <span class='no'>len</span>, <span class='no'>characterFirst</span>)</pre>
+<span class='fu'>rndstr</span>(<span class='kw'>n</span>, <span class='kw'>len</span>, <span class='kw'>characterFirst</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -200,10 +200,21 @@ first character of the string (useful if being used for object names).</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Character vector of random strings.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty and Eliot McIntire</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>11</span>)
-<span class='fu'>rndstr</span>()</div><div class='output co'>#&gt; [1] "HTofMAXR"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "lklZtCtkys"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] "GCIxMuDK"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "M5J2yGhbsx" "c9fpax8XD6" "hToX6PIg4r" "rAjZqgLlbJ" "CNCwMrqrBZ"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] "uLB5dkBg" "kuPWfZKO" "c3OG6r2r" "QvkZbMwg" "hhPG2ZnA"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "gIg7ECJc" "bLdEaxL9" "hib6YIC3" "Ms3nvISn" "fV8i0Lgz"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "RN3VaqESAL"</div><div class='input'><span class='fu'>rndstr</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>len</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>characterFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "rvomtUDlEQ" "PWN2z2MpUY" "CFariE59hK" "JF4c5WI7f4" "o7RfszlTs9"</div><div class='input'>
+<span class='fu'>rndstr</span>()
+</div><div class='output co'>#&gt; [1] "HTofMAXR"</div><div class='input'><span class='fu'>rndstr</span>(len = <span class='fl'>10</span>)
+</div><div class='output co'>#&gt; [1] "lklZtCtkys"</div><div class='input'><span class='fu'>rndstr</span>(characterFirst = <span class='fl'>FALSE</span>)
+</div><div class='output co'>#&gt; [1] "GCIxMuDK"</div><div class='input'><span class='fu'>rndstr</span>(n = <span class='fl'>5</span>, len = <span class='fl'>10</span>)
+</div><div class='output co'>#&gt; [1] "M5J2yGhbsx" "c9fpax8XD6" "hToX6PIg4r" "rAjZqgLlbJ" "CNCwMrqrBZ"</div><div class='input'><span class='fu'>rndstr</span>(n = <span class='fl'>5</span>)
+</div><div class='output co'>#&gt; [1] "uLB5dkBg" "kuPWfZKO" "c3OG6r2r" "QvkZbMwg" "hhPG2ZnA"</div><div class='input'><span class='fu'>rndstr</span>(n = <span class='fl'>5</span>, characterFirst = <span class='fl'>TRUE</span>)
+</div><div class='output co'>#&gt; [1] "gIg7ECJc" "bLdEaxL9" "hib6YIC3" "Ms3nvISn" "fV8i0Lgz"</div><div class='input'><span class='fu'>rndstr</span>(len = <span class='fl'>10</span>, characterFirst = <span class='fl'>TRUE</span>)
+</div><div class='output co'>#&gt; [1] "RN3VaqESAL"</div><div class='input'><span class='fu'>rndstr</span>(n = <span class='fl'>5</span>, len = <span class='fl'>10</span>, characterFirst = <span class='fl'>TRUE</span>)
+</div><div class='output co'>#&gt; [1] "rvomtUDlEQ" "PWN2z2MpUY" "CFariE59hK" "JF4c5WI7f4" "o7RfszlTs9"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -220,7 +231,7 @@ first character of the string (useful if being used for object names).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

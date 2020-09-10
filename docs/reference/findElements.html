@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find all references to <code>sim$</code> — .findElementsInEnv • SpaDES.core</title>
+<title>Find all references to sim$ — .findElementsInEnv • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Find all references to <code>sim$</code> — .findElementsInEnv" />
+<meta property="og:title" content="Find all references to sim$ — .findElementsInEnv" />
 <meta property="og:description" content="Find all references to sim$
 .parsingSim will pull out the various ways to use sim, e.g.,
 sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
@@ -84,7 +84,7 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -156,14 +156,14 @@ sim$xxx, sim[['xxx']], sim[[P(sim)$xxx]]" />
     </div>
 
     <pre class="usage"><span class='fu'>.findElementsInEnv</span>(
-  <span class='kw'>envToFindSim</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
-  <span class='kw'>moduleEnv</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
-  <span class='no'>type</span>
+  envToFindSim = <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
+  moduleEnv = <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
+  <span class='kw'>type</span>
 )
 
-<span class='fu'>.findElement</span>(<span class='no'>x</span>, <span class='no'>type</span>)
+<span class='fu'>.findElement</span>(<span class='kw'>x</span>, <span class='kw'>type</span>)
 
-<span class='fu'>.parsingSim</span>(<span class='no'>x</span>, <span class='no'>type</span>)</pre>
+<span class='fu'>.parsingSim</span>(<span class='kw'>x</span>, <span class='kw'>type</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -208,6 +208,9 @@ scans for all functions (i.e., "globals") being used. This is similar to
 <code>type = "assign"</code>. Usually this is a test of existence of that object, in
 order to assign to that object. It is only reading it to determine whether or
 not it should write to it.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Eliot McIntire</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -224,7 +227,7 @@ not it should write to it.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

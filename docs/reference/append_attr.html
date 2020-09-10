@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add a module to a <code>moduleList</code> — append_attr • SpaDES.core</title>
+<title>Add a module to a moduleList — append_attr • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Add a module to a <code>moduleList</code> — append_attr" />
+<meta property="og:title" content="Add a module to a moduleList — append_attr" />
 <meta property="og:description" content="Ordinary base lists and vectors do not retain their attributes when subsetted
 or appended. This function appends items to a list while preserving the
 attributes of items in the list (but not of the list itself)." />
@@ -84,7 +84,7 @@ attributes of items in the list (but not of the list itself)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -155,10 +155,10 @@ or appended. This function appends items to a list while preserving the
 attributes of items in the list (but not of the list itself).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>append_attr</span>(<span class='no'>x</span>, <span class='no'>y</span>)
+    <pre class="usage"><span class='fu'>append_attr</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
 
 <span class='co'># S4 method for list,list</span>
-<span class='fu'>append_attr</span>(<span class='no'>x</span>, <span class='no'>y</span>)</pre>
+<span class='fu'>append_attr</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -175,16 +175,21 @@ attributes of items in the list (but not of the list itself).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Similar to <code>updateList</code> but does not require named lists.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Alex Chubaty and Eliot McIntire</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># igraph exports magrittr's pipe operator</span></div><div class='output co'>#&gt; <span class='message'></span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>) <span class='co'># igraph exports magrittr's pipe operator</span>
+</div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘igraph’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    decompose, spectrum</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    union</span></div><div class='input'><span class='no'>tmp1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"apple"</span>, <span class='st'>"banana"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='no'>.</span>, <span class='no'>`attributes&lt;-`</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"fruit"</span>))
-<span class='no'>tmp2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"carrot"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='no'>.</span>, <span class='no'>`attributes&lt;-`</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"vegetable"</span>))
-<span class='fu'>append_attr</span>(<span class='no'>tmp1</span>, <span class='no'>tmp2</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; <span class='message'>    union</span></div><div class='input'><span class='kw'>tmp1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"apple"</span>, <span class='st'>"banana"</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='kw'>.</span>, <span class='kw'>`attributes&lt;-`</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(type = <span class='st'>"fruit"</span>))
+<span class='kw'>tmp2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"carrot"</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='kw'>.</span>, <span class='kw'>`attributes&lt;-`</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(type = <span class='st'>"vegetable"</span>))
+<span class='fu'>append_attr</span>(<span class='kw'>tmp1</span>, <span class='kw'>tmp2</span>)
+</div><div class='output co'>#&gt; [[1]]
 #&gt; [1] "apple"
 #&gt; attr(,"type")
 #&gt; [1] "fruit"
@@ -198,7 +203,8 @@ attributes of items in the list (but not of the list itself).</p>
 #&gt; [1] "carrot"
 #&gt; attr(,"type")
 #&gt; [1] "vegetable"
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='no'>tmp1</span>, <span class='no'>tmp2</span>)</div></pre>
+#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>tmp1</span>, <span class='kw'>tmp2</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -214,7 +220,7 @@ attributes of items in the list (but not of the list itself).</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

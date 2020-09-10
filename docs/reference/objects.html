@@ -85,7 +85,7 @@ one can simply use sim$object or sim[[&quot;object&quot;]]." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,21 +151,21 @@ one can simply use sim$object or sim[[&quot;object&quot;]]." />
     </div>
 
     <div class="ref-description">
-    <p>The <code>[[</code> and <code>$</code> operators provide "shortcuts" for accessing
+    <p>The <code><a href='https://rdrr.io/r/base/Extract.html'>[[</a></code> and <code><a href='https://rdrr.io/r/base/Extract.html'>$</a></code> operators provide "shortcuts" for accessing
 objects in the simulation environment.
 I.e., instead of using <code>envir(sim)$object</code> or <code>envir(sim)[["object"]]</code>,
 one can simply use <code>sim$object</code> or <code>sim[["object"]]</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>objs</span>(<span class='no'>sim</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>objs</span>(<span class='kw'>sim</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>objs</span>(<span class='no'>sim</span>, <span class='no'>...</span>)
+<span class='fu'>objs</span>(<span class='kw'>sim</span>, <span class='kw'>...</span>)
 
-<span class='fu'>objs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>objs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>objs</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+<span class='fu'>objs</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,18 +198,18 @@ the simulation environment.</p>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.1 on Simulation Parameters.</p>
 <p>Other functions to access elements of a 'simList' object: 
-<code><a href='addDepends.html'>.addDepends</a>()</code>,
-<code><a href='checkpoint.html'>doEvent.checkpoint</a>()</code>,
-<code><a href='simList-accessors-envir.html'>envir</a>()</code>,
-<code><a href='simList-accessors-events.html'>events</a>()</code>,
+<code><a href='.addDepends.html'>.addDepends</a>()</code>,
+<code><a href='doEvent.checkpoint.html'>doEvent.checkpoint</a>()</code>,
+<code><a href='envir.html'>envir</a>()</code>,
+<code><a href='events.html'>events</a>()</code>,
 <code><a href='globals.html'>globals</a>()</code>,
-<code><a href='simList-accessors-inputs.html'>inputs</a>()</code>,
-<code><a href='simList-accessors-modules.html'>modules</a>()</code>,
+<code><a href='inputs.html'>inputs</a>()</code>,
+<code><a href='modules.html'>modules</a>()</code>,
 <code><a href='packages.html'>packages</a>()</code>,
 <code><a href='params.html'>params</a>()</code>,
-<code><a href='simList-accessors-paths.html'>paths</a>()</code>,
-<code><a href='progress.html'>progressInterval</a>()</code>,
-<code><a href='simList-accessors-times.html'>times</a>()</code></p></div>
+<code><a href='paths.html'>paths</a>()</code>,
+<code><a href='progressInterval.html'>progressInterval</a>()</code>,
+<code><a href='times.html'>times</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -226,7 +226,7 @@ the simulation environment.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

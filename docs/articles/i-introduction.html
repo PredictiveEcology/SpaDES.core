@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -102,7 +102,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">August 27 2020</h4>
+            <h4 class="date">September 10 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -169,32 +169,36 @@
 <a href="#spades-demos-and-sample-modules" class="anchor"></a><code>SpaDES</code> demos and sample modules</h2>
 <p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
 <p>This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"SpaDES.core"</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st"><a href="https://spades-core.predictiveecology.org">"SpaDES.core"</a></span>)
 
-<span class="no">demoSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="../reference/simInit.html">simInit</a></span>(
-  <span class="kw">times</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="fl">100</span>),
-  <span class="kw">modules</span> <span class="kw">=</span> <span class="st">"SpaDES_sampleModules"</span>,
-  <span class="kw">params</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-    <span class="kw">.globals</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">burnStats</span> <span class="kw">=</span> <span class="st">"nPixelsBurned"</span>),
-    <span class="kw">randomLandscapes</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      <span class="kw">nx</span> <span class="kw">=</span> <span class="fl">1e2</span>, <span class="kw">ny</span> <span class="kw">=</span> <span class="fl">1e2</span>, <span class="kw">.saveObjects</span> <span class="kw">=</span> <span class="st">"landscape"</span>,
-      <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">.plotInterval</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">inRAM</span> <span class="kw">=</span> <span class="fl">TRUE</span>
+<span class="kw">demoSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="../reference/simInit.html">simInit</a></span>(
+  times = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(start = <span class="fl">0</span>, end = <span class="fl">100</span>),
+  modules = <span class="st">"SpaDES_sampleModules"</span>,
+  params = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+    .globals = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(burnStats = <span class="st">"nPixelsBurned"</span>),
+    randomLandscapes = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      nx = <span class="fl">1e2</span>, ny = <span class="fl">1e2</span>, .saveObjects = <span class="st">"landscape"</span>,
+      .plotInitialTime = <span class="fl">NA</span>, .plotInterval = <span class="fl">NA</span>, inRAM = <span class="fl">TRUE</span>
     ),
-    <span class="kw">caribouMovement</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      <span class="kw">N</span> <span class="kw">=</span> <span class="fl">1e2</span>, <span class="kw">.saveObjects</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"caribou"</span>),
-      <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">.plotInterval</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">moveInterval</span> <span class="kw">=</span> <span class="fl">1</span>
+    caribouMovement = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      N = <span class="fl">1e2</span>, .saveObjects = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"caribou"</span>),
+      .plotInitialTime = <span class="fl">1</span>, .plotInterval = <span class="fl">1</span>, moveInterval = <span class="fl">1</span>
     ),
-    <span class="kw">fireSpread</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      <span class="kw">nFires</span> <span class="kw">=</span> <span class="fl">1e1</span>, <span class="kw">spreadprob</span> <span class="kw">=</span> <span class="fl">0.235</span>, <span class="kw">persistprob</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">its</span> <span class="kw">=</span> <span class="fl">1e6</span>,
-      <span class="kw">returnInterval</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">startTime</span> <span class="kw">=</span> <span class="fl">0</span>,
-      <span class="kw">.plotInitialTime</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">.plotInterval</span> <span class="kw">=</span> <span class="fl">10</span>
+    fireSpread = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      nFires = <span class="fl">1e1</span>, spreadprob = <span class="fl">0.235</span>, persistprob = <span class="fl">0</span>, its = <span class="fl">1e6</span>,
+      returnInterval = <span class="fl">10</span>, startTime = <span class="fl">0</span>,
+      .plotInitialTime = <span class="fl">0</span>, .plotInterval = <span class="fl">10</span>
     )
   ),
-  <span class="kw">path</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">modulePath</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"SpaDES.core"</span>))
+  path = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(modulePath = <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, package = <span class="st">"SpaDES.core"</span>))
 ))
-<span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="no">demoSim</span>)</pre></body></html></div>
+<span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="kw">demoSim</span>)
+</pre></div>
 <p>Additional <code>SpaDES</code> modules are available via a GitHub repository: <a href="https://github.com/PredictiveEcology/SpaDES-modules">https://github.com/PredictiveEcology/SpaDES-modules</a>. Modules from this repository can be downloaded to a local directory using:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="st">"moduleName"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span>(name = <span class="st">"moduleName"</span>)
+</pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved to the directory specified by the <code>spades.modulesPath</code>. An alternate path can be provided to <code>downloadModule</code> directly via the <code>path</code> argument, or specified using <code><a href="https://rdrr.io/r/base/options.html">options(spades.modulesPath = "path/to/my/modules")</a></code>.</p>
 <p>A detailed guide to module development is provided in the <a href="ii-modules.html">modules vignette</a>.</p>
 </div>
@@ -223,33 +227,39 @@
 <p>The details of each simulation are stored in a <code>simList</code> object, including the simulation parameters and modules used, as well as storing the current state of the simulation and the future event queue. A list of completed events is also stored, which can provide useful debugging information. This <code>simList</code> object contains a unique <code>unique</code> object, along with data used/created during the simulation. The <code>envir</code> object is simply an environment, which means objects stored in it are updated using reference semantics (so objects don’t need to be copied). You can access objects stored in environments using the same syntax as for lists (<em>e.g.</em>, <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>, <code><a href="https://rdrr.io/r/base/Extract.html">[[</a></code>), in addition to <code>get</code>, which makes working with simulated data easy to do inside modules.</p>
 <p>A new simulation is initialized using the <code>simInit</code> function, which does all the work of creating the <code>envir</code> and <code>simList</code> objects for your simulation. This function also attempts to provide additional feedback to the user regarding parameters that may be improperly specified.</p>
 <p>Once a simulation is initialized you can inspect the contents of a <code>envir</code> object using:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># full simulation details:</span>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="co"># full simulation details:</span>
 <span class="co">#  simList object info + simulation data</span>
-<span class="no">mySim</span>
+<span class="kw">mySim</span>
 
 <span class="co"># less detail:</span>
 <span class="co"># simList object isn't shown; object details are</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/ls_str.html">ls.str</a></span>(<span class="no">mySim</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/ls_str.html">ls.str</a></span>(<span class="kw">mySim</span>)                 
 
 <span class="co"># least detail:</span>
 <span class="co"># simList object isn't shown; object names only </span>
-<span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(<span class="no">mySim</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(<span class="kw">mySim</span>)
+</pre></div>
 <p>Simulation module object dependencies can be viewed using:</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">igraph</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">DiagrammeR</span>)
-<span class="fu"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(<span class="no">mySim</span>, <span class="fl">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span>
-<span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(<span class="no">mySim</span>)        <span class="co"># plots simplified module (object) dependency graph</span>
-<span class="fu"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(<span class="no">mySim</span>)        <span class="co"># plots object dependency diagram</span></pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://igraph.org">igraph</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/rich-iannone/DiagrammeR">DiagrammeR</a></span>)
+<span class="fu"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(<span class="kw">mySim</span>, <span class="fl">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span>
+<span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(<span class="kw">mySim</span>)        <span class="co"># plots simplified module (object) dependency graph</span>
+<span class="fu"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(<span class="kw">mySim</span>)        <span class="co"># plots object dependency diagram</span>
+</pre></div>
 <p>They can viewed directly by printing the output of the <code>depsEdgeList</code> function.</p>
 </div>
 <div id="running-a-simulation-the-spades-function" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-a-simulation-the-spades-function" class="anchor"></a>Running a simulation: the <code>spades</code> function</h2>
 <p>Once a simulation is properly initialized it is executed using the <code>spades</code> function. By default in an interactive session, a progress bar is displayed in the console (this can be customized), and any specified files are loaded (via including an <code>input</code> <code>data.frame</code> or <code>data.table</code>, see examples). Debugging mode, <em>i.e.</em>, setting <code><a href="../reference/spades.html">spades(mySim, debug = TRUE)</a></code>, prints the contents of the <code>simList</code> object after the completion of every event during simulation. See the <a href="https://github.com/PredictiveEcology/SpaDES/wiki/Debugging">wiki entry on debugging</a> for more details on debugging SpaDES models.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">spades.nCompleted</span> <span class="kw">=</span> <span class="fl">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span>
-<span class="no">mySim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span>(<span class="no">...</span>)             <span class="co"># initialize a simulation using valid parameters</span>
-<span class="no">mySim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="no">mySim</span>)            <span class="co"># run the simulation, returning the completed sim object</span>
-<span class="fu"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(<span class="no">mySim</span>)               <span class="co"># visualize the sequence of events for all modules</span></pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(spades.nCompleted = <span class="fl">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span>
+<span class="kw">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span>(<span class="kw">...</span>)             <span class="co"># initialize a simulation using valid parameters</span>
+<span class="kw">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="kw">mySim</span>)            <span class="co"># run the simulation, returning the completed sim object</span>
+<span class="fu"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(<span class="kw">mySim</span>)               <span class="co"># visualize the sequence of events for all modules</span>
+</pre></div>
 </div>
 </div>
 <div id="types-of-models" class="section level1">
@@ -416,7 +426,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

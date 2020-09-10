@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -151,13 +151,13 @@
     <p>Calculate the test coverage by unit tests for the module and its functions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>moduleCoverage</span>(<span class='no'>name</span>, <span class='no'>path</span>)
+    <pre class="usage"><span class='fu'>moduleCoverage</span>(<span class='kw'>name</span>, <span class='kw'>path</span>)
 
 <span class='co'># S4 method for character,character</span>
-<span class='fu'>moduleCoverage</span>(<span class='no'>name</span>, <span class='no'>path</span>)
+<span class='fu'>moduleCoverage</span>(<span class='kw'>name</span>, <span class='kw'>path</span>)
 
 <span class='co'># S4 method for character,missing</span>
-<span class='fu'>moduleCoverage</span>(<span class='no'>name</span>)</pre>
+<span class='fu'>moduleCoverage</span>(<span class='kw'>name</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,20 +195,24 @@ To accurately test your module, the test filename must follow the format
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='newModule.html'>newModule</a></code>.</p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Yong Luo</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
- <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>) <span class='co'># for %&gt;%</span>
- <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>SpaDES.core</span>)
- <span class='no'>tmpdir</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"coverage"</span>)
- <span class='no'>modulePath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>tmpdir</span>, <span class='st'>"Modules"</span>) <span class='kw'>%&gt;%</span> <span class='fu'>checkPath</span>(<span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
- <span class='no'>moduleName</span> <span class='kw'>&lt;-</span> <span class='st'>"forestAge"</span> <span class='co'># sample module to test</span>
- <span class='fu'><a href='downloadModule.html'>downloadModule</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>) <span class='co'># download sample module</span>
- <span class='no'>testResults</span> <span class='kw'>&lt;-</span> <span class='fu'>moduleCoverage</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='no'>moduleName</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>modulePath</span>)
- <span class='fu'>report</span>(<span class='no'>testResults</span>$<span class='no'>moduleCoverage</span>)
- <span class='fu'>report</span>(<span class='no'>testResults</span>$<span class='no'>functionCoverage</span>)
- <span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span>(<span class='no'>tmpdir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-}</div></pre>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+ <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>) <span class='co'># for %&gt;%</span>
+ <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://spades-core.predictiveecology.org'>SpaDES.core</a></span>)
+ <span class='kw'>tmpdir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"coverage"</span>)
+ <span class='kw'>modulePath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>tmpdir</span>, <span class='st'>"Modules"</span>) <span class='op'>%&gt;%</span> <span class='fu'>checkPath</span>(create = <span class='fl'>TRUE</span>)
+ <span class='kw'>moduleName</span> <span class='op'>&lt;-</span> <span class='st'>"forestAge"</span> <span class='co'># sample module to test</span>
+ <span class='fu'><a href='downloadModule.html'>downloadModule</a></span>(name = <span class='kw'>moduleName</span>, path = <span class='kw'>modulePath</span>) <span class='co'># download sample module</span>
+ <span class='kw'>testResults</span> <span class='op'>&lt;-</span> <span class='fu'>moduleCoverage</span>(name = <span class='kw'>moduleName</span>, path = <span class='kw'>modulePath</span>)
+ <span class='fu'>report</span>(<span class='kw'>testResults</span><span class='op'>$</span><span class='kw'>moduleCoverage</span>)
+ <span class='fu'>report</span>(<span class='kw'>testResults</span><span class='op'>$</span><span class='kw'>functionCoverage</span>)
+ <span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span>(<span class='kw'>tmpdir</span>, recursive = <span class='fl'>TRUE</span>)
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -224,7 +228,7 @@ To accurately test your module, the test filename must follow the format
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

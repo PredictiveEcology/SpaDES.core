@@ -84,7 +84,7 @@ Second, at the spades call itself, which can be simpler. See examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -155,25 +155,25 @@ in the .progress list element in the params list element passed to <code><a href
 Second, at the <code><a href='spades.html'>spades</a></code> call itself, which can be simpler. See examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>progressInterval</span>(<span class='no'>sim</span>)
+    <pre class="usage"><span class='fu'>progressInterval</span>(<span class='kw'>sim</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>progressInterval</span>(<span class='no'>sim</span>)
+<span class='fu'>progressInterval</span>(<span class='kw'>sim</span>)
 
-<span class='fu'>progressInterval</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>progressInterval</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>progressType</span>(<span class='no'>sim</span>)
+<span class='fu'>progressInterval</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>progressType</span>(<span class='no'>sim</span>)
+<span class='fu'>progressInterval</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
-<span class='fu'>progressType</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>progressType</span>(<span class='kw'>sim</span>)
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>progressType</span>(<span class='no'>sim</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+<span class='fu'>progressType</span>(<span class='kw'>sim</span>)
+
+<span class='fu'>progressType</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>progressType</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -200,43 +200,44 @@ See examples.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other functions to access elements of a 'simList' object: 
-<code><a href='addDepends.html'>.addDepends</a>()</code>,
-<code><a href='checkpoint.html'>doEvent.checkpoint</a>()</code>,
-<code><a href='simList-accessors-envir.html'>envir</a>()</code>,
-<code><a href='simList-accessors-events.html'>events</a>()</code>,
+<code><a href='.addDepends.html'>.addDepends</a>()</code>,
+<code><a href='doEvent.checkpoint.html'>doEvent.checkpoint</a>()</code>,
+<code><a href='envir.html'>envir</a>()</code>,
+<code><a href='events.html'>events</a>()</code>,
 <code><a href='globals.html'>globals</a>()</code>,
-<code><a href='simList-accessors-inputs.html'>inputs</a>()</code>,
-<code><a href='simList-accessors-modules.html'>modules</a>()</code>,
-<code><a href='objects.html'>objs</a>()</code>,
+<code><a href='inputs.html'>inputs</a>()</code>,
+<code><a href='modules.html'>modules</a>()</code>,
+<code><a href='objs.html'>objs</a>()</code>,
 <code><a href='packages.html'>packages</a>()</code>,
 <code><a href='params.html'>params</a>()</code>,
-<code><a href='simList-accessors-paths.html'>paths</a>()</code>,
-<code><a href='simList-accessors-times.html'>times</a>()</code></p></div>
+<code><a href='paths.html'>paths</a>()</code>,
+<code><a href='times.html'>times</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>mySim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-  <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start</span><span class='kw'>=</span><span class='fl'>0.0</span>, <span class='kw'>end</span><span class='kw'>=</span><span class='fl'>100.0</span>),
-  <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>.globals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>stackName</span> <span class='kw'>=</span> <span class='st'>"landscape"</span>),
-  <span class='kw'>.progress</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"text"</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>10</span>),
-  <span class='kw'>.checkpoint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='st'>"chkpnt.RData"</span>)),
-  <span class='kw'>modules</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>),
-  <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>modulePath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"SpaDES.core"</span>)))
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
+  times = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start=<span class='fl'>0.0</span>, end=<span class='fl'>100.0</span>),
+  params = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(.globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>),
+  .progress = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(type = <span class='st'>"text"</span>, interval = <span class='fl'>10</span>),
+  .checkpoint = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(interval = <span class='fl'>10</span>, file = <span class='st'>"chkpnt.RData"</span>)),
+  modules = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>),
+  paths = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>)))
 
 <span class='co'># progress bar</span>
-<span class='fu'>progressType</span>(<span class='no'>mySim</span>) <span class='co'># "text"</span>
-<span class='fu'>progressInterval</span>(<span class='no'>mySim</span>) <span class='co'># 10</span>
+<span class='fu'>progressType</span>(<span class='kw'>mySim</span>) <span class='co'># "text"</span>
+<span class='fu'>progressInterval</span>(<span class='kw'>mySim</span>) <span class='co'># 10</span>
 
 <span class='co'># parameters</span>
-<span class='fu'><a href='params.html'>params</a></span>(<span class='no'>mySim</span>) <span class='co'># returns all parameters in all modules</span>
+<span class='fu'><a href='params.html'>params</a></span>(<span class='kw'>mySim</span>) <span class='co'># returns all parameters in all modules</span>
               <span class='co'># including .global, .progress, .checkpoint</span>
-<span class='fu'><a href='globals.html'>globals</a></span>(<span class='no'>mySim</span>) <span class='co'># returns only global parameters</span>
+<span class='fu'><a href='globals.html'>globals</a></span>(<span class='kw'>mySim</span>) <span class='co'># returns only global parameters</span>
 
 <span class='co'># checkpoint</span>
-<span class='fu'><a href='checkpoint.html'>checkpointFile</a></span>(<span class='no'>mySim</span>) <span class='co'># returns the name of the checkpoint file</span>
+<span class='fu'><a href='doEvent.checkpoint.html'>checkpointFile</a></span>(<span class='kw'>mySim</span>) <span class='co'># returns the name of the checkpoint file</span>
                       <span class='co'># In this example, "chkpnt.RData"</span>
-<span class='fu'><a href='checkpoint.html'>checkpointInterval</a></span>(<span class='no'>mySim</span>) <span class='co'># 10</span>
-}</div></pre>
+<span class='fu'><a href='doEvent.checkpoint.html'>checkpointInterval</a></span>(<span class='kw'>mySim</span>) <span class='co'># 10</span>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -252,7 +253,7 @@ See examples.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>
