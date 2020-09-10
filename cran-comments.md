@@ -31,7 +31,7 @@ There are no ERRORs nor WARNINGs.
 
 There was 1 NOTE:
 
-1. Some words were flagged as possibly mispelled, but they are false positives:
+1. Some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
           workflow (6:58)
