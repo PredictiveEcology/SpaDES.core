@@ -1,8 +1,6 @@
 ## Updated release
 
-This is a maintenance release that fixes some bugs and CRAN check errors.
-Per CRAN's request, we have reduced the number of tests run on CRAN.
-(However, we still run these extended tests using GitHub actions for multiple platforms.)
+This release fixes an error in an example caused by a recent change in dependency `Require`.
 
 See `NEWS.md` for a full list of changes.
 
@@ -22,22 +20,27 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.0.0
 
 ### Development R version
-* Ubuntu 18.04                 (GitHub), R 4.1.0 (2020-08-17 r79033)
-* Ubuntu 20.04                  (local), R 4.1.0 (2020-08-18 r79041)
-* Windows                      (GitHub), R 4.1.0 (2020-08-17 r79033)
-* Windows                 (win-builder), R 4.1.0 (2020-08-18 r79041)
+* Ubuntu 18.04                 (GitHub), R 4.1.0 (2020-09-08 r79165)
+* Ubuntu 20.04                  (local), R 4.1.0 (2020-09-10 r79180)
+* Windows                      (GitHub), R 4.1.0 (2020-09-09 r79174)
+* Windows                 (win-builder), R 4.1.0 (2020-09-09 r79174)
 
 ## R CMD check results
 
 There are no ERRORs nor WARNINGs.
 
-There was 1 NOTE:
+There were 2 NOTEs:
 
-1. Some words were flagged as possibly mispelled, but they are false positives:
+1. Some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
           workflow (6:58)
           workflows (10:64)
+
+2. Unable to reach the default time server:
+
+        > checking for future file timestamps ... NOTE
+          unable to verify current time
 
 ## Downstream dependencies
 

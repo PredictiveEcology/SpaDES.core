@@ -1,5 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.3
+=============
+
+## new features
+* none
+
+## dependencies
+* completely removed `RCurl` dependency (#120)
+* Suggests `sp` because it's linked in documentation (#120)
+
+## bug fixes
+* fix `pkgDeps` example for new version of `Require`
+* minor bug fixes
+
 version 1.0.2
 =============
 
