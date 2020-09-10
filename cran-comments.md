@@ -1,8 +1,6 @@
 ## Updated release
 
-This is a maintenance release that fixes some bugs and CRAN check errors.
-Per CRAN's request, we have reduced the number of tests run on CRAN.
-(However, we still run these extended tests using GitHub actions for multiple platforms.)
+This release fixes an error in an example caused by a recent change in dependency `Require`.
 
 See `NEWS.md` for a full list of changes.
 
