@@ -253,24 +253,29 @@ setMethod(
     } else {
       files
     }
-    res <- Map(reproducible::preProcess,
-               targetFile = targetFiles,
-               url = urls,
-               MoreArgs = append(
-                 list(
-                   quick = quickCheck,
-                   overwrite = overwrite,
-                   destinationPath = file.path(path, module, "data")
-                  ),
-                 list(...)
-               )
-    )
-    chksums <- rbindlist(lapply(res, function(x) x$checkSums))
-    chksums <- chksums[order(-result)]
-    chksums <- unique(chksums, by = "expectedFile")
+    notNAs <- !unlist(lapply(urls, is.na))
+    dPath <- file.path(path, module, "data")
+    if (any(notNAs)) {
+      res <- Map(reproducible::preProcess,
+                 targetFile = targetFiles[notNAs],
+                 url = urls[notNAs],
+                 MoreArgs = append(
+                   list(
+                     quick = quickCheck,
+                     overwrite = overwrite,
+                     destinationPath = dPath
+                   ),
+                   list(...)
+                 )
+      )
+      chksums <- rbindlist(lapply(res, function(x) x$checkSums))
+      chksums <- chksums[order(-result)]
+      chksums <- unique(chksums, by = "expectedFile")
+    } else {
+      chksums <- Checksums(dPath, write = TRUE)
+    }
 
     # after download, check for childModules that also require downloading
-    chksums2 <- chksums[0,]
     #children <- moduleMetadata(module, path)$childModules
     if (!is.null(children)) {
       if (length(children)) {
@@ -278,11 +283,12 @@ setMethod(
           chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
                              quickCheck = quickCheck) %>%
             bind_rows()
+          chksums <- bind_rows(chksums, chksums2)
         }
       }
     }
 
-    return(bind_rows(chksums, chksums2))
+    return(chksums)
 })
 
 #' @rdname downloadData
