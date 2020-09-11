@@ -10,7 +10,7 @@ output:
     self_contained: yes
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{01 Introduction to SpaDES}
+  %\VignetteIndexEntry{01 Introduction to `SpaDES`}
   %\VignetteDepends{SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{discrete event simulation, spatial simulation models}
   %\VignetteEncoding{UTF-8}
@@ -79,7 +79,7 @@ Likewise, numerous upgrades to R, including minimizing object copying since `R` 
 
 [^julia]: https://julialang.org
 
-[^benchmarks]: https://PredictiveEcology.org/benchmarking
+[^benchmarks]: http://PredictiveEcology.org/benchmarking/
 
 ## Discrete event simulation and `SpaDES`
 

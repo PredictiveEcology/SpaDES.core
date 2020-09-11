@@ -1,7 +1,8 @@
 test_that("downloadModule downloads and unzips a single module", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -34,9 +35,10 @@ test_that("downloadModule downloads and unzips a single module", {
 })
 
 test_that("downloadModule downloads and unzips a parent module", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -71,9 +73,10 @@ test_that("downloadModule downloads and unzips a parent module", {
 })
 
 test_that("downloadModule can overwrite existing modules", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -114,9 +117,10 @@ test_that("downloadModule can overwrite existing modules", {
 })
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")

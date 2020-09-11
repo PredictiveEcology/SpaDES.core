@@ -70,8 +70,7 @@ test_that("timeunit works correctly", {
   )
 
   # check that minTimeunit finds the smallest timeunit of the modules loaded
-  whNotNA <- sapply(depends(mySim)@dependencies,
-                    function(x) !is.na(x@timeunit))
+  whNotNA <- sapply(depends(mySim)@dependencies, function(x) !is.na(x@timeunit))
   expect_equivalent(as.numeric(eval(parse(
     text = paste0("d", minTimeunit(mySim), "(1)")))),
     min(sapply(depends(mySim)@dependencies[whNotNA],
@@ -106,6 +105,8 @@ test_that("timeunit works correctly", {
 })
 
 test_that("timeunits with child and parent modules work correctly", {
+  skip_on_cran()
+
   m <- testInit("igraph", smcc = TRUE)
   options("spades.memoryUseInterval" = 0)
   on.exit({
@@ -234,7 +235,6 @@ test_that("timeunits with child and parent modules work correctly", {
                      paths = list(modulePath = tmpdir, inputPath = tmpdir, cachePath = cacheDir),
                      params = list("child6" = list(.useCache = ".inputObjects")))
   })
-
 
   xxx1 <- c(xxx[seq(lineOfInterest1 - 1)], "  expectsInput(\"b\", \"character\", \"temp thing\"),",
             xxx[seq(length(xxx) - lineOfInterest1) + lineOfInterest1])

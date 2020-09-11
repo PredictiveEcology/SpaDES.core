@@ -94,7 +94,7 @@ The following options are likely of interest to most users
     point number comparisons. \cr
 
   \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
-    \tab : The default user agent to use for downloading modules from GitHub.com. \cr
+    \tab : The default user agent to use for downloading modules from GitHub. \cr
 
 }
 }

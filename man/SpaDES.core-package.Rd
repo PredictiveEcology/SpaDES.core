@@ -514,7 +514,7 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   > 1 event in the past, i.e., redo some of the "completed" events. Default is
   \code{TRUE}, i.e., it will keep the state of the \code{simList}
   at the start of the current event. This can be recovered with \code{restartSpades}
-  and the differences can be seen in a hidden object in the stashed simList.
+  and the differences can be seen in a hidden object in the stashed \code{simList.}
   There is a message which describes how to find that.
 
   \item \code{spades.switchPkgNamespaces}: Should the search path be modified

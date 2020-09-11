@@ -2,7 +2,7 @@ if (!isGeneric("Plot")) {
   setGeneric("Plot", function(..., new, addTo, gp, gpText, gpAxis, axes,
                               speedup, size, cols, zoomExtent, visualSqueeze,
                               legend, legendRange, legendText, pch, title,
-                              na.color, zero.color, length){
+                              na.color, zero.color, length) {
     standardGeneric("Plot")
   })
 }
@@ -78,7 +78,8 @@ setMethod(
       }
     }
     out <- tryCatch(
-      eval(parse(text=deparse(elems[[useElem]])), envir=tmp@.xData),
-      error=function(x) eval(parse(text=deparse(elems[[useElem]])), envir=envir))
+      eval(parse(text = deparse(elems[[useElem]])), envir = tmp@.xData),
+      error = function(x) eval(parse(text = deparse(elems[[useElem]])), envir = envir)
+    )
     return(out)
 })

@@ -72,15 +72,15 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
 }
 
 testOnExit <- function(testInitOut) {
-    if (length(testInitOut$optsVerbose))
-      options("reproducible.verbose" = testInitOut$optsVerbose[[1]])
-    if (length(testInitOut$optsAsk))
-      options("reproducible.ask" = testInitOut$optsAsk[[1]])
-    if (length(testInitOut$opts))
-      options(testInitOut$opts)
-    setwd(testInitOut$origDir)
-    unlink(testInitOut$tmpdir, recursive = TRUE)
-    lapply(testInitOut$libs, function(lib) {
-      try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
-    )
-  }
+  if (length(testInitOut$optsVerbose))
+    options("reproducible.verbose" = testInitOut$optsVerbose[[1]])
+  if (length(testInitOut$optsAsk))
+    options("reproducible.ask" = testInitOut$optsAsk[[1]])
+  if (length(testInitOut$opts))
+    options(testInitOut$opts)
+  setwd(testInitOut$origDir)
+  unlink(testInitOut$tmpdir, recursive = TRUE)
+  lapply(testInitOut$libs, function(lib) {
+    try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
+  )
+}

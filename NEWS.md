@@ -1,5 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.3
+=============
+
+## new features
+* none
+
+## dependencies
+* completely removed `RCurl` dependency (#120)
+* Suggests `sp` because it's linked in documentation (#120)
+
+## bug fixes
+* fix `pkgDeps` example for new version of `Require`
+* minor bug fixes
+
 version 1.0.2
 =============
 
@@ -10,6 +24,7 @@ version 1.0.2
 * new helper functions for debugging: `writeEventInfo()` and `writeRNGInfo()` to write info to file.
 
 ## dependencies
+* drop support for R < 3.6
 * removed imports from `stringi`
 
 ## bug fixes
@@ -18,6 +33,7 @@ version 1.0.2
 * module template has full path instead of `..` for `moduleParams` etc. This is more accurate. 
 * address changes to active bindings in R-devel
 * fix CRAN check errors
+* reduced the number of tests run on CRAN (extended tests still run on GitHub Actions)
 
 version 1.0.1
 =============
