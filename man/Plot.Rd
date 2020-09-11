@@ -63,7 +63,8 @@ Default \code{gpar(col = "black")}.}
 \item{gpAxis}{A \code{gpar} object for the axes.
 Default \code{gpar(col = "black")}.}
 
-\item{axes}{Logical or \code{"L"}, representing the left and bottom axes, over all plots.}
+\item{axes}{Logical or \code{"L"}, representing the left and bottom axes,
+over all plots.}
 
 \item{speedup}{Numeric. The factor by which the number of pixels is divided
 by to plot rasters. See Details.}

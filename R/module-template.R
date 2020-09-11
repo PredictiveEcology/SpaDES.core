@@ -685,7 +685,7 @@ setMethod(
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "character"),
           definition = function(name, version, data, ...) {
-            zipModule(name = name, path = ".", version = version, data = data, ...)
+            zipModule(name = name, path = "..", version = version, data = data, ...)
 })
 
 #' @export
@@ -693,8 +693,7 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "missing"),
           definition = function(name, data, ...) {
-            vers <- moduleVersion(name, path) %>% as.character()
-            zipModule(name = name, path = ".", version = vers, data = data, ...)
+            zipModule(name = name, path = "..", data = data, ...)
 })
 
 #' @export
@@ -702,6 +701,6 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "character", version = "missing"),
           definition = function(name, path, data, ...) {
-            vers <- vers <- moduleVersion(name, path) %>% as.character()
+            vers <- moduleVersion(name, path) %>% as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })
