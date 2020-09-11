@@ -1012,7 +1012,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
   ## quote is so that entire simList is not serialized in do.call
-  objsSpades <- append(list(sim = quote(sim)), objsAll[spadesFormals])
+  objsSpades <- append(alist(sim = sim), objsAll[spadesFormals])
   sim <- do.call(spades, objsSpades)
 }
 

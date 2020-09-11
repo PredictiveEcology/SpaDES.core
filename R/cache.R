@@ -576,7 +576,7 @@ setMethod(
 
 
               a <- do.call(unique,
-                           args = list(append(b[eventsAddedByThisModule], d)))
+                           args = alist(append(b[eventsAddedByThisModule], d)))
 
               # a <- do.call(unique,
               #              args = list(append(object@events[eventsAddedByThisModule], object2@events)))
