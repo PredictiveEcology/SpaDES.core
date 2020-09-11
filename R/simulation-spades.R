@@ -806,7 +806,7 @@ setMethod(
     useNormalMessaging <- TRUE
     newDebugging <- is.list(debug)
     if (newDebugging) {
-      if (requireNamespace("logging")) {
+      if (requireNamespace("logging", quietly = TRUE)) {
         debug <- setupDebugger(debug)
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
@@ -1022,13 +1022,13 @@ setMethod(
       .pkgEnv$.cleanEnd <- TRUE
       return(invisible(sim))
     },
-    warning = function(w) { if (requireNamespace("logging")) {
+    warning = function(w) { if (requireNamespace("logging", quietly = TRUE)) {
       logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       } else {
         warning(w)
       }
     },
-    error = function(e) { if (requireNamespace("logging")) {
+    error = function(e) { if (requireNamespace("logging", quietly = TRUE)) {
       logging::logerror(e)
     } else {
       stop(e)
