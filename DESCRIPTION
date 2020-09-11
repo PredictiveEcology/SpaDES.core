@@ -46,7 +46,6 @@ Imports:
     R.utils (>= 2.5.0),
     raster (>= 2.5-8),
     Require (>= 0.0.7),
-    rlang,
     stats,
     tcltk,
     tools,

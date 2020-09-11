@@ -786,7 +786,6 @@ setGeneric(
   })
 
 #' @rdname spades
-#' @importFrom rlang cnd_muffle
 setMethod(
   "spades",
   signature(sim = "simList", cache = "missing"),
@@ -1041,7 +1040,8 @@ setMethod(
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
       }
       # This will "muffle" the original message
-      tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
+      invokeRestart("muffleMessage")
+      # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
     return(invisible(sim))
