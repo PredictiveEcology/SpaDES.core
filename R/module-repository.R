@@ -310,7 +310,7 @@ setMethod(
       checkModule(name, repo)
       if (is.na(version)) version <- getModuleVersion(name, repo)
 
-      innerPaths <- c(paste0("/master/modules/", name), "/master/")
+      innerPaths <- c(paste0("/master/modules/", name, "/"), "/master/")
       for (tries in 1:2) {
         innerPath <- innerPaths[tries]
 
