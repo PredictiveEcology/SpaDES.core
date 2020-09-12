@@ -191,6 +191,8 @@ setMethod(
       # what is not provided in modules, but needed
       missingObjects <- simEdgeList %>% filter(from != to) %>%
         anti_join(pth, ., by = c("from", "to"))
+      missingObjects2 <- pth[!simEdgeList[from != to], on = c("from", "to")]
+      if (!identical(missingObjects, missingObjects2)) browser()
       if (nrow(missingObjects)) {
         warning("Problem resolving the module dependencies:\n",
                 paste(missingObjects), collapse = "\n")
