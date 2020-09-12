@@ -1,6 +1,6 @@
 test_that("local mod object", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE,
-                          "reproducible.useMemoise" = FALSE)
+                          opts = list("reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
