@@ -1040,7 +1040,7 @@ setMethod(
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
       }
       # This will "muffle" the original message
-      invokeRestart("muffleMessage")
+      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
       # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
