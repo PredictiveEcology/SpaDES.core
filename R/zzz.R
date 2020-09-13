@@ -63,6 +63,9 @@
     packageStartupMessage(
       "To change these, use setPaths(...); see ?setPaths"
     )
+    packageStartupMessage(
+      "See ?spadesOptions for advanced features"
+    )
   }
 
   #unlockBinding("Paths", as.environment("package:SpaDES.core"))

@@ -1146,7 +1146,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
         } else {
-          browser()
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = mBase, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))
