@@ -270,49 +270,49 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # laptop -- May 25, 2019 0.603 Seconds --> 120 microseconds/event!
   # laptop with new completed as environment -- May 25, 2019 0.357 Seconds --> 71 microseconds/event!
   options("spades.keepCompleted" = TRUE)
-  microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
-
-  # Turn off completed list
-  #  Changed to use "seconds" -- better comparison with simple loop
-  # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
-  #                         -- This is 161 microseconds per event
-  # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
-  # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
-  # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
-  # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
-  # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
-  # With many new "exists"
-  # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
-  options("spades.keepCompleted" = FALSE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
-
-  a <- 0
-  a3 <- microbenchmark::microbenchmark(
-    for (i in 1:N) {
-      a <- a + 1
-    }
-  )
-
-  summary(a2)[, "median"]/summary(a3)[, "median"]
-
-  ########################################
-  # With 2 modules, therefore sorting
-  ########################################
-  modules <- list("test", "test2")
-  mySim <- simInit(times = times, params = parameters, modules = modules,
-                   objects = objects, paths = paths)
-
-  nTimes <- 10
-  # Turn off completed list
-  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
-  options("spades.keepCompleted" = FALSE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
-
-  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
-  options("spades.keepCompleted" = TRUE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  # microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
+  #
+  # # Turn off completed list
+  # #  Changed to use "seconds" -- better comparison with simple loop
+  # # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
+  # #                         -- This is 161 microseconds per event
+  # # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
+  # # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
+  # # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
+  # # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
+  # # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
+  # # With many new "exists"
+  # # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
+  # options("spades.keepCompleted" = FALSE)
+  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  # #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
+  #
+  # a <- 0
+  # a3 <- microbenchmark::microbenchmark(
+  #   for (i in 1:N) {
+  #     a <- a + 1
+  #   }
+  # )
+  #
+  # summary(a2)[, "median"]/summary(a3)[, "median"]
+  #
+  # ########################################
+  # # With 2 modules, therefore sorting
+  # ########################################
+  # modules <- list("test", "test2")
+  # mySim <- simInit(times = times, params = parameters, modules = modules,
+  #                  objects = objects, paths = paths)
+  #
+  # nTimes <- 10
+  # # Turn off completed list
+  # # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
+  # options("spades.keepCompleted" = FALSE)
+  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  # #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
+  #
+  # # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
+  # options("spades.keepCompleted" = TRUE)
+  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
 })
 
 test_that("conflicting function types", {
