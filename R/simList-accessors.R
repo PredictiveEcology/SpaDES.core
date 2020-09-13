@@ -1111,7 +1111,6 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @importFrom data.table := data.table
 #' @importFrom stats na.omit
-#' @importFrom tools file_ext file_path_sans_ext
 #' @name outputs
 #' @rdname simList-accessors-outputs
 #'
@@ -1225,11 +1224,11 @@ setReplaceMethod(
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !grepl(txtTimeA, sim@outputs$file)
        sim@outputs[wh, "file"] <- paste0(
-         file_path_sans_ext(sim@outputs[wh, "file"]),
+         filePathSansExt(sim@outputs[wh, "file"]),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) ,
-                file_ext(sim@outputs[wh, "file"]),
+         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) ,
+                fileExt(sim@outputs[wh, "file"]),
                 "")
        )
      } else {
