@@ -1010,9 +1010,10 @@ setReplaceMethod(
 
      # If a filename is provided, determine if it is absolute path, if so,
      # use that, if not, then append it to inputPath(sim)
-     sim@inputs[!isAbsolutePath(sim@inputs$file) & !is.na(sim@inputs$file), "file"] <-
+     isAP <- isAbsolutePath(as.character(sim@inputs$file))
+     sim@inputs[!isAP & !is.na(sim@inputs$file), "file"] <-
        file.path(inputPath(sim),
-                 sim@inputs$file[!isAbsolutePath(sim@inputs$file) & !is.na(sim@inputs$file)])
+                 sim@inputs$file[!isAP & !is.na(sim@inputs$file)])
 
      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
        stop(paste("input table can only have columns named",
@@ -1195,8 +1196,10 @@ setReplaceMethod(
        # use that, if not, then append it to outputPath(sim)
        alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
        if (any(!alreadyWithOutputPath)) {
-         sim@outputs[!isAbsolutePath(sim@outputs$file)[!alreadyWithOutputPath], "file"] <-
-           file.path(outputPath(sim), sim@outputs$file[!isAbsolutePath(sim@outputs$file)])
+         isAP <- isAbsolutePath(as.character(sim@outputs$file))
+
+         sim@outputs[!isAP[!alreadyWithOutputPath], "file"] <-
+           file.path(outputPath(sim), sim@outputs$file[!isAP])
        }
 
        # If there is no function provided, then use saveRDS, from package base
