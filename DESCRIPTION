@@ -33,7 +33,6 @@ Depends:
     quickPlot (>= 0.1.4),
     reproducible (>= 1.2.1)
 Imports:
-    backports,
     crayon,
     data.table (>= 1.10.4),
     fastdigest,

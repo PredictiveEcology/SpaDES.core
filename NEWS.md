@@ -8,7 +8,7 @@ version 1.0.4
 * none
 
 ## dependencies
-* completely removed `dplyr`, `lubridate`, `R.utils`, `tools` and `rlang` from dependencies
+* completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies
 * move `tcltk` to `Suggests`
 * remove `devtools`, `microbenchmark` from `Suggests`
 
