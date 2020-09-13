@@ -725,9 +725,16 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 #' This simply sets defaults to \code{fill = TRUE}, and
 #' \code{use.names = TRUE}
 #'
-#' @param ...
+#' @param ... 1 or more \code{data.frame}, \code{data.table}, or \code{list} objects
 #' @export
 bindrows <- function(...) {
-  rws <- list(...)
-  rbindlist(rws, fill = TRUE, use.names = TRUE)
+  # Deal with things like "trailing commas"
+  rws <- try(list(...), silent = TRUE)
+  if (is(rws, "try-error")) {
+    ll <- as.list(match.call(expand.dots = TRUE))
+    nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0)))
+    eval(as.call(ll[nonEmpties]))
+  } else {
+    rbindlist(rws, fill = TRUE, use.names = TRUE)
+  }
 }

@@ -6,6 +6,9 @@
 \usage{
 bindrows(...)
 }
+\arguments{
+\item{...}{1 or more \code{data.frame}, \code{data.table}, or \code{list} objects}
+}
 \description{
 This simply sets defaults to \code{fill = TRUE}, and
 \code{use.names = TRUE}
