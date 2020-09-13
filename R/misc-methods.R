@@ -719,3 +719,15 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
   lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
 }
+
+#' Simple wrapper around \code{data.table::rbindlist}
+#'
+#' This simply sets defaults to \code{fill = TRUE}, and
+#' \code{use.names = TRUE}
+#'
+#' @param ...
+#' @export
+bindrows <- function(...) {
+  rws <- list(...)
+  rbindlist(rws, fill = TRUE, use.names = TRUE)
+}

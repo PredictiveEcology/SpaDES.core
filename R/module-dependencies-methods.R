@@ -140,8 +140,7 @@ setMethod("depsGraph",
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table as.data.table data.table rbindlist
-#' @importFrom dplyr anti_join filter inner_join lead
+#' @importFrom data.table as.data.table data.table rbindlist shift
 #' @importFrom stats na.omit
 #' @include simList-class.R
 #' @keywords internal
@@ -170,7 +169,7 @@ setMethod(
                                    from = rownames(M)[row],
                                    to = colnames(M)[col])$vpath[[1]]
             pth1 <- data.frame(from = rownames(M)[pth1],
-                               to = rownames(M)[lead(match(names(pth1), rownames(M)), 1)],
+                               to = rownames(M)[shift(match(names(pth1), rownames(M)), -1)],
                                stringsAsFactors = FALSE) %>%
                     na.omit() %>% as.data.table()
 
@@ -178,7 +177,7 @@ setMethod(
                                    from = colnames(M)[col],
                                    to = rownames(M)[row])$vpath[[1]]
             pth2 <- data.frame(from = rownames(M)[pth2],
-                               to = rownames(M)[lead(match(names(pth2), rownames(M)), 1)],
+                               to = rownames(M)[shift(match(names(pth2), rownames(M)), -1)],
                                stringsAsFactors = FALSE) %>%
                     na.omit() %>% as.data.table()
 
@@ -186,22 +185,27 @@ setMethod(
           }
         }
       }
-      pth <- pth %>% inner_join(simEdgeList, by = c("from", "to"))
+      pth <- simEdgeList[pth, on = c("from", "to")]
+      #pth <- pth %>% inner_join(simEdgeList, by = c("from", "to"))
+      #if (!identical(pth, pth2)) browser()
 
       # what is not provided in modules, but needed
-      missingObjects <- simEdgeList %>% filter(from != to) %>%
-        anti_join(pth, ., by = c("from", "to"))
-      missingObjects2 <- pth[!simEdgeList[from != to], on = c("from", "to")]
-      if (!identical(missingObjects, missingObjects2)) browser()
+      # missingObjects <- simEdgeList %>% filter(from != to) %>%
+      #   anti_join(pth, ., by = c("from", "to"))
+      missingObjects <- pth[!simEdgeList[from != to], on = c("from", "to")]
+      # if (!identical(missingObjects, missingObjects2)) browser()
       if (nrow(missingObjects)) {
         warning("Problem resolving the module dependencies:\n",
                 paste(missingObjects), collapse = "\n")
       }
 
       # what is provided in modules, and can be omitted from simEdgeList object
-      newEdgeList <- simEdgeList %>%
-        filter(from != to) %>%
-        anti_join(pth, by = c("from", "to"))
+      # newEdgeList <- simEdgeList %>%
+      #   filter(from != to) %>%
+      #   anti_join(pth, by = c("from", "to"))
+      newEdgeList <- simEdgeList[from != to][!pth, on = c("from", "to")]
+      # if (!identical(newEdgeList, newEdgeList2)) browser()
+
     } else {
       newEdgeList <- simEdgeList
     }

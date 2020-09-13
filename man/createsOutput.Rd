@@ -29,7 +29,7 @@ a module's metadata.
 Used to specify an output object's name, class, description and other specifications.
 }
 \examples{
-outputObjects <- dplyr::bind_rows(
+outputObjects <- bindrows(
   createsOutput(objectName = "outputObject1", objectClass = "character",
                 desc = "this is for example"),
   createsOutput(objectName = "outputObject2", objectClass = "numeric",

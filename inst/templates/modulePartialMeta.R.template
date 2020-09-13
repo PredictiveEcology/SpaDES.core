@@ -14,11 +14,11 @@
                           "This is generally intended for data-type modules, where stochasticity",
                           "and time are not relevant"))
   ),
-  inputObjects = bind_rows(
+  inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),
     expectsInput(objectName = NA, objectClass = NA, desc = NA, sourceURL = NA)
   ),
-  outputObjects = bind_rows(
+  outputObjects = bindrows(
     #createsOutput("objectName", "objectClass", "output object description", ...),
     createsOutput(objectName = NA, objectClass = NA, desc = NA)
   )

@@ -180,9 +180,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
       reqdPkgs = list(),
       parameters = rbind(
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 
@@ -215,9 +215,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
       reqdPkgs = list(),
       parameters = rbind(
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 

@@ -26,10 +26,10 @@ test_that("local mod object", {
       parameters = rbind(
         defineParameter("testParA", "numeric", 1, NA, NA, "")
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
         expectsInput("sdf", "sdf", "sdfd")
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
         createsOutput("testPar1", "numeric", "")
       )
       ))
@@ -73,10 +73,10 @@ test_that("local mod object", {
       parameters = rbind(
         defineParameter("testParB", "numeric", 2, NA, NA, "")
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
         expectsInput("sdf", "sdf", "sdfd")
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
         createsOutput("testPar2", "numeric", "")
       )
       ))

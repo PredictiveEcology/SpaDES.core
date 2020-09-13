@@ -32,12 +32,12 @@ test_that("defineModule correctly handles different inputs", {
       defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description
                       with spaces")
     ),
-    inputObjects = bind_rows(
+    inputObjects = bindrows(
       expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_),
       expectsInput(objectName = "testInput2", objectClass = "list", sourceURL = "", desc = "another vague
                    description with spaces")
     ),
-    outputObjects = bind_rows(
+    outputObjects = bindrows(
       createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_),
       createsOutput(objectName = "testOutput", objectClass = "list", desc = "another vague
                    description with spaces for outputs   another space")

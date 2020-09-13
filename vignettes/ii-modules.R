@@ -31,11 +31,11 @@ options(spades.moduleCodeChecks = FALSE)
 #      defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time ..."),
 #      defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time ...")
 #    ),
-#    inputObjects = bind_rows(
+#    inputObjects = bindrows(
 #      expectsInput(objectName = NA_character_, objectClass = NA_character_,
 #                   desc = NA_character_, sourceURL = NA_character_, other = NA_character_)
 #    ),
-#    outputObjects = bind_rows(
+#    outputObjects = bindrows(
 #      createsOutput(objectName = globals(sim)$stackName, objectClass = "RasterStack",
 #                    desc = NA_character_, other = NA_character_)
 #    )

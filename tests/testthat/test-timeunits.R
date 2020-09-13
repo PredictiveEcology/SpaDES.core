@@ -34,10 +34,10 @@ test_that("timeunit works correctly", {
     parameters = rbind(
       defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description")
     ),
-    inputObjects = dplyr::bind_rows(
+    inputObjects = bindrows(
       expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_)
     ),
-    outputObjects = dplyr::bind_rows(
+    outputObjects = bindrows(
       createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_)
     )
   )

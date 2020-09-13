@@ -76,11 +76,11 @@ test_that("test objectSynonyms", {
       parameters = rbind(
         defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
         expectsInput("age", "numeric", ""),
         expectsInput("age2", "numeric", "") # need a dummy one that isn not supplied in simInit below
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 

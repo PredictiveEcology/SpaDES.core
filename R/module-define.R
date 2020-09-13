@@ -479,7 +479,7 @@ setMethod(
 #' @rdname expectsInput
 #'
 #' @examples
-#' inputObjects <- dplyr::bind_rows(
+#' inputObjects <- bindrows(
 #'   expectsInput(objectName = "inputObject1", objectClass = "character",
 #'                desc = "this is for example", sourceURL = "not available"),
 #'   expectsInput(objectName = "inputObject2", objectClass = "numeric",
@@ -548,7 +548,7 @@ setMethod(
 #' @rdname createsOutput
 #'
 #' @examples
-#' outputObjects <- dplyr::bind_rows(
+#' outputObjects <- bindrows(
 #'   createsOutput(objectName = "outputObject1", objectClass = "character",
 #'                 desc = "this is for example"),
 #'   createsOutput(objectName = "outputObject2", objectClass = "numeric",

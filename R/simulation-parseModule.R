@@ -76,9 +76,18 @@ setMethod(
       } else {
         out <- list()
       }
+
       out <- tryCatch(
         eval(out),
-        error = function(x) out
+        error = function(x) {
+          if (any(grepl("bind_rows", out))) { # historical artifact
+            if (!require("dplyr"))
+              stop("To read module: '", gsub("\\.R", "", basename(filename)),
+                   "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
+            out <- eval(out)
+          }
+          out
+        }
       )
     } else {
       out <- NULL

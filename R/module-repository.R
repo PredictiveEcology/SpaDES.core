@@ -361,7 +361,6 @@ setMethod(
                            overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
-#          dataList2 <<- bind_rows(dataList2, f[[2]])
           dataList2 <<- setDF(rbindlist(list(dataList2, f[[2]]), use.names = TRUE, fill = TRUE))
         })
       }
@@ -396,7 +395,6 @@ setMethod(
 
     return(list(c(files, files2),
                 setDF(rbindlist(list(dataList, dataList2), use.names = TRUE, fill = TRUE))))
-#                bind_rows(dataList, dataList2)))
 })
 
 #' @rdname downloadModule
