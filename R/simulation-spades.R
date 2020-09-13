@@ -186,7 +186,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             }
           }
 
-          browser(expr = exists("._doEvent_2"))
+          # browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
             isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
               isTRUE(getOption("reproducible.showSimilar", FALSE))
@@ -202,7 +202,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                            showSimilar = showSimilar)
 
-          browser(expr = exists("._doEvent_3"))
+          # browser(expr = exists("._doEvent_3"))
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",

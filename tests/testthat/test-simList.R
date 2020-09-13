@@ -314,7 +314,7 @@ test_that("simList test all signatures", {
       names(li) <- argNames
       li <- li[!sapply(li, is.null)]
       messes <- capture_messages(successes[i] <- tryCatch(
-        is(do.call(simInit, args = li), "simList"),
+        is(suppressMessages(do.call(simInit, args = li)), "simList"),
         error = function(e) { FALSE },
         warning = function(w) { FALSE }
       ))

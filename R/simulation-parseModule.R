@@ -218,7 +218,7 @@ setMethod(
         if (!is.null(sim@.xData$.mods[[mBase]])) {
           rm(list = mBase, envir = sim@.xData$.mods)
         }
-        browser(expr = exists("._parseModule_2"))
+        # browser(expr = exists("._parseModule_2"))
 
         #sim@.xData$.mods[[mBase]] <- new.env(parent = sim@.xData$.mods)
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
@@ -298,7 +298,7 @@ setMethod(
         #  inside of the defineModule.
         #  First, load anything that is active code into an environment whose parent
         #  is here (and thus has access to sim), then move the depends (only) back to main sim
-        browser(expr = exists("._parseModule_3"))
+        # browser(expr = exists("._parseModule_3"))
         env <- new.env(parent = parent.frame())
         # env <- new.env(parent = asNamespace("SpaDES.core"))
         # env$sim <- Copy(sim, objects = FALSE)
@@ -496,7 +496,7 @@ setMethod(
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
                                sim) {
 
-  browser(expr = exists("._evalWithActiveCode_1"))
+  # browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
   #tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
@@ -516,7 +516,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   rm(tmpEnvir)
 
   if (any(activeCode)) {
-    browser(expr = exists("._evalWithActiveCode_2"))
+    # browser(expr = exists("._evalWithActiveCode_2"))
     env <- new.env(parent = parentFrame);
     # env <- new.env(parent = asNamespace("SpaDES.core"));
     env$sim <- sim#simCopy
