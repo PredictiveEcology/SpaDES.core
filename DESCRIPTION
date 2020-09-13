@@ -49,7 +49,6 @@ Imports:
 Suggests:
     codetools,
     covr,
-    devtools,
     DiagrammeR (>= 0.8.2),
     dplyr,
     future,
@@ -59,7 +58,6 @@ Suggests:
     knitr,
     logging,
     magrittr,
-    microbenchmark,
     png,
     RandomFields (>= 3.3.4),
     RColorBrewer (>= 1.1-2),
