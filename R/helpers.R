@@ -316,3 +316,5 @@ needInstall <- function(pkg = "methods", minVersion = NULL,
          "install.packages('",pkg,"')")
   }
 }
+
+isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")

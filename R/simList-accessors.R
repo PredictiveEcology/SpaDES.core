@@ -931,7 +931,6 @@ setReplaceMethod("progressType",
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
 #' @importFrom stats na.omit
-#' @importFrom R.utils isAbsolutePath
 #' @export
 #' @name inputs
 #' @aliases simList-accessors-inout
@@ -1110,7 +1109,6 @@ setReplaceMethod(
 #' @export
 #' @include simList-class.R
 #' @importFrom data.table := data.table
-#' @importFrom R.utils isAbsolutePath
 #' @importFrom stats na.omit
 #' @importFrom tools file_ext file_path_sans_ext
 #' @name outputs

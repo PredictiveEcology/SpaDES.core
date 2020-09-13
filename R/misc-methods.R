@@ -642,7 +642,6 @@ Paths <- .paths()
 #' @rdname setPaths
 #' @importFrom raster tmpDir
 #' @importFrom Require checkPath
-#' @importFrom R.utils getOption
 #' @param silent Logical. Should the messaging occur.
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {
   defaults <- list(
