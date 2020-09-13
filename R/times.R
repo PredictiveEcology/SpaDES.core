@@ -28,17 +28,28 @@
 #' @author Eliot McIntire
 #' @export
 #' @rdname spadesTime
+dhour <- function(x) {
+  x * 60 * 60
+}
+
+#' @export
+#' @rdname spadesTime
+dday <- function(x) {
+  x * 24 * hoursInSeconds
+}
+
+#' @export
+#' @rdname spadesTime
 setGeneric("dyears", function(x) {
   standardGeneric("dyears")
 })
 
-#' @importFrom lubridate duration
 #' @export
 #' @rdname spadesTime
 setMethod("dyears",
           signature(x = "numeric"),
           definition = function(x) {
-            duration(x * 60 * 60 * 24 * 365.25)
+            x * dday(1) * 365.25
 })
 
 yearsInSeconds <- as.numeric(dyears(1)) # 31557600L
@@ -50,12 +61,11 @@ setGeneric("dmonths", function(x) {
   standardGeneric("dmonths")
 })
 
-#' @importFrom lubridate duration
 #' @rdname spadesTime
 setMethod("dmonths",
           signature(x = "numeric"),
           definition = function(x) {
-            duration(x * as.numeric(yearsInSeconds) / 12)
+            x * as.numeric(yearsInSeconds) / 12
 })
 
 #' @export
@@ -65,12 +75,11 @@ setGeneric("dweeks", function(x) {
 })
 
 #' @export
-#' @importFrom lubridate duration
 #' @rdname spadesTime
 setMethod("dweeks",
           signature(x = "numeric"),
           definition = function(x) {
-            duration(x * as.numeric(yearsInSeconds) / 52)
+            x * as.numeric(yearsInSeconds) / 52
 })
 
 #' @export
@@ -93,23 +102,8 @@ dyear <- function(x) {
 
 #' @export
 #' @rdname spadesTime
-#' @importFrom lubridate dseconds
 dsecond <- function(x) {
-  dseconds(x)
-}
-
-#' @export
-#' @rdname spadesTime
-#' @importFrom lubridate ddays
-dday <- function(x) {
-  ddays(x)
-}
-
-#' @export
-#' @rdname spadesTime
-#' @importFrom lubridate dhours
-dhour <- function(x) {
-  dhours(x)
+  x
 }
 
 #' @export
@@ -119,12 +113,11 @@ setGeneric("dNA", function(x) {
 })
 
 #' @export
-#' @importFrom lubridate duration
 #' @rdname spadesTime
 setMethod("dNA",
           signature(x = "ANY"),
           definition = function(x) {
-            duration(0)
+            0
 })
 
 secondsInSeconds <- as.numeric(1)
