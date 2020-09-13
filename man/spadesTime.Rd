@@ -67,11 +67,11 @@ weeks as year/52.
 }
 \details{
 When these units are not correct, a module developer can create their own
-time unit using, and create a function to calculate the number of seconds
+time unit, and create a function to calculate the number of seconds
 in that unit using the "d" prefix (for duration), following the
 \code{lubridate} package standard:
-\code{dfortnight <- function(x) lubridate::duration(dday(14))}.
-Then the module developer can use "fortnight" as the module's time unit.
+\code{ddecade <- function(x) lubridate::duration(dyear(10))}.
+Then the module developer can use "decade" as the module's time unit.
 }
 \author{
 Eliot McIntire

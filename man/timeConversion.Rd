@@ -45,8 +45,13 @@ input numeric. See Details.}
 A numeric vector of length 1, with \code{unit} attribute set to "seconds".
 }
 \description{
-In addition to using the \code{lubridate} package, some additional functions
-to work with times are provided.
+Current pre-defined units are found within the \code{spadesTimes()} function.
+The user can define a new unit. The unit name can be anything, but the function
+definition must be of the form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
+The unit name is the part without the \code{d} and the function name definition includes the \code{d}.
+This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
+(you will need to declare 'lubridate' in your 'pkgDeps' in the metadata)
+can be placed anywhere in the search path or in a module.
 
 This function takes a numeric with a "unit" attribute and converts it to
 another numeric with a different time attribute.
@@ -54,13 +59,6 @@ If the units passed to argument \code{units} are the same as
 \code{attr(time, "unit")}, then it simply returns input \code{time}.
 }
 \details{
-Current pre-defined units are found within the \code{spadesTimes()} function.
-The user can define a new unit. The unit name can be anything, but the function
-definition must be of the form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
-The unit name is the part without the \code{d} and the function name definition includes the \code{d}.
-This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
-can be placed anywhere in the search path or in a module.
-
 Because of R scoping, if \code{envir} is a simList environment, then
 this function will search there first, then up the current \code{search()} path.
 Thus, it will find a user defined or module defined unit before a SpaDES unit.

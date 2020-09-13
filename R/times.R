@@ -15,11 +15,11 @@
 #' weeks as year/52.
 #'
 #' When these units are not correct, a module developer can create their own
-#' time unit using, and create a function to calculate the number of seconds
+#' time unit, and create a function to calculate the number of seconds
 #' in that unit using the "d" prefix (for duration), following the
 #' \code{lubridate} package standard:
-#' \code{dfortnight <- function(x) lubridate::duration(dday(14))}.
-#' Then the module developer can use "fortnight" as the module's time unit.
+#' \code{ddecade <- function(x) lubridate::duration(dyear(10))}.
+#' Then the module developer can use "decade" as the module's time unit.
 #'
 #' @param x numeric. Number of the desired units
 #'
@@ -33,6 +33,7 @@ dhour <- function(x) {
 }
 
 hoursInSeconds <- as.numeric(dhour(1))    # 3600L
+attributes(hoursInSeconds)$unit <- "second"
 
 #' @export
 #' @rdname spadesTime
@@ -47,6 +48,7 @@ setGeneric("dyears", function(x) {
 })
 
 daysInSeconds <- as.numeric(dday(1))      # 86400L
+attributes(daysInSeconds)$unit <- "second"
 
 #' @export
 #' @rdname spadesTime
@@ -128,22 +130,18 @@ secondsInSeconds <- as.numeric(1)
 weeksInSeconds <- as.numeric(dweek(1))    # 606876.92307692
 monthsInSeconds <- as.numeric(dmonth(1))  # 2629800L
 attributes(secondsInSeconds)$unit <- "second"
-attributes(hoursInSeconds)$unit <- "second"
-attributes(daysInSeconds)$unit <- "second"
 attributes(weeksInSeconds)$unit <- "second"
 attributes(monthsInSeconds)$unit <- "second"
 
 ################################################################################
 #' Convert time units
 #'
-#' In addition to using the \code{lubridate} package, some additional functions
-#' to work with times are provided.
-#'
 #' Current pre-defined units are found within the \code{spadesTimes()} function.
 #' The user can define a new unit. The unit name can be anything, but the function
 #' definition must be of the form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
 #' The unit name is the part without the \code{d} and the function name definition includes the \code{d}.
 #' This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
+#' (you will need to declare 'lubridate' in your 'pkgDeps' in the metadata)
 #' can be placed anywhere in the search path or in a module.
 #'
 #' @param unit   Character. One of the time units used in \code{SpaDES} or user
