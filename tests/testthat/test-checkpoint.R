@@ -71,10 +71,11 @@ test_that("test checkpointing with disk-backed raster", {
   )
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   simA$ras <- raster(extent(0, 10, 0, 10), vals = 1)
-  tmpRasFilename <- tempfile("tmpRas", fileext = ".tif") %T>%
+  tmpRasFilename <- tempfile("tmpRas", fileext = ".grd") %T>%
     file.create() %>%
     normPath()
-  simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
+  if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
+  simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
   simA <- spades(simA)
 
   ## save checkpoints; with load/restore
@@ -85,8 +86,10 @@ test_that("test checkpointing with disk-backed raster", {
 
   # Eliot uncommented this next line Sept 17, 2019 b/c writeRaster next line newly failed
   # filenames of source and target should be different
-  tmpRasFilename <- tempfile("tmpRas", fileext = ".tif")
-  simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename, overwrite = TRUE)
+  tmpRasFilename <- tempfile("tmpRas", fileext = ".grd")
+  if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
+  simA$ras[] <- getValues(simA$ras)
+  simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
   end(simB) <- 1
   simB <- spades(simB)
   rm(simB)
