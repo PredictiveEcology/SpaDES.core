@@ -48,7 +48,7 @@ test_that("timeunit works correctly", {
 
 
   # check for new unit being put into simList
-  assign("dfortnight", function(x) lubridate::duration(dday(14)),
+  assign("dfortnight", function(x) dday(14),
          envir = envir(mySim))
   expect_match(timeunit(mySim) <- "fortnight", "")
   expect_match(timeunit(mySim), "fortnight")
