@@ -32,6 +32,8 @@ dhour <- function(x) {
   x * 60 * 60
 }
 
+hoursInSeconds <- as.numeric(dhour(1))    # 3600L
+
 #' @export
 #' @rdname spadesTime
 dday <- function(x) {
@@ -44,12 +46,14 @@ setGeneric("dyears", function(x) {
   standardGeneric("dyears")
 })
 
+daysInSeconds <- as.numeric(dday(1))      # 86400L
+
 #' @export
 #' @rdname spadesTime
 setMethod("dyears",
           signature(x = "numeric"),
           definition = function(x) {
-            x * dday(1) * 365.25
+            x * daysInSeconds * 365.25
 })
 
 yearsInSeconds <- as.numeric(dyears(1)) # 31557600L
@@ -121,8 +125,6 @@ setMethod("dNA",
 })
 
 secondsInSeconds <- as.numeric(1)
-hoursInSeconds <- as.numeric(dhour(1))    # 3600L
-daysInSeconds <- as.numeric(dday(1))      # 86400L
 weeksInSeconds <- as.numeric(dweek(1))    # 606876.92307692
 monthsInSeconds <- as.numeric(dmonth(1))  # 2629800L
 attributes(secondsInSeconds)$unit <- "second"
