@@ -728,7 +728,12 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 #' @export
 bindrows <- function(...) {
   # Deal with things like "trailing commas"
-  ll <- as.list(sys.call()) # capture without evaluating
-  nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0))) # find empty elements
-  rbindlist(lapply(ll[nonEmpties][-1], eval), fill = TRUE, use.names = TRUE) # rbind them
+  rws <- try(list(...), silent = TRUE)
+  if (is(rws, "try-error")) {
+    ll <- as.list(match.call(expand.dots = TRUE))
+    nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0)))
+    eval(as.call(ll[nonEmpties]))
+  } else {
+    rbindlist(rws, fill = TRUE, use.names = TRUE)
+  }
 }
