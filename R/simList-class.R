@@ -212,6 +212,9 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   list2env(from, envir = x@.xData)
   list2env(from@completed, envir = x@completed)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  if (!is.null(x$objectSynonyms)) {
+    x <- .checkObjectSynonyms(x)
+  }
   return(x)
 })
 
@@ -229,6 +232,11 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
            paths = from@paths)
   x@.Data <- as.list(envir(from), all.names = TRUE)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  if (!is.null(from$objectSynonyms)) {
+    activeBindingsToDel <- unlist(lapply(from$objectSynonyms, function(os) os[-1]))
+    attr(x$objectSynonyms, "bindings") <- NULL
+    x[activeBindingsToDel] <- NULL
+  }
   return(x)
 })
 
