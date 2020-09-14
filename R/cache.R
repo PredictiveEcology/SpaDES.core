@@ -81,7 +81,7 @@ setMethod(
       names(objects2) <- mods
       .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
       if (length(objects1ByModWhole))
-        .objects <- updateList(.objects, objects1ByModWhole)
+        .objects <- suppressWarnings(updateList(.objects, objects1ByModWhole))
     } else {
       .objects <- allObjsInSimList
     }

@@ -17,14 +17,12 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
   }
 }
 
+
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
-#' Merge two named list based on their named entries. Where
-#' any element matches in both lists, the value from the
-#' second list is used in the updated list.
-#' Subelements are not examined and are simply replaced. If one list is empty, then
-#' it returns the other one, unchanged.
+#' Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
+#' \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
 #'
 #' @param x   a named list
 #' @param y   a named list
@@ -35,6 +33,7 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #'
 #' @author Alex Chubaty
 #' @export
+#' @importFrom utils modifyList
 #' @rdname updateList
 #'
 #' @examples
@@ -43,56 +42,19 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' updateList(L1, L2)
 #'
 #' updateList(L1, NULL)
+#' updateList(L1)
+#' updateList(y = L2)
 #' updateList(NULL, L2)
 #' updateList(NULL, NULL) # should return empty list
 #'
-setGeneric("updateList", function(x, y) {
-  standardGeneric("updateList")
-})
+updateList <- function(x, y) {
+  if (missing(x)) x <- list()
+  if (missing(y)) y <- list()
+  if (is.null(y)) y <- list()
+  if (is.null(x)) x <- list()
+  modifyList(x = x, val = y)
+}
 
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("list", "list"),
-          definition = function(x, y) {
-            if (any(is.null(names(x)), is.null(names(y)))) {
-              # If one of the lists is empty, then just return the other, unchanged
-              if (length(y) == 0) return(x)
-              if (length(x) == 0) return(y)
-              stop("All elements in lists x,y must be named.")
-            } else {
-              x[names(y)] <- y
-              return(x[order(names(x))])
-            }
-})
-
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("NULL", "list"),
-          definition = function(x, y) {
-            if (is.null(names(y))) {
-              if (length(y) == 0) return(x)
-              stop("All elements in list y must be named.")
-            }
-            return(y[order(names(y))])
-})
-
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("list", "NULL"),
-          definition = function(x, y) {
-            if (is.null(names(x))) {
-              if (length(x) == 0) return(x)
-              stop("All elements in list x must be named.")
-            }
-            return(x[order(names(x))])
-})
-
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("NULL", "NULL"),
-          definition = function(x, y) {
-            return(list())
-})
 
 ################################################################################
 #' Add a module to a \code{moduleList}
@@ -137,95 +99,6 @@ setMethod("append_attr",
             return(out[!dups])
 })
 
-################################################################################
-#' Load packages.
-#'
-#' Load and optionally install additional packages.
-#'
-#' @param packageList A list of character strings specifying
-#' the names of packages to be loaded.
-#'
-#' @param install Logical flag. If required packages are not
-#' already installed, should they be installed?
-#'
-#' @param quiet Logical flag. Should the final "packages loaded"
-#' message be suppressed?
-#'
-#' @return Specified packages are loaded and attached using \code{require()},
-#'         invisibly returning a logical vector of successes.
-#'
-#' @seealso \code{\link{require}}.
-#'
-#' @export
-#' @rdname loadPackages
-#' @importFrom utils install.packages installed.packages
-#'
-#' @author Alex Chubaty
-#'
-#' @examples
-#' \dontrun{
-#'   pkgs <- list("raster", "lme4")
-#'   loadPackages(pkgs) # loads packages if installed
-#'   loadPackages(pkgs, install = TRUE) # loads packages after installation (if needed)
-#' }
-#'
-setGeneric("loadPackages", function(packageList, install = FALSE, quiet = TRUE) {
-  standardGeneric("loadPackages")
-})
-
-#' @rdname loadPackages
-setMethod(
-  "loadPackages",
-  signature = "character",
-  definition = function(packageList, install, quiet) {
-    packageList <- na.omit(packageList) %>% as.character()
-    if (length(packageList)) {
-      if (install) {
-        repos <- getOption("repos")
-        if (is.null(repos) | any(repos == "")) {
-          repos <- "https://cran.rstudio.com"
-        }
-        installed <- unname(installed.packages()[, "Package"])
-        toInstall <- packageList[packageList %in% installed]
-        install.packages(toInstall, repos = repos)
-      }
-
-      loaded <- suppressMessages(sapply(packageList, require, character.only = TRUE,
-                                        quiet = TRUE, warn.conflicts = FALSE))
-      if (any(!loaded)) {
-        alreadyLoaded <- unlist(lapply(packageList[!loaded], isNamespaceLoaded))
-        if (!all(alreadyLoaded)) {
-          stop("Some packages required for the simulation are not installed:\n",
-             "    ", paste(names(loaded[-which(loaded)]), collapse = "\n    "))
-        } else {
-          message("Older version(s) of ",
-                  paste(collapse = ", ", packageList[!loaded]), " already loaded")
-        }
-      }
-
-      if (!quiet) {
-        message(paste("Loaded", length(which(loaded == TRUE)), "of",
-                      length(packageList), "packages.", sep = " "))
-      }
-    } else {
-      loaded <- character(0)
-    }
-    return(invisible(loaded))
-})
-
-#' @rdname loadPackages
-setMethod("loadPackages",
-          signature = "list",
-          definition = function(packageList, install, quiet) {
-            loadPackages(unlist(packageList), install, quiet)
-})
-
-#' @rdname loadPackages
-setMethod("loadPackages",
-          signature = "NULL",
-          definition = function(packageList, install, quiet) {
-            return(invisible(character(0)))
-})
 
 ################################################################################
 #' Convert numeric to character with padding

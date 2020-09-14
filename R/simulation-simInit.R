@@ -589,7 +589,7 @@ setMethod(
 
     tmp <- list()
     lapply(pnames, function(x) {
-      tmp[[x]] <<- updateList(sim@params[[x]], params[[x]])
+      tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
     })
     sim@params <- tmp
 
