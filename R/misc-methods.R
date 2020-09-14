@@ -19,6 +19,44 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 
 
 ################################################################################
+#' Update elements of a named list with elements of a second named list
+#'
+#' Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
+#' \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
+#'
+#' @param x   a named list
+#' @param y   a named list
+#'
+#' @return A named list, with elements sorted by name.
+#'          The values of matching elements in list \code{y}
+#'          replace the values in list \code{x}.
+#'
+#' @author Alex Chubaty
+#' @export
+#' @importFrom utils modifyList
+#' @rdname updateList
+#'
+#' @examples
+#' L1 <- list(a = "hst", b = NA_character_, c = 43)
+#' L2 <- list(a = "gst", c = 42, d = list(letters))
+#' updateList(L1, L2)
+#'
+#' updateList(L1, NULL)
+#' updateList(L1)
+#' updateList(y = L2)
+#' updateList(NULL, L2)
+#' updateList(NULL, NULL) # should return empty list
+#'
+updateList <- function(x, y) {
+  if (missing(x)) x <- list()
+  if (missing(y)) y <- list()
+  if (is.null(y)) y <- list()
+  if (is.null(x)) x <- list()
+  modifyList(x = x, val = y)
+}
+
+
+################################################################################
 #' Add a module to a \code{moduleList}
 #'
 #' Ordinary base lists and vectors do not retain their attributes when subsetted
