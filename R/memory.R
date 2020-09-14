@@ -163,7 +163,6 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
   return(sim)
 }
 
-#' @importFrom tools pskill
 #' @importFrom data.table fwrite
 memoryUseOnExit <- function(sim, originalFuturePlan) {
   if (requireNamespace("future", quietly = TRUE)) {
@@ -174,8 +173,6 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
       Sys.sleep(0.1)
     }
     unlink(stopFilename(sim$.memoryUse$filename))
-    #  tryCatch(tools::pskill(sim$.memoryUse$futureObj$process$get_pid()),
-    #           error = function(x) message("Future being used for memoryUse did not close correctly"))
     future::plan("sequential") # kill all processes
     future::plan(originalFuturePlan) # reset to original
 
@@ -199,7 +196,7 @@ outputFilename <- function(thisPid) {
   reproducible::tempfile2("memoryUse", fileext = paste0("..memAvail", "_", thisPid, ".txt"))
 }
 
-futureMessage <- message(
+futureMessage <- paste0(
   "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
-  "  install.packages(c('future', 'future.callr'))"
-)
+  "  install.packages(c('future', 'future.callr'))")
+

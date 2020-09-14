@@ -17,11 +17,11 @@ defineModule(sim, list(
     defineParameter(".plotInitialTime", "numeric", NA_real_, NA, NA, "This describes the simulation time at which the first plot event should occur"),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "This describes the simulation time at which the first save event should occur")
   ),
-  inputObjects = bind_rows(
+  inputObjects = bindrows(
     expectsInput(objectName = NA_character_, objectClass = NA_character_,
                  desc = NA_character_, sourceURL = NA_character_, other = NA_character_)
   ),
-  outputObjects = bind_rows(
+  outputObjects = bindrows(
     createsOutput(objectName = NA_character_, objectClass = NA_character_,
                   desc = NA_character_, other = NA_character_)
   )

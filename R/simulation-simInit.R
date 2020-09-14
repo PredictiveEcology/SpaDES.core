@@ -545,7 +545,7 @@ setMethod(
 
     ## do multi-pass if there are parent modules; first for parents, then for children
     all_parsed <- FALSE
-    browser(expr = exists("._simInit_5"))
+    # browser(expr = exists("._simInit_5"))
     while (!all_parsed) {
       sim <- .parseModule(sim,
                           as.list(sim@modules),
@@ -623,7 +623,7 @@ setMethod(
     })
 
     ## load user-defined modules
-    browser(expr = exists("._simInit_4"))
+    # browser(expr = exists("._simInit_4"))
 
     for (m in loadOrder) {
       mFullPath <- loadOrderNames[match(m, loadOrder)]
@@ -847,7 +847,7 @@ setMethod(
                         outputs,
                         loadOrder,
                         notOlderThan) {
-    browser(expr = exists("._simInit_1"))
+    # browser(expr = exists("._simInit_1"))
     namesMatchCall <- names(match.call())
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
@@ -899,9 +899,9 @@ setMethod(
     neic <- names(expectedInnerClasses)
     names(neic) <- neic
     namesInner <- lapply(neic, function(x) NULL)
-    browser(expr = exists("._simInit_2"))
+    # browser(expr = exists("._simInit_2"))
     correctArgsInner <- unlist(lapply(1:length(li), function(x) {
-      browser(expr = exists("._simInit_3"))
+      # browser(expr = exists("._simInit_3"))
       if (isTRUE(is(li[[x]], "list")) &&
           isTRUE(all(expectedInnerClasses[[x]] != "ANY"))) {
         if (is(expectedInnerClasses[[x]], "list")) {
@@ -913,7 +913,7 @@ setMethod(
           }
           NAItems <- is.na(items)
           if (any(NAItems)) { # fill in unnamed list elements
-            browser(expr = exists("innerClasses"))
+            # browser(expr = exists("innerClasses"))
             items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
               !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
             names(li[[x]])[NAItems] <- items[NAItems]
@@ -934,7 +934,7 @@ setMethod(
         TRUE
       }
     }))
-    browser(expr = exists("innerClasses"))
+    # browser(expr = exists("innerClasses"))
     # give names to inner elements if they were only done by order
     nulls <- sapply(namesInner, is.null)
     eic <- expectedInnerClasses[!nulls]
@@ -1113,13 +1113,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
-  browser(expr = exists("._runModuleInputObjects_1"))
+  # browser(expr = exists("._runModuleInputObjects_1"))
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
     if (!is.null(sim@.xData$.mods[[mBase]][[".inputObjects"]])) {
-      browser(expr = exists("._runModuleInputObjects_2"))
+      # browser(expr = exists("._runModuleInputObjects_2"))
       list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
       a <- P(sim, mBase, ".useCache")
@@ -1146,7 +1146,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
           objectsToEvaluateForCaching <- c(moduleSpecificObjs)
         } else {
-          browser()
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = mBase, value = TRUE),
                                            na.omit(moduleSpecificInputObjects))
@@ -1172,7 +1171,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
           # showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
-          browser(expr = exists("._runModuleInputObjects_3"))
+          # browser(expr = exists("._runModuleInputObjects_3"))
           showSimilar <- if (is.null(sim@params[[mBase]][[".showSimilar"]]) ||
                              isTRUE(is.na(sim@params[[mBase]][[".showSimilar"]]))) {
             isTRUE(getOption("reproducible.showSimilar", FALSE))

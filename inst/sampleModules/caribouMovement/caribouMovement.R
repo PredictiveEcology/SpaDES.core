@@ -39,12 +39,12 @@ defineModule(sim, list(
     defineParameter(".saveInterval", "numeric", NA_real_, -Inf, Inf,
                     "time interval between save events")
   ),
-  inputObjects = bind_rows(
+  inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, "caribouMovement")$stackName,
                  objectClass = "RasterStack", desc = "layername = \"habitatQuality\"",
                  sourceURL = NA_character_)
   ),
-  outputObjects = bind_rows(
+  outputObjects = bindrows(
     createsOutput(objectName = "caribou", objectClass = "SpatialPointsDataFrame",
                   desc = NA_character_)
   )

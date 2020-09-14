@@ -27,7 +27,6 @@
 #'
 #' @include environment.R
 #' @include priority.R
-#' @importFrom R.utils isAbsolutePath
 #' @importFrom quickPlot .objectNames
 #' @importFrom Require checkPath
 #' @export

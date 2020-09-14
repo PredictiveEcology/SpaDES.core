@@ -642,7 +642,6 @@ Paths <- .paths()
 #' @rdname setPaths
 #' @importFrom raster tmpDir
 #' @importFrom Require checkPath
-#' @importFrom R.utils getOption
 #' @param silent Logical. Should the messaging occur.
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {
   defaults <- list(
@@ -718,4 +717,23 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 
   lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
+}
+
+#' Simple wrapper around \code{data.table::rbindlist}
+#'
+#' This simply sets defaults to \code{fill = TRUE}, and
+#' \code{use.names = TRUE}
+#'
+#' @param ... 1 or more \code{data.frame}, \code{data.table}, or \code{list} objects
+#' @export
+bindrows <- function(...) {
+  # Deal with things like "trailing commas"
+  rws <- try(list(...), silent = TRUE)
+  if (any(grepl("argument|bind_rows", rws))) {
+    ll <- as.list(match.call(expand.dots = TRUE))
+    nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0)))
+    eval(as.call(ll[nonEmpties]))
+  } else {
+    rbindlist(rws, fill = TRUE, use.names = TRUE)
+  }
 }

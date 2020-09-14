@@ -45,9 +45,9 @@ test_that("simulation runs with simInit and spades", {
       reqdPkgs = list(),
       parameters = rbind(
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 

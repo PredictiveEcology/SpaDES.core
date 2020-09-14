@@ -186,7 +186,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             }
           }
 
-          browser(expr = exists("._doEvent_2"))
+          # browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
             isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
               isTRUE(getOption("reproducible.showSimilar", FALSE))
@@ -202,7 +202,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
           sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                            showSimilar = showSimilar)
 
-          browser(expr = exists("._doEvent_3"))
+          # browser(expr = exists("._doEvent_3"))
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
@@ -1040,7 +1040,7 @@ setMethod(
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
       }
       # This will "muffle" the original message
-      invokeRestart("muffleMessage")
+      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
       # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
@@ -1293,7 +1293,7 @@ messageInterrupt1 <- function(recoverMode) {
 
 setupDebugger <- function(debug = getOption("spades.debug")) {
   if (!missing(debug)) {
-    if (!isFALSE(debug)) {
+    if (!.isFALSE(debug)) {
       if (is.list(debug)) {
         needInstall("logging",
                     messageStart = "debug cannot be a list unless logging package is installed: ")
@@ -1335,7 +1335,7 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
           }
           logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
           cat(file = debug$file$file, "##################################\n",
-              append = !isFALSE(debug$file$append)) # default append it TRUE
+              append = !.isFALSE(debug$file$append)) # default append it TRUE
         }
         # with(getLogger(), names(handlers))
 

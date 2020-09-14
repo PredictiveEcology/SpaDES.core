@@ -1,5 +1,19 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+
+version 1.0.4
+=============
+
+## new features
+* none
+
+## dependencies
+* completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies
+* move `tcltk` to `Suggests`
+* remove `devtools`, `microbenchmark` from `Suggests`
+
+## bug fixes
+
 version 1.0.3
 =============
 

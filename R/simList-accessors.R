@@ -931,7 +931,6 @@ setReplaceMethod("progressType",
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
 #' @importFrom stats na.omit
-#' @importFrom R.utils isAbsolutePath
 #' @export
 #' @name inputs
 #' @aliases simList-accessors-inout
@@ -1011,9 +1010,10 @@ setReplaceMethod(
 
      # If a filename is provided, determine if it is absolute path, if so,
      # use that, if not, then append it to inputPath(sim)
-     sim@inputs[!isAbsolutePath(sim@inputs$file) & !is.na(sim@inputs$file), "file"] <-
+     isAP <- isAbsolutePath(as.character(sim@inputs$file))
+     sim@inputs[!isAP & !is.na(sim@inputs$file), "file"] <-
        file.path(inputPath(sim),
-                 sim@inputs$file[!isAbsolutePath(sim@inputs$file) & !is.na(sim@inputs$file)])
+                 sim@inputs$file[!isAP & !is.na(sim@inputs$file)])
 
      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
        stop(paste("input table can only have columns named",
@@ -1110,9 +1110,7 @@ setReplaceMethod(
 #' @export
 #' @include simList-class.R
 #' @importFrom data.table := data.table
-#' @importFrom R.utils isAbsolutePath
 #' @importFrom stats na.omit
-#' @importFrom tools file_ext file_path_sans_ext
 #' @name outputs
 #' @rdname simList-accessors-outputs
 #'
@@ -1197,8 +1195,10 @@ setReplaceMethod(
        # use that, if not, then append it to outputPath(sim)
        alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
        if (any(!alreadyWithOutputPath)) {
-         sim@outputs[!isAbsolutePath(sim@outputs$file)[!alreadyWithOutputPath], "file"] <-
-           file.path(outputPath(sim), sim@outputs$file[!isAbsolutePath(sim@outputs$file)])
+         isAP <- isAbsolutePath(as.character(sim@outputs$file))
+
+         sim@outputs[!isAP[!alreadyWithOutputPath], "file"] <-
+           file.path(outputPath(sim), sim@outputs$file[!isAP])
        }
 
        # If there is no function provided, then use saveRDS, from package base
@@ -1224,11 +1224,11 @@ setReplaceMethod(
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !grepl(txtTimeA, sim@outputs$file)
        sim@outputs[wh, "file"] <- paste0(
-         file_path_sans_ext(sim@outputs[wh, "file"]),
+         filePathSansExt(sim@outputs[wh, "file"]),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) ,
-                file_ext(sim@outputs[wh, "file"]),
+         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) ,
+                fileExt(sim@outputs[wh, "file"]),
                 "")
        )
      } else {

@@ -53,7 +53,8 @@ setMethod(
     }
 
     io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
-    io[[module]][io[[module]][["objectName"]] == objectName, "sourceURL"]
+    wh <- io[[module]][["objectName"]] == objectName
+    io[[module]][wh]$sourceURL
 })
 
 #' Calculate checksum for a module's data files
@@ -198,7 +199,6 @@ remoteFileSize <- function(url) {
 #'
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
-#' @importFrom dplyr bind_rows
 #' @importFrom reproducible compareNA
 #' @importFrom Require checkPath
 #' @importFrom utils download.file
@@ -280,10 +280,9 @@ setMethod(
     if (!is.null(children)) {
       if (length(children)) {
         if (all(nzchar(children) & !is.na(children))) {
-          chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
-                             quickCheck = quickCheck) %>%
-            bind_rows()
-          chksums <- bind_rows(chksums, chksums2)
+          chksums2 <- bindrows(lapply(children, downloadData, path = path, quiet = quiet,
+                             quickCheck = quickCheck))
+          chksums <- bindrows(chksums, chksums2)
         }
       }
     }

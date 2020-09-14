@@ -40,12 +40,12 @@ defineModule(sim, list(
     defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time interval between save events"),
     defineParameter(".useCache", "logical", FALSE, c("init", "plot"), NA, "should the module result be cached for future use")
   ),
-  inputObjects = bind_rows(
+  inputObjects = bindrows(
     expectsInput(objectName = NA_character_, objectClass = NA_character_,
                  sourceURL = NA_character_, desc = NA_character_,
                  other = NA_character_)
   ),
-  outputObjects = bind_rows(
+  outputObjects = bindrows(
     createsOutput(objectName = SpaDES.core::P(sim, "randomLandscapes")$stackName, objectClass = "RasterStack",
                   desc = NA_character_, other = NA_character_)
   )
@@ -98,11 +98,11 @@ Init <- function(sim) {
   speedup <- max(1, nx / 5e2)
 
   # Make dummy maps for testing of models
-  DEM <- gaussMap(template, scale = 300, var = 0.03, speedup = speedup, inMemory = inMemory)
-  DEM[] <- round(getValues(DEM), 1) * 1000
+  DEM <- gaussMap(template, scale = 10, var = 0.03, speedup = speedup, inMemory = inMemory)
+  DEM[] <- round(getValues(DEM), 1) * 300
   forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
   forestAge[] <- round(getValues(forestAge), 1) * 20
-  percentPine <- gaussMap(template, scale = 50, var = 1, speedup = speedup, inMemory = inMemory)
+  percentPine <- gaussMap(template, scale = 10, var = 1, speedup = speedup, inMemory = inMemory)
   percentPine[] <- round(getValues(percentPine), 1)
 
   # Scale them as needed
