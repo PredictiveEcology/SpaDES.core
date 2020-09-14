@@ -181,7 +181,6 @@ utils::globalVariables(".")
 #' @include simulation-parseModule.R
 #' @include priority.R
 #' @importFrom reproducible basename2
-#' @importFrom utils modifyList
 #' @importFrom Require Require trimVersionNumber
 #' @rdname simInit
 #'
@@ -590,7 +589,7 @@ setMethod(
 
     tmp <- list()
     lapply(pnames, function(x) {
-      tmp[[x]] <<- modifyList(sim@params[[x]], params[[x]])
+      tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
     })
     sim@params <- tmp
 

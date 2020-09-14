@@ -134,8 +134,8 @@ setMethod("loadPackages",
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
-#' Deprecated. Use \code{\link[utils]{modifyList}} or
-#' \code{\link[Require]{modifyList2}} for case with >2 lists.
+#' Deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
+#' \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
 #'
 #' @param x   a named list
 #' @param y   a named list
@@ -146,6 +146,7 @@ setMethod("loadPackages",
 #'
 #' @author Alex Chubaty
 #' @export
+#' @importFrom utils modifyList
 #' @rdname updateList
 #'
 #' @examples
@@ -160,7 +161,7 @@ setMethod("loadPackages",
 #' updateList(NULL, NULL) # should return empty list
 #'
 updateList <- function(x, y) {
-  .Deprecated("modifyList", "utils")
+  .Deprecated("modifyList2", "Require")
   if (missing(x)) x <- list()
   if (missing(y)) y <- list()
   if (is.null(y)) y <- list()
