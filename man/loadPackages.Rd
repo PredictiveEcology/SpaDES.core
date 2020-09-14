@@ -30,7 +30,7 @@ Specified packages are loaded and attached using \code{require()},
         invisibly returning a logical vector of successes.
 }
 \description{
-Load and optionally install additional packages.
+Deprecated. Please use \code{\link[Require]{Require}}
 }
 \examples{
 \dontrun{

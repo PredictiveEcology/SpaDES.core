@@ -38,3 +38,132 @@ POM <- function(...) {
 simInitAndExperiment <- function(...) {
   .Deprecated(msg = deprecatedMsg(match.call()[[1]]))
 }
+
+################################################################################
+#' Load packages.
+#'
+#' Deprecated. Please use \code{\link[Require]{Require}}
+#'
+#' @param packageList A list of character strings specifying
+#' the names of packages to be loaded.
+#'
+#' @param install Logical flag. If required packages are not
+#' already installed, should they be installed?
+#'
+#' @param quiet Logical flag. Should the final "packages loaded"
+#' message be suppressed?
+#'
+#' @return Specified packages are loaded and attached using \code{require()},
+#'         invisibly returning a logical vector of successes.
+#'
+#' @seealso \code{\link{require}}.
+#'
+#' @export
+#' @rdname loadPackages
+#' @importFrom utils install.packages installed.packages
+#'
+#' @author Alex Chubaty
+#'
+#' @examples
+#' \dontrun{
+#'   pkgs <- list("raster", "lme4")
+#'   loadPackages(pkgs) # loads packages if installed
+#'   loadPackages(pkgs, install = TRUE) # loads packages after installation (if needed)
+#' }
+#'
+setGeneric("loadPackages", function(packageList, install = FALSE, quiet = TRUE) {
+  standardGeneric("loadPackages")
+})
+
+#' @rdname loadPackages
+setMethod(
+  "loadPackages",
+  signature = "character",
+  definition = function(packageList, install, quiet) {
+    .Deprecated("Require", "Require")
+    packageList <- na.omit(packageList) %>% as.character()
+    if (length(packageList)) {
+      if (install) {
+        repos <- getOption("repos")
+        if (is.null(repos) | any(repos == "")) {
+          repos <- "https://cran.rstudio.com"
+        }
+        installed <- unname(installed.packages()[, "Package"])
+        toInstall <- packageList[packageList %in% installed]
+        install.packages(toInstall, repos = repos)
+      }
+
+      loaded <- suppressMessages(sapply(packageList, require, character.only = TRUE,
+                                        quiet = TRUE, warn.conflicts = FALSE))
+      if (any(!loaded)) {
+        alreadyLoaded <- unlist(lapply(packageList[!loaded], isNamespaceLoaded))
+        if (!all(alreadyLoaded)) {
+          stop("Some packages required for the simulation are not installed:\n",
+               "    ", paste(names(loaded[-which(loaded)]), collapse = "\n    "))
+        } else {
+          message("Older version(s) of ",
+                  paste(collapse = ", ", packageList[!loaded]), " already loaded")
+        }
+      }
+
+      if (!quiet) {
+        message(paste("Loaded", length(which(loaded == TRUE)), "of",
+                      length(packageList), "packages.", sep = " "))
+      }
+    } else {
+      loaded <- character(0)
+    }
+    return(invisible(loaded))
+  })
+
+#' @rdname loadPackages
+setMethod("loadPackages",
+          signature = "list",
+          definition = function(packageList, install, quiet) {
+            loadPackages(unlist(packageList), install, quiet)
+          })
+
+#' @rdname loadPackages
+setMethod("loadPackages",
+          signature = "NULL",
+          definition = function(packageList, install, quiet) {
+            return(invisible(character(0)))
+          })
+
+
+################################################################################
+#' Update elements of a named list with elements of a second named list
+#'
+#' Deprecated. Use \code{\link[utils]{modifyList}} or
+#' \code{\link[Require]{modifyList2}} for case with >2 lists.
+#'
+#' @param x   a named list
+#' @param y   a named list
+#'
+#' @return A named list, with elements sorted by name.
+#'          The values of matching elements in list \code{y}
+#'          replace the values in list \code{x}.
+#'
+#' @author Alex Chubaty
+#' @export
+#' @rdname updateList
+#'
+#' @examples
+#' L1 <- list(a = "hst", b = NA_character_, c = 43)
+#' L2 <- list(a = "gst", c = 42, d = list(letters))
+#' updateList(L1, L2)
+#'
+#' updateList(L1, NULL)
+#' updateList(L1)
+#' updateList(y = L2)
+#' updateList(NULL, L2)
+#' updateList(NULL, NULL) # should return empty list
+#'
+updateList <- function(x, y) {
+  .Deprecated("modifyList", "utils")
+  if (missing(x)) x <- list()
+  if (missing(y)) y <- list()
+  if (is.null(y)) y <- list()
+  if (is.null(x)) x <- list()
+  modifyList(x = x, val = y)
+}

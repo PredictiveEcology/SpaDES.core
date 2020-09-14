@@ -2,21 +2,9 @@
 % Please edit documentation in R/misc-methods.R
 \name{updateList}
 \alias{updateList}
-\alias{updateList,list,list-method}
-\alias{updateList,NULL,list-method}
-\alias{updateList,list,NULL-method}
-\alias{updateList,NULL,NULL-method}
 \title{Update elements of a named list with elements of a second named list}
 \usage{
 updateList(x, y)
-
-\S4method{updateList}{list,list}(x, y)
-
-\S4method{updateList}{`NULL`,list}(x, y)
-
-\S4method{updateList}{list,`NULL`}(x, y)
-
-\S4method{updateList}{`NULL`,`NULL`}(x, y)
 }
 \arguments{
 \item{x}{a named list}
@@ -29,11 +17,8 @@ A named list, with elements sorted by name.
          replace the values in list \code{x}.
 }
 \description{
-Merge two named list based on their named entries. Where
-any element matches in both lists, the value from the
-second list is used in the updated list.
-Subelements are not examined and are simply replaced. If one list is empty, then
-it returns the other one, unchanged.
+Deprecated. Use \code{\link[utils]{modifyList}} or
+\code{\link[Require]{modifyList2}} for case with >2 lists.
 }
 \examples{
 L1 <- list(a = "hst", b = NA_character_, c = 43)
