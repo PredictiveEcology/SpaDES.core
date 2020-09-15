@@ -1,0 +1,87 @@
+---
+title: "05 Automated module testing"
+author:
+  - "Alex M. Chubaty"
+date: "`r strftime(Sys.Date(), '%B %d %Y')`"
+output:
+  rmarkdown::html_vignette:
+    number_sections: yes
+    self_contained: yes
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{05 Automated module testing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE,
+  eval = FALSE
+)
+```
+
+# Overview
+
+Regular automated checks of your module code help ensure your module can be run by others and that no errors are introduced when you make a change to your code.
+Users hosting module code in GitHub repositories can take advantage of free [GitHub Actions](https://github.com/features/actions) minutes to automatically run their module.
+
+*NOTE:* Long-running or memory-intensive code should not be run. GitHub actions limits code execution.
+
+Since we encourage all module authors to maintain a high-level overview of their module in a `.Rmd` file, this can be used to  demonstrate use of the module, as as well as test that the module can be run without error.
+By default, the automated testing of the module is done by running (_i.e._, rendering) the module's `.Rmd` file.
+
+# Setting up module tests
+
+## Using testing with new modules
+
+When creating a new module, simply specify `useGitHub = TRUE` to generate the necessary GitHub Actions configuration file.
+
+## Using testing with existing modules
+
+For existing modules, use `use_gha(name = 'moduleName', path = 'modulePath')` to add the GitHub Actions testing workflow.
+
+# Customizing the test configuration
+
+You can modify your module's workflow file (`.github/workflows/render-module-rmd.yaml`) to suit your specific needs.
+
+## Adding system dependencies
+
+Some packages may require installation of additional system dependencies.
+The workflow file contains a section named _Install GDAL and other dependencies_, which can be updated to include additional system packages.
+To determine which additional packages need to be installed, use `remotes::system_requirements`.
+For example, to determine the system dependencies required for the `usefulFuns` package (from GitHub), get the package code and determine what additional system packages need to be installed.
+
+
+```{bash, get-sysdeps}
+$ git clone https://github.com/PredictiveEcology/usefulFuns
+$ cd usefulFuns
+$ Rscript -e 'remotes::system_requirements("ubuntu", "18.04")'
+ [1] "apt-get install -y libcurl4-openssl-dev"
+ [2] "apt-get install -y libssl-dev"          
+ [3] "apt-get install -y imagemagick"         
+ [4] "apt-get install -y libmagick++-dev"     
+ [5] "apt-get install -y texlive"             
+ [6] "apt-get install -y swftools"            
+ [7] "apt-get install -y zlib1g-dev"          
+ [8] "apt-get install -y make"                
+ [9] "apt-get install -y libfreetype6-dev"    
+[10] "apt-get install -y libpng-dev"          
+[11] "apt-get install -y libicu-dev"          
+[12] "apt-get install -y libglpk-dev"         
+[13] "apt-get install -y libgmp3-dev"         
+[14] "apt-get install -y libxml2-dev"         
+[15] "apt-get install -y libgdal-dev"         
+[16] "apt-get install -y gdal-bin"            
+[17] "apt-get install -y libproj-dev"         
+[18] "apt-get install -y libgeos-dev"         
+[19] "apt-get install -y libjpeg-dev"         
+[20] "apt-get install -y git"                 
+[21] "apt-get install -y libudunits2-dev"     
+[22] "apt-get install -y pandoc"  
+```
+
+Note that this does not currently capture system dependencies from packages in the `Remotes` field of the `DESCRIPTION` file.
+However, a separate call to those packages will get them.

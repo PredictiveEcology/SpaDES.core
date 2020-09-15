@@ -76,7 +76,7 @@
 #'              Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\cr\cr
 #'
 #'              \code{useGitHub}. Logical. Is module development happening on GitHub?
-#'              Default \code{TRUE}. Setting up GitHub projects relies on the \pkg{usethis} package.\cr\cr
+#'              Default \code{TRUE}.
 #'
 #' @return Nothing is returned. The new module file is created at
 #' \file{path/name.R}, as well as ancillary files for documentation, citation,
@@ -363,6 +363,27 @@ setMethod("newModuleDocumentation",
             newModuleDocumentation(name = name, path = ".", open = interactive())
 })
 
+#' Use GitHub actions for automated module checking
+#'
+#' See corresponding vignette for more information.
+#'
+#' @param name module name
+#' @param path module path
+#'
+#' @export
+#' @importFrom reproducible checkPath
+#' @importFrom whisker whisker.render
+use_gha <- function(name, path) {
+  ghActionPath <- checkPath(file.path(path, name, ".github", "workflows"), create = TRUE)
+
+  moduleRmdYaml <- list(name = name)
+  renderModuleRmdYamlTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
+                                                     "render-module-rmd.yaml.template"))
+  writeLines(whisker.render(renderModuleRmdYamlTemplate, moduleRmdYaml),
+             file.path(ghActionPath, "render-module-rmd.yaml"))
+  write("*.html\n", file = file.path(path, name, ".github", ".gitignore"), append = TRUE)
+}
+
 #' Create template testing structures for new modules
 #'
 #' @param name  Character string specifying the name of the new module.
@@ -415,13 +436,7 @@ setMethod(
     ## create basic testing infrastructure using GitHub Actions
     ## -- see ?usethis::use_github_action and https://github.com/r-lib/actions/tree/master/examples
     if (isTRUE(useGitHub)) {
-      ghActionPath <- checkPath(file.path(path, name, ".github", "workflows"), create = TRUE)
-
-      moduleRmdYaml <- list(name = name)
-      renderModuleRmdYamlTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
-                                                         "render-module-rmd.yaml.template"))
-      writeLines(whisker.render(renderModuleRmdYamlTemplate, moduleRmdYaml),
-                 file.path(ghActionPath, "render-module-rmd.yaml"))
+      use_gha(name, path)
     }
 })
 

@@ -4,7 +4,7 @@ test_that("module templates work", {
     testOnExit(testInitOut)
   }, add = TRUE)
 
-  expect_true(file.exists(tmpdir))
+  expect_true(dir.exists(tmpdir))
   moduleName <- "myModule"
 
   newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE, useGitHub = TRUE)
