@@ -44,18 +44,20 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
     # Check here if resolved
     curForFuture <- sim@events[[1]]
     if (!curForFuture[["moduleName"]] %in% core) {
-      futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                    curModName = curForFuture[["moduleName"]])
-      canProceed <- if (length(futureNeeds) && length(sim$simFuture)) {
-        # with the assumption that the "unresolved" future could schedule itself,
-        # must block any module who's outputs are needed by the same module as the
-        # unresolved future module
-        !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture[["moduleName"]])
-      } else {
-        TRUE
-      }
-      if (!canProceed) {
-        sim <- evaluateFutureNow(sim)
+      if (length(sim$simFuture)) {
+        futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                      curModName = sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
+        canProceed <- if (length(futureNeeds)) {
+          # with the assumption that the "unresolved" future could schedule itself,
+          # must block any module who's outputs are needed by the same module as the
+          # unresolved future module
+          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture[["moduleName"]])
+        } else {
+          TRUE
+        }
+        if (!canProceed) {
+          sim <- evaluateFutureNow(sim)
+        }
       }
 
     }
@@ -228,18 +230,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
             # stop("using future for spades events is not yet fully implemented")
             futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
                                           curModName = cur[["moduleName"]])
-            # if all this module's outputs are NOT in any other modules' inputs, can use future::future
-            canProceed <- if (length(sim$simFuture)) {
-              # with the assumption that the "unresolved" future could schedule itself,
-              # must block any module who's outputs are needed by the same module as the
-              # unresolved future module
-              !unlist(lapply(sim$simFuture, function(x) any(x$thisModOutputs$dontAllowModules %in% cur[["moduleName"]])))
-            } else {
-              TRUE
-            }
-            if (!canProceed) {
-              sim <- evaluateFutureNow(sim)
-            }
 
             if (!any(futureNeeds$thisModOutputs %in% futureNeeds$otherModsInputs)) {
               requireNamespace("future")
