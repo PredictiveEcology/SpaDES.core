@@ -17,23 +17,59 @@ name: Render module Rmd
 jobs:
   render:
     name: Render module Rmd
-    runs-on: macOS-latest
+    runs-on: ubuntu-20.04
+
+    env:
+      RSPM: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-r@v1
+
       - uses: r-lib/actions/setup-pandoc@v1
-      - name: Install devtools, knitr and rmarkdown
-        run: Rscript -e 'install.packages(c("devtools", "knitr", "rmarkdown"))'
+
+      - name: Install GDAL and other dependencies
+        run: |
+          sudo apt-get install -y \
+            libcurl4-openssl-dev \
+            libgdal-dev \
+            libgeos-dev \
+            libgit2-dev \
+            libglpk-dev \
+            libmagick++-dev \
+            libproj-dev \
+            libudunits2-dev \
+            libxml2-dev \
+            python3-gdal
+
+      - name: Install remotes, knitr, rmarkdown
+        run: |
+          install.packages("remotes")
+          remotes::install_cran("rmarkdown")
+          remotes::install_cran("knitr")
+        shell: Rscript {0}
+
       - name: Install SpaDES
         run: |
-          Rscript -e 'devtools::install_github("PredictiveEcology/reproducible@development")'
-          Rscript -e 'devtools::install_github("PredictiveEcology/SpaDES.core@development", dependencies = TRUE)'
-          Rscript -e 'devtools::install_github("PredictiveEcology/SpaDES.tools@development", dependencies = TRUE)'
+          install.packages("SpaDES", dependencies = TRUE)
+        shell: Rscript {0}
+
       - name: Install module package dependencies
-        run: Rscript -e 'pkgs <- SpaDES.core::packages(modules = "[[name]]", paths = "..")[[1]]; reproducible::Require(pkgs)'
+        run: |
+          pkgs <- SpaDES.core::packages(modules = "[[name]]", paths = "..")[[1]]
+          Require::Require(pkgs)
+        shell: Rscript {0}
+
       - name: Render module Rmd
-        run: Rscript -e 'rmarkdown::render("[[name]].Rmd", encoding = "UTF-8")'
+        run: |
+          rmarkdown::render("[[name]].Rmd", encoding = "UTF-8")
+        shell: Rscript {0}
+
       - name: Commit results
         run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
           git commit [[name]].html -m 'Re-build [[name]].Rmd' || echo "No changes to commit"
           git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{github.ref}} || echo "No changes to commit"
