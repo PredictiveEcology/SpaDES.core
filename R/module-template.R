@@ -372,6 +372,7 @@ setMethod("newModuleDocumentation",
 #'
 #' @export
 #' @importFrom reproducible checkPath
+#' @importFrom whisker whisker.render
 use_gha <- function(name, path) {
   ghActionPath <- checkPath(file.path(path, name, ".github", "workflows"), create = TRUE)
 
@@ -380,7 +381,7 @@ use_gha <- function(name, path) {
                                                      "render-module-rmd.yaml.template"))
   writeLines(whisker.render(renderModuleRmdYamlTemplate, moduleRmdYaml),
              file.path(ghActionPath, "render-module-rmd.yaml"))
-  write("*.html\n", file = file.path(".github", ".gitignore"), append = TRUE)
+  write("*.html\n", file = file.path(path, name, ".github", ".gitignore"), append = TRUE)
 }
 
 #' Create template testing structures for new modules
@@ -435,7 +436,7 @@ setMethod(
     ## create basic testing infrastructure using GitHub Actions
     ## -- see ?usethis::use_github_action and https://github.com/r-lib/actions/tree/master/examples
     if (isTRUE(useGitHub)) {
-      use_gha(path, name)
+      use_gha(name, path)
     }
 })
 
