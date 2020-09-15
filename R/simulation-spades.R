@@ -43,8 +43,22 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
   if (isTRUE(useFuture)) {
     # Check here if resolved
     curForFuture <- sim@events[[1]]
-    futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                  curModName = curForFuture[["moduleName"]])
+    if (!curForFuture[["moduleName"]] %in% core) {
+      futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                    curModName = curForFuture[["moduleName"]])
+      canProceed <- if (length(futureNeeds) && length(sim$simFuture)) {
+        # with the assumption that the "unresolved" future could schedule itself,
+        # must block any module who's outputs are needed by the same module as the
+        # unresolved future module
+        !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture[["moduleName"]])
+      } else {
+        TRUE
+      }
+      if (!canProceed) {
+        sim <- evaluateFutureNow(sim)
+      }
+
+    }
 
   }
 
@@ -211,7 +225,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
           skipEvent <- FALSE
           .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
           if (useFuture) {
-            stop("using future for spades events is not yet fully implemented")
+            # stop("using future for spades events is not yet fully implemented")
             futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
                                           curModName = cur[["moduleName"]])
             # if all this module's outputs are NOT in any other modules' inputs, can use future::future
@@ -227,25 +241,12 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
               sim <- evaluateFutureNow(sim)
             }
 
-            if (!any(futureNeeds$thisModOutputs %in% otherModsInputs)) {
+            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$otherModsInputs)) {
               require("future")
-              envir <- environment()
-              sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
-                list(sim = future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                                                                  showSimilar = showSimilar, .pkgEnv),
-
-                                    globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
-                                                "showSimilar", ".pkgEnv"),
-                                    packages = c("SpaDES.core", "raster"),
-                                    envir = envir),
-                     thisModOutputs = list(moduleName = cur[["moduleName"]],
-                                           objects = futureNeeds$thisModOutputs,
-                                           dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
+              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                     futureNeeds = futureNeeds)
               skipEvent <- TRUE
-
-              # a <- future::future(.runEvent(sim, cacheIt, debug,
-              #                         moduleCall, fnEnv, cur, notOlderThan))
-              # stop("futures are not yet implemented")
             }
           }
           if (!skipEvent)
@@ -1094,7 +1095,6 @@ setMethod(
           if (length(sim$simFuture)) {
             for (simFut in seq_along(sim$simFuture)) {
               if (FALSE) { #resolved(sim$simFuture[[1]][[1]])) {
-                browser()
                 sim <- evaluateFutureNow(sim)
               }
             }
@@ -1514,5 +1514,26 @@ getFutureNeeds <- function(deps, curModName) {
       modu@outputObjects$objectName
   )
   out$dontAllowModules <- unlist(lapply(out$otherModsOutputs, function(x) any(x %in% out$thisModsInputs)))
+  out
 
+}
+
+.runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                            showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
+  modEnv <- sim$.mods[[cur[["moduleName"]]]]
+  modObjs <- mget(ls(envir = modEnv), envir = modEnv)
+  pkgs <- Require:::extractPkgName(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
+  list2env(modObjs, envir = envir)
+  sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
+    list(sim = future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                                      showSimilar = showSimilar, .pkgEnv),
+
+                              globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
+                                          "showSimilar", ".pkgEnv", names(modObjs)),
+                              packages = c("SpaDES.core", pkgs),
+                              envir = envir),
+         thisModOutputs = list(moduleName = cur[["moduleName"]],
+                               objects = futureNeeds$thisModOutputs,
+                               dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
+  sim
 }
