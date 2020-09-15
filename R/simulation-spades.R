@@ -642,6 +642,28 @@ scheduleConditionalEvent <- function(sim,
 #' module did not use \code{.plotInitialTime} or \code{.saveInitialTime}, then
 #' these arguments will not do anything.
 #'
+#' @section Caching with SpaDES:
+#'
+#' There are numerous ways in which Caching can be used within SpaDES. Please
+#' see the vignette
+#' \url{https://cran.r-project.org/web/packages/SpaDES.core/vignettes/iii-cache.html}
+#' for many examples. Briefly, functions, events, modules, entire spades calls or
+#' experiment calls (see \url{https::/github.com/PredictiveEcology/SpaDES.experiment})
+#' can be cached and mixtures of all of these will work. For functions, simply
+#' wrap the call with \code{Cache}, moving the original function name into
+#' the first argument of Cache. For events or modules, set the module \code{parameters},
+#' \code{.useCache}. e.g.,
+#' \code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
+#' This can be set to an event name, which will cache that event, or a logical (e.g., \code{}),
+#' which will cache \emph{every} event in that module. Event and module caching
+#' makes most sense when the event or module only runs once, such as an initialization
+#' or data preparation event/module. Caching an entire simulation is actually just
+#' a function call to \code{simInitAndSpades}, for example. So, simply writing
+#' \code{Cache(simInitAndSpades, modules = ...)} will effectively cache a whole simulation.
+#' Finally for experiments, it is just like a function call:
+#' \code{Cache(simInitandExperiment, ...)}. The final way Caching can be done is in
+#' \code{experiment} or \code{spades}, by setting the \code{cache} argument.
+#'
 #' If \code{cache} is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
 #' Instead, upon a call to \code{spades} in which the simList is identical,

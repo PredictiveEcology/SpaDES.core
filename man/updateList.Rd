@@ -17,7 +17,7 @@ A named list, with elements sorted by name.
          replace the values in list \code{x}.
 }
 \description{
-Deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
+Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
 \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
 }
 \examples{
