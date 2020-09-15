@@ -242,7 +242,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
             }
 
             if (!any(futureNeeds$thisModOutputs %in% futureNeeds$otherModsInputs)) {
-              require("future")
+              requireNamespace("future")
               sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                      showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                      futureNeeds = futureNeeds)
@@ -1091,10 +1091,9 @@ setMethod(
         if (useFuture) {
           if (!exists("simFuture", envir = envir(sim)))
             sim$simFuture <- list()
-
           if (length(sim$simFuture)) {
             for (simFut in seq_along(sim$simFuture)) {
-              if (FALSE) { #resolved(sim$simFuture[[1]][[1]])) {
+              if (future::resolved(sim$simFuture[[1]][[1]])) {
                 sim <- evaluateFutureNow(sim)
               }
             }
@@ -1522,7 +1521,7 @@ getFutureNeeds <- function(deps, curModName) {
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
   modObjs <- mget(ls(envir = modEnv), envir = modEnv)
-  pkgs <- Require:::extractPkgName(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
+  pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
   sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
     list(sim = future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
