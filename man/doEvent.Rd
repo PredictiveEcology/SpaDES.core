@@ -4,8 +4,12 @@
 \alias{doEvent}
 \title{Process a simulation event}
 \usage{
-doEvent(sim, debug = FALSE, notOlderThan,
-  useFuture = getOption("spades.useFuture", FALSE))
+doEvent(
+  sim,
+  debug = FALSE,
+  notOlderThan,
+  useFuture = getOption("spades.useFuture", FALSE)
+)
 }
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}

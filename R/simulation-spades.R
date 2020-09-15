@@ -200,11 +200,19 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
             .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
                               removeOthers = FALSE)
 
+          skipEvent <- FALSE
+          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
           if (useFuture) {
+            stop("using future for spades events is not yet fully implemented")
             mods <- names(sim@depends@dependencies)
             moduleNamesNotThisOne <- mods[!mods %in% cur[["moduleName"]]]
             otherModsInputs <- na.omit(unique(unlist(lapply(
-              sim@depends@dependencies[moduleNamesNotThisOne],
+              sim@depends@dependencies, # can be a different event, don't exclude self
+              function(modu)
+                modu@inputObjects$objectName
+            ))))
+            thisModsInputs <- na.omit(unique(unlist(lapply(
+              sim@depends@dependencies[cur[["moduleName"]]], # can be a different event, don't exclude self
               function(modu)
                 modu@inputObjects$objectName
             ))))
@@ -213,15 +221,55 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
               function(modu)
                 modu@outputObjects$objectName
             ))))
+            otherModsOutputs <- lapply(
+              sim@depends@dependencies,
+              function(modu)
+                modu@outputObjects$objectName
+            )
+            dontAllowModules <- unlist(lapply(otherModsOutputs, function(x) any(x %in% thisModsInputs)))
+
             # if all this module's outputs are NOT in any other modules' inputs, can use future::future
+            canProceed <- if (length(sim$simFuture)) {
+              # with the assumption that the "unresolved" future could schedule itself,
+              # must block any module who's outputs are needed by the same module as the
+              # unresolved future module
+              !unlist(lapply(sim$simFuture, function(x) any(x$thisModOutputs$dontAllowModules %in% cur[["moduleName"]])))
+            } else {
+              TRUE
+            }
+            if (!canProceed) {
+              sim <- evaluateFutureNow(sim)
+            }
+
             if (!any(thisModOutputs %in% otherModsInputs)) {
-              #a <- future::future(.runEvent(sim, cacheIt, debug,
+              require("future")
+              envir <- environment()
+              # a <- future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+              #                                             showSimilar = showSimilar, .pkgEnv), packages = c("SpaDES.core"),
+              #                     globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
+              #                                 "showSimilar", ".pkgEnv"),
+              #                     envir = envir)
+              sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
+                list(sim = future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                                                  showSimilar = showSimilar, .pkgEnv),
+
+                                    globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
+                                                "showSimilar", ".pkgEnv"),
+                                    packages = c("SpaDES.core", "raster"),
+                                    envir = envir),
+                     thisModOutputs = list(moduleName = cur[["moduleName"]],
+                                           objects = thisModOutputs,
+                                           dontAllowModules = names(dontAllowModules)[dontAllowModules]))
+              skipEvent <- TRUE
+
+              # a <- future::future(.runEvent(sim, cacheIt, debug,
               #                         moduleCall, fnEnv, cur, notOlderThan))
-              stop("futures are not yet implemented")
+              # stop("futures are not yet implemented")
             }
           }
-          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                           showSimilar = showSimilar)
+          if (!skipEvent)
+            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                             showSimilar = showSimilar, .pkgEnv)
 
           # browser(expr = exists("._doEvent_3"))
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
@@ -1018,12 +1066,13 @@ setMethod(
           sim@completed <- new.env(parent = emptyenv())
       }
 
-    useFuture <- getOption("spades.useFuture", FALSE)
       if (recoverMode > 0) {
         rmo <- NULL # The recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
+      useFuture <- getOption("spades.useFuture", FALSE)
+      if (useFuture) sim$simFuture <- list()
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         if (recoverMode > 0) {
@@ -1031,7 +1080,6 @@ setMethod(
         }
 
         sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
-
 
         if (recoverMode > 0) {
           rmo <- recoverModePost(sim, rmo, recoverMode)
@@ -1055,6 +1103,19 @@ setMethod(
             sim$._conditionalEvents <- sim$._conditionalEvents[-condEventsToOmit]
             if (length(sim$._conditionalEvents) == 0) {
               rm("._conditionalEvents", envir = sim)
+            }
+          }
+        }
+        if (useFuture) {
+          if (!exists("simFuture", envir = envir(sim)))
+            sim$simFuture <- list()
+
+          if (length(sim$simFuture)) {
+            for (simFut in seq_along(sim$simFuture)) {
+              if (FALSE) { #resolved(sim$simFuture[[1]][[1]])) {
+                browser()
+                sim <- evaluateFutureNow(sim)
+              }
             }
           }
         }
@@ -1148,7 +1209,7 @@ setMethod(
 })
 
 #' @keywords internal
-.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar) {
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
@@ -1427,4 +1488,22 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
     }
   }
   return(invisible())
+}
+
+evaluateFutureNow <- function(sim) {
+  tmpSim <- future::value(sim$simFuture[[1]][[1]])
+  simMetadata <- sim$simFuture[[1]][[2]]
+  list2env(mget(simMetadata$objects, envir = envir(tmpSim)), envir = envir(sim))
+  evntsFut <- events(tmpSim, unit = "seconds")
+  evntsNormal <- rbindlist(list(current(sim, unit = "seconds"), events(sim, unit = "seconds")))
+  newEvents <- evntsFut[!evntsNormal, on = c("eventTime", "moduleName", "eventTime", "eventPriority")]
+  newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
+
+  slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
+
+  ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
+               unlist(lapply(sim@events, function(x) x$eventPriority)))
+  slot(sim, "events") <- sim@events[ord]
+  sim$simFuture <- sim$simFuture[-1]
+  sim
 }
