@@ -3,12 +3,6 @@ test_that("test-load.R: loading inputs does not work correctly", {
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
-  # library(igraph)
-  # tmpdir <- file.path(tempdir(), "test_load", rndstr()) %>% checkPath(create = TRUE)
-  # on.exit({
-  #   detach("package:igraph")
-  #   unlink(tmpdir, recursive = TRUE)
-  # }, add = TRUE)
 
   mapPath <- system.file("maps", package = "quickPlot")
 
@@ -197,17 +191,10 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
       functions = "fread",
       stringsAsFactors = FALSE
     )
-    if (getRversion() < "3.5.2") {
-      try(detach("package:data.table"), silent = TRUE)
-      expect_error(simInit(times = times, params = parameters, modules = modules,
-                           paths = paths, inputs = inputs), "'inputs' often requires")
-    }
     require(data.table)
     mess <- capture_messages(simInit(times = times, params = parameters, modules = modules,
-                         paths = paths, inputs = inputs))
-
+                                     paths = paths, inputs = inputs))
     expect_true(any(grepl(paste(basename(tmpFile)), mess)))
-
   }
 })
 
@@ -317,6 +304,8 @@ test_that("test-load.R: passing nearly empty file to simInit does not work corre
 })
 
 test_that("test-load.R: more tests", {
+  skip_on_cran()
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -351,11 +340,19 @@ test_that("test-load.R: more tests", {
        loadTime = 0,
        intervals = c(rep(NA, length(files) - 1), 10)
     )
-    expect_message(sim2 <- loadFiles(filelist = filelist), "DEM read from")
-    expect_message(sim2 <- loadFiles(filelist = filelist), "forestAge read from")
+    expect_message({
+      sim2 <- loadFiles(filelist = filelist)
+    }, "DEM read from")
+    expect_message({
+      sim2 <- loadFiles(filelist = filelist)
+    }, "forestAge read from")
     end(sim2) <- 20
-    expect_message(sim3 <- spades(sim2), "time 10")
-    expect_message(sim3 <- spades(sim2), "time 20")
+    expect_message({
+      sim3 <- spades(sim2)
+    }, "time 10")
+    expect_message({
+      sim3 <- spades(sim2)
+    }, "time 20")
   }
 })
 
@@ -409,5 +406,34 @@ test_that("test-load.R: interval loading of objects from .GlobalEnv", {
   end(a) <- 3
   a <- spades(a)
   expect_identical(a2, a$a)
+})
 
+test_that("Filenames for simList", {
+  testInitOut <- testInit(c("raster"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
+                          opts = list("reproducible.ask" = FALSE))
+
+  on.exit({
+    testOnExit(testInitOut)
+    options(opts)
+    rm(s)
+  }, add = TRUE)
+
+  s <- simInit()
+  s$r <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  s$r2 <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  s$r <- suppressWarnings(writeRaster(s$r, filename = tmpfile[1], overwrite = TRUE))
+  s$r2 <- suppressWarnings(writeRaster(s$r2, filename = tmpfile[3], overwrite = TRUE))
+  s$s <- stack(s$r, s$r2)
+  a <- s$s
+  a[] <- a[]
+  s$b <- writeRaster(a, filename = tmpfile[5], overwrite = TRUE)
+
+  Fns <- Filenames(s)
+
+  fnsGrd <- normPath(c(filename(s$b), gsub("grd$", "gri", filename(s$b))))
+  expect_true(identical(c(Fns[["b1"]], Fns[["b2"]]), fnsGrd))
+  expect_true(identical(Fns[["r"]], normPath(filename(s$r))))
+  expect_true(identical(Fns[["r2"]], normPath(filename(s$r2))))
+  expect_true(identical(c(Fns[["s1"]], Fns[["s2"]]),
+              sapply(seq_len(nlayers(s$s)), function(rInd) normPath(filename(s$s[[rInd]])))))
 })

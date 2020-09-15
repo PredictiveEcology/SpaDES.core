@@ -1,13 +1,11 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
-}
+utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 
 #' A slightly modified version of getOption
 #'
 #' This can take x as a character string or as a function that returns a character string.
 #'
 #' @inheritParams base::getOption
-#' @rdname spadesOptions
+#' @rdname getOption
 #' @keywords internal
 .getOption <- function(x, default = NULL) {
   optionDefault <- options(x)[[1]]
@@ -19,14 +17,12 @@ if (getRversion() >= "3.1.0") {
   }
 }
 
+
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
-#' Merge two named list based on their named entries. Where
-#' any element matches in both lists, the value from the
-#' second list is used in the updated list.
-#' Subelements are not examined and are simply replaced. If one list is empty, then
-#' it returns the other one, unchanged.
+#' Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
+#' \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
 #'
 #' @param x   a named list
 #' @param y   a named list
@@ -37,6 +33,7 @@ if (getRversion() >= "3.1.0") {
 #'
 #' @author Alex Chubaty
 #' @export
+#' @importFrom utils modifyList
 #' @rdname updateList
 #'
 #' @examples
@@ -45,56 +42,19 @@ if (getRversion() >= "3.1.0") {
 #' updateList(L1, L2)
 #'
 #' updateList(L1, NULL)
+#' updateList(L1)
+#' updateList(y = L2)
 #' updateList(NULL, L2)
 #' updateList(NULL, NULL) # should return empty list
 #'
-setGeneric("updateList", function(x, y) {
-  standardGeneric("updateList")
-})
+updateList <- function(x, y) {
+  if (missing(x)) x <- list()
+  if (missing(y)) y <- list()
+  if (is.null(y)) y <- list()
+  if (is.null(x)) x <- list()
+  modifyList(x = x, val = y)
+}
 
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("list", "list"),
-          definition = function(x, y) {
-            if (any(is.null(names(x)), is.null(names(y)))) {
-              # If one of the lists is empty, then just return the other, unchanged
-              if (length(y) == 0) return(x)
-              if (length(x) == 0) return(y)
-              stop("All elements in lists x,y must be named.")
-            } else {
-              x[names(y)] <- y
-              return(x[order(names(x))])
-            }
-})
-
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("NULL", "list"),
-          definition = function(x, y) {
-            if (is.null(names(y))) {
-              if (length(y) == 0) return(x)
-              stop("All elements in list y must be named.")
-            }
-            return(y[order(names(y))])
-})
-
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("list", "NULL"),
-          definition = function(x, y) {
-            if (is.null(names(x))) {
-              if (length(x) == 0) return(x)
-              stop("All elements in list x must be named.")
-            }
-            return(x[order(names(x))])
-})
-
-#' @rdname updateList
-setMethod("updateList",
-          signature = c("NULL", "NULL"),
-          definition = function(x, y) {
-            return(list())
-})
 
 ################################################################################
 #' Add a module to a \code{moduleList}
@@ -139,98 +99,14 @@ setMethod("append_attr",
             return(out[!dups])
 })
 
-################################################################################
-#' Load packages.
-#'
-#' Load and optionally install additional packages.
-#'
-#' @param packageList A list of character strings specifying
-#' the names of packages to be loaded.
-#'
-#' @param install Logical flag. If required packages are not
-#' already installed, should they be installed?
-#'
-#' @param quiet Logical flag. Should the final "packages loaded"
-#' message be suppressed?
-#'
-#' @return Specified packages are loaded and attached using \code{require()},
-#'         invisibly returning a logical vector of successes.
-#'
-#' @seealso \code{\link{require}}.
-#'
-#' @export
-#' @rdname loadPackages
-#' @importFrom utils install.packages installed.packages
-#'
-#' @author Alex Chubaty
-#'
-#' @examples
-#' \dontrun{
-#'   pkgs <- list("raster", "lme4")
-#'   loadPackages(pkgs) # loads packages if installed
-#'   loadPackages(pkgs, install = TRUE) # loads packages after installation (if needed)
-#' }
-#'
-setGeneric("loadPackages", function(packageList, install = FALSE, quiet = TRUE) {
-  standardGeneric("loadPackages")
-})
-
-#' @rdname loadPackages
-setMethod(
-  "loadPackages",
-  signature = "character",
-  definition = function(packageList, install, quiet) {
-    packageList <- na.omit(packageList) %>% as.character()
-    if (length(packageList)) {
-      if (install) {
-        repos <- getOption("repos")
-        if (is.null(repos) | any(repos == "")) {
-          repos <- "https://cran.rstudio.com"
-        }
-        installed <- unname(installed.packages()[, "Package"])
-        toInstall <- packageList[packageList %in% installed]
-        install.packages(toInstall, repos = repos)
-      }
-
-      loaded <- suppressMessages(sapply(packageList, require, character.only = TRUE,
-                                        quiet = TRUE, warn.conflicts = FALSE))
-      if (any(!loaded)) {
-        alreadyLoaded <- unlist(lapply(packageList[!loaded], isNamespaceLoaded))
-        if (!all(alreadyLoaded)) {
-          stop("Some packages required for the simulation are not installed:\n",
-             "    ", paste(names(loaded[-which(loaded)]), collapse = "\n    "))
-        } else {
-          message("Older version(s) of ",
-                  paste(collapse = ", ", packageList[!loaded]), " already loaded")
-        }
-      }
-
-      if (!quiet) {
-        message(paste("Loaded", length(which(loaded == TRUE)), "of",
-                      length(packageList), "packages.", sep = " "))
-      }
-    } else {
-      loaded <- character(0)
-    }
-    return(invisible(loaded))
-})
-
-#' @rdname loadPackages
-setMethod("loadPackages",
-          signature = "list",
-          definition = function(packageList, install, quiet) {
-            loadPackages(unlist(packageList), install, quiet)
-})
-
-#' @rdname loadPackages
-setMethod("loadPackages",
-          signature = "NULL",
-          definition = function(packageList, install, quiet) {
-            return(invisible(character(0)))
-})
 
 ################################################################################
 #' Convert numeric to character with padding
+#'
+#' This will pad floating point numbers, right or left. For integers, either class
+#' integer or functionally integer (e.g., 1.0), it will not pad right of the decimal.
+#' For more specific control or to get exact padding right and left of decimal,
+#' try the \code{stringi} package. It will also not do any rounding. See examples.
 #'
 #' @param x numeric. Number to be converted to character with padding
 #'
@@ -241,30 +117,24 @@ setMethod("loadPackages",
 #'              If not enough, \code{pad} will be used to pad.
 #'
 #' @param pad character to use as padding (\code{nchar(pad) == 1} must be \code{TRUE}).
-#'            Passed to \code{\link[stringi]{stri_pad}}
 #'
 #' @return Character string representing the filename.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom fpCompare %==%
-#' @importFrom stringi stri_pad_left stri_pad_right
 #' @rdname paddedFloatToChar
 #'
 #' @examples
 #' paddedFloatToChar(1.25)
 #' paddedFloatToChar(1.25, padL = 3, padR = 5)
+#' paddedFloatToChar(1.25, padL = 3, padR = 1) # no rounding, so keeps 2 right of decimal
 paddedFloatToChar <- function(x, padL = ceiling(log10(x + 1)), padR = 3, pad = "0") {
-  xIC <- x %/% 1 %>%
-    format(., trim = TRUE, digits = 5, scientific = FALSE) %>%
-    stri_pad_left(., pad = pad, width = padL)
   xf <- x %% 1
-  xFC <- ifelse(xf %==% 0, "",
-    strsplit(format(xf, digits = padR, scientific = FALSE), split = "\\.")[[1]][2] %>%
-      stri_pad_right(., width = padR, pad = pad) %>%
-      paste0(".", .))
-
-  return(paste0(xIC, xFC))
+  numDecimals <- nchar(gsub("(.*)(\\.)|([0]*$)","",xf))
+  newPadR <- ifelse(xf %==% 0, 0, pmax(numDecimals, padR))
+  xFCEnd <- sprintf(paste0("%0", padL+newPadR+1*(newPadR > 0),".", newPadR, "f"), x)
+  return(xFCEnd)
 }
 
 ###############################################################################
@@ -372,7 +242,7 @@ setMethod("rndstr",
 ################################################################################
 #' Filter objects by class
 #'
-#' Based on \url{http://stackoverflow.com/a/5158978/1380598}.
+#' Based on \url{https://stackoverflow.com/a/5158978/1380598}.
 #'
 #' @param x Character vector of object names to filter, possibly from \code{ls}.
 #'
@@ -387,7 +257,7 @@ setMethod("rndstr",
 #'
 #' @note \code{\link{inherits}} is used internally to check the object class,
 #' which can, in some cases, return results inconsistent with \code{is}.
-#' See \url{http://stackoverflow.com/a/27923346/1380598}.
+#' See \url{https://stackoverflow.com/a/27923346/1380598}.
 #' These (known) cases are checked manually and corrected.
 #'
 #' @export
@@ -582,13 +452,21 @@ setMethod(
 #' @param outputPath  The default local directory in which to save simulation outputs.
 #'                    If not specified, defaults to \code{getOption("spades.outputPath")}.
 #'
+#' @param rasterPath  The default local directory in which to save transient raster files.
+#'                    If not specified, defaults to \code{\link[raster:rasterOptions]{tmpDir}}.
+#'                    \emph{Important note:} this location may not be cleaned up automatically,
+#'                    so be sure to monitor this directory and remove unnecessary temp files
+#'                    that may contribute to excessive disk usage.
+#'
 #' @return Returns a named list of the user's default working directories.
 #' \code{setPaths} is invoked for the side effect of setting these directories.
 #'
 #' @author Alex Chubaty
 #' @keywords internal
+#' @importFrom raster tmpDir
 #' @name setPaths
 #' @rdname setPaths
+#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -618,7 +496,8 @@ setMethod(
     cachePath = .getOption("reproducible.cachePath"),
     inputPath = getOption("spades.inputPath"),
     modulePath = getOption("spades.modulePath"),
-    outputPath = getOption("spades.outputPath")
+    outputPath = getOption("spades.outputPath"),
+    rasterPath = tmpDir()
   )
 }
 
@@ -634,22 +513,23 @@ Paths <- .paths()
 
 #' @export
 #' @rdname setPaths
-#' @importFrom reproducible checkPath
-#' @importFrom R.utils getOption
+#' @importFrom raster tmpDir
+#' @importFrom Require checkPath
 #' @param silent Logical. Should the messaging occur.
-setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALSE) {
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {
   defaults <- list(
     CP = FALSE,
     IP = FALSE,
     MP = FALSE,
-    OP = FALSE
+    OP = FALSE,
+    RP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath")     # nolint
+    cachePath <- .getOption("reproducible.cachePath") # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {
-    inputPath <- getOption("spades.inputPath")    # nolint
+    inputPath <- getOption("spades.inputPath") # nolint
     defaults$IP <- TRUE
   }
   if (missing(modulePath)) {
@@ -660,13 +540,19 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
     outputPath <- getOption("spades.outputPath") # nolint
     defaults$OP <- TRUE
   }
+  if (missing(rasterPath)) {
+    rasterPath <- tmpDir()
+    defaults$RP <- TRUE
+  }
 
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
-  options(spades.inputPath = inputPath,
-          spades.modulePath = unlist(modulePath), spades.outputPath = outputPath,
-          reproducible.cachePath = cachePath)
+  options(rasterTmpDir = rasterPath,
+          reproducible.cachePath = cachePath,
+          spades.inputPath = inputPath,
+          spades.modulePath = unlist(modulePath),
+          spades.outputPath = outputPath)
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
@@ -676,25 +562,51 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, silent = FALS
 
   if (!silent) {
     if (!allDefault) {
-      message("Setting:\n",
-              "  options(\n",
-              if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"), #nolint
-              if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
-              if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
-              if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
-              "  )")
+      message(
+        "Setting:\n",
+        "  options(\n",
+        if (!defaults$RP) paste0("    rasterTmpDir = '", normPath(rasterPath), "'\n"),
+        if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"),
+        if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
+        if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
+        if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
+        "  )"
+      )
     }
-    if (any(unlist(defaults)))
-      message("Paths set to:\n",
-              "  options(\n",
-              "    reproducible.cachePath = '", normPath(cachePath), "'\n",
-              "    spades.inputPath = '", normPath(inputPath), "'\n",
-              "    spades.outputPath = '", normPath(outputPath), "'\n",
-              "    spades.modulePath = '", modPaths, "'\n",
-              "  )")
+
+    if (any(unlist(defaults))) {
+      message(
+        "Paths set to:\n",
+        "  options(\n",
+        "    rasterTmpDir = '", normPath(rasterPath), "'\n",
+        "    reproducible.cachePath = '", normPath(cachePath), "'\n",
+        "    spades.inputPath = '", normPath(inputPath), "'\n",
+        "    spades.outputPath = '", normPath(outputPath), "'\n",
+        "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
+        "  )"
+      )
+    }
   }
 
   lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
 }
 
+#' Simple wrapper around \code{data.table::rbindlist}
+#'
+#' This simply sets defaults to \code{fill = TRUE}, and
+#' \code{use.names = TRUE}
+#'
+#' @param ... 1 or more \code{data.frame}, \code{data.table}, or \code{list} objects
+#' @export
+bindrows <- function(...) {
+  # Deal with things like "trailing commas"
+  rws <- try(list(...), silent = TRUE)
+  if (any(grepl("argument|bind_rows", rws))) {
+    ll <- as.list(match.call(expand.dots = TRUE))
+    nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0)))
+    eval(as.call(ll[nonEmpties]))
+  } else {
+    rbindlist(rws, fill = TRUE, use.names = TRUE)
+  }
+}

@@ -1,5 +1,5 @@
 test_that("module templates work", {
-  testInitOut <- testInit("knitr", smcc = FALSE)
+  testInitOut <- testInit(c("knitr", "rmarkdown"), smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -7,7 +7,7 @@ test_that("module templates work", {
   expect_true(file.exists(tmpdir))
   moduleName <- "myModule"
 
-  newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE)
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE, useGitHub = TRUE)
 
   mpath <- file.path(tmpdir, moduleName)
 
@@ -17,12 +17,19 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".R"))))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".Rmd"))))
   expect_true(file.exists(file.path(mpath, "README.txt")))
+
+  expect_true(dir.exists(file.path(mpath, ".github")))
+  expect_true(dir.exists(file.path(mpath, ".github", "workflows")))
+  expect_true(file.exists(file.path(mpath, ".github", "workflows", "render-module-rmd.yaml")))
+
   expect_true(dir.exists(file.path(mpath, "data")))
+  expect_true(file.exists(file.path(mpath, "data", "CHECKSUMS.txt")))
+  expect_true(file.exists(file.path(mpath, "data", ".gitignore")))
+
   expect_true(dir.exists(file.path(mpath, "tests")))
   expect_true(dir.exists(file.path(mpath, "tests", "testthat")))
   expect_true(file.exists(file.path(mpath, "tests", "unitTests.R")))
   expect_true(file.exists(file.path(mpath, "tests", "testthat", "test-template.R")))
-  expect_true(file.exists(file.path(mpath, "data", "CHECKSUMS.txt")))
 
   utils::capture.output(
     zipModule(name = moduleName, path = tmpdir, version = "0.0.2", flags = "-q -r9X")
@@ -37,9 +44,8 @@ test_that("module templates work", {
                file.path(mpath, paste0(moduleName, ".md")))
 
   # Test that the dummy unit tests work
-  #test_file(file.path(mpath, "tests", "testthat", "test-template.R"))
+  #test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
 })
-
 
 test_that("empty defineModule", {
   testInitOut <- testInit("knitr", smcc = FALSE)
@@ -48,19 +54,17 @@ test_that("empty defineModule", {
   }, add = TRUE)
 
   sim <- simInit()
-  expect_warning(sim <- defineModule(sim, list()))
+  sim <- expect_warning(defineModule(sim, list()))
   b <- depends(sim)
   out <- lapply(names(moduleDefaults), function(modDef) {
     if (modDef != "version") {
       if (all(!(c("extent", "timeframe") %in% modDef))) {
-        expect_identical(slot(b@dependencies[[1]], modDef),moduleDefaults[[modDef]])
+        expect_identical(slot(b@dependencies[[1]], modDef), moduleDefaults[[modDef]])
       } else if (modDef == "extent") {
-        expect_identical(slot(b@dependencies[[1]], "spatialExtent"),eval(moduleDefaults[[modDef]]))
+        expect_identical(slot(b@dependencies[[1]], "spatialExtent"), eval(moduleDefaults[[modDef]]))
       } else if (modDef == "timeframe") {
-        expect_identical(slot(b@dependencies[[1]], "timeframe"),eval(moduleDefaults[[modDef]]))
+        expect_identical(slot(b@dependencies[[1]], "timeframe"), eval(moduleDefaults[[modDef]]))
       }
-
     }
-
   })
 })

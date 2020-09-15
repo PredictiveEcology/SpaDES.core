@@ -10,8 +10,8 @@ doEvent(sim, debug = FALSE, notOlderThan,
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}
 
-\item{debug}{Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+\item{debug}{Optional tools for invoking debugging. Supplying a \code{list}
+will invoke the more powerful \code{logging} package. See details.
 Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{notOlderThan}{Date or time. Passed to \code{reproducible::Cache} to update the cache.
@@ -32,13 +32,12 @@ Internal function called from \code{spades}.
 Calls the module corresponding to the event call, and executes the event.
 
 Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).
+submodules to the simulation. We use S4 classes and methods.
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://www.nostarch.com/artofr.htm}
+            Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \author{
 Alex Chubaty

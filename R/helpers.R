@@ -10,11 +10,15 @@
 #' @name .coreModules
 #' @rdname coreModules
 .coreModules <- function() {
-  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load")
+  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load",
+       restartR = "restartR")
 }
 
+#' @keywords internal
+#' @include environment.R
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
+#' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
 
 ################################################################################
@@ -73,7 +77,7 @@ setMethod(
     set(eeldt, NULL, "eventType", eventType)
     set(eeldt, NULL, "eventPriority", eventPriority)
     eeldt # don't set key because it is set later when used
-  })
+})
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -83,13 +87,11 @@ setMethod(
             eventType = "missing", eventPriority = "missing"),
   definition = function() {
     copy(.emptyEventListDT)
-  })
+})
 
 #' @keywords internal
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
-
-
 
 #' Default (empty) metadata
 #'
@@ -103,7 +105,6 @@ setMethod(
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname emptyMetadata
-#'
 setGeneric(".emptyMetadata", function(x) {
   standardGeneric(".emptyMetadata")
 })
@@ -114,18 +115,18 @@ setMethod(
   signature(x = "missing"),
   definition = function() {
     out <- list(
-      name = character(0),
-      description = character(0),
-      keywords = character(0),
-      childModules = character(0),
-      authors = person("unknown"),
-      version = numeric_version(NULL),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
-      timeframe = as.POSIXlt(c(NA, NA)),
-      timeunit = NA_character_,
-      citation = list(),
-      documentation = list(),
-      reqdPkgs = list(),
+      name = moduleDefaults[["name"]],
+      description = moduleDefaults[["description"]],
+      keywords = moduleDefaults[["keywords"]],
+      childModules = moduleDefaults[["childModules"]],
+      authors = moduleDefaults[["authors"]],
+      version = moduleDefaults[["version"]],
+      spatialExtent = raster::extent(rep(NA_real_, 4)), ## match up with moduleDefaults
+      timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
+      timeunit = moduleDefaults[["timeunit"]],
+      citation = moduleDefaults[["citation"]],
+      documentation = moduleDefaults[["documentation"]],
+      reqdPkgs = moduleDefaults[["reqdPkgs"]],
       parameters = defineParameter(),
       inputObjects = ._inputObjectsDF(),
       outputObjects = ._outputObjectsDF()
@@ -148,7 +149,6 @@ setMethod(
 #' @keywords internal
 #' @name findObjects
 #' @rdname findObjects
-#'
 .findObjects <- function(objects, functionCall = "simInit") {
   scalls <- sys.calls()
   grep1 <- .grepSysCalls(scalls, functionCall)
@@ -167,11 +167,12 @@ setMethod(
 #' search path. Note, several "core" packages are not touched; or more specifically,
 #' they will remain in the search path, but may move down if packages are rearranged.
 #' The current set of these core packages used by SpaDES can be found here:
-#' \code{SpaDES.core:::.pkgEnv$corePackages}
+#' \code{SpaDES.core:::.corePackages}
 #'
 #' @param pkgs The packages that are to be placed at the beginning of the search path,
 #'
-#' @param removeOthers Logical. If \code{TRUE}, then only the packages in \code{pkgs}
+#' @param removeOthers Logical. If \code{TRUE}, then only the packages in
+#'                     \code{c(pkgs, SpaDES.core:::.corePackages)}
 #'                     will remain in the search path, i.e., all others will be removed.
 #'
 #' @param skipNamespacing Logical. If \code{FALSE}, then the running of an event in a module
@@ -188,48 +189,54 @@ setMethod(
                               skipNamespacing = !getOption("spades.switchPkgNamespaces")) {
   if (!skipNamespacing) {
     pkgs <- c("SpaDES.core", pkgs)
-    pkgs <- unlist(pkgs)[!(pkgs %in% .pkgEnv$corePackagesVec)]
-    pkgPositions <- pmatch(paste0("package:", unlist(pkgs)), search())
+    pkgs <- unlist(pkgs)[!(pkgs %in% .corePackages)]
+    pkgsWithPrefix <- paste0("package:", unlist(pkgs))
+    pkgPositions <- pmatch(pkgsWithPrefix, search())
 
     # Find all packages that are not in the first sequence after .GlobalEnv
     whNotAtTop <- !((seq_along(pkgPositions) + 1) %in% pkgPositions)
 
     if (any(whNotAtTop)) {
+      whAdd <- which(is.na(pkgPositions))
       if (removeOthers) {
-        pkgs <- setdiff(search(), pkgs)
-        pkgs <- grep(pkgs, pattern = .pkgEnv$corePackages, invert = TRUE, value = TRUE)
-        whRm <- seq_along(pkgs)
+        pkgsToRm <- setdiff(search(), pkgsWithPrefix)
+        pkgsToRm <- grep(pkgsToRm, pattern = .corePackagesGrep, invert = TRUE, value = TRUE)
+        whRm <- seq_along(pkgsToRm)
       } else {
         whRm <- which(pkgPositions > min(which(whNotAtTop)))
-        whAdd <- which(is.na(pkgPositions))
+        pkgsToRm <- pkgs[whRm]
       }
 
       if (length(whRm) > 0) {
         # i.e,. ones that need reordering
         suppressWarnings(
-          lapply(unique(gsub(pkgs, pattern = "package:", replacement = "")[whRm]), function(pack) {
+          lapply(unique(gsub(pkgsToRm, pattern = "package:", replacement = "")[whRm]), function(pack) {
             try(detach(paste0("package:", pack), character.only = TRUE), silent = TRUE)
           })
         )
       }
-      if (!removeOthers) {
-        if (length(c(whAdd, whRm))) {
-          suppressMessages(
-            lapply(rev(pkgs[c(whAdd, whRm)]), function(pack) {
-              try(attachNamespace(pack), silent = TRUE)
-            })
-          )
-        }
+      #if (!removeOthers) {
+      if (length(whAdd)) {
+        suppressMessages(
+          lapply(rev(pkgs[whAdd]), function(pack) {
+            try(attachNamespace(pack), silent = TRUE)
+          })
+        )
       }
+      #}
     }
   }
 }
 
-.pkgEnv$corePackages <- ".GlobalEnv|Autoloads|SpaDES.core|base|methods|utils|graphics|datasets|stats" # nolint
+#' @keywords internal
+.corePackages <- c(".GlobalEnv","Autoloads","SpaDES.core","base","grDevices",
+                   "rstudio","devtools_shims",
+                   "methods","utils","graphics","datasets","stats", "testthat") # nolint
+.corePackagesGrep <- paste(.corePackages, collapse = "|")
 
-.pkgEnv$corePackagesVec <- unlist(strsplit(.pkgEnv$corePackages, split = "\\|"))
-.pkgEnv$corePackagesVec <- c(.pkgEnv$corePackagesVec[(1:2)],
-                             paste0("package:", .pkgEnv$corePackagesVec[-(1:2)]))
+# .pkgEnv$corePackagesVec <- unlist(strsplit(.corePackagesGrep, split = "\\|"))
+.corePackagesVec <- c(.corePackages[(1:2)],
+                      paste0("package:", .corePackages[-(1:2)]))
 
 #' tryCatch that keeps warnings, errors and value (result)
 #'
@@ -273,10 +280,16 @@ all.equal.simList <- function(target, current, ...) {
     completed(current) <- completed(current, times = FALSE)
 
   # remove all objects starting with ._ in the simList@.xData
-  objsTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
-  objsCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
-  rm(list = objsTarget, envir = envir(target))
-  rm(list = objsCurrent, envir = envir(current))
+  objNamesTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
+  objNamesCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  objsTarget <- mget(objNamesTarget, envir = envir(target))
+  objsCurrent <- mget(objNamesCurrent, envir = envir(current))
+  on.exit({
+    list2env(objsTarget, envir = envir(target))
+    list2env(objsCurrent, envir = envir(current))
+  })
+  rm(list = objNamesTarget, envir = envir(target))
+  rm(list = objNamesCurrent, envir = envir(current))
   # suppressWarnings(rm("._startClockTime", envir = envir(target)))
   # suppressWarnings(rm("._startClockTime", envir = envir(current)))
   # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
@@ -286,3 +299,24 @@ all.equal.simList <- function(target, current, ...) {
 
   all.equal.default(target, current)
 }
+
+
+
+needInstall <- function(pkg = "methods", minVersion = NULL,
+                        messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {
+  need <- FALSE
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    need <- TRUE
+  } else {
+    if (isTRUE(packageVersion(pkg) < minVersion))
+      need <- TRUE
+  }
+  if (need) {
+    stop(messageStart,
+         "install.packages('",pkg,"')")
+  }
+}
+
+isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
+
+.isFALSE <- function(x) is.logical(x) && length(x) == 1L && !is.na(x) && !x

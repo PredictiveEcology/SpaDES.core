@@ -15,50 +15,63 @@
 #' weeks as year/52.
 #'
 #' When these units are not correct, a module developer can create their own
-#' time unit using, and create a function to calculate the number of seconds
+#' time unit, and create a function to calculate the number of seconds
 #' in that unit using the "d" prefix (for duration), following the
 #' \code{lubridate} package standard:
-#' \code{dfortnight <- function(x) lubridate::duration(dday(14))}.
-#' Then the module developer can use "fortnight" as the module's time unit.
+#' \code{ddecade <- function(x) lubridate::duration(dyear(10))}.
+#' Then the module developer can use "decade" as the module's time unit.
 #'
 #' @param x numeric. Number of the desired units
 #'
 #' @return Number of seconds within each unit
 #'
+#' @author Eliot McIntire
 #' @export
 #' @rdname spadesTime
-#'
-#' @author Eliot McIntire
-#'
+dhour <- function(x) {
+  x * 60 * 60
+}
+
+hoursInSeconds <- as.numeric(dhour(1))    # 3600L
+attributes(hoursInSeconds)$unit <- "second"
+
+#' @export
+#' @rdname spadesTime
+dday <- function(x) {
+  x * 24 * hoursInSeconds
+}
+
+#' @export
+#' @rdname spadesTime
 setGeneric("dyears", function(x) {
   standardGeneric("dyears")
 })
 
-#' @importFrom lubridate duration
+daysInSeconds <- as.numeric(dday(1))      # 86400L
+attributes(daysInSeconds)$unit <- "second"
+
 #' @export
 #' @rdname spadesTime
 setMethod("dyears",
           signature(x = "numeric"),
           definition = function(x) {
-            duration(x * 60 * 60 * 24 * 365.25)
+            x * daysInSeconds * 365.25
 })
 
 yearsInSeconds <- as.numeric(dyears(1)) # 31557600L
 attributes(yearsInSeconds)$unit <- "second"
 
-#' @inheritParams dyears
 #' @export
 #' @rdname spadesTime
 setGeneric("dmonths", function(x) {
   standardGeneric("dmonths")
 })
 
-#' @importFrom lubridate duration
 #' @rdname spadesTime
 setMethod("dmonths",
           signature(x = "numeric"),
           definition = function(x) {
-            duration(x * as.numeric(yearsInSeconds) / 12)
+            x * as.numeric(yearsInSeconds) / 12
 })
 
 #' @export
@@ -68,12 +81,11 @@ setGeneric("dweeks", function(x) {
 })
 
 #' @export
-#' @importFrom lubridate duration
 #' @rdname spadesTime
 setMethod("dweeks",
           signature(x = "numeric"),
           definition = function(x) {
-            duration(x * as.numeric(yearsInSeconds) / 52)
+            x * as.numeric(yearsInSeconds) / 52
 })
 
 #' @export
@@ -96,23 +108,8 @@ dyear <- function(x) {
 
 #' @export
 #' @rdname spadesTime
-#' @importFrom lubridate dseconds
 dsecond <- function(x) {
-  dseconds(x)
-}
-
-#' @export
-#' @rdname spadesTime
-#' @importFrom lubridate ddays
-dday <- function(x) {
-  ddays(x)
-}
-
-#' @export
-#' @rdname spadesTime
-#' @importFrom lubridate dhours
-dhour <- function(x) {
-  dhours(x)
+  x
 }
 
 #' @export
@@ -122,36 +119,29 @@ setGeneric("dNA", function(x) {
 })
 
 #' @export
-#' @importFrom lubridate duration
 #' @rdname spadesTime
 setMethod("dNA",
           signature(x = "ANY"),
           definition = function(x) {
-            duration(0)
+            0
 })
 
 secondsInSeconds <- as.numeric(1)
-hoursInSeconds <- as.numeric(dhour(1))    # 3600L
-daysInSeconds <- as.numeric(dday(1))      # 86400L
 weeksInSeconds <- as.numeric(dweek(1))    # 606876.92307692
 monthsInSeconds <- as.numeric(dmonth(1))  # 2629800L
 attributes(secondsInSeconds)$unit <- "second"
-attributes(hoursInSeconds)$unit <- "second"
-attributes(daysInSeconds)$unit <- "second"
 attributes(weeksInSeconds)$unit <- "second"
 attributes(monthsInSeconds)$unit <- "second"
 
 ################################################################################
 #' Convert time units
 #'
-#' In addition to using the \code{lubridate} package, some additional functions
-#' to work with times are provided.
-#'
 #' Current pre-defined units are found within the \code{spadesTimes()} function.
 #' The user can define a new unit. The unit name can be anything, but the function
 #' definition must be of the form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
 #' The unit name is the part without the \code{d} and the function name definition includes the \code{d}.
 #' This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
+#' (you will need to declare 'lubridate' in your 'pkgDeps' in the metadata)
 #' can be placed anywhere in the search path or in a module.
 #'
 #' @param unit   Character. One of the time units used in \code{SpaDES} or user
@@ -169,10 +159,9 @@ attributes(monthsInSeconds)$unit <- "second"
 #'
 #' @return A numeric vector of length 1, with \code{unit} attribute set to "seconds".
 #'
-#' @export
 #' @author Alex Chubaty & Eliot McIntire
+#' @export
 #' @rdname timeConversion
-#'
 inSeconds <- function(unit, envir, skipChecks = FALSE) {
   if (!skipChecks) {
     if (missing(envir)) envir <- .GlobalEnv
@@ -197,7 +186,7 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
                 #  from switch fn above if it does not appear. So search through SpaDES
                 # functions first above, then check user defined units
                 #attributes(out)$unit = "second"
-                if(checkTimeunit(unit, envir)) {
+                if (checkTimeunit(unit, envir)) {
                   as.numeric(get(paste0("d", unit), envir = envir)(1))
                   } else {
                     NULL
@@ -205,6 +194,7 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 
   return(out)
 }
+
 ################################################################################
 #' Convert time units
 #'
@@ -218,12 +208,11 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #'
 #' @param time   Numeric. With a unit attribute, indicating the time unit of the
 #'               input numeric. See Details.
+#'
+#' @author Eliot McIntire
 #' @export
-#' @importFrom stringi stri_detect_fixed
-#' @inheritParams inSeconds
 #' @include simList-class.R
 #' @rdname timeConversion
-#' @author Eliot McIntire
 convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   if (!skipChecks) {
     if (missing(envir)) envir <- .GlobalEnv
@@ -256,7 +245,6 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
       # if timeUnit is same as unit, skip calculations
   if (is.null(timeUnit)) timeUnit <- "NA" # for next line
   if (unit != timeUnit) {
-
     # For bypassing calculation -- use table of knowns
     if (timeUnit != "NA") {
       if (!startsWith(timeUnit, prefix = "second")) {
@@ -286,6 +274,7 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
   }
   return(time)
 }
+
 ################################################################################
 #' Determine the largest timestep unit in a simulation
 #'
@@ -367,6 +356,7 @@ setMethod(
     return("second")
 })
 
+#' @keywords internal
 .getTU <- function(ts, simEnv) {
     tsFun <- paste0("d", ts)
     if (exists(tsFun, envir = simEnv, inherits = FALSE))
@@ -374,7 +364,6 @@ setMethod(
     else
       get(tsFun)(1)
 }
-
 
 #' @export
 #' @rdname minTimeunit
@@ -395,7 +384,6 @@ setMethod(
 #' @rdname timeConversion
 .spadesTimes <- c("year", "month", "week", "day", "hour", "second")
 .spadesTimes <- c(.spadesTimes, paste0(.spadesTimes, "s"))
-
 
 #' @export
 #' @rdname timeConversion

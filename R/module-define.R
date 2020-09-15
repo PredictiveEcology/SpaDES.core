@@ -5,16 +5,25 @@
 #' @export
 #'
 moduleDefaults <- list(
+  ## these need to match up with `.emptyMetadata` list in helpers.R
   timeunit = "year",
   name = NA_character_,
-  description = NA_character_,
-  keywords = NA_character_,
-  authors = person("unknown"),
+  description = "",
+  keywords = "",
+  authors = {
+    pers = getOption("devtools.desc.author",
+                      person(c("First", "Middle"), "Last",
+                             email = "email@example.com",
+                             role = c("aut", "cre")))
+    if (!is(pers, "person"))
+      pers <- tryCatch(eval(parse(text = pers)), error = function(e) pers)
+    pers
+    },
   childModules = character(0),
-  version = quote(as.numeric_version(x$version)),
+  version = "0.0.0.9000", ## numeric_versions don't deparse well
   extent = quote(raster::extent(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
-  citation = list(),
+  citation = list("citation.bib"),
   documentation = list(),
   reqdPkgs = list()
 )
@@ -52,7 +61,7 @@ moduleDefaults <- list(
 #'    \code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
 #'                        if a character or numeric are supplied).
 #'                        The module developer should update manually this with each change
-#'                        that is made to the module. See \url{http://semver.org/}
+#'                        that is made to the module. See \url{https://semver.org/}
 #'                        for a widely accepted standard for version numbering.\cr
 #'    \code{spatialExtent} \tab The spatial extent of the module supplied via
 #'                              \code{raster::extent}. This is currently unimplemented.
@@ -78,9 +87,9 @@ moduleDefaults <- list(
 #'                              it is for human readers only.\cr\cr
 #'    \code{reqdPkgs} \tab List of R package names required by the module. These
 #'                         packages will be loaded when \code{simInit} is called.
-#'                         \code{\link[reproducible]{Require}} will be used internally
+#'                         \code{\link[Require]{Require}} will be used internally
 #'                         to load if available, and install if not available.
-#'                         Because \code{\link[reproducible]{Require}} can also download from
+#'                         Because \code{\link[Require]{Require}} can also download from
 #'                         GitHub.com, these packages can specify package names stored
 #'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
 #'    \code{parameters} \tab A data.frame specifying the parameters used in the module.
@@ -139,48 +148,10 @@ moduleDefaults <- list(
 #' @examples
 #' \dontrun{
 #'   ## a default version of the defineModule is created with a call to newModule
-#'   newModule("test", path = tempdir())
+#'   newModule("test", path = tempdir(), open = FALSE)
 #'
 #'   ## view the resulting module file
 #'   if (interactive()) file.edit(file.path(tempdir(), "test", "test.R"))
-#'
-#'   # The default defineModule created by newModule is currently (SpaDES version 1.3.1.9044):
-#'   defineModule(sim, list(
-#'     name = "test",
-#'     description = "insert module description here",
-#'     keywords = c("insert key words here"),
-#'     authors = c(person(c("First", "Middle"), "Last",
-#'                        email = "email@example.com", role = c("aut", "cre"))),
-#'     childModules = character(0),
-#'     version = list(SpaDES = "1.3.1.9044", test = "0.0.1"),
-#'     spatialExtent = raster::extent(rep(NA_real_, 4)),
-#'     timeframe = as.POSIXlt(c(NA, NA)),
-#'     timeunit = NA_character_, # e.g., "year",
-#'     citation = list("citation.bib"),
-#'     documentation = list("README.txt", "test.Rmd"),
-#'     reqdPkgs = list(),
-#'     parameters = rbind(
-#'       #defineParameter("paramName", "paramClass", value, min, max,
-#'       # "parameter description")),
-#'       defineParameter(".plotInitialTime", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first plot event should occur"),
-#'       defineParameter(".plotInterval", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first plot event should occur"),
-#'       defineParameter(".saveInitialTime", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first save event should occur"),
-#'       defineParameter(".saveInterval", "numeric", NA, NA, NA,
-#'       "This describes the simulation time at which the first save event should occur")
-#'     ),
-#'     inputObjects = bind_rows(
-#'       expectsInput(objectName = NA_character_, objectClass = NA_character_,
-#'         sourceURL = NA_character_, desc = NA_character_, other = NA_character_)
-#'     ),
-#'     outputObjects = bind_rows(
-#'       createsOutput(objectName = NA_character_, objectClass = NA_character_,
-#'         desc = NA_character_, other = NA_character_)
-#'     )
-#'   ))
-#'
 #' }
 #'
 setGeneric("defineModule", function(sim, x) {
@@ -201,7 +172,7 @@ setMethod(
       warning(paste0(
         "The \'", x$name, "\' module is missing the metadata for:\n",
         paste(" - ", metadataMissing, collapse = "\n"), "\n",
-        "Using default values, which may not be desireable.\n",
+        "Using default values, which may not be desirable.\n",
         "See moduleDefaults"
       ))
     }
@@ -234,10 +205,11 @@ setMethod(
     ## maintain backwards compatibility with SpaDES versions prior to 1.3.1.9044
     ## where `version` was a single `numeric_version` value instead of named list
     x$version <- if (is.null(names(x$version))) {
-      eval(moduleDefaults$version) ## SpaDES < 1.3.1.9044
+      eval(moduleDefaults[["version"]]) ## SpaDES < 1.3.1.9044
     } else {
-      as.numeric_version(x$version[[x$name]]) ## SpaDES >= 1.3.1.9044
+      x$version[[x$name]] ## SpaDES >= 1.3.1.9044
     }
+    x$version <- as.numeric_version(x$version)
 
     x$spatialExtent <- if (!is(x$spatialExtent, "Extent")) {
       if (is.null(x$spatialExtent)) {
@@ -351,7 +323,11 @@ setMethod(
 ################################################################################
 #' Define a parameter used in a module
 #'
-#' Used to specify a parameter's name, value, and set a default.
+#' Used to specify a parameter's name, value, and set a default. The \code{min} and
+#' \code{max} arguments are ignored by \code{simInit} or \code{spades}; they
+#' are for human use only. To ensure that a user cannot set parameters outside of
+#' a range of values, the module developer should use assertions in their module
+#' code.
 #'
 #' @note Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
 #'       real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
@@ -363,8 +339,14 @@ setMethod(
 #'                  Non-standard evaluation is used for the expression.
 #' @param min       With \code{max}, used to define a suitable range of values.
 #'                  Non-standard evaluation is used for the expression.
+#'                  \emph{These are not tested by} \code{simInit} \emph{or}
+#'                  \code{spades}. These are primarily for human use, i.e., to
+#'                  tell a module user what values the module expects.
 #' @param max       With \code{min}, used to define a suitable range of values.
 #'                  Non-standard evaluation is used for the expression.
+#'                  \emph{These are not tested by} \code{simInit} \emph{or}
+#'                  \code{spades}. These are primarily for human use, i.e., to
+#'                  tell a module user what values the module expects.
 #' @param desc      Text string providing a brief description of the parameter.
 #'
 #' @return data.frame
@@ -387,10 +369,10 @@ setMethod(
 #' checkPath(tmpdir, create = TRUE)
 #'
 #' # creates a  new, "empty" module -- it has defaults for everything that is required
-#' newModule("testModule", tmpdir)
+#' newModule("testModule", tmpdir, open = FALSE)
 #'
 #' # Look at new module code -- see defineParameter
-#' file.edit(file.path(tmpdir, "testModule", "testModule.R"))
+#' if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 #'
 #' # initialize the simList
 #' mySim <- simInit(modules = "testModule",
@@ -400,9 +382,7 @@ setMethod(
 #' #  function, we must specify the module name. If used within a module,
 #' #  we can omit the module name
 #' P(mySim, "testModule")$.useCache
-#'
 #' }
-#'
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc) {
   standardGeneric("defineParameter")
@@ -499,7 +479,7 @@ setMethod(
 #' @rdname expectsInput
 #'
 #' @examples
-#' inputObjects <- dplyr::bind_rows(
+#' inputObjects <- bindrows(
 #'   expectsInput(objectName = "inputObject1", objectClass = "character",
 #'                desc = "this is for example", sourceURL = "not available"),
 #'   expectsInput(objectName = "inputObject2", objectClass = "numeric",
@@ -533,13 +513,7 @@ setMethod(
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc, sourceURL),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (length(templist) > 0) {
-      for (i in 1:length(templist)) {
-        returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
-                                            stringsAsFactors = FALSE))
-        names(returnDataframe)[ncol(returnDataframe)] <- names(templist)[i]
-      }
-    }
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "expectsInput")
     return(returnDataframe)
 })
 
@@ -574,7 +548,7 @@ setMethod(
 #' @rdname createsOutput
 #'
 #' @examples
-#' outputObjects <- dplyr::bind_rows(
+#' outputObjects <- bindrows(
 #'   createsOutput(objectName = "outputObject1", objectClass = "character",
 #'                 desc = "this is for example"),
 #'   createsOutput(objectName = "outputObject2", objectClass = "numeric",
@@ -609,13 +583,7 @@ setMethod(
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (length(templist) > 0) {
-      for (i in 1:length(templist)) {
-        returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
-                                            stringsAsFactors = FALSE))
-        names(returnDataframe)[ncol(returnDataframe)] <- names(templist)[i]
-      }
-    }
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "createsOutput")
     return(returnDataframe)
 })
 
@@ -626,7 +594,6 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
-#' @importFrom tools file_ext
 #' @rdname fillInputRows
 .fillInputRows <- function(inputDF, startTime) {
   factorCols <- sapply(inputDF, is.factor)
@@ -668,14 +635,14 @@ setMethod(
     if (any(is.na(inputDF2[, "fun"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- na.omit(match(file_ext(fl), .fileExts[, "exts"]))
+      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]))
       inputDF2$fun[is.na(inputDF2$fun)] <- .fileExts[exts, "fun"]
     }
 
     if (any(is.na(inputDF2[, "package"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- match(file_ext(fl), .fileExts[, "exts"])
+      exts <- match(fileExt(fl), .fileExts[, "exts"])
       inputDF2$package[is.na(inputDF2$package)]  <- .fileExts[exts, "package"]
     }
     inputDF[!objectsOnly, ] <- inputDF2
@@ -690,7 +657,6 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
-#' @importFrom tools file_ext
 #' @rdname fillOutputRows
 .fillOutputRows <- function(outputDF, endTime) {
   needRenameArgs <- grepl(names(outputDF), pattern = "arg[s]?$")
@@ -722,27 +688,56 @@ setMethod(
   if (any(is.na(outputDF[, "fun"]))) {
     .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
-    exts <- file_ext(fl)
+    exts <- fileExt(fl)
     if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
       outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
     }
     if (any(is.na(outputDF[, "fun"]))) {
-      exts <- na.omit(match(exts, .fileExts[, "exts"]))
-      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[exts, "fun"]
+      extsAvail <- checkKnownExts(exts, .fileExts)
+      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
     }
   }
 
   if (any(is.na(outputDF[, "package"]))) {
     .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
-    exts <- file_ext(fl)
+    exts <- fileExt(fl)
     if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
       outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
     }
     if (any(is.na(outputDF[, "package"]))) {
-      exts <- na.omit(match(file_ext(fl), .fileExts[, "exts"]) )
-      outputDF$package[is.na(outputDF$package)] <- .fileExts[exts, "package"]
+      exts <- fileExt(fl)
+      extsAvail <- checkKnownExts(exts, .fileExts)
+      outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
     }
   }
   return(outputDF)
 }
+
+checkKnownExts <- function(exts, knownFileExts) {
+  if (missing(knownFileExts))
+    knownFileExts <- .saveFileExtensions()
+  extsAvail <- na.omit(match(exts, knownFileExts[, "exts"]))
+  extsMissing <- setdiff(exts, exts[extsAvail])
+  if (length(extsMissing) > 0)
+    stop("No known save method is available for class ", extsMissing)
+  extsAvail
+}
+
+
+addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
+  if (length(templist) > 0) {
+    for (i in 1:length(templist)) {
+      returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
+                                          stringsAsFactors = FALSE))
+      nam <- names(templist)[i]
+      if (is.null(nam))
+        stop(fn, " for ", objectName, " has too many unnamed fields; perhaps forgot to use paste(...)?")
+      names(returnDataframe)[ncol(returnDataframe)] <- nam
+    }
+  }
+  returnDataframe
+}
+
+fileExt <- getFromNamespace("fileExt", "reproducible")
+filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")

@@ -11,7 +11,7 @@
 
 \item{current}{other \R object, to be compared with \code{target}.}
 
-\item{...}{Further arguments for different methods, notably the
+\item{...}{further arguments for different methods, notably the
     following two, for numerical comparison:}
 }
 \value{

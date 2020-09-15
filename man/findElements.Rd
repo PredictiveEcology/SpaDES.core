@@ -4,10 +4,13 @@
 \alias{.findElementsInEnv}
 \alias{.findElement}
 \alias{.parsingSim}
-\title{Find all references to sim$}
+\title{Find all references to \code{sim$}}
 \usage{
-.findElementsInEnv(envToFindSim = parent.frame(),
-  moduleEnv = parent.frame(), type)
+.findElementsInEnv(
+  envToFindSim = parent.frame(),
+  moduleEnv = parent.frame(),
+  type
+)
 
 .findElement(x, type)
 
@@ -18,7 +21,7 @@
 the element accessing the simList is actually a call, e.g.,
 \code{sim[[P(sim)$stackName]]}}
 
-\item{moduleEnv}{The environment where the module functions are}
+\item{moduleEnv}{The environment where the module functions are.}
 
 \item{type}{Either "get", "assign", or "globals". See details.}
 
@@ -28,7 +31,7 @@ the element accessing the simList is actually a call, e.g.,
 A character string with all sim objects found
 }
 \description{
-Find all references to sim$
+Find all references to \code{sim$}
 
 \code{.parsingSim} will pull out the various ways to use sim, e.g.,
 \code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}
@@ -45,7 +48,7 @@ the RHS of an assignment operator or when there is no assignment. When
 \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
 LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 scans for all functions (i.e., "globals") being used. This is similar to
-\code{\link[codetools]{findGlobals}}, but faster.
+\code{codetools::findGlobals}, but faster.
 
 \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
 \code{type = "assign"}. Usually this is a test of existence of that object, in

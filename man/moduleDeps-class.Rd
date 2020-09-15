@@ -23,7 +23,7 @@ Descriptor object for specifying SpaDES module dependencies.
 Modules listed here will be loaded with this module.}
 
 \item{\code{version}}{The module version as a \code{numeric_version}.
-Semantic versioning is assumed \url{http://semver.org/}.}
+Semantic versioning is assumed \url{https://semver.org/}.}
 
 \item{\code{spatialExtent}}{Specifies the module's spatial extent as an
 \code{\link{Extent}} object. Default is \code{NA}.}

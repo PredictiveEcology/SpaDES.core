@@ -7,7 +7,9 @@
 \alias{getPaths}
 \alias{Paths}
 \title{Get and set default working directories}
-\format{An object of class \code{list} of length 4.}
+\format{
+An object of class \code{list} of length 5.
+}
 \usage{
 .paths()
 
@@ -15,7 +17,14 @@ getPaths()
 
 Paths
 
-setPaths(cachePath, inputPath, modulePath, outputPath, silent = FALSE)
+setPaths(
+  cachePath,
+  inputPath,
+  modulePath,
+  outputPath,
+  rasterPath,
+  silent = FALSE
+)
 }
 \arguments{
 \item{cachePath}{The default local directory in which to cache simulation outputs.
@@ -30,6 +39,12 @@ If not specified, defaults to \code{getOption("spades.modulePath")}.}
 
 \item{outputPath}{The default local directory in which to save simulation outputs.
 If not specified, defaults to \code{getOption("spades.outputPath")}.}
+
+\item{rasterPath}{The default local directory in which to save transient raster files.
+If not specified, defaults to \code{\link[raster:rasterOptions]{tmpDir}}.
+\emph{Important note:} this location may not be cleaned up automatically,
+so be sure to monitor this directory and remove unnecessary temp files
+that may contribute to excessive disk usage.}
 
 \item{silent}{Logical. Should the messaging occur.}
 }

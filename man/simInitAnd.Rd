@@ -2,16 +2,25 @@
 % Please edit documentation in R/simulation-simInit.R
 \name{simInitAndSpades}
 \alias{simInitAndSpades}
-\alias{simInitAndExperiment}
-\title{Call \code{simInit} and \code{spades} or \code{experiment} together}
+\title{Call \code{simInit} and \code{spades} together}
 \usage{
-simInitAndSpades(times, params, modules, objects, paths, inputs, outputs,
-  loadOrder, notOlderThan, debug, progress, cache, .plotInitialTime,
-  .saveInitialTime, ...)
-
-simInitAndExperiment(times, params, modules, objects, paths, inputs,
-  outputs, loadOrder, notOlderThan, replicates, dirPrefix, substrLength,
-  saveExperiment, experimentFile, clearSimEnv, cl, ...)
+simInitAndSpades(
+  times,
+  params,
+  modules,
+  objects,
+  paths,
+  inputs,
+  outputs,
+  loadOrder,
+  notOlderThan,
+  debug,
+  progress,
+  cache,
+  .plotInitialTime,
+  .saveInitialTime,
+  ...
+)
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times
@@ -20,22 +29,22 @@ simInitAndExperiment(times, params, modules, objects, paths, inputs,
 \item{params}{A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 See details.}
 
-\item{modules}{A named list of character strings specifying the names
-of modules to be loaded for the simulation. Note: the module name
-should correspond to the R source file from which the module is loaded.
-Example: a module named "caribou" will be sourced form the file
-\file{caribou.R}, located at the specified \code{modulePath(simList)} (see below).}
+\item{modules}{A named list of character strings specifying the names of modules to be loaded
+for the simulation.
+Note: the module name should correspond to the R source file from which the module is loaded.
+Example: a module named "caribou" will be sourced form the file \file{caribou.R},
+located at the specified \code{modulePath(simList)} (see below).}
 
 \item{objects}{(optional) A vector of object names (naming objects
 that are in the calling environment of
 the \code{simInit}, which is often the
-\code{.GlobalEnv} unless used programmatically
--- NOTE: this mechanism will
+\code{.GlobalEnv} unless used programmatically.
+NOTE: this mechanism will
 fail if object name is in a package dependency), or
 a named list of data objects to be
-passed into the simList (more reliable).
+passed into the \code{simList} (more reliable).
 These objects will be accessible
-from the simList as a normal list, e.g,. \code{mySim$obj}.}
+from the \code{simList} as a normal list, e.g,. \code{mySim$obj}.}
 
 \item{paths}{An optional named list with up to 4 named elements,
 \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
@@ -52,7 +61,12 @@ See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
-\code{saveTime} (numeric). See \code{\link{outputs}} and
+\code{saveTime} (numeric) and \code{eventPriority} (numeric). If
+\code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
+is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
+it should give "initial conditions".
+
+See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional list of module names specifying the order in
@@ -68,8 +82,8 @@ Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
 
-\item{debug}{Optional logical flag or character vector indicating what to print to
-console at each event. See details.
+\item{debug}{Optional tools for invoking debugging. Supplying a \code{list}
+will invoke the more powerful \code{logging} package. See details.
 Default is to use the value in \code{getOption("spades.debug")}.}
 
 \item{progress}{Logical (\code{TRUE} or \code{FALSE} show a graphical progress bar),
@@ -88,51 +102,17 @@ parameter for all modules. See Details.}
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
 parameter for all modules. See Details.}
 
-\item{...}{Arguments passed to simInit, and spades or experiment}
-
-\item{replicates}{The number of replicates to run of the same \code{simList}.
-See details and examples.}
-
-\item{dirPrefix}{String vector. This will be concatenated as a prefix on the
-directory names. See details and examples.}
-
-\item{substrLength}{Numeric. While making \code{outputPath} for each spades call, this
-is the number of characters kept from each factor level.
-See details and examples.}
-
-\item{saveExperiment}{Logical. Should params, modules, inputs, sim, and resulting
-experimental design be saved to a file. If TRUE are saved to a single list
-called \code{experiment}. Default TRUE.}
-
-\item{experimentFile}{String. Filename if \code{saveExperiment} is TRUE; saved to
-\code{outputPath(sim)} in \code{.RData} format. See Details.}
-
-\item{clearSimEnv}{Logical. If TRUE, then the envir(sim) of each simList in the return list
-is emptied. This is to reduce RAM load of large return object.
-Default FALSE.}
-
-\item{cl}{A cluster object. Optional. This would generally be created using
-parallel::makeCluster or equivalent. This is an alternative way, instead
-of \code{beginCluster()}, to use parallelism for this function, allowing for
-more control over cluster use.}
+\item{...}{Arguments passed to simInit and spades}
 }
 \value{
 Same as \code{\link{spades}} (a \code{simList}) or
-    \code{\link{experiment}} (list of \code{simList} objects)
 }
 \description{
 These functions are convenience wrappers that may allow for
 more efficient Caching.
 Passes all arguments to \code{simInit}, then passes the created \code{simList}
-to \code{spades} or \code{experiment}.
-}
-\details{
-\code{simInitAndExperiment} cannot pass modules or params to \code{experiment} because
-these are also in \code{simInit}. If the \code{experiment} is being used
-to vary these arguments, it must be done separately (i.e., \code{simInit} then
-\code{experiment}).
+to \code{spades}.
 }
 \seealso{
 \code{\link{simInit}}, \code{\link{spades}}
-    \code{\link{experiment}}
 }

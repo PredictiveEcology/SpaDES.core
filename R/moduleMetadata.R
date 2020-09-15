@@ -1,11 +1,11 @@
 #' Parse and extract module metadata
 #'
+#' @inheritParams spades
+#'
 #' @param module Character string. Your module's name.
 #'
 #' @param path   Character string specifying the file path to modules directory.
 #'               Default is to use the \code{spades.modulePath} option.
-#'
-#' @inheritParams spades
 #'
 #' @return A list of module metadata, matching the structure in
 #'         \code{\link{defineModule}}.
@@ -37,6 +37,7 @@ setMethod(
     }
 
     ## store metadata as list
+
     defineModuleListItems <- c(
       "name", "description", "keywords", "childModules", "authors",
       "version", "spatialExtent", "timeframe", "timeunit", "citation",
@@ -64,7 +65,8 @@ setMethod(
 
         out2 <- as.call(inner2)
       }
-      aa <- capture.output(type = "message", bb <- eval(out2))
+      # Remove extra spaces
+      aa <- capture.output(type = "message", {bb <- eval(out2)})
       return(bb)
     })
 
@@ -72,6 +74,7 @@ setMethod(
 
     #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
 
+    metadata <- rmExtraSpacesEOLList(metadata)
     return(metadata)
 })
 
@@ -99,6 +102,7 @@ setMethod(
       }
 
     } else {
+
       if (!missing(path)) message("path not used with sim provided")
       if (missing(module)) {
         module <- unlist(modules(sim))
@@ -112,6 +116,9 @@ setMethod(
         lapply(sn, function(element) {
           slot(mod, name = element)
         })
+      })
+      metadataList <- lapply(metadataList, function(moduleMetadata) {
+        rmExtraSpacesEOLList(moduleMetadata)
       })
       if (numModules == 1)
         metadataList <- metadataList[[module]]
@@ -157,7 +164,7 @@ setMethod(
       as.numeric_version(v) ## SpaDES < 1.3.1.9044
     } else {
       as.numeric_version(v[[module]]) ## SpaDES >= 1.3.1.9044
-  }
+    }
 })
 
 #' @export
@@ -166,8 +173,7 @@ setMethod(
   "moduleVersion",
   signature = c(module = "character", path = "missing", sim = "missing", envir = "ANY"),
   definition = function(module, envir) {
-    moduleVersion(module = module, path = getOption("spades.modulePath"),
-                  envir = envir)
+    moduleVersion(module = module, path = getOption("spades.modulePath"), envir = envir)
 })
 
 #' @export
@@ -186,3 +192,94 @@ setMethod(
       as.numeric_version(v[[module]])  ## SpaDES >= 1.3.1.9044
     }
 })
+
+################################################################################
+#' Extract a module's parameters, inputs, or outputs
+#'
+#' These are more or less wrappers around \code{moduleMetadata}, with the exception
+#' that extraneous spaces and End-Of-Line characters will be removed from the
+#' \code{desc} arguments in \code{defineParameters}, \code{defineInputs}, and
+#' \code{defineOutputs}
+#'
+#' @param module Character string. Your module's name.
+#'
+#' @param path   Character string specifying the file path to modules directory.
+#'               Default is to use the \code{spades.modulePath} option.
+#'
+#' @return \code{data.frame}
+#'
+#' @author Alex Chubaty
+#' @export
+#' @rdname moduleParamsInputsOuputs
+#' @seealso \code{\link{moduleMetadata}}
+#'
+#' @example inst/examples/example_moduleParamsInputsOuputs.R
+#'
+setGeneric("moduleParams", function(module, path) {
+  standardGeneric("moduleParams")
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleParams",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    # remove spaces and EOL
+    md[["parameters"]][["paramDesc"]] <- rmExtraSpacesEOL(md[["parameters"]][["paramDesc"]])
+    md[["parameters"]]
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setGeneric("moduleInputs", function(module, path) {
+  standardGeneric("moduleInputs")
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleInputs",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    # remove spaces and EOL
+    md[["inputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["inputObjects"]][["desc"]])
+    md[["inputObjects"]]
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setGeneric("moduleOutputs", function(module, path) {
+  standardGeneric("moduleOutputs")
+})
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleOutputs",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    # remove spaces and EOL
+    md[["outputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["outputObjects"]][["desc"]])
+    md[["outputObjects"]]
+})
+
+rmExtraSpacesEOL <- function(x) gsub(" +|[ *\n]+", " ", x)
+
+rmExtraSpacesEOLList <- function(xx) {
+  toRmESEOL <- grepl(c("parameters|inputObjects|outputObjects"), names(xx))
+  xx[toRmESEOL] <- lapply(xx[toRmESEOL], function(elem) {
+    if (any(grepl("desc", tolower(names(elem))))) {
+      whCol <- grep("desc", tolower(names(elem)))
+      elem[[whCol]] <- rmExtraSpacesEOL(elem[[whCol]])
+      elem
+    } else {
+      elem
+    }
+  })
+
+  xx
+}

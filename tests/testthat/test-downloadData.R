@@ -1,7 +1,8 @@
 test_that("downloadData downloads and unzips module data", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -9,8 +10,7 @@ test_that("downloadData downloads and unzips module data", {
     options(download.file.method = "curl", download.file.extra = "-L")
   }
 
-  testInitOut <- testInit(smcc = FALSE,
-                          opts = list(reproducible.inputPaths = NULL))
+  testInitOut <- testInit(smcc = FALSE, opts = list(reproducible.inputPaths = NULL))
   on.exit(testOnExit(testInitOut), add = TRUE)
 
   m <- "test"
@@ -18,7 +18,7 @@ test_that("downloadData downloads and unzips module data", {
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- getRversion()
-  if (Rversion > "3.4.2") { ## TODO: need o test on earlier versions too!
+  if (Rversion > "3.4.2") {
     # write checksums
     chksums <- structure(
       list(
@@ -40,26 +40,30 @@ test_that("downloadData downloads and unzips module data", {
       stringsAsFactors = FALSE
     )
 
-    t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
-                                   files = c("DEM.tif", "habitatQuality.tif")))
+    a <- capture.output({
+      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+                                     files = c("DEM.tif", "habitatQuality.tif")))
+    })
     result <- checksums(m, tmpdir)$result
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))
 
     # shouldn't need a redownload because file exists
-    t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
-                                   files = c("DEM.tif", "habitatQuality.tif")))
+    a <- capture.output({
+      t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
+                                     files = c("DEM.tif", "habitatQuality.tif")))
+    })
     expect_true(t1[3] > t2[3]) # compare elapsed times
 
     # if one file is missing, will fill in correctly
     unlink(file.path(datadir, filenames)[1])
-    downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL)
+    a <- capture.output(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
     expect_true(all(file.exists(file.path(datadir, filenames))))
 
     # if files are there, but one is incorrectly named
     file.rename(from = file.path(datadir, filenames[1]),
                 to = file.path(datadir, "test.tif"))
-    downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL) # renames the file back to expected
+    a <- capture.output(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL)) # renames the file back to expected
     expect_true(all(file.exists(file.path(datadir, filenames))))
 
     # if files are there with correct names, but wrong content
@@ -69,11 +73,7 @@ test_that("downloadData downloads and unzips module data", {
       ras <- raster(file.path(datadir, filenames[2]))
       ras[5] <- maxValue(ras) + 1
       writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
-      # It updates it to new file -- but it doesn't do this correctly -- it downloads both
-      #   because it doesn't know what targetFile is
-      expect_error(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL))
-      expect_false(exists("dwnload", inherits = FALSE))
-      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)
+      a <- capture.output(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7))
       expect_true(all(dwnload$result %in% "OK"))
       expect_true(all(file.exists(file.path(datadir, filenames))))
     }

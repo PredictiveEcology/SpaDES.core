@@ -1,64 +1,17 @@
-test_that("test cache", {
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
-                                      spades.useRequire = FALSE),
-                          setPaths = FALSE)
-
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-
-  # Example of changing parameter values
-  mySim <- simInit(
-    times = list(start = 0.0, end = 1.0, timeunit = "year"),
-    params = list(
-      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-      # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA)
-    ),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                 outputPath = tmpdir,
-                 cachePath = tmpdir),
-    # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou"),
-                         stringsAsFactors = FALSE)
-  )
-
-  set.seed(1123)
-  expr <- quote(experiment(Copy(mySim), replicates = 2, cache = TRUE, debug = FALSE,
-                           omitArgs = c("progress", "debug", ".plotInitialTime", ".saveInitialTime")))
-  sims <- eval(expr)
-  out <- showCache(sims[[1]])
-  expect_true(NROW(out[tagValue == "spades"]) == 2) # 2 cached copies, one for each "experiment"
-  expect_true(NROW(unique(out$artifact)) == 2) # 2 cached copies
-  expect_output(print(out), "cacheId")
-  expect_output(print(out), "simList")
-  expect_true(NROW(out[!tagKey %in% c("preDigest", "otherFunctions")]) == 16) #
-  expect_true(NROW(out[tagKey %in% "preDigest"]) ==
-                     (length(slotNames(sims[[1]]))*2 + 2 * length(modules(mySim)) + 2 * 2)) # 2 args for Cache -- FUN & replicate
-  expect_message(sims <- eval(expr),
-                 "loading cached result from previous spades call")
-
-  out2 <- showCache(sims[[1]])
-
-  # 2 original times, 2 cached times per spades
-  expect_true(NROW(out2[tagKey == "accessed"]) == 4)
-
-  # 2 cached copies of spades
-  expect_true(NROW(unique(out2$artifact)) == 2)
-
-  clearCache(sims[[1]], ask = FALSE)
-  out <- showCache(sims[[1]])
-  expect_true(NROW(out) == 0)
-})
-
 test_that("test event-level cache", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list("reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
+
+  modPath <- system.file("sampleModules", package = "SpaDES.core")
+
+  mods <- c("caribouMovement", "randomLandscapes", "fireSpread")
+  pkgs <- reqdPkgs(module = mods,
+          modulePath = modPath)
+  expect_true(length(pkgs) == 3)
+  expect_true(all(names(pkgs) == mods))
+  expect_true(all(c("raster", "sp", "SpaDES.tools", "RColorBrewer") %in% unlist(pkgs)))
 
   # Example of changing parameter values
   mySim <- simInit(
@@ -68,10 +21,10 @@ test_that("test event-level cache", {
       # Turn off interactive plotting
       fireSpread = list(.plotInitialTime = NA),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init")
+      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
     ),
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modules = mods,
+    paths = list(modulePath = modPath,
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou
@@ -80,13 +33,20 @@ test_that("test event-level cache", {
   )
 
   set.seed(1123)
-  expect_true(!"Using cached copy of init event in randomLandscapes module" %in%
-                capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)))
+  # ._robustDigest_2 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<- ._Cache_11 <<- ._Cache_13 <<- 1
+  #._addTagsToOutput_2 <<- 1
+  expect_true(!"loaded cached copy of init event in randomLandscapes module" %in%
+                capture_messages({
+                  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+                }))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap1 <- sims$landscape$Fires
-  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
-  expect_true(any(grepl(pattern = "Using cached copy of init event in randomLandscapes module", mess1)))
+  #._doEvent_3 <<- ._prepareOutput_5 <<- 1
+  mess1 <- capture_messages({
+    sims <- spades(Copy(mySim), debug = FALSE)
+  })
+  expect_true(any(grepl(pattern = "loaded cached copy of init event in randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
 
@@ -94,11 +54,12 @@ test_that("test event-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
-
 })
 
 test_that("test module-level cache", {
-  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE)
+  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
+                          opts = list("reproducible.useMemoise" = FALSE))
+
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -129,8 +90,10 @@ test_that("test module-level cache", {
 
   set.seed(1123)
   pdf(tmpfile)
-  expect_true(!("Using cached copy of init event in randomLandscapes module" %in%
-                  capture_output(sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE))))
+  expect_true(!("loaded cached copy of init event in randomLandscapes module" %in%
+                  capture_messages({
+                    sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+                  })))
   dev.off()
 
   expect_true(file.info(tmpfile)$size > 20000)
@@ -142,7 +105,9 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile1)
-  mess1 <- capture_output(sims <- spades(Copy(mySim), debug = FALSE))
+  mess1 <- capture_messages({
+    sims <- spades(Copy(mySim), debug = FALSE)
+  })
   dev.off()
 
   if (!identical(Sys.info()[["sysname"]], "Windows") || interactive()) ## TODO: TEMPORARY to avoid random CRAN fail
@@ -150,7 +115,7 @@ test_that("test module-level cache", {
 
   unlink(tmpfile1)
 
-  expect_true(any(grepl(pattern = "Using cached copy of randomLandscapes module", mess1)))
+  expect_true(any(grepl(pattern = "loaded cached copy of randomLandscapes module", mess1)))
   landscapeMaps2 <- raster::dropLayer(sims$landscape, "Fires")
   fireMap2 <- sims$landscape$Fires
 
@@ -158,7 +123,6 @@ test_that("test module-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
-
 })
 
 test_that("test .prepareOutput", {
@@ -209,7 +173,8 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE)
+  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoveryMode = FALSE,
+                                                             "reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -229,8 +194,10 @@ test_that("test .robustDigest for simLists", {
   msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
   expect_true(all(grepl(msgGrep, mess1)))
 
-  msgGrep <- "Running .input|Using cached copy|module code|Setting|Paths"
+  msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
+  #a <- capture.output(
   expect_message(do.call(simInit, args), regexp = msgGrep)
+  #)
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
@@ -241,7 +208,8 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
-  expect_message(do.call(simInit, args), regexp = msgGrep, all = TRUE)
+  mess1 <- capture_messages(do.call(simInit, args))
+  expect_true(all(grepl(msgGrep, mess1)))
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
   xxx <- readLines(fileName)
@@ -259,8 +227,10 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
-  expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  options(opts)
+  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 
   # make a change in Init function
   xxx <- readLines(fileName)
@@ -271,11 +241,13 @@ test_that("test .robustDigest for simLists", {
   cat(xxx, file = fileName, sep = "\n")
 
   bbb <- do.call(simInit, args)
-  expect_true(any(grepl(format(bbb$test$Init), pattern = newCode)))
+  expect_true(any(grepl(format(bbb@.xData$.mods$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(bbb, debug = FALSE))
-  expect_output(spades(bbb), regexp = "Using cached copy of init", all = TRUE)
+  options(opts)
+  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
@@ -290,32 +262,33 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # accepts character string
   aa <- .checkCacheRepo(tmpCache, create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # uses .getPaths during simInit
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   justAPath <- tmpCache ;
   options("reproducible.cachePath" = justAPath)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # accepts character string
   aa <- .checkCacheRepo(tmpCache, create = TRUE)
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
 
   # uses .getPaths during simInit
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
-  expect_equal(aa, tmpCache)
+  expect_equal(normPath(aa), normPath(tmpCache))
+
 })
 
 test_that("test objSize", {
@@ -326,11 +299,12 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os) == 5) # 4 objects, the environment, the rest
+  expect_true(length(os) == 6) # 4 objects, the environment, the rest
 })
 
-test_that("Cache of sim objects via .Cache attr -- using preDigest and postDigest", {
-  testInitOut <- testInit(smcc = FALSE, debug = FALSE)
+test_that("Cache sim objs via .Cache attr", {
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE,
+                                                                   "reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -368,7 +342,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
       sim$co1 <- 1
       sim$co2 <- 1
       sim$co3 <- 1
-      sim$test$hi <- 1
+      sim$.mods$test$hi <- 1
       mod$hello <- 2
       ",
       xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
@@ -390,7 +364,7 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_true(mySim2$co5 == 6)
 
   # Test mod
-  expect_true(mySim2$test$hello == 2)
+  expect_true(mySim2$.mods$test$.objects$hello == 2)
 
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
@@ -398,9 +372,9 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
 
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
-  expect_true(is.null(mySim$test$hi)) # will be changed by init
+  expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
   mySim2 <- spades(Copy(mySim))
-  expect_true(mySim2$test$hi == 1) # was affected
+  expect_true(mySim2$.mods$test$hi == 1) # was affected
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
   expect_true(mySim2$co3 == 1) # was affected
@@ -409,13 +383,61 @@ test_that("Cache of sim objects via .Cache attr -- using preDigest and postDiges
   expect_true(is.null(mySim2$co5)) # wan't affected, and isn't there
 
   # Try again, hi should be there
-  expect_true(is.null(mySim$test$hi)) # is not in the
-  mess1 <- capture_output(mySim2 <- spades(Copy(mySim)))
-  expect_true(mySim2$test$hi == 1) # recovered in Cache
-  expect_true(mySim2$test$hello == 2) # recovered in Cache
-  expect_true(grepl("Using cached copy", mess1))
-
+  expect_true(is.null(mySim$.mods$test$hi)) # is not in the
+  # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
+  mess1 <- capture_messages({
+    mySim2 <- spades(Copy(mySim))
+  })
+  expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
+  # Test mod
+  expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
+  expect_true(any(grepl("loaded cached copy", mess1)))
 })
 
+test_that("test showSimilar", {
+  testInitOut <- testInit(smcc = FALSE, "raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
 
+  # Example of changing parameter values
+  params <- list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+    # Turn off interactive plotting
+    fireSpread = list(.plotInitialTime = NA),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+  )
 
+  mySim <- simInit(
+    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+    param = params,
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    # Save final state of landscape and caribou
+    outputs = data.frame(objectName = c("landscape", "caribou"),
+                         stringsAsFactors = FALSE)
+  )
+
+  out1 <- spades(Copy(mySim))#, showSimilar = TRUE)
+  params(mySim)$randomLandscapes$nx <- 101
+  mess <- capture_messages({
+    out2 <- spades(Copy(mySim))#, showSimilar = TRUE)
+  })
+  mySim$a <- 1
+  mess <- capture_messages({
+    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  })
+  expect_true(any(grepl("This call to cache differs", mess)))
+  mySim$a <- 2
+  mess <- capture_messages({
+    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  })
+  expect_true(any(grepl("This call to cache differs", mess)))
+  mess <- capture_messages({
+    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+  })
+  expect_false(any(grepl("This call to cache differs", mess)))
+})

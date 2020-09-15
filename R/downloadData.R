@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("expectedFile", "result"))
-}
+utils::globalVariables(c("expectedFile", "result"))
 
 #' Extract a url from module metadata
 #'
@@ -34,12 +32,14 @@ setMethod(
   definition = function(objectName, sim, module) {
     i <- 0
     lenSC <- length(sys.calls())
+    # This will get the simList that is closest in the call stack, noting that
+    #  in this first one (i.e., this function), sim will be missing
     while (missing(sim) && i < lenSC) {
       i <- i + 1
       simEnv <- whereInStack("sim", -i)
       sim <- simEnv$sim
     }
-    extractURL(objectName = objectName, sim = sim)
+    extractURL(objectName = objectName, sim = sim, module = module)
 })
 
 #' @export
@@ -53,7 +53,8 @@ setMethod(
     }
 
     io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
-    io[[module]][io[[module]][["objectName"]] == objectName, "sourceURL"]
+    wh <- io[[module]][["objectName"]] == objectName
+    io[[module]][wh]$sourceURL
 })
 
 #' Calculate checksum for a module's data files
@@ -110,7 +111,7 @@ checksums <- function(module, path, ...) {
 
 #' Determine the size of a remotely hosted file
 #'
-#' Query a remote web server to determine the size of a remote file.
+#' Deprecated.
 #'
 #' @param url  The url of the remote file.
 #'
@@ -118,27 +119,23 @@ checksums <- function(module, path, ...) {
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @importFrom RCurl url.exists
-#'
-#' @examples
-#' urls <- c("https://www.alexchubaty.com/uploads/2011/11/open-forest-science-journal.csl",
-#'           "https://www.alexchubaty.com/uploads/2011/08/models_GUI_2011-08-07.zip",
-#'           "http://example.com/doesntexist.csv")
-#' try(remoteFileSize(urls)) ## 5429, 3997384, 0
 #'
 remoteFileSize <- function(url) {
-  contentLength <- vapply(url, function(u) {
-    header <- RCurl::url.exists(u, .header = TRUE)
-    status <- tryCatch(as.numeric(header[["status"]]), error = function(e) 0)
-    if (status == 200) {
-      as.numeric(header[["Content-Length"]])
-    } else {
-      0
-    }
-  }, numeric(1))
-
-  return(contentLength)
+  .Deprecated()
+  # contentLength <- vapply(url, function(u) {
+  #   header <- RCurl::url.exists(u, .header = TRUE)
+  #   status <- tryCatch(as.numeric(header[["status"]]), error = function(e) 0)
+  #   if (status == 200) {
+  #     as.numeric(header[["Content-Length"]])
+  #   } else {
+  #     0
+  #   }
+  # }, numeric(1))
+  #
+  # return(contentLength)
 }
+
+
 
 ################################################################################
 #' Download module data
@@ -202,10 +199,8 @@ remoteFileSize <- function(url) {
 #'
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
-#' @importFrom dplyr mutate bind_rows
-#' @importFrom googledrive as_id drive_auth drive_download
-#' @importFrom RCurl url.exists
-#' @importFrom reproducible checkPath compareNA
+#' @importFrom reproducible compareNA
+#' @importFrom Require checkPath
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
@@ -258,36 +253,41 @@ setMethod(
     } else {
       files
     }
-    res <- Map(reproducible::preProcess,
-               targetFile = targetFiles,
-               url = urls,
-               MoreArgs = append(
-                 list(
-                   quick = quickCheck,
-                   overwrite = overwrite,
-                   destinationPath = file.path(path, module, "data")
-                  ),
-                 list(...)
-               )
-    )
-    chksums <- rbindlist(lapply(res, function(x) x$checkSums))
-    chksums <- chksums[order(-result)]
-    chksums <- unique(chksums, by = "expectedFile")
+    notNAs <- !unlist(lapply(urls, is.na))
+    dPath <- file.path(path, module, "data")
+    if (any(notNAs)) {
+      res <- Map(reproducible::preProcess,
+                 targetFile = targetFiles[notNAs],
+                 url = urls[notNAs],
+                 MoreArgs = append(
+                   list(
+                     quick = quickCheck,
+                     overwrite = overwrite,
+                     destinationPath = dPath
+                   ),
+                   list(...)
+                 )
+      )
+      chksums <- rbindlist(lapply(res, function(x) x$checkSums))
+      chksums <- chksums[order(-result)]
+      chksums <- unique(chksums, by = "expectedFile")
+    } else {
+      chksums <- Checksums(dPath, write = TRUE)
+    }
 
     # after download, check for childModules that also require downloading
-    chksums2 <- chksums[0,]
     #children <- moduleMetadata(module, path)$childModules
     if (!is.null(children)) {
       if (length(children)) {
         if (all(nzchar(children) & !is.na(children))) {
-          chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
-                             quickCheck = quickCheck) %>%
-            bind_rows()
+          chksums2 <- bindrows(lapply(children, downloadData, path = path, quiet = quiet,
+                             quickCheck = quickCheck))
+          chksums <- bindrows(chksums, chksums2)
         }
       }
     }
 
-    return(bind_rows(chksums, chksums2))
+    return(chksums)
 })
 
 #' @rdname downloadData

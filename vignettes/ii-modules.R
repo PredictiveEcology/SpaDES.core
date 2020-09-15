@@ -1,8 +1,8 @@
-## ----setup, include=FALSE------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 options(spades.moduleCodeChecks = FALSE)
 
-## ----module-metadata, eval=FALSE, echo=TRUE------------------------------
+## ----module-metadata, eval=FALSE, echo=TRUE-----------------------------------
 #  ## sample module metadata for the default `randomLandscapes` module
 #  ## NOTE: long lines have been truncated
 #  defineModule(sim, list(
@@ -31,17 +31,17 @@ options(spades.moduleCodeChecks = FALSE)
 #      defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time ..."),
 #      defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time ...")
 #    ),
-#    inputObjects = bind_rows(
+#    inputObjects = bindrows(
 #      expectsInput(objectName = NA_character_, objectClass = NA_character_,
 #                   desc = NA_character_, sourceURL = NA_character_, other = NA_character_)
 #    ),
-#    outputObjects = bind_rows(
+#    outputObjects = bindrows(
 #      createsOutput(objectName = globals(sim)$stackName, objectClass = "RasterStack",
 #                    desc = NA_character_, other = NA_character_)
 #    )
 #  ))
 
-## ----passing-params, eval=FALSE, echo=TRUE-------------------------------
+## ----passing-params, eval=FALSE, echo=TRUE------------------------------------
 #  library(SpaDES.core)
 #  
 #  outputDir <- file.path(tempdir(), "simOutputs")
@@ -78,9 +78,9 @@ options(spades.moduleCodeChecks = FALSE)
 #  # If used within the module source code, then module name can be omitted:
 #  # This will return NULL here, but will return the actual value if used
 #  # in a module
-#  P(sim)$N  # Only one parameter
+#  P(mySim)$N  # Only one parameter
 
-## ----event-types, echo=TRUE, eval=FALSE----------------------------------
+## ----event-types, echo=TRUE, eval=FALSE---------------------------------------
 #  ## sample event type definitions from the default `randomLandscapes` module
 #  doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
 #    if (eventType == "init") {
@@ -120,7 +120,7 @@ options(spades.moduleCodeChecks = FALSE)
 #    return(invisible(sim))
 #  }
 
-## ----event-functions, echo=TRUE, eval=FALSE------------------------------
+## ----event-functions, echo=TRUE, eval=FALSE-----------------------------------
 #  ## sample event functions from the default `randomLandscapes` module
 #  library(raster)
 #  if (require(SpaDES.tools)) {
@@ -198,15 +198,13 @@ if (require(SpaDES.tools) && require(RandomFields)) {
   unlink(ftmp)
 }
 
-## ----eventDiagram, eval=TRUE, fig.height=10, fig.width=7-----------------
+## ----eventDiagram, echo=FALSE, eval=TRUE, fig.height=10, fig.width=7----------
 if (require(SpaDES.tools) && require(RandomFields))  {
-  mySim <- spades(mySim) # runs the simulation
-  
   # overview of the events in the simulation
   eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 }
 
-## ----checksums, eval=FALSE-----------------------------------------------
+## ----checksums, eval=FALSE----------------------------------------------------
 #  ## 1. specify your module here
 #  moduleName <- "my_module"
 #  
@@ -250,7 +248,7 @@ moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module gr
 # detailed visual representation of objects
 objectDiagram(mySim, width = 720)
 
-## ----checkpoints, echo=TRUE, eval=TRUE, message=FALSE--------------------
+## ----checkpoints, echo=TRUE, eval=TRUE, message=FALSE-------------------------
 
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 30)
@@ -269,7 +267,7 @@ mySim <- simInit(times = times, params = parameters, modules = modules, paths = 
 checkpointFile(mySim)
 checkpointInterval(mySim)
 
-## ----progress, echo=TRUE, eval=TRUE, message=FALSE-----------------------
+## ----progress, echo=TRUE, eval=TRUE, message=FALSE----------------------------
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 100.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -281,7 +279,7 @@ mySim <- simInit(times = list(start = 0.0, end = 100.0),
 progressType(mySim)
 progressInterval(mySim)
 
-## ----load-save, echo=TRUE, eval=TRUE, message=FALSE----------------------
+## ----load-save, echo=TRUE, eval=TRUE, message=FALSE---------------------------
 # initialize a new simulation, setting the load and save parameters
 library(data.table)
 
@@ -323,14 +321,14 @@ mySim2 <- spades(mySim)
 dev.off()
 unlink(ftmp)
 
-## ----save-events, echo=TRUE, eval=FALSE, message=FALSE-------------------
+## ----save-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
 #  ### WITHIN A MODULE:
 #  
 #  # schedule a recurring save event
 #  nextSave <- time(mySim) + params(mySim)$randomLandscapes$.saveInterval
 #  sim <- scheduleEvent(mySim, nextSave, "randomLandscapes", "save")
 
-## ----plotting, echo=TRUE, eval=FALSE, message=FALSE----------------------
+## ----plotting, echo=TRUE, eval=FALSE, message=FALSE---------------------------
 #  # initialize a new simulation, setting the load and save parameters
 #  mySim <- simInit(times = list(start = 0.0, end = 100),
 #                   params = list(
@@ -345,25 +343,25 @@ unlink(ftmp)
 #  params(mySim)$randomLandscapes$.plotInitialTime
 #  params(mySim)$randomLandscapes$.plotInterval
 
-## ----plot-events, echo=TRUE, eval=FALSE, message=FALSE-------------------
+## ----plot-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
 #  ### WITHIN A MODULE:
 #  
 #  # schedule a recurring plot event
 #  nextPlot <- time(mySim) + params(mySim)$randomLandscapes$.plotInterval
 #  mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
 
-## ----caribouMovement, echo=TRUE, eval=FALSE------------------------------
+## ----caribouMovement, echo=TRUE, eval=FALSE-----------------------------------
 #  openModules(system.file("sampleModules", package = "SpaDES.core"), "moduleName")
 
-## ----download-module, echo=TRUE, eval=FALSE------------------------------
+## ----download-module, echo=TRUE, eval=FALSE-----------------------------------
 #  downloadModule("moduleName")
 
-## ----create-new-module, eval=FALSE, echo=TRUE, message=FALSE-------------
+## ----create-new-module, eval=FALSE, echo=TRUE, message=FALSE------------------
 #  # create a new module called "randomLandscape" in the "custom-modules" subdirectory
 #  # and open the resulting file immediately for editing.
 #  newModule(name = "randomLandscapes", path = "custom-modules", open = TRUE)
 
-## ----module-group-init, eval=FALSE---------------------------------------
+## ----module-group-init, eval=FALSE--------------------------------------------
 #  library(DiagrammeR)
 #  library(SpaDES.core)
 #  
@@ -395,9 +393,9 @@ unlink(ftmp)
 #  
 #  modules(mySim) # note the child modules are initialized
 
-## ----module-group-dl, eval=FALSE-----------------------------------------
+## ----module-group-dl, eval=FALSE----------------------------------------------
 #  downloadModule("SpaDES_sampleModules")
 
-## ----cleanup, eval=TRUE, echo=FALSE--------------------------------------
+## ----cleanup, eval=TRUE, echo=FALSE-------------------------------------------
 unlink(outputDir, recursive = TRUE)
 

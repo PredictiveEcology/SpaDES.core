@@ -1,6 +1,8 @@
 test_that("test objectSynonyms", {
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
-                                      spades.useRequire = FALSE))
+                                      spades.useRequire = FALSE#,
+                                      #reproducible.useMemoise = FALSE
+                                      ))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -18,12 +20,11 @@ test_that("test objectSynonyms", {
 
   # Check maintenance
   set.seed(123)
-  times <- list(start = 1, end = 1)
+  times <- list(start = 1, end = 2)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     caribouMovement = list(N = 3),
     randomLandscapes = list(inRAM = TRUE, nx = 15, ny = 15)
-
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -45,13 +46,13 @@ test_that("test objectSynonyms", {
               c("systime", "systime2"),
               c("vegMap", "veg"))
   sim <- objectSynonyms(sim, os)
-  expect_true(length(sim$objectSynonyms)==length(os))
+  expect_true(length(sim$objectSynonyms) == length(os))
   sim <- objectSynonyms(sim, os2)
 
-  expect_true(length(sim$objectSynonyms)==4)
+  expect_true(length(sim$objectSynonyms) == 4)
   expect_true(identical(sim$objectSynonyms[[2]], unique(c(os[[1]], os2[[1]]))))
 
-  e <- new.env()
+  e <- new.env(parent = emptyenv())
   e <- objectSynonyms(e, list(c("age", "ageMap")))
   expect_true(is.null(e$age))
   rm("age", envir = e)
@@ -75,11 +76,15 @@ test_that("test objectSynonyms", {
       documentation = list("README.txt", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
+        defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")
       ),
-      inputObjects = bind_rows(
-        expectsInput("age", "numeric", "")
+      inputObjects = bindrows(
+        expectsInput("age", "numeric", ""),
+        expectsInput("ageMap", "numeric", ""),
+        expectsInput("worked", "numeric", ""),
+        expectsInput("age2", "numeric", "") # need a dummy one that isn not supplied in simInit below
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 
@@ -88,10 +93,10 @@ test_that("test objectSynonyms", {
       eventType,
       init = {
       #sim$dp <- dataPath(sim)
-      #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       },
       event1 = {
-      #sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
+      sim <- scheduleEvent(sim, sim@simtimes$current+1, "test", "event1")
       })
       return(invisible(sim))
       }
@@ -105,9 +110,61 @@ test_that("test objectSynonyms", {
       ', fill = TRUE)
   modules <- "test"
   sim <- simInit(times, params, modules = modules,
-                 objects = list(objectSynonyms = os),
+                 objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
                  paths = list(modulePath = tmpdir))
-
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
 
-})
+  sim <- Cache(simInit, times, params, modules = modules,
+                 objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+                 paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  sim <- Cache(simInit, times, params, modules = modules,
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  # test simInitAndSpades with Caching/memoising with objects
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  # test simInitAndSpades with Caching/memoising with NULL objects in the active bindings
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  })

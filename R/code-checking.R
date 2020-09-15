@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(".")
-}
+utils::globalVariables(".")
 
 # These are known functions that will definitely cause conflicts unless they are
 # prefixed by their packages.
@@ -26,14 +24,15 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 allCleanMessage <- "module code appears clean"
 cantCodeCheckMessage <- ": line could not be checked "
 
-#' Find all references to sim$
+#' Find all references to \code{sim$}
 #'
 #' @param envToFindSim An environment where sim is defined. This is used when
 #'                     the element accessing the simList is actually a call, e.g.,
 #'                     \code{sim[[P(sim)$stackName]]}
-#' @param moduleEnv The environment where the module functions are
-#' @param type Either "get", "assign", or "globals". See details.
 #'
+#' @param moduleEnv The environment where the module functions are.
+#'
+#' @param type Either "get", "assign", or "globals". See details.
 #'
 #' @details
 #' \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
@@ -47,7 +46,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
 #' LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 #' scans for all functions (i.e., "globals") being used. This is similar to
-#' \code{\link[codetools]{findGlobals}}, but faster.
+#' \code{codetools::findGlobals}, but faster.
 #'
 #' @return
 #' A character string with all sim objects found
@@ -55,8 +54,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @author Eliot McIntire
 #' @keywords internal
 #' @rdname findElements
-.findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(),
-                               type) {
+.findElementsInEnv <- function(envToFindSim = parent.frame(), moduleEnv = parent.frame(), type) {
   out <- unlist(unique(lapply(names(moduleEnv), function(x) {
     if (is.function(moduleEnv[[x]])) {
 
@@ -127,15 +125,15 @@ cantCodeCheckMessage <- ": line could not be checked "
   return(out)
 }
 
-#' @keywords internal
 #' @param x A call in which to search for sim
-#' @inheritParams .findElementsInEnv
+#'
 #' @details
 #' \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
 #' \code{type = "assign"}. Usually this is a test of existence of that object, in
 #' order to assign to that object. It is only reading it to determine whether or
 #' not it should write to it.
 #'
+#' @keywords internal
 #' @rdname findElements
 .findElement <- function(x, type) {
   if (is.atomic(x)) {
@@ -182,7 +180,7 @@ cantCodeCheckMessage <- ": line could not be checked "
       } else if (identical(x[[1]], quote(`<-`)) ) {
         if (length(x[[2]]) > 1) {
           if (is.call(x[[2]][[2]])) {
-            if (any(grepl(x[[2]][[2]], pattern = ".xData"))) {# i.e., sim@.xData
+            if (any(grepl(x[[2]][[2]], pattern = ".xData"))) {# i.e., sim@.xData$.mods
               assigner <- FALSE
             } else {
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
@@ -247,9 +245,10 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' Runs a series of code checks during simInit
 #'
-#' This uses codetools::codeCheck for function consistency, and
-#' codetools::findGlobals to check for function collisions with known,
-#' common function collisions (raster::stack, raster::scale)
+#' This uses custom tools and some optional tools in \code{codetools}
+#' package to check for function collisions with known,
+#' common function collisions (raster::stack, raster::scale).
+#' All outputs will be sent as messages.
 #'
 #' @param sim simList
 #' @param m module name
@@ -266,19 +265,19 @@ cantCodeCheckMessage <- ": line could not be checked "
   outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
 
   # search for all sim$xx <-  or sim[[xxx]] <- in module code
-  simAssigns <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "assign")
+  simAssigns <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "assign")
   simAssigns <- simAssigns[!(simAssigns %in% ignoreObjectsAssign)]
 
   # search for all '<- sim$' or '<- sim[[xxx]]' in module code
-  simGets <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "get")
+  simGets <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "get")
   simGets <- simGets[!(simGets %in% ignoreObjectsGet)]
 
-  returnsSim <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "returnSim")
+  returnsSim <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "returnSim")
   returnsSim <- tapply(returnsSim, names(returnsSim), function(xx) any(xx == "sim"))
 
-  assignToSim <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "assignToSim")
+  assignToSim <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "assignToSim")
 
-  fg <- .findElementsInEnv(environment(), sim@.xData[[m]], type = "globals")
+  fg <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "globals")
   hasConflicts <- fg[fg %in% conflictingFnsSimple]
 
   # Can't code check:
@@ -409,8 +408,10 @@ cantCodeCheckMessage <- ": line could not be checked "
     getOption("spades.moduleCodeChecks")
   }
 
+  needInstall("codetools",
+              messageStart = "Some code checking can't be done with codetools package: ")
   checkUsageMsg <- capture.output(
-    do.call(checkUsageEnv, args = append(list(env = sim@.xData[[m]]), checks))
+    do.call(codetools::checkUsageEnv, args = append(list(env = sim@.xData$.mods[[m]]), checks))
   )
   checkUsageMsg <- grep(checkUsageMsg, pattern = "doEvent.*: parameter",
                         invert = TRUE, value = TRUE)
@@ -418,8 +419,6 @@ cantCodeCheckMessage <- ": line could not be checked "
     hadPrevMessage <- unique(unlist(lapply(checkUsageMsg, function(x)
       .parseMessage(m, "module code", message = x))))
   }
-
-
 
   #############################################################
   #######  Conflicting Functions ##############################
@@ -520,9 +519,9 @@ cantCodeCheckMessage <- ": line could not be checked "
   }
 
   # search for conflicts in module function names with common problems, like quickPlot::Plot
-  clashingFuns <- names(sim@.xData[[m]])[names(sim@.xData[[m]]) %in% clashingFnsSimple]
+  clashingFuns <- names(sim@.xData$.mods[[m]])[names(sim@.xData$.mods[[m]]) %in% clashingFnsSimple]
   if (length(clashingFuns)) {
-    fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.xData[[m]])]
+    fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.xData$.mods[[m]])]
     verb <- .verb(clashingFuns)
     hadPrevMessage <- .parseMessage(m, "module functions", paste0(
             paste(clashingFuns, collapse = ", "), " ", verb,
@@ -571,8 +570,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' Chose verb conjugation for "to be"
 #'
-#' @param item The item to accord conjugation with. If length 1, then "is"
-#' else "are"
+#' @param item The item to accord conjugation with. If length 1, then "is" else "are".
 #'
 #' @return
 #' "is" or "are"
@@ -585,8 +583,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
 #' \code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}
+#'
 #' @keywords internal
-#' @inheritParams .findElements
 #' @rdname findElements
 .parsingSim <- function(x, type) {
   if (length(x) > 1) {
@@ -640,7 +638,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 .lineNumbersInSrcFile <- function(sim, module, namedTxt, pd) {
   if (!missing(sim)) {
-    pd <- sim@.xData[[module]][["._parsedData"]]
+    pd <- sim@.xData$.mods[[module]][["._parsedData"]]
   }
   lineNumbers <- lapply(seq(namedTxt), function(patternIndex) {
     patt <- gsub("\\(", "\\\\(", namedTxt[patternIndex])

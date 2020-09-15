@@ -2,7 +2,7 @@
 % Please edit documentation in R/cache.R
 \name{.findSimList}
 \alias{.findSimList}
-\title{Find simList in a nested list}
+\title{Find \code{simList} in a nested list}
 \usage{
 .findSimList(x)
 }
@@ -11,5 +11,5 @@
 \code{simList} in it}
 }
 \description{
-This is recursive, so it will find the all simLists even if they are deeply nested.
+This is recursive, so it will find the all \code{simList}s even if they are deeply nested.
 }

@@ -1,6 +1,4 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c("fun", "loadTime", "package"))
-}
+utils::globalVariables(c("fun", "loadTime", "package"))
 
 #' File extensions map
 #'
@@ -10,17 +8,19 @@ if (getRversion() >= "3.1.0") {
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
+    "asc", "raster", "raster",
+    "csv", "read.csv", "utils",
+    "png", "raster", "raster",
+    "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "tif", "raster", "raster",
-    "png", "raster", "raster",
-    "csv", "read.csv", "utils",
     "shp", "readOGR", "rgdal",
-    "txt", "read.table", "utils",
-    "asc", "raster", "raster")),
+    "tif", "raster", "raster",
+    "txt", "read.table", "utils"
+    )),
     stringsAsFactors = FALSE)
   colnames(.fE) <- c("exts", "fun", "package")
   return(.fE)
@@ -36,7 +36,6 @@ if (getRversion() >= "3.1.0") {
 fileName <- function(x) {
   return(unlist(strsplit(basename(unlist(x)), "\\..*$")))
 }
-
 
 # The load doEvent
 doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
@@ -65,7 +64,6 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist
-#' @importFrom stringi stri_detect_fixed
 #' @importFrom raster inMemory
 #' @importFrom utils getFromNamespace
 #' @include simulation-simInit.R
@@ -172,11 +170,9 @@ setMethod(
                   stop("'inputs' often requires (like now) that package be specified",
                        " explicitly in the 'fun' column, e.g., base::load")
                 }
-
               } else {
                 objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
               }
-
             } else {
               objListEnv <- quickPlot::whereInStack(filelist$objectName[y])
               objList <- list(get(filelist$objectName[y], objListEnv))
@@ -220,7 +216,6 @@ setMethod(
             if (identical(loadFun[y], "load")) {
               do.call(getFromNamespace(loadFun[y], loadPackage[y]),
                       args = argument, envir = sim@.xData)
-
             } else {
               sim[[filelist[y, "objectName"]]] <-
                 if (is.na(loadPackage[y])) {
@@ -229,8 +224,6 @@ setMethod(
                   do.call(getFromNamespace(loadFun[y], loadPackage[y]),
                           args = argument)
                 }
-
-
             }
             filelist[y, "loaded"] <- TRUE
 
@@ -324,3 +317,23 @@ setMethod("rasterToMemory",
             r <- setValues(r, getValues(r))
             return(r)
 })
+
+#' Load a saved \code{simList} from file
+#'
+#' @param file Character giving the name of a saved simulation file
+#'
+#' @export
+#' @importFrom qs qread
+loadSimList <- function(file) {
+  sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
+
+  mods <- setdiff(sim@modules, .coreModules())
+  ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
+  lapply(mods, function(mod) {
+    if (!is.null(sim$.mods[[mod]]))
+      rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
+    makeModActiveBinding(sim = sim, mod = mod)
+  })
+
+  return(sim)
+}

@@ -4,6 +4,8 @@
 \name{simList-class}
 \alias{simList-class}
 \alias{simList}
+\alias{simList_-class}
+\alias{simList_}
 \title{The \code{simList} class}
 \description{
 Contains the minimum components of a \code{SpaDES} simulation.
@@ -26,15 +28,20 @@ more efficient).
 \item{\code{params}}{Named list of potentially other lists specifying simulation
 parameters.}
 
-\item{\code{events}}{The list of scheduled events (i.e., event queue), as a
-\code{data.table}. See 'Event Lists' for more information.}
+\item{\code{events}}{The list of scheduled events (i.e., event queue), which can
+be converted to a sorted \code{data.table} with \code{events(sim)}.
+See 'Event Lists' for more information.}
 
 \item{\code{current}}{The current event, as a \code{data.table}.
 See 'Event Lists' for more information..}
 
-\item{\code{completed}}{The list of completed events, as a \code{list}.
+\item{\code{completed}}{An environment consisting of completed events, with
+each object named a character representation of the order
+of events. This was converted from a previous version which
+was a list. This was changed because the list became
+slow as number of events increased.
 See 'Event Lists' for more information. It is kept
-as a list of individual events for speed. The \code{completed}
+as an environment of individual events for speed. The \code{completed}
 method converts it to a sorted \code{data.table}.}
 
 \item{\code{depends}}{A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
@@ -71,7 +78,8 @@ The \code{\link{simList_}} class is similar, but it extends the \code{list}
 class. All other slots are the same.
 Thus, \code{simList} is identical to \code{simList_}, except that the former
 uses an environment for objects and the latter uses a list.
-The class \code{simList_} is only used internally.
+The class \code{simList_} is only used internally when saving/loading, because
+saving/loading a list behaves more reliably than saving/loading an environment.
 }
 \section{Accessor Methods}{
 
@@ -108,7 +116,7 @@ Each event is represented by a \code{\link{data.table}} row consisting of:
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
             San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://www.nostarch.com/artofr.htm}
+            Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \author{
 Alex Chubaty and Eliot McIntire

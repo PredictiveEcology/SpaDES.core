@@ -1,4 +1,4 @@
-test_that("simulation runs with simInit and spades", {
+test_that("simulation runs with simInit and spades with set.seed", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -6,107 +6,58 @@ test_that("simulation runs with simInit and spades", {
 
   set.seed(42)
 
-  times <- list(start = 0.0, end = 10, timeunit = "year")
+  times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes", #"caribouMovement",
+                  "fireSpread")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
+  set.seed(123)
   mySim <- simInit(times, params, modules, objects = list(), paths) %>%
-    spades(debug = FALSE)
+    spades(debug = FALSE, .plotInitialTime = NA)
+  set.seed(123)
+  mySim2 <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA)
 
   ## simtime
-  expect_equivalent(time(mySim), 10.0)
+  expect_equivalent(time(mySim), 1.0)
   expect_equivalent(start(mySim), 0.0)
-  expect_equivalent(end(mySim), 10.0)
+  expect_equivalent(end(mySim), 1.0)
+  expect_true(all.equal(mySim2, mySim))
 
-  ## sim results
-  ## NOTE: version 3.3.4 of RandomFields completely changed the values!!!
-  burnedLast <- c(1725, 126, 816, 2136, 1836, 825, 1381, 1507, 1509, 1624)
-
-  pos_x <- c(3.67198762961861, 43.5696708785149, 47.2305734618245, 3.60246886799683,
-             20.2341208513449, -47.8103385360554, 16.549667617437, -21.4073219999126,
-             -47.2769911726926, -6.90873327788373, 36.835560427439, 12.9374835943128,
-             40.5674117042784, -11.7361472823519, -41.5713366897425, 34.5473813500302,
-             48.7716328246997, 1.17105329929266, 35.5846164245956, -7.86561428907069,
-             -46.3823959510007, -15.5702817526754, -30.8126668166424, -10.8010597558361,
-             -21.621652166683, -34.9716907591623, 25.5631391945506, -39.4952612681468,
-             -25.1246681360093, 21.622935348448, -14.4866699835992, -49.0314824104314,
-             29.5110481868387, 29.2980035604069, -43.4047992834982, -29.9034739927016,
-             -47.4019699552285, 16.4433227782692, -14.9724014492504, 29.3395340026156,
-             13.6774863068155, -34.9815939568256, -49.2326424452628, -24.63099179726,
-             29.5125886276067, 23.458819195019, -49.267195519905, -38.9791254541313,
-             -28.2266566260833, 13.5885336184307, -20.6503350281957, -33.8303967733853,
-             -24.1745353595507, -31.3420623391095, 6.61947623399171, -21.1950814939711,
-             -1.33380687943018, -3.75424367990195, -14.1989815964155, 39.9509364652245,
-             11.3294250869671, -45.6319461016064, -20.4925846467192, 33.5846108424744,
-             -27.8641689486461, 49.2799565507116, 10.6300284406548, 9.82084260223184,
-             -14.0267505658531, -38.7461668664082, -17.4223198195779, -42.0410983042247,
-             13.116781230502, -30.2946890723426, -7.24177892193424, -48.5130451079312,
-             17.1057771797333, -34.2704160400112, 45.5029029338103, -45.8001752305177,
-             -17.2400741380727, 44.8468809094991, -30.2109608623335, 36.1406259127961,
-             49.5797105154377, 37.9715152273499, 28.9228258650546, 0.0171507589597368,
-             -49.8120291449472, -0.98955203861027, -23.0873331875497, 37.1384151375969,
-             -5.71780586016212, 43.5434737540987, 30.4242728959723, -26.1180246775251,
-             -41.1416482549562, -27.6357211052713, -44.4316026481829, -5.95912959330009)
-
-  pos_y <- c(-15.001761220824, -5.35080605403711, 19.5077777843759, -36.397145230444,
-             -33.6423155958808, 15.5654887730343, 15.1161302639245, 39.6292863891733,
-             -6.33467507909924, 18.7170224485725, 9.9439345128018, -35.6163117424963,
-             30.3189149133229, 36.3302747888531, -20.5841744054804, 35.0724288881633,
-             6.89301514649688, 26.6513337958583, 40.7971294972673, -42.5921974005888,
-             -25.1956144258027, 8.07885129937992, -4.96023665998145, -17.0580144244664,
-             6.70757582479894, -30.0547962733918, -26.9514004855529, 9.51961127097033,
-             45.8924961557304, -35.064160676, 15.9600129744977, -11.0340528019363,
-             15.0513989967463, 28.2511337198897, 12.6024406421523, 29.6186430588117,
-             -39.7428219762265, 35.4932893119247, -43.7241362328051, -37.9005457120927,
-             12.0957051751919, 23.8288477776908, -19.2354379455293, 23.8879129871873,
-             33.7143251941822, -3.12072701146833, -31.6235585354086, 16.7528980653008,
-             36.7097153167129, -11.7295242023283, -6.94989772244249, 13.9367056129548,
-             28.4679184711446, -15.8080671318301, -3.55494838851763, 14.9708684826552,
-             -38.8792113697679, -15.9961364230978, 37.0641490103275, 37.8956868303261,
-             47.326711092004, 26.553518278515, -49.1534947969543, -10.7774399881724,
-             15.8927912475565, -6.9736291044513, 3.01107884790719, -33.4855281463676,
-             -11.9831588943045, -38.8181249029193, -6.62110647477371, 45.9736674749952,
-             -34.1942437078733, -40.9635623302871, 5.17629246277392, -6.68267453641167,
-             29.1209898564489, 45.3398473666519, -30.5369457698111, -42.9088551558613,
-             -19.1027196578503, -4.02030489693142, 2.12143116091905, -44.4144553066295,
-             10.7604128113847, -49.9396648839783, 45.0920147869853, -0.0581486970932161,
-             9.09784601154538, 35.1429818255256, 1.65204980292364, -46.334526877774,
-             32.4348917623925, 38.1377734360978, 44.4057542471017, 19.6370212341059,
-             -47.8588704211158, 12.5778638346433, 27.527048666893, 7.68312730236396)
-
-  expect_equal(mySim$npixelsburned, burnedLast)
-  expect_equivalent(mySim$caribou$x, pos_x)
-  expect_equivalent(mySim$caribou$y, pos_y)
 })
 
-test_that("spades calls with different signatures don't work", {
+test_that("spades calls - diff't signatures", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
 
+  #innerClasses <<- 1
+  #browser()
   a <- simInit()
   a1 <- Copy(a)
-  expect_output(spades(a, debug = TRUE), "eventTime")
+  opts <- options(spades.saveSimOnExit = FALSE)
+  expect_message(spades(a, debug = TRUE), "eventTime")
   expect_silent(spades(a, debug = FALSE))
   expect_silent(spades(a, debug = FALSE, .plotInitialTime = NA))
   expect_silent(spades(a, debug = FALSE, .saveInitialTime = NA))
-  expect_output(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
-  expect_output(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
+  opts <- options(opts)
+  expect_message(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
+  expect_message(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
                     capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
 
-  expect_output(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
-                "This is the current event")
-  expect_output(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
+  expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+        "eventTime *moduleName *eventType *eventPriority")
+  expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
                 "moduleName")
-  expect_output(spades(a, debug = "simList", .plotInitialTime = NA),
+  expect_message(spades(a, debug = "simList", .plotInitialTime = NA),
                 "Completed Events")
 
   if (interactive()) {
@@ -114,13 +65,16 @@ test_that("spades calls with different signatures don't work", {
     expect_output(spades(a, progress = "text", debug = TRUE), "20%")
     expect_output(spades(a, progress = "text"), "..........| 100%")
   }
+  opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(spades(a, debug = FALSE, progress = FALSE))
   expect_silent(spades(a, debug = FALSE, progress = "rr"))
+  opts <- options(opts)
 
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
   a <- Copy(a1)
-  expect_output(spades(a, cache = TRUE, debug = TRUE, notOlderThan = Sys.time()), "eventTime")
-  expect_true(all(c("backpack.db", "gallery") %in% dir(paths(a)$cachePath)))
+  expect_message(spades(a, cache = TRUE, debug = TRUE, notOlderThan = Sys.time()), "eventTime")
+  expect_true(all(basename2(c(CacheDBFile(paths(a)$cachePath), CacheStorageDir(paths(a)$cachePath))) %in%
+                    dir(paths(a)$cachePath)))
   file.remove(dir(paths(a)$cachePath, full.names = TRUE, recursive = TRUE))
 
   # test for system time ... in this case, the first time through loop is slow
@@ -142,6 +96,15 @@ test_that("spades calls with different signatures don't work", {
     paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
     assign(paste0("st", i), system.time(spades(a, cache = TRUE, .plotInitialTime = NA)))
   }
+  params1 <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = c(nx = 20, ny = 20)
+  )
+  expect_error(a <- simInit(times, params1, modules, paths = paths))
+  expect_error(a <- simInit(list(3, "a", "s"), params, modules, paths = paths))
+  err <- capture_error(a <- simInit(list(3, "years", start = 1), params, modules, paths = paths))
+  expect_true(is.null(err))
+
   #expect_gt(st1[1], st2[1]) ## no longer true on R >= 3.5.1 ??
   file.remove(dir(paths(a)$cachePath, full.names = TRUE, recursive = TRUE))
 })
@@ -156,13 +119,13 @@ test_that("simInit with R subfolder scripts", {
   cat(file = file.path("child1", "R", "script.R"),
       "a <- function(poiuoiu) {
       poiuoiu + 1
-}", sep = "\n")
+  }", sep = "\n")
   mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir))
-  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData, all.names = TRUE), function(x) {
-    if (is.environment(mySim@.xData[[x]])) ls(envir = mySim@.xData[[x]], all.names = TRUE)
+  expect_true(sum(grepl(unlist(lapply(ls(mySim@.xData$.mods, all.names = TRUE), function(x) {
+    if (is.environment(mySim@.xData$.mods[[x]])) ls(envir = mySim@.xData$.mods[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
-  expect_true(mySim@.xData$child1$a(2) == 3) # Fns
-  })
+  expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
+})
 
 test_that("simulation runs with simInit with duplicate modules named", {
   testInitOut <- testInit()
@@ -180,9 +143,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
   modules <- list("randomLandscapes", "randomLandscapes", "caribouMovement")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 
-  expect_true(any(grepl(capture_messages(
+  expect_true(any(grepl(capture_messages({
     mySim <- simInit(times, params, modules, objects = list(), paths)
-  ), pattern = "Duplicate module")))
+  }), pattern = "Duplicate module")))
   expect_true(length(modules(mySim)) != length(modules))
   expect_true(length(modules(mySim)) == length(unique(modules)))
 })
@@ -217,9 +180,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
       reqdPkgs = list(),
       parameters = rbind(
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 
@@ -252,9 +215,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
       reqdPkgs = list(),
       parameters = rbind(
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 
@@ -274,7 +237,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   N <- 5000
 
   moduleDir <- file.path(tmpdir)
-  inputDir <- file.path(moduleDir, "inputs") %>% reproducible::checkPath(create = TRUE)
+  inputDir <- file.path(moduleDir, "inputs") %>% checkPath(create = TRUE)
   outputDir <- file.path(moduleDir, "outputs")
   cacheDir <- file.path(outputDir, "cache")
   times <- list(start = 0, end = N)
@@ -304,48 +267,52 @@ test_that("simulation runs with simInit with duplicate modules named", {
   # Windows Desktop -- slower -- Nov 26, 2018 0.730 Seconds --> 148 microseconds/event!
   # Linux Server -- slower -- Nov 26, 2018 0.795 Seconds --> 159 microseconds/event!
   # BorealCloud Server -- slower -- Nov 26, 2018 0.972 Seconds --> 194 microseconds/event!
+  # laptop -- May 25, 2019 0.603 Seconds --> 120 microseconds/event!
+  # laptop with new completed as environment -- May 25, 2019 0.357 Seconds --> 71 microseconds/event!
   options("spades.keepCompleted" = TRUE)
-  microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
-
-  # Turn off completed list
-  #  Changed to use "seconds" -- better comparison with simple loop
-  # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
-  #                         -- This is 161 microseconds per event
-  # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
-  # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
-  # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
-  # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
-  # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
-  options("spades.keepCompleted" = FALSE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
-
-  a <- 0
-  a3 <- microbenchmark::microbenchmark(
-    for (i in 1:N) {
-      a <- a + 1
-    }
-  )
-
-  summary(a2)[, "median"]/summary(a3)[, "median"]
-
-  ########################################
-  # With 2 modules, therefore sorting
-  ########################################
-  modules <- list("test", "test2")
-  mySim <- simInit(times = times, params = parameters, modules = modules,
-                   objects = objects, paths = paths)
-
-  nTimes <- 10
-  # Turn off completed list
-  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
-  options("spades.keepCompleted" = FALSE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-  #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
-
-  # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
-  options("spades.keepCompleted" = TRUE)
-  (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  # microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
+  #
+  # # Turn off completed list
+  # #  Changed to use "seconds" -- better comparison with simple loop
+  # # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
+  # #                         -- This is 161 microseconds per event
+  # # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
+  # # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
+  # # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
+  # # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
+  # # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
+  # # With many new "exists"
+  # # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
+  # options("spades.keepCompleted" = FALSE)
+  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  # #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
+  #
+  # a <- 0
+  # a3 <- microbenchmark::microbenchmark(
+  #   for (i in 1:N) {
+  #     a <- a + 1
+  #   }
+  # )
+  #
+  # summary(a2)[, "median"]/summary(a3)[, "median"]
+  #
+  # ########################################
+  # # With 2 modules, therefore sorting
+  # ########################################
+  # modules <- list("test", "test2")
+  # mySim <- simInit(times = times, params = parameters, modules = modules,
+  #                  objects = objects, paths = paths)
+  #
+  # nTimes <- 10
+  # # Turn off completed list
+  # # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
+  # options("spades.keepCompleted" = FALSE)
+  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
+  # #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
+  #
+  # # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
+  # options("spades.keepCompleted" = TRUE)
+  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
 })
 
 test_that("conflicting function types", {
@@ -376,7 +343,7 @@ test_that("conflicting function types", {
 
       levels(poiuoiu) <- rat
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
@@ -391,7 +358,7 @@ test_that("conflicting function types", {
       poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
       poiuoiu <- scale(poiuoiu)
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  "raster::scale")
@@ -403,7 +370,7 @@ test_that("conflicting function types", {
       poiuoiu <- raster::scale(poiuoiu)
       sim$poiuoiu <- poiuoiu
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  "poiuoiu is assigned")
@@ -432,7 +399,7 @@ test_that("conflicting function types", {
       sim@.xData$g1 <- f
       return(list(a, d, f, sim))
       ",
-      xxx1[(lineWithInit+1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
+      xxx1[(lineWithInit + 1):length(xxx1)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
@@ -462,14 +429,14 @@ test_that("conflicting function types", {
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_error(simInit(paths = list(modulePath = tmpdir), modules = m),
                c(paste0(m, ": You have created an object")))
 
   # declared in metadata inputObjects
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
-  cat(xxx[1:(lineWithInputObjects-1)], "
+  cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('a', 'numeric', '', '')
       ",
       xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
@@ -479,22 +446,22 @@ test_that("conflicting function types", {
 
   # declared in metadata outputObjects
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
-  cat(xxx[1:(lineWithOutputObjects-1)], "
+  cat(xxx[1:(lineWithOutputObjects - 1)], "
       createsOutput('b', 'numeric', '')
       ",
-      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInputObjects + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  c(paste0(m, ": module code: b is declared in metadata outputObjects")))
 
-  cat(xxx[1:(lineWithInputObjects-1)], "
+  cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('a', 'numeric', '', '')
       ",
-      xxx[(lineWithInputObjects+1):(lineWithOutputObjects-1)],
+      xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)],
       "
       createsOutput('b', 'numeric', '')
       ",
-      xxx[(lineWithOutputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInputObjects + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
@@ -528,15 +495,17 @@ test_that("conflicting function types", {
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
   lineWithDotInputObjects <- grep(xxx, pattern = "\\.inputObjects")[1]
-  cat(xxx[1:(lineWithInputObjects-1)], "
-      expectsInput('ei1', 'numeric', '', ''),
+  cat(xxx[1:(lineWithInputObjects - 1)], "
+      expectsInput('ei1', 'numeric', desc = 'This is a test with    spaces
+                    and EOL', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
-      expectsInput('ei4', 'numeric', '', '')
+      expectsInput('ei4', 'numeric', '', 'test.com')
       ",
       xxx[(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
-      createsOutput('co2', 'numeric', ''),
+      createsOutput('co2', 'numeric', desc = 'This is a test with    spaces
+                    and EOL on the      createsOutputs'),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
@@ -553,6 +522,15 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
+      url1 <- extractURL('ei4')
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without sim or module fails')
+      url1 <- extractURL('ei4', sim = sim)
+      if (!identical(url1, 'test.com'))
+        stop('extractURL without module fails')",
+paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
+      if (!identical(url1, 'test.com'))
+        stop('extractURL fails')
       sim$g <- 1
       sim$ei1 <- 4
       fff <- sim$ei1
@@ -578,7 +556,9 @@ test_that("conflicting function types", {
     "child4: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects"
   )
 
-  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  mm <- capture_messages({
+    mySim <- simInit(paths = list(modulePath = tmpdir), modules = m)
+  })
   mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
   # for (x in seq(fullMessage)) {
@@ -590,6 +570,30 @@ test_that("conflicting function types", {
   #   }
   #   expect_true(theGrep)
   # }
+  x1 <- moduleMetadata(mySim)
+  sns <- slotNames(mySim@depends@dependencies[[m]])
+  names(sns) <- sns
+  x2 <- lapply(sns, function(sn) {
+    slot(mySim@depends@dependencies[[m]], sn)
+  })
+  expect_true(any(unlist(lapply(x2, function(v)
+    grepl("  |\n", v)))))
+  x2 <- rmExtraSpacesEOLList(x2)
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x2, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleParams(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleInputs(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+  x1 <- moduleOutputs(m, dirname(dirname(fileName)))
+  expect_false(any(unlist(lapply(x1, function(v)
+    grepl("  |\n", v)))))
+
+
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
@@ -605,8 +609,9 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
   #lineWithInit <- grep(xxx, pattern = "^Init")
 
   xxx1 <- gsub(xxx, pattern = '.plotInitialTime', replacement = '.plotInitialTim') # nolint
-  xxx2 <- gsub(",$", grep(".plotInitialTim\\>", xxx1, value = TRUE)[1], replacement = "")
-  xxx3 <- parse(text = xxx2)
+  xxx2a <- grep(".plotInitialTim\\>", xxx1, value = TRUE)[1]
+  xxx2b <- gsub(",$", grep("time interval between plot", xxx1, value = TRUE), replacement = "")
+  xxx3 <- parse(text = paste(xxx2a, xxx2b))
   # show that it is logical
   expect_true(is.logical(eval(xxx3)$default[[1]]))
 
@@ -664,19 +669,19 @@ test_that("messaging with multiple modules", {
                     "\\testtime\", \"logical\", NA_real_", xxx1[[3]])
   xxx1[[4]] <- xxx[[4]] # clean one
 
-  cat(xxx1[[1]][1:(lineWithInputObjects-1)], "
+  cat(xxx1[[1]][1:(lineWithInputObjects - 1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei2', 'numeric', '', ''),
       expectsInput('ei3', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx1[[1]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx1[[1]][(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co2', 'numeric', ''),
       createsOutput('co3', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx1[[1]][(lineWithOutputObjects+1):lineWithInit], "
+      xxx1[[1]][(lineWithInputObjects + 1):lineWithInit], "
       a <- sim$b
       sim$g <- f
       holy(sim$co4) <- f
@@ -687,7 +692,7 @@ test_that("messaging with multiple modules", {
       xx <- c(1,2)
       xx[sim$ei4] <- NA
       ",
-      xxx1[[1]][(lineWithInit+1):lineWithDotInputObjects], "
+      xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
       sim$g <- 1
       sim$ei1 <- 4
@@ -695,28 +700,28 @@ test_that("messaging with multiple modules", {
       fff <- sim$co3
       sim$co1 <- 123
       ",
-      xxx1[[1]][(lineWithDotInputObjects+1):length(xxx1[[1]])],
+      xxx1[[1]][(lineWithDotInputObjects + 1):length(xxx1[[1]])],
       sep = "\n", fill = FALSE, file = fileNames[1])
 
 
-  cat(xxx1[[2]][1:(lineWithInputObjects-1)], "
+  cat(xxx1[[2]][1:(lineWithInputObjects - 1)], "
       expectsInput('ei1', 'numeric', '', ''),
       expectsInput('ei4', 'numeric', '', '')
       ",
-      xxx1[[2]][(lineWithInputObjects+1):(lineWithOutputObjects-1)], "
+      xxx1[[2]][(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
       createsOutput('co1', 'numeric', ''),
       createsOutput('co4', 'numeric', '')
       ",
-      xxx1[[2]][(lineWithOutputObjects+1):lineWithInit], "
+      xxx1[[2]][(lineWithInputObjects + 1):lineWithInit], "
       a <- sim$b
       xx <- c(1,2)
       xx[sim$ei4] <- NA
       ",
-      xxx1[[2]][(lineWithInit+1):lineWithDotInputObjects], "
+      xxx1[[2]][(lineWithInit + 1):lineWithDotInputObjects], "
       a <- sim$b
       sim$co1 <- 123
       ",
-      xxx1[[2]][(lineWithDotInputObjects+1):length(xxx1[[2]])],
+      xxx1[[2]][(lineWithDotInputObjects + 1):length(xxx1[[2]])],
       sep = "\n", fill = FALSE, file = fileNames[2])
 
   fullMessage <- c(
@@ -752,7 +757,7 @@ test_that("messaging with multiple modules", {
     "test4: module code appears clean"
   )
 
-  for(y in 3:4) {
+  for (y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
 
@@ -808,7 +813,7 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
 
       sim$a <- 1
       ",
-      xxx[(lineWithInit+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   mm <- cleanMessage(mm)
@@ -841,7 +846,6 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   #   cat(paste(collapse = "\n", mm), file = tmpFilename, append = TRUE)
   # }
   expect_true(test1 || test2)
-
 })
 
 test_that("simInitAndSpades", {
@@ -871,16 +875,110 @@ test_that("simInitAndSpades", {
     spades(debug = FALSE)
 
   expect_true(all.equal(mySim, mySim2))
+})
 
-  set.seed(123)
-  mySim <- simInitAndExperiment(times = times, params = params,
-                                modules = modules, objects = list(), paths = paths, debug = FALSE)
+test_that("scheduleEvent with invalid values for eventTime", {
+  testInitOut <- testInit()
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  s <- simInit(times = list(start = 1, end = 10))
+  expect_error({
+    s <- scheduleEvent(s, eventTime = -1, eventType = "test1", moduleName = "test")
+  })
+  expect_warning({
+    s <- scheduleEvent(s, eventTime = numeric(), eventType = "test1", moduleName = "test")
+  })
+  expect_error({
+    s <- scheduleEvent(s, eventTime = 0, eventType = "test1", moduleName = "test")
+  })
+})
 
-  set.seed(123)
-  mySim2 <- simInit(times = times, params = params,
-                    modules = modules, objects = list(), paths = paths) %>%
-    experiment(debug = FALSE)
+test_that("debug using logging", {
+  testInitOut <- testInit(tmpFileExt = "log")
+  if (requireNamespace("logging")) {
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
 
-  expect_true(all.equal(mySim, mySim2))
+    set.seed(42)
 
+    times <- list(start = 0.0, end = 1, timeunit = "year")
+    params <- list(
+      .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .useCache = "init"),
+      caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    )
+    modules <- list("randomLandscapes")
+    paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+
+    set.seed(123)
+    mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
+    logging::logReset()
+    unlink(tmpfile)
+    expect_false(file.exists(tmpfile))
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        mySim2 <- spades(Copy(mySim),
+                         debug = list("console" = list(level = 10), debug = 1),
+                         .plotInitialTime = NA)
+      })
+    })
+    expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
+    expect_true(any(grepl("total elpsd", mess2)))
+    expect_true(any(grepl(Sys.Date(), mess2))) # the loginfo does have date
+    expect_false(any(grepl(Sys.Date(), mess1))) # original debug has date added
+
+    logging::logReset()
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        mySim2 <- spades(Copy(mySim),
+                         debug = list("console" = list(level = 5),
+                                      "file" = list(file = tmpfile),
+                                      debug = 1),
+                         .plotInitialTime = NA)
+      })
+    })
+
+    expect_true(file.exists(tmpfile))
+    log1 <- readLines(tmpfile)
+    expect_true(any(grepl("total elpsd", log1)))
+    expect_true(any(grepl(Sys.Date(), log1)))
+    expect_false(any(grepl("total elpsd", mess1)))  # messages not produced with debug as list
+    unlink(tmpfile)
+
+    logging::logReset()
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        mySim2 <- spades(Copy(mySim), debug = 1, .plotInitialTime = NA)
+      })
+    })
+    expect_false(file.exists(tmpfile))
+    expect_true(length(mess2) == 0)
+    expect_true(any(grepl("total elpsd", mess1)))
+    expect_true(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+
+    # Test whether suppressMessages works
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        suppressMessages({
+          mySim2 <- spades(Copy(mySim),
+                           debug = list("console" = list(level = "INFO"), debug = 1),
+                           .plotInitialTime = NA)
+          })
+      })
+    })
+    expect_true(length(mess1) == 0)
+
+    # Test whether suppressMessages works
+    mess1 <- capture_messages({
+      mess2 <- capture.output(type = "output", {
+        suppressMessages({
+          mySim2 <- spades(Copy(mySim), debug = 1, .plotInitialTime = NA)
+        })
+      })
+    })
+    expect_true(length(mess1) == 0)
+  }
 })

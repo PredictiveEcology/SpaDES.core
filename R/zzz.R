@@ -1,34 +1,25 @@
 ## be sure to update the 'Package Options' section of the package help file
 ##   in R/spades-core-package.R
 ##
+# e = new.env()
+#
+# reg.finalizer(e, function(e) {
+#   message('Object Bye!')
+# }, onexit = TRUE)
+#
+#
+# finalize <- function(env) {
+#   print(ls(env))
+#   message("Bye from Name space Finalizer")
+# }
+
+.spadesTempDir <- file.path(tempdir(), "SpaDES")
+
 .onLoad <- function(libname, pkgname) {
   ## set options using the approach used by devtools
   opts <- options()
   reproCachePath <- getOption("reproducible.cachePath")
-  opts.spades <- list( # nolint
-    spades.browserOnError = FALSE,
-    #spades.cachePath = reproCachePath,
-    spades.debug = TRUE, # TODO: is this the best default? see discussion in #5
-    spades.inputPath = file.path(.spadesTempDir, "inputs"),
-    spades.lowMemory = FALSE,
-    spades.moduleCodeChecks = list(
-      skipWith = TRUE,
-      suppressNoLocalFun = TRUE,
-      suppressParamUnused = FALSE,
-      suppressPartialMatchArgs = FALSE,
-      suppressUndefined = TRUE
-    ),
-    spades.modulePath = file.path(.spadesTempDir, "modules"),
-    spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
-    spades.nCompleted = 10000L,
-    spades.outputPath = file.path(.spadesTempDir, "outputs"),
-    spades.saveSimOnExit = TRUE,
-    spades.switchPkgNamespaces = FALSE,
-    spades.tolerance = .Machine$double.eps ^ 0.5,
-    spades.useragent = "http://github.com/PredictiveEcology/SpaDES",
-    spades.useRequire = TRUE,
-    spades.keepCompleted = TRUE
-  )
+  opts.spades <- spadesOptions()
   toset <- !(names(opts.spades) %in% names(opts))
   if (any(toset)) options(opts.spades[toset])
 
@@ -39,8 +30,7 @@
   for (u in .spadesTimes) {
     bbs[[u]] <- bb
     attr(bbs[[u]], "unit") <- u
-    bbs[[u]] <- round(as.numeric(convertTimeunit(bbs[[u]], "seconds",
-                                                 skipChecks = TRUE)), 0)
+    bbs[[u]] <- round(as.numeric(convertTimeunit(bbs[[u]], "seconds", skipChecks = TRUE)), 0)
   }
   .pkgEnv[["unitConversions"]] <- as.matrix(as.data.frame(bbs))
 
@@ -52,12 +42,19 @@
                     env = pkgEnv
   )
 
+  # parent <- parent.env(environment())
+  # print(str(parent))
+  #reg.finalizer(parent, finalize, onexit= TRUE)
+
   invisible()
 }
 
 #' @importFrom reproducible normPath
 #' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
+  # module template path
+  .pkgEnv[["templatePath"]] <- system.file("templates", package = "SpaDES.core")
+
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     a <- capture.output(setPaths(), type = "message")
@@ -66,7 +63,11 @@
     packageStartupMessage(
       "To change these, use setPaths(...); see ?setPaths"
     )
+    packageStartupMessage(
+      "See ?spadesOptions for advanced features"
+    )
   }
+
   #unlockBinding("Paths", as.environment("package:SpaDES.core"))
   # rm("Paths", envir = as.environment("package:SpaDES.core"))
   # makeActiveBinding(sym = "Paths",
@@ -86,7 +87,6 @@
   #                   env = as.environment("package:SpaDES.core")
   # )
   # lockBinding("Paths", as.environment("package:SpaDES.core"))
-
 }
 
 .onUnload <- function(libpath) {
@@ -104,8 +104,3 @@
     options(spades.outputPath = NULL)
   }
 }
-
-.spadesTempDir <- file.path(tempdir(), "SpaDES")
-
-
-

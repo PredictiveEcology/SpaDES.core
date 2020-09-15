@@ -18,8 +18,8 @@ Included are numerous tools to visualize various spatial data formats,
 as well as non-spatial data. Much work has been done to speed up the core
 of the DES, with current benchmarking as low as 56 microseconds overhead for
 each event (including scheduling, sorting event queue, spawning event etc.) or
-38 microseconds if there is no sorting (i.e., no sorting occurs under simple
-conditions). Under most event conditions, therefore, the DES itself will contribute
+38 microseconds if there is no sorting (i.e., no sorting occurs under simple conditions).
+Under most event conditions, therefore, the DES itself will contribute
 very minimally compared to the content of the events, which may often be
 milliseconds to many seconds each event.
 
@@ -43,7 +43,10 @@ A collection of top-level functions for doing spatial discrete event simulation.
   \tabular{ll}{
     \code{\link{simInit}} \tab Initialize a new simulation\cr
     \code{\link{spades}} \tab Run a discrete event simulation\cr
-    \code{\link{experiment}} \tab Run multiple \code{\link{spades}} calls\cr
+    \code{experiment} \tab In \code{SpaDES.experiment} package.
+                                  Run multiple \code{\link{spades}} calls\cr
+    \code{experiment2} \tab In \code{SpaDES.experiment} package.
+                                  Run multiple \code{\link{spades}} calls\cr
   }
 }
 
@@ -108,7 +111,8 @@ of a \code{\link{simList}} object are summarized further below.
      \code{\link{modulePath}} \tab Global simulation module path.\cr
      \code{\link{inputPath}} \tab Global simulation input path.\cr
      \code{\link{outputPath}} \tab Global simulation output path.\cr
-     \code{\link{paths}} \tab Global simulation paths (cache, modules, inputs, outputs).\cr
+     \code{\link{rasterPath}} \tab Global simulation temporary raster path.\cr
+     \code{\link{paths}} \tab Global simulation paths (cache, modules, inputs, outputs, rasters).\cr
   }
 }
 
@@ -255,11 +259,12 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
   \tabular{ll}{
     \code{\link[SpaDES.tools]{adj}} \tab An optimized (i.e., faster) version of \code{\link[raster]{adjacent}}\cr
     \code{\link[SpaDES.tools]{cir}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*}} object\cr
-    \code{\link[SpaDES.tools]{directionFromEachPoint}} \tab Fast calculation of direction and distance surfaces\cr
+    \code{\link[SpaDES.tools:distanceFromEachPoint]{directionFromEachPoint}} \tab Fast calculation of direction and distance surfaces\cr
     \code{\link[SpaDES.tools]{distanceFromEachPoint}} \tab Fast calculation of distance surfaces\cr
     \code{\link[SpaDES.tools]{rings}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
     \code{\link[SpaDES.tools]{spokes}} \tab Identify outward radiating spokes from initial points\cr
     \code{\link[SpaDES.tools]{spread}} \tab Contagious cellular automata\cr
+    \code{\link[SpaDES.tools]{spread2}} \tab Contagious cellular automata, different algorithm, more robust\cr
     \code{\link[SpaDES.tools]{wrap}} \tab Create a torus from a grid\cr
   }
 }
@@ -271,8 +276,8 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
     \code{\link[SpaDES.tools]{crw}} \tab Simple correlated random walk function\cr
     \code{\link[SpaDES.tools]{heading}} \tab Determines the heading between \code{SpatialPoints*}\cr
     \code{\link[quickPlot]{makeLines}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
-    \code{\link[SpaDES.tools]{move}} \tab A meta function that can currently only take "crw"\cr
-    \code{\link[SpaDES.tools]{specificNumPerPatch}} \tab Initiate a specific number of agents per patch\cr
+    \code{\link[SpaDES.tools:crw]{move}} \tab A meta function that can currently only take "crw"\cr
+    \code{\link[SpaDES.tools:specnumperpatch-probs]{specificNumPerPatch}} \tab Initiate a specific number of agents per patch\cr
   }
 }
 
@@ -301,9 +306,9 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
   Here are several helper functions to add to, set and get colors of \code{Raster*} objects:
 
   \tabular{ll}{
-    \code{\link[quickPlot:setColors<-]{setColors}} \tab Set colours for plotting \code{Raster*} objects\cr
+    \code{\link[quickPlot:getSetColors]{setColors}} \tab Set colours for plotting \code{Raster*} objects\cr
     \code{\link{getColors}} \tab Get colours in a \code{Raster*} objects\cr
-    \code{\link{divergentColors}} \tab Create a color palette with diverging colors around a middle\cr
+    \code{\link{divergentColors}} \tab Create a colour palette with diverging colours around a middle\cr
   }
 }
 
@@ -323,21 +328,21 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
 
   \tabular{ll}{
     \code{\link{checkObject}} \tab Check for a existence of an object within a \code{simList} \cr
-    \code{\link[reproducible]{checkPath}} \tab Checks the specified filepath for formatting consistencies\cr
+    \code{\link[Require]{checkPath}} \tab Checks the specified filepath for formatting consistencies\cr
   }
 }
 
 \subsection{5.8 SELES-type approach to simulation}{
   These functions are essentially skeletons and are not fully implemented.
-  They are intended to make translations from \href{http://www.gowlland.ca/}{SELES}.
+  They are intended to make translations from SELES (https://www.gowlland.ca/).
   You must know how to use SELES for these to be useful:
 
   \tabular{ll}{
-    \code{\link[SpaDES.tools]{agentLocation}} \tab Agent location\cr
+    \code{\link[SpaDES.tools:SELESagentLocation]{agentLocation}} \tab Agent location\cr
     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
-    \code{\link[SpaDES.tools]{numAgents}} \tab Number of agents\cr
-    \code{\link[SpaDES.tools]{probInit}} \tab Probability of initiating an agent or event\cr
-    \code{\link[SpaDES.tools]{transitions}} \tab Transition probability\cr
+    \code{\link[SpaDES.tools:SELESnumAgents]{numAgents}} \tab Number of agents\cr
+    \code{\link[SpaDES.tools:SELESprobInit]{probInit}} \tab Probability of initiating an agent or event\cr
+    \code{\link[SpaDES.tools:SELEStransitions]{transitions}} \tab Transition probability\cr
   }
 }
 
@@ -347,10 +352,8 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
   \tabular{ll}{
     \code{\link[SpaDES.tools]{inRange}} \tab Test whether a number lies within range [a,b]\cr
     \code{\link{layerNames}} \tab Get layer names for numerous object classes\cr
-    \code{\link{loadPackages}} \tab Simple wrapper for loading packages\cr
     \code{\link{numLayers}} \tab Return number of layers\cr
     \code{\link{paddedFloatToChar}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
-    \code{\link{updateList}} \tab Update values in a named list\cr
   }
 }
 
@@ -372,11 +375,9 @@ See example in \code{\link{spades}}, achieved by using \code{cache = TRUE} argum
 
 \tabular{ll}{
   \code{\link[reproducible]{Cache}} \tab Caches a function, but often accessed as arg in \code{\link{spades}}\cr
-  \code{\link[reproducible]{cache}} \tab deprecated. Please use \code{Cache}\cr
-  \code{\link[reproducible]{showCache}} \tab Shows information about the objects in the cache\cr
-  \code{\link[reproducible]{clearCache}} \tab Removes objects from the cache\cr
-  \code{\link[reproducible]{keepCache}} \tab Keeps only the objects described\cr
-  \code{\link[reproducible]{clearStubArtifacts}} \tab Removes any erroneous items in a cache repository\cr
+  \code{\link[reproducible:cache-tools]{showCache}} \tab Shows information about the objects in the cache\cr
+  \code{\link[reproducible:cache-tools]{clearCache}} \tab Removes objects from the cache\cr
+  \code{\link[reproducible:cache-tools]{keepCache}} \tab Keeps only the objects described\cr
 }
 
 A module developer can build caching into their module by creating cached versions of their
@@ -388,8 +389,7 @@ functions.
 \section{7 Plotting}{
 
 
-\emph{Much of the underlying plotting functionality is provided by the \code{quickPlot}
-package.}
+\emph{Much of the underlying plotting functionality is provided by \pkg{quickPlot}.}
 
 There are several user-accessible plotting functions that are optimized for modularity
 and speed of plotting:
@@ -502,6 +502,19 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
   save simulation outputs.
   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
 
+  \item \code{spades.recoveryMode}: If this a numeric > 0 or TRUE, then the
+  discrete event simulator will take a snapshot of the objects in the simList
+  that might change (based on metadata \code{outputObjects} for that module), prior to
+  initiating every event. This will allow the
+  user to be able to recover in case of an error or manual interruption (e.g., \code{Esc}).
+  If this is numeric, a copy of that number of "most
+  recent events" will be maintained so that the user can recover and restart
+  > 1 event in the past, i.e., redo some of the "completed" events. Default is
+  \code{TRUE}, i.e., it will keep the state of the \code{simList}
+  at the start of the current event. This can be recovered with \code{restartSpades}
+  and the differences can be seen in a hidden object in the stashed \code{simList.}
+  There is a message which describes how to find that.
+
   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
     to ensure a module's required packages are listed first?
     Default \code{FALSE} to keep computational overhead down. If \code{TRUE},
@@ -512,32 +525,26 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
     point number comparisons. Default \code{.Machine$double.eps^0.5}.
 
   \item \code{spades.useragent}: The default user agent to use for downloading
-    modules from GitHub.com. Default \code{"http://github.com/PredictiveEcology/SpaDES"}.
+    modules from GitHub.com. Default \code{"https://github.com/PredictiveEcology/SpaDES"}.
 }
 }
 
 \seealso{
-Useful links:
-\itemize{
-  \item \url{http://spades-core.predictiveecology.org/}
-  \item \url{https://github.com/PredictiveEcology/SpaDES.core}
-  \item Report bugs at \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
-}
-
+\code{\link{spadesOptions}}
 }
 \author{
-\strong{Maintainer}: Alex M Chubaty \email{alex.chubaty@gmail.com} (0000-0001-7146-8135)
+\strong{Maintainer}: Alex M Chubaty \email{alex.chubaty@gmail.com} (\href{https://orcid.org/0000-0001-7146-8135}{ORCID})
 
 Authors:
 \itemize{
-  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (0000-0002-6914-8316)
+  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
 }
 
 Other contributors:
 \itemize{
   \item Yong Luo \email{yluo1@lakeheadu.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
-  \item Ceres Barros \email{cbarros@mail.ubc.ca} (0000-0003-4036-977X) [contributor]
+  \item Ceres Barros \email{cbarros@mail.ubc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID}) [contributor]
   \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
 

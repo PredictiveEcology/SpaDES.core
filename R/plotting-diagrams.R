@@ -1,12 +1,10 @@
-if (getRversion() >= "3.1.0") {
-  utils::globalVariables(c(".", "moduleName"))
-}
+utils::globalVariables(c(".", "moduleName"))
 
 ################################################################################
 #' ganttStatus
 #'
 #' Internal function assign the "status" of each event to be passed to
-#' \code{\link[DiagrammeR]{mermaid}} to make a Gantt chart representing the
+#' \code{DiagrammeR::mermaid} to make a Gantt chart representing the
 #' events in a completed simulation.
 #' 'init' events are set as "done"; 'plot' events as "critical"; and all others
 #' as "active".
@@ -46,7 +44,7 @@ setMethod("ganttStatus",
 #'
 #' Internal function to convert the completed events list of a \code{simList}
 #' object to a list of \code{data.frame}s suitable to pass to a call to
-#' \code{\link[DiagrammeR]{mermaid}} to make a Gantt chart representing the
+#' \code{DiagrammeR::mermaid} to make a Gantt chart representing the
 #' events in a completed simulation.
 #'
 #' @param sim  A \code{simList} object (typically corresponding to a
@@ -116,7 +114,7 @@ setMethod(
 #' the width of the bar associated with a particular module's event DOES NOT
 #' correspond to an event's "duration".
 #'
-#' Based on this StackOverflow answer: \url{http://stackoverflow.com/a/29999300/1380598}.
+#' Based on this StackOverflow answer: \url{https://stackoverflow.com/a/29999300/1380598}.
 #'
 #' @note
 #' A red vertical line corresponding to the current date may appear on the figure.
@@ -134,10 +132,9 @@ setMethod(
 #'
 #' @return Plots an event diagram as Gantt Chart, invisibly returning a \code{mermaid} object.
 #'
-#' @seealso \code{\link[DiagrammeR]{mermaid}}.
+#' @seealso \code{DiagrammeR::mermaid}.
 #'
 #' @include simList-accessors.R
-#' @importFrom DiagrammeR mermaid
 #' @export
 #' @rdname eventDiagram
 #'
@@ -154,6 +151,8 @@ setMethod(
   signature(sim = "simList", n = "numeric", startDate = "character"),
   definition = function(sim, n, startDate, ...) {
     # get automatic scaling of vertical bars in Gantt chart
+    needInstall("DiagrammeR", minVersion = "0.8.2",
+                messageStart = "Please install DiagrammeR: ")
     dots <- list(...)
     dots$width <- if (any(grepl(pattern = "width", names(dots)))) {
       as.numeric(dots$width)
@@ -185,7 +184,7 @@ setMethod(
                  df$start, ",", df$end, collapse = "\n")
         }), collapse = "\n"), "\n"
       )
-      do.call(mermaid, args = append(diagram, dots))
+      do.call(DiagrammeR::mermaid, args = append(diagram, dots))
     } else {
       stop("Unable to create eventDiagram for a simulation that hasn't been run.\n",
            "Run your simulation using `mySim <- spades(mySim)` and try again.")
@@ -221,15 +220,15 @@ setMethod(
 #' @param sim  A \code{simList} object (typically corresponding to a
 #'             completed simulation).
 #'
-#' @param ...  Additional arguments passed to \code{mermaid}.
+#' @param ...  Additional arguments passed to \code{DiagrammeR::mermaid}.
 #'             Useful for specifying \code{height} and \code{width}.
 #'
-#' @return Plots a sequence diagram, invisibly returning a \code{mermaid} object.
+#' @return Plots a sequence diagram, invisibly returning a
+#'   \code{DiagrammeR::mermaid} object.
 #'
-#' @seealso \code{\link[DiagrammeR]{mermaid}}.
+#' @seealso \code{DiagrammeR::mermaid}.
 #'
 #' @include simList-accessors.R
-#' @importFrom DiagrammeR mermaid
 #' @export
 #' @rdname objectDiagram
 #'
@@ -246,6 +245,8 @@ setMethod(
   signature(sim = "simList"),
   definition = function(sim, ...) {
     dt <- depsEdgeList(sim, FALSE)
+    needInstall("DiagrammeR", minVersion = "0.8.2",
+                messageStart = "Please install DiagrammeR: ")
     DiagrammeR::mermaid(...,
       paste0(
         # mermaid "header"
@@ -457,7 +458,9 @@ setMethod(
       return(invisible(NULL))
     } else {
       mg <- attr(sim@modules, "modulesGraph")
-      parents <- unique(mg[, "from"])
+      mg[["from"]] <- basename(mg[["from"]])
+      mg[["to"]] <- basename(mg[["to"]])
+      parents <- unique(mg[, "from"]) %>% basename()
 
       deps <- depsEdgeList(sim)[, list(from, to)]
       el <- rbind(mg, deps)
@@ -479,7 +482,7 @@ setMethod(
         membership[which(names(V(grph)) == "_INPUT_")] <- max(membership, na.rm = TRUE) + 1
         grps$membership <- membership
 
-        el1 <- lapply(parents, function(par) data.frame(el[from == par]))
+        el1 <- lapply(parents, function(par) data.frame(el["from" == par]))
         el1 <- rbindlist(el1)
         e <- apply(el1, 1, paste, collapse = "|")
         e <- edges(e)

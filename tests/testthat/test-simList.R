@@ -1,4 +1,4 @@
-test_that("simList object initializes correctly", {
+test_that("simList object initializes correctly (1)", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -32,17 +32,15 @@ test_that("simList object initializes correctly", {
   expect_true(length(reqdPkgs(mySim)) == 3)
   expect_true(NROW(reqdPkgs(mySim, "fireSpread")) == 4)
 
-
-  #
   expect_is(mySim, "simList")
 
   w <- getOption("width")
   options(width = 100L)
   out <- utils::capture.output(show(mySim))
 
-  # data.table v1.11.0 no longer prints "NULL" data.table.
-  # See bug fix 8 in https://github.com/Rdatatable/data.table/blob/master/NEWS.md
-  nline <- if (out[60] == "NULL") 75 else 73
+  ## data.table v1.11.0 no longer prints "NULL" data.table.
+  ## See bug fix 8 in https://github.com/Rdatatable/data.table/blob/master/NEWS.md
+  nline <- if (out[60] == "NULL") 72 else 70
 
   expect_equal(length(out), nline)
   options(width = w); rm(w)
@@ -50,8 +48,7 @@ test_that("simList object initializes correctly", {
   ### SLOT .xData
   expect_is(envir(mySim), "environment")
   expect_is(objs(mySim), "list")
-  expect_equal(sort(names(objs(mySim, all.names = TRUE))),
-               sort(names(as(mySim, "simList_"))))
+  expect_equal(sort(names(objs(mySim, all.names = TRUE))), sort(names(as(mySim, "simList_"))))
   expect_equivalent(mySim, as(as(mySim, "simList_"), "simList"))
   expect_equal(ls(mySim), objects(mySim))
   expect_equal(ls(mySim), sort(names(objs(mySim))))
@@ -86,10 +83,10 @@ test_that("simList object initializes correctly", {
 
   ### SLOT modules
   expect_is(modules(mySim), "list")
-  compList <- as.list(c(defaults, modules))
+  compList <- setdiff(as.list(c(defaults, modules)), "restartR")
   attr(compList, "modulesGraph") <- data.frame(from = character(0), to = character(),
                                                stringsAsFactors = FALSE)
-  expect_equivalent(modules(mySim, hidden = TRUE), compList)
+  expect_equivalent(unname(modules(mySim, hidden = TRUE)), compList)
   expect_equal(unname(modules(mySim)), as.list(modules))
 
   ### SLOT params
@@ -202,16 +199,56 @@ test_that("simList object initializes correctly", {
   rm(mySim)
 })
 
-test_that("simList test all signatures", {
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
+test_that("simList object initializes correctly (2)", {
+  testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
+  }, add = TRUE)
+  ## test with outputs
+  ras <- raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
+  abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
+
+  tmpdir <- tempdir()
+  newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
+  obj <- list(abundRasters = abundRasters)#, tempRasters = tempRasters)
+  paths <- list(modulePath = file.path(tmpdir, "modules"))
+
+  ## If start is set to 1.0, there is a warning message and spades doesn't seem to run
+  aa <- (capture_warnings({
+    mySim <- simInit(times = list(start = 1.0, end = 2.0),
+                     modules = list("test"), paths = paths,
+                     objects = obj)
+    }))
+  expect_length(aa, 0)
+})
+
+test_that("simList test all signatures", {
+  skip_on_cran()
+
+  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
+
+  on.exit({
+    testOnExit(testInitOut)
+    if (!curPathIsPkgPath) {
+      setPaths(modulePath = origDir)
+    }
   }, add = TRUE)
   # times
   times <- list(start = 0.0, end = 10)
 
   # modules
-  modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
+  modules <- list("randomLandscapes")#, "caribouMovement", "fireSpread")
+  curPathIsPkgPath <- (identical(
+    normPath(system.file("sampleModules", package = "SpaDES.core")),
+    normPath(getwd())))
+  if (!curPathIsPkgPath) { # on a R CMD check, these paths are same, so don't copy
+    modPaths <- dir(system.file("sampleModules", package = "SpaDES.core"),
+                    recursive = TRUE, full.names = TRUE)
+    modPaths <- grep(paste(modules, collapse = "|"), modPaths, value = TRUE)
+    file.copy(dirname(modPaths), recursive = TRUE, to = ".")
+    origDir <- getOption("spades.modulePath", getwd())
+    setPaths(modulePath = getwd())
+  }
 
   # paths
   mapPath <- system.file("maps", package = "quickPlot")
@@ -254,7 +291,7 @@ test_that("simList test all signatures", {
     )
 
     # loadOrder
-    loadOrder <- c("randomLandscapes", "caribouMovement", "fireSpread")
+    loadOrder <- c("randomLandscapes")#, "caribouMovement", "fireSpread")
 
     # test all argument combinations to simInit
     N <- 256L
@@ -276,42 +313,81 @@ test_that("simList test all signatures", {
                     "outputs", "loadOrder")
       names(li) <- argNames
       li <- li[!sapply(li, is.null)]
-      successes[i] <- tryCatch(
-        is(do.call(simInit, args = li), "simList"),
+      messes <- capture_messages(successes[i] <- tryCatch(
+        is(suppressMessages(do.call(simInit, args = li)), "simList"),
         error = function(e) { FALSE },
         warning = function(w) { FALSE }
-      )
+      ))
       argsTested[[i]] <- names(li)
     }
 
     # needs paths and params; many defaults are fine
     expect_equal(sum(successes, na.rm = TRUE), 256)
-
+    if (FALSE) {
+      dt <- data.table(lapply(argsTested, paste, collapse = "_"), successes)
+    }
   }
 })
 
-
-
-test_that("simList object initializes correctly", {
+test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
+  skip_on_cran()
+  ## Test resulting from bug found by Greg Paradis April 7, 2019
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
-  ## test with outputs
-  ras = raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
-  abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
-
-  tmpdir <- tempdir()
-  newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
-  obj = list(abundRasters = abundRasters)#,
-             #tempRasters = tempRasters)
-  paths = list(modulePath = file.path(tmpdir, "modules"))
-  #If start is set to 1.0, there is a warning message and spades doesn???t seem to run.
-  aa <- (capture_warnings(mySim <- simInit(times = list(start = 1.0, end = 2.0),
-                   modules = list("test"), paths = paths,
-                   objects = obj)))
-  expect_length(aa, 0)
-
-
+  setPaths(modulePath = tmpdir)
+  childModName <- "child_module"
+  newModule(childModName, tmpdir, type = "child")
+  newModule("parent_module", tmpdir, type = "parent", children = c("child_module"))
+  paths <- getPaths()
+  modules <- list("parent_module")
+  times <- list(start = 1, end = 10)
+  expect_is({mySim <- simInit(paths = paths, modules = modules, times = times)}, "simList")
+  ## test some child related stuff
+  expect_true(all(modules(mySim) %in% childModName))
+  expect_true(dirname(names(modules(mySim))) %in% modulePath(mySim))
 })
 
+test_that("test that module directory exists, but not files", {
+  skip_on_cran()
+
+  ## Test resulting from bug found by Eliot McIntire April 28, 2019
+  testInitOut <- testInit("raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+  setPaths(modulePath = tmpdir)
+  childModName <- "child_module"
+  parentModName <- "parent_module"
+  newModule(childModName, tmpdir, type = "child", open = FALSE)
+  newModule(parentModName, tmpdir, type = "parent", children = childModName, open = FALSE)
+  paths <- getPaths()
+  modules <- list(parentModName)
+  times <- list(start = 1, end = 10)
+  mainChildModuleFile <- file.path(paths$modulePath, childModName, paste0(childModName, ".R") )
+  mainParentModuleFile <- file.path(paths$modulePath, parentModName, paste0(parentModName, ".R") )
+  expect_true(file.exists(mainChildModuleFile))
+
+  file.remove(mainChildModuleFile)
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist")
+  })
+
+  unlink(dirname(mainChildModuleFile), recursive = TRUE)
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "does not exist")
+  })
+
+  file.remove(mainParentModuleFile)
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "doesn't exist")
+  })
+
+  unlink(dirname(mainParentModuleFile), recursive = TRUE)
+  a <- capture_messages({
+    expect_error(simInit(paths = paths, modules = modules, times = times), "doesn't exist in")
+  })
+
+  unlink(paths$modulePath, recursive = TRUE)
+})

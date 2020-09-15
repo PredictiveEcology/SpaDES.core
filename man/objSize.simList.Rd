@@ -2,10 +2,15 @@
 % Please edit documentation in R/cache.R
 \name{objSize.simList}
 \alias{objSize.simList}
-\title{Object size for simLists}
+\title{Object size for \code{simList}}
 \usage{
-\method{objSize}{simList}(x, quick = getOption("reproducible.quick",
-  FALSE))
+\method{objSize}{simList}(
+  x,
+  quick = getOption("reproducible.quick", FALSE),
+  enclosingEnvs = TRUE,
+  .prevEnvirs = list(),
+  ...
+)
 }
 \arguments{
 \item{x}{An object}
@@ -13,13 +18,22 @@
 \item{quick}{Logical. Only some methods use this. e.g.,
 \code{Path} class objects. In which case, \code{file.size} will be
 used instead of \code{object.size}.}
+
+\item{enclosingEnvs}{Logical indicating whether to include enclosing environments.
+Default \code{TRUE}.}
+
+\item{.prevEnvirs}{For internal account keeping to identify and prevent duplicate counting}
+
+\item{...}{Additional arguments (currently unused)}
 }
 \description{
-Recursively, runs \code{object.size} on the simList environment.
-Currently, this will not assess \code{object.size} of the other elements.
+Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
+so it estimates the correct size of functions stored there (e.g., with their enclosing
+environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
+\code{objSize(completed(sim))}.
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))
 objSize(a)
-object.size(a)
+utils::object.size(a)
 }

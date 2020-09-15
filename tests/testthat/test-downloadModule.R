@@ -1,7 +1,8 @@
 test_that("downloadModule downloads and unzips a single module", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -16,29 +17,28 @@ test_that("downloadModule downloads and unzips a single module", {
 
   m <- "test"
 
-  if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
-    if (!is.null(f$error)) {
-      if (grepl("Forbidden", f$error)) {
-        skip("Forbidden HTTP 403 on GitHub during downloadModule")
-      }
+  f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
+  if (!is.null(f$error)) {
+    if (grepl("Forbidden", f$error)) {
+      skip("Forbidden HTTP 403 on GitHub during downloadModule")
     }
-    f <- f$value[[1]] %>% unlist() %>% as.character() %>% basename()
-
-    f_expected <- c("LICENSE", "README.txt", "citation.bib", "CHECKSUMS.txt",
-                    "test.R", "test.Rmd")
-
-    expect_gt(length(f), 0)
-    expect_gt(length(file.path(tmpdir)), 0)
-    expect_gt(length(file.path(tmpdir, m)), 0)
-    expect_true(all(f %in% f_expected))
   }
+  f <- f$value[[1]] %>% unlist() %>% as.character() %>% basename()
+
+  f_expected <- c("LICENSE", "README.txt", "citation.bib", "CHECKSUMS.txt",
+                  "test.R", "test.Rmd")
+
+  expect_gt(length(f), 0)
+  expect_gt(length(file.path(tmpdir)), 0)
+  expect_gt(length(file.path(tmpdir, m)), 0)
+  expect_true(all(f %in% f_expected))
 })
 
 test_that("downloadModule downloads and unzips a parent module", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -53,31 +53,30 @@ test_that("downloadModule downloads and unzips a parent module", {
 
   m <- "LCC2005"
 
-  if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
-    if (!is.null(f$error)) {
-      if (grepl("Forbidden", f$error)) {
-        skip("Forbidden HTTP 403 on GitHub during downloadModule")
-      }
+  ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
+  f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
+  if (!is.null(f$error)) {
+    if (grepl("Forbidden", f$error)) {
+      skip("Forbidden HTTP 403 on GitHub during downloadModule")
     }
-    f <- f$value[[1]] %>% unlist() %>% as.character()
-
-    #f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
-    d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
-
-    d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
-      c(m, "data", "testthat") %>% sort()
-
-    expect_equal(length(f), 43)
-    expect_equal(d, d_expected)
   }
+  f <- f$value[[1]] %>% unlist() %>% as.character()
+
+  d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
+
+  d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
+    c(m, "data", "testthat") %>% sort()
+
+  valToCompare <- 45 # if (.Platform$OS.type == "unix" || isWindows()) 45 else 43
+  expect_equal(length(f), valToCompare)
+  expect_equal(d, d_expected)
 })
 
-
 test_that("downloadModule can overwrite existing modules", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -118,9 +117,10 @@ test_that("downloadModule can overwrite existing modules", {
 })
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
+  skip_on_cran()
+
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-  skip_on_cran()
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")

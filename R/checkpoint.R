@@ -7,7 +7,7 @@
 #'
 #' RNG save code adapted from:
 #' \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
-#' and \url{https://stackoverflow.com/questions/13997444/}
+#' and \url{https://stackoverflow.com/q/13997444/1380598}
 #'
 #' @param sim           A \code{simList} simulation object.
 #'
@@ -27,9 +27,8 @@
 #'
 #' @include environment.R
 #' @include priority.R
-#' @importFrom R.utils isAbsolutePath
 #' @importFrom quickPlot .objectNames
-#' @importFrom reproducible checkPath
+#' @importFrom Require checkPath
 #' @export
 #' @rdname checkpoint
 #'
@@ -43,7 +42,7 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
   ### determine checkpoint file location, for use in events below
   if (useChkpnt) {
     if (is.null(checkpointFile(sim))) {
-      checkpointFile <- "checkpoint.RData"
+      checkpointFile <- "checkpoint.qs"
     } else {
       checkpointFile <- checkpointFile(sim)
     }
@@ -83,32 +82,36 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param file The checkpoint file.
 #' @rdname checkpoint
 #' @export
+#' @importFrom raster extension
 checkpointLoad <- function(file) {
+  stopifnot(raster::extension(file) == ".qs")
+
   # check for previous checkpoint files
   if (file.exists(file)) {
-    simListName <- load(file, envir = .GlobalEnv)
-    sim <- get(simListName, envir = .GlobalEnv)
+    sim <- loadSimList(file)
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
     rm(list = c("._rng.kind", "._rng.state", "._timestamp"), envir = sim@.xData)
-    return(invisible(TRUE))
+    return(invisible(sim))
   } else {
-    return(invisible(FALSE))
+    stop("checkpoint file ", file, " not found.")
   }
 }
 
 #' @rdname checkpoint
+#' @importFrom stats runif
 .checkpointSave <- function(sim, file) {
   sim$._timestamp <- Sys.time() # nolint
-  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv) # nolint
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
+  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE) # nolint
   sim$._rng.kind <- RNGkind() # nolint
 
-  tmpEnv <- new.env()
+  tmpEnv <- new.env(parent = emptyenv())
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
-              filename = file, keepFileBackedAsIs = TRUE, envir = tmpEnv)
+              filename = file, fileBackend = 1, envir = tmpEnv)
 
   invisible(TRUE) # return "success" invisibly
 }

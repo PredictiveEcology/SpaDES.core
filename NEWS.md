@@ -1,10 +1,187 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+
+version 1.0.4
+=============
+
+## new features
+* none
+
+## dependencies
+* completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies
+* move `tcltk` to `Suggests`
+* remove `devtools`, `microbenchmark` from `Suggests`
+
+## bug fixes
+
+version 1.0.3
+=============
+
+## new features
+* none
+
+## dependencies
+* completely removed `RCurl` dependency (#120)
+* Suggests `sp` because it's linked in documentation (#120)
+
+## bug fixes
+* fix `pkgDeps` example for new version of `Require`
+* minor bug fixes
+
+version 1.0.2
+=============
+
+## new features
+* `desc` argument in `defineParameter`, `expectsInput`, and `createsOutput` can now have extraneous spaces and End-of-Line characters.
+  This means that they can now be written more easily with a single set of quotes, without needing `paste`.
+  The accessor functions, `moduleParams`, `moduleInputs`, and `moduleOutputs` all will strip extraneous spaces and End-of-Line characters.
+* new helper functions for debugging: `writeEventInfo()` and `writeRNGInfo()` to write info to file.
+
+## dependencies
+* drop support for R < 3.6
+* removed imports from `stringi`
+
+## bug fixes
+
+* minor bug fixes in sample modules
+* module template has full path instead of `..` for `moduleParams` etc. This is more accurate. 
+* address changes to active bindings in R-devel
+* fix CRAN check errors
+* reduced the number of tests run on CRAN (extended tests still run on GitHub Actions)
+
+version 1.0.1
+=============
+
+## new features
+
+* `Par` is now an `activeBinding` (similar to `mod`) pointing to `P(sim)`; this allows for tab autocomplete to function correctly.
+* new helper functions to extract parameters, inputs, and outputs tables from module metadata:
+  `moduleParams()`, `moduleInputs()`, `moduleOutputs()`. These are now used in default `.Rmd` template.
+* better testing of `memoryUse` functionality
+* A pointer to `sim` is now created at `.pkgEnv$.sim` at the start of `spades` call, rather than `on.exit`; failures due to "out of memory" were not completing the `on.exit`
+* improved templating of new modules, including support for automated module code checking using GitHub Actions (`newModule()` sets `useGitHub = TRUE` by default).
+
+## dependencies
+* add `usethis` to Suggests for use with GitHub Actions
+
+## deprecated
+* none
+
+## bug fixes
+* tests for `Filenames` function coming from `reproducible` package
+* `options('spades.recoverMode')` was creating temp folders every event and not removing them; now it does.
+
+version 1.0.0
+=============
+
+## new features
+
+* several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting `options('spades.recoveryMode' = 0)` may further help
+* Updates to deal with new backend with `reproducible`
+* better assertions inside list elements of `simInit`, e.g., `simInit(times = list(start = "test"))` now fails because times must be a list of 2 `numeric` objects
+* messaging is now all with `message` instead of a mixture of `message`, `cat` and `print`.
+  This allows for easier suppressing of messaging, e.g., via `suppressMessages`.
+  This was requested in a downstream package, `SpaDES.experiment` that was submitted to CRAN but rejected due to the now former inability to suppress messages.
+* `restartR` saves simulation objects using `qs::qsave()` which is faster and creates smaller file sizes.
+
+## dependencies
+
+* moved packages from Imports to Suggests: `codetools`, `future`, `httr`, `logging`, and `tcltk`
+* removed `archivist`
+* `qs` now used for improved object serialization to disk
+
+## deprecated
+
+`.objSizeInclEnviros` and removed
+
+## bug fixes
+
+* removed mention of 'demo' from intro vignette (#110)
+* `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`.
+
+version 0.2.8
+=============
+
+## new features
+
+* Changed all internal `print` and `cat` statements to message to allow use of `suppressMessages`, as recommended by CRAN
+* added file based logging via `logging` package, invoked by setting `debug` argument in `spades` function call to a `list(...)`. `?spades` describes details
+
+## bug fixes
+
+* `restartR` minor bug fixes
+
+version 0.2.7
+=============
+
+## dependencies
+
+* Removed dependency packages `DEoptim`, `future.apply`, `Matrix`, `parallel`, `pryr`, `purrr`, and `rgenoud`, which are no longer required.
+  See "deprecated" info below.
+* added `whisker` to Imports to facilitate module file templating (#100)
+
+## new features
+
+* memory and peak memory estimation is now available for *nix-type systems, when `future` is installed.
+  See new vignette `iv-advanced` and `?memoryUse`.
+* new function and capacity: `restartR`.
+  Restarts R mid-stream to deal with apparent memory leaks in R.
+  In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <https://github.com/r-lib/fastmap>).
+  This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation.
+  The new functionality allows a user who is hitting this memory leak issue to restart R as a work around.
+  See `?restartR` for instructions.
+* new function `newProject` to initialize a SpaDES project with subdirectories `cache/`, `inputs/`, `modules/`, and `outputs/`, and `setPaths()` accordingly.
+
+## bug fixes
+
+* `newModule()` now uses `open = interactive()` as default to prevent files being left open during tests.
+* various bug fixes and improvements.
+
+## deprecated
+
+* `experiment()`, `experiment2()`, and `POM()` have been moved to the `SpaDES.experiment` package
+
+version 0.2.6
+=============
+
+## dependencies
+
+* R 3.5.0 is the minimum version required for `SpaDES.core`.
+  Too many dependency packages are not maintaining their backwards compatibility.
+* added `backports` to Imports for R-oldrel support
+* removed `googledrive` dependency (this functionality moved to `reproducible`)
+
+## documentation
+
+* improved documentation for `P`, `params`, and `parameters`, thanks to Louis-Etienne Robert.
+
+## new features
+
+* update `objSize.simList` method with 2 new arguments from `reproducible` package
+* `.robustDigest` method for `simList` class objects now does only includes parameters that are listed within the module metadata, if `Cache` or `.robustDigest` is called within a module. This means that changes to parameter values in "other" modules will not affect the Caching of "the current" module.
+* New function `outputObjectNames` will extract just the object names of all `outputObjects` across modules
+* New function `restartSpades` and its associated `options(spades.recoveryMode = 1)`, the new default, which is still experimental. Its purpose is to be able to restart a simulation in the case of an error or interruption. 
+* Now gives better errors if modules are missing main .R file or if they are missing entirely 
+* More silent tests
+* `mod` is now an active binding to `sim[[currentModule(sim)]]$.objects` (move from `sim[[currentModule(sim)]]`) and its parent environment is `emptyenv()`. This should cause no changes to users who use `mod$...`, but it will cause a change if user was calling objects directly via `sim[[currentModule(sim)]]$...`. This change is to separate the function enclosing environments and object enclosing environments, which should be different.
+* `sim@completed` is now an environment instead of a list. Of the three event queues, this one can become the largest. The `list` would get increasingly slow as the number of completed events increased. There should be no user visible changes when using `completed(sim)`
+
+## User visible changes to default options
+
+`spades.debug` is now set to 1
+`spades.recoveryMode` is new and set to 1 (i.e., the current event will be kept at its initial state)
+
+## bug fixes
+
+* Internal bugs during `simInit` especially in some weird cases of `childModules`.
+* packages listed in `reqdPkgs` not being loaded when only listed in child modules. Fixed in `5cd79ac95bc8d190e954313f125928458b0108d2`.
+* fixed issue with saving simulation outputs at simulation end time.
+
 version 0.2.5
 =============
 
 * improved messaging and fixed test failures when GLPK installed but not used by `igraph`
-* compatibility with forthcoming `RandomFields` v3.3.4
+* compatibility with `RandomFields` >= 3.3.4
 
 version 0.2.4
 =============

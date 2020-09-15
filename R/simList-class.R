@@ -1,4 +1,3 @@
-################################################################################
 #' The \code{simList} class
 #'
 #' Contains the minimum components of a \code{SpaDES} simulation.
@@ -20,22 +19,28 @@
 #' class. All other slots are the same.
 #' Thus, \code{simList} is identical to \code{simList_}, except that the former
 #' uses an environment for objects and the latter uses a list.
-#' The class \code{simList_} is only used internally.
+#' The class \code{simList_} is only used internally when saving/loading, because
+#' saving/loading a list behaves more reliably than saving/loading an environment.
 #'
 #' @slot modules    List of character names specifying which modules to load.
 #'
 #' @slot params     Named list of potentially other lists specifying simulation
 #'                  parameters.
 #'
-#' @slot events     The list of scheduled events (i.e., event queue), as a
-#'                  \code{data.table}. See 'Event Lists' for more information.
+#' @slot events     The list of scheduled events (i.e., event queue), which can
+#'                  be converted to a sorted \code{data.table} with \code{events(sim)}.
+#'                  See 'Event Lists' for more information.
 #'
 #' @slot current    The current event, as a \code{data.table}.
 #'                  See 'Event Lists' for more information..
 #'
-#' @slot completed  The list of completed events, as a \code{list}.
+#' @slot completed  An environment consisting of completed events, with
+#'                  each object named a character representation of the order
+#'                  of events. This was converted from a previous version which
+#'                  was a list. This was changed because the list became
+#'                  slow as number of events increased.
 #'                  See 'Event Lists' for more information. It is kept
-#'                  as a list of individual events for speed. The \code{completed}
+#'                  as an environment of individual events for speed. The \code{completed}
 #'                  method converts it to a sorted \code{data.table}.
 #'
 #' @slot depends    A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
@@ -88,26 +93,23 @@
 #'   \code{eventPriority} \tab The priority given to the event. \cr
 #' }
 #'
-#' @aliases simList
-#' @rdname simList-class
-#' @rdname simList
-#' @importFrom data.table as.data.table data.table
-#' @include helpers.R misc-methods.R module-dependencies-class.R
-#'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://www.nostarch.com/artofr.htm}
+#'             Retrieved from \url{https://nostarch.com/artofr.htm}
 #'
+#' @aliases simList
 #' @author Alex Chubaty and Eliot McIntire
 #' @exportClass simList
-#'
+#' @importFrom data.table as.data.table data.table
+#' @include helpers.R misc-methods.R module-dependencies-class.R
+#' @rdname simList-class
 setClass(
   "simList",
   contains = "environment",
   slots = list(
     modules = "list", params = "list", events = "list",#data.table",
     current = "list", #"data.table",
-    completed = "list", depends = ".simDeps",
+    completed = "environment", depends = ".simDeps",
     simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
     .envir = "environment"
   ),
@@ -132,11 +134,10 @@ setClass(
 #' @export
 #' @include misc-methods.R
 #' @rdname initialize-method
-#'
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object, ...) {
-
+            # browser(expr = exists("._initialize_1"))
             sn <- slotNames(.Object)
             dots <- list(...)
             slotsProvided <- sn %in% names(dots)
@@ -144,60 +145,45 @@ setMethod("initialize",
               slot(.Object, ss) <- dots[[ss]]
             }
 
-
             expected <- c("modules", "params", "depends", "simtimes",
-              "inputs", "outputs", "paths")
+                          "inputs", "outputs", "paths")
             haves <- na.omit(match(sn[!slotsProvided], expected))
-            if (any(1==haves))
+            if (any(1 == haves))
               .Object@modules = as.list(NULL)
 
-            if (any(2==haves))
+            if (any(2 == haves))
               .Object@params = list(
                 .checkpoint = list(interval = NA_real_, file = NULL),
                 .progress = list(type = NULL, interval = NULL)
               )
-            if (any(3==haves))
+            if (any(3 == haves))
               .Object@depends = .emptySimDeps #new(".simDeps", dependencies = list(NULL))
-            if (any(4==haves))
+            if (any(4 == haves))
               .Object@simtimes = list(
                 current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
               )
-            if (any(5==haves))
+            if (any(5 == haves))
               .Object@inputs = .fileTableInDF
-            if (any(6==haves))
+            if (any(6 == haves))
               .Object@outputs = .fileTableOutDF
-            if (any(7==haves))
+            if (any(7 == haves))
               .Object@paths = .paths()
 
+            .Object@completed <- new.env(parent = emptyenv())
+
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            # browser(expr = exists("._initialize_2"))
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
-            #
-            return(.Object)
-          })
 
+            return(.Object)
+})
 
 ################################################################################
-#' The \code{simList_} class
-#'
-#' Internal use only. Used when saving/loading a \code{simList}.
-#'
-#' This is identical to class \code{simList}, except that the \code{.xData} slot
-#' is replaced by a \code{.Data} containing a list to store the objects from the
-#' environment contained within the \code{simList}.
-#' Saving/loading a list behaves more reliably than saving/loading an environment.
-#'
-#' @inheritParams simList
-#'
-#' @seealso \code{\link{simList}}
-#'
 #' @aliases simList_
-#' @keywords internal
-#' @rdname simList_-class
-#'
-#' @author Alex Chubaty
-#'
+#' @aliases simList_-class
+#' @rdname simList-class
 setClass("simList_",
          contains = "list",
          slots = list(
@@ -215,20 +201,22 @@ setAs(from = "simList_", to = "simList", def = function(from) {
            params = from@params,
            events = from@events,
            current = from@current,
-           completed = from@completed,
+           completed = new.env(parent = emptyenv()),
            depends = from@depends,
            simtimes = from@simtimes,
            inputs = from@inputs,
            outputs = from@outputs,
            paths = from@paths)
-  x@.xData <- new.env(new.env(parent = emptyenv()))
+  x@.xData <- new.env(parent = emptyenv())
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)
+  list2env(from@completed, envir = x@completed)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  if (!is.null(x$objectSynonyms)) {
+    x <- .checkObjectSynonyms(x)
+  }
   return(x)
 })
-
-
 
 setAs(from = "simList", to = "simList_", def = function(from, to) {
   x <- new(to,
@@ -236,7 +224,7 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
            params = from@params,
            events = from@events,
            current = from@current,
-           completed = from@completed,
+           completed = as.list(from@completed, all.names = TRUE, sorted = TRUE),
            depends = from@depends,
            simtimes = from@simtimes,
            inputs = from@inputs,
@@ -244,9 +232,13 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
            paths = from@paths)
   x@.Data <- as.list(envir(from), all.names = TRUE)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  if (!is.null(from$objectSynonyms)) {
+    activeBindingsToDel <- unlist(lapply(from$objectSynonyms, function(os) os[-1]))
+    attr(x$objectSynonyms, "bindings") <- NULL
+    x[activeBindingsToDel] <- NULL
+  }
   return(x)
 })
-
 
 ### `initialize` generic is already defined in the methods package
 #' Generate a \code{simList} object
@@ -270,4 +262,4 @@ setMethod("initialize",
             #.Object@.envir <- new.env(parent = asNamespace("SpaDES.core"))
             #attr(.Object@.envir, "name") <- "sim"
             return(.Object)
-          })
+})
