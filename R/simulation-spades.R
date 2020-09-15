@@ -40,6 +40,14 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
   # core modules
   core <- .pkgEnv$.coreModules
 
+  if (isTRUE(useFuture)) {
+    # Check here if resolved
+    curForFuture <- sim@events[[1]]
+    futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                  curModName = curForFuture[["moduleName"]])
+
+  }
+
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
     if (length(sim@events)) {
@@ -204,30 +212,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
           .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
           if (useFuture) {
             stop("using future for spades events is not yet fully implemented")
-            mods <- names(sim@depends@dependencies)
-            moduleNamesNotThisOne <- mods[!mods %in% cur[["moduleName"]]]
-            otherModsInputs <- na.omit(unique(unlist(lapply(
-              sim@depends@dependencies, # can be a different event, don't exclude self
-              function(modu)
-                modu@inputObjects$objectName
-            ))))
-            thisModsInputs <- na.omit(unique(unlist(lapply(
-              sim@depends@dependencies[cur[["moduleName"]]], # can be a different event, don't exclude self
-              function(modu)
-                modu@inputObjects$objectName
-            ))))
-            thisModOutputs <- na.omit(unique(unlist(lapply(
-              sim@depends@dependencies[cur[["moduleName"]]],
-              function(modu)
-                modu@outputObjects$objectName
-            ))))
-            otherModsOutputs <- lapply(
-              sim@depends@dependencies,
-              function(modu)
-                modu@outputObjects$objectName
-            )
-            dontAllowModules <- unlist(lapply(otherModsOutputs, function(x) any(x %in% thisModsInputs)))
-
+            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                          curModName = cur[["moduleName"]])
             # if all this module's outputs are NOT in any other modules' inputs, can use future::future
             canProceed <- if (length(sim$simFuture)) {
               # with the assumption that the "unresolved" future could schedule itself,
@@ -241,14 +227,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
               sim <- evaluateFutureNow(sim)
             }
 
-            if (!any(thisModOutputs %in% otherModsInputs)) {
+            if (!any(futureNeeds$thisModOutputs %in% otherModsInputs)) {
               require("future")
               envir <- environment()
-              # a <- future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-              #                                             showSimilar = showSimilar, .pkgEnv), packages = c("SpaDES.core"),
-              #                     globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
-              #                                 "showSimilar", ".pkgEnv"),
-              #                     envir = envir)
               sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
                 list(sim = future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                                                   showSimilar = showSimilar, .pkgEnv),
@@ -258,8 +239,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
                                     packages = c("SpaDES.core", "raster"),
                                     envir = envir),
                      thisModOutputs = list(moduleName = cur[["moduleName"]],
-                                           objects = thisModOutputs,
-                                           dontAllowModules = names(dontAllowModules)[dontAllowModules]))
+                                           objects = futureNeeds$thisModOutputs,
+                                           dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
               skipEvent <- TRUE
 
               # a <- future::future(.runEvent(sim, cacheIt, debug,
@@ -1506,4 +1487,32 @@ evaluateFutureNow <- function(sim) {
   slot(sim, "events") <- sim@events[ord]
   sim$simFuture <- sim$simFuture[-1]
   sim
+}
+
+getFutureNeeds <- function(deps, curModName) {
+  out <- list()
+  mods <- names(deps)
+  moduleNamesNotThisOne <- mods[!mods %in% curModName]
+  out$otherModsInputs <- na.omit(unique(unlist(lapply(
+    deps, # can be a different event, don't exclude self
+    function(modu)
+      modu@inputObjects$objectName
+  ))))
+  out$thisModsInputs <- na.omit(unique(unlist(lapply(
+    deps[curModName], # can be a different event, don't exclude self
+    function(modu)
+      modu@inputObjects$objectName
+  ))))
+  out$thisModOutputs <- na.omit(unique(unlist(lapply(
+    deps[curModName],
+    function(modu)
+      modu@outputObjects$objectName
+  ))))
+  out$otherModsOutputs <- lapply(
+    deps,
+    function(modu)
+      modu@outputObjects$objectName
+  )
+  out$dontAllowModules <- unlist(lapply(out$otherModsOutputs, function(x) any(x %in% out$thisModsInputs)))
+
 }
