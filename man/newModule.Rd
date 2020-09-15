@@ -33,7 +33,7 @@ The default is the current working directory.}
              Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\cr\cr
 
              \code{useGitHub}. Logical. Is module development happening on GitHub?
-             Default \code{TRUE}. Setting up GitHub projects relies on the \pkg{usethis} package.\cr\cr}
+             Default \code{TRUE}.}
 }
 \value{
 Nothing is returned. The new module file is created at

@@ -33,5 +33,7 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 
+inst/doc
+
 # reverse dependency checks cache
 revdep/.cache.rds

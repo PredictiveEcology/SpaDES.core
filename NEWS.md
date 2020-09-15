@@ -1,18 +1,21 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-
 version 1.0.4
 =============
 
 ## new features
-* none
+
+* enable automated module code checking with GitHub Actions (`use_gha()` and corresponding vignette; #74)
 
 ## dependencies
+
 * completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies
 * move `tcltk` to `Suggests`
 * remove `devtools`, `microbenchmark` from `Suggests`
 
 ## bug fixes
+
+* minor bug fixes
 
 version 1.0.3
 =============
