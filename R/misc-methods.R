@@ -602,7 +602,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 bindrows <- function(...) {
   # Deal with things like "trailing commas"
   rws <- try(list(...), silent = TRUE)
-  if (any(grepl("argument|bind_rows", rws))) {
+  if (any(grepl("argument is missing|bind_rows", rws))) {
     ll <- as.list(match.call(expand.dots = TRUE))
     nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0)))
     eval(as.call(ll[nonEmpties]))
