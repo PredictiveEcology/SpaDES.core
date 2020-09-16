@@ -1,4 +1,4 @@
-utils::globalVariables(".")
+utils::globalVariables(c(".", ".I", "whi"))
 
 ################################################################################
 #' Process a simulation event
@@ -1561,7 +1561,7 @@ getFutureNeeds <- function(deps, curModName) {
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
   sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
-    list(sim = future::future(SpaDES.core:::.runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+    list(sim = future::future(getFromNamespace(".runEvent", "SpaDES.core")(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                                       showSimilar = showSimilar, .pkgEnv),
 
                               globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
