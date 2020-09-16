@@ -238,7 +238,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
                                           curModName = cur[["moduleName"]])
 
             if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
-              requireNamespace("future")
               sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                      showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                      futureNeeds = futureNeeds)
@@ -1053,6 +1052,7 @@ setMethod(
       }
       useFuture <- getOption("spades.futureEvents", FALSE)
       if (useFuture) {
+        if (!requireNamespace("future")) stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
         message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
                 "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
                 "User must manage future::plan, e.g., \nfuture::plan(multiprocess(workers = 2))")

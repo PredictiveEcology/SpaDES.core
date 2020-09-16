@@ -4,7 +4,7 @@ version 1.0.4
 =============
 
 ## new features
-
+* New experimental `spades.futureEvents` option. If set to `TRUE`, spades will run module events in a "future" (see future package), if they do not produce outputs for other modules.
 * enable automated module code checking with GitHub Actions (`use_gha()` and corresponding vignette; #74)
 
 ## dependencies
