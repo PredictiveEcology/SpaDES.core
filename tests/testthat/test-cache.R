@@ -15,7 +15,7 @@ test_that("test event-level cache", {
 
   # Example of changing parameter values
   mySim <- simInit(
-    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+    times = list(start = 0.0, end = 3.0, timeunit = "year"),
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
       # Turn off interactive plotting

@@ -37,6 +37,12 @@
 #'   \code{spades.debug} \tab \code{TRUE}
 #'     \tab  The default debugging value \code{debug} argument in \code{spades()} \cr
 #'
+#'   \code{spades.futureEvents} \tab \code{FALSE}
+#'     \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
+#'     whose outputs are not needed (by other events in the sim) into a future. In some
+#'     cases, this will speed up simulations, by running some events in parallel.
+#'     Still VERY experimental. Use cautiously. \cr
+#'
 #'   \code{spades.lowMemory} \tab \code{FALSE}
 #'     \tab If true, some functions will use more memory
 #'     efficient (but slower) algorithms. \cr
@@ -98,6 +104,7 @@ spadesOptions <- function() {
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
+    spades.futureEvents = FALSE,
     spades.futurePlan = "callr",
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
