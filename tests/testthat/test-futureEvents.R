@@ -1,8 +1,8 @@
-test_that("test futureEvents", {
+test_that("test spades.futureEvents", {
   if (interactive()) {
     testInitOut <- testInit( smcc = FALSE, libraries = "future",
                             opts = list("reproducible.useMemoise" = FALSE,
-                                                      "spades.useFuture" = TRUE))
+                                                      "spades.futureEvents" = TRUE))
     tmpdir <- tempdir()
     modPath <- system.file("sampleModules", package = "SpaDES.core")
     newModule("test", path = modPath)
@@ -60,10 +60,10 @@ test_that("test futureEvents", {
     mySim@params$test$.plotInitialTime <- 0
     mySim@params$test$.plotInterval <- 1
 
-    options("spades.useFuture" = TRUE)
+    options("spades.futureEvents" = TRUE)
     set.seed(1)
     simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
-    options("spades.useFuture" = FALSE)
+    options("spades.futureEvents" = FALSE)
     set.seed(1)
     simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
     # expect_true(isTRUE(all.equal(completed(simsFALSE), completed(simsTRUE))))
@@ -73,10 +73,10 @@ test_that("test futureEvents", {
     data.table::setorderv(s1, c("eventTime", "moduleName", "eventType"))
 
     mySim@depends@dependencies$caribouMovement@timeunit <- "year"
-    options("spades.useFuture" = TRUE)
+    options("spades.futureEvents" = TRUE)
     set.seed(1)
     simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
-    options("spades.useFuture" = FALSE)
+    options("spades.spades.futureEvents" = FALSE)
     set.seed(1)
     simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
 

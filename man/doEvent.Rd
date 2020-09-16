@@ -8,7 +8,7 @@ doEvent(
   sim,
   debug = FALSE,
   notOlderThan,
-  useFuture = getOption("spades.useFuture", FALSE)
+  useFuture = getOption("spades.futureEvents", FALSE)
 )
 }
 \arguments{

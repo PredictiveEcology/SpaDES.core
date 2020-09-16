@@ -29,7 +29,7 @@ utils::globalVariables(".")
 #' @keywords internal
 #' @rdname doEvent
 #'
-doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.useFuture", FALSE)) {
+doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.futureEvents", FALSE)) {
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
@@ -1051,10 +1051,11 @@ setMethod(
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
-      useFuture <- getOption("spades.useFuture", FALSE)
+      useFuture <- getOption("spades.futureEvents", FALSE)
       if (useFuture) {
         message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
-                "if their outputs are not needed by the next event. STILL EXPERIMENTAL. Use cautiously")
+                "if their outputs are not needed by the next event. STILL EXPERIMENTAL. Use cautiously.",
+                "User must manage future::plan, e.g., \nfuture::plan(multiprocess(workers = 2))")
         sim$.futureEventsSkipped <- 0
         sim$simFuture <- list()
       }
