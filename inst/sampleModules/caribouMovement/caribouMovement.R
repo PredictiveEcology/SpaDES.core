@@ -42,6 +42,9 @@ defineModule(sim, list(
   inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, "caribouMovement")$stackName,
                  objectClass = "RasterStack", desc = "layername = \"habitatQuality\"",
+                 sourceURL = NA_character_),
+    expectsInput(objectName = "caribou",
+                 objectClass = "SpatialPointsDataFrame",
                  sourceURL = NA_character_)
   ),
   outputObjects = bindrows(
