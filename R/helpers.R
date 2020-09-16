@@ -19,6 +19,10 @@
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
 #' @keywords internal
+#' @include environment.R
+.pkgEnv$.coreModulesMinusSave <- setdiff(.coreModules(), "save") %>% unname()
+
+#' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
 
 ################################################################################

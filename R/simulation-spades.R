@@ -43,21 +43,24 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
   if (isTRUE(useFuture)) {
     # Check here if resolved
     curForFuture <- sim@events[[1]]
-    if (!curForFuture[["moduleName"]] %in% core) {
+    if (!curForFuture[["moduleName"]] %in% .pkgEnv$.coreModulesMinusSave) {
       if (length(sim$simFuture)) {
         futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                      curModName = sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
+                                      curModName = curForFuture[["moduleName"]])#sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
         canProceed <- if (length(futureNeeds)) {
           # with the assumption that the "unresolved" future could schedule itself,
           # must block any module who's outputs are needed by the same module as the
           # unresolved future module
-          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture[["moduleName"]])
+          modInFuture <- gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(sim$simFuture))
+          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% modInFuture) #&&
+            #modInFuture != curForFuture[["moduleName"]]
         } else {
           TRUE
         }
-        if (!canProceed) {
-          sim <- evaluateFutureNow(sim)
+        if (!canProceed || curForFuture$moduleName == "save" || future::resolved(sim$simFuture[[1]][[1]])) {
+          sim <- resolveFutureNow(sim)
         }
+
       }
 
     }
@@ -231,7 +234,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
             futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
                                           curModName = cur[["moduleName"]])
 
-            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$otherModsInputs)) {
+            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
               requireNamespace("future")
               sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                      showSimilar = showSimilar, .pkgEnv, envir = environment(),
@@ -1079,14 +1082,19 @@ setMethod(
           }
         }
         if (useFuture) {
-          if (!exists("simFuture", envir = envir(sim)))
-            sim$simFuture <- list()
-          if (length(sim$simFuture)) {
+          if (length(sim$simFuture) > 1) {
             for (simFut in seq_along(sim$simFuture)) {
               if (future::resolved(sim$simFuture[[1]][[1]])) {
-                sim <- evaluateFutureNow(sim)
+                sim <- resolveFutureNow(sim)
               }
             }
+          }
+        }
+      }
+      if (useFuture) {
+        if (length(sim$simFuture)) {
+          for (simFut in seq_along(sim$simFuture)) {
+              sim <- resolveFutureNow(sim)
           }
         }
       }
@@ -1460,29 +1468,44 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
   return(invisible())
 }
 
-evaluateFutureNow <- function(sim) {
+resolveFutureNow <- function(sim) {
+
+  futureRunning <- sim@events[[1]]
+  futureRunning[1:4] <- as.list(strsplit(names(sim$simFuture)[1], split = "_")[[1]])
+  futureRunning[[1]] <- convertTimeunit(as.numeric(futureRunning[[1]]), unit = timeunit(sim))
+  setDT(futureRunning)
+  message(crayon::magenta("        -- Resolving", capture.output(print(futureRunning, row.names = FALSE, col.names = "none"))))
+
   tmpSim <- future::value(sim$simFuture[[1]][[1]])
   simMetadata <- sim$simFuture[[1]][[2]]
+
+  # objects
   list2env(mget(simMetadata$objects, envir = envir(tmpSim)), envir = envir(sim))
+
+  # events
   evntsFut <- events(tmpSim, unit = "seconds")
   evntsNormal <- rbindlist(list(current(sim, unit = "seconds"), events(sim, unit = "seconds")))
   newEvents <- evntsFut[!evntsNormal, on = c("eventTime", "moduleName", "eventTime", "eventPriority")]
-  newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
-
-  slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
-
-  ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
-               unlist(lapply(sim@events, function(x) x$eventPriority)))
-  slot(sim, "events") <- sim@events[ord]
+  if (NROW(newEvents)) {
+    newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
+    slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
+    ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
+                 unlist(lapply(sim@events, function(x) x$eventPriority)))
+    slot(sim, "events") <- sim@events[ord]
+  }
   sim$simFuture <- sim$simFuture[-1]
+
   sim
 }
 
 getFutureNeeds <- function(deps, curModName) {
+  #browser(expr = curModName == "fireSpread")
   out <- list()
   mods <- names(deps)
   moduleNamesNotThisOne <- mods[!mods %in% curModName]
-  out$otherModsInputs <- na.omit(unique(unlist(lapply(
+  out$thisMod <- curModName
+  allOtherModNames <- deps[names(deps) != curModName]
+  out$anyModInputs <- na.omit(unique(unlist(lapply(
     deps, # can be a different event, don't exclude self
     function(modu)
       modu@inputObjects$objectName
@@ -1497,18 +1520,19 @@ getFutureNeeds <- function(deps, curModName) {
     function(modu)
       modu@outputObjects$objectName
   ))))
-  out$otherModsOutputs <- lapply(
+  out$anyModOutputs <- lapply(
     deps,
     function(modu)
       modu@outputObjects$objectName
   )
-  out$dontAllowModules <- unlist(lapply(out$otherModsOutputs, function(x) any(x %in% out$thisModsInputs)))
+  out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
   out
 
 }
 
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
+  message(crayon::magenta("        -- Spawning in a future"))
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
   modObjs <- mget(ls(envir = modEnv), envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
