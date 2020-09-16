@@ -242,9 +242,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
               skipEvent <- TRUE
             }
           }
-          if (!skipEvent)
+
+          if (!skipEvent) {
             sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                              showSimilar = showSimilar, .pkgEnv)
+          }
 
           # browser(expr = exists("._doEvent_3"))
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
@@ -1484,7 +1486,7 @@ resolveFutureNow <- function(sim) {
 
   # events
   evntsFut <- events(tmpSim, unit = "seconds")
-  evntsNormal <- rbindlist(list(current(sim, unit = "seconds"), events(sim, unit = "seconds")))
+  evntsNormal <- rbindlist(list(completed(sim, unit = "seconds")[, 1:4], current(sim, unit = "seconds"), events(sim, unit = "seconds")))
   newEvents <- evntsFut[!evntsNormal, on = c("eventTime", "moduleName", "eventTime", "eventPriority")]
   if (NROW(newEvents)) {
     newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
@@ -1502,30 +1504,32 @@ getFutureNeeds <- function(deps, curModName) {
   #browser(expr = curModName == "fireSpread")
   out <- list()
   mods <- names(deps)
-  moduleNamesNotThisOne <- mods[!mods %in% curModName]
-  out$thisMod <- curModName
-  allOtherModNames <- deps[names(deps) != curModName]
-  out$anyModInputs <- na.omit(unique(unlist(lapply(
-    deps, # can be a different event, don't exclude self
-    function(modu)
-      modu@inputObjects$objectName
-  ))))
-  out$thisModsInputs <- na.omit(unique(unlist(lapply(
-    deps[curModName], # can be a different event, don't exclude self
-    function(modu)
-      modu@inputObjects$objectName
-  ))))
-  out$thisModOutputs <- na.omit(unique(unlist(lapply(
-    deps[curModName],
-    function(modu)
-      modu@outputObjects$objectName
-  ))))
-  out$anyModOutputs <- lapply(
-    deps,
-    function(modu)
-      modu@outputObjects$objectName
-  )
-  out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
+  if (isTRUE(curModName %in% mods)) {
+    moduleNamesNotThisOne <- mods[!mods %in% curModName]
+    out$thisMod <- curModName
+    allOtherModNames <- deps[names(deps) != curModName]
+    out$anyModInputs <- na.omit(unique(unlist(lapply(
+      deps, # can be a different event, don't exclude self
+      function(modu)
+        modu@inputObjects$objectName
+    ))))
+    out$thisModsInputs <- na.omit(unique(unlist(lapply(
+      deps[curModName], # can be a different event, don't exclude self
+      function(modu)
+        modu@inputObjects$objectName
+    ))))
+    out$thisModOutputs <- na.omit(unique(unlist(lapply(
+      deps[curModName],
+      function(modu)
+        modu@outputObjects$objectName
+    ))))
+    out$anyModOutputs <- lapply(
+      deps,
+      function(modu)
+        modu@outputObjects$objectName
+    )
+    out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
+  }
   out
 
 }

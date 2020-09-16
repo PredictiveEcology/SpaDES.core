@@ -14,7 +14,7 @@ test_that("test futureEvents", {
       file.copy(f1, f2)
       ll <- readLines(f1)
       lin <- grep("Burn\\(sim\\)|Move\\(sim\\)|plotFun\\(sim\\)", ll)
-      newModCode <- c(ll[seq(lin-1)], "    system.time(for (i in 1:3e5) rnorm(10))",
+      newModCode <- c(ll[seq(lin-1)], "    system.time(for (i in 1:3e6) rnorm(10))",
                       if(mod == "test") "sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, 'test', 'plot')",
                       ll[lin:length(ll)])
       writeLines(newModCode, con = f1)
@@ -30,7 +30,7 @@ test_that("test futureEvents", {
     add = TRUE)
 
 
-    future::plan(future::multiprocess(workers = 2))
+    future::plan(future::multiprocess(workers = 3))
 
     mods <- c("caribouMovement", "randomLandscapes", "fireSpread", "test")
     # Example of changing parameter values
