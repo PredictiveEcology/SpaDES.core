@@ -606,6 +606,8 @@ bindrows <- function(...) {
     ll <- as.list(match.call(expand.dots = TRUE))
     nonEmpties <- unlist(lapply(ll, function(x) any(nchar(x) > 0)))
     eval(as.call(ll[nonEmpties]))
+  } else if (is(rws, "try-error")) {
+    stop(rws)
   } else {
     rbindlist(rws, fill = TRUE, use.names = TRUE)
   }
