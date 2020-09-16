@@ -131,13 +131,13 @@ test_that("depsEdgeList and depsGraph work", {
 
   # depsEdgeList
   el <- depsEdgeList(mySim)
-  el_from <- c("fireSpread", "fireSpread",
+  el_from <- c("caribouMovement", "fireSpread", "fireSpread",
                "fireSpread", "randomLandscapes", "randomLandscapes")
-  el_to <- c("caribouMovement", "fireSpread", "fireSpread",
+  el_to <- c("caribouMovement", "caribouMovement", "fireSpread", "fireSpread",
              "caribouMovement", "fireSpread")
-  el_objName <- c("landscape", "landscape",
+  el_objName <- c("caribou", "landscape", "landscape",
                   "npixelsburned", "landscape", "landscape")
-  el_objClass <- c("RasterStack", "RasterStack",
+  el_objClass <- c("SpatialPointsDataFrame", "RasterStack", "RasterStack",
                    "numeric", "RasterStack", "RasterStack")
 
   expect_is(el, "data.table")
