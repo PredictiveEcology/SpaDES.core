@@ -45,20 +45,23 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
     curForFuture <- sim@events[[1]]
     if (!curForFuture[["moduleName"]] %in% .pkgEnv$.coreModulesMinusSave) {
       if (length(sim$simFuture)) {
+        modInFuture <- modNameInFuture(sim$simFuture)
         futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                      curModName = curForFuture[["moduleName"]])#sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
+                                      curModName = modInFuture)#sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
         canProceed <- if (length(futureNeeds)) {
           # with the assumption that the "unresolved" future could schedule itself,
           # must block any module who's outputs are needed by the same module as the
           # unresolved future module
-          modInFuture <- gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(sim$simFuture))
-          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% modInFuture) #&&
+          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture$moduleName) #&&
             #modInFuture != curForFuture[["moduleName"]]
         } else {
           TRUE
         }
         if (!canProceed || curForFuture$moduleName == "save" || future::resolved(sim$simFuture[[1]][[1]])) {
-          sim <- resolveFutureNow(sim)
+          cause <- if (!canProceed) paste0(curForFuture$moduleName, " requires outputs from ", modInFuture)
+          else if (curForFuture$moduleName == "save") paste0("Current event is 'save'; so resolving all")
+          else paste0(modInFuture, " finished running")
+          sim <- resolveFutureNow(sim, cause = cause)
         }
 
       }
@@ -1049,7 +1052,12 @@ setMethod(
         if (is.null(allObjNames)) recoverMode <- 0
       }
       useFuture <- getOption("spades.useFuture", FALSE)
-      if (useFuture) sim$simFuture <- list()
+      if (useFuture) {
+        message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
+                "if their outputs are not needed by the next event. STILL EXPERIMENTAL. Use cautiously")
+        sim$.futureEventsSkipped <- 0
+        sim$simFuture <- list()
+      }
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         if (recoverMode > 0) {
@@ -1087,7 +1095,7 @@ setMethod(
           if (length(sim$simFuture) > 1) {
             for (simFut in seq_along(sim$simFuture)) {
               if (future::resolved(sim$simFuture[[1]][[1]])) {
-                sim <- resolveFutureNow(sim)
+                sim <- resolveFutureNow(sim, cause = paste0(modNameInFuture(sim$simFuture[1]), " finished running"))
               }
             }
           }
@@ -1096,9 +1104,10 @@ setMethod(
       if (useFuture) {
         if (length(sim$simFuture)) {
           for (simFut in seq_along(sim$simFuture)) {
-              sim <- resolveFutureNow(sim)
+            sim <- resolveFutureNow(sim, cause = "End of simulation")
           }
         }
+        message(crayon::magenta(sim$.futureEventsSkipped, " events ran while events ran in futures"))
       }
       sim@simtimes[["current"]] <- sim@simtimes[["end"]]
 
@@ -1470,13 +1479,18 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
   return(invisible())
 }
 
-resolveFutureNow <- function(sim) {
+resolveFutureNow <- function(sim, cause = "") {
 
   futureRunning <- sim@events[[1]]
   futureRunning[1:4] <- as.list(strsplit(names(sim$simFuture)[1], split = "_")[[1]])
-  futureRunning[[1]] <- convertTimeunit(as.numeric(futureRunning[[1]]), unit = timeunit(sim))
+  futureRunning[["eventTime"]] <- as.numeric(futureRunning[[1]])
+  futureRunning[["eventPriority"]] <- as.numeric(futureRunning[["eventPriority"]])
+  futureRunningSimTU <- futureRunning
+  futureRunningSimTU[["eventTime"]] <- convertTimeunit(as.numeric(futureRunningSimTU[[1]]), unit = timeunit(sim))
+  setDT(futureRunningSimTU)
   setDT(futureRunning)
-  message(crayon::magenta("        -- Resolving", capture.output(print(futureRunning, row.names = FALSE, col.names = "none"))))
+  message(crayon::magenta("        -- Resolving", capture.output(print(futureRunningSimTU, row.names = FALSE, col.names = "none"))))
+  message(crayon::magenta("           ", cause))
 
   tmpSim <- future::value(sim$simFuture[[1]][[1]])
   simMetadata <- sim$simFuture[[1]][[2]]
@@ -1484,10 +1498,14 @@ resolveFutureNow <- function(sim) {
   # objects
   list2env(mget(simMetadata$objects, envir = envir(tmpSim)), envir = envir(sim))
 
+  allCols <- c("eventTime", "moduleName", "eventTime", "eventPriority")
   # events
   evntsFut <- events(tmpSim, unit = "seconds")
-  evntsNormal <- rbindlist(list(completed(sim, unit = "seconds")[, 1:4], current(sim, unit = "seconds"), events(sim, unit = "seconds")))
-  newEvents <- evntsFut[!evntsNormal, on = c("eventTime", "moduleName", "eventTime", "eventPriority")]
+  compltd <- completed(sim, unit = "seconds")[, 1:4]
+  evntsNormal <- rbindlist(list(compltd, current(sim, unit = "seconds"), events(sim, unit = "seconds")))
+  newEvents <- evntsFut[!evntsNormal, on = allCols]
+
+  sim$.futureEventsSkipped <- sim$.futureEventsSkipped + NROW(compltd) - futureRunning[compltd, whi := .I, on = allCols]$wh
   if (NROW(newEvents)) {
     newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
     slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
@@ -1553,4 +1571,8 @@ getFutureNeeds <- function(deps, curModName) {
                                objects = futureNeeds$thisModOutputs,
                                dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
   sim
+}
+
+modNameInFuture <- function(simFuture) {
+  gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
 }
