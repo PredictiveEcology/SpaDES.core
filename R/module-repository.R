@@ -97,7 +97,7 @@ setMethod(
   signature = c(name = "character", repo = "character"),
   definition = function(name, repo) {
     goAhead <- FALSE
-    if (requireNamespace("httr")) {
+    if (requireNamespace("httr", quietly = TRUE)) {
       if (packageVersion("httr") >= "1.2.1") {
         goAhead <- TRUE
       }}
@@ -299,7 +299,7 @@ setMethod(
                 quickCheck = "ANY", overwrite = "logical"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
-    if (requireNamespace("httr")) {
+    if (requireNamespace("httr", quietly = TRUE)) {
     path <- checkPath(path, create = TRUE)
     checkPath(file.path(path, name), create = TRUE)
 

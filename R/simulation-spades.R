@@ -1052,7 +1052,9 @@ setMethod(
       }
       useFuture <- getOption("spades.futureEvents", FALSE)
       if (useFuture) {
-        if (!requireNamespace("future")) stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
+        if (!requireNamespace("future", quietly = TRUE))
+          stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
+
         message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
                 "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
                 "User must manage future::plan, e.g., \nfuture::plan(multiprocess(workers = 2))")

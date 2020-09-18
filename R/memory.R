@@ -120,7 +120,8 @@ memoryUse <- function(sim, max = TRUE) {
 isWindows <- function() identical(.Platform$OS.type, "windows")
 
 memoryUseSetup <- function(sim, originalFuturePlan) {
-  if (requireNamespace("future") && requireNamespace("future.callr")) {
+  if (requireNamespace("future", quietly = TRUE) &&
+      requireNamespace("future.callr", quietly = TRUE)) {
 
     thePlan <- getOption("spades.futurePlan", NULL)
     # originalFuturePlan <- future::plan()

@@ -337,7 +337,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   )
 
   # from pryr::mem_used
-  #if (requireNamespace("pryr")) {
+  #if (requireNamespace("pryr", quietly = TRUE)) {
   mu <- sum(gc()[, 1] * c(as.integer(8 * .Machine$sizeof.pointer - .Machine$sizeof.pointer),
                           as.integer(8)))
   class(mu) <- "object_size"

@@ -63,7 +63,7 @@ newProgressBar <- function(sim) {
   tu <- sim@simtimes[["timeunit"]]
   OS <- tolower(Sys.info()["sysname"])
   wantGraphical <- isTRUE(P(sim, ".progress")$type == "graphical")
-  if (!requireNamespace("tcltk")) {
+  if (!requireNamespace("tcltk", quietly = TRUE)) {
     if (wantGraphical && (OS != "windows")) {
       warning("Can't use graphical progress bar without tcltk package: ",
               "install.packages('tcltk')\n",
@@ -97,7 +97,7 @@ setProgressBar <- function(sim) {
   tu <- sim@simtimes[["timeunit"]]
   pb <- get(".pb", envir = .pkgEnv)
   wantGraphical <- isTRUE(P(sim, ".progress")$type == "graphical")
-  if (!requireNamespace("tcltk")) {
+  if (!requireNamespace("tcltk", quietly = TRUE)) {
     if (wantGraphical && (OS != "windows")) {
       warning("Can't use graphical progress bar without tcltk package: ",
               "install.packages('tcltk')\n",
