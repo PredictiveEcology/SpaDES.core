@@ -54,7 +54,7 @@ setMethod(
 
     io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
     wh <- io[[module]][["objectName"]] == objectName
-    io[[module]][wh]$sourceURL
+    io[[module]][wh, ]$sourceURL
 })
 
 #' Calculate checksum for a module's data files
