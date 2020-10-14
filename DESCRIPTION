@@ -36,7 +36,6 @@ Imports:
     crayon,
     data.table (>= 1.10.4),
     fastdigest,
-    fpCompare (>= 0.2.1),
     igraph (>= 1.0.1),
     methods,
     qs (>= 0.21.1),
@@ -106,6 +105,7 @@ Collate:
     'plotting.R'
     'progress.R'
     'project-template.R'
+    'reexports.R'
     'restart.R'
     'save.R'
     'simulation-spades.R'
