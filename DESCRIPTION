@@ -31,12 +31,11 @@ Authors@R: c(
 Depends:
     R (>= 3.6),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.1)
+    reproducible (>= 1.2.1.9007)
 Imports:
     crayon,
     data.table (>= 1.10.4),
     fastdigest,
-    fpCompare (>= 0.2.1),
     igraph (>= 1.0.1),
     methods,
     qs (>= 0.21.1),
@@ -67,6 +66,8 @@ Suggests:
     rmarkdown,
     tcltk,
     testthat (>= 1.0.2)
+Remotes:
+    PredictiveEcology/reproducible@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
@@ -106,6 +107,7 @@ Collate:
     'plotting.R'
     'progress.R'
     'project-template.R'
+    'reexports.R'
     'restart.R'
     'save.R'
     'simulation-spades.R'
