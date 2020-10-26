@@ -273,7 +273,7 @@ setMethod(
     moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
     writeLines(whisker.render(moduleTemplate, moduleData), filenameR)
 
-    message(crayon::green("New module, '", name, "', made in ", dirname(nestedPath)))
+    message(crayon::green(paste0("New module, '", name, "', made in ", dirname(nestedPath))))
     if (isTRUE(open)) {
       openModules(name, nestedPath)
     }
