@@ -25,12 +25,6 @@ Create a sequence diagram illustrating the data object dependencies of a
 simulation. Offers a more detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link{moduleDiagram}}.
 }
-\examples{
-objectDiagram(sim)
-# if there are lots of objects, may need to increase width and/or height
-objectDiagram(sim, height = 3000, width = 3000)
-
-}
 \seealso{
 \code{DiagrammeR::mermaid}.
 }
