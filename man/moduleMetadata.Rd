@@ -7,9 +7,16 @@
 \alias{moduleMetadata,ANY,ANY,ANY-method}
 \title{Parse and extract module metadata}
 \usage{
-moduleMetadata(sim, module, path)
+moduleMetadata(
+  sim,
+  module,
+  path,
+  defineModuleListItems = c("name", "description", "keywords", "childModules",
+    "authors", "version", "spatialExtent", "timeframe", "timeunit", "citation",
+    "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects")
+)
 
-\S4method{moduleMetadata}{missing,character,character}(module, path)
+\S4method{moduleMetadata}{missing,character,character}(module, path, defineModuleListItems)
 
 \S4method{moduleMetadata}{missing,character,missing}(module)
 

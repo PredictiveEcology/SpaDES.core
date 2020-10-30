@@ -18,7 +18,12 @@
 #'
 #' @example inst/examples/example_moduleMetadata.R
 #'
-setGeneric("moduleMetadata", function(sim, module, path) {
+setGeneric("moduleMetadata", function(sim, module, path,
+                                      defineModuleListItems = c(
+                                        "name", "description", "keywords", "childModules", "authors",
+                                        "version", "spatialExtent", "timeframe", "timeunit", "citation",
+                                        "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects"
+                                      )) {
   standardGeneric("moduleMetadata")
 })
 
@@ -27,7 +32,7 @@ setGeneric("moduleMetadata", function(sim, module, path) {
 setMethod(
   "moduleMetadata",
   signature = c(sim = "missing", module = "character", path = "character"),
-  definition = function(module, path) {
+  definition = function(module, path, defineModuleListItems) {
     filename <- paste(path, "/", module, "/", module, ".R", sep = "")
     if (!file.exists(filename)) {
       stop(paste(filename, "does not exist. This was created by putting",
@@ -38,11 +43,6 @@ setMethod(
 
     ## store metadata as list
 
-    defineModuleListItems <- c(
-      "name", "description", "keywords", "childModules", "authors",
-      "version", "spatialExtent", "timeframe", "timeunit", "citation",
-      "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects"
-    )
     metadata <- lapply(defineModuleListItems, function(xx) {
       pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                  defineModuleElement = xx)

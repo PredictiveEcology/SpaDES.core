@@ -11,10 +11,11 @@
 \item{object}{an object to digest.}
 
 \item{.objects}{Character vector of objects to be digested. This is only applicable
-if there is a list, environment (or similar) named objects
+if there is a list, environment (or similar) with named objects
 within it. Only this/these objects will be considered for caching,
 i.e., only use a subset of
-the list, environment or similar objects.}
+the list, environment or similar objects. In the case of nested list-type
+objects, this will only be applied outermost first.}
 
 \item{length}{Numeric. If the element passed to Cache is a \code{Path} class
 object (from e.g., \code{asPath(filename)}) or it is a \code{Raster} with
