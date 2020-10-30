@@ -35,6 +35,7 @@ simulation. Offers a less detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link{objectDiagram}}.
 }
 \examples{
+\dontrun{
 # Will use quickPlot::Plot
 moduleDiagram(sim)
 # Can also use default base::plot
@@ -53,7 +54,6 @@ ig <- igraph::graph_from_data_frame(edgeList[, list(from, to)])
 plot(ig)
 
 # Or use qgraph package
-\dontrun{
 # library(qgraph)
 # qgraph(edgeList, shape = "rectangle", vsize = 12, vsize2 = 2
 }

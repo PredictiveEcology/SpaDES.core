@@ -234,9 +234,11 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #' @examples
+#' \dontrun{
 #' objectDiagram(sim)
 #' # if there are lots of objects, may need to increase width and/or height
 #' objectDiagram(sim, height = 3000, width = 3000)
+#' }
 #'
 setGeneric("objectDiagram", function(sim, ...) {
   standardGeneric("objectDiagram")
@@ -294,6 +296,7 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #' @examples
+#' \dontrun{
 #' # Will use quickPlot::Plot
 #' moduleDiagram(sim)
 #' # Can also use default base::plot
@@ -312,7 +315,6 @@ setMethod(
 #' plot(ig)
 #'
 #' # Or use qgraph package
-#' \dontrun{
 #' # library(qgraph)
 #' # qgraph(edgeList, shape = "rectangle", vsize = 12, vsize2 = 2
 #' }
