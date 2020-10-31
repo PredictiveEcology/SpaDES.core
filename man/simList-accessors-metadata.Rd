@@ -4,8 +4,10 @@
 \alias{inputObjects}
 \alias{simList-accessors-metadata}
 \alias{inputObjects,simList-method}
+\alias{inputObjects,missing-method}
 \alias{outputObjects}
 \alias{outputObjects,simList-method}
+\alias{outputObjects,missing-method}
 \alias{outputObjectNames}
 \alias{outputObjectNames,simList-method}
 \alias{reqdPkgs}
@@ -18,13 +20,17 @@
 \alias{citation,character-method}
 \title{Metadata accessors}
 \usage{
-inputObjects(sim, module)
+inputObjects(sim, module, path)
 
-\S4method{inputObjects}{simList}(sim, module)
+\S4method{inputObjects}{simList}(sim, module, path)
 
-outputObjects(sim, module)
+\S4method{inputObjects}{missing}(sim, module, path)
 
-\S4method{outputObjects}{simList}(sim, module)
+outputObjects(sim, module, path)
+
+\S4method{outputObjects}{simList}(sim, module, path)
+
+\S4method{outputObjects}{missing}(sim, module, path)
 
 outputObjectNames(sim, module)
 
@@ -51,6 +57,9 @@ citation(package, lib.loc = NULL, auto = NULL, module = character())
 in which to replace element(s).}
 
 \item{module}{Character vector of module name(s)}
+
+\item{path}{The path to the module., i.e., the \code{modulePath}.
+Only relevent if \code{sim} not supplied.}
 
 \item{modulePath}{That path where \code{module} can be found. If set already
 using \code{setPaths}, it will use that. This will be ignored if \code{sim}

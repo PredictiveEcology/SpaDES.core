@@ -2577,12 +2577,14 @@ setMethod(
 #' in a \code{simList} if not specified.
 #'
 #' @inheritParams P
+#' @param path The path to the module., i.e., the \code{modulePath}.
+#'    Only relevent if \code{sim} not supplied.
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 #'
-setGeneric("inputObjects", function(sim, module) {
+setGeneric("inputObjects", function(sim, module, path) {
   standardGeneric("inputObjects")
 })
 
@@ -2590,8 +2592,8 @@ setGeneric("inputObjects", function(sim, module) {
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 setMethod("inputObjects",
-          signature = "simList",
-          definition = function(sim, module) {
+          signature(sim = "simList"),
+          definition = function(sim, module, path) {
             if (missing(module)) {
               module <- current(sim)
               if (NROW(module) == 0)
@@ -2606,6 +2608,26 @@ setMethod("inputObjects",
             return(out)
 })
 
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("inputObjects",
+          signature(sim = "missing"),
+          definition = function(sim, module, path) {
+            out <- inputOrOutputObjects(type = "inputObjects", module = module, path = path)
+            return(out)
+          })
+
+inputOrOutputObjects <- function(type, module, path) {
+  if (missing(path)) {
+    path <- getPaths()$modulePath
+  }
+  names(module) <- module
+  mm <- lapply(module, function(m)
+    moduleMetadata(module = m, path = path, defineModuleListItems = type)[[type]])
+  mm
+}
+
 ################################################################################
 #' @inheritParams P
 #' @include simList-class.R
@@ -2613,7 +2635,7 @@ setMethod("inputObjects",
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 #'
-setGeneric("outputObjects", function(sim, module) {
+setGeneric("outputObjects", function(sim, module, path) {
   standardGeneric("outputObjects")
 })
 
@@ -2622,7 +2644,7 @@ setGeneric("outputObjects", function(sim, module) {
 #' @aliases simList-accessors-metadata
 setMethod("outputObjects",
           signature = "simList",
-          definition = function(sim, module) {
+          definition = function(sim, module, path) {
             if (missing(module)) {
               module <- current(sim)
               if (NROW(module) == 0)
@@ -2636,6 +2658,15 @@ setMethod("outputObjects",
             }
             return(out)
 })
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("outputObjects",
+          signature(sim = "missing", module = "ANY"),
+          definition = function(sim, module, path) {
+            inputOrOutputObjects(type = "outputObjects", module = module, path = path)
+          })
 
 ################################################################################
 #' @inheritParams P
