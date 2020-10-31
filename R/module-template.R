@@ -18,12 +18,15 @@
 .fileEdit <- function(file) {
   if (Sys.getenv("RSTUDIO") == "1") {
     file <- gsub(file, pattern = "\\./", replacement = "")
-    message("Using RStudio, open file manually with:\n",
-            paste0("file.edit('", file, "')")
-    )
+    file.show(file)
+    message("Using RStudio; may need to open manually e.g., with file.edit or file.show")#,
+#            paste0("file.edit('", file, "')")
+#    )
   } else {
     file.edit(file)
   }
+  message(paste0("file.edit('", file, "')"))
+
 }
 
 ################################################################################
@@ -133,7 +136,7 @@ setMethod(
 
     stopifnot(
       is(children, "character"),
-      is(open, "logical"),
+      is(open, "logical") || any(endsWith(tolower(open), c("r", "rmd"))),
       is(type, "character"),
       type %in% c("child", "parent"),
       is(unitTests, "logical"),
@@ -155,14 +158,16 @@ setMethod(
     }
 
     ## module code file
-    newModuleCode(name = name, path = path, open = open, type = type, children = children)
+    newModuleCode(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "r"),
+                  type = type, children = children)
 
     if (type == "child" && unitTests) {
-      newModuleTests(name = name, path = path, open = open, useGitHub = useGitHub)
+      newModuleTests(name = name, path = path, open = !.isFALSE(open), useGitHub = useGitHub)
     }
 
     ### Make R Markdown file for module documentation
-    newModuleDocumentation(name = name, path = path, open = open, type = type, children = children)
+    newModuleDocumentation(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "rmd"),
+                           type = type, children = children)
 })
 
 #' @export
@@ -268,7 +273,10 @@ setMethod(
     moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
     writeLines(whisker.render(moduleTemplate, moduleData), filenameR)
 
-    if (open) openModules(name, nestedPath)
+    message(crayon::green(paste0("New module, '", name, "', made in ", dirname(nestedPath))))
+    if (isTRUE(open)) {
+      openModules(name, nestedPath)
+    }
 })
 
 #' Create new module documentation
@@ -505,9 +513,9 @@ setMethod(
     if (length(onlyModuleRFile) > 0) Rfiles <- Rfiles[onlyModuleRFile]
 
     # Open Rmd file also
-    RfileRmd <- dir(pattern = paste0(name, ".[Rr]md$"), recursive = TRUE, full.names = TRUE)
+    # RfileRmd <- dir(pattern = paste0(name, ".[Rr]md$"), recursive = TRUE, full.names = TRUE)
 
-    Rfiles <- c(Rfiles, RfileRmd)
+    # Rfiles <- c(Rfiles, RfileRmd)
     Rfiles <- Rfiles[grep(pattern = "[/\\\\]", Rfiles)]
     Rfiles <- Rfiles[sapply(strsplit(Rfiles,"[/\\\\\\.]"), function(x) any(duplicated(x)))]
 
