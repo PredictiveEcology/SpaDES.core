@@ -58,6 +58,9 @@ in which to replace element(s).}
 
 \item{module}{Character vector of module name(s)}
 
+\item{path}{The path to the module., i.e., the \code{modulePath}.
+Only relevent if \code{sim} not supplied.}
+
 \item{modulePath}{That path where \code{module} can be found. If set already
 using \code{setPaths}, it will use that. This will be ignored if \code{sim}
 is supplied and is required if \code{sim} not supplied}

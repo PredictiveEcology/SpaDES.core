@@ -6,6 +6,8 @@
 #'
 #' @param path   Character string specifying the file path to modules directory.
 #'               Default is to use the \code{spades.modulePath} option.
+#' @param defineModuleListItems A vector of metadata entries to return values
+#'   about.
 #'
 #' @return A list of module metadata, matching the structure in
 #'         \code{\link{defineModule}}.

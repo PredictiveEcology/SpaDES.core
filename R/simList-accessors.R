@@ -2577,6 +2577,8 @@ setMethod(
 #' in a \code{simList} if not specified.
 #'
 #' @inheritParams P
+#' @param path The path to the module., i.e., the \code{modulePath}.
+#'    Only relevent if \code{sim} not supplied.
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata

@@ -29,6 +29,9 @@ moduleMetadata(
 
 \item{path}{Character string specifying the file path to modules directory.
 Default is to use the \code{spades.modulePath} option.}
+
+\item{defineModuleListItems}{A vector of metadata entries to return values
+about.}
 }
 \value{
 A list of module metadata, matching the structure in
