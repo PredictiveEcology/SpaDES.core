@@ -301,7 +301,7 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current)
+  all.equal.default(target, current, check.environments = FALSE)
 }
 
 
