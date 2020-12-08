@@ -196,7 +196,7 @@ test_that("saveSimList does not work correctly", {
   sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1], overwrite = TRUE)
 
   mySim$landscape <- setMinMax(mySim$landscape)
-  expect_true(all.equal(mySim, sim))
+  expect_true(all.equal(mySim, sim, check.environments = FALSE))
 
   # Now try to keep filename intact
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 0, filebackedDir = NULL)

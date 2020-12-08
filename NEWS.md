@@ -18,6 +18,7 @@ version 1.0.4
 ## bug fixes
 
 * minor bug fixes
+* use new `all.equal(..., check.environments = FALSE)` for internal testing 
 
 version 1.0.3
 =============
