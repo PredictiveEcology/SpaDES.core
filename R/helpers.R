@@ -294,6 +294,7 @@ all.equal.simList <- function(target, current, ...) {
   })
   rm(list = objNamesTarget, envir = envir(target))
   rm(list = objNamesCurrent, envir = envir(current))
+
   # suppressWarnings(rm("._startClockTime", envir = envir(target)))
   # suppressWarnings(rm("._startClockTime", envir = envir(current)))
   # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
@@ -301,7 +302,23 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current)
+  # This is necessary as of R 4.1.0 where the `environment(...) <- ...` that is in Copy.simList
+  #    fails and creates a weird error about the names of the environment are different
+  targetList <- Copy(target)
+  currentList <- Copy(current)
+  # modNames <- ls(current$.mods)
+  # out <- lapply(modNames, function(mn) {
+  #   out <- lapply(ls(current$.mods[[mn]], all.names = TRUE), function(fnName) { # skip the
+  #     if (is.function(get(fnName, envir = targetList$.mods[[mn]]))) {
+  #       if (!grepl("^mod$|^Par$", fnName)) {
+  #         targetList$.mods[[mn]][[fnName]] <- as.list(target$.mods[[mn]][[fnName]])
+  #         currentList$.mods[[mn]][[fnName]] <- as.list(current$.mods[[mn]][[fnName]])
+  #       }
+  #     }
+  #   })
+  # })
+
+  all.equal.default(targetList, currentList)
 }
 
 
