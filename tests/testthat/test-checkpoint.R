@@ -107,5 +107,5 @@ test_that("test checkpointing with disk-backed raster", {
   names(simA$ras) <- names(simB$ras) <- "tmp"
 
   ## both versions above should yield identical results
-  expect_equal(simA, simB)
+  expect_true(all.equal(simA, simB, check.environments = FALSE))
 })
