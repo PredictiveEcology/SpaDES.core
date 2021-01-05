@@ -647,9 +647,9 @@ scheduleConditionalEvent <- function(sim,
 #'                 the number of update intervals to show in a graphical progress bar.
 #'
 #' @param cache Logical. If \code{TRUE}, then the \code{spades} call will be cached.
-#'              This means that if the call is made again with the same simList,
+#'              This means that if the call is made again with the same \code{simList},
 #'              then `spades`` will return the return value from the previous run
-#'              of that exact same simList. Default \code{FALSE}. See Details.
+#'              of that exact same \code{simList}. Default \code{FALSE}. See Details.
 #'              See also the vignette on caching for examples.
 #'
 #' @param .plotInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
@@ -694,13 +694,13 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' There are numerous ways in which Caching can be used within SpaDES. Please
 #' see the vignette
-#' \url{https://cran.r-project.org/web/packages/SpaDES.core/vignettes/iii-cache.html}
+#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
 #' for many examples. Briefly, functions, events, modules, entire spades calls or
 #' experiment calls (see \url{https::/github.com/PredictiveEcology/SpaDES.experiment})
 #' can be cached and mixtures of all of these will work. For functions, simply
 #' wrap the call with \code{Cache}, moving the original function name into
 #' the first argument of Cache. For events or modules, set the module \code{parameters},
-#' \code{.useCache}. e.g.,
+#' \code{.useCache}, e.g.,
 #' \code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
 #' This can be set to an event name, which will cache that event, or a logical (e.g., \code{}),
 #' which will cache \emph{every} event in that module. Event and module caching
