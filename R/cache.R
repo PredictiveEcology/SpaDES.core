@@ -33,7 +33,7 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
-    browser(expr = exists("._robustDigest_1"))
+    # browser(expr = exists("._robustDigest_1"))
 
     curMod <- currentModule(object)
 
@@ -61,7 +61,7 @@ setMethod(
     } else {
       TRUE
     }
-    browser(expr = exists("._robustDigest_2"))
+    # browser(expr = exists("._robustDigest_2"))
     if (!isObjectEmpty) {
       # objects may be provided in a namespaced format: modName:objName --
       # e.g., coming from .parseModule
@@ -81,13 +81,13 @@ setMethod(
       names(objects2) <- mods
       .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
       if (length(objects1ByModWhole))
-        .objects <- updateList(.objects, objects1ByModWhole)
+        .objects <- suppressWarnings(updateList(.objects, objects1ByModWhole))
     } else {
       .objects <- allObjsInSimList
     }
     envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
                      function(objs, name) {
-                       browser(expr = exists("._robustDigest_5"))
+                       # browser(expr = exists("._robustDigest_5"))
                        dotUnderscoreObjs <- objs[startsWith(objs, "._")]
                        objs <- objs[!objs %in% c(dotUnderscoreObjs, "mod", "Par")]
                        objs <- objs[objs %in% .objects[[name]]]
@@ -114,7 +114,7 @@ setMethod(
     envirHash$.xData[names(eh)] <- eh
     envirHash[names(eh)] <- NULL
 
-    browser(expr = exists("._robustDigest_3"))
+    # browser(expr = exists("._robustDigest_3"))
     # Copy all parts except environment, clear that, then convert to list
     objectTmp <- object
     object <- Copy(object, objects = FALSE, queues = FALSE)
@@ -198,7 +198,7 @@ setMethod(
       if (FALSE %in% classOptions$completed) obj$completed <- NULL
     if (!is.null(classOptions$simtimes))
       if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
-    browser(expr = exists("._robustDigest_4"))
+    # browser(expr = exists("._robustDigest_4"))
     obj
 })
 
@@ -391,7 +391,7 @@ setMethod(
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
 
-    browser(expr = exists("._addChangedAttr_5"))
+    # browser(expr = exists("._addChangedAttr_5"))
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
       .setSubAttrInList(object, ".Cache", "newCache", NULL)
@@ -410,7 +410,7 @@ setMethod(
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
-      whSimList2 <- if (is.null(internalSimList) || isFALSE(internalSimList)) {
+      whSimList2 <- if (is.null(internalSimList) || .isFALSE(internalSimList)) {
         1
       } else {
         # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
@@ -474,7 +474,7 @@ setMethod(
   signature = "simList",
   definition = function(object, cacheRepo, ...) {
     tmpl <- list(...)
-    browser(expr = exists("._prepareOutput_5"))
+    # browser(expr = exists("._prepareOutput_5"))
     tmpl <- .findSimList(tmpl)
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
@@ -576,7 +576,7 @@ setMethod(
 
 
               a <- do.call(unique,
-                           args = list(append(b[eventsAddedByThisModule], d)))
+                           args = alist(append(b[eventsAddedByThisModule], d)))
 
               # a <- do.call(unique,
               #              args = list(append(object@events[eventsAddedByThisModule], object2@events)))
@@ -683,7 +683,7 @@ setMethod(
   signature = "simList",
   definition = function(object, outputObjects, FUN, preDigestByClass) {
     if (!is.null(outputObjects)) {
-      browser(expr = exists("._addTagsToOutput_2"))
+      # browser(expr = exists("._addTagsToOutput_2"))
       outputToSave <- object
       outputToSave@.xData <- new.env(parent = emptyenv())
       outputToSave@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))

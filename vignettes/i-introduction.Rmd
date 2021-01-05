@@ -310,7 +310,7 @@ To view available vignettes use `browseVignettes(package = "SpaDES.core")` (this
 
 ### Website
 
-[http://SpaDES.PredictiveEcology.org](http://SpaDES.PredictiveEcology.org)
+[https://SpaDES.PredictiveEcology.org](https://SpaDES.PredictiveEcology.org)
 
 ### Wiki
 

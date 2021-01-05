@@ -36,7 +36,7 @@ Used to specify an input object's name, class, description, source url and
 other specifications.
 }
 \examples{
-inputObjects <- dplyr::bind_rows(
+inputObjects <- bindrows(
   expectsInput(objectName = "inputObject1", objectClass = "character",
                desc = "this is for example", sourceURL = "not available"),
   expectsInput(objectName = "inputObject2", objectClass = "numeric",

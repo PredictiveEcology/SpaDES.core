@@ -54,7 +54,7 @@ This is for overplotting, when the overplot is not to occur on
 the plot with the same name, such as plotting a
 \code{SpatialPoints*} object on a \code{RasterLayer}.}
 
-\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot]{gpar}} function,
+\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot:grid-functions]{gpar}},
 to change plotting parameters (see \pkg{grid} package).}
 
 \item{gpText}{A \code{gpar} object for the title text.

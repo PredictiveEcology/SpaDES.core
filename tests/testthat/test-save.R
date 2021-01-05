@@ -196,7 +196,7 @@ test_that("saveSimList does not work correctly", {
   sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1], overwrite = TRUE)
 
   mySim$landscape <- setMinMax(mySim$landscape)
-  expect_true(all.equal(mySim, sim))
+  expect_true(all.equal(mySim, sim, check.environment = FALSE))
 
   # Now try to keep filename intact
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 0, filebackedDir = NULL)
@@ -233,7 +233,6 @@ test_that("restart does not work correctly", {
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
   #devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
-  devtools::load_all() # need the testInit function
   testInitOut <- testInit(libraries = "raster", tmpFileExt = c("grd", "Rdata", "Rdata"),
                           opts = list("spades.restartRInterval" = 1, "spades.moduleCodeChecks" = FALSE))
   on.exit({

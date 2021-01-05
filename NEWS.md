@@ -1,5 +1,23 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.4
+=============
+
+## new features
+* New experimental `spades.futureEvents` option. If set to `TRUE`, spades will run module events in a "future" (see `future` package), if they do not produce outputs for other modules.
+* enable automated module code checking with GitHub Actions (`use_gha()` and corresponding vignette; #74)
+* `newProject` creates Rstudio `.Rproj` file if invoked in Rstudio
+* moved `paddedFloatToChar` to reproducible; but re-exported here, so still usable.
+
+## dependencies
+* completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies
+* move `tcltk` to `Suggests`
+* remove `devtools`, `microbenchmark` from `Suggests`
+
+## bug fixes
+* minor bug fixes
+* use new `all.equal(..., check.environment = FALSE)` for internal testing 
+
 version 1.0.3
 =============
 

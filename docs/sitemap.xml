@@ -1,432 +1,441 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://spades-core.predictiveecology.org//index.html</loc>
+    <loc>https://spades-core.predictiveecology.org//index.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/Copy.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/Copy.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/Plot.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/Plot.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/SpaDES.core-package.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/SpaDES.core-package.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/addChangedAttr.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/addChangedAttr.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/addDepends.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/addDepends.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/addTagsToOutput.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/addTagsToOutput.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/all.equal.simList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/all.equal.simList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/append_attr.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/append_attr.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/cacheMessage.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/bindrows.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checkCacheRepo.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/cacheMessage.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checkModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checkCacheRepo.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checkModuleLocal.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checkModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checkObject.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checkModuleLocal.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checkParams.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checkObject.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checkpoint.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checkParams.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/checksums.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checkpoint.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/classFilter.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/checksums.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/clearCache.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/classFilter.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/copyModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/clearCache.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/coreModules.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/copyModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/createsOutput.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/coreModules.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/defineModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/createsOutput.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/defineParameter.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/defineModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/deprecated.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/defineParameter.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/depsEdgeList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/deprecated.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/depsGraph.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/depsEdgeList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/depsLoadOrder.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/depsGraph.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/depsPruneEdges.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/depsLoadOrder.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/doEvent.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/depsPruneEdges.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/downloadData.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/doEvent.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/downloadModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/downloadData.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/emptyEventList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/downloadModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/emptyMetadata.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/emptyEventList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/eventDiagram.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/emptyMetadata.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/expectsInput.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/eventDiagram.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/extractURL.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/expectsInput.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/fileEdit.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/extractURL.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/fileName.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/fileEdit.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/fileTable.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/fileName.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/fillInputRows.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/fileTable.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/fillOutputRows.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/fillInputRows.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/findElements.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/fillOutputRows.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/findModuleName.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/findElements.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/findObjects.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/findModuleName.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/findSimList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/findObjects.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/ganttStatus.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/findSimList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/getModuleInputObjects.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/ganttStatus.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/getModuleVersion.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/getModuleInputObjects.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/getOption.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/getModuleVersion.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/globals.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/getOption.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/identifyChildModules.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/globals.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/initialize-method.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/identifyChildModules.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/inputObjectsDF.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/initialize-method.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/isNamespaced.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/inputObjectsDF.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/keepAttrs.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/isNamespaced.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/loadFiles.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/keepAttrs.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/loadPackages.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/loadFiles.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/loadSimList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/loadPackages.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/makeMemoisable.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/loadSimList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/maxTimeunit.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/makeMemoisable.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/memoryUse.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/maxTimeunit.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/minTimeunit.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/memoryUse.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/modifySearchPath.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/minTimeunit.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleCoverage.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/modifySearchPath.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleDefaults.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleCoverage.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleDeps-class.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleDefaults.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleDiagram.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleDeps-class.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleGraph.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleDiagram.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleMetadata.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleGraph.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleParamsInputsOuputs.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleMetadata.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/moduleVersion.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleParamsInputsOuputs.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/namespacing.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/moduleVersion.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/newModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/namespacing.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/newModuleCode.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/newModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/newModuleDocumentation.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/newModuleCode.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/newModuleTests.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/newModuleDocumentation.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/newProject.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/newModuleTests.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/newProjectCode.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/newProject.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objSize.simList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/newProjectCode.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objectDiagram.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/objSize.simList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objectSynonyms.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/objectDiagram.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/objects.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/objectSynonyms.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/openModules.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/objects.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/packages.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/openModules.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/paddedFloatToChar.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/packages.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/params.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/params.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/parseElems.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/parseElems.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/parseMessage.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/parseMessage.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/parseModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/parseModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/pkgEnv.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/pkgEnv.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/preDigestByClass.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/preDigestByClass.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/prepareOutput.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/prepareOutput.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/priority.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/priority.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/progress.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/progress.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/progressBar.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/progressBar.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/quickCheck.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/quickCheck.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/rasterToMemory.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/rasterToMemory.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/remoteFileSize.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/reexports.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/restartR.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/remoteFileSize.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/restartSpades.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/restartR.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/rndstr.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/restartSpades.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/robustDigest.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/rndstr.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/runCodeChecks.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/robustDigest.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/runModuleInputsObjects.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/runCodeChecks.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/saveFiles.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/runModuleInputsObjects.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/saveSimList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/saveFiles.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/scheduleConditionalEvent.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/saveSimList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/scheduleEvent.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/scheduleConditionalEvent.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/setPaths.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/scheduleEvent.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/show-method.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/setPaths.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/sim2gantt.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/show-method.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simDeps-class.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/sim2gantt.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simInit.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simDeps-class.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simInitAnd.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simInit.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-envir.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simInitAnd.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-events.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-envir.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-inputs.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-events.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-metadata.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-inputs.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-modules.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-metadata.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-outputs.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-modules.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-paths.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-outputs.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-accessors-times.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-paths.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/simList-class.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-accessors-times.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/spades-classes.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/simList-class.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/spades.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/spades-classes.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/spadesOptions.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/spades.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/spadesTime.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/spadesOptions.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/suppliedElsewhere.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/spadesTime.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/tagsByClass.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/suppliedElsewhere.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/timeConversion.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/tagsByClass.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/tryCatch.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/timeConversion.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/unparsed.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/tryCatch.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/updateList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/unparsed.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/verb.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/updateList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/writeEventInfo.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/use_gha.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/writeRNGInfo.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/verb.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/zipModule.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/writeEventInfo.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//reference/zipSimList.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/writeRNGInfo.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//articles/i-introduction.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/zipModule.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//articles/ii-modules.html</loc>
+    <loc>https://spades-core.predictiveecology.org//reference/zipSimList.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//articles/iii-cache.html</loc>
+    <loc>https://spades-core.predictiveecology.org//articles/i-introduction.html</loc>
   </url>
   <url>
-    <loc>http://spades-core.predictiveecology.org//articles/iv-advanced.html</loc>
+    <loc>https://spades-core.predictiveecology.org//articles/ii-modules.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org//articles/iii-cache.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org//articles/iv-advanced.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org//articles/v-automated-testing.html</loc>
   </url>
 </urlset>

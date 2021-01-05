@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -90,7 +90,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -116,6 +116,9 @@
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -125,7 +128,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -151,19 +154,19 @@
     <p>Based on <a href='https://stackoverflow.com/a/5158978/1380598'>https://stackoverflow.com/a/5158978/1380598</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>classFilter</span>(<span class='kw'>x</span>, <span class='kw'>include</span>, <span class='kw'>exclude</span>, <span class='kw'>envir</span>)
+    <pre class="usage"><span class='fu'>classFilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>include</span>, <span class='va'>exclude</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,character,environment</span>
-<span class='fu'>classFilter</span>(<span class='kw'>x</span>, <span class='kw'>include</span>, <span class='kw'>exclude</span>, <span class='kw'>envir</span>)
+<span class='fu'>classFilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>include</span>, <span class='va'>exclude</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,character,missing</span>
-<span class='fu'>classFilter</span>(<span class='kw'>x</span>, <span class='kw'>include</span>, <span class='kw'>exclude</span>)
+<span class='fu'>classFilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>include</span>, <span class='va'>exclude</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,missing,environment</span>
-<span class='fu'>classFilter</span>(<span class='kw'>x</span>, <span class='kw'>include</span>, <span class='kw'>envir</span>)
+<span class='fu'>classFilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>include</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,missing,missing</span>
-<span class='fu'>classFilter</span>(<span class='kw'>x</span>, <span class='kw'>include</span>)</pre>
+<span class='fu'>classFilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>include</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -201,54 +204,54 @@ These (known) cases are checked manually and corrected.</p>
     <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='co'>## from global environment</span>
-  <span class='kw'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>)     <span class='co'># class `list`</span>
-  <span class='kw'>b</span> <span class='op'>&lt;-</span> <span class='kw'>letters</span>        <span class='co'># class `character`</span>
-  <span class='kw'>d</span> <span class='op'>&lt;-</span> <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>10</span>)      <span class='co'># class `numeric`</span>
-  <span class='kw'>f</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fl'>1L</span><span class='op'>:</span><span class='fl'>10L</span>) <span class='co'># class `numeric`, `integer`</span>
-  <span class='kw'>g</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>( <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span>(<span class='kw'>d</span>) <span class='op'>~</span> <span class='kw'>d</span> ) <span class='co'># class `lm`</span>
-  <span class='kw'>h</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>( <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span>(<span class='kw'>d</span>) <span class='op'>~</span> <span class='kw'>d</span> ) <span class='co'># class `lm`, `glm`</span>
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"character"</span>, <span class='st'>"list"</span>))
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"numeric"</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"numeric"</span>, exclude = <span class='st'>"integer"</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"lm"</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"lm"</span>, exclude = <span class='st'>"glm"</span>)
-  <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>a</span>, <span class='kw'>b</span>, <span class='kw'>d</span>, <span class='kw'>f</span>, <span class='kw'>g</span>, <span class='kw'>h</span>)
-}
+  <span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>     <span class='co'># class `list`</span>
+  <span class='va'>b</span> <span class='op'>&lt;-</span> <span class='va'>letters</span>        <span class='co'># class `character`</span>
+  <span class='va'>d</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>      <span class='co'># class `numeric`</span>
+  <span class='va'>f</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1L</span><span class='op'>:</span><span class='fl'>10L</span><span class='op'>)</span> <span class='co'># class `numeric`, `integer`</span>
+  <span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>d</span> <span class='op'>)</span> <span class='co'># class `lm`</span>
+  <span class='va'>h</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>d</span> <span class='op'>)</span> <span class='co'># class `lm`, `glm`</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"character"</span>, <span class='st'>"list"</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"numeric"</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"numeric"</span>, exclude <span class='op'>=</span> <span class='st'>"integer"</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"lm"</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"lm"</span>, exclude <span class='op'>=</span> <span class='st'>"glm"</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, <span class='va'>d</span>, <span class='va'>f</span>, <span class='va'>g</span>, <span class='va'>h</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 <span class='co'>## from local (e.g., function) environment</span>
-<span class='fu'><a href='https://rdrr.io/r/base/eval.html'>local</a></span>({
-  <span class='kw'>e</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>environment</a></span>()
-  <span class='kw'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>)     <span class='co'># class `list`</span>
-  <span class='kw'>b</span> <span class='op'>&lt;-</span> <span class='kw'>letters</span>        <span class='co'># class `character`</span>
-  <span class='kw'>d</span> <span class='op'>&lt;-</span> <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>10</span>)      <span class='co'># class `numeric`</span>
-  <span class='kw'>f</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fl'>1L</span><span class='op'>:</span><span class='fl'>10L</span>) <span class='co'># class `numeric`, `integer`</span>
-  <span class='kw'>g</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>( <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span>(<span class='kw'>d</span>) <span class='op'>~</span> <span class='kw'>d</span> ) <span class='co'># class `lm`</span>
-  <span class='kw'>h</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>( <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span>(<span class='kw'>d</span>) <span class='op'>~</span> <span class='kw'>d</span> ) <span class='co'># class `lm`, `glm`</span>
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"character"</span>, <span class='st'>"list"</span>), envir = <span class='kw'>e</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"numeric"</span>, envir = <span class='kw'>e</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"numeric"</span>, exclude = <span class='st'>"integer"</span>, envir = <span class='kw'>e</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"lm"</span>, envir = <span class='kw'>e</span>)
-  <span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(), include = <span class='st'>"lm"</span>, exclude = <span class='st'>"glm"</span>, envir = <span class='kw'>e</span>)
-  <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>a</span>, <span class='kw'>b</span>, <span class='kw'>d</span>, <span class='kw'>e</span>, <span class='kw'>f</span>, <span class='kw'>g</span>, <span class='kw'>h</span>)
-})
+<span class='fu'><a href='https://rdrr.io/r/base/eval.html'>local</a></span><span class='op'>(</span><span class='op'>{</span>
+  <span class='va'>e</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>environment</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>     <span class='co'># class `list`</span>
+  <span class='va'>b</span> <span class='op'>&lt;-</span> <span class='va'>letters</span>        <span class='co'># class `character`</span>
+  <span class='va'>d</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>      <span class='co'># class `numeric`</span>
+  <span class='va'>f</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1L</span><span class='op'>:</span><span class='fl'>10L</span><span class='op'>)</span> <span class='co'># class `numeric`, `integer`</span>
+  <span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>d</span> <span class='op'>)</span> <span class='co'># class `lm`</span>
+  <span class='va'>h</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>d</span> <span class='op'>)</span> <span class='co'># class `lm`, `glm`</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"character"</span>, <span class='st'>"list"</span><span class='op'>)</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"numeric"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"numeric"</span>, exclude <span class='op'>=</span> <span class='st'>"integer"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"lm"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+  <span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"lm"</span>, exclude <span class='op'>=</span> <span class='st'>"glm"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, <span class='va'>d</span>, <span class='va'>e</span>, <span class='va'>f</span>, <span class='va'>g</span>, <span class='va'>h</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
 
 <span class='co'>## from another environment</span>
-<span class='kw'>e</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(parent = <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>())
-<span class='kw'>e</span><span class='op'>$</span><span class='kw'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>)     <span class='co'># class `list`</span>
-<span class='kw'>e</span><span class='op'>$</span><span class='kw'>b</span> <span class='op'>&lt;-</span> <span class='kw'>letters</span>        <span class='co'># class `character`</span>
-<span class='kw'>e</span><span class='op'>$</span><span class='kw'>d</span> <span class='op'>&lt;-</span> <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>10</span>)      <span class='co'># class `numeric`</span>
-<span class='kw'>e</span><span class='op'>$</span><span class='kw'>f</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fl'>1L</span><span class='op'>:</span><span class='fl'>10L</span>) <span class='co'># class `numeric`, `integer`</span>
-<span class='kw'>e</span><span class='op'>$</span><span class='kw'>g</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>( <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span>(<span class='kw'>e</span><span class='op'>$</span><span class='kw'>d</span>) <span class='op'>~</span> <span class='kw'>e</span><span class='op'>$</span><span class='kw'>d</span> ) <span class='co'># class `lm`</span>
-<span class='kw'>e</span><span class='op'>$</span><span class='kw'>h</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>( <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span>(<span class='kw'>e</span><span class='op'>$</span><span class='kw'>d</span>) <span class='op'>~</span> <span class='kw'>e</span><span class='op'>$</span><span class='kw'>d</span> ) <span class='co'># class `lm`, `glm`</span>
-<span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(<span class='kw'>e</span>), include=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"character"</span>, <span class='st'>"list"</span>), envir = <span class='kw'>e</span>)
-</div><div class='output co'>#&gt; [1] "a" "b"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(<span class='kw'>e</span>), include = <span class='st'>"numeric"</span>, envir = <span class='kw'>e</span>)
-</div><div class='output co'>#&gt; [1] "d" "f"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(<span class='kw'>e</span>), include = <span class='st'>"numeric"</span>, exclude = <span class='st'>"integer"</span>, envir = <span class='kw'>e</span>)
-</div><div class='output co'>#&gt; [1] "d"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(<span class='kw'>e</span>), include = <span class='st'>"lm"</span>, envir = <span class='kw'>e</span>)
-</div><div class='output co'>#&gt; [1] "g" "h"</div><div class='input'><span class='fu'>classFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>(<span class='kw'>e</span>), include = <span class='st'>"lm"</span>, exclude = <span class='st'>"glm"</span>, envir = <span class='kw'>e</span>)
-</div><div class='output co'>#&gt; [1] "g"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>a</span>, <span class='kw'>b</span>, <span class='kw'>d</span>, <span class='kw'>f</span>, <span class='kw'>g</span>, <span class='kw'>h</span>, envir = <span class='kw'>e</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>e</span>)
+<span class='va'>e</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span><span class='op'>(</span>parent <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>e</span><span class='op'>$</span><span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>     <span class='co'># class `list`</span>
+<span class='va'>e</span><span class='op'>$</span><span class='va'>b</span> <span class='op'>&lt;-</span> <span class='va'>letters</span>        <span class='co'># class `character`</span>
+<span class='va'>e</span><span class='op'>$</span><span class='va'>d</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>      <span class='co'># class `numeric`</span>
+<span class='va'>e</span><span class='op'>$</span><span class='va'>f</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1L</span><span class='op'>:</span><span class='fl'>10L</span><span class='op'>)</span> <span class='co'># class `numeric`, `integer`</span>
+<span class='va'>e</span><span class='op'>$</span><span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>$</span><span class='va'>d</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>e</span><span class='op'>$</span><span class='va'>d</span> <span class='op'>)</span> <span class='co'># class `lm`</span>
+<span class='va'>e</span><span class='op'>$</span><span class='va'>h</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/jitter.html'>jitter</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>$</span><span class='va'>d</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>e</span><span class='op'>$</span><span class='va'>d</span> <span class='op'>)</span> <span class='co'># class `lm`, `glm`</span>
+<span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span>, include<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"character"</span>, <span class='st'>"list"</span><span class='op'>)</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "a" "b"</div><div class='input'><span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"numeric"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "d" "f"</div><div class='input'><span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"numeric"</span>, exclude <span class='op'>=</span> <span class='st'>"integer"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "d"</div><div class='input'><span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"lm"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "g" "h"</div><div class='input'><span class='fu'>classFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span>, include <span class='op'>=</span> <span class='st'>"lm"</span>, exclude <span class='op'>=</span> <span class='st'>"glm"</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "g"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, <span class='va'>d</span>, <span class='va'>f</span>, <span class='va'>g</span>, <span class='va'>h</span>, envir <span class='op'>=</span> <span class='va'>e</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span>
 
 </div></pre>
   </div>
@@ -266,7 +269,7 @@ These (known) cases are checked manually and corrected.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

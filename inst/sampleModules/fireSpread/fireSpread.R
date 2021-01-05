@@ -41,13 +41,13 @@ defineModule(sim, list(
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time to schedule first save event"),
     defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time interval between save events")
   ),
-  inputObjects = bind_rows(
+  inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
                  desc = NA_character_, sourceURL = NA_character_),
     expectsInput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                  desc = NA_character_, sourceURL = NA_character_)
   ),
-  outputObjects = bind_rows(
+  outputObjects = bindrows(
     createsOutput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
                   desc = NA_character_, other = NA_character_),
     createsOutput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",

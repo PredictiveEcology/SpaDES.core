@@ -34,10 +34,10 @@ test_that("timeunit works correctly", {
     parameters = rbind(
       defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description")
     ),
-    inputObjects = dplyr::bind_rows(
+    inputObjects = bindrows(
       expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_)
     ),
-    outputObjects = dplyr::bind_rows(
+    outputObjects = bindrows(
       createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_)
     )
   )
@@ -48,7 +48,7 @@ test_that("timeunit works correctly", {
 
 
   # check for new unit being put into simList
-  assign("dfortnight", function(x) lubridate::duration(dday(14)),
+  assign("dfortnight", function(x) dday(14),
          envir = envir(mySim))
   expect_match(timeunit(mySim) <- "fortnight", "")
   expect_match(timeunit(mySim), "fortnight")

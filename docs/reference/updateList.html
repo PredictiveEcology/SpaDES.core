@@ -40,11 +40,8 @@
 
 
 <meta property="og:title" content="Update elements of a named list with elements of a second named list — updateList" />
-<meta property="og:description" content="Merge two named list based on their named entries. Where
-any element matches in both lists, the value from the
-second list is used in the updated list.
-Subelements are not examined and are simply replaced. If one list is empty, then
-it returns the other one, unchanged." />
+<meta property="og:description" content="Being deprecated. Use modifyList (which can not handle NULL) or
+modifyList2 for case with &amp;gt;2 lists and can handle NULL lists." />
 
 
 
@@ -86,7 +83,7 @@ it returns the other one, unchanged." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -94,7 +91,7 @@ it returns the other one, unchanged." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -120,6 +117,9 @@ it returns the other one, unchanged." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -129,7 +129,7 @@ it returns the other one, unchanged." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -152,26 +152,11 @@ it returns the other one, unchanged." />
     </div>
 
     <div class="ref-description">
-    <p>Merge two named list based on their named entries. Where
-any element matches in both lists, the value from the
-second list is used in the updated list.
-Subelements are not examined and are simply replaced. If one list is empty, then
-it returns the other one, unchanged.</p>
+    <p>Being deprecated. Use <code><a href='https://rdrr.io/r/utils/modifyList.html'>modifyList</a></code> (which can not handle NULL) or
+<code><a href='https://Require.predictiveecology.org/reference/modifyList2.html'>modifyList2</a></code> for case with &gt;2 lists and can handle NULL lists.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
-
-<span class='co'># S4 method for list,list</span>
-<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
-
-<span class='co'># S4 method for `NULL`,list</span>
-<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
-
-<span class='co'># S4 method for list,`NULL`</span>
-<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)
-
-<span class='co'># S4 method for `NULL`,`NULL`</span>
-<span class='fu'>updateList</span>(<span class='kw'>x</span>, <span class='kw'>y</span>)</pre>
+    <pre class="usage"><span class='fu'>updateList</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -196,9 +181,9 @@ it returns the other one, unchanged.</p>
     <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>L1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(a = <span class='st'>"hst"</span>, b = <span class='fl'>NA_character_</span>, c = <span class='fl'>43</span>)
-<span class='kw'>L2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(a = <span class='st'>"gst"</span>, c = <span class='fl'>42</span>, d = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>letters</span>))
-<span class='fu'>updateList</span>(<span class='kw'>L1</span>, <span class='kw'>L2</span>)
+    <pre class="examples"><div class='input'><span class='va'>L1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"hst"</span>, b <span class='op'>=</span> <span class='cn'>NA_character_</span>, c <span class='op'>=</span> <span class='fl'>43</span><span class='op'>)</span>
+<span class='va'>L2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"gst"</span>, c <span class='op'>=</span> <span class='fl'>42</span>, d <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>letters</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>updateList</span><span class='op'>(</span><span class='va'>L1</span>, <span class='va'>L2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $a
 #&gt; [1] "gst"
 #&gt; 
@@ -214,7 +199,7 @@ it returns the other one, unchanged.</p>
 #&gt; [20] "t" "u" "v" "w" "x" "y" "z"
 #&gt; 
 #&gt; </div><div class='input'>
-<span class='fu'>updateList</span>(<span class='kw'>L1</span>, <span class='kw'>NULL</span>)
+<span class='fu'>updateList</span><span class='op'>(</span><span class='va'>L1</span>, <span class='cn'>NULL</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $a
 #&gt; [1] "hst"
 #&gt; 
@@ -223,7 +208,16 @@ it returns the other one, unchanged.</p>
 #&gt; 
 #&gt; $c
 #&gt; [1] 43
-#&gt; </div><div class='input'><span class='fu'>updateList</span>(<span class='kw'>NULL</span>, <span class='kw'>L2</span>)
+#&gt; </div><div class='input'><span class='fu'>updateList</span><span class='op'>(</span><span class='va'>L1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $a
+#&gt; [1] "hst"
+#&gt; 
+#&gt; $b
+#&gt; [1] NA
+#&gt; 
+#&gt; $c
+#&gt; [1] 43
+#&gt; </div><div class='input'><span class='fu'>updateList</span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>L2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $a
 #&gt; [1] "gst"
 #&gt; 
@@ -235,7 +229,19 @@ it returns the other one, unchanged.</p>
 #&gt;  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
 #&gt; [20] "t" "u" "v" "w" "x" "y" "z"
 #&gt; 
-#&gt; </div><div class='input'><span class='fu'>updateList</span>(<span class='kw'>NULL</span>, <span class='kw'>NULL</span>) <span class='co'># should return empty list</span>
+#&gt; </div><div class='input'><span class='fu'>updateList</span><span class='op'>(</span><span class='cn'>NULL</span>, <span class='va'>L2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $a
+#&gt; [1] "gst"
+#&gt; 
+#&gt; $c
+#&gt; [1] 42
+#&gt; 
+#&gt; $d
+#&gt; $d[[1]]
+#&gt;  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+#&gt; [20] "t" "u" "v" "w" "x" "y" "z"
+#&gt; 
+#&gt; </div><div class='input'><span class='fu'>updateList</span><span class='op'>(</span><span class='cn'>NULL</span>, <span class='cn'>NULL</span><span class='op'>)</span> <span class='co'># should return empty list</span>
 </div><div class='output co'>#&gt; list()</div><div class='input'>
 </div></pre>
   </div>
@@ -253,7 +259,7 @@ it returns the other one, unchanged.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

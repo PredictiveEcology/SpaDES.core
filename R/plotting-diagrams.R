@@ -233,6 +233,12 @@ setMethod(
 #' @rdname objectDiagram
 #'
 #' @author Alex Chubaty
+#' @examples
+#' \dontrun{
+#' objectDiagram(sim)
+#' # if there are lots of objects, may need to increase width and/or height
+#' objectDiagram(sim, height = 3000, width = 3000)
+#' }
 #'
 setGeneric("objectDiagram", function(sim, ...) {
   standardGeneric("objectDiagram")
@@ -289,6 +295,30 @@ setMethod(
 #' @rdname moduleDiagram
 #'
 #' @author Alex Chubaty
+#' @examples
+#' \dontrun{
+#' # Will use quickPlot::Plot
+#' moduleDiagram(sim)
+#' # Can also use default base::plot
+#' modDia <- depsGraph(sim, plot = TRUE)
+#' # See ?plot.igraph
+#' plot(modDia, layout = layout_as_star)
+#'
+#' # Or for more control - here, change the label "_INPUT_" to "DATA"
+#' edgeList <- depsEdgeList(sim)
+#' edgeList <- edgeList[, list(from, to)]
+#' edgeList[from == "_INPUT_", from := "Data"]
+#' edgeList[to == "_INPUT_", to := "Data"]
+#' edgeList <- unique(edgeList)
+#' edge
+#' ig <- igraph::graph_from_data_frame(edgeList[, list(from, to)])
+#' plot(ig)
+#'
+#' # Or use qgraph package
+#' # library(qgraph)
+#' # qgraph(edgeList, shape = "rectangle", vsize = 12, vsize2 = 2
+#' }
+#'
 # igraph is being imported in spades-package.R
 setGeneric("moduleDiagram", function(sim, type, showParents, ...) {
   standardGeneric("moduleDiagram")

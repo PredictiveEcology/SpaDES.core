@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -90,7 +90,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -116,6 +116,9 @@
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -125,7 +128,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -151,16 +154,16 @@
     <p>Parse and extract a module's version</p>
     </div>
 
-    <pre class="usage"><span class='fu'>moduleVersion</span>(<span class='kw'>module</span>, <span class='kw'>path</span>, <span class='kw'>sim</span>, envir = <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>moduleVersion</span><span class='op'>(</span><span class='va'>module</span>, <span class='va'>path</span>, <span class='va'>sim</span>, envir <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>moduleVersion</span>(<span class='kw'>module</span>, <span class='kw'>path</span>, <span class='kw'>envir</span>)
+<span class='fu'>moduleVersion</span><span class='op'>(</span><span class='va'>module</span>, <span class='va'>path</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,missing,missing</span>
-<span class='fu'>moduleVersion</span>(<span class='kw'>module</span>, <span class='kw'>envir</span>)
+<span class='fu'>moduleVersion</span><span class='op'>(</span><span class='va'>module</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,missing,simList</span>
-<span class='fu'>moduleVersion</span>(<span class='kw'>module</span>, <span class='kw'>sim</span>, <span class='kw'>envir</span>)</pre>
+<span class='fu'>moduleVersion</span><span class='op'>(</span><span class='va'>module</span>, <span class='va'>sim</span>, <span class='va'>envir</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -199,31 +202,31 @@ have no effect.</p></td>
     <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>)
+    <pre class="examples"><div class='input'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"sampleModules"</span>, package <span class='op'>=</span> <span class='st'>"SpaDES.core"</span><span class='op'>)</span>
 
 <span class='co'># using filepath</span>
-<span class='fu'>moduleVersion</span>(<span class='st'>"caribouMovement"</span>, <span class='kw'>path</span>)
+<span class='fu'>moduleVersion</span><span class='op'>(</span><span class='st'>"caribouMovement"</span>, <span class='va'>path</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] ‘1.6.0’</div><div class='input'>
 <span class='co'># using simList</span>
-<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-   times = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start = <span class='fl'>2000.0</span>, end = <span class='fl'>2002.0</span>, timeunit = <span class='st'>"year"</span>),
-   params = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-     .globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>, burnStats = <span class='st'>"nPixelsBurned"</span>)
-   ),
-   modules = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"caribouMovement"</span>),
-   paths = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='kw'>path</span>)
-)
+<span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>
+   times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>2000.0</span>, end <span class='op'>=</span> <span class='fl'>2002.0</span>, timeunit <span class='op'>=</span> <span class='st'>"year"</span><span class='op'>)</span>,
+   params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+     .globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span>, burnStats <span class='op'>=</span> <span class='st'>"nPixelsBurned"</span><span class='op'>)</span>
+   <span class='op'>)</span>,
+   modules <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"caribouMovement"</span><span class='op'>)</span>,
+   paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
+<span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpbP9ELl/temp_libpath16a81bad313a/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/Require/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp3O9MOW/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp3O9MOW/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
-#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>caribouMovement: module code: landscape is declared in metadata inputObjects, but no default(s) is provided in .inputObjects</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>caribouMovement: inputObjects: habitatQuality is used from sim inside Move, but is not declared in metadata inputObjects</span><span></span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='input'><span class='fu'>moduleVersion</span>(<span class='st'>"caribouMovement"</span>, sim = <span class='kw'>mySim</span>)
+#&gt; <span class='message'>    rasterTmpDir = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/Require/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpVMuWI9/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpVMuWI9/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpbP9ELl/temp_libpath16a81bad313a/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>caribouMovement: module code: landscape, caribou are declared in metadata inputObjects, but no default(s) are provided in .inputObjects</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>caribouMovement: inputObjects: habitatQuality is used from sim inside Move, but is not declared in metadata inputObjects</span><span></span></div><div class='output co'>#&gt; <span class='message'>Global parameter(s) not used in any module: burnStats.</span></div><div class='input'><span class='fu'>moduleVersion</span><span class='op'>(</span><span class='st'>"caribouMovement"</span>, sim <span class='op'>=</span> <span class='va'>mySim</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] ‘1.6.0’</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -240,7 +243,7 @@ have no effect.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

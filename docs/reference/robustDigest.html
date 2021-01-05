@@ -83,7 +83,7 @@ a simList would look like once it is converted to a repeatably digestible object
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@ a simList would look like once it is converted to a repeatably digestible object
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,6 +117,9 @@ a simList would look like once it is converted to a repeatably digestible object
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -126,7 +129,7 @@ a simList would look like once it is converted to a repeatably digestible object
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -154,7 +157,7 @@ a <code>simList</code> would look like once it is converted to a repeatably dige
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>.robustDigest</span>(<span class='kw'>object</span>, <span class='kw'>.objects</span>, <span class='kw'>length</span>, <span class='kw'>algo</span>, <span class='kw'>quick</span>, <span class='kw'>classOptions</span>)</pre>
+<span class='fu'>.robustDigest</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>.objects</span>, <span class='va'>length</span>, <span class='va'>algo</span>, <span class='va'>quick</span>, <span class='va'>classOptions</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,10 +169,11 @@ a <code>simList</code> would look like once it is converted to a repeatably dige
     <tr>
       <th>.objects</th>
       <td><p>Character vector of objects to be digested. This is only applicable
-if there is a list, environment (or similar) named objects
+if there is a list, environment (or similar) with named objects
 within it. Only this/these objects will be considered for caching,
 i.e., only use a subset of
-the list, environment or similar objects.</p></td>
+the list, environment or similar objects. In the case of nested list-type
+objects, this will only be applied outermost first.</p></td>
     </tr>
     <tr>
       <th>length</th>
@@ -185,7 +189,7 @@ Default is <code><a href='https://rdrr.io/r/base/options.html'>getOption("reprod
       <td><p>The algorithms to be used; currently available choices are
     <code>md5</code>, which is also the default, <code>sha1</code>, <code>crc32</code>,
     <code>sha256</code>, <code>sha512</code>, <code>xxhash32</code>, <code>xxhash64</code>,
-    <code>murmur32</code> and <code>spookyhash</code>.</p></td>
+    <code>murmur32</code>, <code>spookyhash</code> and <code>blake3</code>.</p></td>
     </tr>
     <tr>
       <th>quick</th>
@@ -241,7 +245,7 @@ This will likely still not allow identical digest results across R versions.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

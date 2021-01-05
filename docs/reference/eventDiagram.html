@@ -84,7 +84,7 @@ To change the number of events shown, provide an n argument." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ To change the number of events shown, provide an n argument." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ To change the number of events shown, provide an n argument." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ To change the number of events shown, provide an n argument." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,16 +158,16 @@ This event diagram is constructed using the completed event list
 To change the number of events shown, provide an <code>n</code> argument.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>eventDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>n</span>, <span class='kw'>startDate</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>eventDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>n</span>, <span class='va'>startDate</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList,numeric,character</span>
-<span class='fu'>eventDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>n</span>, <span class='kw'>startDate</span>, <span class='kw'>...</span>)
+<span class='fu'>eventDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>n</span>, <span class='va'>startDate</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList,missing,character</span>
-<span class='fu'>eventDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>n</span>, <span class='kw'>startDate</span>, <span class='kw'>...</span>)
+<span class='fu'>eventDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>n</span>, <span class='va'>startDate</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList,missing,missing</span>
-<span class='fu'>eventDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>n</span>, <span class='kw'>startDate</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>eventDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>n</span>, <span class='va'>startDate</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -227,7 +230,7 @@ This is useful for Gantt Charts generally but can be considered a 'bug' here.</p
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

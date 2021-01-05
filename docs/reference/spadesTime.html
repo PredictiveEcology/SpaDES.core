@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SpaDES time units — dyears • SpaDES.core</title>
+<title>SpaDES time units — dhour • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="SpaDES time units — dyears" />
+<meta property="og:title" content="SpaDES time units — dhour" />
 <meta property="og:description" content="SpaDES modules commonly use approximate durations that divide with no
 remainder among themselves.
 For example, models that simulate based on a &quot;week&quot; timestep, will likely
@@ -93,7 +93,7 @@ weeks as year/52." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@ weeks as year/52." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -127,6 +127,9 @@ weeks as year/52." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -136,7 +139,7 @@ weeks as year/52." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -173,37 +176,37 @@ In an astronomical year, leap years are added within each year with an extra
 weeks as year/52.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dyears</span>(<span class='kw'>x</span>)
+    <pre class="usage"><span class='fu'>dhour</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+
+<span class='fu'>dday</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+
+<span class='fu'>dyears</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for numeric</span>
-<span class='fu'>dyears</span>(<span class='kw'>x</span>)
+<span class='fu'>dyears</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dmonths</span>(<span class='kw'>x</span>)
-
-<span class='co'># S4 method for numeric</span>
-<span class='fu'>dmonths</span>(<span class='kw'>x</span>)
-
-<span class='fu'>dweeks</span>(<span class='kw'>x</span>)
+<span class='fu'>dmonths</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for numeric</span>
-<span class='fu'>dweeks</span>(<span class='kw'>x</span>)
+<span class='fu'>dmonths</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dweek</span>(<span class='kw'>x</span>)
+<span class='fu'>dweeks</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dmonth</span>(<span class='kw'>x</span>)
+<span class='co'># S4 method for numeric</span>
+<span class='fu'>dweeks</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dyear</span>(<span class='kw'>x</span>)
+<span class='fu'>dweek</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dsecond</span>(<span class='kw'>x</span>)
+<span class='fu'>dmonth</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dday</span>(<span class='kw'>x</span>)
+<span class='fu'>dyear</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dhour</span>(<span class='kw'>x</span>)
+<span class='fu'>dsecond</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>dNA</span>(<span class='kw'>x</span>)
+<span class='fu'>dNA</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for ANY</span>
-<span class='fu'>dNA</span>(<span class='kw'>x</span>)</pre>
+<span class='fu'>dNA</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -220,11 +223,11 @@ weeks as year/52.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>When these units are not correct, a module developer can create their own
-time unit using, and create a function to calculate the number of seconds
+time unit, and create a function to calculate the number of seconds
 in that unit using the "d" prefix (for duration), following the
 <code>lubridate</code> package standard:
-<code>dfortnight &lt;- function(x) lubridate::duration(dday(14))</code>.
-Then the module developer can use "fortnight" as the module's time unit.</p>
+<code>ddecade &lt;- function(x) lubridate::duration(dyear(10))</code>.
+Then the module developer can use "decade" as the module's time unit.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Eliot McIntire</p>
@@ -244,7 +247,7 @@ Then the module developer can use "fortnight" as the module's time unit.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

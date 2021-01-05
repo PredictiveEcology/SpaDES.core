@@ -1,6 +1,6 @@
 <!-- badges: start -->
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/SpaDES.core)](https://cran.r-project.org/package=SpaDES.core)
-[![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/SpaDES.core)](https://cran.r-project.org/package=SpaDES.core)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/SpaDES.core)](https://cran.r-project.org/package=SpaDES.core)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/SpaDES.core)](https://cran.r-project.org/package=SpaDES.core)
 [![R build status](https://github.com/PredictiveEcology/SpaDES.core/workflows/R-CMD-check/badge.svg)](https://github.com/PredictiveEcology/SpaDES.core/actions)
 [![Gitter](https://badges.gitter.im/PredictiveEcology/spades-core.svg)](https://gitter.im/PredictiveEcology/spades-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 <!-- badges: end -->
@@ -11,7 +11,7 @@
 
 Core functionality for Spatial Discrete Event Simulation (SpaDES)
 
-**Website:** [http://SpaDES.PredictiveEcology.org](http://SpaDES.PredictiveEcology.org)
+**Website:** [https://SpaDES.PredictiveEcology.org](https://SpaDES.PredictiveEcology.org)
 
 **Wiki:** [https://github.com/PredictiveEcology/SpaDES/wiki](https://github.com/PredictiveEcology/SpaDES/wiki)
 

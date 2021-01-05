@@ -97,7 +97,7 @@ setMethod(
   signature = c(name = "character", repo = "character"),
   definition = function(name, repo) {
     goAhead <- FALSE
-    if (requireNamespace("httr")) {
+    if (requireNamespace("httr", quietly = TRUE)) {
       if (packageVersion("httr") >= "1.2.1") {
         goAhead <- TRUE
       }}
@@ -120,15 +120,18 @@ setMethod(
       allFiles <- unlist(lapply(httr::content(request)$tree, "[", "path"), use.names = FALSE)
       moduleFiles <- grep(paste0("^modules/", name), allFiles, value = TRUE)
       if (length(moduleFiles) == 0) {
-        agrep(name, allFiles, max.distance = 0.25, value = TRUE,
-              ignore.case = FALSE) %>%
-          strsplit(., split = "/") %>%
-          lapply(., function(x) x[2]) %>%
-          unique() %>%
-          unlist() %>%
-          paste(., collapse = ", ") %>%
-          stop("Module ", name, " does not exist in the repository. ",
-               "Did you mean: ", ., "?")
+        moduleFiles <- grep(paste0("^", name), allFiles, value = TRUE)
+        if (length(moduleFiles) == 0) {
+          agrep(name, allFiles, max.distance = 0.25, value = TRUE,
+                ignore.case = FALSE) %>%
+            strsplit(., split = "/") %>%
+            lapply(., function(x) x[2]) %>%
+            unique() %>%
+            unlist() %>%
+            paste(., collapse = ", ") %>%
+            stop("Module ", name, " does not exist in the repository. ",
+                 "Did you mean: ", ., "?")
+        }
       }
     } else {
       stop("checkModule does not work without httr package: ",
@@ -296,7 +299,7 @@ setMethod(
                 quickCheck = "ANY", overwrite = "logical"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
                         overwrite) {
-    if (requireNamespace("httr")) {
+    if (requireNamespace("httr", quietly = TRUE)) {
     path <- checkPath(path, create = TRUE)
     checkPath(file.path(path, name), create = TRUE)
 
@@ -307,22 +310,27 @@ setMethod(
       checkModule(name, repo)
       if (is.na(version)) version <- getModuleVersion(name, repo)
 
-      #versionWarning(name, version)
+      innerPaths <- c(paste0("/master/modules/", name, "/"), "/master/")
+      for (tries in 1:2) {
+        innerPath <- innerPaths[tries]
 
-      zip <- paste0("https://raw.githubusercontent.com/", repo,
-                    "/master/modules/", name, "/", name, "_", version, ".zip") # nolint
-      localzip <- file.path(path, basename(zip))
+        zip <- paste0("https://raw.githubusercontent.com/", repo,
+                      innerPath, name, "_", version, ".zip") # nolint
+        localzip <- file.path(path, basename(zip))
 
-      ua <- httr::user_agent(getOption("spades.useragent"))
-      pat <- Sys.getenv("GITHUB_PAT")
-      request <- if (identical(pat, "")) {
-        httr::GET(zip, ua, httr::write_disk(localzip, overwrite = overwrite))
-      } else {
-        message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
-        httr::GET(zip, ua, config = list(httr::config(token = pat)),
-                  httr::write_disk(localzip, overwrite = overwrite))
+        ua <- httr::user_agent(getOption("spades.useragent"))
+        pat <- Sys.getenv("GITHUB_PAT")
+        request <- if (identical(pat, "")) {
+          httr::GET(zip, ua, httr::write_disk(localzip, overwrite = overwrite))
+        } else {
+          message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
+          httr::GET(zip, ua, config = list(httr::config(token = pat)),
+                    httr::write_disk(localzip, overwrite = overwrite))
+        }
+        status1 <- try(httr::stop_for_status(request), silent = TRUE)
+        if (!is(status1, "try-error")) break
+        if (is(status1, "try-error") && tries == 2) stop(status1)
       }
-      httr::stop_for_status(request)
 
       files <- unzip(localzip, exdir = file.path(path), overwrite = TRUE)
     } else {
@@ -353,7 +361,6 @@ setMethod(
                            overwrite = overwrite)
           }
           files2 <<- append(files2, f[[1]])
-#          dataList2 <<- bind_rows(dataList2, f[[2]])
           dataList2 <<- setDF(rbindlist(list(dataList2, f[[2]]), use.names = TRUE, fill = TRUE))
         })
       }
@@ -379,7 +386,8 @@ setMethod(
     } else {
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
-    message(crayon::magenta("Download complete for module ", name, " (v", version, ").", sep = ""))
+    message(crayon::magenta("Download complete for module ", name,
+                            " (v", version, " at '", path,"').", sep = ""))
     } else{
       stop("downloadModule does not work without httr package: ",
            "install.package('httr')")
@@ -387,7 +395,6 @@ setMethod(
 
     return(list(c(files, files2),
                 setDF(rbindlist(list(dataList, dataList2), use.names = TRUE, fill = TRUE))))
-#                bind_rows(dataList, dataList2)))
 })
 
 #' @rdname downloadModule

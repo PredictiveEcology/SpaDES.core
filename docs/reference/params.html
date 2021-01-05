@@ -83,7 +83,7 @@ params has a replace method, so can be used to update a parameter value." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@ params has a replace method, so can be used to update a parameter value." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,6 +117,9 @@ params has a replace method, so can be used to update a parameter value." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -126,7 +129,7 @@ params has a replace method, so can be used to update a parameter value." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -153,22 +156,22 @@ params has a replace method, so can be used to update a parameter value." />
 <code>params</code> has a replace method, so can be used to update a parameter value.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>params</span>(<span class='kw'>sim</span>)
+    <pre class="usage"><span class='fu'>params</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>params</span>(<span class='kw'>sim</span>)
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 
-<span class='fu'>params</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>params</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
-
-<span class='fu'>P</span>(<span class='kw'>sim</span>, <span class='kw'>module</span>, <span class='kw'>param</span>)
-
-<span class='fu'>parameters</span>(<span class='kw'>sim</span>, asDF = <span class='fl'>FALSE</span>)
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>parameters</span>(<span class='kw'>sim</span>, asDF = <span class='fl'>FALSE</span>)</pre>
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='fu'>P</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>module</span>, <span class='va'>param</span><span class='op'>)</span>
+
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>sim</span>, asDF <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>sim</span>, asDF <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -233,26 +236,26 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 <code><a href='times.html'>times</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>modules</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>)
-<span class='kw'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>))
-<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(modules = <span class='kw'>modules</span>, paths = <span class='kw'>paths</span>,
-                 params = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(.globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>)))
+    <pre class="examples"><div class='input'><span class='va'>modules</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"randomLandscapes"</span><span class='op'>)</span>
+<span class='va'>paths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"sampleModules"</span>, package <span class='op'>=</span> <span class='st'>"SpaDES.core"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>modules <span class='op'>=</span> <span class='va'>modules</span>, paths <span class='op'>=</span> <span class='va'>paths</span>,
+                 params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>.globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpbP9ELl/temp_libpath16a81bad313a/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpsJxN7x/temp_libpath9cb784421dd21/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpbP9ELl/temp_libpath16a81bad313a/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span><span></span></div><div class='input'>
 <span class='co'># update some parameters using assignment -- currently only params will work</span>
-<span class='fu'>params</span>(<span class='kw'>mySim</span>)<span class='op'>$</span><span class='kw'>randomLandscapes</span><span class='op'>$</span><span class='kw'>nx</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
-<span class='fu'>params</span>(<span class='kw'>mySim</span>)<span class='op'>$</span><span class='kw'>randomLandscapes</span><span class='op'>$</span><span class='kw'>ny</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>nx</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>ny</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
 
-<span class='fu'>parameters</span>(<span class='kw'>mySim</span>) <span class='co'># Does not contain these user overridden values</span>
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span> <span class='co'># Does not contain these user overridden values</span>
 </div><div class='output co'>#&gt; $randomLandscapes
 #&gt; $randomLandscapes$inRAM
 #&gt;   paramClass default  min   max                              paramDesc
@@ -294,20 +297,20 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># These next 2 are same here because they are not within a module</span>
-<span class='fu'>P</span>(<span class='kw'>mySim</span>)          <span class='co'># Does contain the user overridden values</span>
+<span class='fu'>P</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>          <span class='co'># Does contain the user overridden values</span>
 </div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$file
-#&gt; NULL
-#&gt; 
 #&gt; $.checkpoint$interval
 #&gt; [1] NA
 #&gt; 
+#&gt; $.checkpoint$file
+#&gt; NULL
+#&gt; 
 #&gt; 
 #&gt; $.progress
-#&gt; $.progress$interval
+#&gt; $.progress$type
 #&gt; [1] NA
 #&gt; 
-#&gt; $.progress$type
+#&gt; $.progress$interval
 #&gt; [1] NA
 #&gt; 
 #&gt; 
@@ -317,6 +320,18 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; 
 #&gt; $randomLandscapes
+#&gt; $randomLandscapes$inRAM
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $randomLandscapes$nx
+#&gt; [1] 200
+#&gt; 
+#&gt; $randomLandscapes$ny
+#&gt; [1] 200
+#&gt; 
+#&gt; $randomLandscapes$stackName
+#&gt; [1] "landscape"
+#&gt; 
 #&gt; $randomLandscapes$.plotInitialTime
 #&gt; [1] 0
 #&gt; attr(,"unit")
@@ -334,6 +349,29 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
 #&gt; 
+#&gt; </div><div class='input'><span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>     <span class='co'># Does contain the user overridden values</span>
+</div><div class='output co'>#&gt; $.checkpoint
+#&gt; $.checkpoint$interval
+#&gt; [1] NA
+#&gt; 
+#&gt; $.checkpoint$file
+#&gt; NULL
+#&gt; 
+#&gt; 
+#&gt; $.progress
+#&gt; $.progress$type
+#&gt; [1] NA
+#&gt; 
+#&gt; $.progress$interval
+#&gt; [1] NA
+#&gt; 
+#&gt; 
+#&gt; $.globals
+#&gt; $.globals$stackName
+#&gt; [1] "landscape"
+#&gt; 
+#&gt; 
+#&gt; $randomLandscapes
 #&gt; $randomLandscapes$inRAM
 #&gt; [1] FALSE
 #&gt; 
@@ -346,29 +384,6 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; $randomLandscapes$stackName
 #&gt; [1] "landscape"
 #&gt; 
-#&gt; </div><div class='input'><span class='fu'>params</span>(<span class='kw'>mySim</span>)     <span class='co'># Does contain the user overridden values</span>
-</div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$file
-#&gt; NULL
-#&gt; 
-#&gt; $.checkpoint$interval
-#&gt; [1] NA
-#&gt; 
-#&gt; 
-#&gt; $.progress
-#&gt; $.progress$interval
-#&gt; [1] NA
-#&gt; 
-#&gt; $.progress$type
-#&gt; [1] NA
-#&gt; 
-#&gt; 
-#&gt; $.globals
-#&gt; $.globals$stackName
-#&gt; [1] "landscape"
-#&gt; 
-#&gt; 
-#&gt; $randomLandscapes
 #&gt; $randomLandscapes$.plotInitialTime
 #&gt; [1] 0
 #&gt; attr(,"unit")
@@ -385,25 +400,13 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$inRAM
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$nx
-#&gt; [1] 200
-#&gt; 
-#&gt; $randomLandscapes$ny
-#&gt; [1] 200
-#&gt; 
-#&gt; $randomLandscapes$stackName
-#&gt; [1] "landscape"
 #&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># NOTE -- deleting a parameter will affect params and P, not parameters</span>
-<span class='fu'>params</span>(<span class='kw'>mySim</span>)<span class='op'>$</span><span class='kw'>randomLandscapes</span><span class='op'>$</span><span class='kw'>nx</span> <span class='op'>&lt;-</span> <span class='kw'>NULL</span>
-<span class='fu'>params</span>(<span class='kw'>mySim</span>)<span class='op'>$</span><span class='kw'>randomLandscapes</span><span class='op'>$</span><span class='kw'>ny</span> <span class='op'>&lt;-</span> <span class='kw'>NULL</span>
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>nx</span> <span class='op'>&lt;-</span> <span class='cn'>NULL</span>
+<span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>ny</span> <span class='op'>&lt;-</span> <span class='cn'>NULL</span>
 
-<span class='fu'>parameters</span>(<span class='kw'>mySim</span>) <span class='co'># Shows nx and ny</span>
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span> <span class='co'># Shows nx and ny</span>
 </div><div class='output co'>#&gt; $randomLandscapes
 #&gt; $randomLandscapes$inRAM
 #&gt;   paramClass default  min   max                              paramDesc
@@ -445,20 +448,20 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># These next 2 are same here because they are not within a module</span>
-<span class='fu'>P</span>(<span class='kw'>mySim</span>)          <span class='co'># nx and ny are Gone</span>
+<span class='fu'>P</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>          <span class='co'># nx and ny are Gone</span>
 </div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$file
-#&gt; NULL
-#&gt; 
 #&gt; $.checkpoint$interval
 #&gt; [1] NA
 #&gt; 
+#&gt; $.checkpoint$file
+#&gt; NULL
+#&gt; 
 #&gt; 
 #&gt; $.progress
-#&gt; $.progress$interval
+#&gt; $.progress$type
 #&gt; [1] NA
 #&gt; 
-#&gt; $.progress$type
+#&gt; $.progress$interval
 #&gt; [1] NA
 #&gt; 
 #&gt; 
@@ -468,6 +471,12 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; 
 #&gt; $randomLandscapes
+#&gt; $randomLandscapes$inRAM
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $randomLandscapes$stackName
+#&gt; [1] "landscape"
+#&gt; 
 #&gt; $randomLandscapes$.plotInitialTime
 #&gt; [1] 0
 #&gt; attr(,"unit")
@@ -485,26 +494,20 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
 #&gt; 
-#&gt; $randomLandscapes$inRAM
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$stackName
-#&gt; [1] "landscape"
-#&gt; 
-#&gt; </div><div class='input'><span class='fu'>params</span>(<span class='kw'>mySim</span>)     <span class='co'># nx and ny are Gone</span>
+#&gt; </div><div class='input'><span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>     <span class='co'># nx and ny are Gone</span>
 </div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$file
-#&gt; NULL
-#&gt; 
 #&gt; $.checkpoint$interval
 #&gt; [1] NA
 #&gt; 
+#&gt; $.checkpoint$file
+#&gt; NULL
+#&gt; 
 #&gt; 
 #&gt; $.progress
-#&gt; $.progress$interval
+#&gt; $.progress$type
 #&gt; [1] NA
 #&gt; 
-#&gt; $.progress$type
+#&gt; $.progress$interval
 #&gt; [1] NA
 #&gt; 
 #&gt; 
@@ -514,6 +517,12 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; 
 #&gt; $randomLandscapes
+#&gt; $randomLandscapes$inRAM
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $randomLandscapes$stackName
+#&gt; [1] "landscape"
+#&gt; 
 #&gt; $randomLandscapes$.plotInitialTime
 #&gt; [1] 0
 #&gt; attr(,"unit")
@@ -530,12 +539,6 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$inRAM
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$stackName
-#&gt; [1] "landscape"
 #&gt; 
 #&gt; </div></span></pre>
   </div>
@@ -553,7 +556,7 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

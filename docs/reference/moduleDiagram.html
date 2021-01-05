@@ -84,7 +84,7 @@ plotting the depsEdgeList directly with objectDiagram." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ plotting the depsEdgeList directly with objectDiagram." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ plotting the depsEdgeList directly with objectDiagram." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ plotting the depsEdgeList directly with objectDiagram." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,13 +158,13 @@ simulation. Offers a less detailed view of specific objects than does
 plotting the <code>depsEdgeList</code> directly with <code><a href='objectDiagram.html'>objectDiagram</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>moduleDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>type</span>, <span class='kw'>showParents</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>moduleDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>type</span>, <span class='va'>showParents</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList,character,logical</span>
-<span class='fu'>moduleDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>type</span>, <span class='kw'>showParents</span>, <span class='kw'>...</span>)
+<span class='fu'>moduleDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>type</span>, <span class='va'>showParents</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList,missing,ANY</span>
-<span class='fu'>moduleDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>type</span>, <span class='kw'>showParents</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>moduleDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>type</span>, <span class='va'>showParents</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -200,6 +203,31 @@ parent and children module structure.</p></div>
 
     <p>Alex Chubaty</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># Will use quickPlot::Plot</span>
+<span class='fu'>moduleDiagram</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
+<span class='co'># Can also use default base::plot</span>
+<span class='va'>modDia</span> <span class='op'>&lt;-</span> <span class='fu'><a href='depsGraph.html'>depsGraph</a></span><span class='op'>(</span><span class='va'>sim</span>, plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='co'># See ?plot.igraph</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>modDia</span>, layout <span class='op'>=</span> <span class='va'>layout_as_star</span><span class='op'>)</span>
+
+<span class='co'># Or for more control - here, change the label "_INPUT_" to "DATA"</span>
+<span class='va'>edgeList</span> <span class='op'>&lt;-</span> <span class='fu'><a href='depsEdgeList.html'>depsEdgeList</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
+<span class='va'>edgeList</span> <span class='op'>&lt;-</span> <span class='va'>edgeList</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>from</span>, <span class='va'>to</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>edgeList</span><span class='op'>[</span><span class='va'>from</span> <span class='op'>==</span> <span class='st'>"_INPUT_"</span>, <span class='va'>from</span> <span class='op'>:=</span> <span class='st'>"Data"</span><span class='op'>]</span>
+<span class='va'>edgeList</span><span class='op'>[</span><span class='va'>to</span> <span class='op'>==</span> <span class='st'>"_INPUT_"</span>, <span class='va'>to</span> <span class='op'>:=</span> <span class='st'>"Data"</span><span class='op'>]</span>
+<span class='va'>edgeList</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>edgeList</span><span class='op'>)</span>
+<span class='va'>edge</span>
+<span class='va'>ig</span> <span class='op'>&lt;-</span> <span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/graph_from_data_frame.html'>graph_from_data_frame</a></span><span class='op'>(</span><span class='va'>edgeList</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>from</span>, <span class='va'>to</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>ig</span><span class='op'>)</span>
+
+<span class='co'># Or use qgraph package</span>
+<span class='co'># library(qgraph)</span>
+<span class='co'># qgraph(edgeList, shape = "rectangle", vsize = 12, vsize2 = 2</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -215,7 +243,7 @@ parent and children module structure.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

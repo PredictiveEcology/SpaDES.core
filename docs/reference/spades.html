@@ -84,7 +84,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ instead of `data.frame` to implement the event queue (because it is much faster)
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,40 +158,40 @@ submodules to the simulation. We use S4 classes and methods, and use `data.table
 instead of `data.frame` to implement the event queue (because it is much faster).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>spades</span>(
-  <span class='kw'>sim</span>,
-  debug = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.debug"</span>),
-  progress = <span class='fl'>NA</span>,
-  <span class='kw'>cache</span>,
-  .plotInitialTime = <span class='kw'>NULL</span>,
-  .saveInitialTime = <span class='kw'>NULL</span>,
-  notOlderThan = <span class='kw'>NULL</span>,
-  <span class='kw'>...</span>
-)
+    <pre class="usage"><span class='fu'>spades</span><span class='op'>(</span>
+  <span class='va'>sim</span>,
+  debug <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"spades.debug"</span><span class='op'>)</span>,
+  progress <span class='op'>=</span> <span class='cn'>NA</span>,
+  <span class='va'>cache</span>,
+  .plotInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
+  .saveInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
+  notOlderThan <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for simList,ANY,ANY,missing</span>
-<span class='fu'>spades</span>(
-  <span class='kw'>sim</span>,
-  debug = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.debug"</span>),
-  progress = <span class='fl'>NA</span>,
-  <span class='kw'>cache</span>,
-  .plotInitialTime = <span class='kw'>NULL</span>,
-  .saveInitialTime = <span class='kw'>NULL</span>,
-  notOlderThan = <span class='kw'>NULL</span>,
-  <span class='kw'>...</span>
-)
+<span class='fu'>spades</span><span class='op'>(</span>
+  <span class='va'>sim</span>,
+  debug <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"spades.debug"</span><span class='op'>)</span>,
+  progress <span class='op'>=</span> <span class='cn'>NA</span>,
+  <span class='va'>cache</span>,
+  .plotInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
+  .saveInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
+  notOlderThan <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for ANY,ANY,ANY,logical</span>
-<span class='fu'>spades</span>(
-  <span class='kw'>sim</span>,
-  debug = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"spades.debug"</span>),
-  progress = <span class='fl'>NA</span>,
-  <span class='kw'>cache</span>,
-  .plotInitialTime = <span class='kw'>NULL</span>,
-  .saveInitialTime = <span class='kw'>NULL</span>,
-  notOlderThan = <span class='kw'>NULL</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'>spades</span><span class='op'>(</span>
+  <span class='va'>sim</span>,
+  debug <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"spades.debug"</span><span class='op'>)</span>,
+  progress <span class='op'>=</span> <span class='cn'>NA</span>,
+  <span class='va'>cache</span>,
+  .plotInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
+  .saveInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
+  notOlderThan <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -212,9 +215,9 @@ the number of update intervals to show in a graphical progress bar.</p></td>
     <tr>
       <th>cache</th>
       <td><p>Logical. If <code>TRUE</code>, then the <code>spades</code> call will be cached.
-This means that if the call is made again with the same simList,
+This means that if the call is made again with the same <code>simList</code>,
 then `spades`` will return the return value from the previous run
-of that exact same simList. Default <code>FALSE</code>. See Details.
+of that exact same <code>simList</code>. Default <code>FALSE</code>. See Details.
 See also the vignette on caching for examples.</p></td>
     </tr>
     <tr>
@@ -259,6 +262,37 @@ the simList values reinstated. To turn off plotting and saving, use
 <code>.plotInitialTime = NA</code> or <code>.saveInitialTime = NA</code>. NOTE: if a
 module did not use <code>.plotInitialTime</code> or <code>.saveInitialTime</code>, then
 these arguments will not do anything.</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>The debug option is primarily intended to facilitate building simulation
+models by the user.
+Will print additional outputs informing the user of updates to the values of
+various <code>simList</code> slot components.
+See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https://github.com/PredictiveEcology/SpaDES/wiki/Debugging</a> for details.</p>
+    <h2 class="hasAnchor" id="caching-with-spades"><a class="anchor" href="#caching-with-spades"></a>Caching with SpaDES</h2>
+
+    
+
+
+<p>There are numerous ways in which Caching can be used within SpaDES. Please
+see the vignette
+<a href='https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html'>https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html</a>
+for many examples. Briefly, functions, events, modules, entire spades calls or
+experiment calls (see <a href='https::/github.com/PredictiveEcology/SpaDES.experiment'>https::/github.com/PredictiveEcology/SpaDES.experiment</a>)
+can be cached and mixtures of all of these will work. For functions, simply
+wrap the call with <code>Cache</code>, moving the original function name into
+the first argument of Cache. For events or modules, set the module <code>parameters</code>,
+<code>.useCache</code>, e.g.,
+<code><a href='simInit.html'>simInit(..., parameters = list(myModule = list(.useCache = "init")))</a></code>.
+This can be set to an event name, which will cache that event, or a logical (e.g., <code></code>),
+which will cache <em>every</em> event in that module. Event and module caching
+makes most sense when the event or module only runs once, such as an initialization
+or data preparation event/module. Caching an entire simulation is actually just
+a function call to <code>simInitAndSpades</code>, for example. So, simply writing
+<code><a href='.robustDigest,simList-method.html'>Cache(simInitAndSpades, modules = ...)</a></code> will effectively cache a whole simulation.
+Finally for experiments, it is just like a function call:
+<code><a href='.robustDigest,simList-method.html'>Cache(simInitandExperiment, ...)</a></code>. The final way Caching can be done is in
+<code>experiment</code> or <code>spades</code>, by setting the <code>cache</code> argument.</p>
 <p>If <code>cache</code> is TRUE, this allows for a seamless way to "save" results
 of a simulation. The  user does not have to intentionally do any saving manually.
 Instead, upon a call to <code>spades</code> in which the simList is identical,
@@ -267,13 +301,6 @@ been rerun. Use this with caution, as it will return exactly the result from
 a previous run, even if there is stochasticity internally.
 Caching is only based on the input simList.
 See also the vignette on caching for examples.</p>
-    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
-
-    <p>The debug option is primarily intended to facilitate building simulation
-models by the user.
-Will print additional outputs informing the user of updates to the values of
-various <code>simList</code> slot components.
-See <a href='https://github.com/PredictiveEcology/SpaDES/wiki/Debugging'>https://github.com/PredictiveEcology/SpaDES/wiki/Debugging</a> for details.</p>
     <h2 class="hasAnchor" id="debug"><a class="anchor" href="#debug"></a><code>debug</code></h2>
 
     
@@ -357,46 +384,46 @@ uses <code><a href='https://reproducible.predictiveecology.org/reference/Cache.h
     <p>Alex Chubaty and Eliot McIntire</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
- times = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start = <span class='fl'>0.0</span>, end = <span class='fl'>2.0</span>, timeunit = <span class='st'>"year"</span>),
- params = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-   .globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>, burnStats = <span class='st'>"nPixelsBurned"</span>)
- ),
- modules = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
- paths = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>))
-)
-<span class='fu'>spades</span>(<span class='kw'>mySim</span>)
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>
+ times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>0.0</span>, end <span class='op'>=</span> <span class='fl'>2.0</span>, timeunit <span class='op'>=</span> <span class='st'>"year"</span><span class='op'>)</span>,
+ params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+   .globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span>, burnStats <span class='op'>=</span> <span class='st'>"nPixelsBurned"</span><span class='op'>)</span>
+ <span class='op'>)</span>,
+ modules <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span><span class='op'>)</span>,
+ paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"sampleModules"</span>, package <span class='op'>=</span> <span class='st'>"SpaDES.core"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span>
+<span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>
 
 <span class='co'># set default debug printing for the current session</span>
 <span class='co'># setOption(spades.debug = TRUE)</span>
 
 <span class='co'># Different debug options (overrides the package option 'spades.debug')</span>
-<span class='fu'>spades</span>(<span class='kw'>mySim</span>, debug = <span class='fl'>TRUE</span>) <span class='co'># Fastest</span>
-<span class='fu'>spades</span>(<span class='kw'>mySim</span>, debug = <span class='st'>"simList"</span>)
-<span class='fu'>spades</span>(<span class='kw'>mySim</span>, debug = <span class='st'>"print(table(sim$landscape$Fires[]))"</span>)
+<span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, debug <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='co'># Fastest</span>
+<span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, debug <span class='op'>=</span> <span class='st'>"simList"</span><span class='op'>)</span>
+<span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, debug <span class='op'>=</span> <span class='st'>"print(table(sim$landscape$Fires[]))"</span><span class='op'>)</span>
 <span class='co'># To get a combination -- use list(debug = list(..., ...))</span>
-<span class='fu'>spades</span>(<span class='kw'>mySim</span>, debug = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(debug = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/raster/man/as.data.frame.html'>as.data.frame</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='kw'>sim</span><span class='op'>$</span><span class='kw'>landscape</span><span class='op'>$</span><span class='kw'>Fires</span>[]))))))
+<span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, debug <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>debug <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>$</span><span class='va'>landscape</span><span class='op'>$</span><span class='va'>Fires</span><span class='op'>[</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># Can turn off plotting, and inspect the output simList instead</span>
-<span class='kw'>out</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span>(<span class='kw'>mySim</span>, .plotInitialTime = <span class='fl'>NA</span>) <span class='co'># much faster</span>
-<span class='fu'><a href='events.html'>completed</a></span>(<span class='kw'>out</span>) <span class='co'># shows completed events</span>
+<span class='va'>out</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, .plotInitialTime <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span> <span class='co'># much faster</span>
+<span class='fu'><a href='events.html'>completed</a></span><span class='op'>(</span><span class='va'>out</span><span class='op'>)</span> <span class='co'># shows completed events</span>
 
 <span class='co'># use cache -- simInit should generally be rerun each time a spades call is made</span>
 <span class='co'>#   to guarantee that it is identical. Here, run spades call twice, first</span>
 <span class='co'>#   time to establish cache, second time to return cached result</span>
-<span class='co'>for</span> (<span class='kw'>i</span> <span class='co'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>) {
- <span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(
-   times = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start = <span class='fl'>0.0</span>, end = <span class='fl'>2.0</span>, timeunit = <span class='st'>"year"</span>),
-   params = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-     .globals = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(stackName = <span class='st'>"landscape"</span>, burnStats = <span class='st'>"nPixelsBurned"</span>)
-   ),
-   modules = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span>),
-   paths = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"sampleModules"</span>, package = <span class='st'>"SpaDES.core"</span>))
- )
- <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span>(<span class='kw'>out</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span>(<span class='kw'>mySim</span>, cache = <span class='fl'>TRUE</span>)))
-}
-}
+<span class='kw'>for</span> <span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span><span class='op'>)</span> <span class='op'>{</span>
+ <span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>
+   times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>0.0</span>, end <span class='op'>=</span> <span class='fl'>2.0</span>, timeunit <span class='op'>=</span> <span class='st'>"year"</span><span class='op'>)</span>,
+   params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+     .globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span>, burnStats <span class='op'>=</span> <span class='st'>"nPixelsBurned"</span><span class='op'>)</span>
+   <span class='op'>)</span>,
+   modules <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span><span class='op'>)</span>,
+   paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"sampleModules"</span>, package <span class='op'>=</span> <span class='st'>"SpaDES.core"</span><span class='op'>)</span><span class='op'>)</span>
+ <span class='op'>)</span>
+ <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>out</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, cache <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+<span class='op'>}</span>
 
 </div></pre>
   </div>
@@ -414,7 +441,7 @@ uses <code><a href='https://reproducible.predictiveecology.org/reference/Cache.h
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

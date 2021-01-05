@@ -18,12 +18,15 @@
 .fileEdit <- function(file) {
   if (Sys.getenv("RSTUDIO") == "1") {
     file <- gsub(file, pattern = "\\./", replacement = "")
-    message("Using RStudio, open file manually with:\n",
-            paste0("file.edit('", file, "')")
-    )
+    file.show(file)
+    message("Using RStudio; may need to open manually e.g., with file.edit or file.show")#,
+#            paste0("file.edit('", file, "')")
+#    )
   } else {
     file.edit(file)
   }
+  message(paste0("file.edit('", file, "')"))
+
 }
 
 ################################################################################
@@ -76,7 +79,7 @@
 #'              Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\cr\cr
 #'
 #'              \code{useGitHub}. Logical. Is module development happening on GitHub?
-#'              Default \code{TRUE}. Setting up GitHub projects relies on the \pkg{usethis} package.\cr\cr
+#'              Default \code{TRUE}.
 #'
 #' @return Nothing is returned. The new module file is created at
 #' \file{path/name.R}, as well as ancillary files for documentation, citation,
@@ -133,7 +136,7 @@ setMethod(
 
     stopifnot(
       is(children, "character"),
-      is(open, "logical"),
+      is(open, "logical") || any(endsWith(tolower(open), c("r", "rmd"))),
       is(type, "character"),
       type %in% c("child", "parent"),
       is(unitTests, "logical"),
@@ -155,14 +158,16 @@ setMethod(
     }
 
     ## module code file
-    newModuleCode(name = name, path = path, open = open, type = type, children = children)
+    newModuleCode(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "r"),
+                  type = type, children = children)
 
     if (type == "child" && unitTests) {
-      newModuleTests(name = name, path = path, open = open, useGitHub = useGitHub)
+      newModuleTests(name = name, path = path, open = !.isFALSE(open), useGitHub = useGitHub)
     }
 
     ### Make R Markdown file for module documentation
-    newModuleDocumentation(name = name, path = path, open = open, type = type, children = children)
+    newModuleDocumentation(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "rmd"),
+                           type = type, children = children)
 })
 
 #' @export
@@ -268,7 +273,10 @@ setMethod(
     moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
     writeLines(whisker.render(moduleTemplate, moduleData), filenameR)
 
-    if (open) openModules(name, nestedPath)
+    message(crayon::green(paste0("New module, '", name, "', made in ", dirname(nestedPath))))
+    if (isTRUE(open)) {
+      openModules(name, nestedPath)
+    }
 })
 
 #' Create new module documentation
@@ -363,6 +371,27 @@ setMethod("newModuleDocumentation",
             newModuleDocumentation(name = name, path = ".", open = interactive())
 })
 
+#' Use GitHub actions for automated module checking
+#'
+#' See corresponding vignette for more information.
+#'
+#' @param name module name
+#' @param path module path
+#'
+#' @export
+#' @importFrom reproducible checkPath
+#' @importFrom whisker whisker.render
+use_gha <- function(name, path) {
+  ghActionPath <- checkPath(file.path(path, name, ".github", "workflows"), create = TRUE)
+
+  moduleRmdYaml <- list(name = name)
+  renderModuleRmdYamlTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
+                                                     "render-module-rmd.yaml.template"))
+  writeLines(whisker.render(renderModuleRmdYamlTemplate, moduleRmdYaml),
+             file.path(ghActionPath, "render-module-rmd.yaml"))
+  write("*.html\n", file = file.path(path, name, ".github", ".gitignore"), append = TRUE)
+}
+
 #' Create template testing structures for new modules
 #'
 #' @param name  Character string specifying the name of the new module.
@@ -415,13 +444,7 @@ setMethod(
     ## create basic testing infrastructure using GitHub Actions
     ## -- see ?usethis::use_github_action and https://github.com/r-lib/actions/tree/master/examples
     if (isTRUE(useGitHub)) {
-      ghActionPath <- checkPath(file.path(path, name, ".github", "workflows"), create = TRUE)
-
-      moduleRmdYaml <- list(name = name)
-      renderModuleRmdYamlTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
-                                                         "render-module-rmd.yaml.template"))
-      writeLines(whisker.render(renderModuleRmdYamlTemplate, moduleRmdYaml),
-                 file.path(ghActionPath, "render-module-rmd.yaml"))
+      use_gha(name, path)
     }
 })
 
@@ -490,9 +513,9 @@ setMethod(
     if (length(onlyModuleRFile) > 0) Rfiles <- Rfiles[onlyModuleRFile]
 
     # Open Rmd file also
-    RfileRmd <- dir(pattern = paste0(name, ".[Rr]md$"), recursive = TRUE, full.names = TRUE)
+    # RfileRmd <- dir(pattern = paste0(name, ".[Rr]md$"), recursive = TRUE, full.names = TRUE)
 
-    Rfiles <- c(Rfiles, RfileRmd)
+    # Rfiles <- c(Rfiles, RfileRmd)
     Rfiles <- Rfiles[grep(pattern = "[/\\\\]", Rfiles)]
     Rfiles <- Rfiles[sapply(strsplit(Rfiles,"[/\\\\\\.]"), function(x) any(duplicated(x)))]
 
@@ -685,7 +708,7 @@ setMethod(
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "character"),
           definition = function(name, version, data, ...) {
-            zipModule(name = name, path = ".", version = version, data = data, ...)
+            zipModule(name = name, path = "..", version = version, data = data, ...)
 })
 
 #' @export
@@ -693,8 +716,7 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "missing"),
           definition = function(name, data, ...) {
-            vers <- moduleVersion(name, path) %>% as.character()
-            zipModule(name = name, path = ".", version = vers, data = data, ...)
+            zipModule(name = name, path = "..", data = data, ...)
 })
 
 #' @export
@@ -702,6 +724,6 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "character", version = "missing"),
           definition = function(name, path, data, ...) {
-            vers <- vers <- moduleVersion(name, path) %>% as.character()
+            vers <- moduleVersion(name, path) %>% as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })

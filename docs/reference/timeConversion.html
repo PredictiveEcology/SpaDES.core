@@ -40,8 +40,15 @@
 
 
 <meta property="og:title" content="Convert time units — inSeconds" />
-<meta property="og:description" content="In addition to using the lubridate package, some additional functions
-to work with times are provided.
+<meta property="og:description" content="Current pre-defined units are found within the spadesTimes() function.
+The user can define a new unit.
+The unit name can be anything, but the function definition must be of the
+form &quot;dunitName&quot;, e.g., dyear or dfortnight.
+The unit name is the part without the d and the function name
+definition includes the d.
+This new function, e.g., dfortnight &amp;lt;- function(x) lubridate::duration(dday(14))
+can be placed anywhere in the search path or in a module
+(you will need to declare &quot;lubridate&quot; in your pkgDeps in the metadata).
 This function takes a numeric with a &quot;unit&quot; attribute and converts it to
 another numeric with a different time attribute.
 If the units passed to argument units are the same as
@@ -87,7 +94,7 @@ attr(time, &quot;unit&quot;), then it simply returns input time." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -95,7 +102,7 @@ attr(time, &quot;unit&quot;), then it simply returns input time." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -121,6 +128,9 @@ attr(time, &quot;unit&quot;), then it simply returns input time." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -130,7 +140,7 @@ attr(time, &quot;unit&quot;), then it simply returns input time." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -153,29 +163,36 @@ attr(time, &quot;unit&quot;), then it simply returns input time." />
     </div>
 
     <div class="ref-description">
-    <p>In addition to using the <code>lubridate</code> package, some additional functions
-to work with times are provided.</p>
+    <p>Current pre-defined units are found within the <code>spadesTimes()</code> function.
+The user can define a new unit.
+The unit name can be anything, but the function definition must be of the
+form <code>"dunitName"</code>, e.g., <code>dyear</code> or <code>dfortnight</code>.
+The unit name is the part without the <code>d</code> and the function name
+definition includes the <code>d</code>.
+This new function, e.g., <code>dfortnight &lt;- function(x) lubridate::duration(dday(14))</code>
+can be placed anywhere in the search path or in a module
+(you will need to declare <code>"lubridate"</code> in your <code>pkgDeps</code> in the metadata).</p>
 <p>This function takes a numeric with a "unit" attribute and converts it to
 another numeric with a different time attribute.
 If the units passed to argument <code>units</code> are the same as
 <code><a href='https://rdrr.io/r/base/attr.html'>attr(time, "unit")</a></code>, then it simply returns input <code>time</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>inSeconds</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>, skipChecks = <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>inSeconds</span><span class='op'>(</span><span class='va'>unit</span>, <span class='va'>envir</span>, skipChecks <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>convertTimeunit</span>(<span class='kw'>time</span>, <span class='kw'>unit</span>, <span class='kw'>envir</span>, skipChecks = <span class='fl'>FALSE</span>)
+<span class='fu'>convertTimeunit</span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>unit</span>, <span class='va'>envir</span>, skipChecks <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='kw'>.spadesTimes</span>
+<span class='va'>.spadesTimes</span>
 
-<span class='fu'>spadesTimes</span>()
+<span class='fu'>spadesTimes</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>checkTimeunit</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>)
+<span class='fu'>checkTimeunit</span><span class='op'>(</span><span class='va'>unit</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,missing</span>
-<span class='fu'>checkTimeunit</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>)
+<span class='fu'>checkTimeunit</span><span class='op'>(</span><span class='va'>unit</span>, <span class='va'>envir</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,environment</span>
-<span class='fu'>checkTimeunit</span>(<span class='kw'>unit</span>, <span class='kw'>envir</span>)</pre>
+<span class='fu'>checkTimeunit</span><span class='op'>(</span><span class='va'>unit</span>, <span class='va'>envir</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,13 +227,7 @@ input numeric. See Details.</p></td>
     <p>A numeric vector of length 1, with <code>unit</code> attribute set to "seconds".</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Current pre-defined units are found within the <code>spadesTimes()</code> function.
-The user can define a new unit. The unit name can be anything, but the function
-definition must be of the form <code>"dunitName"</code>, e.g., <code>dyear</code> or <code>dfortnight</code>.
-The unit name is the part without the <code>d</code> and the function name definition includes the <code>d</code>.
-This new function, e.g., <code>dfortnight &lt;- function(x) lubridate::duration(dday(14))</code>
-can be placed anywhere in the search path or in a module.</p>
-<p>Because of R scoping, if <code>envir</code> is a simList environment, then
+    <p>Because of R scoping, if <code>envir</code> is a simList environment, then
 this function will search there first, then up the current <code><a href='https://rdrr.io/r/base/search.html'>search()</a></code> path.
 Thus, it will find a user defined or module defined unit before a SpaDES unit.
 This means that a user can override the <code>dyear</code> given in SpaDES, for example,
@@ -243,7 +254,7 @@ seconds.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -1,6 +1,8 @@
 test_that("test objectSynonyms", {
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
-                                      spades.useRequire = FALSE))
+                                      spades.useRequire = FALSE#,
+                                      #reproducible.useMemoise = FALSE
+                                      ))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -76,11 +78,13 @@ test_that("test objectSynonyms", {
       parameters = rbind(
         defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")
       ),
-      inputObjects = bind_rows(
+      inputObjects = bindrows(
         expectsInput("age", "numeric", ""),
+        expectsInput("ageMap", "numeric", ""),
+        expectsInput("worked", "numeric", ""),
         expectsInput("age2", "numeric", "") # need a dummy one that isn not supplied in simInit below
       ),
-      outputObjects = bind_rows(
+      outputObjects = bindrows(
       )
       ))
 
@@ -111,13 +115,42 @@ test_that("test objectSynonyms", {
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
 
-  sim <- Cache(simInitAndSpades, times, params, modules = modules,
-               objects = list(objectSynonyms = os),
+  sim <- Cache(simInit, times, params, modules = modules,
+                 objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+                 paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  sim <- Cache(simInit, times, params, modules = modules,
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
                paths = list(modulePath = tmpdir))
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  # test simInitAndSpades with Caching/memoising with objects
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  # test simInitAndSpades with Caching/memoising with NULL objects in the active bindings
   sim <- Cache(simInitAndSpades, times, params, modules = modules,
                objects = list(objectSynonyms = os),
                paths = list(modulePath = tmpdir))
@@ -125,4 +158,13 @@ test_that("test objectSynonyms", {
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
-})
+
+  sim <- Cache(simInitAndSpades, times, params, modules = modules,
+               objects = list(objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
+  expect_equal(sim$age, sim$ageMap)
+  expect_equal(sim$veg, sim$vegMap)
+  expect_equal(sim$studyArea, sim$studyArea2)
+  expect_true(isTRUE(sim$worked))
+
+  })

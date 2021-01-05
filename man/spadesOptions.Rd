@@ -42,6 +42,12 @@ The following options are likely of interest to most users
   \code{spades.debug} \tab \code{TRUE}
     \tab  The default debugging value \code{debug} argument in \code{spades()} \cr
 
+  \code{spades.futureEvents} \tab \code{FALSE}
+    \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
+    whose outputs are not needed (by other events in the sim) into a future. In some
+    cases, this will speed up simulations, by running some events in parallel.
+    Still VERY experimental. Use cautiously. \cr
+
   \code{spades.lowMemory} \tab \code{FALSE}
     \tab If true, some functions will use more memory
     efficient (but slower) algorithms. \cr

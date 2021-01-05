@@ -82,7 +82,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   message("This is very experimental and will only work if the event that caused the error has not yet changed the simList.\n",
           "This should be used with caution")
 
-  browser(expr = exists("._restartSpades_1"))
+  # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
     sim <- .pkgEnv$.sim
   }
@@ -116,7 +116,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   # move objects back in place
   eventIndices <- seq_len(NROW(eventsToReplayDT))
   eventIndicesRev <- rev(eventIndices)
-  browser(expr = exists("._restartSpades_2"))
+  # browser(expr = exists("._restartSpades_2"))
   out <- lapply(eventIndices, function(event) {
     objNames <- names(sim$.recoverableObjs[[event]])
     if (!is.null(objNames)) {
@@ -337,7 +337,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   )
 
   # from pryr::mem_used
-  #if (requireNamespace("pryr")) {
+  #if (requireNamespace("pryr", quietly = TRUE)) {
   mu <- sum(gc()[, 1] * c(as.integer(8 * .Machine$sizeof.pointer - .Machine$sizeof.pointer),
                           as.integer(8)))
   class(mu) <- "object_size"

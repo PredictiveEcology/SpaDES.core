@@ -314,7 +314,7 @@ test_that("simList test all signatures", {
       names(li) <- argNames
       li <- li[!sapply(li, is.null)]
       messes <- capture_messages(successes[i] <- tryCatch(
-        is(do.call(simInit, args = li), "simList"),
+        is(suppressMessages(do.call(simInit, args = li)), "simList"),
         error = function(e) { FALSE },
         warning = function(w) { FALSE }
       ))
@@ -390,4 +390,32 @@ test_that("test that module directory exists, but not files", {
   })
 
   unlink(paths$modulePath, recursive = TRUE)
+})
+
+test_that("inputObjects on module arg not sim", {
+  testInitOut <- testInit(smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  defaults <- .coreModules() %>% unname()
+  times <- list(start = 1.0, end = 10)
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape")
+  )
+  modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
+  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  io <- inputObjects(module = modules, path = paths$modulePath)
+  oo <- outputObjects(module = modules, path = paths$modulePath)
+  sim1 <- simInit(modules = modules, paths = paths)
+  io1 <- inputObjects(sim1)
+  oo1 <- outputObjects(sim1)
+  expect_true(is.data.frame(io[[modules[[1]]]]))
+  expect_true(is.data.frame(oo[[modules[[1]]]]))
+  expect_true(length(io) == length(modules))
+  expect_true(length(oo) == length(modules))
+
+  out <- lapply(modules, function(m) {
+    expect_true(all.equal(setDF(io[[m]][, -1]), io1[[m]][, -1]))
+  })
 })

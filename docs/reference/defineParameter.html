@@ -86,7 +86,7 @@ code." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@ code." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -120,6 +120,9 @@ code." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -129,7 +132,7 @@ code." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -159,16 +162,16 @@ a range of values, the module developer should use assertions in their module
 code.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>defineParameter</span>(<span class='kw'>name</span>, <span class='kw'>class</span>, <span class='kw'>default</span>, <span class='kw'>min</span>, <span class='kw'>max</span>, <span class='kw'>desc</span>)
+    <pre class="usage"><span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,ANY,ANY,ANY,character</span>
-<span class='fu'>defineParameter</span>(<span class='kw'>name</span>, <span class='kw'>class</span>, <span class='kw'>default</span>, <span class='kw'>min</span>, <span class='kw'>max</span>, <span class='kw'>desc</span>)
+<span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,ANY,missing,missing,character</span>
-<span class='fu'>defineParameter</span>(<span class='kw'>name</span>, <span class='kw'>class</span>, <span class='kw'>default</span>, <span class='kw'>desc</span>)
+<span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>desc</span><span class='op'>)</span>
 
 <span class='co'># S4 method for missing,missing,missing,missing,missing,missing</span>
-<span class='fu'>defineParameter</span>()</pre>
+<span class='fu'>defineParameter</span><span class='op'>(</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -225,31 +228,31 @@ tell a module user what values the module expects.</p></td>
     <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>parameters</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span>(
-  <span class='fu'>defineParameter</span>(<span class='st'>"lambda"</span>, <span class='st'>"numeric"</span>, <span class='fl'>1.23</span>, desc = <span class='st'>"intrinsic rate of increase"</span>),
-  <span class='fu'>defineParameter</span>(<span class='st'>"P"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='st'>"probability of attack"</span>)
-)
+    <pre class="examples"><div class='input'><span class='va'>parameters</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span>
+  <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"lambda"</span>, <span class='st'>"numeric"</span>, <span class='fl'>1.23</span>, desc <span class='op'>=</span> <span class='st'>"intrinsic rate of increase"</span><span class='op'>)</span>,
+  <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='st'>"probability of attack"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># Create a new module, then access parameters using \code{P}</span>
-<span class='kw'>tmpdir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"test"</span>)
-<span class='fu'>checkPath</span>(<span class='kw'>tmpdir</span>, create = <span class='fl'>TRUE</span>)
+<span class='va'>tmpdir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"test"</span><span class='op'>)</span>
+<span class='fu'>checkPath</span><span class='op'>(</span><span class='va'>tmpdir</span>, create <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># creates a  new, "empty" module -- it has defaults for everything that is required</span>
-<span class='fu'><a href='newModule.html'>newModule</a></span>(<span class='st'>"testModule"</span>, <span class='kw'>tmpdir</span>, open = <span class='fl'>FALSE</span>)
+<span class='fu'><a href='newModule.html'>newModule</a></span><span class='op'>(</span><span class='st'>"testModule"</span>, <span class='va'>tmpdir</span>, open <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># Look at new module code -- see defineParameter</span>
-<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>tmpdir</span>, <span class='st'>"testModule"</span>, <span class='st'>"testModule.R"</span>))
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/file.edit.html'>file.edit</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>tmpdir</span>, <span class='st'>"testModule"</span>, <span class='st'>"testModule.R"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># initialize the simList</span>
-<span class='kw'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span>(modules = <span class='st'>"testModule"</span>,
-                 paths = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(modulePath = <span class='kw'>tmpdir</span>))
+<span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>modules <span class='op'>=</span> <span class='st'>"testModule"</span>,
+                 paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='va'>tmpdir</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># Access one of the parameters -- because this line is not inside a module</span>
 <span class='co'>#  function, we must specify the module name. If used within a module,</span>
 <span class='co'>#  we can omit the module name</span>
-<span class='fu'><a href='params.html'>P</a></span>(<span class='kw'>mySim</span>, <span class='st'>"testModule"</span>)<span class='op'>$</span><span class='kw'>.useCache</span>
-}
+<span class='fu'><a href='params.html'>P</a></span><span class='op'>(</span><span class='va'>mySim</span>, <span class='st'>"testModule"</span><span class='op'>)</span><span class='op'>$</span><span class='va'>.useCache</span>
+<span class='op'>}</span>
 
 </div></pre>
   </div>
@@ -267,7 +270,7 @@ tell a module user what values the module expects.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

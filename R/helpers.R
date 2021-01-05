@@ -19,6 +19,10 @@
 .pkgEnv$.coreModules <- .coreModules() %>% unname()
 
 #' @keywords internal
+#' @include environment.R
+.pkgEnv$.coreModulesMinusSave <- setdiff(.coreModules(), "save") %>% unname()
+
+#' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
 
 ################################################################################
@@ -297,10 +301,8 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current)
+  all.equal.default(target, current, check.environment = FALSE)
 }
-
-
 
 needInstall <- function(pkg = "methods", minVersion = NULL,
                         messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {
@@ -316,3 +318,7 @@ needInstall <- function(pkg = "methods", minVersion = NULL,
          "install.packages('",pkg,"')")
   }
 }
+
+isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
+
+.isFALSE <- function(x) is.logical(x) && length(x) == 1L && !is.na(x) && !x

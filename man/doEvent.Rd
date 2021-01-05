@@ -4,7 +4,12 @@
 \alias{doEvent}
 \title{Process a simulation event}
 \usage{
-doEvent(sim, debug = FALSE, notOlderThan)
+doEvent(
+  sim,
+  debug = FALSE,
+  notOlderThan,
+  useFuture = getOption("spades.futureEvents", FALSE)
+)
 }
 \arguments{
 \item{sim}{Character string for the \code{simList} simulation object.}
@@ -18,6 +23,8 @@ Default is \code{NULL}, meaning don't update the cache.
 If \code{Sys.time()} is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
 Ignored if \code{cache} is \code{FALSE}.}
+
+\item{useFuture}{Experimental use of future::future package. Not fully implemented.}
 }
 \value{
 Returns the modified \code{simList} object.

@@ -41,7 +41,8 @@
 
 <meta property="og:title" content="Create new SpaDES project — newProject" />
 <meta property="og:description" content="Initialize a project with subdirectories cache/, modules/,
-inputs/, outputs/, and setPaths accordingly." />
+inputs/, outputs/, and setPaths accordingly.
+If invoked from Rstudio, will also create a new Rstudio project file." />
 
 
 
@@ -83,7 +84,7 @@ inputs/, outputs/, and setPaths accordingly." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -91,7 +92,7 @@ inputs/, outputs/, and setPaths accordingly." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,6 +118,9 @@ inputs/, outputs/, and setPaths accordingly." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -126,7 +130,7 @@ inputs/, outputs/, and setPaths accordingly." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -150,16 +154,17 @@ inputs/, outputs/, and setPaths accordingly." />
 
     <div class="ref-description">
     <p>Initialize a project with subdirectories <code class="file">cache/</code>, <code class="file">modules/</code>,
-<code class="file">inputs/</code>, <code class="file">outputs/</code>, and <code>setPaths</code> accordingly.</p>
+<code class="file">inputs/</code>, <code class="file">outputs/</code>, and <code>setPaths</code> accordingly.
+If invoked from Rstudio, will also create a new Rstudio project file.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>newProject</span>(<span class='kw'>name</span>, <span class='kw'>path</span>, <span class='kw'>open</span>)
+    <pre class="usage"><span class='fu'>newProject</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>path</span>, <span class='va'>open</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,logical</span>
-<span class='fu'>newProject</span>(<span class='kw'>name</span>, <span class='kw'>path</span>, <span class='kw'>open</span>)
+<span class='fu'>newProject</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>path</span>, <span class='va'>open</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>newProject</span>(<span class='kw'>name</span>, <span class='kw'>path</span>, <span class='kw'>open</span>)</pre>
+<span class='fu'>newProject</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>path</span>, <span class='va'>open</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -181,26 +186,26 @@ Default <code>TRUE</code> in an interactive session.</p></td>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>myProjDir</span> <span class='op'>&lt;-</span> <span class='fu'>newProject</span>(<span class='st'>"myProject"</span>, <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>())
+    <pre class="examples"><div class='input'><span class='va'>myProjDir</span> <span class='op'>&lt;-</span> <span class='fu'>newProject</span><span class='op'>(</span><span class='st'>"myProject"</span>, <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpm6ajzj/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpm6ajzj/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpm6ajzj/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpm6ajzj/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpm6ajzj/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/Rtmpthq7GU/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>myProjDir</span>, <span class='st'>"cache"</span>))
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>myProjDir</span>, <span class='st'>"inputs"</span>))
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>myProjDir</span>, <span class='st'>"modules"</span>))
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='kw'>myProjDir</span>, <span class='st'>"outputs"</span>))
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span>(<span class='kw'>myProjDir</span>, recursive = <span class='fl'>TRUE</span>) <span class='co'>## cleanup</span>
+<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>myProjDir</span>, <span class='st'>"cache"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>myProjDir</span>, <span class='st'>"inputs"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>myProjDir</span>, <span class='st'>"modules"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>myProjDir</span>, <span class='st'>"outputs"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span><span class='op'>(</span><span class='va'>myProjDir</span>, recursive <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='co'>## cleanup</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -217,7 +222,7 @@ Default <code>TRUE</code> in an interactive session.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

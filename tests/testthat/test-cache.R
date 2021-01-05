@@ -1,5 +1,5 @@
 test_that("test event-level cache", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit(smcc = FALSE, opts = list("reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -15,7 +15,7 @@ test_that("test event-level cache", {
 
   # Example of changing parameter values
   mySim <- simInit(
-    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+    times = list(start = 0.0, end = 3.0, timeunit = "year"),
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
       # Turn off interactive plotting
@@ -57,7 +57,9 @@ test_that("test event-level cache", {
 })
 
 test_that("test module-level cache", {
-  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE)
+  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
+                          opts = list("reproducible.useMemoise" = FALSE))
+
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -171,7 +173,8 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoveryMode = FALSE))
+  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoveryMode = FALSE,
+                                                             "reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -300,7 +303,8 @@ test_that("test objSize", {
 })
 
 test_that("Cache sim objs via .Cache attr", {
-  testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE))
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE,
+                                                                   "reproducible.useMemoise" = FALSE))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)

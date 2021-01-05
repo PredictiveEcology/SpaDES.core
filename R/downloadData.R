@@ -53,7 +53,8 @@ setMethod(
     }
 
     io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
-    io[[module]][io[[module]][["objectName"]] == objectName, "sourceURL"]
+    wh <- io[[module]][["objectName"]] == objectName
+    io[[module]][wh, ]$sourceURL
 })
 
 #' Calculate checksum for a module's data files
@@ -198,7 +199,6 @@ remoteFileSize <- function(url) {
 #'
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
-#' @importFrom dplyr bind_rows
 #' @importFrom reproducible compareNA
 #' @importFrom Require checkPath
 #' @importFrom utils download.file
@@ -253,36 +253,41 @@ setMethod(
     } else {
       files
     }
-    res <- Map(reproducible::preProcess,
-               targetFile = targetFiles,
-               url = urls,
-               MoreArgs = append(
-                 list(
-                   quick = quickCheck,
-                   overwrite = overwrite,
-                   destinationPath = file.path(path, module, "data")
-                  ),
-                 list(...)
-               )
-    )
-    chksums <- rbindlist(lapply(res, function(x) x$checkSums))
-    chksums <- chksums[order(-result)]
-    chksums <- unique(chksums, by = "expectedFile")
+    notNAs <- !unlist(lapply(urls, is.na))
+    dPath <- file.path(path, module, "data")
+    if (any(notNAs)) {
+      res <- Map(reproducible::preProcess,
+                 targetFile = targetFiles[notNAs],
+                 url = urls[notNAs],
+                 MoreArgs = append(
+                   list(
+                     quick = quickCheck,
+                     overwrite = overwrite,
+                     destinationPath = dPath
+                   ),
+                   list(...)
+                 )
+      )
+      chksums <- rbindlist(lapply(res, function(x) x$checkSums))
+      chksums <- chksums[order(-result)]
+      chksums <- unique(chksums, by = "expectedFile")
+    } else {
+      chksums <- Checksums(dPath, write = TRUE)
+    }
 
     # after download, check for childModules that also require downloading
-    chksums2 <- chksums[0,]
     #children <- moduleMetadata(module, path)$childModules
     if (!is.null(children)) {
       if (length(children)) {
         if (all(nzchar(children) & !is.na(children))) {
-          chksums2 <- lapply(children, downloadData, path = path, quiet = quiet,
-                             quickCheck = quickCheck) %>%
-            bind_rows()
+          chksums2 <- bindrows(lapply(children, downloadData, path = path, quiet = quiet,
+                             quickCheck = quickCheck))
+          chksums <- bindrows(chksums, chksums2)
         }
       }
     }
 
-    return(bind_rows(chksums, chksums2))
+    return(chksums)
 })
 
 #' @rdname downloadData

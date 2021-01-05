@@ -931,7 +931,6 @@ setReplaceMethod("progressType",
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
 #' @importFrom stats na.omit
-#' @importFrom R.utils isAbsolutePath
 #' @export
 #' @name inputs
 #' @aliases simList-accessors-inout
@@ -1011,9 +1010,10 @@ setReplaceMethod(
 
      # If a filename is provided, determine if it is absolute path, if so,
      # use that, if not, then append it to inputPath(sim)
-     sim@inputs[!isAbsolutePath(sim@inputs$file) & !is.na(sim@inputs$file), "file"] <-
+     isAP <- isAbsolutePath(as.character(sim@inputs$file))
+     sim@inputs[!isAP & !is.na(sim@inputs$file), "file"] <-
        file.path(inputPath(sim),
-                 sim@inputs$file[!isAbsolutePath(sim@inputs$file) & !is.na(sim@inputs$file)])
+                 sim@inputs$file[!isAP & !is.na(sim@inputs$file)])
 
      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
        stop(paste("input table can only have columns named",
@@ -1110,9 +1110,7 @@ setReplaceMethod(
 #' @export
 #' @include simList-class.R
 #' @importFrom data.table := data.table
-#' @importFrom R.utils isAbsolutePath
 #' @importFrom stats na.omit
-#' @importFrom tools file_ext file_path_sans_ext
 #' @name outputs
 #' @rdname simList-accessors-outputs
 #'
@@ -1197,8 +1195,10 @@ setReplaceMethod(
        # use that, if not, then append it to outputPath(sim)
        alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
        if (any(!alreadyWithOutputPath)) {
-         sim@outputs[!isAbsolutePath(sim@outputs$file)[!alreadyWithOutputPath], "file"] <-
-           file.path(outputPath(sim), sim@outputs$file[!isAbsolutePath(sim@outputs$file)])
+         isAP <- isAbsolutePath(as.character(sim@outputs$file))
+
+         sim@outputs[!isAP[!alreadyWithOutputPath], "file"] <-
+           file.path(outputPath(sim), sim@outputs$file[!isAP])
        }
 
        # If there is no function provided, then use saveRDS, from package base
@@ -1224,11 +1224,11 @@ setReplaceMethod(
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !grepl(txtTimeA, sim@outputs$file)
        sim@outputs[wh, "file"] <- paste0(
-         file_path_sans_ext(sim@outputs[wh, "file"]),
+         filePathSansExt(sim@outputs[wh, "file"]),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(file_ext(sim@outputs[wh, "file"]), keepNA = TRUE) ,
-                file_ext(sim@outputs[wh, "file"]),
+         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) ,
+                fileExt(sim@outputs[wh, "file"]),
                 "")
        )
      } else {
@@ -2577,12 +2577,14 @@ setMethod(
 #' in a \code{simList} if not specified.
 #'
 #' @inheritParams P
+#' @param path The path to the module., i.e., the \code{modulePath}.
+#'    Only relevant if \code{sim} not supplied.
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 #'
-setGeneric("inputObjects", function(sim, module) {
+setGeneric("inputObjects", function(sim, module, path) {
   standardGeneric("inputObjects")
 })
 
@@ -2590,8 +2592,8 @@ setGeneric("inputObjects", function(sim, module) {
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 setMethod("inputObjects",
-          signature = "simList",
-          definition = function(sim, module) {
+          signature(sim = "simList"),
+          definition = function(sim, module, path) {
             if (missing(module)) {
               module <- current(sim)
               if (NROW(module) == 0)
@@ -2606,6 +2608,26 @@ setMethod("inputObjects",
             return(out)
 })
 
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("inputObjects",
+          signature(sim = "missing"),
+          definition = function(sim, module, path) {
+            out <- inputOrOutputObjects(type = "inputObjects", module = module, path = path)
+            return(out)
+          })
+
+inputOrOutputObjects <- function(type, module, path) {
+  if (missing(path)) {
+    path <- getPaths()$modulePath
+  }
+  names(module) <- module
+  mm <- lapply(module, function(m)
+    moduleMetadata(module = m, path = path, defineModuleListItems = type)[[type]])
+  mm
+}
+
 ################################################################################
 #' @inheritParams P
 #' @include simList-class.R
@@ -2613,7 +2635,7 @@ setMethod("inputObjects",
 #' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 #'
-setGeneric("outputObjects", function(sim, module) {
+setGeneric("outputObjects", function(sim, module, path) {
   standardGeneric("outputObjects")
 })
 
@@ -2622,7 +2644,7 @@ setGeneric("outputObjects", function(sim, module) {
 #' @aliases simList-accessors-metadata
 setMethod("outputObjects",
           signature = "simList",
-          definition = function(sim, module) {
+          definition = function(sim, module, path) {
             if (missing(module)) {
               module <- current(sim)
               if (NROW(module) == 0)
@@ -2636,6 +2658,15 @@ setMethod("outputObjects",
             }
             return(out)
 })
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("outputObjects",
+          signature(sim = "missing", module = "ANY"),
+          definition = function(sim, module, path) {
+            inputOrOutputObjects(type = "outputObjects", module = module, path = path)
+          })
 
 ################################################################################
 #' @inheritParams P

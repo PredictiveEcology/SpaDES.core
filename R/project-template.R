@@ -2,6 +2,7 @@
 #'
 #' Initialize a project with subdirectories \file{cache/}, \file{modules/},
 #' \file{inputs/}, \file{outputs/}, and \code{setPaths} accordingly.
+#' If invoked from Rstudio, will also create a new Rstudio project file.
 #'
 #' @param name project name (name of project directory)
 #' @param path path to directory in which to create the project directory
@@ -41,7 +42,10 @@ setMethod(
       #rasterPath = checkPath(file.path(dirname(tempdir()), "scratch", name), create = TRUE)
     )
 
-    ## TODO: check for Rstudio project?
+    if (interactive() && Sys.getenv("RSTUDIO") == "1") {
+      if (requireNamespace("rstudioapi", quietly = TRUE))
+        rstudioapi::initializeProject(path = projDir)
+    }
 
     newProjectCode(name, path, open = open)
 
@@ -82,8 +86,7 @@ setMethod(
     filenameR <- file.path(nestedPath, paste0(name, "-project.R"))
 
     projectData <- list()
-    projectTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
-                                                     "project.R.template"))
+    projectTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "project.R.template"))
     writeLines(whisker.render(projectTemplate, projectData), filenameR)
 
     if (open) .fileEdit(filenameR)

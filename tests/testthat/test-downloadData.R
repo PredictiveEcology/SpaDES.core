@@ -73,10 +73,6 @@ test_that("downloadData downloads and unzips module data", {
       ras <- raster(file.path(datadir, filenames[2]))
       ras[5] <- maxValue(ras) + 1
       writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
-      # It updates it to new file -- but it doesn't do this correctly -- it downloads both
-      #   because it doesn't know what targetFile is
-      a <- capture.output(expect_error(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL)))
-      expect_false(exists("dwnload", inherits = FALSE))
       a <- capture.output(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7))
       expect_true(all(dwnload$result %in% "OK"))
       expect_true(all(file.exists(file.path(datadir, filenames))))

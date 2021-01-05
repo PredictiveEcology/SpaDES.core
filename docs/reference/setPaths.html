@@ -84,7 +84,7 @@ Paths$cachePath for example instead of getPaths()$cachePath" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ Paths$cachePath for example instead of getPaths()$cachePath" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ Paths$cachePath for example instead of getPaths()$cachePath" />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ Paths$cachePath for example instead of getPaths()$cachePath" />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,20 +158,20 @@ Note: there is an active binding made to <code>Paths</code>, so a user can use
 <code>Paths$cachePath</code> for example instead of <code>getPaths()$cachePath</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>.paths</span>()
+    <pre class="usage"><span class='fu'>.paths</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>getPaths</span>()
+<span class='fu'>getPaths</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='kw'>Paths</span>
+<span class='va'>Paths</span>
 
-<span class='fu'>setPaths</span>(
-  <span class='kw'>cachePath</span>,
-  <span class='kw'>inputPath</span>,
-  <span class='kw'>modulePath</span>,
-  <span class='kw'>outputPath</span>,
-  <span class='kw'>rasterPath</span>,
-  silent = <span class='fl'>FALSE</span>
-)</pre>
+<span class='fu'>setPaths</span><span class='op'>(</span>
+  <span class='va'>cachePath</span>,
+  <span class='va'>inputPath</span>,
+  <span class='va'>modulePath</span>,
+  <span class='va'>outputPath</span>,
+  <span class='va'>rasterPath</span>,
+  silent <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -220,21 +223,21 @@ that may contribute to excessive disk usage.</p></td>
     <p>Alex Chubaty</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>getPaths</span>()                       <span class='co'>## returns the current default working paths</span>
-<span class='fu'>setPaths</span>(cachePath = <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>())  <span class='co'>## sets custom cachePath with other paths default</span>
-<span class='fu'>setPaths</span>(inputPath = <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>())  <span class='co'>## sets custom inputPath with other paths default</span>
-<span class='fu'>setPaths</span>(modulePath = <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>()) <span class='co'>## sets custom modulePath with other paths default</span>
-<span class='fu'>setPaths</span>(outputPath = <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>()) <span class='co'>## sets custom outputPath with other paths default</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'>getPaths</span><span class='op'>(</span><span class='op'>)</span>                       <span class='co'>## returns the current default working paths</span>
+<span class='fu'>setPaths</span><span class='op'>(</span>cachePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>  <span class='co'>## sets custom cachePath with other paths default</span>
+<span class='fu'>setPaths</span><span class='op'>(</span>inputPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>  <span class='co'>## sets custom inputPath with other paths default</span>
+<span class='fu'>setPaths</span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='co'>## sets custom modulePath with other paths default</span>
+<span class='fu'>setPaths</span><span class='op'>(</span>outputPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='co'>## sets custom outputPath with other paths default</span>
 
 <span class='co'># NOTE: on loading and attaching SpaDES.core,</span>
 <span class='co'># an active binding is made to "Paths"</span>
 
-<span class='fu'>getPaths</span>()
-<span class='kw'>Paths</span> <span class='co'># same</span>
-<span class='fu'>setPaths</span>(outputPath = <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>())
-<span class='kw'>Paths</span> <span class='co'># shows change</span>
-}
+<span class='fu'>getPaths</span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>Paths</span> <span class='co'># same</span>
+<span class='fu'>setPaths</span><span class='op'>(</span>outputPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>Paths</span> <span class='co'># shows change</span>
+<span class='op'>}</span>
 
 </div></pre>
   </div>
@@ -252,7 +255,7 @@ that may contribute to excessive disk usage.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

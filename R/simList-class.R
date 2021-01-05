@@ -137,7 +137,7 @@ setClass(
 setMethod("initialize",
           signature(.Object = "simList"),
           definition = function(.Object, ...) {
-            browser(expr = exists("._initialize_1"))
+            # browser(expr = exists("._initialize_1"))
             sn <- slotNames(.Object)
             dots <- list(...)
             slotsProvided <- sn %in% names(dots)
@@ -172,7 +172,7 @@ setMethod("initialize",
             .Object@completed <- new.env(parent = emptyenv())
 
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
-            browser(expr = exists("._initialize_2"))
+            # browser(expr = exists("._initialize_2"))
             .Object@.xData <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
@@ -212,6 +212,9 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   list2env(from, envir = x@.xData)
   list2env(from@completed, envir = x@completed)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  if (!is.null(x$objectSynonyms)) {
+    x <- .checkObjectSynonyms(x)
+  }
   return(x)
 })
 
@@ -229,6 +232,11 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
            paths = from@paths)
   x@.Data <- as.list(envir(from), all.names = TRUE)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
+  if (!is.null(from$objectSynonyms)) {
+    activeBindingsToDel <- unlist(lapply(from$objectSynonyms, function(os) os[-1]))
+    attr(x$objectSynonyms, "bindings") <- NULL
+    x[activeBindingsToDel] <- NULL
+  }
   return(x)
 })
 

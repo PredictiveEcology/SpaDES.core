@@ -334,7 +334,7 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
 
 \subsection{5.8 SELES-type approach to simulation}{
   These functions are essentially skeletons and are not fully implemented.
-  They are intended to make translations from \href{http://www.gowlland.ca/}{SELES}.
+  They are intended to make translations from SELES (https://www.gowlland.ca/).
   You must know how to use SELES for these to be useful:
 
   \tabular{ll}{
@@ -352,10 +352,8 @@ the suggested \code{SpaDES.tools} package, and are summarized below.}
   \tabular{ll}{
     \code{\link[SpaDES.tools]{inRange}} \tab Test whether a number lies within range [a,b]\cr
     \code{\link{layerNames}} \tab Get layer names for numerous object classes\cr
-    \code{\link{loadPackages}} \tab Simple wrapper for loading packages\cr
     \code{\link{numLayers}} \tab Return number of layers\cr
     \code{\link{paddedFloatToChar}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
-    \code{\link{updateList}} \tab Update values in a named list\cr
   }
 }
 

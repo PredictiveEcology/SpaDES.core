@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -45,7 +45,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -71,6 +71,9 @@
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -80,7 +83,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -94,14 +97,14 @@
 
       
 
-      </header><script src="iv-advanced_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="iv-advanced_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>04 Advanced <code>SpaDES</code> use</h1>
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">September 10 2020</h4>
+            <h4 class="date">January 05 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/iv-advanced.Rmd"><code>vignettes/iv-advanced.Rmd</code></a></small>
       <div class="hidden name"><code>iv-advanced.Rmd</code></div>
@@ -117,18 +120,19 @@
 <div id="memory-monitoring" class="section level2">
 <h2 class="hasAnchor">
 <a href="#memory-monitoring" class="anchor"></a>Memory monitoring</h2>
-<p>While <code><a href="https://rdrr.io/pkg/profvis/man/profvis.html">profvis::profvis</a></code> is an essential tool for memory monitoring using deep R internals, it is often not sufficient for a discrete event situation. For example, it may be useful to know the <em>peak memory use</em> of an event, as this may be the limiting step for setting up many parallel instances. There is an experimental tool that gets triggered with <code><a href="https://rdrr.io/r/base/options.html">options("spades.memoryUseInterval" = xxx)</a></code> where <code>xxx</code> is a <code>numeric</code> in seconds, e.g., <code>0.2</code>. If this is set, and <code>future</code> and <code>future.callr</code> are installed, then whenever a <code>spades</code> call is made, the memory use will be assessed at that regular interval. The procedure is: 1. spawn a future session (i.e., a parallel session) that runs <code><a href="https://rdrr.io/r/base/system.html">system('ps')</a></code> which lists all processes. It only keeps the process that represents the process ID of the main R session; 2. that <code>ps</code> call writes to a text file every <code><a href="https://rdrr.io/r/base/options.html">getOption('spades.memoryUseInterval')</a></code>; 3. if you ran this with a <code>spades</code> call, setting <code><a href="https://rdrr.io/r/base/options.html">options("spades.memoryUseInterval" = 0.5)</a></code> or some other interval (in seconds), it will read that text file into the <code>simList</code> at the end (<code>on.exit</code>) of the <code>spades</code> call (<em>doing this triggers a file deletion of the text file</em>); 4. the object is then in <code>sim$.memoryUse$obj</code>.</p>
+<p>While <code>profvis::profvis</code> is an essential tool for memory monitoring using deep R internals, it is often not sufficient for a discrete event situation. For example, it may be useful to know the <em>peak memory use</em> of an event, as this may be the limiting step for setting up many parallel instances. There is an experimental tool that gets triggered with <code><a href="https://rdrr.io/r/base/options.html">options("spades.memoryUseInterval" = xxx)</a></code> where <code>xxx</code> is a <code>numeric</code> in seconds, e.g., <code>0.2</code>. If this is set, and <code>future</code> and <code>future.callr</code> are installed, then whenever a <code>spades</code> call is made, the memory use will be assessed at that regular interval. The procedure is: 1. spawn a future session (i.e., a parallel session) that runs <code><a href="https://rdrr.io/r/base/system.html">system('ps')</a></code> which lists all processes. It only keeps the process that represents the process ID of the main R session; 2. that <code>ps</code> call writes to a text file every <code><a href="https://rdrr.io/r/base/options.html">getOption('spades.memoryUseInterval')</a></code>; 3. if you ran this with a <code>spades</code> call, setting <code><a href="https://rdrr.io/r/base/options.html">options("spades.memoryUseInterval" = 0.5)</a></code> or some other interval (in seconds), it will read that text file into the <code>simList</code> at the end (<code>on.exit</code>) of the <code>spades</code> call (<em>doing this triggers a file deletion of the text file</em>); 4. the object is then in <code>sim$.memoryUse$obj</code>.</p>
 <p>At that point, the function <code>memoryUse</code> can be called on the <code>simList</code> and it will do a join on the <code>sim$.memoryUse$obj</code> with the <code><a href="../reference/events.html">completed(sim)</a></code> <em>by</em> time stamp, so each event shows its memory use.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">"future"</span>)) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">requireNamespace</span>(<span class="st">"future.callr"</span>)<span class="er">)</span> {</span>
-<span id="cb1-2"><a href="#cb1-2"></a>  <span class="kw">options</span>(<span class="st">"spades.memoryUseInterval"</span> =<span class="st"> </span><span class="fl">0.5</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a>  </span>
-<span id="cb1-4"><a href="#cb1-4"></a>  <span class="co"># run your simInit and spades calls here</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>  <span class="co"># sim &lt;- simInit()</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>  <span class="co"># sim &lt;- spades(sim)  </span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>  </span>
-<span id="cb1-8"><a href="#cb1-8"></a>  <span class="kw">memoryUse</span>(sim, <span class="dt">max =</span> <span class="ot">TRUE</span>) <span class="co"># this should show peak memory use by eventType -- i.e., summarizes if multiple times</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a>  <span class="kw">memoryUse</span>(sim, <span class="dt">max =</span> <span class="ot">FALSE</span>) <span class="co"># this should show peak memory use by event</span></span>
-<span id="cb1-10"><a href="#cb1-10"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">"future"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) <span class="sc">&amp;&amp;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">requireNamespace</span>(<span class="st">"future.callr"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)<span class="er">)</span> {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">options</span>(<span class="st">"spades.memoryUseInterval"</span> <span class="ot">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># run your simInit and spades calls here</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># sim &lt;- simInit()</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># sim &lt;- spades(sim)  </span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">memoryUse</span>(sim, <span class="at">max =</span> <span class="cn">TRUE</span>) <span class="co"># this should show peak memory use by eventType -- i.e., summarizes if multiple times</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">memoryUse</span>(sim, <span class="at">max =</span> <span class="cn">FALSE</span>) <span class="co"># this should show peak memory use by event</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level1">
@@ -152,7 +156,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

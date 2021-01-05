@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -90,7 +90,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -116,6 +116,9 @@
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -125,7 +128,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -151,13 +154,13 @@
     <p>Used to specify an output object's name, class, description and other specifications.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>createsOutput</span>(<span class='kw'>objectName</span>, <span class='kw'>objectClass</span>, <span class='kw'>desc</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>createsOutput</span><span class='op'>(</span><span class='va'>objectName</span>, <span class='va'>objectClass</span>, <span class='va'>desc</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for ANY,ANY,ANY</span>
-<span class='fu'>createsOutput</span>(<span class='kw'>objectName</span>, <span class='kw'>objectClass</span>, <span class='kw'>desc</span>, <span class='kw'>...</span>)
+<span class='fu'>createsOutput</span><span class='op'>(</span><span class='va'>objectName</span>, <span class='va'>objectClass</span>, <span class='va'>desc</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,character</span>
-<span class='fu'>createsOutput</span>(<span class='kw'>objectName</span>, <span class='kw'>objectClass</span>, <span class='kw'>desc</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>createsOutput</span><span class='op'>(</span><span class='va'>objectName</span>, <span class='va'>objectClass</span>, <span class='va'>desc</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -189,13 +192,13 @@ a module's metadata.</p>
     <p>Yong Luo</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>outputObjects</span> <span class='op'>&lt;-</span> <span class='kw'>dplyr</span>::<span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span>(
-  <span class='fu'>createsOutput</span>(objectName = <span class='st'>"outputObject1"</span>, objectClass = <span class='st'>"character"</span>,
-                desc = <span class='st'>"this is for example"</span>),
-  <span class='fu'>createsOutput</span>(objectName = <span class='st'>"outputObject2"</span>, objectClass = <span class='st'>"numeric"</span>,
-                desc = <span class='st'>"this is for example"</span>,
-                otherInformation = <span class='st'>"I am the second output object"</span>)
-)
+    <pre class="examples"><div class='input'><span class='va'>outputObjects</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bindrows.html'>bindrows</a></span><span class='op'>(</span>
+  <span class='fu'>createsOutput</span><span class='op'>(</span>objectName <span class='op'>=</span> <span class='st'>"outputObject1"</span>, objectClass <span class='op'>=</span> <span class='st'>"character"</span>,
+                desc <span class='op'>=</span> <span class='st'>"this is for example"</span><span class='op'>)</span>,
+  <span class='fu'>createsOutput</span><span class='op'>(</span>objectName <span class='op'>=</span> <span class='st'>"outputObject2"</span>, objectClass <span class='op'>=</span> <span class='st'>"numeric"</span>,
+                desc <span class='op'>=</span> <span class='st'>"this is for example"</span>,
+                otherInformation <span class='op'>=</span> <span class='st'>"I am the second output object"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 </div></pre>
   </div>
@@ -213,7 +216,7 @@ a module's metadata.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

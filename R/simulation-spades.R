@@ -1,4 +1,4 @@
-utils::globalVariables(".")
+utils::globalVariables(c(".", ".I", "whi"))
 
 ################################################################################
 #' Process a simulation event
@@ -11,6 +11,7 @@ utils::globalVariables(".")
 #' submodules to the simulation. We use S4 classes and methods.
 #'
 #' @param sim Character string for the \code{simList} simulation object.
+#' @param useFuture Experimental use of future::future package. Not fully implemented.
 #'
 #' @inheritParams spades
 #' @return Returns the modified \code{simList} object.
@@ -28,7 +29,7 @@ utils::globalVariables(".")
 #' @keywords internal
 #' @rdname doEvent
 #'
-doEvent <- function(sim, debug = FALSE, notOlderThan) {
+doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.futureEvents", FALSE)) {
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
@@ -38,6 +39,36 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
 
   # core modules
   core <- .pkgEnv$.coreModules
+
+  if (isTRUE(useFuture)) {
+    # Check here if resolved
+    curForFuture <- sim@events[[1]]
+    if (!curForFuture[["moduleName"]] %in% .pkgEnv$.coreModulesMinusSave) {
+      if (length(sim$simFuture)) {
+        modInFuture <- modNameInFuture(sim$simFuture)
+        futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                      curModName = modInFuture)#sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
+        canProceed <- if (length(futureNeeds)) {
+          # with the assumption that the "unresolved" future could schedule itself,
+          # must block any module who's outputs are needed by the same module as the
+          # unresolved future module
+          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture$moduleName) #&&
+            #modInFuture != curForFuture[["moduleName"]]
+        } else {
+          TRUE
+        }
+        if (!canProceed || curForFuture$moduleName == "save" || future::resolved(sim$simFuture[[1]][[1]])) {
+          cause <- if (!canProceed) paste0(curForFuture$moduleName, " requires outputs from ", modInFuture)
+          else if (curForFuture$moduleName == "save") paste0("Current event is 'save'; so resolving all")
+          else paste0(modInFuture, " finished running")
+          sim <- resolveFutureNow(sim, cause = cause)
+        }
+
+      }
+
+    }
+
+  }
 
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
@@ -186,7 +217,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             }
           }
 
-          browser(expr = exists("._doEvent_2"))
+          # browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
             isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
               isTRUE(getOption("reproducible.showSimilar", FALSE))
@@ -199,10 +230,27 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
             .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
                               removeOthers = FALSE)
 
-          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                           showSimilar = showSimilar)
+          skipEvent <- FALSE
+          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+          if (useFuture) {
+            # stop("using future for spades events is not yet fully implemented")
+            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                          curModName = cur[["moduleName"]])
 
-          browser(expr = exists("._doEvent_3"))
+            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
+              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                     futureNeeds = futureNeeds)
+              skipEvent <- TRUE
+            }
+          }
+
+          if (!skipEvent) {
+            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                             showSimilar = showSimilar, .pkgEnv)
+          }
+
+          # browser(expr = exists("._doEvent_3"))
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
@@ -599,9 +647,9 @@ scheduleConditionalEvent <- function(sim,
 #'                 the number of update intervals to show in a graphical progress bar.
 #'
 #' @param cache Logical. If \code{TRUE}, then the \code{spades} call will be cached.
-#'              This means that if the call is made again with the same simList,
+#'              This means that if the call is made again with the same \code{simList},
 #'              then `spades`` will return the return value from the previous run
-#'              of that exact same simList. Default \code{FALSE}. See Details.
+#'              of that exact same \code{simList}. Default \code{FALSE}. See Details.
 #'              See also the vignette on caching for examples.
 #'
 #' @param .plotInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
@@ -641,6 +689,28 @@ scheduleConditionalEvent <- function(sim,
 #' \code{.plotInitialTime = NA} or \code{.saveInitialTime = NA}. NOTE: if a
 #' module did not use \code{.plotInitialTime} or \code{.saveInitialTime}, then
 #' these arguments will not do anything.
+#'
+#' @section Caching with SpaDES:
+#'
+#' There are numerous ways in which Caching can be used within SpaDES. Please
+#' see the vignette
+#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
+#' for many examples. Briefly, functions, events, modules, entire spades calls or
+#' experiment calls (see \url{https::/github.com/PredictiveEcology/SpaDES.experiment})
+#' can be cached and mixtures of all of these will work. For functions, simply
+#' wrap the call with \code{Cache}, moving the original function name into
+#' the first argument of Cache. For events or modules, set the module \code{parameters},
+#' \code{.useCache}, e.g.,
+#' \code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
+#' This can be set to an event name, which will cache that event, or a logical (e.g., \code{}),
+#' which will cache \emph{every} event in that module. Event and module caching
+#' makes most sense when the event or module only runs once, such as an initialization
+#' or data preparation event/module. Caching an entire simulation is actually just
+#' a function call to \code{simInitAndSpades}, for example. So, simply writing
+#' \code{Cache(simInitAndSpades, modules = ...)} will effectively cache a whole simulation.
+#' Finally for experiments, it is just like a function call:
+#' \code{Cache(simInitandExperiment, ...)}. The final way Caching can be done is in
+#' \code{experiment} or \code{spades}, by setting the \code{cache} argument.
 #'
 #' If \code{cache} is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
@@ -786,7 +856,6 @@ setGeneric(
   })
 
 #' @rdname spades
-#' @importFrom rlang cnd_muffle
 setMethod(
   "spades",
   signature(sim = "simList", cache = "missing"),
@@ -806,7 +875,7 @@ setMethod(
     useNormalMessaging <- TRUE
     newDebugging <- is.list(debug)
     if (newDebugging) {
-      if (requireNamespace("logging")) {
+      if (requireNamespace("logging", quietly = TRUE)) {
         debug <- setupDebugger(debug)
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
@@ -981,6 +1050,17 @@ setMethod(
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
+      useFuture <- getOption("spades.futureEvents", FALSE)
+      if (useFuture) {
+        if (!requireNamespace("future", quietly = TRUE))
+          stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
+
+        message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
+                "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
+                "User must manage future::plan, e.g., \nfuture::plan(multiprocess(workers = 2))")
+        sim$.futureEventsSkipped <- 0
+        sim$simFuture <- list()
+      }
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         if (recoverMode > 0) {
@@ -988,7 +1068,6 @@ setMethod(
         }
 
         sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
-
 
         if (recoverMode > 0) {
           rmo <- recoverModePost(sim, rmo, recoverMode)
@@ -1015,6 +1094,23 @@ setMethod(
             }
           }
         }
+        if (useFuture) {
+          if (length(sim$simFuture) > 1) {
+            for (simFut in seq_along(sim$simFuture)) {
+              if (future::resolved(sim$simFuture[[1]][[1]])) {
+                sim <- resolveFutureNow(sim, cause = paste0(modNameInFuture(sim$simFuture[1]), " finished running"))
+              }
+            }
+          }
+        }
+      }
+      if (useFuture) {
+        if (length(sim$simFuture)) {
+          for (simFut in seq_along(sim$simFuture)) {
+            sim <- resolveFutureNow(sim, cause = "End of simulation")
+          }
+        }
+        message(crayon::magenta(sim$.futureEventsSkipped, " events ran while events ran in futures"))
       }
       sim@simtimes[["current"]] <- sim@simtimes[["end"]]
 
@@ -1022,13 +1118,13 @@ setMethod(
       .pkgEnv$.cleanEnd <- TRUE
       return(invisible(sim))
     },
-    warning = function(w) { if (requireNamespace("logging")) {
+    warning = function(w) { if (requireNamespace("logging", quietly = TRUE)) {
       logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       } else {
         warning(w)
       }
     },
-    error = function(e) { if (requireNamespace("logging")) {
+    error = function(e) { if (requireNamespace("logging", quietly = TRUE)) {
       logging::logerror(e)
     } else {
       stop(e)
@@ -1041,7 +1137,8 @@ setMethod(
         message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
       }
       # This will "muffle" the original message
-      tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
+      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+      # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
     return(invisible(sim))
@@ -1104,7 +1201,7 @@ setMethod(
 })
 
 #' @keywords internal
-.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar) {
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
   if (cacheIt) { # means that a module or event is to be cached
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
@@ -1293,7 +1390,7 @@ messageInterrupt1 <- function(recoverMode) {
 
 setupDebugger <- function(debug = getOption("spades.debug")) {
   if (!missing(debug)) {
-    if (!isFALSE(debug)) {
+    if (!.isFALSE(debug)) {
       if (is.list(debug)) {
         needInstall("logging",
                     messageStart = "debug cannot be a list unless logging package is installed: ")
@@ -1335,7 +1432,7 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
           }
           logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
           cat(file = debug$file$file, "##################################\n",
-              append = !isFALSE(debug$file$append)) # default append it TRUE
+              append = !.isFALSE(debug$file$append)) # default append it TRUE
         }
         # with(getLogger(), names(handlers))
 
@@ -1383,4 +1480,102 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
     }
   }
   return(invisible())
+}
+
+resolveFutureNow <- function(sim, cause = "") {
+
+  futureRunning <- sim@events[[1]]
+  futureRunning[1:4] <- as.list(strsplit(names(sim$simFuture)[1], split = "_")[[1]])
+  futureRunning[["eventTime"]] <- as.numeric(futureRunning[[1]])
+  futureRunning[["eventPriority"]] <- as.numeric(futureRunning[["eventPriority"]])
+  futureRunningSimTU <- futureRunning
+  futureRunningSimTU[["eventTime"]] <- convertTimeunit(as.numeric(futureRunningSimTU[[1]]), unit = timeunit(sim))
+  setDT(futureRunningSimTU)
+  setDT(futureRunning)
+  message(crayon::magenta("        -- Resolving", capture.output(print(futureRunningSimTU, row.names = FALSE, col.names = "none"))))
+  message(crayon::magenta("           ", cause))
+
+  tmpSim <- future::value(sim$simFuture[[1]][[1]])
+  simMetadata <- sim$simFuture[[1]][[2]]
+
+  # objects
+  list2env(mget(simMetadata$objects, envir = envir(tmpSim)), envir = envir(sim))
+
+  allCols <- c("eventTime", "moduleName", "eventTime", "eventPriority")
+  # events
+  evntsFut <- events(tmpSim, unit = "seconds")
+  compltd <- completed(sim, unit = "seconds")[, 1:4]
+  evntsNormal <- rbindlist(list(compltd, current(sim, unit = "seconds"), events(sim, unit = "seconds")))
+  newEvents <- evntsFut[!evntsNormal, on = allCols]
+
+  sim$.futureEventsSkipped <- sim$.futureEventsSkipped + NROW(compltd) - futureRunning[compltd, whi := .I, on = allCols]$wh
+  if (NROW(newEvents)) {
+    newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
+    slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
+    ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
+                 unlist(lapply(sim@events, function(x) x$eventPriority)))
+    slot(sim, "events") <- sim@events[ord]
+  }
+  sim$simFuture <- sim$simFuture[-1]
+
+  sim
+}
+
+getFutureNeeds <- function(deps, curModName) {
+  #browser(expr = curModName == "fireSpread")
+  out <- list()
+  mods <- names(deps)
+  if (isTRUE(curModName %in% mods)) {
+    moduleNamesNotThisOne <- mods[!mods %in% curModName]
+    out$thisMod <- curModName
+    allOtherModNames <- deps[names(deps) != curModName]
+    out$anyModInputs <- na.omit(unique(unlist(lapply(
+      deps, # can be a different event, don't exclude self
+      function(modu)
+        modu@inputObjects$objectName
+    ))))
+    out$thisModsInputs <- na.omit(unique(unlist(lapply(
+      deps[curModName], # can be a different event, don't exclude self
+      function(modu)
+        modu@inputObjects$objectName
+    ))))
+    out$thisModOutputs <- na.omit(unique(unlist(lapply(
+      deps[curModName],
+      function(modu)
+        modu@outputObjects$objectName
+    ))))
+    out$anyModOutputs <- lapply(
+      deps,
+      function(modu)
+        modu@outputObjects$objectName
+    )
+    out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
+  }
+  out
+
+}
+
+.runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                            showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
+  message(crayon::magenta("        -- Spawning in a future"))
+  modEnv <- sim$.mods[[cur[["moduleName"]]]]
+  modObjs <- mget(ls(envir = modEnv), envir = modEnv)
+  pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
+  list2env(modObjs, envir = envir)
+  sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
+    list(sim = future::future(getFromNamespace(".runEvent", "SpaDES.core")(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                                      showSimilar = showSimilar, .pkgEnv),
+
+                              globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
+                                          "showSimilar", ".pkgEnv", names(modObjs)),
+                              packages = c("SpaDES.core", pkgs),
+                              envir = envir),
+         thisModOutputs = list(moduleName = cur[["moduleName"]],
+                               objects = futureNeeds$thisModOutputs,
+                               dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
+  sim
+}
+
+modNameInFuture <- function(simFuture) {
+  gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
 }

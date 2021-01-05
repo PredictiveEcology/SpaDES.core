@@ -84,7 +84,7 @@ the correct one." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ the correct one." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ the correct one." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ the correct one." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,59 +158,59 @@ directory, or if there is a checksum mismatch indicating that the file is not
 the correct one.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>downloadData</span>(
-  <span class='kw'>module</span>,
-  <span class='kw'>path</span>,
-  <span class='kw'>quiet</span>,
-  quickCheck = <span class='fl'>FALSE</span>,
-  overwrite = <span class='fl'>FALSE</span>,
-  files = <span class='kw'>NULL</span>,
-  checked = <span class='kw'>NULL</span>,
-  urls = <span class='kw'>NULL</span>,
-  children = <span class='kw'>NULL</span>,
-  <span class='kw'>...</span>
-)
+    <pre class="usage"><span class='fu'>downloadData</span><span class='op'>(</span>
+  <span class='va'>module</span>,
+  <span class='va'>path</span>,
+  <span class='va'>quiet</span>,
+  quickCheck <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overwrite <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  files <span class='op'>=</span> <span class='cn'>NULL</span>,
+  checked <span class='op'>=</span> <span class='cn'>NULL</span>,
+  urls <span class='op'>=</span> <span class='cn'>NULL</span>,
+  children <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,logical</span>
-<span class='fu'>downloadData</span>(
-  <span class='kw'>module</span>,
-  <span class='kw'>path</span>,
-  <span class='kw'>quiet</span>,
-  quickCheck = <span class='fl'>FALSE</span>,
-  overwrite = <span class='fl'>FALSE</span>,
-  files = <span class='kw'>NULL</span>,
-  checked = <span class='kw'>NULL</span>,
-  urls = <span class='kw'>NULL</span>,
-  children = <span class='kw'>NULL</span>,
-  <span class='kw'>...</span>
-)
+<span class='fu'>downloadData</span><span class='op'>(</span>
+  <span class='va'>module</span>,
+  <span class='va'>path</span>,
+  <span class='va'>quiet</span>,
+  quickCheck <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  overwrite <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  files <span class='op'>=</span> <span class='cn'>NULL</span>,
+  checked <span class='op'>=</span> <span class='cn'>NULL</span>,
+  urls <span class='op'>=</span> <span class='cn'>NULL</span>,
+  children <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for character,missing,missing</span>
-<span class='fu'>downloadData</span>(<span class='kw'>module</span>, <span class='kw'>quickCheck</span>, <span class='kw'>overwrite</span>, <span class='kw'>files</span>, <span class='kw'>checked</span>, <span class='kw'>urls</span>, <span class='kw'>children</span>)
+<span class='fu'>downloadData</span><span class='op'>(</span><span class='va'>module</span>, <span class='va'>quickCheck</span>, <span class='va'>overwrite</span>, <span class='va'>files</span>, <span class='va'>checked</span>, <span class='va'>urls</span>, <span class='va'>children</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,missing,logical</span>
-<span class='fu'>downloadData</span>(
-  <span class='kw'>module</span>,
-  <span class='kw'>quiet</span>,
-  <span class='kw'>quickCheck</span>,
-  <span class='kw'>overwrite</span>,
-  <span class='kw'>files</span>,
-  <span class='kw'>checked</span>,
-  <span class='kw'>urls</span>,
-  <span class='kw'>children</span>
-)
+<span class='fu'>downloadData</span><span class='op'>(</span>
+  <span class='va'>module</span>,
+  <span class='va'>quiet</span>,
+  <span class='va'>quickCheck</span>,
+  <span class='va'>overwrite</span>,
+  <span class='va'>files</span>,
+  <span class='va'>checked</span>,
+  <span class='va'>urls</span>,
+  <span class='va'>children</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,missing</span>
-<span class='fu'>downloadData</span>(
-  <span class='kw'>module</span>,
-  <span class='kw'>path</span>,
-  <span class='kw'>quickCheck</span>,
-  <span class='kw'>overwrite</span>,
-  <span class='kw'>files</span>,
-  <span class='kw'>checked</span>,
-  <span class='kw'>urls</span>,
-  <span class='kw'>children</span>
-)</pre>
+<span class='fu'>downloadData</span><span class='op'>(</span>
+  <span class='va'>module</span>,
+  <span class='va'>path</span>,
+  <span class='va'>quickCheck</span>,
+  <span class='va'>overwrite</span>,
+  <span class='va'>files</span>,
+  <span class='va'>checked</span>,
+  <span class='va'>urls</span>,
+  <span class='va'>children</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -293,15 +296,15 @@ for downloading modules and building a checksums file.</p></div>
     <p>Alex Chubaty &amp; Eliot McIntire</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># For a Google Drive example</span>
 <span class='co'># In metadata:</span>
-<span class='fu'>expectsInputs</span>(<span class='st'>"theFilename.zip"</span>, <span class='st'>"NA"</span>, <span class='st'>"NA"</span>,
-  sourceURL = <span class='st'>"https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez"</span>)
+<span class='fu'>expectsInputs</span><span class='op'>(</span><span class='st'>"theFilename.zip"</span>, <span class='st'>"NA"</span>, <span class='st'>"NA"</span>,
+  sourceURL <span class='op'>=</span> <span class='st'>"https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez"</span><span class='op'>)</span>
 <span class='co'># create the checksums file</span>
-<span class='fu'><a href='checksums.html'>checksums</a></span>(<span class='st'>"thisModule"</span>, <span class='st'>"there"</span>, write = <span class='fl'>TRUE</span>)
-<span class='fu'>downloadData</span>(<span class='st'>"thisModule"</span>, <span class='st'>"there"</span>, files = <span class='st'>"theFilename.zip"</span>)
-}
+<span class='fu'><a href='checksums.html'>checksums</a></span><span class='op'>(</span><span class='st'>"thisModule"</span>, <span class='st'>"there"</span>, write <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>downloadData</span><span class='op'>(</span><span class='st'>"thisModule"</span>, <span class='st'>"there"</span>, files <span class='op'>=</span> <span class='st'>"theFilename.zip"</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 </div></pre>
   </div>
@@ -319,7 +322,7 @@ for downloading modules and building a checksums file.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

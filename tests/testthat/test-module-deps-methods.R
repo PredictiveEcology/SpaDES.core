@@ -32,12 +32,12 @@ test_that("defineModule correctly handles different inputs", {
       defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description
                       with spaces")
     ),
-    inputObjects = bind_rows(
+    inputObjects = bindrows(
       expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_),
       expectsInput(objectName = "testInput2", objectClass = "list", sourceURL = "", desc = "another vague
                    description with spaces")
     ),
-    outputObjects = bind_rows(
+    outputObjects = bindrows(
       createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_),
       createsOutput(objectName = "testOutput", objectClass = "list", desc = "another vague
                    description with spaces for outputs   another space")
@@ -131,13 +131,13 @@ test_that("depsEdgeList and depsGraph work", {
 
   # depsEdgeList
   el <- depsEdgeList(mySim)
-  el_from <- c("fireSpread", "fireSpread",
+  el_from <- c("caribouMovement", "fireSpread", "fireSpread",
                "fireSpread", "randomLandscapes", "randomLandscapes")
-  el_to <- c("caribouMovement", "fireSpread", "fireSpread",
+  el_to <- c("caribouMovement", "caribouMovement", "fireSpread", "fireSpread",
              "caribouMovement", "fireSpread")
-  el_objName <- c("landscape", "landscape",
+  el_objName <- c("caribou", "landscape", "landscape",
                   "npixelsburned", "landscape", "landscape")
-  el_objClass <- c("RasterStack", "RasterStack",
+  el_objClass <- c("SpatialPointsDataFrame", "RasterStack", "RasterStack",
                    "numeric", "RasterStack", "RasterStack")
 
   expect_is(el, "data.table")

@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -45,7 +45,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -71,6 +71,9 @@
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -80,7 +83,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -94,7 +97,7 @@
 
       
 
-      </header><script src="i-introduction_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="i-introduction_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>01 Introduction to <code>SpaDES</code>
@@ -102,7 +105,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">September 10 2020</h4>
+            <h4 class="date">January 05 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -152,7 +155,7 @@
 <h2 class="hasAnchor">
 <a href="#discrete-event-simulation-and-spades" class="anchor"></a>Discrete event simulation and <code>SpaDES</code>
 </h2>
-<p>Discrete event simulation (DES) as implemented here is ‘event driven’, meaning that an activity changes the state of the system at particular times (called events). This approach assumes that state of the system only changes due to events, therefore there is no change between events. A particular activity may have several events associated with it. Future events are scheduled in an event queue, and then processed in chronological order (with ties being resolved using ‘first-in-first-out’). Because the system state doesn’t change between events, we do not need to ‘run the clock’ in fixed increments each timestep. Rather, time advances to the time of the next event in the queue, effectively optimizing computations especially when different modules have different characteristic time intervals (<em>i.e.</em>, ‘timestep’).</p>
+<p>Discrete event simulation (DES) as implemented here is ‘event driven,’ meaning that an activity changes the state of the system at particular times (called events). This approach assumes that state of the system only changes due to events, therefore there is no change between events. A particular activity may have several events associated with it. Future events are scheduled in an event queue, and then processed in chronological order (with ties being resolved using ‘first-in-first-out’). Because the system state doesn’t change between events, we do not need to ‘run the clock’ in fixed increments each timestep. Rather, time advances to the time of the next event in the queue, effectively optimizing computations especially when different modules have different characteristic time intervals (<em>i.e.</em>, ‘timestep’).</p>
 <p>‘Time’ is the core concept linking various simulation components via the event queue. Activities schedule events (which change the state of the system according to their programmed rules) and do not need to know about each other. Rather than wrapping a sequence of functions (events) inside a <code>for</code> loop for time and iterating through each timestep, each event is simply scheduled to be completed. Repeated events are simply scheduled repeatedly. This not only allows for modularity of simulation components, it also allows complex model dynamics to emerge based on scheduling rules of each activity (module). Thus, complex simulations involving multiple processes (activities) can be built fairly easily, provided these processes are modelled using a common DES framework.</p>
 <p><code>SpaDES</code> provides such a framework, facilitating interaction between multiple processes (built as ‘modules’) that don’t interact with one another directly, but are scheduled in the event queue and carry out operations on shared data objects in the simulation environment. This package provides tools for building modules natively in <code>R</code> that can be reused. Additionally, because of the flexibility <code>R</code> provides for interacting with other programming languages and external data sources, modules can also be built using external tools and integrated with <code>SpaDES</code> (see figure below).</p>
 <p><img src="../man/figures/SpaDES-overview-diagram.png" title="Schematic representation of a `SpaDES` simulation model."></p>
@@ -169,36 +172,34 @@
 <a href="#spades-demos-and-sample-modules" class="anchor"></a><code>SpaDES</code> demos and sample modules</h2>
 <p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
 <p>This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st"><a href="https://spades-core.predictiveecology.org">"SpaDES.core"</a></span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://spades-core.predictiveecology.org/">"SpaDES.core"</a></span><span class="op">)</span>
 
-<span class="kw">demoSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="../reference/simInit.html">simInit</a></span>(
-  times = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(start = <span class="fl">0</span>, end = <span class="fl">100</span>),
-  modules = <span class="st">"SpaDES_sampleModules"</span>,
-  params = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-    .globals = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(burnStats = <span class="st">"nPixelsBurned"</span>),
-    randomLandscapes = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      nx = <span class="fl">1e2</span>, ny = <span class="fl">1e2</span>, .saveObjects = <span class="st">"landscape"</span>,
-      .plotInitialTime = <span class="fl">NA</span>, .plotInterval = <span class="fl">NA</span>, inRAM = <span class="fl">TRUE</span>
-    ),
-    caribouMovement = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      N = <span class="fl">1e2</span>, .saveObjects = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"caribou"</span>),
-      .plotInitialTime = <span class="fl">1</span>, .plotInterval = <span class="fl">1</span>, moveInterval = <span class="fl">1</span>
-    ),
-    fireSpread = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-      nFires = <span class="fl">1e1</span>, spreadprob = <span class="fl">0.235</span>, persistprob = <span class="fl">0</span>, its = <span class="fl">1e6</span>,
-      returnInterval = <span class="fl">10</span>, startTime = <span class="fl">0</span>,
-      .plotInitialTime = <span class="fl">0</span>, .plotInterval = <span class="fl">10</span>
-    )
-  ),
-  path = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(modulePath = <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"sampleModules"</span>, package = <span class="st">"SpaDES.core"</span>))
-))
-<span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="kw">demoSim</span>)
-</pre></div>
+<span class="va">demoSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span>
+  times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
+  modules <span class="op">=</span> <span class="st">"SpaDES_sampleModules"</span>,
+  params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+    .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>burnStats <span class="op">=</span> <span class="st">"nPixelsBurned"</span><span class="op">)</span>,
+    randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+      nx <span class="op">=</span> <span class="fl">1e2</span>, ny <span class="op">=</span> <span class="fl">1e2</span>, .saveObjects <span class="op">=</span> <span class="st">"landscape"</span>,
+      .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, .plotInterval <span class="op">=</span> <span class="cn">NA</span>, inRAM <span class="op">=</span> <span class="cn">TRUE</span>
+    <span class="op">)</span>,
+    caribouMovement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+      N <span class="op">=</span> <span class="fl">1e2</span>, .saveObjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"caribou"</span><span class="op">)</span>,
+      .plotInitialTime <span class="op">=</span> <span class="fl">1</span>, .plotInterval <span class="op">=</span> <span class="fl">1</span>, moveInterval <span class="op">=</span> <span class="fl">1</span>
+    <span class="op">)</span>,
+    fireSpread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+      nFires <span class="op">=</span> <span class="fl">1e1</span>, spreadprob <span class="op">=</span> <span class="fl">0.235</span>, persistprob <span class="op">=</span> <span class="fl">0</span>, its <span class="op">=</span> <span class="fl">1e6</span>,
+      returnInterval <span class="op">=</span> <span class="fl">10</span>, startTime <span class="op">=</span> <span class="fl">0</span>,
+      .plotInitialTime <span class="op">=</span> <span class="fl">0</span>, .plotInterval <span class="op">=</span> <span class="fl">10</span>
+    <span class="op">)</span>
+  <span class="op">)</span>,
+  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span>
+<span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="va">demoSim</span><span class="op">)</span></code></pre></div>
 <p>Additional <code>SpaDES</code> modules are available via a GitHub repository: <a href="https://github.com/PredictiveEcology/SpaDES-modules">https://github.com/PredictiveEcology/SpaDES-modules</a>. Modules from this repository can be downloaded to a local directory using:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span>(name = <span class="st">"moduleName"</span>)
-</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"moduleName"</span><span class="op">)</span></code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved to the directory specified by the <code>spades.modulesPath</code>. An alternate path can be provided to <code>downloadModule</code> directly via the <code>path</code> argument, or specified using <code><a href="https://rdrr.io/r/base/options.html">options(spades.modulesPath = "path/to/my/modules")</a></code>.</p>
 <p>A detailed guide to module development is provided in the <a href="ii-modules.html">modules vignette</a>.</p>
 </div>
@@ -227,39 +228,36 @@
 <p>The details of each simulation are stored in a <code>simList</code> object, including the simulation parameters and modules used, as well as storing the current state of the simulation and the future event queue. A list of completed events is also stored, which can provide useful debugging information. This <code>simList</code> object contains a unique <code>unique</code> object, along with data used/created during the simulation. The <code>envir</code> object is simply an environment, which means objects stored in it are updated using reference semantics (so objects don’t need to be copied). You can access objects stored in environments using the same syntax as for lists (<em>e.g.</em>, <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>, <code><a href="https://rdrr.io/r/base/Extract.html">[[</a></code>), in addition to <code>get</code>, which makes working with simulated data easy to do inside modules.</p>
 <p>A new simulation is initialized using the <code>simInit</code> function, which does all the work of creating the <code>envir</code> and <code>simList</code> objects for your simulation. This function also attempts to provide additional feedback to the user regarding parameters that may be improperly specified.</p>
 <p>Once a simulation is initialized you can inspect the contents of a <code>envir</code> object using:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="co"># full simulation details:</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># full simulation details:</span>
 <span class="co">#  simList object info + simulation data</span>
-<span class="kw">mySim</span>
+<span class="va">mySim</span>
 
 <span class="co"># less detail:</span>
 <span class="co"># simList object isn't shown; object details are</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/ls_str.html">ls.str</a></span>(<span class="kw">mySim</span>)                 
+<span class="fu"><a href="https://rdrr.io/r/utils/ls_str.html">ls.str</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>                 
 
 <span class="co"># least detail:</span>
 <span class="co"># simList object isn't shown; object names only </span>
-<span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(<span class="kw">mySim</span>)
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></code></pre></div>
 <p>Simulation module object dependencies can be viewed using:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://igraph.org">igraph</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/rich-iannone/DiagrammeR">DiagrammeR</a></span>)
-<span class="fu"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span>(<span class="kw">mySim</span>, <span class="fl">FALSE</span>)  <span class="co"># data.frame of all object dependencies</span>
-<span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span>(<span class="kw">mySim</span>)        <span class="co"># plots simplified module (object) dependency graph</span>
-<span class="fu"><a href="../reference/objectDiagram.html">objectDiagram</a></span>(<span class="kw">mySim</span>)        <span class="co"># plots object dependency diagram</span>
-</pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org">igraph</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rich-iannone/DiagrammeR">DiagrammeR</a></span><span class="op">)</span>
+<span class="fu"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># data.frame of all object dependencies</span>
+<span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>        <span class="co"># plots simplified module (object) dependency graph</span>
+<span class="fu"><a href="../reference/objectDiagram.html">objectDiagram</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>        <span class="co"># plots object dependency diagram</span></code></pre></div>
 <p>They can viewed directly by printing the output of the <code>depsEdgeList</code> function.</p>
 </div>
 <div id="running-a-simulation-the-spades-function" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-a-simulation-the-spades-function" class="anchor"></a>Running a simulation: the <code>spades</code> function</h2>
 <p>Once a simulation is properly initialized it is executed using the <code>spades</code> function. By default in an interactive session, a progress bar is displayed in the console (this can be customized), and any specified files are loaded (via including an <code>input</code> <code>data.frame</code> or <code>data.table</code>, see examples). Debugging mode, <em>i.e.</em>, setting <code><a href="../reference/spades.html">spades(mySim, debug = TRUE)</a></code>, prints the contents of the <code>simList</code> object after the completion of every event during simulation. See the <a href="https://github.com/PredictiveEcology/SpaDES/wiki/Debugging">wiki entry on debugging</a> for more details on debugging SpaDES models.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(spades.nCompleted = <span class="fl">50</span>)   <span class="co"># default: store 1000 events in the completed event list</span>
-<span class="kw">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span>(<span class="kw">...</span>)             <span class="co"># initialize a simulation using valid parameters</span>
-<span class="kw">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span>(<span class="kw">mySim</span>)            <span class="co"># run the simulation, returning the completed sim object</span>
-<span class="fu"><a href="../reference/eventDiagram.html">eventDiagram</a></span>(<span class="kw">mySim</span>)               <span class="co"># visualize the sequence of events for all modules</span>
-</pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>spades.nCompleted <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>   <span class="co"># default: store 1000 events in the completed event list</span>
+<span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>             <span class="co"># initialize a simulation using valid parameters</span>
+<span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>            <span class="co"># run the simulation, returning the completed sim object</span>
+<span class="fu"><a href="../reference/eventDiagram.html">eventDiagram</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>               <span class="co"># visualize the sequence of events for all modules</span></code></pre></div>
 </div>
 </div>
 <div id="types-of-models" class="section level1">
@@ -333,7 +331,7 @@
 <div id="website" class="section level3">
 <h3 class="hasAnchor">
 <a href="#website" class="anchor"></a>Website</h3>
-<p><a href="http://SpaDES.PredictiveEcology.org">http://SpaDES.PredictiveEcology.org</a></p>
+<p><a href="https://SpaDES.PredictiveEcology.org">https://SpaDES.PredictiveEcology.org</a></p>
 </div>
 <div id="wiki" class="section level3">
 <h3 class="hasAnchor">
@@ -366,39 +364,39 @@
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div id="refs" class="references">
-<div id="ref-sp:2013">
-<p>Bivand, Roger S, Edzer J Pebesma, and Virgilio Gomez-Rubio. 2013. <em>Applied spatial data analysis with R</em>. Second edi. NY: Springer. <a href="https://asdar-book.org/">https://asdar-book.org/</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-sp:2013" class="csl-entry">
+Bivand, Roger S, Edzer J Pebesma, and Virgilio Gomez-Rubio. 2013. <em><span class="nocase">Applied spatial data analysis with R</span></em>. Second edi. NY: Springer. <a href="https://asdar-book.org/">https://asdar-book.org/</a>.
 </div>
-<div id="ref-Eddelbuettel:2013Rcpp">
-<p>Eddelbuettel, Dirk. 2013. <em>Seamless R and C++ Integration with Rcpp</em>. New York, NY: Springer.</p>
+<div id="ref-Eddelbuettel:2013Rcpp" class="csl-entry">
+Eddelbuettel, Dirk. 2013. <em><span class="nocase">Seamless R and C++ Integration with Rcpp</span></em>. New York, NY: Springer.
 </div>
-<div id="ref-Eddelbuettel:2011Rcpp">
-<p>Eddelbuettel, Dirk, and Romain Francois. 2011. “Rcpp : Seamless R and C++ Integration.” <em>Journal of Statistical Software</em> 40 (8): 1–18. <a href="https://www.jstatsoft.org/v40/i08/">https://www.jstatsoft.org/v40/i08/</a>.</p>
+<div id="ref-Eddelbuettel:2011Rcpp" class="csl-entry">
+Eddelbuettel, Dirk, and Romain Francois. 2011. <span>“<span class="nocase">Rcpp : Seamless R and C++ Integration</span>.”</span> <em>Journal Of Statistical Software</em> 40 (8): 1–18. <a href="https://www.jstatsoft.org/v40/i08/">https://www.jstatsoft.org/v40/i08/</a>.
 </div>
-<div id="ref-Fall:2001em">
-<p>Fall, Andrew, and Joseph Fall. 2001. “A domain-specific language for models of landscape dynamics.” <em>Ecological Modelling</em> 141: 1–18.</p>
+<div id="ref-Fall:2001em" class="csl-entry">
+Fall, Andrew, and Joseph Fall. 2001. <span>“<span class="nocase">A domain-specific language for models of landscape dynamics</span>.”</span> <em>Ecological Modelling</em> 141: 1–18.
 </div>
-<div id="ref-Grimm:2005bk">
-<p>Grimm, Volker, and Steven F Railsback. 2005. <em>Individual-based modelling and ecology</em>. Princeton, NJ: Princeton University Press.</p>
+<div id="ref-Grimm:2005bk" class="csl-entry">
+Grimm, Volker, and Steven F Railsback. 2005. <em><span class="nocase">Individual-based modelling and ecology</span></em>. Princeton, NJ: Princeton University Press.
 </div>
-<div id="ref-Grimm2005science">
-<p>Grimm, Volker, Eloy Revilla, Uta Berger, Florian Jeltsch, Wolf M Mooij, Steven F Railsback, Hans-Hermann Thulke, Jacob Weiner, Thorsten Wiegand, and Donald L DeAngelis. 2005. “Pattern-oriented modeling of agent-based complex systems: lessons from ecology.” <em>Science</em> 310 (5750): 987–91. <a href="https://doi.org/10.1126/science.1116681">https://doi.org/10.1126/science.1116681</a>.</p>
+<div id="ref-Grimm2005science" class="csl-entry">
+Grimm, Volker, Eloy Revilla, Uta Berger, Florian Jeltsch, Wolf M Mooij, Steven F Railsback, Hans-Hermann Thulke, Jacob Weiner, Thorsten Wiegand, and Donald L DeAngelis. 2005. <span>“<span class="nocase">Pattern-oriented modeling of agent-based complex systems: lessons from ecology.</span>”</span> <em>Science</em> 310 (5750): 987–91. <a href="https://doi.org/10.1126/science.1116681">https://doi.org/10.1126/science.1116681</a>.
 </div>
-<div id="ref-raster:2015">
-<p>Hijmans, Robert J. 2015. <em>raster: Geographic Data Analysis and Modeling</em>. <a href="https://CRAN.R-project.org/package=raster">https://CRAN.R-project.org/package=raster</a>.</p>
+<div id="ref-raster:2015" class="csl-entry">
+Hijmans, Robert J. 2015. <em><span class="nocase">raster: Geographic Data Analysis and Modeling</span></em>. <a href="https://CRAN.R-project.org/package=raster">https://CRAN.R-project.org/package=raster</a>.
 </div>
-<div id="ref-sp:2005">
-<p>Pebesma, Edzer J, and Roger S Bivand. 2005. “Classes and methods for spatial data in R.” <em>R News</em> 5 (2). <a href="https://cran.r-project.org/doc/Rnews/">https://cran.r-project.org/doc/Rnews/</a>.</p>
+<div id="ref-sp:2005" class="csl-entry">
+Pebesma, Edzer J, and Roger S Bivand. 2005. <span>“<span class="nocase">Classes and methods for spatial data in R</span>.”</span> <em>R News</em> 5 (2). <a href="https://cran.r-project.org/doc/Rnews/">https://cran.r-project.org/doc/Rnews/</a>.
 </div>
-<div id="ref-Scheller:2007em">
-<p>Scheller, Robert M, James B Domingo, Brian R Sturtevant, Jeremy S Williams, Arnold Rudy, Eric J Gustafson, and David J Mladenoff. 2007. “Design, development, and application of LANDIS-II, a spatial landscape simulation model with flexible temporal and spatial resolution.” <em>Ecological Modelling</em> 201: 409–19. <a href="https://doi.org/10.1016/j.ecolmodel.2006.10.009">https://doi.org/10.1016/j.ecolmodel.2006.10.009</a>.</p>
+<div id="ref-Scheller:2007em" class="csl-entry">
+Scheller, Robert M, James B Domingo, Brian R Sturtevant, Jeremy S Williams, Arnold Rudy, Eric J Gustafson, and David J Mladenoff. 2007. <span>“<span class="nocase">Design, development, and application of LANDIS-II, a spatial landscape simulation model with flexible temporal and spatial resolution</span>.”</span> <em>Ecological Modelling</em> 201: 409–19. <a href="https://doi.org/10.1016/j.ecolmodel.2006.10.009">https://doi.org/10.1016/j.ecolmodel.2006.10.009</a>.
 </div>
-<div id="ref-Thiele2015">
-<p>Thiele, Jan C, and Volker Grimm. 2015. “Replicating and breaking models: good for you and good for ecology.” <em>Oikos</em>. <a href="https://doi.org/10.1111/oik.02170">https://doi.org/10.1111/oik.02170</a>.</p>
+<div id="ref-Thiele2015" class="csl-entry">
+Thiele, Jan C, and Volker Grimm. 2015. <span>“<span class="nocase">Replicating and breaking models: good for you and good for ecology</span>.”</span> <em>Oikos</em>. <a href="https://doi.org/10.1111/oik.02170">https://doi.org/10.1111/oik.02170</a>.
 </div>
-<div id="ref-NetLogo">
-<p>Wilensky, U. 1999. “NetLogo.” Evanston, IL: Center for Connected Learning; Computer-Based Modeling, Northwestern University. <a href="https://ccl.northwestern.edu/netlogo/">https://ccl.northwestern.edu/netlogo/</a>.</p>
+<div id="ref-NetLogo" class="csl-entry">
+Wilensky, U. 1999. <span>“<span>NetLogo</span>.”</span> Evanston, IL: Center for Connected Learning; Computer-Based Modeling, Northwestern University. <a href="https://ccl.northwestern.edu/netlogo/">https://ccl.northwestern.edu/netlogo/</a>.
 </div>
 </div>
 </div>
@@ -426,7 +424,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

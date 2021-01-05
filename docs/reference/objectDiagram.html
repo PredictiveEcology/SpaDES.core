@@ -84,7 +84,7 @@ plotting the depsEdgeList directly with moduleDiagram." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ plotting the depsEdgeList directly with moduleDiagram." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ plotting the depsEdgeList directly with moduleDiagram." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ plotting the depsEdgeList directly with moduleDiagram." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,10 +158,10 @@ simulation. Offers a more detailed view of specific objects than does
 plotting the <code>depsEdgeList</code> directly with <code><a href='moduleDiagram.html'>moduleDiagram</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>objectDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>objectDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>objectDiagram</span>(<span class='kw'>sim</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>objectDiagram</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -186,6 +189,14 @@ Useful for specifying <code>height</code> and <code>width</code>.</p></td>
 
     <p>Alex Chubaty</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'>objectDiagram</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
+<span class='co'># if there are lots of objects, may need to increase width and/or height</span>
+<span class='fu'>objectDiagram</span><span class='op'>(</span><span class='va'>sim</span>, height <span class='op'>=</span> <span class='fl'>3000</span>, width <span class='op'>=</span> <span class='fl'>3000</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -201,7 +212,7 @@ Useful for specifying <code>height</code> and <code>width</code>.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

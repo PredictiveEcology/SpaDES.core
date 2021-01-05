@@ -84,7 +84,7 @@ by scheduling checkpoint events." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ by scheduling checkpoint events." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -118,6 +118,9 @@ by scheduling checkpoint events." />
     <li>
       <a href="../articles/iv-advanced.html">04 Advanced `SpaDES` use</a>
     </li>
+    <li>
+      <a href="../articles/v-automated-testing.html">05 Automated module testing</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -127,7 +130,7 @@ by scheduling checkpoint events." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,31 +158,31 @@ including the state of the random number generator,
 by scheduling checkpoint events.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>doEvent.checkpoint</span>(<span class='kw'>sim</span>, <span class='kw'>eventTime</span>, <span class='kw'>eventType</span>, debug = <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>doEvent.checkpoint</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>eventTime</span>, <span class='va'>eventType</span>, debug <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>checkpointLoad</span>(<span class='kw'>file</span>)
+<span class='fu'>checkpointLoad</span><span class='op'>(</span><span class='va'>file</span><span class='op'>)</span>
 
-<span class='fu'>.checkpointSave</span>(<span class='kw'>sim</span>, <span class='kw'>file</span>)
+<span class='fu'>.checkpointSave</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>file</span><span class='op'>)</span>
 
-<span class='fu'>checkpointFile</span>(<span class='kw'>sim</span>)
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>checkpointFile</span>(<span class='kw'>sim</span>)
-
-<span class='fu'>checkpointFile</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+<span class='fu'>checkpointFile</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>checkpointFile</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+<span class='fu'>checkpointFile</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 
-<span class='fu'>checkpointInterval</span>(<span class='kw'>sim</span>)
-
-<span class='co'># S4 method for simList</span>
-<span class='fu'>checkpointInterval</span>(<span class='kw'>sim</span>)
-
-<span class='fu'>checkpointInterval</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
+<span class='fu'>checkpointFile</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for simList</span>
-<span class='fu'>checkpointInterval</span>(<span class='kw'>sim</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span></pre>
+<span class='fu'>checkpointFile</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='fu'>checkpointInterval</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>checkpointInterval</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
+
+<span class='fu'>checkpointInterval</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S4 method for simList</span>
+<span class='fu'>checkpointInterval</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -255,7 +258,7 @@ and <a href='https://stackoverflow.com/q/13997444/1380598'>https://stackoverflow
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

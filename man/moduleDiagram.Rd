@@ -34,6 +34,31 @@ Create a network diagram illustrating the simplified module dependencies of a
 simulation. Offers a less detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link{objectDiagram}}.
 }
+\examples{
+\dontrun{
+# Will use quickPlot::Plot
+moduleDiagram(sim)
+# Can also use default base::plot
+modDia <- depsGraph(sim, plot = TRUE)
+# See ?plot.igraph
+plot(modDia, layout = layout_as_star)
+
+# Or for more control - here, change the label "_INPUT_" to "DATA"
+edgeList <- depsEdgeList(sim)
+edgeList <- edgeList[, list(from, to)]
+edgeList[from == "_INPUT_", from := "Data"]
+edgeList[to == "_INPUT_", to := "Data"]
+edgeList <- unique(edgeList)
+edge
+ig <- igraph::graph_from_data_frame(edgeList[, list(from, to)])
+plot(ig)
+
+# Or use qgraph package
+# library(qgraph)
+# qgraph(edgeList, shape = "rectangle", vsize = 12, vsize2 = 2
+}
+
+}
 \seealso{
 \code{\link{igraph}}, \code{\link{moduleGraph}} for a version that accounts for
 parent and children module structure.

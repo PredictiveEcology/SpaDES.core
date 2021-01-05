@@ -23,6 +23,7 @@ Default \code{TRUE} in an interactive session.}
 \description{
 Initialize a project with subdirectories \file{cache/}, \file{modules/},
 \file{inputs/}, \file{outputs/}, and \code{setPaths} accordingly.
+If invoked from Rstudio, will also create a new Rstudio project file.
 }
 \examples{
 myProjDir <- newProject("myProject", tempdir())

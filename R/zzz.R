@@ -42,9 +42,6 @@
                     env = pkgEnv
   )
 
-  ## import functions using backports:
-  backports::import(pkgname, "isFALSE")
-
   # parent <- parent.env(environment())
   # print(str(parent))
   #reg.finalizer(parent, finalize, onexit= TRUE)
@@ -65,6 +62,9 @@
     packageStartupMessage(a)
     packageStartupMessage(
       "To change these, use setPaths(...); see ?setPaths"
+    )
+    packageStartupMessage(
+      "See ?spadesOptions for advanced features"
     )
   }
 
