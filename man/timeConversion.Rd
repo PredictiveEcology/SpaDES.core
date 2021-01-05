@@ -46,12 +46,14 @@ A numeric vector of length 1, with \code{unit} attribute set to "seconds".
 }
 \description{
 Current pre-defined units are found within the \code{spadesTimes()} function.
-The user can define a new unit. The unit name can be anything, but the function
-definition must be of the form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
-The unit name is the part without the \code{d} and the function name definition includes the \code{d}.
+The user can define a new unit.
+The unit name can be anything, but the function definition must be of the
+form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
+The unit name is the part without the \code{d} and the function name
+definition includes the \code{d}.
 This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
-(you will need to declare 'lubridate' in your 'pkgDeps' in the metadata)
-can be placed anywhere in the search path or in a module.
+can be placed anywhere in the search path or in a module
+(you will need to declare \code{"lubridate"} in your \code{pkgDeps} in the metadata).
 
 This function takes a numeric with a "unit" attribute and converts it to
 another numeric with a different time attribute.
