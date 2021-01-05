@@ -301,10 +301,8 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current, check.environments = FALSE)
+  all.equal.default(target, current, check.environment = FALSE)
 }
-
-
 
 needInstall <- function(pkg = "methods", minVersion = NULL,
                         messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {
