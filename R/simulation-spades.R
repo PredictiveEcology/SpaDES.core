@@ -696,7 +696,7 @@ scheduleConditionalEvent <- function(sim,
 #' see the vignette
 #' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
 #' for many examples. Briefly, functions, events, modules, entire spades calls or
-#' experiment calls (see \url{https::/github.com/PredictiveEcology/SpaDES.experiment})
+#' experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experiment})
 #' can be cached and mixtures of all of these will work. For functions, simply
 #' wrap the call with \code{Cache}, moving the original function name into
 #' the first argument of Cache. For events or modules, set the module \code{parameters},
