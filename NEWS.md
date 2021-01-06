@@ -10,15 +10,13 @@ version 1.0.4
 * moved `paddedFloatToChar` to reproducible; but re-exported here, so still usable.
 
 ## dependencies
-
 * completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies
 * move `tcltk` to `Suggests`
 * remove `devtools`, `microbenchmark` from `Suggests`
 
 ## bug fixes
-
 * minor bug fixes
-* use new `all.equal(..., check.environments = FALSE)` for internal testing 
+* use new `all.equal(..., check.environment = FALSE)` for internal testing 
 
 version 1.0.3
 =============

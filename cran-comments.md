@@ -1,6 +1,6 @@
 ## Updated release
 
-This release fixes an error in an example caused by a recent change in dependency `Require`.
+This release fixes problems associated with recent change to `all.equal` on R-devel.
 
 See `NEWS.md` for a full list of changes.
 
@@ -12,18 +12,18 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 3.6.3
 
 ### Current R versions
-* macOS 10.15.6 Catalina       (GitHub), R 4.0.0
-* macOS 10.15.5 Catalina        (local), R 4.0.0
-* Ubuntu 18.04                 (GitHub), R 4.0.0
-* Ubuntu 20.04                  (local), R 4.0.0
-* Windows                      (GitHub), R 4.0.0
-* Windows                 (win-builder), R 4.0.0
+* macOS 10.15.6 Catalina       (GitHub), R 4.0.3
+* macOS 11.1 Big Sur            (local), R 4.0.3
+* Ubuntu 18.04                 (GitHub), R 4.0.3
+* Ubuntu 20.04                  (local), R 4.0.3
+* Windows                      (GitHub), R 4.0.3
+* Windows                 (win-builder), R 4.0.3
 
 ### Development R version
-* Ubuntu 18.04                 (GitHub), R 4.1.0 (2020-09-08 r79165)
-* Ubuntu 20.04                  (local), R 4.1.0 (2020-09-10 r79180)
-* Windows                      (GitHub), R 4.1.0 (2020-09-09 r79174)
-* Windows                 (win-builder), R 4.1.0 (2020-09-09 r79174)
+* Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-01-03 r79781)
+* Ubuntu 20.04                  (local), R 4.1.0 (2021-01-03 r79781)
+* Windows                      (GitHub), R 4.1.0 (2021-01-03 r79781)
+* Windows                 (win-builder), R 4.1.0 (2021-01-02 r79767)
 
 ## R CMD check results
 

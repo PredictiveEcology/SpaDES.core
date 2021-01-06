@@ -91,9 +91,9 @@ character (\code{"graphical"}, \code{"text"}) or numeric indicating
 the number of update intervals to show in a graphical progress bar.}
 
 \item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
-This means that if the call is made again with the same simList,
+This means that if the call is made again with the same \code{simList},
 then `spades`` will return the return value from the previous run
-of that exact same simList. Default \code{FALSE}. See Details.
+of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
 \item{.plotInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}

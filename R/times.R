@@ -137,12 +137,14 @@ attributes(monthsInSeconds)$unit <- "second"
 #' Convert time units
 #'
 #' Current pre-defined units are found within the \code{spadesTimes()} function.
-#' The user can define a new unit. The unit name can be anything, but the function
-#' definition must be of the form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
-#' The unit name is the part without the \code{d} and the function name definition includes the \code{d}.
+#' The user can define a new unit.
+#' The unit name can be anything, but the function definition must be of the
+#' form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
+#' The unit name is the part without the \code{d} and the function name
+#' definition includes the \code{d}.
 #' This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
-#' (you will need to declare 'lubridate' in your 'pkgDeps' in the metadata)
-#' can be placed anywhere in the search path or in a module.
+#' can be placed anywhere in the search path or in a module
+#' (you will need to declare \code{"lubridate"} in your \code{pkgDeps} in the metadata).
 #'
 #' @param unit   Character. One of the time units used in \code{SpaDES} or user
 #'               defined time unit, given as the unit name only. See details.
