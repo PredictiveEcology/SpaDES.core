@@ -84,7 +84,7 @@ sim$._conditionalEvents. This is very experimental. Use with caution." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
       </span>
     </div>
 
@@ -241,11 +241,11 @@ to very low or even negative to ensure it gets inserted at the top of the event 
     <pre class="examples"><div class='input'>  <span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>0</span>, end <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpGeL8s4/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpGeL8s4/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpGeL8s4/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpGeL8s4/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpGeL8s4/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'>  <span class='va'>condition</span> <span class='op'>&lt;-</span> <span class='st'>"sim$age &gt; 1"</span> <span class='co'># provide as string</span>
   <span class='va'>condition</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>$</span><span class='va'>age</span> <span class='op'>&gt;</span> <span class='fl'>1</span><span class='op'>)</span> <span class='co'># provide as a call</span>
   <span class='va'>condition</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/expression.html'>expression</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>$</span><span class='va'>age</span> <span class='op'>&gt;</span> <span class='fl'>1</span><span class='op'>)</span> <span class='co'># provide as an expression</span>
@@ -253,12 +253,12 @@ to very low or even negative to ensure it gets inserted at the top of the event 
   <span class='fu'><a href='events.html'>conditionalEvents</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      condition minEventTime maxEventTime moduleName eventType eventPriority
 #&gt; 1: sim$age &gt; 1            0            2 firemodule      burn             5</div><div class='input'>  <span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='co'># no changes to sim$age, i.e., it is absent</span>
-</div><div class='output co'>#&gt; <span class='message'>2021-01-06 10:56:50 INFO::<span style='color: #00BB00;'> total elpsd: 0.00091 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 10:56:50 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0025 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 10:56:50 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0036 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 10:56:50 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0047 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+</div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:22 INFO::<span style='color: #00BB00;'> total elpsd: 0.0015 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:22 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:22 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0066 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:22 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0088 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'>  <span class='fu'><a href='events.html'>events</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='co'># nothing scheduled</span>
 </div><div class='output co'>#&gt; Null data.table (0 rows and 0 cols)</div><div class='input'>  <span class='va'>sim</span><span class='op'>$</span><span class='va'>age</span> <span class='op'>&lt;-</span> <span class='fl'>2</span> <span class='co'># change the value</span>
   <span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='co'># Run spades, the condition is now true, so event is</span>
-</div><div class='output co'>#&gt; <span class='message'>2021-01-06 10:56:50 INFO::  Conditional Event -- sim$age &gt; 1 is true. Scheduling for now</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+</div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:22 INFO::  Conditional Event -- sim$age &gt; 1 is true. Scheduling for now</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'>                     <span class='co'>#  scheduled at current time</span>
   <span class='fu'><a href='events.html'>events</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>        <span class='co'># now scheduled in the normal event queue</span>
