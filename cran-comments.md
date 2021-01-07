@@ -1,6 +1,7 @@
 ## Updated release
 
 This release fixes problems associated with recent change to `all.equal` on R-devel.
+We have also resolved some URL issues.
 
 See `NEWS.md` for a full list of changes.
 
