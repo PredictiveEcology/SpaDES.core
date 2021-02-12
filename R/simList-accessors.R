@@ -2616,7 +2616,7 @@ setMethod("inputObjects",
           definition = function(sim, module, path) {
             out <- inputOrOutputObjects(type = "inputObjects", module = module, path = path)
             return(out)
-          })
+})
 
 inputOrOutputObjects <- function(type, module, path) {
   if (missing(path)) {
@@ -2666,7 +2666,7 @@ setMethod("outputObjects",
           signature(sim = "missing", module = "ANY"),
           definition = function(sim, module, path) {
             inputOrOutputObjects(type = "outputObjects", module = module, path = path)
-          })
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2761,7 +2761,7 @@ setMethod("reqdPkgs",
                                   defineModuleElement = "reqdPkgs") )
             })
             return(out)
-          })
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2878,7 +2878,6 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
       units(a) <- units
     }
     ret[, elapsedTime := a]
-
   } else {
     ret <- NULL
   }
