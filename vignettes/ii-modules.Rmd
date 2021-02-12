@@ -20,7 +20,8 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-options(spades.moduleCodeChecks = FALSE)
+options("spades.moduleCodeChecks" = FALSE,
+        "spades.useRequire" = FALSE)
 ```
 
 ```{css, echo=FALSE}

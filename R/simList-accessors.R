@@ -2714,7 +2714,8 @@ setMethod("outputObjectNames",
 #' @aliases simList-accessors-metadata
 #'
 #' @examples
-#' # To pre-install and pre-load all packages prior to simInit
+#' \dontrun{
+#' # To pre-install and pre-load all packages prior to \code{simInit}.
 #'
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -2723,6 +2724,7 @@ setMethod("outputObjectNames",
 #' pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 #' pkgs <- unique(unlist(pkgs))
 #' Require(pkgs)
+#' }
 setGeneric("reqdPkgs", function(sim, module, modulePath) {
   standardGeneric("reqdPkgs")
 })

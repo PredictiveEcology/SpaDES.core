@@ -19,7 +19,8 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
                      opts = list(), tmpFileExt = "") {
   a <- list(reproducible.inputPaths = NULL,
             reproducible.showSimilar = FALSE,
-            spades.moduleCodeChecks = smcc)
+            spades.moduleCodeChecks = smcc,
+            spades.useRequire = FALSE)
   a[names(opts)] <- opts
   opts1 <- a
 
