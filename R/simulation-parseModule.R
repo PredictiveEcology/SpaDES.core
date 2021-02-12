@@ -187,7 +187,8 @@ setMethod(
     parent_ids <- integer()
     dots <- list(...)
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
-    sim@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
+    # sim@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
+    # sim@.xData$.objects <- new.env(parent = emptyenv())
 
     for (j in .unparsed(modules)) {
       m <- names(modules)[[j]][1]
@@ -225,6 +226,7 @@ setMethod(
         sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         # sim@.xData$.mods[[mBase]] <- new.env(parent = emptyenv())
         attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+        # sim@.xData$.objects[[mBase]]<- new.env(parent = emptyenv())
         sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         tmp <- .parseConditional(envir = envir, filename = filename)
