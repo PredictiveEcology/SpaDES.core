@@ -174,6 +174,8 @@ setMethod("initialize",
             #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             # browser(expr = exists("._initialize_2"))
             .Object@.xData <- new.env(parent = emptyenv())
+            # .Object@.xData$.objects <- new.env(parent = emptyenv())
+            .Object@.xData$.mods <- new.env(parent = emptyenv())
             .Object@.envir <- .Object@.xData
             attr(.Object@.xData, "name") <- "sim"
 
