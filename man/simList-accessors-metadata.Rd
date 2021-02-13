@@ -86,7 +86,8 @@ These accessors extract the metadata for a module (if specified) or all modules
 in a \code{simList} if not specified.
 }
 \examples{
-# To pre-install and pre-load all packages prior to simInit
+\dontrun{
+# To pre-install and pre-load all packages prior to \code{simInit}.
 
 # set modulePath
 setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -95,4 +96,5 @@ if (!interactive()) chooseCRANmirror(ind = 1) #
 pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 pkgs <- unique(unlist(pkgs))
 Require(pkgs)
+}
 }
