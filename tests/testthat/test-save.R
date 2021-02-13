@@ -17,7 +17,6 @@ test_that("saving files (and memoryUse)", {
     future::plan(origPlan)
   }, add = TRUE)
 
-
   times <- list(start = 0, end = 6, "month")
   parameters <- list(
     .globals = list(stackName = "landscape"),
@@ -90,7 +89,6 @@ test_that("saving files (and memoryUse)", {
   expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
   rm(mySim)
 
-
   # test when filename has a dot
   tmpdir <- paste0(tmpdir, ".sdfd.lkjlll")
 
@@ -115,7 +113,6 @@ test_that("saving files (and memoryUse)", {
   expect_true(file.exists(file.path(tmpdir, "caribou_month7.rds")))
   expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
   rm(mySim)
-
 })
 
 test_that("saving csv files does not work correctly", {
@@ -265,8 +262,6 @@ test_that("restart does not work correctly", {
     mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                      outputs = data.frame(objectName = "landscape", saveTime = times$end))
     mySim <- spades(mySim, debug = 1)
-
-
   } else if (testNum == 2) {
     options("spades.restartRInterval" = 10)
     mySim <- mySim <- simInit(
