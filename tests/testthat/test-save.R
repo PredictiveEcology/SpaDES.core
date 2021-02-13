@@ -211,8 +211,8 @@ test_that("saveSimList does not work correctly", {
   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
   # rm(mySim)
 
-  #assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$mod) ## TODO: why is `mod` null now?
-  #assign("a", 2, envir = sim@.xData$.mods$caribouMovement$mod) ## TODO: why is `mod` null now?
+  assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$.objects)
+  assign("a", 2, envir = sim@.xData$.mods$caribouMovement$.objects)
 
   expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
   # test file-backed raster is gone
