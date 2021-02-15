@@ -17,13 +17,13 @@ See `NEWS.md` for a full list of changes.
 * Ubuntu 18.04                 (GitHub), R 4.0.3
 * Ubuntu 20.04                  (local), R 4.0.3
 * Windows                      (GitHub), R 4.0.3
-* Windows                 (win-builder), R 4.0.3
+* Windows                 (win-builder), R 4.0.4
 
 ### Development R version
 * Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-01-25 r79883)
 * Ubuntu 20.04                  (local), R 4.1.0 (2021-02-15 r80012)
 * Windows                      (GitHub), R 4.1.0 (2021-02-11 r79990)
-* Windows                 (win-builder), R 4.1.0 (2021-02-11 r79990)
+* Windows                 (win-builder), R 4.1.0 (2021-02-13 r80000)
 
 ## R CMD check results
 
