@@ -2616,7 +2616,7 @@ setMethod("inputObjects",
           definition = function(sim, module, path) {
             out <- inputOrOutputObjects(type = "inputObjects", module = module, path = path)
             return(out)
-          })
+})
 
 inputOrOutputObjects <- function(type, module, path) {
   if (missing(path)) {
@@ -2666,7 +2666,7 @@ setMethod("outputObjects",
           signature(sim = "missing", module = "ANY"),
           definition = function(sim, module, path) {
             inputOrOutputObjects(type = "outputObjects", module = module, path = path)
-          })
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2714,7 +2714,8 @@ setMethod("outputObjectNames",
 #' @aliases simList-accessors-metadata
 #'
 #' @examples
-#' # To pre-install and pre-load all packages prior to simInit
+#' \dontrun{
+#' # To pre-install and pre-load all packages prior to \code{simInit}.
 #'
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -2723,6 +2724,7 @@ setMethod("outputObjectNames",
 #' pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 #' pkgs <- unique(unlist(pkgs))
 #' Require(pkgs)
+#' }
 setGeneric("reqdPkgs", function(sim, module, modulePath) {
   standardGeneric("reqdPkgs")
 })
@@ -2761,7 +2763,7 @@ setMethod("reqdPkgs",
                                   defineModuleElement = "reqdPkgs") )
             })
             return(out)
-          })
+})
 
 ################################################################################
 #' @inheritParams P
@@ -2878,7 +2880,6 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
       units(a) <- units
     }
     ret[, elapsedTime := a]
-
   } else {
     ret <- NULL
   }

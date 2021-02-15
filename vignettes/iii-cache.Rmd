@@ -19,6 +19,11 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r setup, include = FALSE}
+options("spades.moduleCodeChecks" = FALSE,
+        "spades.useRequire" = FALSE)
+```
+
 As part of a reproducible work flow, caching of various function calls are a critical component.
 Down the road, it is likely that an entire work flow from raw data to publication, decision support, report writing, presentation building etc., could be built and be reproducible anywhere, on demand.
 The `reproducible::Cache` function is built to work with any R function. 
@@ -52,7 +57,6 @@ library(raster)
 library(reproducible)
 library(SpaDES.core)
 
-opts <- options("spades.moduleCodeChecks" = FALSE) # turns off syntactic checking of modules
 mySim <- simInit(
   times = list(start = 0.0, end = 5.0),
   params = list(
@@ -61,8 +65,8 @@ mySim <- simInit(
     fireSpread = list(.plotInitialTime = NA)
   ),
   modules = list("randomLandscapes", "fireSpread"),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
-options(opts)
+  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+)
 ```
 
 This functionality can be achieved within a `spades` call.

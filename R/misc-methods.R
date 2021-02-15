@@ -17,7 +17,6 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
   }
 }
 
-
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
@@ -98,8 +97,6 @@ setMethod("append_attr",
             dups <- duplicated(out) # unique strips names ... out[!dups] does not
             return(out[!dups])
 })
-
-
 
 ###############################################################################
 #' Generate random strings

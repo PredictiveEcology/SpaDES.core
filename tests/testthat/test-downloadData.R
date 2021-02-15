@@ -1,9 +1,6 @@
 test_that("downloadData downloads and unzips module data", {
   skip_on_cran()
 
-  if (identical(Sys.getenv("TRAVIS"), "true") &&
-      tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
   } else {
@@ -72,8 +69,13 @@ test_that("downloadData downloads and unzips module data", {
       on.exit(detach("package:rgdal"), add = TRUE)
       ras <- raster(file.path(datadir, filenames[2]))
       ras[5] <- maxValue(ras) + 1
-      writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
-      a <- capture.output(dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7))
+      suppressWarnings({
+        ## TODO: remove suppressWarnings after raster package fixes/updates
+        writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
+      })
+      a <- capture.output({
+        dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)
+      })
       expect_true(all(dwnload$result %in% "OK"))
       expect_true(all(file.exists(file.path(datadir, filenames))))
     }
