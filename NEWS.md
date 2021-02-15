@@ -4,7 +4,7 @@ version 1.0.6
 =============
 
 ## new features
-* none
+* more informative message re: module package versions when `spades.useRequire = FALSE` (#141)
 
 ## dependencies
 * no changes
