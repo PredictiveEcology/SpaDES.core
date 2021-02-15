@@ -1,6 +1,6 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 1.0.5.9000
+version 1.0.6
 =============
 
 ## new features
@@ -10,6 +10,8 @@ version 1.0.5.9000
 * no changes
 
 ## bug fixes
+* use `try()` with `communities()` to skip tests on systems without `igraph` GLPK support.
+* prevent package (re)installation during examples, tests, vignettes.
 * minor bug fixes
 
 version 1.0.5
