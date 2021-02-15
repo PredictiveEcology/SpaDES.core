@@ -1,7 +1,6 @@
 ## Updated release
 
-This release fixes problems associated with recent change to `all.equal` on R-devel.
-We have also resolved some URL issues.
+This release fixes problems with package installation and GLPK-`igraph` detection revealed during CRAN checks.
 
 See `NEWS.md` for a full list of changes.
 
@@ -22,9 +21,9 @@ See `NEWS.md` for a full list of changes.
 
 ### Development R version
 * Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-01-25 r79883)
-* Ubuntu 20.04                  (local), R 4.1.0 (2021-02-12 r79996)
+* Ubuntu 20.04                  (local), R 4.1.0 (2021-02-15 r80012)
 * Windows                      (GitHub), R 4.1.0 (2021-02-11 r79990)
-* Windows                 (win-builder), R 4.1.0 (2021-01-02 r79767)
+* Windows                 (win-builder), R 4.1.0 (2021-02-11 r79990)
 
 ## R CMD check results
 
