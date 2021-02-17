@@ -256,8 +256,8 @@ test_that("test .robustDigest for simLists", {
   # should NOT use Cached copy, so no message
   opts <- options(spades.saveSimOnExit = FALSE)
   aaa <- capture_messages(spades(bbb, debug = FALSE))
-  aa <- sum(grepl("Saving large|Done", aaa))
-  expect_true(sum(aa) == 2 || sum(aa) == 0) # seems to vary stochastically; either is OK
+  aa <- sum(grepl("loaded cached", aaa))
+  expect_true(aa == 0) # seems to vary stochastically; either is OK
   options(opts)
   expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 })
