@@ -25,7 +25,7 @@ utils::globalVariables(c(".", ".I", "whi"))
 #' @importFrom data.table data.table rbindlist setkey fread
 #' @importFrom reproducible Cache
 #' @importFrom utils write.table
-#' @include helpers.R
+#' @include helpers.R memory-leaks.R
 #' @keywords internal
 #' @rdname doEvent
 #'
@@ -916,6 +916,14 @@ setMethod(
       }
       if (is.null(sim@.xData[["._startClockTime"]]))
         sim@.xData[["._startClockTime"]] <- Sys.time()
+
+      # This sets up checking for memory leaks
+      if (is.null(sim@.xData[["._knownObjects"]])) {
+        moduleNames <- unname(modules(sim))
+        names(moduleNames) <- moduleNames
+        sim@.xData[["._knownObjects"]] <- lapply(moduleNames, function(x) character())
+        sim@.xData[["._knownObjects"]]$sim <- character()
+      }
       if (is.null(sim@.xData[["._simRndString"]]))
         sim@.xData[["._simRndString"]] <- rndstr(1, 8, characterFirst = TRUE)
       .pkgEnv$searchPath <- search()
@@ -1202,8 +1210,8 @@ setMethod(
 
 #' @keywords internal
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
+  createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
   if (cacheIt) { # means that a module or event is to be cached
-    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     fns <- ls(fnEnv, all.names = TRUE)
     moduleSpecificObjects <-
       c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
@@ -1233,11 +1241,19 @@ setMethod(
   }
 
   if (.pkgEnv[["spades.browserOnError"]]) {
-    .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
+    sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
     #fnEnv[[moduleCall]](sim, cur[["eventTime"]], cur[["eventType"]])
-    eval(fnCallAsExpr) # slower than more direct version just above
+    sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
+  # Test for memory leaks
+  if (getOption("spades.testMemoryLeaks", TRUE))
+    sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
+                                          modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
+                                          modName = cur[["moduleName"]],
+                                          knownObjects = sim@.xData$._knownObjects)
+
+  return(sim)
 }
 
 #' @keywords internal
@@ -1579,3 +1595,4 @@ getFutureNeeds <- function(deps, curModName) {
 modNameInFuture <- function(simFuture) {
   gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
 }
+
