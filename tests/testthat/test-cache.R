@@ -54,6 +54,67 @@ test_that("test event-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
+
+  # Test for memory leak
+  # Noting that there was a bug in `objSize` in reproducible that would
+  #   get this part wrong
+  # Take a function from the package -- shouldn't trigger memory leak stuff
+  sims$crazyFunction2 <- SpaDES.core:::bindrows
+  end(sims) <- end(sims) + 0.1
+
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) == 0)
+
+  sims$crazyFunction3 <- sims$.mods$caribouMovement$Init
+  end(sims) <- end(sims) + 0.1
+  simsOut <- spades(sims, debug = FALSE)
+
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) == 0)
+
+  # Take a leaky function -- should trigger memory leak stuff
+  fn <- function() { rnorm(1)}
+  sims$crazyFunction <- fn
+  end(sims) <- end(sims) + 0.1
+
+  # simsOut <- spades(sims, debug = FALSE)
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) > 0)
+  expect_true(grepl("function", warnsFunction))
+  expect_true(grepl("crazyFunction", warnsFunction))
+  expect_true(!grepl("crazyFormula", warnsFunction))
+  expect_true(!grepl("formula", warnsFunction))
+
+  sims$crazyFormula <- formula(hi ~ test)
+  end(sims) <- end(sims) + 0.1
+  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFormula) > 0)
+  expect_true(grepl("formula", warnsFormula))
+  expect_true(grepl("crazyFormula", warnsFormula))
+  expect_true(!grepl("crazyFunction", warnsFormula))
+  expect_true(!grepl("function", warnsFormula))
+
+  sims$.mods$caribouMovement$.objects$crazyFunction <- function() { rnorm(1)}
+  end(sims) <- end(sims) + 0.1
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) > 0)
+  expect_true(grepl("function", warnsFunction))
+  expect_true(grepl("crazyFunction", warnsFunction))
+  expect_true(!grepl("crazyFormula", warnsFunction))
+  expect_true(grepl("mod", warnsFunction))
+  expect_true(!grepl("formula", warnsFunction))
+
+  sims$.mods$caribouMovement$.objects$crazyFormula <-  formula(hi ~ test)
+  end(sims) <- end(sims) + 0.1
+  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFormula) > 0)
+  expect_true(grepl("formula", warnsFormula))
+  expect_true(grepl("mod", warnsFormula))
+  expect_true(grepl("crazyFormula", warnsFormula))
+  expect_true(!grepl("crazyFunction", warnsFormula))
+  expect_true(!grepl("function", warnsFormula))
+
+
 })
 
 test_that("test module-level cache", {
