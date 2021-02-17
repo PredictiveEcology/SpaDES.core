@@ -1,4 +1,4 @@
-#' @importFrom utils object.size
+#' @importFrom utils object.size packageVersion
 testObjectForLeak <- function(objs, envir, class, type, customMessage) {
   lapply(seq(objs), function(i) {
     x <- get(objs[i], envir = envir)
@@ -22,8 +22,8 @@ testObjectForLeak <- function(objs, envir, class, type, customMessage) {
 
 memoryLeakWarning <- function(class, where, objName, customMessage) {
   if (length(objName))
-    warning(paste0("A ",class,", ",objName,
-                   ", has been added to the ",where,"; this is causing a memory leak; ",
+    warning(paste0("A ", class, ", ", objName,
+                   ", has been added to the ", where, "; this is causing a memory leak; ",
                    customMessage))
 }
 
@@ -46,8 +46,7 @@ testMemoryLeaks <- function(simEnv, modEnv, modName, knownObjects) {
     out <- testObjectForLeak(untested$modObjects, modEnv, "function", "mod",
                              customMessage = "It is suggested to add it as a normal function in the module, not a nested function.")
 
-    knownObjects[[modName]] <- c(knownObjects[[modName]],
-                                 untested$modObjects)
+    knownObjects[[modName]] <- c(knownObjects[[modName]], untested$modObjects)
     knownObjects$sim <- c(knownObjects$sim, untested$simObjects)
 
   }
