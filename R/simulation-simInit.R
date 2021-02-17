@@ -183,6 +183,7 @@ utils::globalVariables(".")
 #' @importFrom reproducible basename2
 #' @importFrom utils compareVersion
 #' @importFrom Require Require trimVersionNumber
+#' @importFrom utils compareVersion
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -423,7 +424,7 @@ setMethod(
         if (any(versionSpecs$hasVersionSpec)) {
           out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
             comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-                           versionSpecs$versionSpec[iii])
+                                   versionSpecs$versionSpec[iii])
             if (comp < 0)
               warning(versionSpecs$Package[iii], " needs to be updated to at least ",
                       versionSpecs$versionSpec[iii])

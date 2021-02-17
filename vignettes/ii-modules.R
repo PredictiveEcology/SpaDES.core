@@ -1,6 +1,7 @@
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
-options(spades.moduleCodeChecks = FALSE)
+options("spades.moduleCodeChecks" = FALSE,
+        "spades.useRequire" = FALSE)
 
 ## ----module-metadata, eval=FALSE, echo=TRUE-----------------------------------
 #  ## sample module metadata for the default `randomLandscapes` module
