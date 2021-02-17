@@ -181,6 +181,7 @@ utils::globalVariables(".")
 #' @include simulation-parseModule.R
 #' @include priority.R
 #' @importFrom reproducible basename2
+#' @importFrom utils compareVersion
 #' @importFrom Require Require trimVersionNumber
 #' @importFrom utils compareVersion
 #' @rdname simInit
@@ -408,16 +409,17 @@ setMethod(
                          envir = sim@.xData[[".parsedFiles"]])
 
     # Load only needed packages -- compare to current search path
-    loadedPkgs <- search();
     uniqueReqdPkgs <- unique(unlist(reqdPkgs))
-    neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
-    names(neededPkgs) <- uniqueReqdPkgs
 
-    if (sum(!neededPkgs) > 0) {
-      allPkgs <- c(unique(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
+    if (length(uniqueReqdPkgs)) {
+      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
       if (getOption("spades.useRequire")) {
-        Require(allPkgs)
+        Require(allPkgs, upgrade = FALSE)
       } else {
+        loadedPkgs <- search();
+        neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
+        names(neededPkgs) <- uniqueReqdPkgs
+        allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
         versionSpecs <- Require::getPkgVersions(allPkgs)
         if (any(versionSpecs$hasVersionSpec)) {
           out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
@@ -625,6 +627,7 @@ setMethod(
     # Make local activeBindings to mod
     lapply(as.character(sim@modules), function(mod) {
       makeModActiveBinding(sim = sim, mod = mod)
+      # sim$.mods$caribouMovement$mod <- list()
     })
 
     lapply(sim@modules, function(mod) {
