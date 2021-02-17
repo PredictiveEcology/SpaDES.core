@@ -5,6 +5,7 @@ version 1.0.6
 
 ## new features
 * more informative message re: module package versions when `spades.useRequire = FALSE` (#141)
+* now detects user-created memory leaks when a user adds a closure or formula to the `sim`
 
 ## dependencies
 * no changes
