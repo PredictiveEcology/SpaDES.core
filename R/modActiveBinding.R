@@ -14,10 +14,14 @@ activeModBindingFunction <- function(value) {
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
-      sim <- get("sim", simEnv, inherits = FALSE)
-      mod <- currentModule(sim)
-      if (length(mod))
-        get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
+      sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
+      if (!is(sim, "try-error")) {
+        mod <- currentModule(sim)
+        if (length(mod))
+          get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
+      } else {
+        NULL
+      }
     } else {
       NULL
     }
@@ -31,10 +35,14 @@ activeParBindingFunction <- function(value) {
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
-      sim <- get("sim", simEnv, inherits = FALSE)
-      mod <- currentModule(sim)
-      if (length(mod))
-        sim@params[[mod]]
+      sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
+      if (!is(sim, "try-error")) {
+        mod <- currentModule(sim)
+        if (length(mod))
+          sim@params[[mod]]
+      } else {
+        NULL
+      }
     } else {
       NULL
     }
