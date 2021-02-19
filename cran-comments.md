@@ -24,7 +24,7 @@ See `NEWS.md` for a full list of changes.
 * Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-02-16 r80015)
 * Ubuntu 20.04                  (local), R 4.1.0 (2021-02-15 r80012)
 * Windows                      (GitHub), R 4.1.0 (2021-02-17 r80023)
-* Windows                 (win-builder), R 4.1.0 (2021-02-13 r80000)
+* Windows                 (win-builder), R 4.1.0 (2021-02-18 r80027)
 
 ## R CMD check results
 
