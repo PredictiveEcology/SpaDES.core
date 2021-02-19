@@ -12,17 +12,18 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 3.6.3
 
 ### Current R versions
-* macOS 10.15.6 Catalina       (GitHub), R 4.0.3
-* macOS 11.1 Big Sur            (local), R 4.0.3
-* Ubuntu 18.04                 (GitHub), R 4.0.3
-* Ubuntu 20.04                  (local), R 4.0.3
-* Windows                      (GitHub), R 4.0.3
+* macOS 10.15.6 Catalina       (GitHub), R 4.0.4
+* macOS 11.1 Big Sur            (local), R 4.0.4
+* Ubuntu 18.04                 (GitHub), R 4.0.4
+* Ubuntu 20.04                  (local), R 4.0.4
+* Windows                      (GitHub), R 4.0.4
+* Windows                       (local), R 4.0.4
 * Windows                 (win-builder), R 4.0.4
 
 ### Development R version
-* Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-01-25 r79883)
+* Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-02-16 r80015)
 * Ubuntu 20.04                  (local), R 4.1.0 (2021-02-15 r80012)
-* Windows                      (GitHub), R 4.1.0 (2021-02-11 r79990)
+* Windows                      (GitHub), R 4.1.0 (2021-02-17 r80023)
 * Windows                 (win-builder), R 4.1.0 (2021-02-13 r80000)
 
 ## R CMD check results
