@@ -174,7 +174,7 @@ test_that("simList object initializes correctly (1)", {
   expect_equal("second", attr(mySim@simtimes$current, "unit"))
 
   ### required packages
-  pkgs <- c("grid", "methods", "raster", "RColorBrewer", "sp",
+  pkgs <- c("grid", "methods", "RandomFields", "raster", "RColorBrewer", "sp",
             "SpaDES.tools", "SpaDES.core", "stats")
   expect_equal(sort(packages(mySim)), sort(pkgs))
 
