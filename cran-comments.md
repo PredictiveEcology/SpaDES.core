@@ -1,6 +1,6 @@
 ## Updated release
 
-This release fixes problems with package installation and GLPK-`igraph` detection revealed during CRAN checks.
+This release fixes several problems revealed during CRAN checks, including fixes for changes in dependency packages.
 
 See `NEWS.md` for a full list of changes.
 
