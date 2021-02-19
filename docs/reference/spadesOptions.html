@@ -84,7 +84,7 @@ See Details below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
       </span>
     </div>
 
@@ -218,6 +218,11 @@ file so they persist between sessions.</p>
     to ensure a module's required packages are listed first?
     If <code>TRUE</code>, there should be no name conflicts among package objects,
     but it is much slower, especially if the events are themselves fast.</td></tr>
+<tr><td><code>spades.testMemoryLeaks</code></td><td><code>TRUE</code>.</td><td>There is a very easy way to create a memory leak with R and SpaDES,
+        by adding formulas or functions to <code>sim$</code> when the enclosing environment
+        of the formula or function contained a large object, most relevant here is
+        the <code>sim</code> object. SpaDES.core now tests for likely culprits for this
+        and suggests alternatives with a warning</td></tr>
 <tr><td><code>spades.tolerance</code></td><td><code>.Machine$double.eps^0.5</code>.</td><td>The default tolerance value used for floating
     point number comparisons.</td></tr>
 <tr><td><code>spades.useragent</code></td><td><code>"https://github.com/PredictiveEcology/SpaDES"</code>.</td><td>: The default user agent to use for downloading modules from GitHub.</td></tr>

@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@
       <h1 data-toc-skip>05 Automated module testing</h1>
                         <h4 class="author">Alex M. Chubaty</h4>
             
-            <h4 class="date">January 06 2021</h4>
+            <h4 class="date">February 19 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/v-automated-testing.Rmd"><code>vignettes/v-automated-testing.Rmd</code></a></small>
       <div class="hidden name"><code>v-automated-testing.Rmd</code></div>
@@ -141,31 +141,31 @@
 <h2 class="hasAnchor">
 <a href="#adding-system-dependencies" class="anchor"></a>Adding system dependencies</h2>
 <p>Some packages may require installation of additional system dependencies. The workflow file contains a section named <em>Install GDAL and other dependencies</em>, which can be updated to include additional system packages. To determine which additional packages need to be installed, use <code><a href="https://remotes.r-lib.org/reference/system_requirements.html">remotes::system_requirements</a></code>. For example, to determine the system dependencies required for the <code>usefulFuns</code> package (from GitHub), get the package code and determine what additional system packages need to be installed.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone https://github.com/PredictiveEcology/usefulFuns</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd usefulFuns</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> Rscript <span class="at">-e</span> <span class="st">'remotes::system_requirements("ubuntu", "18.04")'</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> <span class="ex">[1]</span> <span class="st">"apt-get install -y libcurl4-openssl-dev"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> <span class="ex">[2]</span> <span class="st">"apt-get install -y libssl-dev"</span>          </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> <span class="ex">[3]</span> <span class="st">"apt-get install -y imagemagick"</span>         </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">[4]</span> <span class="st">"apt-get install -y libmagick++-dev"</span>     </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> <span class="ex">[5]</span> <span class="st">"apt-get install -y texlive"</span>             </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> <span class="ex">[6]</span> <span class="st">"apt-get install -y swftools"</span>            </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> <span class="ex">[7]</span> <span class="st">"apt-get install -y zlib1g-dev"</span>          </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> <span class="ex">[8]</span> <span class="st">"apt-get install -y make"</span>                </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a> <span class="ex">[9]</span> <span class="st">"apt-get install -y libfreetype6-dev"</span>    </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[10]</span> <span class="st">"apt-get install -y libpng-dev"</span>          </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[11]</span> <span class="st">"apt-get install -y libicu-dev"</span>          </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[12]</span> <span class="st">"apt-get install -y libglpk-dev"</span>         </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[13]</span> <span class="st">"apt-get install -y libgmp3-dev"</span>         </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[14]</span> <span class="st">"apt-get install -y libxml2-dev"</span>         </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[15]</span> <span class="st">"apt-get install -y libgdal-dev"</span>         </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[16]</span> <span class="st">"apt-get install -y gdal-bin"</span>            </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[17]</span> <span class="st">"apt-get install -y libproj-dev"</span>         </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">[18]</span> <span class="st">"apt-get install -y libgeos-dev"</span>         </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">[19]</span> <span class="st">"apt-get install -y libjpeg-dev"</span>         </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[20]</span> <span class="st">"apt-get install -y git"</span>                 </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[21]</span> <span class="st">"apt-get install -y libudunits2-dev"</span>     </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">[22]</span> <span class="st">"apt-get install -y pandoc"</span>  </span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> clone https://github.com/PredictiveEcology/usefulFuns</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>$ <span class="bu">cd</span> usefulFuns</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>$ <span class="ex">Rscript</span> -e <span class="st">'remotes::system_requirements("ubuntu", "18.04")'</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> [<span class="ex">1</span>] <span class="st">"apt-get install -y libcurl4-openssl-dev"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> [<span class="ex">2</span>] <span class="st">"apt-get install -y libssl-dev"</span>          </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> [<span class="ex">3</span>] <span class="st">"apt-get install -y imagemagick"</span>         </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> [<span class="ex">4</span>] <span class="st">"apt-get install -y libmagick++-dev"</span>     </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> [<span class="ex">5</span>] <span class="st">"apt-get install -y texlive"</span>             </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> [<span class="ex">6</span>] <span class="st">"apt-get install -y swftools"</span>            </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> [<span class="ex">7</span>] <span class="st">"apt-get install -y zlib1g-dev"</span>          </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> [<span class="ex">8</span>] <span class="st">"apt-get install -y make"</span>                </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a> [<span class="ex">9</span>] <span class="st">"apt-get install -y libfreetype6-dev"</span>    </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>[<span class="ex">10</span>] <span class="st">"apt-get install -y libpng-dev"</span>          </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>[<span class="ex">11</span>] <span class="st">"apt-get install -y libicu-dev"</span>          </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>[<span class="ex">12</span>] <span class="st">"apt-get install -y libglpk-dev"</span>         </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>[<span class="ex">13</span>] <span class="st">"apt-get install -y libgmp3-dev"</span>         </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>[<span class="ex">14</span>] <span class="st">"apt-get install -y libxml2-dev"</span>         </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>[<span class="ex">15</span>] <span class="st">"apt-get install -y libgdal-dev"</span>         </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>[<span class="ex">16</span>] <span class="st">"apt-get install -y gdal-bin"</span>            </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>[<span class="ex">17</span>] <span class="st">"apt-get install -y libproj-dev"</span>         </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>[<span class="ex">18</span>] <span class="st">"apt-get install -y libgeos-dev"</span>         </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>[<span class="ex">19</span>] <span class="st">"apt-get install -y libjpeg-dev"</span>         </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>[<span class="ex">20</span>] <span class="st">"apt-get install -y git"</span>                 </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>[<span class="ex">21</span>] <span class="st">"apt-get install -y libudunits2-dev"</span>     </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>[<span class="ex">22</span>] <span class="st">"apt-get install -y pandoc"</span>  </span></code></pre></div>
 <p>Note that this does not currently capture system dependencies from packages in the <code>Remotes</code> field of the <code>DESCRIPTION</code> file. However, a separate call to those packages will get them.</p>
 </div>
 </div>

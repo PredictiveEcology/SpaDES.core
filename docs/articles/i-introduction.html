@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
       </span>
     </div>
 
@@ -105,7 +105,7 @@
                         <h4 class="author">Alex M. Chubaty</h4>
                         <h4 class="author">Eliot J. B. McIntire</h4>
             
-            <h4 class="date">January 06 2021</h4>
+            <h4 class="date">February 19 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/master/vignettes/i-introduction.Rmd"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -173,7 +173,7 @@
 <p>The PDF format does not allow us to demonstrate the simulation visualization components of this package, so we invite you to run the sample simulation provided in this vignette, and to view the source code for the sample modules included in this package.</p>
 <p>This demo loads three sample modules provided with the packages: 1) <code>randomLandscapes</code>, 2) <code>fireSpread</code>, and 3) <code>caribouMovement</code>. These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://spades-core.predictiveecology.org/">"SpaDES.core"</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span>
 
 <span class="va">demoSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span>
   times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
@@ -372,7 +372,7 @@ Bivand, Roger S, Edzer J Pebesma, and Virgilio Gomez-Rubio. 2013. <em><span clas
 Eddelbuettel, Dirk. 2013. <em><span class="nocase">Seamless R and C++ Integration with Rcpp</span></em>. New York, NY: Springer.
 </div>
 <div id="ref-Eddelbuettel:2011Rcpp" class="csl-entry">
-Eddelbuettel, Dirk, and Romain Francois. 2011. <span>“<span class="nocase">Rcpp : Seamless R and C++ Integration</span>.”</span> <em>Journal Of Statistical Software</em> 40 (8): 1–18. <a href="https://www.jstatsoft.org/v40/i08/">https://www.jstatsoft.org/v40/i08/</a>.
+Eddelbuettel, Dirk, and Romain Francois. 2011. <span>“<span class="nocase">Rcpp : Seamless R and C++ Integration</span>.”</span> <em>Journal Of Statistical Software</em> 40 (8): 1–18.
 </div>
 <div id="ref-Fall:2001em" class="csl-entry">
 Fall, Andrew, and Joseph Fall. 2001. <span>“<span class="nocase">A domain-specific language for models of landscape dynamics</span>.”</span> <em>Ecological Modelling</em> 141: 1–18.

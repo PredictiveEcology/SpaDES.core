@@ -86,7 +86,7 @@ shows the user time in the units of the model as shown with timeunit(sim)" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
       </span>
     </div>
 
@@ -331,25 +331,25 @@ of the simulation:</p>
 <span class='va'>s1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpRqC26y/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/private/var/folders/l2/hy6b0sl977bcd8695nt6j7s80000gn/T/RtmpTQEaxc/temp_libpatha0eb47ec10ce/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpu5YZhd/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpu5YZhd/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpu5YZhd/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpu5YZhd/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='va'>s2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span><span class='op'>(</span><span class='va'>s1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:30 INFO::<span style='color: #00BB00;'> total elpsd: 0.00043 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:30 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0028 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:30 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.007 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-01-06 20:35:30 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0093 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:50 INFO::<span style='color: #00BB00;'> total elpsd: 0.00028 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:50 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0015 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:50 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0025 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:50 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0035 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>elapsedTime</span><span class='op'>(</span><span class='va'>s2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    moduleName eventType      elapsedTime
-#&gt; 1: checkpoint      init 0.002324104 secs
-#&gt; 2:       save      init 0.004215002 secs
-#&gt; 3:   progress      init 0.002277851 secs
-#&gt; 4:       load      init 0.002171040 secs</div><div class='input'><span class='fu'>elapsedTime</span><span class='op'>(</span><span class='va'>s2</span>, units <span class='op'>=</span> <span class='st'>"mins"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
-#&gt; 1: checkpoint      init 3.873507e-05 mins
-#&gt; 2:       save      init 7.025003e-05 mins
-#&gt; 3:   progress      init 3.796419e-05 mins
-#&gt; 4:       load      init 3.618399e-05 mins</div></span></pre>
+#&gt; 1: checkpoint      init 0.0012214184 secs
+#&gt; 2:       save      init 0.0010731220 secs
+#&gt; 3:   progress      init 0.0009765625 secs
+#&gt; 4:       load      init 0.0009462833 secs</div><div class='input'><span class='fu'>elapsedTime</span><span class='op'>(</span><span class='va'>s2</span>, units <span class='op'>=</span> <span class='st'>"mins"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    moduleName eventType       elapsedTime
+#&gt; 1: checkpoint      init 2.035697e-05 mins
+#&gt; 2:       save      init 1.788537e-05 mins
+#&gt; 3:   progress      init 1.627604e-05 mins
+#&gt; 4:       load      init 1.577139e-05 mins</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
