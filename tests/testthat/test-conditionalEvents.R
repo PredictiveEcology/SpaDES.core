@@ -1,6 +1,8 @@
 if (interactive()) library(testthat)
 
 test_that("simulation runs with simInit and spades", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
   on.exit({
     testOnExit(testInitOut)
@@ -86,6 +88,4 @@ test_that("simulation runs with simInit and spades", {
   mySimOut2 <- spades(mySimOut, debug = FALSE)
   expect_true(!exists("._conditionalEvents", envir = mySimOut))
   expect_true(NROW(completed(mySimOut2)[eventType == "event2"]) == 1)
-
-
 })

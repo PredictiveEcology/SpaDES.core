@@ -1,6 +1,12 @@
 ## Updated release
 
 This release fixes several problems revealed during CRAN checks, including fixes for changes in dependency packages.
+Dependency package `RandomFields` is currently unavailable for R-devel, as it fails to load:
+
+    Error: package or namespace load failed for 'RandomFields':
+     .onLoad failed in loadNamespace() for 'RandomFields', details:
+      call: fun(libname, pkgname)
+      error: function 'getErrorString' not provided by package 'RandomFieldsUtils'
 
 See `NEWS.md` for a full list of changes.
 

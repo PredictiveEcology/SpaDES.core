@@ -13,6 +13,7 @@ version 1.0.6
 ## bug fixes
 * use `try()` with `communities()` to skip tests on systems without `igraph` GLPK support.
 * prevent package (re)installation during examples, tests, vignettes.
+* fix failures on R-devel caused by `RandomFields` being unavailable.
 * minor bug fixes
 
 version 1.0.5
