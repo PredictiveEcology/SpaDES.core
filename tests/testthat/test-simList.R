@@ -200,6 +200,8 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)

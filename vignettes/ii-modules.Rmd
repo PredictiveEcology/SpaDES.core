@@ -198,7 +198,7 @@ We suggest passing a list of all the parameters needed for a single module toget
 A module's metadata defines default values for module-specific parameters, and these defaults will be used unless overridden by the user.
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
-```{r passing-params, eval=FALSE, echo=TRUE}
+```{r passing-params, eval=RFavailable, echo=TRUE}
 library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
