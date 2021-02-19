@@ -28,7 +28,7 @@ defineModule(sim, list(
   timeunit = "year",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("raster", "RColorBrewer", "SpaDES.tools"),
+  reqdPkgs = list("RandomFields", "raster", "RColorBrewer", "SpaDES.tools"),
   parameters = rbind(
     defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
     defineParameter("nx", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the x dimension"),

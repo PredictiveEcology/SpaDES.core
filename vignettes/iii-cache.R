@@ -5,7 +5,9 @@ options("spades.moduleCodeChecks" = FALSE,
 ## ----examples, echo=TRUE, message=FALSE---------------------------------------
 library(magrittr)
 library(raster)
+library(RandomFields)
 library(reproducible)
+library(SpaDES.tools)
 library(SpaDES.core)
 
 mySim <- simInit(

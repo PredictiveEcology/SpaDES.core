@@ -54,7 +54,9 @@ This is likely most useful in situations where reproducibility is more important
 ```{r examples, echo=TRUE, message=FALSE}
 library(magrittr)
 library(raster)
+library(RandomFields)
 library(reproducible)
+library(SpaDES.tools)
 library(SpaDES.core)
 
 mySim <- simInit(
