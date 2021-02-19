@@ -877,6 +877,6 @@ Additionally, `zipModule()` can be used to build the `.zip` file corresponding t
 To submit your module for inclusion in our GitHub repository, login to GitHub with your account and initiate a pull request to the repository.
 See the [GitHub help documentation](https://help.github.com/articles/creating-a-pull-request/) for more details.
 
-```{r cleanup, eval=TRUE, echo=FALSE}
+```{r cleanup, eval=RFavailable, echo=FALSE}
 unlink(outputDir, recursive = TRUE)
 ```
