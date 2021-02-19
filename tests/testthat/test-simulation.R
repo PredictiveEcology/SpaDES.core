@@ -31,10 +31,11 @@ test_that("simulation runs with simInit and spades with set.seed", {
   expect_equivalent(start(mySim), 0.0)
   expect_equivalent(end(mySim), 1.0)
   expect_true(all.equal(mySim2, mySim))
-
 })
 
 test_that("spades calls - diff't signatures", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)

@@ -10,7 +10,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building `SpaDES` modules}
-  %\VignetteDepends{data.table, DiagrammeR, igraph, RandomFields, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{data.table, DiagrammeR, magrittr, RandomFields, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,7 +19,10 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
+
+knitr::opts_chunk$set(eval = RFavailable)
+
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
 ```
@@ -352,42 +355,39 @@ Simulation time is presented on the x-axis, starting at date `startDate`.
 Each module appears in a colour-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module.
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
-```{r sim-eventDiagram, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-library(igraph) # for %>%
+```{r sim-eventDiagram, eval=RFavailable, echo=FALSE, message=FALSE, warning=FALSE}
+library(magrittr)
 library(SpaDES.core)
-if (require(SpaDES.tools) && require(RandomFields)) {
-  parameters <- list(
-    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-    .progress = list(NA),
-    randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
-    fireSpread = list(nFires = 10L, spreadprob = 0.225, its = 1e6,
-                      persistprob = 0, returnInterval = 1, startTime = 0,
-                      .plotInitialTime = 0, .plotInterval = 10),
-    caribouMovement = list(N = 100L, moveInterval = 1, torus = TRUE,
-                           .plotInitialTime = 1, .plotInterval = 1)
-  )
-  
-  ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
-  pdf(ftmp)
-  clearPlot()
-  mySim <- simInit(
-    times = list(start = 0.0, end = 2.0, timeunit = "year"),
-    params = parameters,
-    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    objects = list(),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-    ) %>% 
-    spades()
-  dev.off()
-  unlink(ftmp)
-}
+
+parameters <- list(
+  .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+  .progress = list(NA),
+  randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
+  fireSpread = list(nFires = 10L, spreadprob = 0.225, its = 1e6,
+                    persistprob = 0, returnInterval = 1, startTime = 0,
+                    .plotInitialTime = 0, .plotInterval = 10),
+  caribouMovement = list(N = 100L, moveInterval = 1, torus = TRUE,
+                         .plotInitialTime = 1, .plotInterval = 1)
+)
+
+ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
+pdf(ftmp)
+clearPlot()
+mySim <- simInit(
+  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  params = parameters,
+  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+  objects = list(),
+  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  ) %>% 
+  spades()
+dev.off()
+unlink(ftmp)
 ```
   
-```{r eventDiagram, echo=FALSE, eval=TRUE, fig.height=10, fig.width=7}
-if (require(SpaDES.tools) && require(RandomFields))  {
-  # overview of the events in the simulation
-  eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
-}
+```{r eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7}
+# overview of the events in the simulation
+eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 ```
 
 ## Module documentation (`moduleName.Rmd`)
@@ -481,7 +481,7 @@ Note that modules need not be inter-dependent on one another: module B may depen
 
 To view the dependencies for a simulation:
 
-```{r module-object-diagrams, eval=TRUE, echo=TRUE, message=FALSE, fig.width=7}
+```{r module-object-diagrams, eval=RFavailable, echo=TRUE, message=FALSE, fig.width=7}
 library(SpaDES.core)
 
 times <- list(start = 0.0, end = 20)
@@ -545,8 +545,7 @@ All objects in the global environment including the state of the random number g
 Checkpoint frequency and filename can be passed as parameters to the simulation object as illustrated below.
 By default, checkpointing is not used unless the `interval` parameter is provided; the simulation checkpoint file (if one exists) is loaded if the `file` parameter is specified.
 
-```{r checkpoints, echo=TRUE, eval=TRUE, message=FALSE}
-
+```{r checkpoints, echo=TRUE, eval=RFavailable, message=FALSE}
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 30)
 parameters <- list(
@@ -569,7 +568,7 @@ checkpointInterval(mySim)
 
 Schedule updates to the simulation progress bar.
 
-```{r progress, echo=TRUE, eval=TRUE, message=FALSE}
+```{r progress, echo=TRUE, eval=RFavailable, message=FALSE}
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 100.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -641,7 +640,7 @@ Therefore, a call to `outputs(mySim)` will indicate which objects have been save
 
 There is partial string matching of these names, so if the `fun` requires arguments to be passed to it, use `outputArgs()`, and it must be the same length as the `outputs()` `data.frame`.
 
-```{r load-save, echo=TRUE, eval=TRUE, message=FALSE}
+```{r load-save, echo=TRUE, eval=RFavailable, message=FALSE}
 # initialize a new simulation, setting the load and save parameters
 library(data.table)
 
@@ -752,7 +751,7 @@ openModules(system.file("sampleModules", package = "SpaDES.core"), "moduleName")
 ```
 
 1. `randomLandscapes`:
-Generate RasterStack of random maps representative of a forest landscape (`DEM`, `forestAge`, `habitatQuality`, `percentPine`).
+Generate `RasterStack` of random maps representative of a forest landscape (`DEM`, `forestAge`, `habitatQuality`, `percentPine`).
 Requires a global simulation parameter `stackName` be set.
 
 2. `fireSpread`:
@@ -762,7 +761,7 @@ Requires a global simulation parameter `stackName` be set.
 
 3. `caribouMovement`:
 Agent based model of caribou movement via correlated random walk.
-Requires a RasterStack object whose name is specified by `globals(sim)$stackName`, containing a RasterLayer named `habitatQuality`.
+Requires a `RasterStack` object whose name is specified by `globals(sim)$stackName`, containing a `RasterLayer` named `habitatQuality`.
 
 ## `SpaDES` module repository
 

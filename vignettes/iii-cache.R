@@ -1,13 +1,15 @@
 ## ----setup, include = FALSE---------------------------------------------------
+RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
+
+knitr::opts_chunk$set(eval = RFavailable)
+
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
 
 ## ----examples, echo=TRUE, message=FALSE---------------------------------------
 library(magrittr)
 library(raster)
-library(RandomFields)
 library(reproducible)
-library(SpaDES.tools)
 library(SpaDES.core)
 
 mySim <- simInit(
