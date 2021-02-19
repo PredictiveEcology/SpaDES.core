@@ -2,7 +2,7 @@
 
 |field    |value                        |
 |:--------|:----------------------------|
-|version  |R version 4.0.3 (2020-10-10) |
+|version  |R version 4.0.4 (2021-02-15) |
 |os       |Ubuntu 20.04.2 LTS           |
 |system   |x86_64, linux-gnu            |
 |ui       |RStudio                      |
@@ -10,7 +10,7 @@
 |collate  |en_CA.UTF-8                  |
 |ctype    |en_CA.UTF-8                  |
 |tz       |America/Edmonton             |
-|date     |2021-02-15                   |
+|date     |2021-02-19                   |
 
 # Dependencies
 
@@ -24,7 +24,7 @@
 |bit64         |4.0.5    |4.0.5    |   |
 |blob          |1.2.1    |1.2.1    |   |
 |brio          |1.1.1    |1.1.1    |   |
-|cachem        |1.0.3    |1.0.3    |   |
+|cachem        |1.0.4    |1.0.4    |   |
 |callr         |3.5.1    |3.5.1    |   |
 |cli           |2.3.0    |2.3.0    |   |
 |colorspace    |2.0-0    |2.0-0    |   |
@@ -49,7 +49,7 @@
 |isoband       |0.2.3    |0.2.3    |   |
 |jsonlite      |1.7.2    |1.7.2    |   |
 |labeling      |0.4.2    |0.4.2    |   |
-|lifecycle     |0.2.0    |0.2.0    |   |
+|lifecycle     |1.0.0    |1.0.0    |   |
 |magrittr      |2.0.1    |2.0.1    |   |
 |memoise       |2.0.0    |2.0.0    |   |
 |munsell       |0.5.0    |0.5.0    |   |
@@ -72,7 +72,7 @@
 |RcppParallel  |5.0.2    |5.0.2    |   |
 |rematch2      |2.1.2    |2.1.2    |   |
 |remotes       |2.2.0    |2.2.0    |   |
-|reproducible  |1.2.4    |1.2.5    |*  |
+|reproducible  |1.2.6    |1.2.6    |   |
 |Require       |0.0.10   |0.0.10   |   |
 |rgdal         |1.5-23   |1.5-23   |   |
 |rgeos         |0.5-5    |0.5-5    |   |
@@ -83,12 +83,12 @@
 |scales        |1.1.1    |1.1.1    |   |
 |sp            |1.4-5    |1.4-5    |   |
 |stringfish    |0.14.2   |0.14.2   |   |
-|testthat      |3.0.1    |3.0.1    |   |
+|testthat      |3.0.2    |3.0.2    |   |
 |tibble        |3.0.6    |3.0.6    |   |
 |utf8          |1.1.4    |1.1.4    |   |
 |vctrs         |0.3.6    |0.3.6    |   |
 |viridisLite   |0.3.0    |0.3.0    |   |
-|waldo         |0.2.3    |0.2.3    |   |
+|waldo         |0.2.4    |0.2.4    |   |
 |whisker       |0.4      |0.4      |   |
 |withr         |2.4.1    |2.4.1    |   |
 

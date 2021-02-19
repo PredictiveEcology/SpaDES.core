@@ -1,4 +1,6 @@
 test_that("test event-level cache & memory leaks", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit(smcc = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
   opts <- options("reproducible.cachePath" = tmpdir)
@@ -10,8 +12,7 @@ test_that("test event-level cache & memory leaks", {
   modPath <- system.file("sampleModules", package = "SpaDES.core")
 
   mods <- c("caribouMovement", "randomLandscapes", "fireSpread")
-  pkgs <- reqdPkgs(module = mods,
-          modulePath = modPath)
+  pkgs <- reqdPkgs(module = mods, modulePath = modPath)
   expect_true(length(pkgs) == 3)
   expect_true(all(names(pkgs) == mods))
   expect_true(all(c("raster", "sp", "SpaDES.tools", "RColorBrewer") %in% unlist(pkgs)))
@@ -121,6 +122,8 @@ test_that("test event-level cache & memory leaks", {
 })
 
 test_that("test module-level cache", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
 
@@ -472,6 +475,8 @@ test_that("Cache sim objs via .Cache attr", {
 })
 
 test_that("test showSimilar", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit(smcc = FALSE, "raster")
   opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({

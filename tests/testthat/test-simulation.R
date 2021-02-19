@@ -1,4 +1,6 @@
 test_that("simulation runs with simInit and spades with set.seed", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -849,6 +851,8 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
 })
 
 test_that("simInitAndSpades", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit(opts = list("spades.moduleCodeChecks" = FALSE))
   on.exit({
     testOnExit(testInitOut)
@@ -895,6 +899,8 @@ test_that("scheduleEvent with invalid values for eventTime", {
 })
 
 test_that("debug using logging", {
+  skip_if_not_installed("RandomFields")
+
   testInitOut <- testInit(tmpFileExt = "log")
   if (requireNamespace("logging")) {
     on.exit({
