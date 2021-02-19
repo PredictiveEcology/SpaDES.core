@@ -1,6 +1,9 @@
-test_that("test event-level cache", {
-  testInitOut <- testInit(smcc = FALSE, opts = list("reproducible.useMemoise" = FALSE))
+test_that("test event-level cache & memory leaks", {
+  testInitOut <- testInit(smcc = FALSE,
+                          opts = list("reproducible.useMemoise" = FALSE))
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
 
@@ -54,13 +57,76 @@ test_that("test event-level cache", {
   #   but non-cached part are different (Fires should be different because stochastic)
   expect_equal(landscapeMaps1, landscapeMaps2)
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
+
+  # Test for memory leak
+  # Noting that there was a bug in `objSize` in reproducible that would
+  #   get this part wrong
+  # Take a function from the package -- shouldn't trigger memory leak stuff
+  sims$crazyFunction2 <- SpaDES.core:::bindrows
+  end(sims) <- end(sims) + 0.1
+
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) == 0)
+
+  sims$crazyFunction3 <- sims$.mods$caribouMovement$Init
+  end(sims) <- end(sims) + 0.1
+  simsOut <- spades(sims, debug = FALSE)
+
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) == 0)
+
+  # Take a leaky function -- should trigger memory leak stuff
+  fn <- function() { rnorm(1)}
+  sims$crazyFunction <- fn
+  end(sims) <- end(sims) + 0.1
+
+  # simsOut <- spades(sims, debug = FALSE)
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) > 0)
+  expect_true(grepl("function", warnsFunction))
+  expect_true(grepl("crazyFunction", warnsFunction))
+  expect_true(!grepl("crazyFormula", warnsFunction))
+  expect_true(!grepl("formula", warnsFunction))
+
+  sims$crazyFormula <- formula(hi ~ test)
+  end(sims) <- end(sims) + 0.1
+  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFormula) > 0)
+  expect_true(grepl("formula", warnsFormula))
+  expect_true(grepl("crazyFormula", warnsFormula))
+  expect_true(!grepl("crazyFunction", warnsFormula))
+  expect_true(!grepl("function", warnsFormula))
+
+  sims$.mods$caribouMovement$.objects$crazyFunction <- function() { rnorm(1)}
+  end(sims) <- end(sims) + 0.1
+  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFunction) > 0)
+  expect_true(grepl("function", warnsFunction))
+  expect_true(grepl("crazyFunction", warnsFunction))
+  expect_true(!grepl("crazyFormula", warnsFunction))
+  expect_true(grepl("mod", warnsFunction))
+  expect_true(!grepl("formula", warnsFunction))
+
+  sims$.mods$caribouMovement$.objects$crazyFormula <-  formula(hi ~ test)
+  end(sims) <- end(sims) + 0.1
+  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  expect_true(length(warnsFormula) > 0)
+  expect_true(grepl("formula", warnsFormula))
+  expect_true(grepl("mod", warnsFormula))
+  expect_true(grepl("crazyFormula", warnsFormula))
+  expect_true(!grepl("crazyFunction", warnsFormula))
+  expect_true(!grepl("function", warnsFormula))
+
+
 })
 
 test_that("test module-level cache", {
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
 
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
 
@@ -127,7 +193,9 @@ test_that("test module-level cache", {
 
 test_that("test .prepareOutput", {
   testInitOut <- testInit("raster", smcc = FALSE)
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
 
@@ -173,9 +241,12 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE, opts = list(spades.recoveryMode = FALSE,
-                                                             "reproducible.useMemoise" = FALSE))
+  testInitOut <- testInit("igraph", smcc = TRUE,
+                          opts = list(spades.recoveryMode = FALSE,
+                                      "reproducible.useMemoise" = FALSE))
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
 
@@ -228,7 +299,7 @@ test_that("test .robustDigest for simLists", {
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
   opts <- options(spades.saveSimOnExit = FALSE)
-  expect_silent(spades(bbb, debug = FALSE))
+  expect_silent(aaMess <- capture_messages(spades(bbb, debug = FALSE)))
   options(opts)
   expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 
@@ -245,14 +316,18 @@ test_that("test .robustDigest for simLists", {
 
   # should NOT use Cached copy, so no message
   opts <- options(spades.saveSimOnExit = FALSE)
-  expect_silent(spades(bbb, debug = FALSE))
+  aaa <- capture_messages(spades(bbb, debug = FALSE))
+  aa <- sum(grepl("loaded cached", aaa))
+  expect_true(aa == 0) # seems to vary stochastically; either is OK
   options(opts)
   expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
   testInitOut <- testInit("igraph", smcc = TRUE)
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
   #tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
@@ -305,7 +380,9 @@ test_that("test objSize", {
 test_that("Cache sim objs via .Cache attr", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE,
                                                                    "reproducible.useMemoise" = FALSE))
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
   Cache(rnorm, 1)
@@ -396,7 +473,9 @@ test_that("Cache sim objs via .Cache attr", {
 
 test_that("test showSimilar", {
   testInitOut <- testInit(smcc = FALSE, "raster")
+  opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
+    options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
 

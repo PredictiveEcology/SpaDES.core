@@ -1,5 +1,9 @@
+## ----setup, include=FALSE-----------------------------------------------------
+options("spades.moduleCodeChecks" = FALSE,
+        "spades.useRequire" = FALSE)
+
 ## ----SpaDES-demo, eval=FALSE, echo=TRUE---------------------------------------
-#  library("SpaDES.core")
+#  library(SpaDES.core)
 #  
 #  demoSim <- suppressMessages(simInit(
 #    times = list(start = 0, end = 100),

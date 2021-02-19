@@ -90,6 +90,13 @@
 #'     If \code{TRUE}, there should be no name conflicts among package objects,
 #'     but it is much slower, especially if the events are themselves fast. \cr
 #'
+#'   \code{spades.testMemoryLeaks} \tab \code{TRUE}.
+#'     \tab  There is a very easy way to create a memory leak with R and SpaDES,
+#'         by adding formulas or functions to \code{sim$} when the enclosing environment
+#'         of the formula or function contained a large object, most relevant here is
+#'         the \code{sim} object. SpaDES.core now tests for likely culprits for this
+#'         and suggests alternatives with a warning \cr
+#'
 #'   \code{spades.tolerance} \tab \code{.Machine$double.eps^0.5}.
 #'     \tab  The default tolerance value used for floating
 #'     point number comparisons. \cr
@@ -127,6 +134,7 @@ spadesOptions <- function() {
     spades.restartR.restartDir = file.path(.spadesTempDir, "outputs"),
     spades.saveSimOnExit = TRUE,
     spades.switchPkgNamespaces = FALSE,
+    spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
     spades.useRequire = TRUE,
