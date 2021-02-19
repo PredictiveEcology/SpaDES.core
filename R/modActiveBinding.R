@@ -11,27 +11,26 @@ makeParActiveBinding <- function(sim, mod) {
 }
 
 activeModBindingFunction <- function(value) {
+  ret <- NULL
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
         mod <- currentModule(sim)
-        if (length(mod))
-          get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
-      } else {
-        NULL
+        if (length(mod) && !is.null(sim@.xData$.mods[[mod]]))
+          ret <- get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
       }
-    } else {
-      NULL
     }
   } else {
     stop("Can't overwrite mod")
   }
+  return(ret)
 }
 
 #' @importFrom quickPlot whereInStack
 activeParBindingFunction <- function(value) {
+  ret <- NULL
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
@@ -39,15 +38,11 @@ activeParBindingFunction <- function(value) {
       if (!is(sim, "try-error")) {
         mod <- currentModule(sim)
         if (length(mod))
-          sim@params[[mod]]
-      } else {
-        NULL
+          ret <- sim@params[[mod]]
       }
-    } else {
-      NULL
     }
   } else {
     stop("Can't overwrite Par")
   }
-
+  return(ret)
 }
