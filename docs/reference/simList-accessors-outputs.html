@@ -253,54 +253,54 @@ rules of recycling for each <code>fun</code>.</td></tr>
                paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>outputPath <span class='op'>=</span> <span class='va'>tmpdir</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpu5YZhd/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpu5YZhd/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpu5YZhd/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpu5YZhd/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpEykBFD/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpEykBFD/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpEykBFD/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpEykBFD/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>outputs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='co'># To see what will be saved, when, what filename</span>
 </div><div class='output co'>#&gt;   objectName                                       file     fun package
-#&gt; 1    tempObj /tmp/Rtmpu5YZhd/outputs/tempObj_year10.rds saveRDS    base
+#&gt; 1    tempObj /tmp/RtmpEykBFD/outputs/tempObj_year10.rds saveRDS    base
 #&gt;   saveTime saved arguments
 #&gt; 1       10    NA        NA</div><div class='input'><span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::<span style='color: #00BB00;'> total elpsd: 0.00024 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 10 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::<span style='color: #00BB00;'> total elpsd: 0.00024 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 10 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>outputs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='co'># To see that it was saved, when, what filename</span>
 </div><div class='output co'>#&gt;   objectName                                       file     fun package
-#&gt; 1    tempObj /tmp/Rtmpu5YZhd/outputs/tempObj_year10.rds saveRDS    base
+#&gt; 1    tempObj /tmp/RtmpEykBFD/outputs/tempObj_year10.rds saveRDS    base
 #&gt;   saveTime saved arguments
 #&gt; 1       10  TRUE        NA</div><div class='input'>
 <span class='co'># Also can add using assignment after a simList object has been made</span>
 <span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>objects <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"tempObj"</span><span class='op'>)</span>, paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>outputPath <span class='op'>=</span> <span class='va'>tmpdir</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpu5YZhd/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpu5YZhd/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpu5YZhd/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpu5YZhd/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpEykBFD/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpEykBFD/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpEykBFD/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpEykBFD/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>outputs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>objectName <span class='op'>=</span> <span class='st'>"tempObj"</span>, saveTime <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
 <span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00025 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 1 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0072 secs | 2 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.01 secs | 3 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.013 secs | 4 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.016 secs | 5 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.019 secs | 6 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.022 secs | 7 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.024 secs | 8 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.027 secs | 9 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.03 secs | 10 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00024 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0014 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 1 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0072 secs | 2 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.01 secs | 3 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.013 secs | 4 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.016 secs | 5 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.019 secs | 6 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.022 secs | 7 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.025 secs | 8 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.028 secs | 9 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.03 secs | 10 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>outputs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='co'># To see that it was saved, when, what filename.</span>
 </div><div class='output co'>#&gt;    objectName saveTime                                       file     fun
-#&gt; 1     tempObj        1 /tmp/Rtmpu5YZhd/outputs/tempObj_year01.rds saveRDS
-#&gt; 2     tempObj        2 /tmp/Rtmpu5YZhd/outputs/tempObj_year02.rds saveRDS
-#&gt; 3     tempObj        3 /tmp/Rtmpu5YZhd/outputs/tempObj_year03.rds saveRDS
-#&gt; 4     tempObj        4 /tmp/Rtmpu5YZhd/outputs/tempObj_year04.rds saveRDS
-#&gt; 5     tempObj        5 /tmp/Rtmpu5YZhd/outputs/tempObj_year05.rds saveRDS
-#&gt; 6     tempObj        6 /tmp/Rtmpu5YZhd/outputs/tempObj_year06.rds saveRDS
-#&gt; 7     tempObj        7 /tmp/Rtmpu5YZhd/outputs/tempObj_year07.rds saveRDS
-#&gt; 8     tempObj        8 /tmp/Rtmpu5YZhd/outputs/tempObj_year08.rds saveRDS
-#&gt; 9     tempObj        9 /tmp/Rtmpu5YZhd/outputs/tempObj_year09.rds saveRDS
-#&gt; 10    tempObj       10 /tmp/Rtmpu5YZhd/outputs/tempObj_year10.rds saveRDS
+#&gt; 1     tempObj        1 /tmp/RtmpEykBFD/outputs/tempObj_year01.rds saveRDS
+#&gt; 2     tempObj        2 /tmp/RtmpEykBFD/outputs/tempObj_year02.rds saveRDS
+#&gt; 3     tempObj        3 /tmp/RtmpEykBFD/outputs/tempObj_year03.rds saveRDS
+#&gt; 4     tempObj        4 /tmp/RtmpEykBFD/outputs/tempObj_year04.rds saveRDS
+#&gt; 5     tempObj        5 /tmp/RtmpEykBFD/outputs/tempObj_year05.rds saveRDS
+#&gt; 6     tempObj        6 /tmp/RtmpEykBFD/outputs/tempObj_year06.rds saveRDS
+#&gt; 7     tempObj        7 /tmp/RtmpEykBFD/outputs/tempObj_year07.rds saveRDS
+#&gt; 8     tempObj        8 /tmp/RtmpEykBFD/outputs/tempObj_year08.rds saveRDS
+#&gt; 9     tempObj        9 /tmp/RtmpEykBFD/outputs/tempObj_year09.rds saveRDS
+#&gt; 10    tempObj       10 /tmp/RtmpEykBFD/outputs/tempObj_year10.rds saveRDS
 #&gt;    package saved arguments
 #&gt; 1     base  TRUE        NA
 #&gt; 2     base  TRUE        NA
@@ -319,14 +319,14 @@ rules of recycling for each <code>fun</code>.</td></tr>
   paths<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>outputPath <span class='op'>=</span> <span class='va'>tmpdir</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpu5YZhd/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpu5YZhd/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpu5YZhd/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpu5YZhd/myProject/modules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpEykBFD/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpEykBFD/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpEykBFD/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpEykBFD/myProject/modules'</span>
 #&gt; <span class='message'>  )</span></div><div class='input'><span class='fu'>outputs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
      objectName <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='st'>"tempObj"</span>, <span class='fl'>2</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='st'>"tempObj2"</span>, <span class='fl'>3</span><span class='op'>)</span>, <span class='st'>"df1"</span><span class='op'>)</span>,
      saveTime <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>4</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>,<span class='fl'>6</span>,<span class='fl'>7</span><span class='op'>)</span>, <span class='fu'><a href='times.html'>end</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span><span class='op'>)</span>,
@@ -337,7 +337,7 @@ rules of recycling for each <code>fun</code>.</td></tr>
 <span class='co'>#   argument for 6th row in data.frame (corresponding to the write.csv function)</span>
 <span class='fu'>outputArgs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>6</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>row.names<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='va'>sim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spades.html'>spades</a></span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00024 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0034 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0043 secs | 1 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0074 secs | 2 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.01 secs | 4 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.013 secs | 6 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.016 secs | 7 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.019 secs | 10 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+</div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00028 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0015 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0028 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0038 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0047 secs | 1 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.008 secs | 2 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.011 secs | 4 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.014 secs | 6 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.017 secs | 7 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.02 secs | 10 save later 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='input'><span class='fu'>outputs</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;   objectName saveTime       fun package
@@ -348,12 +348,12 @@ rules of recycling for each <code>fun</code>.</td></tr>
 #&gt; 5   tempObj2        7   saveRDS    base
 #&gt; 6        df1       10 write.csv   utils
 #&gt;                                          file saved arguments
-#&gt; 1  /tmp/Rtmpu5YZhd/outputs/tempObj_year01.rds  TRUE        NA
-#&gt; 2  /tmp/Rtmpu5YZhd/outputs/tempObj_year04.rds  TRUE        NA
-#&gt; 3 /tmp/Rtmpu5YZhd/outputs/tempObj2_year02.rds  TRUE        NA
-#&gt; 4 /tmp/Rtmpu5YZhd/outputs/tempObj2_year06.rds  TRUE        NA
-#&gt; 5 /tmp/Rtmpu5YZhd/outputs/tempObj2_year07.rds  TRUE        NA
-#&gt; 6      /tmp/Rtmpu5YZhd/outputs/df1_year10.csv  TRUE     FALSE</div><div class='input'>
+#&gt; 1  /tmp/RtmpEykBFD/outputs/tempObj_year01.rds  TRUE        NA
+#&gt; 2  /tmp/RtmpEykBFD/outputs/tempObj_year04.rds  TRUE        NA
+#&gt; 3 /tmp/RtmpEykBFD/outputs/tempObj2_year02.rds  TRUE        NA
+#&gt; 4 /tmp/RtmpEykBFD/outputs/tempObj2_year06.rds  TRUE        NA
+#&gt; 5 /tmp/RtmpEykBFD/outputs/tempObj2_year07.rds  TRUE        NA
+#&gt; 6      /tmp/RtmpEykBFD/outputs/df1_year10.csv  TRUE     FALSE</div><div class='input'>
 <span class='co'># read one back in just to test it all worked as planned</span>
 <span class='va'>newObj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/read.table.html'>read.csv</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span><span class='op'>(</span><span class='va'>tmpdir</span>, pattern <span class='op'>=</span> <span class='st'>"year10.csv"</span>, full.name <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>newObj</span>
@@ -398,15 +398,15 @@ rules of recycling for each <code>fun</code>.</td></tr>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpu5YZhd/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpu5YZhd/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpu5YZhd/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpu5YZhd/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmpu5YZhd/myProject/modules'</span>
-#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00024 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0013 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0024 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0033 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:19:49 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0042 secs | 10 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpEykBFD/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpEykBFD/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpEykBFD/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpEykBFD/myProject/modules'</span>
+#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.00028 secs | 0 checkpoint init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0017 secs | 0 save init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.003 secs | 0 progress init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0039 secs | 0 load init 0</span><span></span></div><div class='output co'>#&gt; <span class='message'>2021-02-19 09:37:26 INFO::</span><span style='color: #00BB00;'> total elpsd: 0.0048 secs | 10 save spades 10</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>simList saved in</span>
 #&gt; <span class='message'> </span><span style='color: #0000BB;'>SpaDES.core:::.pkgEnv$.sim</span><span style='color: #BB00BB;'> </span>
 #&gt; <span class='message'>It will be deleted at next spades() call.</span><span></span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='co'># Clean up after</span>
 <span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span><span class='op'>(</span><span class='va'>tmpdir</span>, recursive <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
