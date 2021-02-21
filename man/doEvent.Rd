@@ -8,7 +8,8 @@ doEvent(
   sim,
   debug = FALSE,
   notOlderThan,
-  useFuture = getOption("spades.futureEvents", FALSE)
+  useFuture = getOption("spades.futureEvents", FALSE),
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,11 @@ i.e., remove old value and replace with new value.
 Ignored if \code{cache} is \code{FALSE}.}
 
 \item{useFuture}{Experimental use of future::future package. Not fully implemented.}
+
+\item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
+This will be included in the \code{Cache} call, so will be unique
+and thus \code{spades} will not use a cached copy as long as
+anything passed in \code{...} is unique, i.e., not cached previously.}
 }
 \value{
 Returns the modified \code{simList} object.

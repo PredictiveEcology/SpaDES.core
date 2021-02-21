@@ -29,7 +29,8 @@ utils::globalVariables(c(".", ".I", "whi"))
 #' @keywords internal
 #' @rdname doEvent
 #'
-doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.futureEvents", FALSE)) {
+doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.futureEvents", FALSE),
+                    ...) {
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
@@ -73,16 +74,28 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
     if (length(sim@events)) {
-      # Do same check as would be done with "slot(..., check = FALSE)", but much faster
-      if (is.list(sim@events[[1]]))
-        slot(sim, "current", check = FALSE) <- sim@events[[1]]
-      if (is.list(sim@events[-1]))
-        slot(sim, "events", check = FALSE) <- sim@events[-1]
+
+      # Section for allowing events to be specified in `spades` call
+      dots <- list(...)
+      eventIndex <- if (!is.null(dots$events))
+        isListedEvent(sim@events, dots$events) else 1L
+
+      if (eventIndex == 0L) {
+        slot(sim, "current", check = FALSE) <- list() # same as no events left
+      } else {
+        # Do same check as would be done with "slot(..., check = FALSE)", but much faster
+        if (is.list(sim@events[[eventIndex]]))
+          slot(sim, "current", check = FALSE) <- sim@events[[eventIndex]]
+        if (is.list(sim@events[-eventIndex]))
+          slot(sim, "events", check = FALSE) <- sim@events[-eventIndex]
+      }
+
     } else {
       # no more events, return empty event list
       slot(sim, "current", check = FALSE) <- list() # this is guaranteed to be a list
     }
   }
+
 
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
@@ -1075,7 +1088,7 @@ setMethod(
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
         }
 
-        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan)  # process the next event
+        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan, ...)  # process the next event
 
         if (recoverMode > 0) {
           rmo <- recoverModePost(sim, rmo, recoverMode)
@@ -1596,3 +1609,23 @@ modNameInFuture <- function(simFuture) {
   gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
 }
 
+isListedEvent <- function(eventQueue, eventsToDo) {
+  foundEventToDo <- FALSE
+  i <- 1
+  if (!is.null(eventsToDo)) {
+    while (isFALSE(foundEventToDo)) {
+      if (length(eventQueue) < i) { # check for
+        # slot(sim, "current", check = FALSE) <- list() # same as no events left
+        foundEventToDo <- NA
+      } else if (eventsToDo %in% eventQueue[[i]]) {
+        foundEventToDo <- TRUE
+      } else {
+        i <- i + 1
+      }
+    }
+  } else {
+    foundEventToDo <- TRUE
+  }
+  if (is.na(foundEventToDo)) i <- 0L
+  i
+}

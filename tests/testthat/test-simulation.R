@@ -21,7 +21,7 @@ test_that("simulation runs with simInit and spades with set.seed", {
 
   set.seed(123)
   mySim <- simInit(times, params, modules, objects = list(), paths) %>%
-    spades(debug = FALSE, .plotInitialTime = NA)
+    spades(debug = FALSE, .plotInitialTime = NA, events = "init")
   set.seed(123)
   mySim2 <- simInit(times, params, modules, objects = list(), paths) %>%
     spades(debug = FALSE, .plotInitialTime = NA)
