@@ -56,8 +56,12 @@ test_that("spades calls - diff't signatures", {
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
                     capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
 
-  expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+  if (requireNamespace("logging", quietly = TRUE))
+    expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
         "eventTime *moduleName *eventType *eventPriority")
+  else
+    expect_warning(expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+                   "eventTime *moduleName *eventType *eventPriority"))
   expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
                 "moduleName")
   expect_message(spades(a, debug = "simList", .plotInitialTime = NA),
@@ -903,7 +907,7 @@ test_that("debug using logging", {
   skip_if_not_installed("RandomFields")
 
   testInitOut <- testInit(tmpFileExt = "log")
-  if (requireNamespace("logging")) {
+  if (requireNamespace("logging", quietly = TRUE)) {
     on.exit({
       testOnExit(testInitOut)
     }, add = TRUE)
