@@ -98,6 +98,19 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(all("init" == completed(mySimEvent9)$eventType))
   expect_true(max(events(mySimEvent9)$eventTime) <= end(mySimEvent9)) # didn't schedule next event
 
+  # Test times
+  #  Set end time to WAY after the init events
+  mySimEvent10 <- simInitAndSpades(times = list(start = 0, end = 10), params, modules, objects = list(), paths,
+                                  debug = FALSE, .plotInitialTime = NA, events = "init")
+  expect_true(time(mySimEvent10) == end(mySimEvent10)) # it is at 10, the end
+  expect_true(all("init" == completed(mySimEvent10)$eventType))
+  expect_true(max(completed(mySimEvent10)$eventTime) == start(mySimEvent10)) # didn't go past start time because init are all at start
+  simOut <- spades(mySimEvent10)
+  expect_true(time(simOut) == end(simOut)) # it is at 10, the end
+  expect_true(!all("init" == completed(simOut)$eventType))
+  expect_true(max(completed(simOut)$eventTime) == end(simOut)) # got to end time
+
+
 })
 
 test_that("spades calls - diff't signatures", {

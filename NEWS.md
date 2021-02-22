@@ -1,5 +1,11 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.7
+=============
+
+## new features
+* `spades` now accepts an `event` argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the `init` case, e.g., `spades(sim, events = "init")`
+
 version 1.0.6
 =============
 
