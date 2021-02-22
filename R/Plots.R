@@ -11,7 +11,7 @@
 #'       \item To disk as a png or other "image" file, like pdf
 #'     }
 #' To turn off plotting both to screen and disk, set both
-#' \code{.plotInititalTime = NA} and \code{.plotsToDisk = NULL} or any other
+#' \code{.plotInititalTime = NA} and \code{.plotsToDisk = NA} or any other
 #' value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 #' argument (e.g., \code{""} will omit all saving).
 #'
