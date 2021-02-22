@@ -870,7 +870,7 @@ scheduleConditionalEvent <- function(sim,
 #' outInitsOnly <- spades(mySim, events = "init")
 #'
 #' # or more fine grained control
-#' outInitsOnly <- spades(mySim,
+#' outSomeEvents <- spades(mySim,
 #'         events = list(randomLandscapes = c("init"),
 #'                       fireSpread = c("init", "burn")))
 #' }
