@@ -19,6 +19,7 @@ simInitAndSpades(
   cache,
   .plotInitialTime,
   .saveInitialTime,
+  events,
   ...
 )
 }
@@ -101,6 +102,11 @@ parameter for all modules. See Details.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
 parameter for all modules. See Details.}
+
+\item{events}{A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules.}
 
 \item{...}{Arguments passed to simInit and spades}
 }
