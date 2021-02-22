@@ -7,6 +7,7 @@
 Plots(
   data,
   fn,
+  filename,
   types = quote(params(sim)[[currentModule(sim)]]$.plotsToDisk),
   paths = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
@@ -18,6 +19,8 @@ Plots(
 function, and should contain all the data required for the inner plotting}
 
 \item{fn}{An arbitrary plotting function.}
+
+\item{filename}{A name that will be the base for the files that will be saved.}
 
 \item{types}{Character vector, zero or more of types. See below.}
 
