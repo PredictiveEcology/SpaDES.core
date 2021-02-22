@@ -1128,9 +1128,9 @@ setMethod(
     },
     warning = function(w) { if (requireNamespace("logging", quietly = TRUE)) {
       logging::logwarn(paste0(collapse = " ", c(names(w), w)))
-      } else {
-        warning(w)
-      }
+      } #else {
+        #w
+      #}
     },
     error = function(e) { if (requireNamespace("logging", quietly = TRUE)) {
       logging::logerror(e)
