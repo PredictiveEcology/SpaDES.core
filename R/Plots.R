@@ -1,6 +1,8 @@
 
 #' Plot wrapper intended for use in a SpaDES module
 #'
+#' THIS IS STILL EXPERIMENTAL and could change in the next release.
+#'
 #' This offers up to 4 different actions for a given plot:
 #'     \itemize{
 #'       \item To screen device
