@@ -23,13 +23,15 @@ utils::globalVariables(c(".", ".I", "whi"))
 #' @author Alex Chubaty
 #' @export
 #' @importFrom data.table data.table rbindlist setkey fread
-#' @importFrom reproducible Cache
+#' @importFrom reproducible Cache messageDF
 #' @importFrom utils write.table
 #' @include helpers.R memory-leaks.R
 #' @keywords internal
 #' @rdname doEvent
 #'
-doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spades.futureEvents", FALSE),
+doEvent <- function(sim, debug = FALSE, notOlderThan,
+                    useFuture = getOption("spades.futureEvents", FALSE),
+                    events = NULL,
                     ...) {
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
@@ -77,8 +79,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan, useFuture = getOption("spa
 
       # Section for allowing events to be specified in `spades` call
       dots <- list(...)
-      eventIndex <- if (!is.null(dots$events))
-        isListedEvent(sim@events, dots$events) else 1L
+      eventIndex <- if (!is.null(events))
+        isListedEvent(sim@events, events) else 1L
 
       if (eventIndex == 0L) {
         slot(sim, "current", check = FALSE) <- list() # same as no events left
@@ -676,6 +678,10 @@ scheduleConditionalEvent <- function(sim,
 #'                     If \code{Sys.time()} is provided, then it will force a recache,
 #'                     i.e., remove old value and replace with new value.
 #'                     Ignored if \code{cache} is \code{FALSE}.
+#' @param events A character vector or a named list of character vectors. If specified,
+#'   the simulations will only do the events indicated here. If a named list, the names
+#'   must correspond to the modules and the character vectors can be specific events within
+#'   each of the named modules.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
 #'            This will be included in the \code{Cache} call, so will be unique
@@ -859,12 +865,16 @@ scheduleConditionalEvent <- function(sim,
 #'  )
 #'  print(system.time(out <- spades(mySim, cache = TRUE)))
 #' }
+#'
+#' # E.g., with only the init events
+#' outInitsOnly <- spades(mySim, events = "init")
 #' }
 #'
 setGeneric(
   "spades",
   function(sim, debug = getOption("spades.debug"), progress = NA, cache,
-           .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL, ...) {
+           .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
+           events = NULL, ...) {
     standardGeneric("spades")
   })
 
@@ -879,6 +889,7 @@ setMethod(
                         .plotInitialTime,
                         .saveInitialTime,
                         notOlderThan,
+                        events,
                         ...) {
 
     oldWd <- getwd()
@@ -1093,7 +1104,8 @@ setMethod(
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
         }
 
-        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan, ...)  # process the next event
+        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
+                       events = events, ...)  # process the next event
 
         if (recoverMode > 0) {
           rmo <- recoverModePost(sim, rmo, recoverMode)
@@ -1171,7 +1183,7 @@ setMethod(
   })
 
 #' @rdname spades
-#' @importFrom reproducible Cache messageDF
+#' @importFrom reproducible Cache
 setMethod(
   "spades",
   signature(cache = "logical"),
@@ -1182,6 +1194,7 @@ setMethod(
                         .plotInitialTime,
                         .saveInitialTime,
                         notOlderThan = NULL,
+                        events,
                         ...) {
     stopifnot(class(sim) == "simList")
 
@@ -1207,7 +1220,9 @@ setMethod(
                     progress = progress,
                     .plotInitialTime = .plotInitialTime,
                     .saveInitialTime = .saveInitialTime,
-                    omitArgs = omitArgs, notOlderThan = notOlderThan
+                    omitArgs = omitArgs,
+                    notOlderThan = notOlderThan,
+                    events = events
                   ),
                   dots
                )
@@ -1220,7 +1235,8 @@ setMethod(
           debug = debug,
           progress = progress,
           .plotInitialTime = .plotInitialTime,
-          .saveInitialTime = .saveInitialTime
+          .saveInitialTime = .saveInitialTime,
+          events = events
         )
       )
     }

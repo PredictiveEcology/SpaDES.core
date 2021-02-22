@@ -80,6 +80,17 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(!all("fireSpread" %in% completed(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
+  mySimEvent7 <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
+  expect_true(all("randomLandscapes" %in% completed(mySimEvent7)$moduleName))
+  expect_true(!all("fireSpread" %in% completed(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  expect_true(all("fireSpread" %in% events(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
+
+  mySimEvent8 <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
+  expect_true(all("randomLandscapes" %in% completed(mySimEvent8)$moduleName))
+  expect_true(!all("fireSpread" %in% completed(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 })
 
 test_that("spades calls - diff't signatures", {

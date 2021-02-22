@@ -14,6 +14,7 @@ spades(
   .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
+  events = NULL,
   ...
 )
 
@@ -25,6 +26,7 @@ spades(
   .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
+  events = NULL,
   ...
 )
 
@@ -36,6 +38,7 @@ spades(
   .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
+  events = NULL,
   ...
 )
 }
@@ -67,6 +70,11 @@ Default is \code{NULL}, meaning don't update the cache.
 If \code{Sys.time()} is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
 Ignored if \code{cache} is \code{FALSE}.}
+
+\item{events}{A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules.}
 
 \item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
 This will be included in the \code{Cache} call, so will be unique
@@ -245,6 +253,9 @@ for (i in 1:2) {
  )
  print(system.time(out <- spades(mySim, cache = TRUE)))
 }
+
+# E.g., with only the init events
+outInitsOnly <- spades(mySim, events = "init")
 }
 
 }
