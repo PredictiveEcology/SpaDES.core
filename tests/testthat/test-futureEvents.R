@@ -18,10 +18,10 @@ test_that("test spades.futureEvents", {
       newModCode <- c(ll[seq(lin-1)], "    system.time(for (i in 1:1e6) rnorm(10))",
                       if(mod == "test") "sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, 'test', 'plot')",
                       ll[lin:length(ll)])
-      lin <- grep("expectsInput\\(objectName = NA", newModCode)
+      lin <- grep("expectsInput", newModCode)[1]
       newModCode <- c(newModCode[seq(lin-1)],
-                      if(mod == "test") "    expectsInput(objectName = \"caribou\", objectClass = \"raster\", desc = NA, sourceURL = NA)",
-                      newModCode[(lin+1):length(newModCode)])
+                      if(mod == "test") "    expectsInput(objectName = 'caribou', objectClass = 'raster', desc = NA, sourceURL = NA),",
+                      newModCode[(lin):length(newModCode)])
 
       writeLines(newModCode, con = f1)
     }
