@@ -51,6 +51,7 @@ Suggests:
     dplyr,
     future,
     future.callr,
+    ggplot2,
     googledrive,
     httr,
     knitr,
@@ -104,6 +105,7 @@ Collate:
     'simList-accessors.R'
     'plotting-diagrams.R'
     'plotting.R'
+    'plotting2.R'
     'progress.R'
     'project-template.R'
     'reexports.R'
