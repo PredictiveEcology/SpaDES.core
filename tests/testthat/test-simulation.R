@@ -1074,30 +1074,31 @@ test_that("debug using logging", {
   }
 })
 
-test_that("simulation runs with simInit with duplicate modules named", {
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+test_that("Plots function", {
+  if (require("ggplot2")) {
+    testInitOut <- testInit()
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
 
-  newModule("test", tmpdir, open = FALSE)
+    newModule("test", tmpdir, open = FALSE)
 
-  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  outs <- list(c("png", "object", "raw"),
-               c("png", "object"),
-               c("png", "raw"),
-               c("raw"),
-               NULL)
-  .plotInitialTimes <- c(NA_integer_, NA_integer_, 1L, 1L, NA_integer_)
-  iii <- 0
-  for (out in outs) {
-    iii <- iii + 1
-    .plotInitialTime <- .plotInitialTimes[iii]
+    # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+    outs <- list(c("png", "object", "raw"),
+                 c("png", "object"),
+                 c("png", "raw"),
+                 c("raw"),
+                 NULL)
+    .plotInitialTimes <- c(NA_integer_, NA_integer_, 1L, 1L, NA_integer_)
+    iii <- 0
+    for (out in outs) {
+      iii <- iii + 1
+      .plotInitialTime <- .plotInitialTimes[iii]
 
-    lll <- capture.output(dput(out))
-    fn <- "testing"
-    fnForCat <- capture.output(dput(fn))
-    cat(file = file.path(tmpdir, "test", "test.R"),'
+      lll <- capture.output(dput(out))
+      fn <- "testing"
+      fnForCat <- capture.output(dput(fn))
+      cat(file = file.path(tmpdir, "test", "test.R"),'
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",
@@ -1110,7 +1111,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
       timeunit = "year",
       citation = list("citation.bib"),
       documentation = list("README.txt", "test.Rmd"),
-      reqdPkgs = list(),
+      reqdPkgs = list("ggplot2"),
       parameters = rbind(
         defineParameter(".plotsToDisk", "character", ',lll,', NA, NA, "lala"),
         defineParameter(".plotInitialTime", "numeric", ',.plotInitialTime,', NA, NA, "lala")
@@ -1142,23 +1143,24 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
 
       ', fill = TRUE)
-    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
-                   times = list(start = 0, end = 10, timeunit = "year"))
-    simOut <- spades(sim, debug = TRUE)
-    files <- dir(file.path(outputPath(sim), "figures"), full.names = TRUE)
-    expect_true(all(grepl(fn, files)))
-    if (iii == 5) {
-      expect_true(length(files) == 0L)
-    }
-    if (any(grepl("object", out)))
-      expect_true(any(grepl("gg", files)))
-    if (any(grepl("raw", out)))
-      expect_true(any(grepl("qs", files) & !grepl("gg", files)))
-    if (any(grepl("png", out)))
-      expect_true(any(grepl("png", files)))
-    if (any(grepl("pdf", out)))
-      expect_true(any(grepl("pdf", files)))
+      sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                     times = list(start = 0, end = 10, timeunit = "year"))
+      simOut <- spades(sim, debug = TRUE)
+      files <- dir(file.path(outputPath(sim), "figures"), full.names = TRUE)
+      expect_true(all(grepl(fn, files)))
+      if (iii == 5) {
+        expect_true(length(files) == 0L)
+      }
+      if (any(grepl("object", out)))
+        expect_true(any(grepl("gg", files)))
+      if (any(grepl("raw", out)))
+        expect_true(any(grepl("qs", files) & !grepl("gg", files)))
+      if (any(grepl("png", out)))
+        expect_true(any(grepl("png", files)))
+      if (any(grepl("pdf", out)))
+        expect_true(any(grepl("pdf", files)))
 
-    unlink(files)
+      unlink(files)
+    }
   }
 })

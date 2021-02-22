@@ -25,7 +25,7 @@
 #' @param ... Anything needed by \code{fn}
 #'
 #' @importFrom qs qsave
-#' @importFrom quickPlot whereInStack
+#' @importFrom quickPlot whereInStack Plot
 #'
 #' @details
 #'
@@ -89,7 +89,7 @@ Plots <- function(data, fn, filename,
   if (needScreen) {
     if (is(gg, "gg"))
       if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-    print(gg)
+    Plot(gg)
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw)
