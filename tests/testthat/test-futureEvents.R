@@ -1,5 +1,6 @@
 test_that("test spades.futureEvents", {
   if (interactive()) {
+    skip_on_os("windows")
     testInitOut <- testInit( smcc = FALSE, libraries = "future",
                             opts = list("reproducible.useMemoise" = FALSE,
                                                       "spades.futureEvents" = TRUE))
