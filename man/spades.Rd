@@ -256,6 +256,11 @@ for (i in 1:2) {
 
 # E.g., with only the init events
 outInitsOnly <- spades(mySim, events = "init")
+
+# or more fine grained control
+outInitsOnly <- spades(mySim,
+        events = list(randomLandscapes = c("init"),
+                      fireSpread = c("init", "burn")))
 }
 
 }
