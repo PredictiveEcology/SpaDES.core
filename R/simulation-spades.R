@@ -879,6 +879,11 @@ setMethod(
         debug <- setupDebugger(debug)
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
+      } else {
+        warning("debug cannot be a list unless logging package is installed: install.package('logging')\n",
+                "setting debug to non-list using unlist(debug)")
+        debug <- unlist(debug)
+
       }
     }
 
@@ -1138,7 +1143,7 @@ setMethod(
       stop(e)
     }},
     message = function(m) {
-      if (newDebugging) {
+      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
