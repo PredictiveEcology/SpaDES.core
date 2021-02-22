@@ -21,7 +21,7 @@ test_that("simulation runs with simInit and spades with set.seed", {
 
   set.seed(123)
   mySim <- simInit(times, params, modules, objects = list(), paths) %>%
-    spades(debug = FALSE, .plotInitialTime = NA, events = "init")
+    spades(debug = FALSE, .plotInitialTime = NA)
   set.seed(123)
   mySim2 <- simInit(times, params, modules, objects = list(), paths) %>%
     spades(debug = FALSE, .plotInitialTime = NA)
@@ -31,6 +31,33 @@ test_that("simulation runs with simInit and spades with set.seed", {
   expect_equivalent(start(mySim), 0.0)
   expect_equivalent(end(mySim), 1.0)
   expect_true(all.equal(mySim2, mySim))
+
+  expect_true(!all("init" == completed(mySim)$eventType))
+  expect_true(max(events(mySim)$eventTime) > end(mySim)) # didn't schedule next event
+  set.seed(123)
+  mySimEvent <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA, events = "init")
+  expect_true(all("init" == completed(mySimEvent)$eventType))
+  expect_true(max(events(mySimEvent)$eventTime) <= end(mySimEvent)) # didn't schedule next event
+
+
+  eventTypes <- c("init", "burn")
+  mySimEvent2 <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+  expect_true(all(eventTypes %in% completed(mySimEvent2)$eventType))
+
+  eventTypes <- c()
+  mySimEvent3 <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+  expect_true(all(eventTypes %in% completed(mySimEvent3)$eventType))
+  expect_true(identical(completed(mySimEvent3)[,1:4], completed(mySim)[,1:4]))
+
+  eventTypes <- c("nothing")
+  mySimEvent4 <- simInit(times, params, modules, objects = list(), paths) %>%
+    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+  expect_true(NROW(completed(mySimEvent4)) == 0) # nothing completed
+  expect_true(all("init" == events(mySimEvent4)$eventType)) # nothing happened; only inits in queue
+
 })
 
 test_that("spades calls - diff't signatures", {

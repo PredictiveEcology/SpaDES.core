@@ -1622,7 +1622,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
       if (length(eventQueue) < i) { # check for
         # slot(sim, "current", check = FALSE) <- list() # same as no events left
         foundEventToDo <- NA
-      } else if (eventsToDo %in% eventQueue[[i]]) {
+      } else if (eventQueue[[i]]$eventType %in% eventsToDo) {
         foundEventToDo <- TRUE
       } else {
         i <- i + 1
