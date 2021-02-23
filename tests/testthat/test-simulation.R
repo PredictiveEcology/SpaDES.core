@@ -118,7 +118,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
                                                eventPriority = 1))
   mess <- capture_messages(mySimEvent11Out <- spades(Copy(mySimEvent11),
                                                      event = list(randomLandscapes = "init")))
-  expect_true(any(grepl("are not specified", mess)))
+  expect_true(any(grepl("not specified", mess)))
 
 })
 
