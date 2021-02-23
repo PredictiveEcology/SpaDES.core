@@ -6,13 +6,15 @@ version 1.0.7
 ## new features
 * `Plots` function that will produce zero to 4 types of items that are relevant for plotting: 1. Visual on screen, 2. The plot object saved to disk, 3. The raw data that went into the plot and 4. The plot as one or more image files, e.g., png, pdf via `ggsave`
 * `spades` now accepts an `events` argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the `init` case, e.g., `spades(sim, events = "init")`. See `?spades`.
+* messaging during `simInit` now is prefixed with `Sys.time()` and `"simInit`"
+* messaging during `spades` is simplified to take up fewer characters: `INFO::` has been removed
 
 version 1.0.6
 =============
 
 ## new features
 * more informative message re: module package versions when `spades.useRequire = FALSE` (#141)
-* now detects user-created memory leaks when a user adds a closure or formula to the `sim`
+* now detects user-created memory leaks when a user adds a closure or formula to the `sim`; user informed with a `warning`
 
 ## dependencies
 * no changes
