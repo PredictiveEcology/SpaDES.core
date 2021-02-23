@@ -8,7 +8,7 @@ Plots(
   data,
   fn,
   filename,
-  types = quote(params(sim)[[currentModule(sim)]]$.plotsToDisk),
+  types = quote(params(sim)[[currentModule(sim)]]$.plots),
   path = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ...
@@ -20,8 +20,8 @@ function, and should contain all the data required for the inner plotting}
 
 \item{fn}{An arbitrary plotting function.}
 
-\item{filename}{A name that will be the base for the files that will be saved. If
-a user providees this as an absolute path, it will override the \code{path}
+\item{filename}{A name that will be the base for the files that will be saved.
+If a user provides this as an absolute path, it will override the \code{path}
 argument.}
 
 \item{types}{Character vector, zero or more of types. See below.}
@@ -49,7 +49,7 @@ This offers up to 4 different actions for a given plot:
       \item To disk as a png or other "image" file, like pdf
     }
 To turn off plotting both to screen and disk, set both
-\code{.plotInititalTime = NA} and \code{.plotsToDisk = NA} or any other
+\code{.plotInititalTime = NA} and \code{.plots = NA} or any other
 value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 argument (e.g., \code{""} will omit all saving).
 
