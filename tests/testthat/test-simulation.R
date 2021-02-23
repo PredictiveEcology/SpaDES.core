@@ -1173,3 +1173,37 @@ test_that("Plots function", {
     }
   }
 })
+
+test_that("testing .plotInitialTime & .plots", {
+  if (interactive()) {
+    skip_if_not_installed("RandomFields")
+
+    testInitOut <- testInit()
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
+
+    times <- list(start = 0.0, end = 1, timeunit = "year")
+    params <- list(
+      .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+      caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    )
+    modules <- list("randomLandscapes", #"caribouMovement",
+                    "fireSpread")
+    paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+
+    mySim <- simInit(times, params, modules, objects = list(), paths)
+
+    mySim@params$randomLandscapes$.plotInitialTime <- 0
+    mySim@params$fireSpread$.plotInitialTime <- 0
+    mySim@params$caribouMovement$.plotInitialTime <- 0
+
+    # Makes plots
+    spades(mySim)
+    # Makes no plots
+    spades(mySim, .plots = NA)
+    spades(mySim, .plotInitialTime = NA)
+  }
+})

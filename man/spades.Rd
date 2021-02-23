@@ -15,6 +15,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
+  .plots = NULL,
   ...
 )
 
@@ -27,6 +28,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
+  .plots = NULL,
   ...
 )
 
@@ -39,6 +41,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
+  .plots = NULL,
   ...
 )
 }
@@ -77,6 +80,17 @@ must correspond to the modules and the character vectors can be specific events 
 each of the named modules. With the \code{list} form, all unspecified modules
 will run \emph{all} their events, including internal spades modules, e.g., \code{save},
 that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
+
+\item{.plots}{Character. Sets the parameter of this name in all modules.
+See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
+For backwards compatibility, if \code{.plotInitialTime} is not set
+in this \code{spades} call, but this
+\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+will turn off all plotting; setting this with \code{"screen"} will trigger
+plotting for any modules that use this parameter but will have no effect on
+other modules. To get plotting, therefore, it may be necessary to also set
+\code{.plotInitialTime = start(sim)}.}
 
 \item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
 This will be included in the \code{Cache} call, so will be unique

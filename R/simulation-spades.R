@@ -674,6 +674,17 @@ scheduleConditionalEvent <- function(sim,
 #' @param .saveInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
 #'                                  parameter for all modules. See Details.
 #'
+#' @param .plots Character. Sets the parameter of this name in all modules.
+#'   See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+#'   take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
+#'   For backwards compatibility, if \code{.plotInitialTime} is not set
+#'   in this \code{spades} call, but this
+#'   \code{.plots} is used, two things will happen: setting this without \code{"screen"}
+#'   will turn off all plotting; setting this with \code{"screen"} will trigger
+#'   plotting for any modules that use this parameter but will have no effect on
+#'   other modules. To get plotting, therefore, it may be necessary to also set
+#'   \code{.plotInitialTime = start(sim)}.
+#'
 #' @param notOlderThan Date or time. Passed to \code{reproducible::Cache} to update the cache.
 #'                     Default is \code{NULL}, meaning don't update the cache.
 #'                     If \code{Sys.time()} is provided, then it will force a recache,
@@ -898,7 +909,7 @@ setGeneric(
   "spades",
   function(sim, debug = getOption("spades.debug"), progress = NA, cache,
            .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
-           events = NULL, ...) {
+           events = NULL, .plots = NULL, ...) {
     standardGeneric("spades")
   })
 
@@ -914,6 +925,7 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan,
                         events,
+                        .plots,
                         ...) {
 
     oldWd <- getwd()
@@ -1057,29 +1069,27 @@ setMethod(
         }
       }, add = TRUE)
 
+      if (!is.null(.plots)) {
+        sim@params <- updateParamSlotInAllModules(
+          sim@params, .plots, ".plots",
+          needClass = "character",
+          needValuesMess = paste0("It must be one or more of 'screen', ",
+                                  "'object', 'raw' and any of the classes that ggplot2::ggsave ",
+                                  "can handle, e.g., 'png'"))
+        if (is.null(.plotInitialTime) && !any(.plots %in% "screen"))
+          sim@params <- updateParamSlotInAllModules(
+            sim@params, NA_integer_, ".plotInitialTime",
+            needClass = "numeric")
+      }
       if (!is.null(.plotInitialTime)) {
-        if (!is.numeric(.plotInitialTime))
-          .plotInitialTime <- as.numeric(.plotInitialTime)
-        paramsLocal <- sim@params
-        whNonHiddenModules <- !grepl(names(paramsLocal), pattern = "\\.")
-        paramsLocal[whNonHiddenModules] <- lapply(paramsLocal[whNonHiddenModules], function(x) {
-            x$.plotInitialTime <- .plotInitialTime
-            x
-          })
-        sim@params <- paramsLocal
+        sim@params <- updateParamSlotInAllModules(
+          sim@params, .plotInitialTime, ".plotInitialTime",
+          needClass = "numeric")
       }
       if (!is.null(.saveInitialTime)) {
-        if (!is.numeric(.saveInitialTime))
-          .saveInitialTime <- as.numeric(.saveInitialTime)
-        paramsLocal <- sim@params
-        whNonHiddenModules <-
-          !grepl(names(paramsLocal), pattern = "\\.")
-        paramsLocal[whNonHiddenModules] <-
-          lapply(paramsLocal[whNonHiddenModules], function(x) {
-            x$.saveInitialTime <- NA_real_
-            x
-          })
-        sim@params <- paramsLocal
+        sim@params <- updateParamSlotInAllModules(
+          sim@params, .saveInitialTime, ".saveInitialTime",
+          needClass = "numeric")
       }
 
       if (!is.na(progress)) {
@@ -1236,6 +1246,7 @@ setMethod(
                         .saveInitialTime,
                         notOlderThan = NULL,
                         events,
+                        .plots,
                         ...) {
     stopifnot(class(sim) == "simList")
 
@@ -1263,7 +1274,8 @@ setMethod(
                     .saveInitialTime = .saveInitialTime,
                     omitArgs = omitArgs,
                     notOlderThan = notOlderThan,
-                    events = events
+                    events = events,
+                    .plots = .plots
                   ),
                   dots
                )
@@ -1277,7 +1289,8 @@ setMethod(
           progress = progress,
           .plotInitialTime = .plotInitialTime,
           .saveInitialTime = .saveInitialTime,
-          events = events
+          events = events,
+          .plots = .plots
         )
       )
     }
@@ -1775,3 +1788,20 @@ debugMessage <- function(debug, sim, cur) {
   }
 
 }
+
+updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
+                                        needClass, needValuesMess) {
+  if (!is(newParamValues, needClass) && !is.na(newParamValues)) {
+    if (missing(needValuesMess))
+      needValuesMess <- ""
+    stop(newParamValues, " must be class '",needClass,"'. It must be ", needValuesMess)
+  }
+  paramsLocal <- paramsList
+  whNonHiddenModules <- !grepl(names(paramsList), pattern = "\\.")
+  paramsList[whNonHiddenModules] <- lapply(paramsList[whNonHiddenModules], function(x) {
+    x[[paramSlot]] <- newParamValues
+    x
+  })
+  paramsList
+}
+

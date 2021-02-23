@@ -19,11 +19,17 @@
 #' @param data An arbitrary data object. It should be used inside the \code{Plots}
 #'   function, and should contain all the data required for the inner plotting
 #' @param fn An arbitrary plotting function.
-#' @param filename A name that will be the base for the files that will be saved.
+#' @param filename A name that will be the base for the files that will be saved. If
+#'   a user providees this as an absolute path, it will override the \code{path}
+#'   argument.
 #' @param types Character vector, zero or more of types. See below.
-#' @param paths Currently a single path for the saved objects on disk
+#' @param path Currently a single path for the saved objects on disk. If \code{filename}
+#'   is supplied as an absolute path, \code{path} will be set to \code{dirname(filename)},
+#'   overriding this argument value.
 #' @param .plotInitialTime A numeric. If \code{NA} then no visual on screen. Anything
-#'   else will have visuals plotted to screen device.
+#'   else will have visuals plotted to screen device. This is here for backwards
+#'   compatibility. A developer should set in the module to the intended initial
+#'   plot time and leave it.
 #' @param ... Anything needed by \code{fn}
 #'
 #' @importFrom qs qsave
