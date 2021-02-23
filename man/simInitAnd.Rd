@@ -70,7 +70,7 @@ it should give "initial conditions".
 See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
-\item{loadOrder}{An optional list of module names specifying the order in
+\item{loadOrder}{An optional character vector of module names specifying the order in
 which to load the modules. If not specified, the module
 load order will be determined automatically.}
 
