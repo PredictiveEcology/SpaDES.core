@@ -569,183 +569,182 @@ setMethod(
       }
     }
 
-    # Force SpaDES.core to front of search path
-    #.modifySearchPath("SpaDES.core", skipNamespacing = FALSE)
+    # From here, capture messaging and prepend it
+    withCallingHandlers({
 
-    #rm(".userSuppliedObjNames", envir=envir(sim))
-    ## add name to depends
-    if (!is.null(names(sim@depends@dependencies))) {
-      names(sim@depends@dependencies) <- sim@depends@dependencies %>%
-        lapply(., function(x)
-          x@name) %>%
-        unlist()
-    }
-
-    ## load core modules
-    for (c in core) {
-      # schedule each module's init event:
-      #.refreshEventQueues()
-      sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
-                           c, "init", .first() - 1)
-    }
-
-    ## assign user-specified non-global params, while
-    ## keeping defaults for params not specified by user
-    omit <- c(which(core == "load"), which(core == "save"))
-    pnames <- unique(c(paste0(".", core[-omit]), names(sim@params)))
-
-    if (is.null(params$.progress) || any(is.na(params$.progress))) {
-      params$.progress <- .pkgEnv$.progressEmpty
-    }
-
-    tmp <- list()
-    lapply(pnames, function(x) {
-      tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
-    })
-    sim@params <- tmp
-
-    ## check user-supplied load order
-    if (!all(length(loadOrder),
-             all(sim@modules %in% loadOrder),
-             all(loadOrder %in% sim@modules))) {
-      loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
-    }
-
-    mBase <- basename2(unlist(sim@modules))
-    loadOrderBase <- basename2(loadOrder)
-    names(loadOrder) <- names(unlist(sim@modules))[na.omit(match(mBase, loadOrderBase))]
-    loadOrder[] <- loadOrderBase
-    loadOrderNames <- names(loadOrder)
-
-    # This is a quick override so that .runInputObjects has access to these
-    #   synonynms
-    if (!is.null(objects$objectSynonyms)) {
-      sim$objectSynonyms <- objects$objectSynonyms
-      sim <- .checkObjectSynonyms(sim)
-    }
-
-    # Make local activeBindings to mod
-    lapply(as.character(sim@modules), function(mod) {
-      makeModActiveBinding(sim = sim, mod = mod)
-      # sim$.mods$caribouMovement$mod <- list()
-    })
-
-    lapply(sim@modules, function(mod) {
-      makeParActiveBinding(sim = sim, mod = mod)
-    })
-
-    ## load user-defined modules
-    # browser(expr = exists("._simInit_4"))
-
-    for (m in loadOrder) {
-      mFullPath <- loadOrderNames[match(m, loadOrder)]
-      ## run .inputObjects() for each module
-      sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
-
-      ## schedule each module's init event:
-      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
-
-      ### add module name to the loaded list
-      names(m) <- mFullPath
-      modulesLoaded <- append(modulesLoaded, m)
-
-
-      ### add NAs to any of the dotParams that are not specified by user
-      # ensure the modules sublist exists by creating a tmp value in it
-      if (is.null(sim@params[[m]])) {
-        sim@params[[m]] <- list(.tmp = NA_real_)
+      ## add name to depends
+      if (!is.null(names(sim@depends@dependencies))) {
+        names(sim@depends@dependencies) <- sim@depends@dependencies %>%
+          lapply(., function(x)
+            x@name) %>%
+          unlist()
       }
 
-      ## add the necessary values to the sublist
-      for (x in dotParamsReal) {
-        if (is.null(sim@params[[m]][[x]])) {
-          sim@params[[m]][[x]] <- NA_real_
-        } else if (is.na(sim@params[[m]][[x]])) {
-          sim@params[[m]][[x]] <- NA_real_
+      ## load core modules
+      for (c in core) {
+        # schedule each module's init event:
+        #.refreshEventQueues()
+        sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
+                             c, "init", .first() - 1)
+      }
+
+      ## assign user-specified non-global params, while
+      ## keeping defaults for params not specified by user
+      omit <- c(which(core == "load"), which(core == "save"))
+      pnames <- unique(c(paste0(".", core[-omit]), names(sim@params)))
+
+      if (is.null(params$.progress) || any(is.na(params$.progress))) {
+        params$.progress <- .pkgEnv$.progressEmpty
+      }
+
+      tmp <- list()
+      lapply(pnames, function(x) {
+        tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
+      })
+      sim@params <- tmp
+
+      ## check user-supplied load order
+      if (!all(length(loadOrder),
+               all(sim@modules %in% loadOrder),
+               all(loadOrder %in% sim@modules))) {
+        loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
+      }
+
+      mBase <- basename2(unlist(sim@modules))
+      loadOrderBase <- basename2(loadOrder)
+      names(loadOrder) <- names(unlist(sim@modules))[na.omit(match(mBase, loadOrderBase))]
+      loadOrder[] <- loadOrderBase
+      loadOrderNames <- names(loadOrder)
+
+      # This is a quick override so that .runInputObjects has access to these
+      #   synonynms
+      if (!is.null(objects$objectSynonyms)) {
+        sim$objectSynonyms <- objects$objectSynonyms
+        sim <- .checkObjectSynonyms(sim)
+      }
+
+      # Make local activeBindings to mod
+      lapply(as.character(sim@modules), function(mod) {
+        makeModActiveBinding(sim = sim, mod = mod)
+        # sim$.mods$caribouMovement$mod <- list()
+      })
+
+      lapply(sim@modules, function(mod) {
+        makeParActiveBinding(sim = sim, mod = mod)
+      })
+
+      ## load user-defined modules
+      # browser(expr = exists("._simInit_4"))
+
+      for (m in loadOrder) {
+        mFullPath <- loadOrderNames[match(m, loadOrder)]
+        ## run .inputObjects() for each module
+        sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+
+        ## schedule each module's init event:
+        sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+
+        ### add module name to the loaded list
+        names(m) <- mFullPath
+        modulesLoaded <- append(modulesLoaded, m)
+
+
+        ### add NAs to any of the dotParams that are not specified by user
+        # ensure the modules sublist exists by creating a tmp value in it
+        if (is.null(sim@params[[m]])) {
+          sim@params[[m]] <- list(.tmp = NA_real_)
+        }
+
+        ## add the necessary values to the sublist
+        for (x in dotParamsReal) {
+          if (is.null(sim@params[[m]][[x]])) {
+            sim@params[[m]][[x]] <- NA_real_
+          } else if (is.na(sim@params[[m]][[x]])) {
+            sim@params[[m]][[x]] <- NA_real_
+          }
+        }
+
+        ## remove the tmp value from the module sublist
+        sim@params[[m]]$.tmp <- NULL
+
+        ### Currently, everything in dotParamsChar is being checked for NULL
+        ### values where used (i.e., in save.R).
+      }
+
+      ## check that modules all loaded correctly and store result
+      if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
+        modules(sim) <- modulesLoaded
+      } else {
+        stop("There was a problem loading some modules.")
+      }
+
+      ## Add the data.frame as an attribute
+      attr(sim@modules, "modulesGraph") <- parentChildGraph
+
+      ## END OF MODULE PARSING AND LOADING
+      if (length(objects)) {
+        if (is.list(objects)) {
+          if (length(objNames) == length(objects)) {
+            objs(sim) <- objects
+          } else {
+            stop(
+              paste(
+                "objects must be a character vector of object names",
+                "to retrieve from the .GlobalEnv, or a named list of",
+                "objects"
+              )
+            )
+          }
+        } else {
+          newInputs <- data.frame(
+            objectName = objNames,
+            loadTime = as.numeric(sim@simtimes[["current"]]),
+            stringsAsFactors = FALSE
+          ) %>%
+            .fillInputRows(startTime = start(sim))
+          inputs(sim) <- newInputs
         }
       }
 
-      ## remove the tmp value from the module sublist
-      sim@params[[m]]$.tmp <- NULL
-
-      ### Currently, everything in dotParamsChar is being checked for NULL
-      ### values where used (i.e., in save.R).
-    }
-
-    ## check that modules all loaded correctly and store result
-    if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
-      modules(sim) <- modulesLoaded
-    } else {
-      stop("There was a problem loading some modules.")
-    }
-
-    ## Add the data.frame as an attribute
-    attr(sim@modules, "modulesGraph") <- parentChildGraph
-
-    ## END OF MODULE PARSING AND LOADING
-    if (length(objects)) {
-      if (is.list(objects)) {
-        if (length(objNames) == length(objects)) {
-          objs(sim) <- objects
-        } else {
-          stop(
-            paste(
-              "objects must be a character vector of object names",
-              "to retrieve from the .GlobalEnv, or a named list of",
-              "objects"
+      ## load files in the filelist
+      if (NROW(inputs) | NROW(inputs(sim))) {
+        inputs(sim) <- rbind(inputs(sim), inputs)
+        if (NROW(events(sim)[moduleName == "load" &
+                             eventType == "inputs" &
+                             eventTime == start(sim)]) > 0) {
+          sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
+          events(sim) <- events(sim)[!(eventTime == time(sim) &
+                                         moduleName == "load" &
+                                         eventType == "inputs"), ]
+        }
+        if (any(events(sim)[["eventTime"]] < start(sim))) {
+          warning(
+            paste0(
+              "One or more objects in the inputs filelist was ",
+              "scheduled to load before start(sim). ",
+              "It is being be removed and not loaded. To ensure loading, loadTime ",
+              "must be start(sim) or later. See examples using ",
+              "loadTime in ?simInit"
             )
           )
+          events(sim) <- events(sim)[eventTime >= start(sim)]
         }
-      } else {
-        newInputs <- data.frame(
-          objectName = objNames,
-          loadTime = as.numeric(sim@simtimes[["current"]]),
-          stringsAsFactors = FALSE
-        ) %>%
-          .fillInputRows(startTime = start(sim))
-        inputs(sim) <- newInputs
       }
-      # if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
-      #   sim <- .checkObjectSynonyms(sim)
-      # }
-    }
 
-    ## load files in the filelist
-    if (NROW(inputs) | NROW(inputs(sim))) {
-      inputs(sim) <- rbind(inputs(sim), inputs)
-      if (NROW(events(sim)[moduleName == "load" &
-                           eventType == "inputs" &
-                           eventTime == start(sim)]) > 0) {
-        sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-        events(sim) <- events(sim)[!(eventTime == time(sim) &
-                                                 moduleName == "load" &
-                                                 eventType == "inputs"), ]
+      if (length(outputs)) {
+        outputs(sim) <- outputs
       }
-      if (any(events(sim)[["eventTime"]] < start(sim))) {
-        warning(
-          paste0(
-            "One or more objects in the inputs filelist was ",
-            "scheduled to load before start(sim). ",
-            "It is being be removed and not loaded. To ensure loading, loadTime ",
-            "must be start(sim) or later. See examples using ",
-            "loadTime in ?simInit"
-          )
-        )
-        events(sim) <- events(sim)[eventTime >= start(sim)]
-      }
+
+      ## check the parameters supplied by the user
+      checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
+
+    },
+    message = function(m) {
+      message(Sys.time(), " simInit::", gsub("\\n", "", m$message))
+      # This will "muffle" the original message
+      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
     }
-
-    if (length(outputs)) {
-      outputs(sim) <- outputs
-    }
-
-    ## check the parameters supplied by the user
-    checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
-
-    ## keep session info for debugging & checkpointing
-    # sim$.sessionInfo <- sessionInfo() # commented out because it gives too much information
-                                        # i.e., it includes all packages in a user search
-                                        #  path, which is not necessarily the correct info
+    )
 
     return(invisible(sim))
 })
