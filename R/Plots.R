@@ -54,20 +54,28 @@
 #' sim <- simInit()
 #' sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 #'
-#' # Need to pass the first argument as a quote, or else it will be evaluated
-#' #   immediately, which is what one may be trying to avoid
 #' Plots(data = sim$something, fn = fn,
 #'       types = c("png"),
-#'       paths = file.path("figures"),
+#'       path = file.path("figures"),
+#'       filename = tempfile(),
 #'       .plotInitialTime = 1
 #'       )
+#'
+#' # plot to active device and to png
+#' Plots(data = sim$something, fn = fn,
+#'       types = c("png", "screen"),
+#'       path = file.path("figures"),
+#'       filename = tempfile(),
+#'       .plotInitialTime = 1
+#'       )
+#'
 #'  } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plotsToDisk),
-                  paths = quote(file.path(outputPath(sim), "figures")),
+                  path = quote(file.path(outputPath(sim), "figures")),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ...) {
-  if (any(is(types, "call") || is(paths, "call") || is(.plotInitialTime, "call"))){
+  if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))){
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn))
       simIsIn <- whereInStack("sim")
@@ -75,15 +83,15 @@ Plots <- function(data, fn, filename,
 
   if (is(types, "call"))
     types = eval(types, envir = simIsIn)
-  if (is(paths, "call"))
-    paths = eval(paths, envir = simIsIn)
+  if (is(path, "call"))
+    path = eval(path, envir = simIsIn)
   if (is(.plotInitialTime, "call"))
     .plotInitialTime = eval(.plotInitialTime, envir = simIsIn)
 
   ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
   ggplotClassesCanHandleBar <- paste(ggplotClassesCanHandle, collapse = "|")
   needSave <- any(grepl(paste(ggplotClassesCanHandleBar, "|object"), types))
-  needScreen <- !is.na(.plotInitialTime)
+  needScreen <- !is.na(.plotInitialTime) && any(grepl("screen", types))
   if (needScreen || needSave) {
     gg <- fn(data, ...)
   }
@@ -94,18 +102,25 @@ Plots <- function(data, fn, filename,
     Plot(gg)
   }
   needSaveRaw <- any(grepl("raw", types))
-  if (needSave || needSaveRaw)
-    checkPath(paths, create = TRUE)
+  if (needSave || needSaveRaw) {
+    if (isAbsolutePath(filename)) {
+      message("filename is an absolute path; overriding path")
+      path <- dirname(filename)
+      filename <- basename(filename)
+    }
+    checkPath(path, create = TRUE)
+  }
+
   if (needSaveRaw)
-    qs::qsave(data, file.path(paths, paste0(filename, "_data.qs")))
+    qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
   if (needSave) {
     ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
     for (ggsf in ggSaveFormats) {
       if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
-        ggsave(plot = gg, filename = file.path(paths, paste0(filename, ".", ggsf)))
+        ggsave(plot = gg, filename = file.path(path, paste0(filename, ".", ggsf)))
     }
 
     if (any(grepl("object", types)))
-      qs::qsave(gg, file = file.path(paths, paste0(filename, "_gg.qs")))
+      qs::qsave(gg, file = file.path(path, paste0(filename, "_gg.qs")))
   }
 }

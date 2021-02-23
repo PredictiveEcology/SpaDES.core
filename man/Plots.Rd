@@ -9,7 +9,7 @@ Plots(
   fn,
   filename,
   types = quote(params(sim)[[currentModule(sim)]]$.plotsToDisk),
-  paths = quote(file.path(outputPath(sim), "figures")),
+  path = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ...
 )
@@ -20,14 +20,20 @@ function, and should contain all the data required for the inner plotting}
 
 \item{fn}{An arbitrary plotting function.}
 
-\item{filename}{A name that will be the base for the files that will be saved.}
+\item{filename}{A name that will be the base for the files that will be saved. If
+a user providees this as an absolute path, it will override the \code{path}
+argument.}
 
 \item{types}{Character vector, zero or more of types. See below.}
 
-\item{paths}{Currently a single path for the saved objects on disk}
+\item{path}{Currently a single path for the saved objects on disk. If \code{filename}
+is supplied as an absolute path, \code{path} will be set to \code{dirname(filename)},
+overriding this argument value.}
 
 \item{.plotInitialTime}{A numeric. If \code{NA} then no visual on screen. Anything
-else will have visuals plotted to screen device.}
+else will have visuals plotted to screen device. This is here for backwards
+compatibility. A developer should set in the module to the intended initial
+plot time and leave it.}
 
 \item{...}{Anything needed by \code{fn}}
 }
@@ -72,12 +78,20 @@ fn <- function(d)
 sim <- simInit()
 sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 
-# Need to pass the first argument as a quote, or else it will be evaluated
-#   immediately, which is what one may be trying to avoid
 Plots(data = sim$something, fn = fn,
       types = c("png"),
-      paths = file.path("figures"),
+      path = file.path("figures"),
+      filename = tempfile(),
       .plotInitialTime = 1
       )
+
+# plot to active device and to png
+Plots(data = sim$something, fn = fn,
+      types = c("png", "screen"),
+      path = file.path("figures"),
+      filename = tempfile(),
+      .plotInitialTime = 1
+      )
+
  } # end of dontrun
 }
