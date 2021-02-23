@@ -951,6 +951,15 @@ setMethod(
       if (is.null(sim@.xData[["._startClockTime"]]))
         sim@.xData[["._startClockTime"]] <- Sys.time()
 
+      if (is.list(events)) {
+        unspecifiedEvents <- setdiff(unlist(modules(sim, TRUE)), names(events))
+        if (length(unspecifiedEvents))
+          message("NOTE: ", paste(unspecifiedEvents, collapse = ", "), " are not specified; ",
+                  "You may want to add e.g., save = 'init'")
+      }
+
+
+
       # This sets up checking for memory leaks
       if (is.null(sim@.xData[["._knownObjects"]])) {
         moduleNames <- unname(modules(sim))

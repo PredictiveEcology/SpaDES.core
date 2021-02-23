@@ -111,6 +111,15 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(max(completed(simOut)$eventTime) == end(simOut)) # got to end time
 
 
+  mySimEvent11 <- simInit(times = list(start = 2000, end = 2010), params, modules,
+                          objects = list(), paths,
+                          # events = "init",
+                          outputs = data.frame(objectName = "landscape", saveTime = 2000:2010,
+                                               eventPriority = 1))
+  mess <- capture_messages(mySimEvent11Out <- spades(Copy(mySimEvent11),
+                                                     event = list(randomLandscapes = "init")))
+  expect_true(any(grepl("are not specified", mess)))
+
 })
 
 test_that("spades calls - diff't signatures", {
