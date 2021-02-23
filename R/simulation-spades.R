@@ -683,8 +683,8 @@ scheduleConditionalEvent <- function(sim,
 #'   the simulations will only do the events indicated here. If a named list, the names
 #'   must correspond to the modules and the character vectors can be specific events within
 #'   each of the named modules. With the \code{list} form, all unspecified modules
-#'   will run \emph{all} their events, including internal spades modules, e.g., \code{save}
-#'   that gets invoked with the \code{outputs} argument in  \code{simInit}.
+#'   will run \emph{all} their events, including internal spades modules, e.g., \code{save},
+#'   that get invoked with the \code{outputs} argument in  \code{simInit}. See example.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
 #'            This will be included in the \code{Cache} call, so will be unique
@@ -876,6 +876,22 @@ scheduleConditionalEvent <- function(sim,
 #' outSomeEvents <- spades(mySim,
 #'         events = list(randomLandscapes = c("init"),
 #'                       fireSpread = c("init", "burn")))
+#'
+#' # with outputs, the save module gets invoked and must be explicitly limited to "init"
+#' mySim <- simInit(
+#'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+#'  params = list(
+#'    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'  ),
+#'  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'  outputs = data.frame(objectName = "landscape", saveTime = 0:2),
+#'  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#' )
+#' # This will print a message saying that caribouMovement will run its events
+#' outSomeEvents <- spades(mySim,
+#'         events = list(randomLandscapes = c("init"),
+#'                       fireSpread = c("init", "burn"),
+#'                       save = "init"))
 #' }
 #'
 setGeneric(
