@@ -19,8 +19,8 @@
 #' @param data An arbitrary data object. It should be used inside the \code{Plots}
 #'   function, and should contain all the data required for the inner plotting
 #' @param fn An arbitrary plotting function.
-#' @param filename A name that will be the base for the files that will be saved. If
-#'   a user providees this as an absolute path, it will override the \code{path}
+#' @param filename A name that will be the base for the files that will be saved.
+#'   If a user provides this as an absolute path, it will override the \code{path}
 #'   argument.
 #' @param types Character vector, zero or more of types. See below.
 #' @param path Currently a single path for the saved objects on disk. If \code{filename}
