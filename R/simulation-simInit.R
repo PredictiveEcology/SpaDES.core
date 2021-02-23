@@ -1,4 +1,4 @@
-utils::globalVariables(".")
+utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 
 #' Initialize a new simulation
 #'

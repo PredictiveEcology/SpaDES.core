@@ -132,7 +132,7 @@ Plots <- function(data, fn, filename,
     ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
     for (ggsf in ggSaveFormats) {
       if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
-        ggsave(plot = gg, filename = file.path(path, paste0(filename, ".", ggsf)))
+        ggplot2::ggsave(plot = gg, filename = file.path(path, paste0(filename, ".", ggsf)))
     }
 
     if (any(grepl("object", types)))

@@ -132,7 +132,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         }
       }
       if (attr(sim, "needDebug")) {
-        debugMessage(debug, sim, cur)
+        debugMessage(debug, sim, cur, fnEnv, curModuleName)
         # if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
         # for (i in seq_along(debug)) {
         #   if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
@@ -1713,7 +1713,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
   i
 }
 
-debugMessage <- function(debug, sim, cur) {
+debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
   for (i in seq_along(debug)) {
     if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
