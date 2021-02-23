@@ -1213,7 +1213,7 @@ setMethod(
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        message(Sys.time(), " INFO::", gsub("\\n", "", m$message))
+        message(Sys.time(), " ", gsub("\\n", "", m$message))
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
