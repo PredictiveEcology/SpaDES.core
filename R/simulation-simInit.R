@@ -413,6 +413,18 @@ setMethod(
 
     if (length(uniqueReqdPkgs)) {
       allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+      versionSpecs <- Require::getPkgVersions(allPkgs)
+      sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
+      if (NROW(sc)) {
+        out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
+          comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
+                                 sc$versionSpec[iii])}))
+        if (any(out11 < 0))
+          stop("One of the modules needs a newer version of SpaDES.core. Please ",
+               "restart R and install with: \n",
+               "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+      }
+
       if (getOption("spades.useRequire")) {
         Require(allPkgs, upgrade = FALSE)
       } else {
