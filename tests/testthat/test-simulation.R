@@ -111,6 +111,15 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(max(completed(simOut)$eventTime) == end(simOut)) # got to end time
 
 
+  mySimEvent11 <- simInit(times = list(start = 2000, end = 2010), params, modules,
+                          objects = list(), paths,
+                          # events = "init",
+                          outputs = data.frame(objectName = "landscape", saveTime = 2000:2010,
+                                               eventPriority = 1))
+  mess <- capture_messages(mySimEvent11Out <- spades(Copy(mySimEvent11),
+                                                     event = list(randomLandscapes = "init")))
+  expect_true(any(grepl("are not specified", mess)))
+
 })
 
 test_that("spades calls - diff't signatures", {
@@ -1071,5 +1080,96 @@ test_that("debug using logging", {
       })
     })
     expect_true(length(mess1) == 0)
+  }
+})
+
+test_that("Plots function", {
+  if (require("ggplot2")) {
+    testInitOut <- testInit()
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
+
+    newModule("test", tmpdir, open = FALSE)
+
+    # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+    outs <- list(c("png", "object", "raw"),
+                 c("png", "object"),
+                 c("png", "raw"),
+                 c("raw"),
+                 NULL)
+    .plotInitialTimes <- c(NA_integer_, NA_integer_, 1L, 1L, NA_integer_)
+    iii <- 0
+    for (out in outs) {
+      iii <- iii + 1
+      .plotInitialTime <- .plotInitialTimes[iii]
+
+      lll <- capture.output(dput(out))
+      fn <- "testing"
+      fnForCat <- capture.output(dput(fn))
+      cat(file = file.path(tmpdir, "test", "test.R"),'
+      defineModule(sim, list(
+      name = "test",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "year",
+      citation = list("citation.bib"),
+      documentation = list("README.txt", "test.Rmd"),
+      reqdPkgs = list("ggplot2"),
+      parameters = rbind(
+        defineParameter(".plotsToDisk", "character", ',lll,', NA, NA, "lala"),
+        defineParameter(".plotInitialTime", "numeric", ',.plotInitialTime,', NA, NA, "lala")
+      ),
+      inputObjects = bindrows(
+      ),
+      outputObjects = bindrows(
+      )
+      ))
+
+      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+        sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1", .skipChecks = TRUE)
+        sim$something <- data.frame(a = sample(1:10, replace = TRUE))
+        Plots(data = sim$something, fn = fn1, filename = ',fnForCat,', bins = 10, fill = "red")
+      },
+      event1 = {
+      sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1", .skipChecks = TRUE)
+      })
+      return(invisible(sim))
+      }
+      fn1 <- function(d, bins, ...) {
+          ggplot(d, aes(a)) +
+          geom_histogram(bins = bins, ...)
+        }
+
+
+
+      ', fill = TRUE)
+      sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                     times = list(start = 0, end = 10, timeunit = "year"))
+      simOut <- spades(sim, debug = TRUE)
+      files <- dir(file.path(outputPath(sim), "figures"), full.names = TRUE)
+      expect_true(all(grepl(fn, files)))
+      if (iii == 5) {
+        expect_true(length(files) == 0L)
+      }
+      if (any(grepl("object", out)))
+        expect_true(any(grepl("gg", files)))
+      if (any(grepl("raw", out)))
+        expect_true(any(grepl("qs", files) & !grepl("gg", files)))
+      if (any(grepl("png", out)))
+        expect_true(any(grepl("png", files)))
+      if (any(grepl("pdf", out)))
+        expect_true(any(grepl("pdf", files)))
+
+      unlink(files)
+    }
   }
 })

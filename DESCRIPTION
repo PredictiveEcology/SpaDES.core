@@ -13,7 +13,7 @@ URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2021-02-22
-Version: 1.0.6.9001
+Version: 1.0.6.9004
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -51,6 +51,7 @@ Suggests:
     dplyr,
     future,
     future.callr,
+    ggplot2,
     googledrive,
     httr,
     knitr,
@@ -73,6 +74,7 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
+    'Plots.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'environment.R'
