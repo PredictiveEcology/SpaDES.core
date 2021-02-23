@@ -33,6 +33,7 @@
 #' @param ... Anything needed by \code{fn}
 #'
 #' @importFrom qs qsave
+#' @importFrom raster writeRaster
 #' @importFrom quickPlot whereInStack Plot
 #'
 #' @details
@@ -118,8 +119,15 @@ Plots <- function(data, fn, filename,
     checkPath(path, create = TRUE)
   }
 
-  if (needSaveRaw)
-    qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
+  if (needSaveRaw) {
+    if (is(data, "Raster")) {
+      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")))
+    } else {
+      qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
+    }
+
+  }
+
   if (needSave) {
     ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
     for (ggsf in ggSaveFormats) {
