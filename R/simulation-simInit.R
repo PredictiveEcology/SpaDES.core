@@ -327,11 +327,6 @@ setMethod(
                         loadOrder,
                         notOlderThan) {
 
-    # For namespacing of each module; keep a snapshot of the search path
-    # .pkgEnv$searchPath <- search()
-    # on.exit({
-    #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
-    # })
     paths <- lapply(paths, function(p)
       checkPath(p, create = TRUE)
     )
@@ -350,8 +345,6 @@ setMethod(
     sim <- new("simList")
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
-    #sim@.xData[[".parsedFiles"]] <- new.env(parent = as.environment("package:SpaDES.core"))
-    #  sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
 
     # paths
@@ -403,110 +396,19 @@ setMethod(
 
     mBase <- basename2(unlist(modules))
 
+    # Load packages
     reqdPkgs <- packages(modules = sim@modules,
                          filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
-
-    # Load only needed packages -- compare to current search path
-    uniqueReqdPkgs <- unique(unlist(reqdPkgs))
-
-    if (length(uniqueReqdPkgs)) {
-      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
-      versionSpecs <- Require::getPkgVersions(allPkgs)
-      sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
-      if (NROW(sc)) {
-        out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
-          comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
-                                 sc$versionSpec[iii])}))
-        if (any(out11 < 0))
-          stop("One of the modules needs a newer version of SpaDES.core. Please ",
-               "restart R and install with: \n",
-               "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
-      }
-
-      if (getOption("spades.useRequire")) {
-        Require(allPkgs, upgrade = FALSE)
-      } else {
-        loadedPkgs <- search();
-        neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
-        names(neededPkgs) <- uniqueReqdPkgs
-        allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
-        versionSpecs <- Require::getPkgVersions(allPkgs)
-        if (any(versionSpecs$hasVersionSpec)) {
-          out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
-            comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-                                   versionSpecs$versionSpec[iii])
-            if (comp < 0)
-              warning(versionSpecs$Package[iii], " needs to be updated to at least ",
-                      versionSpecs$versionSpec[iii])
-          })
-
-        }
-        allPkgs <- unique(Require::extractPkgName(allPkgs))
-        loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
-      }
-    }
-
-    ## timeunit is needed before all parsing of modules.
-    ## It could be used within modules within defineParameter statements.
-    # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
+    loadPkgs(reqdPkgs)
 
     allTimeUnits <- FALSE
-
-    findSmallestTU <- function(sim, mods, childModules) { # recursive function
-      out <- mods
-
-      modsForTU <- names(childModules)
-      stillFinding <- TRUE
-      recurseLevel <- 1
-      ## Time unit could be NA, in which case, it should find the smallest one that is inside a parent...
-      ## if none there, then inside grandparent etc.
-      while (stillFinding && length(modsForTU)) {
-        tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                  envir = sim@.xData[[".parsedFiles"]])
-        hasTU <- !is.na(tu)
-        innerNames <- .findModuleName(childModules, recursive = recurseLevel)
-        modsForTU <- innerNames[nzchar(names(innerNames))]
-        stillFinding <- all(!hasTU)
-        recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
-      }
-      if (!exists("tu", inherits = FALSE)) {
-        return(list("year")) # default
-      }
-      minTU <- minTimeunit(as.list(unlist(tu)))
-      if (isTRUE(is.na(minTU[[1]]))) {
-        minTU[[1]] <- "year"
-      }
-      return(minTU)
-    }
-
-    # recursive function to extract parent and child structures
-    buildParentChildGraph <- function(sim, mods, childModules) {
-      out <- childModules
-
-      # A child module will be a list inside a list of parent modules
-      isParent <- sapply(out, function(x) is.list(x))
-      if (length(isParent)) {
-        from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
-        to <- unlist(lapply(out, function(x) names(x)))
-        if (is.null(to)) to <- character(0)
-        outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
-        aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
-        aa <- rbindlist(aa)
-        outDF <- rbind(outDF, aa)
-      } else {
-        outDF <- data.frame(from = character(0), to = character(0), stringsAsFactors = FALSE)
-      }
-      outDF
-    }
 
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
     parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
 
     timeunits <- findSmallestTU(sim, modulePaths, childModules)
-
-    if (length(timeunits) == 0) timeunits <- list(moduleDefaults$timeunit) # no timeunits or no modules at all
 
     if (!is.null(times$unit)) {
       message(
@@ -1290,4 +1192,104 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   }
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])
+}
+
+checkSpaDES.coreMinVersion <- function(allPkgs) {
+  versionSpecs <- Require::getPkgVersions(allPkgs)
+  sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
+  if (NROW(sc)) {
+    out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
+      comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
+                             sc$versionSpec[iii])}))
+    if (any(out11 < 0))
+      stop("One of the modules needs a newer version of SpaDES.core. Please ",
+           "restart R and install with: \n",
+           "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+  }
+
+}
+
+findSmallestTU <- function(sim, mods, childModules) { # recursive function
+  out <- mods
+
+  modsForTU <- names(childModules)
+  stillFinding <- TRUE
+  recurseLevel <- 1
+  ## Time unit could be NA, in which case, it should find the smallest one that is inside a parent...
+  ## if none there, then inside grandparent etc.
+  while (stillFinding && length(modsForTU)) {
+    tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
+                              envir = sim@.xData[[".parsedFiles"]])
+    hasTU <- !is.na(tu)
+    innerNames <- .findModuleName(childModules, recursive = recurseLevel)
+    modsForTU <- innerNames[nzchar(names(innerNames))]
+    stillFinding <- all(!hasTU)
+    recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
+  }
+  if (!exists("tu", inherits = FALSE)) {
+    return(list("year")) # default
+  }
+  minTU <- minTimeunit(as.list(unlist(tu)))
+  if (isTRUE(is.na(minTU[[1]]))) {
+    minTU[[1]] <- "year"
+  }
+
+  # no timeunits or no modules at all
+  if (length(minTU) == 0) minTU <- list(moduleDefaults$timeunit)
+
+  return(minTU)
+}
+
+# recursive function to extract parent and child structures
+buildParentChildGraph <- function(sim, mods, childModules) {
+  out <- childModules
+
+  # A child module will be a list inside a list of parent modules
+  isParent <- sapply(out, function(x) is.list(x))
+  if (length(isParent)) {
+    from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
+    to <- unlist(lapply(out, function(x) names(x)))
+    if (is.null(to)) to <- character(0)
+    outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
+    aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
+    aa <- rbindlist(aa)
+    outDF <- rbind(outDF, aa)
+  } else {
+    outDF <- data.frame(from = character(0), to = character(0), stringsAsFactors = FALSE)
+  }
+  outDF
+}
+
+loadPkgs <- function(reqdPkgs) {
+  uniqueReqdPkgs <- unique(unlist(reqdPkgs))
+
+  if (length(uniqueReqdPkgs)) {
+    allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+
+    # Check for SpaDES.core minimum version
+    checkSpaDES.coreMinVersion(allPkgs)
+
+    if (getOption("spades.useRequire")) {
+      Require(allPkgs, upgrade = FALSE)
+    } else {
+      loadedPkgs <- search();
+      neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
+      names(neededPkgs) <- uniqueReqdPkgs
+      allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
+      versionSpecs <- Require::getPkgVersions(allPkgs)
+      if (any(versionSpecs$hasVersionSpec)) {
+        out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
+          comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
+                                 versionSpecs$versionSpec[iii])
+          if (comp < 0)
+            warning(versionSpecs$Package[iii], " needs to be updated to at least ",
+                    versionSpecs$versionSpec[iii])
+        })
+
+      }
+      allPkgs <- unique(Require::extractPkgName(allPkgs))
+      loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
+    }
+  }
+
 }
