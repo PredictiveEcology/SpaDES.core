@@ -8,6 +8,7 @@ version 1.0.7
 * `spades` now accepts an `events` argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the `init` case, e.g., `spades(sim, events = "init")`. See `?spades`.
 * messaging during `simInit` now is prefixed with `Sys.time()` and `"simInit`"
 * messaging during `spades` is simplified to take up fewer characters: `INFO::` has been removed
+* `simInit` now checks for minimum version of `SpaDES.core` needed in a module and stops if it fails, giving instructions how to upgrade.
 
 version 1.0.6
 =============
