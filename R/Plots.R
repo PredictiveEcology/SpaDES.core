@@ -40,6 +40,7 @@
 #' \itemize{
 #'   \item \code{type}
 #'     \itemize{
+#'       \item \code{"screen"} -- Will plot to the current device, normally a plot window
 #'       \item \code{"object"} -- Will save the plot object, e.g., ggplot object
 #'       \item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
 #'                           the data argument
