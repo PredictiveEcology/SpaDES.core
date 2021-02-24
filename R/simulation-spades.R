@@ -1814,7 +1814,7 @@ loggingMessage <- function(mess) {
   if (numCharsMax > 0) {
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
     sim <- get("sim", whereInStack("sim"), inherits = FALSE)
-    if (length(sim@events)) {
+    if (length(sim@current)) {
       modName <- sim@current$moduleName
 
       if (is.null(modName)) modName <- sim@events[[1]]$moduleName
