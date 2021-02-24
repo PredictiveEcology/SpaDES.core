@@ -1057,7 +1057,7 @@ test_that("debug using logging", {
     expect_false(file.exists(tmpfile))
     expect_true(length(mess2) == 0)
     expect_true(any(grepl("total elpsd", mess1)))
-    expect_true(any(grepl(Sys.Date(), mess1))) # the straight messages don't have date
+    expect_true(any(grepl(format(Sys.Date(), "%h%d"), mess1))) # the straight messages don't have date
 
     # Test whether suppressMessages works
     mess1 <- capture_messages({
