@@ -1173,3 +1173,89 @@ test_that("Plots function", {
     }
   }
 })
+
+test_that("testing .plotInitialTime & .plots", {
+  if (interactive()) {
+    skip_if_not_installed("RandomFields")
+
+    testInitOut <- testInit()
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
+
+    times <- list(start = 0.0, end = 1, timeunit = "year")
+    params <- list(
+      .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+      caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    )
+    modules <- list("randomLandscapes", #"caribouMovement",
+                    "fireSpread")
+    paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+
+    mySim <- simInit(times, params, modules, objects = list(), paths)
+
+    mySim@params$randomLandscapes$.plotInitialTime <- 0
+    mySim@params$fireSpread$.plotInitialTime <- 0
+    mySim@params$caribouMovement$.plotInitialTime <- 0
+
+    # Makes plots
+    spades(mySim)
+    # Makes no plots
+    spades(mySim, .plots = NA)
+    spades(mySim, .plotInitialTime = NA)
+  }
+})
+
+test_that("Plots function", {
+  if (require("ggplot2")) {
+    testInitOut <- testInit()
+    on.exit({
+      testOnExit(testInitOut)
+    }, add = TRUE)
+
+    newModule("test", tmpdir, open = FALSE)
+
+    # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+    cat(file = file.path(tmpdir, "test", "test.R"),'
+      defineModule(sim, list(
+      name = "test",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "year",
+      citation = list("citation.bib"),
+      documentation = list("README.txt", "test.Rmd"),
+      reqdPkgs = list("SpaDES.core (>= 3.0)", "SpaDES.core (>= 3.3)", "SpaDES.core (>= 1.0)"),
+      parameters = rbind(
+      ),
+      inputObjects = bindrows(
+      ),
+      outputObjects = bindrows(
+      )
+      ))
+
+      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+      },
+      event1 = {
+      })
+      return(invisible(sim))
+      }
+      fn1 <- function(d, bins, ...) {
+          ggplot(d, aes(a)) +
+          geom_histogram(bins = bins, ...)
+        }
+  ', fill = TRUE)
+      expect_error(sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                     times = list(start = 0, end = 10, timeunit = "year")),
+                   "needs a newer version of SpaDES.core")
+  }
+})

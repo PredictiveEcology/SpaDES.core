@@ -15,6 +15,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
+  .plots = NULL,
   ...
 )
 
@@ -27,6 +28,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
+  .plots = NULL,
   ...
 )
 
@@ -39,6 +41,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
+  .plots = NULL,
   ...
 )
 }
@@ -74,7 +77,20 @@ Ignored if \code{cache} is \code{FALSE}.}
 \item{events}{A character vector or a named list of character vectors. If specified,
 the simulations will only do the events indicated here. If a named list, the names
 must correspond to the modules and the character vectors can be specific events within
-each of the named modules.}
+each of the named modules. With the \code{list} form, all unspecified modules
+will run \emph{all} their events, including internal spades modules, e.g., \code{save},
+that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
+
+\item{.plots}{Character. Sets the parameter of this name in all modules.
+See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
+For backwards compatibility, if \code{.plotInitialTime} is not set
+in this \code{spades} call, but this
+\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+will turn off all plotting; setting this with \code{"screen"} will trigger
+plotting for any modules that use this parameter but will have no effect on
+other modules. To get plotting, therefore, it may be necessary to also set
+\code{.plotInitialTime = start(sim)}.}
 
 \item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
 This will be included in the \code{Cache} call, so will be unique
@@ -261,6 +277,22 @@ outInitsOnly <- spades(mySim, events = "init")
 outSomeEvents <- spades(mySim,
         events = list(randomLandscapes = c("init"),
                       fireSpread = c("init", "burn")))
+
+# with outputs, the save module gets invoked and must be explicitly limited to "init"
+mySim <- simInit(
+ times = list(start = 0.0, end = 2.0, timeunit = "year"),
+ params = list(
+   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+ ),
+ modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+ outputs = data.frame(objectName = "landscape", saveTime = 0:2),
+ paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+)
+# This will print a message saying that caribouMovement will run its events
+outSomeEvents <- spades(mySim,
+        events = list(randomLandscapes = c("init"),
+                      fireSpread = c("init", "burn"),
+                      save = "init"))
 }
 
 }

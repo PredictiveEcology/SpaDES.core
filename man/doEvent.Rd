@@ -31,7 +31,9 @@ Ignored if \code{cache} is \code{FALSE}.}
 \item{events}{A character vector or a named list of character vectors. If specified,
 the simulations will only do the events indicated here. If a named list, the names
 must correspond to the modules and the character vectors can be specific events within
-each of the named modules.}
+each of the named modules. With the \code{list} form, all unspecified modules
+will run \emph{all} their events, including internal spades modules, e.g., \code{save},
+that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
 
 \item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
 This will be included in the \code{Cache} call, so will be unique
