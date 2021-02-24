@@ -1833,6 +1833,7 @@ loggingMessage <- function(mess) {
   } else {
     modName8Chars <- ""
   }
+  if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
   mess <- paste0(modName8Chars, mess)
 
   paste0(format(Sys.time(), format = "%h%d %H:%M:%S"),

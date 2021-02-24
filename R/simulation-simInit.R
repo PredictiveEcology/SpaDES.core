@@ -654,7 +654,8 @@ setMethod(
 
     },
     message = function(m) {
-      message(Sys.time(), " simInit::", gsub("\\n", "", m$message))
+      message(loggingMessage(m$message))
+      # message(Sys.time(), " simInit::", gsub("\\n", "", m$message))
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
     }
