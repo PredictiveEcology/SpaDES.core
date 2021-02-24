@@ -244,86 +244,88 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit("igraph", smcc = TRUE,
-                          opts = list(spades.recoveryMode = FALSE,
-                                      "reproducible.useMemoise" = FALSE))
-  opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
+  if (requireNamespace("ggplot2")) {
+    testInitOut <- testInit("igraph", smcc = TRUE,
+                            opts = list(spades.recoveryMode = FALSE,
+                                        "reproducible.useMemoise" = FALSE))
+    opts <- options("reproducible.cachePath" = tmpdir)
+    on.exit({
+      options(opts)
+      testOnExit(testInitOut)
+    }, add = TRUE)
+
+    modName <- "test"
+    newModule(modName, path = tmpdir, open = FALSE)
+    fileName <- file.path(modName, paste0(modName,".R"))
+    newCode <- "\"hi\"" # this will be added below in 2 different spots
+
+    args <- list(modules = list("test"),
+                 paths = list(modulePath = tmpdir, cachePath = tmpCache),
+                 params = list(test = list(.useCache = ".inputObjects")))
+
+    try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
+
+    mess1 <- capture_messages(do.call(simInit, args))
+    msgGrep <- "Running .input|module code|ggplot2|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
+    expect_true(all(grepl(msgGrep, mess1)))
+
+    msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
+    #a <- capture.output(
+    expect_message(do.call(simInit, args), regexp = msgGrep)
+    #)
+
+    # make change to .inputObjects code -- should rerun .inputObjects
+    xxx <- readLines(fileName)
+    startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
+    editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
+    editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine]
+    xxx[editBelowLine + 1] <- newCode
+    cat(xxx, file = fileName, sep = "\n")
+
+    msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
+    mess1 <- capture_messages(do.call(simInit, args))
+    expect_true(all(grepl(msgGrep, mess1)))
+
+    # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
+    xxx <- readLines(fileName)
+    startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
+    editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
+    editBelowLine <- editBelowLines[editBelowLines < startOfFunctionLine][1]
+    xxx[editBelowLine + 1] <- newCode
+    cat(xxx, file = fileName, sep = "\n")
+
+    msgGrep <- "Running .input|loading cached result|module code"
+    expect_message(do.call(simInit, args), regexp = msgGrep)
+
+    # In some other location, test during spades call
+    newModule(modName, path = tmpdir, open = FALSE)
+    try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
+    args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
+    bbb <- do.call(simInit, args)
+    opts <- options(spades.saveSimOnExit = FALSE)
+    expect_silent(aaMess <- capture_messages(spades(bbb, debug = FALSE)))
     options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
+    expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 
-  modName <- "test"
-  newModule(modName, path = tmpdir, open = FALSE)
-  fileName <- file.path(modName, paste0(modName,".R"))
-  newCode <- "\"hi\"" # this will be added below in 2 different spots
+    # make a change in Init function
+    xxx <- readLines(fileName)
+    startOfFunctionLine <- grep(xxx, pattern = "^Init")
+    editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
+    editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine][1]
+    xxx[editBelowLine + 1] <- newCode
+    cat(xxx, file = fileName, sep = "\n")
 
-  args <- list(modules = list("test"),
-               paths = list(modulePath = tmpdir, cachePath = tmpCache),
-               params = list(test = list(.useCache = ".inputObjects")))
+    bbb <- do.call(simInit, args)
+    expect_true(any(grepl(format(bbb@.xData$.mods$test$Init), pattern = newCode)))
 
-  try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
-
-  mess1 <- capture_messages(do.call(simInit, args))
-  msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
-  expect_true(all(grepl(msgGrep, mess1)))
-
-  msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
-  #a <- capture.output(
-  expect_message(do.call(simInit, args), regexp = msgGrep)
-  #)
-
-  # make change to .inputObjects code -- should rerun .inputObjects
-  xxx <- readLines(fileName)
-  startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
-  editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
-  editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine]
-  xxx[editBelowLine + 1] <- newCode
-  cat(xxx, file = fileName, sep = "\n")
-
-  msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
-  mess1 <- capture_messages(do.call(simInit, args))
-  expect_true(all(grepl(msgGrep, mess1)))
-
-  # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
-  xxx <- readLines(fileName)
-  startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
-  editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
-  editBelowLine <- editBelowLines[editBelowLines < startOfFunctionLine][1]
-  xxx[editBelowLine + 1] <- newCode
-  cat(xxx, file = fileName, sep = "\n")
-
-  msgGrep <- "Running .input|loading cached result|module code"
-  expect_message(do.call(simInit, args), regexp = msgGrep)
-
-  # In some other location, test during spades call
-  newModule(modName, path = tmpdir, open = FALSE)
-  try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
-  args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
-  bbb <- do.call(simInit, args)
-  opts <- options(spades.saveSimOnExit = FALSE)
-  expect_silent(aaMess <- capture_messages(spades(bbb, debug = FALSE)))
-  options(opts)
-  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
-
-  # make a change in Init function
-  xxx <- readLines(fileName)
-  startOfFunctionLine <- grep(xxx, pattern = "^Init")
-  editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
-  editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine][1]
-  xxx[editBelowLine + 1] <- newCode
-  cat(xxx, file = fileName, sep = "\n")
-
-  bbb <- do.call(simInit, args)
-  expect_true(any(grepl(format(bbb@.xData$.mods$test$Init), pattern = newCode)))
-
-  # should NOT use Cached copy, so no message
-  opts <- options(spades.saveSimOnExit = FALSE)
-  aaa <- capture_messages(spades(bbb, debug = FALSE))
-  aa <- sum(grepl("loaded cached", aaa))
-  expect_true(aa == 0) # seems to vary stochastically; either is OK
-  options(opts)
-  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
+    # should NOT use Cached copy, so no message
+    opts <- options(spades.saveSimOnExit = FALSE)
+    aaa <- capture_messages(spades(bbb, debug = FALSE))
+    aa <- sum(grepl("loaded cached", aaa))
+    expect_true(aa == 0) # seems to vary stochastically; either is OK
+    options(opts)
+    expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
+  }
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
