@@ -1809,7 +1809,7 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 }
 
 
-loggingMessage <- function(mess) {
+loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
   if (numCharsMax > 0) {
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
@@ -1834,8 +1834,14 @@ loggingMessage <- function(mess) {
     modName8Chars <- ""
   }
   if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
+  if (!is.null(suffix))
+    modName8Chars <- paste0(modName8Chars, suffix)
+  if (!is.null(prefix))
+    modName8Chars <- paste0(prefix, modName8Chars)
+
   mess <- paste0(modName8Chars, mess)
+  mess <- gsub("\\n", "", mess)
 
   paste0(format(Sys.time(), format = "%h%d %H:%M:%S"),
-         gsub("\\n", "", mess))
+         mess)
 }
