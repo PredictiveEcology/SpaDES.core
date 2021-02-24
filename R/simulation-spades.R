@@ -101,7 +101,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
-  cur <- sim@current
+  cur <<- sim@current
   curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
     # Test replacement for speed
@@ -1160,7 +1160,6 @@ setMethod(
         if (recoverMode > 0) {
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
         }
-
         sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
                        events = events, ...)  # process the next event
 
@@ -1227,20 +1226,7 @@ setMethod(
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
-        modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
-        if (length(sim@events)) {
-          modName <- sim@events[[1]]$moduleName
-          nchr <- nchar(modName)
-          tooManyVowels <- nchr - numCharsMax
-          numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
-          tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
-          modName8Chars <- substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",tooFewVowels,",",tooManyVowels,"}"), "",  modName, perl=TRUE), 1, numCharsMax)
-          if (nchr < numCharsMax) modName8Chars <- paste0(modName8Chars, paste(collapse = "", rep(" ", numCharsMax - nchr)))
-        }
-        mess <- paste0(modName8Chars, " ", m$message)
-
-        message(loggingMessage(mess))
+        message(loggingMessage(m$message))
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1824,6 +1810,31 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 
 
 loggingMessage <- function(mess) {
+  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
+  if (numCharsMax > 0) {
+    modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
+    sim <- get("sim", whereInStack("sim"), inherits = FALSE)
+    if (length(sim@events)) {
+      modName <- sim@current$moduleName
+
+      if (is.null(modName)) modName <- sim@events[[1]]$moduleName
+      nchr <- nchar(modName)
+      tooManyVowels <- nchr - numCharsMax
+      numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+      tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+      modName8Chars <-
+        paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+                                       tooFewVowels,",",tooManyVowels,"}"), "",
+                                modName, perl=TRUE), 1, numCharsMax))
+      if (nchr < numCharsMax)
+        modName8Chars <- paste0(modName8Chars,
+                                paste(collapse = "", rep(" ", numCharsMax - nchr)))
+    }
+  } else {
+    modName8Chars <- ""
+  }
+  mess <- paste0(modName8Chars, mess)
+
   paste0(format(Sys.time(), format = "%h%d %H:%M:%S"),
-  " ", gsub("\\n", "", mess))
+         gsub("\\n", "", mess))
 }
