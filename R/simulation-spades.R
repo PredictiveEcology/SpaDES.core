@@ -1085,6 +1085,10 @@ setMethod(
         sim@params <- updateParamSlotInAllModules(
           sim@params, .plotInitialTime, ".plotInitialTime",
           needClass = "numeric")
+        if (is.na(.plotInitialTime))
+          sim@params <- updateParamSlotInAllModules(
+            sim@params, NA_character_, ".plots",
+            needClass = "character")
       }
       if (!is.null(.saveInitialTime)) {
         sim@params <- updateParamSlotInAllModules(

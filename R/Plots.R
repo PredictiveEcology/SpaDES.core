@@ -139,3 +139,25 @@ Plots <- function(data, fn, filename,
       qs::qsave(gg, file = file.path(path, paste0(filename, "_gg.qs")))
   }
 }
+
+#' Test whether there should be any plotting from .plot parameter
+#'
+#' This will do all the various tests needed to determine whether
+#' plotting of one sort or another will occur. Testing any of the
+#' types as listed in \code{\link{Plots}} argument \code{types}. Only the
+#' first 3 letters of the type are required.
+#'
+#' @param .plots Usually will be the \code{P(sim)$.plots} is used within
+#'   a module.
+#'
+#' @export
+anyPlotting <- function(.plots) {
+  needSaveRaw <- any(grepl("raw", .plots))
+  ggplotClassesCanHandleBar <- paste(ggplotClassesCanHandle, collapse = "|")
+  needSave <- any(grepl(paste(ggplotClassesCanHandleBar, "|obj"), .plots))
+  needScreen <- any(grepl("scr", .plots))
+
+  needSaveRaw || needSave || needScreen
+}
+
+ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")

@@ -10,6 +10,7 @@ version 1.0.7
 * messaging during `spades` is simplified to take up fewer characters: `INFO::` has been removed
 * `simInit` now checks for minimum version of `SpaDES.core` needed in a module and stops if it fails, giving instructions how to upgrade.
 * several human-readable only elements of a module metadata are no longer enforced, including `spatialExtent`, as they are not used by the spades algorithms
+* new function: `anyPlotting` to test whether plotting of one form or another should occur
 
 version 1.0.6
 =============
