@@ -1227,7 +1227,20 @@ setMethod(
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        message(Sys.time(), " ", gsub("\\n", "", m$message))
+        numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
+        modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
+        if (!is.null(sim@events[[1]])) {
+          modName <- sim@events[[1]]$moduleName
+          nchr <- nchar(modName)
+          tooManyVowels <- nchr - numCharsMax
+          numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+          tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+          modName8Chars <- substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",tooFewVowels,",",tooManyVowels,"}"), "",  modName, perl=TRUE), 1, numCharsMax)
+          if (nchr < numCharsMax) modName8Chars <- paste0(modName8Chars, paste(collapse = "", rep(" ", numCharsMax - nchr)))
+        }
+        mess <- paste0(modName8Chars, " ", m$message)
+
+        message(loggingMessage(mess))
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1809,3 +1822,8 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
   paramsList
 }
 
+
+loggingMessage <- function(mess) {
+  paste0(format(Sys.time(), format = "%h%d %H:%M:%S"),
+  " ", gsub("\\n", "", mess))
+}
