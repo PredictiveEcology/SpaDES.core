@@ -25,7 +25,7 @@ moduleDefaults <- list(
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
-  reqdPkgs = list()
+  reqdPkgs = list("ggplot2")
 )
 
 ################################################################################
