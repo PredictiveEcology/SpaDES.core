@@ -1229,7 +1229,7 @@ setMethod(
       if (useNormalMessaging) {
         numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
         modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
-        if (!is.null(sim@events[[1]])) {
+        if (length(sim@events)) {
           modName <- sim@events[[1]]$moduleName
           nchr <- nchar(modName)
           tooManyVowels <- nchr - numCharsMax
