@@ -168,13 +168,20 @@ setMethod(
     metadataRequired <- slotNames(new(".moduleDeps"))
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
+
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation")
     if (!all(metadataProvided)) {
-      warning(paste0(
-        "The \'", x$name, "\' module is missing the metadata for:\n",
-        paste(" - ", metadataMissing, collapse = "\n"), "\n",
-        "Using default values, which may not be desirable.\n",
-        "See moduleDefaults"
-      ))
+      # inputObjects and outputObjects are dealt with differently in parseModule
+      #   don't trigger a warning here.
+      metadataMissing <- setdiff(metadataMissing, c("inputObjects", "outputObjects"))
+      metadataMissingHard <- setdiff(metadataMissing, notEnforced)
+      if (length(metadataMissingHard))
+        warning(paste0(
+          "The \'", x$name, "\' module is missing the metadata for:\n",
+          paste(" - ", metadataMissing, collapse = "\n"), "\n",
+          "Using default values, which may not be desirable.\n",
+          "See moduleDefaults"
+        ))
     }
 
     ## enforce/coerce types for the user-supplied param list
