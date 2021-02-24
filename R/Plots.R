@@ -1,7 +1,12 @@
 
 #' Plot wrapper intended for use in a SpaDES module
 #'
-#' THIS IS STILL EXPERIMENTAL and could change in the next release.
+#' This is a single function call that allows a module to change which format in which
+#' the plots will occur. Specifically, the two primary formats would be to "screen" or
+#' to disk as an image file, such as "png". THIS CURRENTLY ONLY WORKS CORRECTLY WITH
+#' ggplot2 objects that can be saved. It uses \code{Plot} internally, so individual
+#' plots may be rearranged. This function requires at least 2 things: a plotting function
+#' and data for that plotting function. See below and examples. THIS IS STILL EXPERIMENTAL and could change in the next release.
 #'
 #' This offers up to 4 different actions for a given plot:
 #'     \itemize{
