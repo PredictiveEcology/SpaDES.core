@@ -12,6 +12,10 @@ version 1.0.7
 * several human-readable only elements of a module metadata are no longer enforced, including `spatialExtent`, as they are not used by the spades algorithms
 * new function: `anyPlotting` to test whether plotting of one form or another should occur
 * line-by-line messaging during `spades` call is now more informative, including module name (by default shortened -- can be changed with `options("spades.messagingNumCharsModule"))`) 
+* defineParameter can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, c("numeric", "function"), where the use can pass either a numeric or a function that would calculate that numeric.
+
+## 
+* several minor bugfixes, including `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
 
 version 1.0.6
 =============
