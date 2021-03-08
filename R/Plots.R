@@ -35,6 +35,7 @@
 #'   else will have visuals plotted to screen device. This is here for backwards
 #'   compatibility. A developer should set in the module to the intended initial
 #'   plot time and leave it.
+#' @param ggsaveArgs An optional list of arguments passed to \code{ggplot2::ggsave}
 #' @param ... Anything needed by \code{fn}
 #'
 #' @importFrom qs qsave
@@ -87,6 +88,7 @@ Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
                   path = quote(file.path(outputPath(sim), "figures")),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
+                  ggsaveArgs = list(),
                   ...) {
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))){
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
@@ -95,7 +97,9 @@ Plots <- function(data, fn, filename,
   }
 
   if (is(types, "call"))
-    types = eval(types, envir = simIsIn)
+    types <- eval(types, envir = simIsIn)
+  if (is(types, "list"))
+    types <- unlist(types)
   if (is(path, "call"))
     path = eval(path, envir = simIsIn)
   if (is(.plotInitialTime, "call"))
@@ -107,12 +111,16 @@ Plots <- function(data, fn, filename,
   needScreen <- !is.na(.plotInitialTime) && any(grepl("screen", types))
   if (needScreen || needSave) {
     gg <- fn(data, ...)
+    if (!is.null(gg$labels$title)) {
+      ggListToScreen <- setNames(list(gg), gg$labels$title)
+      ggListToScreen[[1]]$labels$title <- NULL
+    }
   }
 
   if (needScreen) {
     if (is(gg, "gg"))
       if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-    Plot(gg)
+    Plot(ggListToScreen)
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
@@ -137,7 +145,12 @@ Plots <- function(data, fn, filename,
     ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
     for (ggsf in ggSaveFormats) {
       if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
-        ggplot2::ggsave(plot = gg, filename = file.path(path, paste0(filename, ".", ggsf)))
+      args <- list(plot = gg,
+                   filename = file.path(path, paste0(filename, ".", ggsf)))
+      if (length(ggsaveArgs)) {
+        args <- modifyList(args, ggsaveArgs)
+      }
+      do.call(ggplot2::ggsave, args = args)
     }
 
     if (any(grepl("object", types)))

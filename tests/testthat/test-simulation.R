@@ -1139,7 +1139,8 @@ test_that("Plots function", {
       init = {
         sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1", .skipChecks = TRUE)
         sim$something <- data.frame(a = sample(1:10, replace = TRUE))
-        Plots(data = sim$something, fn = fn1, filename = ',fnForCat,', bins = 10, fill = "red")
+        Plots(data = sim$something, fn = fn1, filename = ',fnForCat,', bins = 10, fill = "red",
+              ggsaveArgs = list(width = 4.345))
       },
       event1 = {
       sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1", .skipChecks = TRUE)
@@ -1148,7 +1149,8 @@ test_that("Plots function", {
       }
       fn1 <- function(d, bins, ...) {
           ggplot(d, aes(a)) +
-          geom_histogram(bins = bins, ...)
+          geom_histogram(bins = bins, ...) +
+          labs(title = "hello")
         }
 
 

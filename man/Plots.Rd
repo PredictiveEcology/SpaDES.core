@@ -11,6 +11,7 @@ Plots(
   types = quote(params(sim)[[currentModule(sim)]]$.plots),
   path = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
+  ggsaveArgs = list(),
   ...
 )
 }
@@ -34,6 +35,8 @@ overriding this argument value.}
 else will have visuals plotted to screen device. This is here for backwards
 compatibility. A developer should set in the module to the intended initial
 plot time and leave it.}
+
+\item{ggsaveArgs}{An optional list of arguments passed to \code{ggplot2::ggsave}}
 
 \item{...}{Anything needed by \code{fn}}
 }
