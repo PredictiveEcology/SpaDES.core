@@ -24,7 +24,8 @@
 #' @param data An arbitrary data object. It should be used inside the \code{Plots}
 #'   function, and should contain all the data required for the inner plotting
 #' @param fn An arbitrary plotting function.
-#' @param filename A name that will be the base for the files that will be saved.
+#' @param filename A name that will be the base for the files that will be saved, i.e,
+#'   do not supply the file extension, as this will be determined based on \code{types}.
 #'   If a user provides this as an absolute path, it will override the \code{path}
 #'   argument.
 #' @param types Character vector, zero or more of types. See below.
@@ -88,22 +89,32 @@ Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
                   path = quote(file.path(outputPath(sim), "figures")),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
-                  ggsaveArgs = list(),
+                  ggsaveArgs = list(), usePlot = TRUE,
                   ...) {
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))){
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
-    if (!exists("sim", simIsIn))
-      simIsIn <- whereInStack("sim")
+    if (!exists("sim", simIsIn)) {
+      simIsIn <- try(whereInStack("sim"), silent = TRUE)
+      if (is(simIsIn, "try-error"))
+        simIsIn <- NULL
+    }
   }
 
-  if (is(types, "call"))
-    types <- eval(types, envir = simIsIn)
+  if (!is.null(simIsIn))
+    if (is(types, "call"))
+      types <- eval(types, envir = simIsIn)
   if (is(types, "list"))
     types <- unlist(types)
-  if (is(path, "call"))
-    path = eval(path, envir = simIsIn)
-  if (is(.plotInitialTime, "call"))
-    .plotInitialTime = eval(.plotInitialTime, envir = simIsIn)
+
+  if (!is.null(simIsIn)) {
+    if (is(simIsIn, "try-error")) {
+      .plotInitialTime <- 0L
+    } else if (is(.plotInitialTime, "call")) {
+      .plotInitialTime = eval(.plotInitialTime, envir = simIsIn)
+    }
+  } else {
+    .plotInitialTime <- 9L
+  }
 
   ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
   ggplotClassesCanHandleBar <- paste(ggplotClassesCanHandle, collapse = "|")
@@ -120,16 +131,34 @@ Plots <- function(data, fn, filename,
   if (needScreen) {
     if (is(gg, "gg"))
       if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-    Plot(ggListToScreen)
+    if (usePlot)
+      Plot(ggListToScreen)
+    else
+      print(gg)
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
+    if (missing(filename)) {
+      filename <- tempfile(fileext = "")
+    }
+    isDefaultPath <-  identical(eval(formals(Plots)$path), path)
+    if (!is.null(simIsIn)) {
+      if (is(path, "call"))
+        path <- eval(path, envir = simIsIn)
+    }
+
     if (isAbsolutePath(filename)) {
-      message("filename is an absolute path; overriding path")
       path <- dirname(filename)
       filename <- basename(filename)
+    } else {
+      if (isDefaultPath) {
+        path <- checkPath(".")
+      }
     }
-    checkPath(path, create = TRUE)
+
+
+    if (is(path, "character"))
+      checkPath(path, create = TRUE)
   }
 
   if (needSaveRaw) {
