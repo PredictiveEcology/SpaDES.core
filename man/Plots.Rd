@@ -40,6 +40,9 @@ plot time and leave it.}
 
 \item{ggsaveArgs}{An optional list of arguments passed to \code{ggplot2::ggsave}}
 
+\item{usePlot}{Logical. If \code{TRUE}, the default, then the plot will occur
+with `quickPlot::Plot`, so it will be arranged with previously existing plots.}
+
 \item{...}{Anything needed by \code{fn}}
 }
 \description{

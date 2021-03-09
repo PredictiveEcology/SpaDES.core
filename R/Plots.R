@@ -37,6 +37,9 @@
 #'   compatibility. A developer should set in the module to the intended initial
 #'   plot time and leave it.
 #' @param ggsaveArgs An optional list of arguments passed to \code{ggplot2::ggsave}
+#' @param usePlot Logical. If \code{TRUE}, the default, then the plot will occur
+#'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
+#'
 #' @param ... Anything needed by \code{fn}
 #'
 #' @importFrom qs qsave
