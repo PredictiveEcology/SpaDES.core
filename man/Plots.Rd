@@ -12,6 +12,7 @@ Plots(
   path = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ggsaveArgs = list(),
+  usePlot = TRUE,
   ...
 )
 }
@@ -21,7 +22,8 @@ function, and should contain all the data required for the inner plotting}
 
 \item{fn}{An arbitrary plotting function.}
 
-\item{filename}{A name that will be the base for the files that will be saved.
+\item{filename}{A name that will be the base for the files that will be saved, i.e,
+do not supply the file extension, as this will be determined based on \code{types}.
 If a user provides this as an absolute path, it will override the \code{path}
 argument.}
 
