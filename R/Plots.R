@@ -122,8 +122,9 @@ Plots <- function(data, fn, filename,
   needScreen <- !is.na(.plotInitialTime) && any(grepl("screen", types))
   if (needScreen || needSave) {
     gg <- fn(data, ...)
+    ggListToScreen <- list(gg)
     if (!is.null(gg$labels$title)) {
-      ggListToScreen <- setNames(list(gg), gg$labels$title)
+      ggListToScreen <- setNames(ggListToScreen, gg$labels$title)
       ggListToScreen[[1]]$labels$title <- NULL
     }
   }
