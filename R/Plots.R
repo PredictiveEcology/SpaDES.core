@@ -91,6 +91,7 @@ Plots <- function(data, fn, filename,
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = TRUE,
                   ...) {
+
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))){
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn)) {
@@ -110,10 +111,12 @@ Plots <- function(data, fn, filename,
     if (is(simIsIn, "try-error")) {
       .plotInitialTime <- 0L
     } else if (is(.plotInitialTime, "call")) {
-      .plotInitialTime = eval(.plotInitialTime, envir = simIsIn)
+      .plotInitialTime = try(eval(.plotInitialTime, envir = simIsIn), silent = TRUE)
+      if (is(.plotInitialTime, "try-error"))
+        .plotInitialTime <- 0L
     }
   } else {
-    .plotInitialTime <- 9L
+    .plotInitialTime <- 0L
   }
 
   ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
@@ -123,7 +126,7 @@ Plots <- function(data, fn, filename,
   if (needScreen || needSave) {
     gg <- fn(data, ...)
     ggListToScreen <- setNames(list(gg), "gg")
-    if (!is.null(gg$labels$title)) {
+    if (!is.null(gg$labels$title) && needScreen) {
       ggListToScreen <- setNames(ggListToScreen, gg$labels$title)
       ggListToScreen[[1]]$labels$title <- NULL
     }
@@ -151,12 +154,7 @@ Plots <- function(data, fn, filename,
     if (isAbsolutePath(filename)) {
       path <- dirname(filename)
       filename <- basename(filename)
-    } else {
-      if (isDefaultPath) {
-        path <- checkPath(".")
-      }
     }
-
 
     if (is(path, "character"))
       checkPath(path, create = TRUE)
