@@ -45,44 +45,44 @@ options("spades.moduleCodeChecks" = FALSE,
 #    )
 #  ))
 
-## ----passing-params, eval=FALSE, echo=TRUE------------------------------------
-#  library(SpaDES.core)
-#  
-#  outputDir <- file.path(tempdir(), "simOutputs")
-#  times <- list(start = 0.0, end = 20.0)
-#  parameters <- list(
-#    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-#    .progress = list(NA),
-#    randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
-#    fireSpread = list(
-#      nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
-#      returnInterval = 10, startTime = 0,
-#      .plotInitialTime = 0, .plotInterval = 10
-#    ),
-#    caribouMovement = list(
-#      N = 100L, moveInterval = 1, torus = TRUE,
-#      .plotInitialTime = 1, .plotInterval = 1
-#    )
-#  )
-#  modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
-#  objects <- list()
-#  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#                outputPath = outputDir)
-#  
-#  mySim <- simInit(times = times, params = parameters, modules = modules,
-#                   objects = objects, paths = paths)
-#  
-#  # Access parameters
-#  params(mySim)               # shows all parameters
-#  P(mySim)                    # same, but more concise
-#  P(mySim, "caribouMovement") # only parameters in caribouMovement
-#  P(mySim)$caribouMovement    # same
-#  P(mySim)$caribouMovement$N  # Only one parameter
-#  
-#  # If used within the module source code, then module name can be omitted:
-#  # This will return NULL here, but will return the actual value if used
-#  # in a module
-#  P(mySim)$N  # Only one parameter
+## ----passing-params, eval=RFavailable, echo=TRUE------------------------------
+library(SpaDES.core)
+
+outputDir <- file.path(tempdir(), "simOutputs")
+times <- list(start = 0.0, end = 20.0)
+parameters <- list(
+  .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+  .progress = list(NA),
+  randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
+  fireSpread = list(
+    nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
+    returnInterval = 10, startTime = 0,
+    .plotInitialTime = 0, .plotInterval = 10
+  ),
+  caribouMovement = list(
+    N = 100L, moveInterval = 1, torus = TRUE,
+    .plotInitialTime = 1, .plotInterval = 1
+  )
+)
+modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
+objects <- list()
+paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+              outputPath = outputDir)
+
+mySim <- simInit(times = times, params = parameters, modules = modules,
+                 objects = objects, paths = paths)
+
+# Access parameters
+params(mySim)               # shows all parameters
+P(mySim)                    # same, but more concise
+P(mySim, "caribouMovement") # only parameters in caribouMovement
+P(mySim)$caribouMovement    # same
+P(mySim)$caribouMovement$N  # Only one parameter
+
+# If used within the module source code, then module name can be omitted:
+# This will return NULL here, but will return the actual value if used
+# in a module
+P(mySim)$N  # Only one parameter
 
 ## ----event-types, echo=TRUE, eval=FALSE---------------------------------------
 #  ## sample event type definitions from the default `randomLandscapes` module
@@ -396,6 +396,6 @@ unlink(ftmp)
 ## ----module-group-dl, eval=FALSE----------------------------------------------
 #  downloadModule("SpaDES_sampleModules")
 
-## ----cleanup, eval=TRUE, echo=FALSE-------------------------------------------
+## ----cleanup, eval=RFavailable, echo=FALSE------------------------------------
 unlink(outputDir, recursive = TRUE)
 

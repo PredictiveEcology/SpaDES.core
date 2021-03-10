@@ -211,6 +211,26 @@ saveFiles <- function(sim) {
   return(.sFE)
 }
 
+#' Generate simulation file name
+#'
+#' Assists with saving and retrieving simulations
+#' (e.g., with \code{saveSimList} and \code{loadSimList}).
+#'
+#' @param name Object name (e.g., \code{"mySimOut"})
+#' @param path Directory location in where the file will be located (e.g., an \code{outputPath}).
+#' @param time Optional simulation time to use as filename suffix. Default \code{NULL}.
+#' @param ext  The file extension to use (default \code{"rds"}).
+#'
+#' @export
+#' @importFrom reproducible normPath
+simFile <- function(name, path, time = NULL, ext = "rds") {
+  if (is.null(time))
+    file.path(normPath(path), paste0(name, ".", ext))
+  else {
+    file.path(normPath(path), paste0(name, "_", paddedFloatToChar(time, padL = 4), ".", ext))
+  }
+}
+
 #' Save a whole \code{simList} object to disk
 #'
 #' Because of the environment slot, this is not quite as straightforward as
