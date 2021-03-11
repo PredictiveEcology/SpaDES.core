@@ -138,10 +138,12 @@ Plots <- function(data, fn, filename,
   if (needScreen) {
     if (is(gg, "gg"))
       if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-    if (usePlot)
-      Plot(ggListToScreen)
-    else
+    if (usePlot) {
+      names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " ", replacement = "_")
+      Plot(ggListToScreen, addTo = gg$labels$title)
+    } else {
       print(gg)
+    }
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
