@@ -14,6 +14,7 @@ version 1.0.6.9000
 * line-by-line messaging during `spades` call is now more informative, including module name (by default shortened -- can be changed with `options("spades.messagingNumCharsModule"))`) 
 * defineParameter can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, c("numeric", "function"), where the use can pass either a numeric or a function that would calculate that numeric.
 * new helper function `simFile` to generate file names for use with e.g., `saveSimList`
+* `zipSimList` is now exported
 
 ## 
 * several minor bugfixes, including `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.

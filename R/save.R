@@ -329,6 +329,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' @param cache Logical. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
 #'    zip archive. Defaults to \code{FALSE} as this could be large, and may include many
 #'    out of date elements. See Details. Not yet implemented.
+#' @export
 #'
 #' @details
 #' If \code{cache} is used, it is likely that it should be trimmed before
