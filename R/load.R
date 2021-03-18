@@ -327,7 +327,28 @@ setMethod("rasterToMemory",
             return(x)
 })
 
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "list"),
+          definition = function(x, ...) {
+            lapply(x, rasterToMemory, ...)
+})
 
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "ANY"),
+          definition = function(x, ...) {
+            x
+})
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "simList"),
+          definition = function(x, ...) {
+            obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
+            list2env(obj, envir = envir(x))
+            return(x)
+})
 
 #' @export
 #' @rdname rasterCreate
@@ -364,30 +385,6 @@ rasterCreate.RasterStack <- function(x, ...) {
 rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
 }
-
-
-#' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "list"),
-          definition = function(x, ...) {
-            lapply(x, rasterToMemory, ...)
-          })
-
-#' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "ANY"),
-          definition = function(x, ...) {
-            x
-          })
-
-#' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "simList"),
-          definition = function(x, ...) {
-            obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
-            list2env(obj, envir = envir(x))
-            return(x)
-          })
 
 #' Load a saved \code{simList} from file
 #'
