@@ -15,6 +15,7 @@ version 1.0.6.9000
 * defineParameter can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, c("numeric", "function"), where the use can pass either a numeric or a function that would calculate that numeric.
 * new helper function `simFile` to generate file names for use with e.g., `saveSimList`
 * `zipSimList` is now exported
+* `saveSimList` will now convert file-backed `Raster*` class objects to memory if `fileBackend = 0`. Previously, it left them as is (on disk if on disk, in memory if in memory).
 
 ## 
 * several minor bugfixes, including `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
