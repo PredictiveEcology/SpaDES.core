@@ -271,33 +271,11 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     simName <- sim
     sim <- get(simName, envir = envir)
   }
-  if (!isTRUE(all.equal(fileBackend, 0))) { # identical gets it wrong if 0L
-    isRaster <- unlist(lapply(sim@.xData, function(x) is(x, "Raster")))
-    if (any(isRaster)) {
-      InMem <- unlist(lapply(mget(names(isRaster)[isRaster], envir = SpaDES.core::envir(sim)),
-                             function(x) inMemory(x)))
-      needModifying <- isTRUE(isTRUE(all.equal(fileBackend, 1)) && !all(InMem)) ||
-        (identical(fileBackend, 2) && (!all(InMem)))
-      if (needModifying) {
-        if (is.null(filebackedDir)) {
-          filebackedDir <- file.path(dirname(filename), "rasters")
-          checkPath(filebackedDir, create = TRUE)
-        }
-        # Need to copy it because the moving to memory affects the original simList
-        sim <- Copy(sim, filebackedDir = filebackedDir)
-        if (isTRUE(all.equal(fileBackend, 1))) {
-          for (x in names(isRaster)[isRaster][!InMem])
-            sim[[x]][] <- sim[[x]][]
-        } else {
-          rasterNamesNotInMem <- names(isRaster)[isRaster][!InMem]
-          list2env(Copy(mget(rasterNamesNotInMem, envir = sim@.xData),
-                        filebackedDir = filebackedDir),
-                   envir = sim@.xData) # don't want to mess with rasters on disk for original
-        }
-      }
+  if (isTRUE(fileBackend[1] > 0)) {
+    sim <- Copy(sim, filebackedDir = filebackedDir, ...)
+    if (isTRUE(fileBackend[1] == 2)) {
+      sim <- rasterToMemory(sim)
     }
-  } else {
-    sim <- rasterToMemory(sim)
   }
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)

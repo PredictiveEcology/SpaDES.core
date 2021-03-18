@@ -385,7 +385,7 @@ setMethod("rasterToMemory",
           signature = c(x = "simList"),
           definition = function(x, ...) {
             obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
-            list2env(obj, envir = envir(sim))
+            list2env(obj, envir = envir(x))
             return(x)
           })
 

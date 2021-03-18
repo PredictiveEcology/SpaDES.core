@@ -224,7 +224,14 @@ test_that("saveSimList does not work correctly", {
   skip(message = "zipSimList not yet testable")
   # zipSimList not tested yet
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
-  zipSimList(sim, zipfile = tmpZip, filebackedDir = tmpdir)
+  checkPath(dirname(tmpZip), create = TRUE)
+  zipSimList(sim, zipfile = tmpZip, fileBackend = 1, filename = "test.qs")
+
+  unlink(Filenames(sim))
+  files <- dir()
+  unlink(grep(".*\\.zip$", files, value = TRUE, invert = TRUE), force = TRUE, recursive = TRUE)
+
+  unzipSimList(tmpZip)
 })
 
 test_that("restart does not work correctly", {
