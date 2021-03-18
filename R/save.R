@@ -296,6 +296,8 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
         }
       }
     }
+  } else {
+    sim <- rasterToMemory(sim)
   }
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
@@ -369,3 +371,4 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
   zip(zipfile = zipfile, files = c(tmpf, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
                                    newnamesOutputs, newnamesInputs))
 }
+

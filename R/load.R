@@ -288,7 +288,9 @@ setMethod("loadFiles",
 #' Read raster to memory
 #'
 #' Wrapper to the \code{raster} function, that creates the raster object in
-#' memory, even if it was read in from file.
+#' memory, even if it was read in from file. There is the default method which is
+#' just a pass through, so this can be safely used on large complex objects,
+#' recursively, e.g., a \code{simList}.
 #'
 #' @param x An object passed directly to the function raster (e.g., character string of a filename).
 #'
@@ -311,12 +313,81 @@ setGeneric("rasterToMemory", function(x, ...) {
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
+          signature = c(x = "Raster"),
+          definition = function(x, ...) {
+            if (any(nchar(Filenames(x)) > 0)) {
+              r <- rasterCreate(x, ...)
+              r[] <- getValues(x)
+              if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+                browser()
+                r <- raster::stack(r, ...)
+              }
+              x <- r
+            }
+            return(x)
+})
+
+
+
+#' @export
+#' @rdname rasterCreate
+rasterCreate <- function(x, ...) {
+  UseMethod("rasterCreate")
+}
+
+#' @export
+#' @rdname rasterCreate
+rasterCreate.default <- function(x, ...) {
+  x
+}
+
+#' @export
+#' @rdname rasterCreate
+rasterCreate.RasterBrick <- function(x, ...) {
+  raster::brick(x, ...)
+}
+
+#' @export
+#' @rdname rasterCreate
+rasterCreate.RasterLayer <- function(x, ...) {
+  raster::raster(x, ...)
+}
+
+#' @export
+#' @rdname rasterCreate
+rasterCreate.RasterStack <- function(x, ...) {
+  raster::stack(x, ...)
+}
+
+#' @export
+#' @rdname rasterCreate
+rasterCreate.Raster <- function(x, ...) {
+  raster::raster(x, ...)
+}
+
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "list"),
+          definition = function(x, ...) {
+            lapply(x, rasterToMemory, ...)
+          })
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
           signature = c(x = "ANY"),
           definition = function(x, ...) {
-            r <- raster(x, ...)
-            r <- setValues(r, getValues(r))
-            return(r)
-})
+            x
+          })
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "simList"),
+          definition = function(x, ...) {
+            obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
+            list2env(obj, envir = envir(sim))
+            return(x)
+          })
 
 #' Load a saved \code{simList} from file
 #'
