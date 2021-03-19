@@ -294,7 +294,8 @@ setMethod("loadFiles",
 #'
 #' @param x An object passed directly to the function raster (e.g., character string of a filename).
 #'
-#' @param ... Additional arguments to \code{raster}.
+#' @param ... Additional arguments to \code{raster::raster}, \code{raster::stack},
+#' or \code{raster::brick}.
 #'
 #' @return A raster object whose values are stored in memory.
 #'
@@ -319,7 +320,6 @@ setMethod("rasterToMemory",
               r <- rasterCreate(x, ...)
               r[] <- getValues(x)
               if (is(x, "RasterStack") && !is(r, "RasterStack")) {
-                browser()
                 r <- raster::stack(r, ...)
               }
               x <- r
@@ -350,7 +350,21 @@ setMethod("rasterToMemory",
             return(x)
 })
 
+
+#' Simple wrapper to load any \code{Raster*} object
+#' This wraps either \code{raster::raster}, \code{raster::stack},
+#' or \code{raster::brick}, allowing a single function to be used
+#' to create a new object of the same class as a template.
+#'
 #' @export
+#' @param x An object, notably a \code{Raster*} object. All others will simply
+#'   be passed through with no effect.
+#' @param ... Passed to \code{raster::raster}, \code{raster::stack},
+#' or \code{raster::brick}
+#'
+#' @details
+#' A new (empty) object of same class as the original.
+#'
 #' @rdname rasterCreate
 rasterCreate <- function(x, ...) {
   UseMethod("rasterCreate")

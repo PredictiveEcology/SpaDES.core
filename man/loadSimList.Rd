@@ -4,10 +4,14 @@
 \alias{loadSimList}
 \title{Load a saved \code{simList} from file}
 \usage{
-loadSimList(file)
+loadSimList(file, paths = getPaths(), otherFiles = "")
 }
 \arguments{
 \item{file}{Character giving the name of a saved simulation file}
+
+\item{paths}{A list of character vectors for all the `simList` paths. When
+loading a \code{simList}, this will replace the paths of everything to
+these new paths. Experimental still.}
 }
 \description{
 Load a saved \code{simList} from file

@@ -21,7 +21,8 @@ rasterToMemory(x, ...)
 \arguments{
 \item{x}{An object passed directly to the function raster (e.g., character string of a filename).}
 
-\item{...}{Additional arguments to \code{raster}.}
+\item{...}{Additional arguments to \code{raster::raster}, \code{raster::stack},
+or \code{raster::brick}.}
 }
 \value{
 A raster object whose values are stored in memory.

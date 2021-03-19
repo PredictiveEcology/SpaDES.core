@@ -19,9 +19,9 @@ zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
 \item{inputs}{Logical. If \code{TRUE}, all files identified in
 \code{inputs(sim)} will be included in the zip.}
 
-\item{cache}{Logical. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
+\item{cache}{Logical. Not yet implemented. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
 zip archive. Defaults to \code{FALSE} as this could be large, and may include many
-out of date elements. See Details. Not yet implemented.}
+out of date elements. See Details.}
 }
 \description{
 Currently, this will save the raster-backed files, \code{outputs(sim)}, \code{inputs(sim)}.
