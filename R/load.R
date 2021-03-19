@@ -389,10 +389,13 @@ rasterCreate.Raster <- function(x, ...) {
 #' Load a saved \code{simList} from file
 #'
 #' @param file Character giving the name of a saved simulation file
+#' @param paths A list of character vectors for all the `simList` paths. When
+#'   loading a \code{simList}, this will replace the paths of everything to
+#'   these new paths. Experimental still.
 #'
 #' @export
 #' @importFrom qs qread
-loadSimList <- function(file) {
+loadSimList <- function(file, paths = getPaths()) {
   sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
 
   mods <- setdiff(sim@modules, .coreModules())

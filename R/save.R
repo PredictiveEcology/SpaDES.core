@@ -306,9 +306,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'    \code{outputs(sim)} will be included in the zip.
 #' @param inputs Logical. If \code{TRUE}, all files identified in
 #'    \code{inputs(sim)} will be included in the zip.
-#' @param cache Logical. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
+#' @param cache Logical. Not yet implemented. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
 #'    zip archive. Defaults to \code{FALSE} as this could be large, and may include many
-#'    out of date elements. See Details. Not yet implemented.
+#'    out of date elements. See Details.
 #' @export
 #'
 #' @details
@@ -316,37 +316,116 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' zipping, to include only cache elements that are relevant.
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   dots <- list(...)
-  if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".qs")
-  tmpDir <- file.path(tempdir(), rndstr(1, 6))
-  tmpf <- file.path(tmpDir, basename(dots$filename))
-  if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("rasters")
-  if (is.null(dots$fileBackend)) dots$fileBackend <- formals(saveSimList)$fileBackend
-  tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
-  saveSimList(sim, filename = tmpf, filebackedDir = tmpRasters, fileBackend = dots$fileBackend)
+  # if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".qs")
+  # tmpDir <- file.path(tempdir(), rndstr(1, 6))
+  # tmpf <- file.path(tmpDir, basename(dots$filename))
+  if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("TransferFolder")
+  if (is.null(dots$fileBackend)) dots$fileBackend <- 1
+  # tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
+  fnOrig <- Filenames(sim)
+  fnOrigSingle <- Filenames(sim, allowMultiple = FALSE)
 
-  newnamesOutputs <- NULL
+  rasters <- reproducible:::isOrHasRaster(sim)
+  rasterObjNames <- names(rasters)[unlist(lapply(rasters, function(r) any(unlist(r))))]
+
+  sim@.xData$._rasterFilenames <- list(filenames = fnOrig, filenamesSingle = fnOrigSingle,
+                                       topLevelObjs = rasterObjNames)
+  do.call(saveSimList, append(list(sim), dots))
+
+  tmpf <- dots[["filename"]]
+  fbd <- dots[["filebackedDir"]]
+
+  outputFNs <- NULL
   if (isTRUE(outputs)) {
-    if (NROW(outputs(sim)) > 0) {
-      tmpOutputs <- file.path(tmpDir, "outputs")
-      checkPath(tmpOutputs, create = TRUE)
-      newnamesOutputs <- file.path(tmpOutputs, gsub(outputPath(sim), "", outputs(sim)$file))
-      newnamesOutputs <- gsub("//", "/", newnamesOutputs)
-      newnamesOutputs <- gsub("\\\\\\\\", "\\\\", newnamesOutputs)
-      file.symlink(outputs(sim)$file, newnamesOutputs)
-    }
+    outputFNs <- outputs(sim)$file
   }
-  newnamesInputs <- NULL
+  inputFNs <- NULL
   if (isTRUE(inputs)) {
-    if (NROW(inputs(sim)) > 0) {
-      tmpInputs <- file.path(tmpDir, "inputs")
-      checkPath(tmpInputs, create = TRUE)
-      newnamesInputs <- file.path(tmpInputs, gsub(inputPath(sim), "", inputs(sim)$file))
-      newnamesInputs <- gsub("//", "/", newnamesInputs)
-      newnamesInputs <- gsub("\\\\\\\\", "\\\\", newnamesInputs)
-      file.symlink(inputs(sim)$file, newnamesInputs)
-    }
+    inputFNs <- inputs(sim)$file
   }
-  zip(zipfile = zipfile, files = c(tmpf, dir(tmpRasters, full.names = TRUE, recursive = TRUE),
-                                   newnamesOutputs, newnamesInputs))
+  # rasterFns <- Filenames(sim, allowMultiple = TRUE)
+  # if (all(nchar(rasterFns) == 0))
+  #   rasterFns <- NULL
+
+  fbdFns <- if (!is.null(fbd)) {
+    dir(fbd, full.names = TRUE, recursive = TRUE)
+  } else {
+    NULL
+  }
+  if (file.exists(zipfile)) unlink(zipfile)
+  fns <- c(tmpf, # rasterFns,
+           fbdFns, outputFNs, inputFNs)
+  checkPath(dirname(zipfile), create = TRUE)
+
+  zip(zipfile = zipfile, files = unname(unlist(fns)))
 }
 
+
+
+#' @export
+#' @param zipfile Filename of a zipped simList
+#' @details
+#' If \code{cache} is used, it is likely that it should be trimmed before
+#' zipping, to include only cache elements that are relevant.
+unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
+
+  zipfile = normPath(zipfile)
+  outFilenames <- unzip(zipfile = zipfile, list = TRUE)
+
+  browser()
+  dots <- list(...)
+  dots <- modifyList(
+    list(exdir = tempdir2(sub = "TransferFolder2"),
+         junkpaths = TRUE),
+         dots)
+  dots <- modifyList(list(zipfile = zipfile),
+                     dots)
+  checkPath(dots$exdir, create = TRUE)
+  unzippedFiles <- do.call(unzip, dots)
+  if (is.null(dots$exdir)) {
+    on.exit({
+      unlink(unzippedFiles, recursive = TRUE, force = TRUE)
+      unlink(dots$exdir, recursive = TRUE, force = TRUE)
+    })
+  }
+
+  if (isTRUE(load)) {
+    sim <- loadSimList(file.path(dots$exdir, basename(outFilenames[["Name"]])[[1]]))
+    originalPaths <- paths(sim)
+    sim@paths <- paths
+    fnsSingle <- Filenames(sim, allowMultiple = FALSE)
+    newFns <- Filenames(sim)
+
+    fnsObj <- sim@.xData$._rasterFilenames
+    origFns <- fnsObj$filenames
+    objNames <- fnsObj$topLevelObjs
+    objNames <- setNames(objNames, objNames)
+
+    reworkedRas <- lapply(objNames, function(objName) {
+      namedObj <- grep(objName, names(origFns), value = TRUE)
+      newPath <- dirname(origFns[namedObj])
+      names(newPath) <- names(origFns[namedObj])
+      dups <- duplicated(newPath)
+      if (any(dups))
+        newPaths <- newPath[!dups]
+
+      dups2ndLayer <- duplicated(newPaths)
+      if (any(dups2ndLayer))
+        stop("Cannot unzip and rebuild lists with rasters with multiple different paths; ",
+                                 "Please simplify the list of Rasters so they all share a same dirname(Filenames(ras))")
+      fns <- Filenames(sim[[objName]], allowMultiple = FALSE)
+      currentFname <- unlist(lapply(fns, function(fn) {
+        grep(basename(fn),
+             unzippedFiles, value = TRUE)
+      }))
+      currentDir <- unique(dirname(currentFname))
+      # nfn <- file.path(newPaths, basename(fns))
+      sim[[objName]] <- reproducible:::updateFilenameSlots.Raster(sim[[objName]],
+                                                                  newFilenames = currentDir)
+      Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths)
+    })
+    list2env(reworkedRas, envir = envir(sim))
+    return(sim)
+  }
+  return(unzippedFiles)
+}

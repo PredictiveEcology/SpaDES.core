@@ -162,7 +162,7 @@ test_that("saving csv files does not work correctly", {
 test_that("saveSimList does not work correctly", {
   skip_if_not_installed("RandomFields")
 
-  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs"))
+  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -188,7 +188,7 @@ test_that("saveSimList does not work correctly", {
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[2], fileBackend = 2)
-  sim <- loadSimList(file = tmpfile[2])
+  sim <- loadSimList(file = tmpfile[2], paths = paths(mySim))
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
 
@@ -225,13 +225,21 @@ test_that("saveSimList does not work correctly", {
   # zipSimList not tested yet
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
   checkPath(dirname(tmpZip), create = TRUE)
-  zipSimList(sim, zipfile = tmpZip, fileBackend = 1, filename = "test.qs")
+  landscape2 <- Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1)
+  landscape3 <- Copy(sim$landscape, filebackedDir = "hi", fileBackend = 1)
+  landscape3 <- writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE)
+  landscape3 <- Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE)
+  sim$ListOfRasters <- list(landscape2, landscape3)
+  zipSimList(sim, zipfile = tmpZip, filename = "test.qs")
 
   unlink(Filenames(sim))
   files <- dir()
   unlink(grep(".*\\.zip$", files, value = TRUE, invert = TRUE), force = TRUE, recursive = TRUE)
+  unlink(paths(mySim)$rasterPath, recursive = T, force = TRUE)
 
-  unzipSimList(tmpZip)
+  out <- unzipSimList(tmpZip, paths = paths(mySim))
+  expect_true(all(file.exists(Filenames(out))))
+
 })
 
 test_that("restart does not work correctly", {
