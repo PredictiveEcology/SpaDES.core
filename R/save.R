@@ -364,6 +364,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 
 #' @export
 #' @param zipfile Filename of a zipped simList
+#' @param load Logical. If \code{TRUE}, the default, then the simList will
+#'   also be loaded into R.
 #' @details
 #' If \code{cache} is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
@@ -372,7 +374,6 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   zipfile = normPath(zipfile)
   outFilenames <- unzip(zipfile = zipfile, list = TRUE)
 
-  browser()
   dots <- list(...)
   dots <- modifyList(
     list(exdir = tempdir2(sub = "TransferFolder2"),
@@ -390,41 +391,9 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   }
 
   if (isTRUE(load)) {
-    sim <- loadSimList(file.path(dots$exdir, basename(outFilenames[["Name"]])[[1]]))
-    originalPaths <- paths(sim)
-    sim@paths <- paths
-    fnsSingle <- Filenames(sim, allowMultiple = FALSE)
-    newFns <- Filenames(sim)
-
-    fnsObj <- sim@.xData$._rasterFilenames
-    origFns <- fnsObj$filenames
-    objNames <- fnsObj$topLevelObjs
-    objNames <- setNames(objNames, objNames)
-
-    reworkedRas <- lapply(objNames, function(objName) {
-      namedObj <- grep(objName, names(origFns), value = TRUE)
-      newPath <- dirname(origFns[namedObj])
-      names(newPath) <- names(origFns[namedObj])
-      dups <- duplicated(newPath)
-      if (any(dups))
-        newPaths <- newPath[!dups]
-
-      dups2ndLayer <- duplicated(newPaths)
-      if (any(dups2ndLayer))
-        stop("Cannot unzip and rebuild lists with rasters with multiple different paths; ",
-                                 "Please simplify the list of Rasters so they all share a same dirname(Filenames(ras))")
-      fns <- Filenames(sim[[objName]], allowMultiple = FALSE)
-      currentFname <- unlist(lapply(fns, function(fn) {
-        grep(basename(fn),
-             unzippedFiles, value = TRUE)
-      }))
-      currentDir <- unique(dirname(currentFname))
-      # nfn <- file.path(newPaths, basename(fns))
-      sim[[objName]] <- reproducible:::updateFilenameSlots.Raster(sim[[objName]],
-                                                                  newFilenames = currentDir)
-      Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths)
-    })
-    list2env(reworkedRas, envir = envir(sim))
+    sim <- loadSimList(file.path(dots$exdir, basename(outFilenames[["Name"]])[[1]]),
+                       paths = paths,
+                       otherFiles = unzippedFiles)
     return(sim)
   }
   return(unzippedFiles)

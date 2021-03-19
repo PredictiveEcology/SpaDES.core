@@ -162,7 +162,9 @@ test_that("saving csv files does not work correctly", {
 test_that("saveSimList does not work correctly", {
   skip_if_not_installed("RandomFields")
 
-  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif"))
+  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", ""))
+  unlink(tmpfile[5])
+  unlink(tmpfile[6])
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -237,8 +239,24 @@ test_that("saveSimList does not work correctly", {
   unlink(grep(".*\\.zip$", files, value = TRUE, invert = TRUE), force = TRUE, recursive = TRUE)
   unlink(paths(mySim)$rasterPath, recursive = T, force = TRUE)
 
-  out <- unzipSimList(tmpZip, paths = paths(mySim))
+  pths <- paths(mySim)
+  pths$cachePath <- tmpfile[5]
+  pths$outputPath <- tmpfile[6]
+  aaaa <<- 1
+  out <- unzipSimList(tmpZip, paths = pths)
+
+  origFns <- Filenames(sim)
+  # Files all exist
   expect_true(all(file.exists(Filenames(out))))
+  # They are in their sub-directories (2 * dirname), in the pths NOT the original paths
+  expect_true(any(normPath(unname(unlist(pths))) %in% normPath(dirname(dirname(Filenames(out))))))
+  expect_false(any(normPath(unname(origFns)) %in% unname(normPath(Filenames(out)))))
+  # capture the subdirectories
+  expect_true(all(basename(dirname(origFns)) %in% basename(dirname(Filenames(out)))))
+
+  # None of the original files exist
+  expect_true(!all(file.exists(origFns)))
+
 
 })
 

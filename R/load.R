@@ -395,7 +395,7 @@ rasterCreate.Raster <- function(x, ...) {
 #'
 #' @export
 #' @importFrom qs qread
-loadSimList <- function(file, paths = getPaths()) {
+loadSimList <- function(file, paths = getPaths(), otherFiles = "") {
   sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
 
   mods <- setdiff(sim@modules, .coreModules())
@@ -405,6 +405,63 @@ loadSimList <- function(file, paths = getPaths()) {
       rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
     makeModActiveBinding(sim = sim, mod = mod)
   })
+
+  # Deal with all the RasterBacked Files that will be wrong
+  if (any(nchar(otherFiles) > 0)) {
+    pathsInOldSim <- paths(sim)
+    sim@paths <- paths
+    fnsSingle <- Filenames(sim, allowMultiple = FALSE)
+    newFns <- Filenames(sim)
+
+    fnsObj <- sim@.xData$._rasterFilenames
+    origFns <- normPath(fnsObj$filenames)
+    objNames <- fnsObj$topLevelObjs
+    objNames <- setNames(objNames, objNames)
+
+    newFns <- vapply(origFns, function(fn) {
+      fnParts <- strsplit(fn, split = "\\/")[[1]]
+      relParts <- vapply(fnParts, grepl, x = unlist(pathsInOldSim),
+                         logical(length(pathsInOldSim))) # 5 paths components
+      whRel <- which(apply(relParts, 2, sum) == 0)
+      whAbs <- whRel[1] - 1
+      whAbs <- which.max(apply(relParts, 1, sum))
+      # use new paths as base for newFns
+      newPath <- file.path(paths[[whAbs]], fnParts[whRel[1]], basename(fn))
+    }, character(1))
+
+    reworkedRas <- lapply(objNames, function(objName) {
+      namedObj <- grep(objName, names(newFns), value = TRUE)
+      newPaths <- dirname(newFns[namedObj])
+      names(newPaths) <- names(newFns[namedObj])
+      dups <- duplicated(newPaths)
+      if (any(dups))
+        newPaths <- newPaths[!dups]
+
+      dups2ndLayer <- duplicated(newPaths)
+      if (any(dups2ndLayer))
+        stop("Cannot unzip and rebuild lists with rasters with multiple different paths; ",
+             "Please simplify the list of Rasters so they all share a same dirname(Filenames(ras))")
+
+      # These won't exist because they are the filenames from the old
+      #   (possibly temporary following saveSimList) simList
+      fns <- Filenames(sim[[objName]], allowMultiple = FALSE)
+
+      # Now match them with the files that exist from unzipping
+      currentFname <- unlist(lapply(fns, function(fn) {
+        grep(basename(fn),
+             otherFiles, value = TRUE)
+      }))
+      currentDir <- unique(dirname(currentFname))
+
+      # First must update the filename slots so that they point to real files (in the exdir)
+      sim[[objName]] <- reproducible:::updateFilenameSlots(sim[[objName]],
+                                                           newFilenames = currentDir)
+      Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths)
+    })
+
+
+    list2env(reworkedRas, envir = envir(sim))
+  }
 
   return(sim)
 }
