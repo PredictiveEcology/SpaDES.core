@@ -947,6 +947,9 @@ setMethod(
       }
     }
 
+    # need to recheck package loading because `simInit` may have been cached
+    pkgs <- packages(sim)
+    loadPkgs(pkgs)
 
     sim <- withCallingHandlers({
 
