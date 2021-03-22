@@ -15,6 +15,7 @@ version 1.0.6.9000
 * defineParameter can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, c("numeric", "function"), where the use can pass either a numeric or a function that would calculate that numeric.
 * new helper function `simFile` to generate file names for use with e.g., `saveSimList`
 * `zipSimList` is now exported
+* `spades` will now attempt to load `reqdPkgs`, which is already done in `simInit`. In cases where `simInit` was not run, e.g., `Cache(simInitAndSpades, ..., events = "init")`, then modules will not have access to packages. For cases where `simInit` was called, then this should add very little overhead.
 
 ## 
 * several minor bugfixes, including `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
