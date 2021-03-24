@@ -35,17 +35,17 @@ platforms. Recent versions use a different (faster) algorithm and only require
 one checksum value per file.
 To update your \file{CHECKSUMS.txt} files using the new algorithm:
 \enumerate{
-  \item specify your module (\code{moduleName <- "my_module"});
-  \item use a temp dir to ensure all modules get fresh copies of the data
-        (\code{tmpdir <- file.path(tempdir(), "SpaDES_modules")});
-  \item download your module's data to the temp dir (\code{downloadData(moduleName, tmpdir)});
-  \item initialize a dummy simulation to ensure any 'data prep' steps in the
-        \code{.inputObjects} section are run (\code{simInit(modules = moduleName)});
-  \item recalculate your checksums and overwrite the file
-        (\code{checksums(moduleName, tmpdir, write = TRUE)});
-  \item copy the new checksums file to your working module directory
-        (the one not in the temp dir)
-        (\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+\item specify your module (\code{moduleName <- "my_module"});
+\item use a temp dir to ensure all modules get fresh copies of the data
+(\code{tmpdir <- file.path(tempdir(), "SpaDES_modules")});
+\item download your module's data to the temp dir (\code{downloadData(moduleName, tmpdir)});
+\item initialize a dummy simulation to ensure any 'data prep' steps in the
+\code{.inputObjects} section are run (\code{simInit(modules = moduleName)});
+\item recalculate your checksums and overwrite the file
+(\code{checksums(moduleName, tmpdir, write = TRUE)});
+\item copy the new checksums file to your working module directory
+(the one not in the temp dir)
+(\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
                to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
                overwrite = TRUE)}).
 }

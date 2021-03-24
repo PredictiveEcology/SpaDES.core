@@ -112,10 +112,12 @@ Collate:
     'reexports.R'
     'restart.R'
     'save.R'
+    'saveLoadSimList.R'
     'simulation-spades.R'
     'spades-classes.R'
     'spades-core-deprecated.R'
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

@@ -40,3 +40,17 @@ to create a new object of the same class as a template.
 \details{
 A new (empty) object of same class as the original.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{default}: Simply passes through argument with no effect
+
+\item \code{RasterBrick}: Uses \code{raster::brick}
+
+\item \code{RasterLayer}: Uses \code{raster::raster}
+
+\item \code{RasterStack}: Uses \code{raster::stack}
+
+\item \code{Raster}: Uses \code{raster::raster} when one of the other,
+less commonly used \code{Raster*} classes, e.g., \code{RasterLayerSparse}
+}}
+

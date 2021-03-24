@@ -43,8 +43,8 @@ Adds a new event to the simulation's event queue, updating the simulation object
 }
 \details{
 Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).
+submodules to the simulation. We use S4 classes and methods, and use \code{data.table}
+instead of \code{data.frame} to implement the event queue (because it is much faster).
 }
 \examples{
 \dontrun{
@@ -60,8 +60,8 @@ instead of `data.frame` to implement the event queue (because it is much faster)
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
 \code{\link{priority}}, \code{\link{scheduleConditionalEvent}}

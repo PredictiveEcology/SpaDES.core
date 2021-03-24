@@ -223,13 +223,14 @@ test_that("saveSimList does not work correctly", {
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 
-  skip(message = "zipSimList not yet testable")
-  # zipSimList not tested yet
+
+  #### zipSimList test
+
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
   checkPath(dirname(tmpZip), create = TRUE)
   landscape2 <- Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1)
   landscape3 <- Copy(sim$landscape, filebackedDir = "hi", fileBackend = 1)
-  landscape3 <- writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE)
+  landscape3 <- suppressWarnings(writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE))
   landscape3 <- Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE)
   sim$ListOfRasters <- list(landscape2, landscape3)
   zipSimList(sim, zipfile = tmpZip, filename = "test.qs")

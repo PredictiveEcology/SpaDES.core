@@ -13,7 +13,7 @@
 }
 \value{
 list of \code{modules} will flat named list of all module names (children, parents etc.) and
-        \code{childModules} a non flat named list of only the childModule names.
+\code{childModules} a non flat named list of only the childModule names.
 }
 \description{
 There can be parents, grandparents, etc

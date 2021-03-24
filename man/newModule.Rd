@@ -18,22 +18,21 @@ newModule(name, path, ...)
 \item{path}{Character string. Subdirectory in which to place the new module code file.
 The default is the current working directory.}
 
-\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr
+\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr\preformatted{         \code{children}. Required when \code{type = "parent"}. A character vector
+         specifying the names of child modules.
 
-             \code{children}. Required when \code{type = "parent"}. A character vector
-             specifying the names of child modules.
+         \code{open}. Logical. Should the new module file be opened after creation?
+         Default \code{TRUE}.\\cr\\cr
 
-             \code{open}. Logical. Should the new module file be opened after creation?
-             Default \code{TRUE}.\cr\cr
+         \code{type}. Character string specifying one of \code{"child"} (default),
+         or \code{"parent"}.\\cr\\cr
 
-             \code{type}. Character string specifying one of \code{"child"} (default),
-             or \code{"parent"}.\cr\cr
+         \code{unitTests}. Logical. Should the new module include unit test files?
+         Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\\cr\\cr
 
-             \code{unitTests}. Logical. Should the new module include unit test files?
-             Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\cr\cr
-
-             \code{useGitHub}. Logical. Is module development happening on GitHub?
-             Default \code{TRUE}.}
+         \code{useGitHub}. Logical. Is module development happening on GitHub?
+         Default \code{TRUE}.
+}}
 }
 \value{
 Nothing is returned. The new module file is created at
@@ -52,21 +51,21 @@ All files will be created within a subdirectory named \code{name} within the
 \code{path}:
 
 \itemize{
-  \item \code{path/}
-    \itemize{
-      \item \code{name/}
-      \item \code{R/               # contains additional module R scripts}
-      \item \code{data/            # directory for all included data}
-      \itemize{
-        \item \code{CHECKSUMS.txt  # contains checksums for data files}
-      }
-      \item \code{tests/           # contains unit tests for module code}
-      \item \code{citation.bib     # bibtex citation for the module}
-      \item \code{LICENSE.txt      # describes module's legal usage}
-      \item \code{README.txt       # provide overview of key aspects}
-      \item \code{name.R           # module code file (incl. metadata)}
-      \item \code{name.Rmd         # documentation, usage info, etc.}
-    }
+\item \code{path/}
+\itemize{
+\item \code{name/}
+\item \code{R/               # contains additional module R scripts}
+\item \code{data/            # directory for all included data}
+\itemize{
+\item \code{CHECKSUMS.txt  # contains checksums for data files}
+}
+\item \code{tests/           # contains unit tests for module code}
+\item \code{citation.bib     # bibtex citation for the module}
+\item \code{LICENSE.txt      # describes module's legal usage}
+\item \code{README.txt       # provide overview of key aspects}
+\item \code{name.R           # module code file (incl. metadata)}
+\item \code{name.Rmd         # documentation, usage info, etc.}
+}
 }
 }
 \note{
