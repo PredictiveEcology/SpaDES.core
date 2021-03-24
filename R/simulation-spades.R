@@ -1159,6 +1159,11 @@ setMethod(
         sim$simFuture <- list()
       }
 
+      # There are some edge cases where there is an event scheduled before current time,
+      #   even though current time is equal to after end time
+      specialStart <- sim@events[[1]][["eventTime"]] < sim@simtimes[["current"]]
+      if (isTRUE(specialStart)) sim@simtimes[["current"]] <- sim@events[[1]][["eventTime"]]
+
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         if (recoverMode > 0) {
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)

@@ -102,8 +102,8 @@ Invisibly returns the modified \code{simList} object.
 }
 \description{
 Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).
+submodules to the simulation. We use S4 classes and methods, and use \code{data.table}
+instead of \code{data.frame} to implement the event queue (because it is much faster).
 }
 \details{
 The is the workhorse function in the SpaDES package. It runs simulations by
@@ -168,13 +168,13 @@ named elements:
 must be a list (including empty \code{list()} for defaults) with the
 sub-list elements here:
 \tabular{lll}{
-  \code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-  \code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
-                                      log entries are appended to file, if it exists\cr
-              \tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
-              \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-  \code{debug} \tab See possible values below\cr
-  }
+\code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
+\code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
+log entries are appended to file, if it exists\cr
+\tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
+\tab \code{level} \tab The \code{level}, see below, of information shown\cr
+\code{debug} \tab See possible values below\cr
+}
 
 \code{level} can be a number from 0 to 100 or a character string matching one
 of the values in \code{logging::loglevels}. These are hierarchical levels of
@@ -197,23 +197,23 @@ outputs. This will be run at the start of every event. The following options for
 are available. Each of these can also be in a list to get multiple outputs:
 
 \tabular{ll}{
-  \code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
-                    it runs\cr
-  a function name (as character string) \tab If a function, then it will be run on the
-                                           simList, e.g., "time" will run
-                                           \code{time(sim)} at each event.\cr
-  moduleName (as character string) \tab All calls to that module will be entered
-                                        interactively\cr
-  eventName (as character string) \tab All calls that have that event name (in any module)
-                                       will be entered interactively\cr
-  \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
-                                            will be entered into. \cr
-  Any other R expression expressed as a character string or quoted call \tab
-                                Will be evaluated with access to the simList as 'sim'.
-                               If this is more than one character string, then all will
-                               be printed to the screen in their sequence. \cr
-  A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
-                                          information that users may find useful \cr
+\code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
+it runs\cr
+a function name (as character string) \tab If a function, then it will be run on the
+simList, e.g., "time" will run
+\code{time(sim)} at each event.\cr
+moduleName (as character string) \tab All calls to that module will be entered
+interactively\cr
+eventName (as character string) \tab All calls that have that event name (in any module)
+will be entered interactively\cr
+\code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+will be entered into. \cr
+Any other R expression expressed as a character string or quoted call \tab
+Will be evaluated with access to the simList as 'sim'.
+If this is more than one character string, then all will
+be printed to the screen in their sequence. \cr
+A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
+information that users may find useful \cr
 
 }
 
@@ -298,8 +298,8 @@ outSomeEvents <- spades(mySim,
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
 \code{\link{SpaDES.core-package}},

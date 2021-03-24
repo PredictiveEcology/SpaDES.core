@@ -23,8 +23,8 @@ Default is \code{FALSE}.}
 }
 \value{
 A \code{data.table} whose first two columns give a list of edges
-         and remaining columns the attributes of the dependency objects
-         (object name, class, etc.).
+and remaining columns the attributes of the dependency objects
+(object name, class, etc.).
 }
 \description{
 Build edge list for module dependency graph

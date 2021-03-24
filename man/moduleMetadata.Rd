@@ -35,7 +35,7 @@ about.}
 }
 \value{
 A list of module metadata, matching the structure in
-        \code{\link{defineModule}}.
+\code{\link{defineModule}}.
 }
 \description{
 Parse and extract module metadata

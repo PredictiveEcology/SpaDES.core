@@ -27,7 +27,7 @@ message be suppressed?}
 }
 \value{
 Specified packages are loaded and attached using \code{require()},
-        invisibly returning a logical vector of successes.
+invisibly returning a logical vector of successes.
 }
 \description{
 Deprecated. Please use \code{\link[Require]{Require}}

@@ -5,6 +5,7 @@
 #' See Details below.
 #'
 #' @export
+#' @noMd
 #' @details
 #'
 #' Below are options that can be set with \code{options("spades.xxx" = newValue)},

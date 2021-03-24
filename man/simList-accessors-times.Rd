@@ -144,12 +144,12 @@ Additional methods are provided to access the current, start, and end times
 of the simulation:
 
 \tabular{ll}{
-   \code{time} \tab Current simulation time.\cr
-   \code{start} \tab Simulation start time.\cr
-   \code{end} \tab Simulation end time.\cr
-   \code{timeunit} \tab Simulation timeunit.\cr
-   \code{timeunits} \tab Module timeunits.\cr
-   \code{times} \tab List of all simulation times (current, start, end, timeunit).\cr
+\code{time} \tab Current simulation time.\cr
+\code{start} \tab Simulation start time.\cr
+\code{end} \tab Simulation end time.\cr
+\code{timeunit} \tab Simulation timeunit.\cr
+\code{timeunits} \tab Module timeunits.\cr
+\code{times} \tab List of all simulation times (current, start, end, timeunit).\cr
 }
 }
 \examples{
@@ -162,7 +162,7 @@ elapsedTime(s2, units = "mins")
 }
 \seealso{
 \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times;
-  \code{\link{elapsedTime}},
+\code{\link{elapsedTime}},
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
