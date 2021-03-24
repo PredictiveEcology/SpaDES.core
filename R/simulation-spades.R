@@ -1160,9 +1160,10 @@ setMethod(
       }
 
       # There are some edge cases where there is an event scheduled before current time,
-      #   even though current time is equal to after end time
+      #   even though current time is after end time
       if (length(sim@events)) {
-        specialStart <- sim@events[[1]][["eventTime"]] < sim@simtimes[["current"]]
+        specialStart <- sim@events[[1]][["eventTime"]] < sim@simtimes[["current"]] &&
+          sim@simtimes[["current"]] > sim@simtimes[["end"]]
         if (isTRUE(specialStart)) sim@simtimes[["current"]] <- sim@events[[1]][["eventTime"]]
       }
 
