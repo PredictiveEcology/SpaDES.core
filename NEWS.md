@@ -20,8 +20,10 @@ version 1.0.6.9000
 * For code/documentation contributors, markdown syntax is now turned on and can be used when writing function documentation  
 * The first event will now run if it is scheduled to be prior to `time(sim)` in the case where it is equal to or after `end(sim)`. Previously, this would not run any events if `time(sim)` >= `end(sim)` && `events(sim)[[1]] < time(sim)`
 
-## 
-* several minor bugfixes, including `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
+## Bugfixes
+* `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
+* recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directoyr of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory
+* other minor bugfixes, 
 
 version 1.0.6
 =============

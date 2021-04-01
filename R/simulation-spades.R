@@ -1439,18 +1439,29 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo$randomSeed <- rmo$randomSeed[seq_len(recoverMode - 1)]
   startTime <- Sys.time()
   if (length(rmo$recoverableObjs) > (recoverMode - 1)) {
+    # remove the previous rmo files, making way for subsequent Copy below. These files
+    #   should be temporary versions and so can be safely deleted
     clearFileBackedObjs(rmo$recoverableObjs, recoverMode)
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
   }
 
 
   if (length(sim@events) > 0) {
+
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
-    rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
-      Copy(mget(ls(sim)[objsInSimListAndModule ], envir = sim@.xData))
-    } else {
-      list()
-    }), rmo$recoverableObjs)
+    # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
+    mess <- capture.output(type = "message",
+                           rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
+                             Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
+                                  filebackedDir = tempdir2("._rmo"))
+                           } else {
+                             list()
+                           }), rmo$recoverableObjs)
+    )
+    mess <- grep("Hardlinked version", mess, invert = TRUE)
+    if (length(mess) > 0)
+      lapply(mess, message)
+
   }
   endTime <- Sys.time()
   rmo$preEvents <- sim@events
