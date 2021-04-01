@@ -228,10 +228,10 @@ test_that("saveSimList does not work correctly", {
 
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
   checkPath(dirname(tmpZip), create = TRUE)
-  landscape2 <- Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1)
-  landscape3 <- Copy(sim$landscape, filebackedDir = "hi", fileBackend = 1)
+  landscape2 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1))
+  landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hi", fileBackend = 1))
   landscape3 <- suppressWarnings(writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE))
-  landscape3 <- Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE)
+  landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE))
   sim$ListOfRasters <- list(landscape2, landscape3)
   zipSimList(sim, zipfile = tmpZip, filename = "test.qs")
 
@@ -243,7 +243,6 @@ test_that("saveSimList does not work correctly", {
   pths <- paths(mySim)
   pths$cachePath <- tmpfile[5]
   pths$outputPath <- tmpfile[6]
-  aaaa <<- 1
   out <- unzipSimList(tmpZip, paths = pths)
 
   origFns <- Filenames(sim)

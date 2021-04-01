@@ -69,7 +69,13 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     sim <- get(simName, envir = envir)
   }
   if (isTRUE(fileBackend[1] > 0)) {
-    sim <- do.call(Copy, append(list(sim, filebackedDir = filebackedDir), dots))
+    mess <- capture.output(type = "message",
+                           sim <- do.call(Copy, append(list(sim, filebackedDir = filebackedDir), dots))
+    )
+    mess <- grep("Hardlinked version", mess, invert = TRUE)
+    if (length(mess))
+      lapply(mess, message)
+
     if (isTRUE(fileBackend[1] == 2)) {
       sim <- rasterToMemory(sim)
     }
@@ -291,9 +297,14 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
       # First must update the filename slots so that they point to real files (in the exdir)
       sim[[objName]] <- reproducible:::updateFilenameSlots(sim[[objName]],
                                                            newFilenames = currentDir)
-      Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths)
+      mess <- capture.output(type = "message",
+                              sim[[objName]] <- (Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths))
+      )
+      mess <- grep("Hardlinked version", mess, invert = TRUE)
+      if (length(mess))
+        lapply(mess, message)
+      return(sim[[objName]])
     })
-
 
     list2env(reworkedRas, envir = envir(sim))
   }
