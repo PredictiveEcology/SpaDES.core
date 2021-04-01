@@ -174,7 +174,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
   fnOrig <- Filenames(sim)
   fnOrigSingle <- Filenames(sim, allowMultiple = FALSE)
 
-  rasters <- reproducible:::isOrHasRaster(sim)
+  rasters <- getFromNamespace("isOrHasRaster", ns = "reproducible")(sim)
   rasterObjNames <- names(rasters)[unlist(lapply(rasters, function(r) any(unlist(r))))]
 
   sim@.xData$._rasterFilenames <- list(filenames = fnOrig, filenamesSingle = fnOrigSingle,
@@ -216,7 +216,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' Loading a `simList` from file can be problematic as there are non-standard
 #' objects that must be rebuilt. See description in [saveSimList()] for details.
 #'
-#' @param file Character giving the name of a saved simulation file
+#' @param filename Character giving the name of a saved simulation file
 #' @param paths A list of character vectors for all the `simList` paths. When
 #'   loading a \code{simList}, this will replace the paths of everything to
 #'   these new paths. Experimental still.
@@ -236,6 +236,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @rdname loadSimList
 #' @seealso [saveSimList()], [zipSimList()]
 #' @importFrom qs qread
+#' @importFrom reproducible updateFilenameSlots
 loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
   sim <- qs::qread(filename, nthreads = getOption("spades.nThreads", 1))
 
@@ -295,7 +296,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
       currentDir <- unique(dirname(currentFname))
 
       # First must update the filename slots so that they point to real files (in the exdir)
-      sim[[objName]] <- reproducible:::updateFilenameSlots(sim[[objName]],
+      sim[[objName]] <- updateFilenameSlots(sim[[objName]],
                                                            newFilenames = currentDir)
       mess <- capture.output(type = "message",
                               sim[[objName]] <- (Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths))
@@ -323,6 +324,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 #' @param zipfile Filename of a zipped simList
 #' @param load Logical. If \code{TRUE}, the default, then the simList will
 #'   also be loaded into R.
+#' @param ... passed to `unzip`
 #' @rdname loadSimList
 #' @details
 #' If \code{cache} is used, it is likely that it should be trimmed before

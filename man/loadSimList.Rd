@@ -10,6 +10,8 @@ loadSimList(filename, paths = getPaths(), otherFiles = "")
 unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 }
 \arguments{
+\item{filename}{Character giving the name of a saved simulation file}
+
 \item{paths}{A list of character vectors for all the \code{simList} paths. When
 loading a \code{simList}, this will replace the paths of everything to
 these new paths. Experimental still.}
@@ -25,7 +27,7 @@ a different computer, path, or drive. This could be the output from \code{unzipS
 \item{load}{Logical. If \code{TRUE}, the default, then the simList will
 also be loaded into R.}
 
-\item{file}{Character giving the name of a saved simulation file}
+\item{...}{passed to \code{unzip}}
 }
 \value{
 \itemize{
