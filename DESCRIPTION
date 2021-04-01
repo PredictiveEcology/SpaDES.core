@@ -67,7 +67,7 @@ Suggests:
     rmarkdown,
     tcltk,
     testthat (>= 1.0.2)
-Remotes: PredictiveEcology/reproducible@CopyRasterStackBugfix
+Remotes: PredictiveEcology/reproducible@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
