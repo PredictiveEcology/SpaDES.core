@@ -27,97 +27,97 @@ values set to defaults
 
 
 \tabular{ll}{
-   \code{name} \tab Module name. Must match the filename (without the \code{.R} extension).
-                    This is currently not parsed by SpaDES;
-                        it is for human readers only. \cr
-   \code{description} \tab Brief description of the module.
-                           This is currently not parsed by SpaDES;
-                           it is for human readers only. \cr
-   \code{keywords} \tab Author-supplied keywords.
-                        This is currently not parsed by SpaDES;
-                        it is for human readers only. \cr
-   \code{childModules} \tab If this contains any character vector, then it will
-                            be treated as a parent module. If this is a parent module,
-                            then only this list entry will be read. For normal,
-                            i.e., 'child modules', this should be \code{character(0)} or
-                            \code{NA}.
-                            If a character vector is provided, then these must be the
-                            names of the modules located in the same file path as this
-                            parent module that will be loaded during the \code{simInit}.\cr
-   \code{authors} \tab Module author information (as a vector of \code{\link{person}}
-                       objects. This is currently not parsed by SpaDES;
-                       it is for human readers only.\cr
-   \code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
-                       if a character or numeric are supplied).
-                       The module developer should update manually this with each change
-                       that is made to the module. See \url{https://semver.org/}
-                       for a widely accepted standard for version numbering.\cr
-   \code{spatialExtent} \tab The spatial extent of the module supplied via
-                             \code{raster::extent}. This is currently unimplemented.
-                             Once implemented, this should define what spatial region this
-                             module is scientifically reasonable to be used in.\cr
-   \code{timeframe} \tab Vector (length 2) of POSIXt dates specifying the temporal extent
-                         of the module. Currently unimplemented.
-                         Once implemented, this should define what time frame this
-                         module is scientifically reasonable to be used for.\cr
-   \code{timeunit} \tab Time scale of the module (e.g., "day", "year"). This
-                        MUST be specified. It indicates what '1' unit of time
-                        means for this module. \code{SpaDES} interprets this
-                        and if modules have different \code{timeunit} values
-                        then it will correctly schedule each module, using the
-                        smallest (currently the default) timeunit as the
-                        'model' timeunit in the \code{spades} call.\cr
-   \code{citation} \tab List of character strings specifying module citation information.
-                        Alternatively, a list of filenames of \code{.bib} or similar files.
-                        This is currently not parsed by SpaDES;
-                        it is for human readers only.\cr
-   \code{documentation} \tab List of filenames referring to module documentation sources.
-                             This is currently not parsed by SpaDES;
-                             it is for human readers only.\cr\cr
-   \code{reqdPkgs} \tab List of R package names required by the module. These
-                        packages will be loaded when \code{simInit} is called.
-                        \code{\link[Require]{Require}} will be used internally
-                        to load if available, and install if not available.
-                        Because \code{\link[Require]{Require}} can also download from
-                        GitHub.com, these packages can specify package names stored
-                        on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
-   \code{parameters} \tab A data.frame specifying the parameters used in the module.
-                          Usually produced by \code{rbind}-ing the outputs of multiple
-                          \code{\link{defineParameter}} calls. These parameters indicate
-                          the default values that will be used unless a module user
-                          overrides them with the \code{params} argument in the
-                          \code{\link{simInit}} call. The minimum and maximum are
-                          currently used by the \code{SpaDES.shiny::shine} function and the
-                          \code{POM} function, and they should indicate the range
-                          of values that are reasonable scientifically.\cr
-   \code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as
-                            inputs to the module,
-                            with columns \code{objectName} (class \code{character}),
-                            \code{objectClass} (class \code{character}),
-                            \code{sourceURL} (class \code{character}), and \code{other}
-                             (currently spades does nothing with this column).
-                            This data.frame identifies the objects that are expected,
-                            but does not do any loading of that object into the simList.
-                            The \code{sourceURL} gives the developer the opportunity
-                            to identify the source of a data file that can be used
-                            with the model. This URL will be
-                            used if the user calls \code{downloadData} (or
-                            \code{downloadModule(..., data = TRUE)}. If the raw data
-                            must be modified, the developer can use create a
-                            function called \code{.inputObjects} in their module. That
-                            function will be run during the \code{simInit} call. The
-                            developer should ensure that if the object is supplied
-                            by the module user as an argument in the \code{simInit}, then
-                            the \code{.inputObjects} should not be run, i.e., use an
-                            \code{(is.null(sim$xxx)))}.\cr
-   \code{outputObjects} \tab A \code{data.frame} specifying the data objects output by
-                             the module, with columns identical to those in
-                             \code{inputObjects}. Like \code{inputObjects} above,
-                             this only identifies the objects that this module will output
-                             into the \code{simList}.
-                             The module developer must create the necessary functions
-                             that will cause these objects to be put into the
-                             \code{simList}.\cr
+\code{name} \tab Module name. Must match the filename (without the \code{.R} extension).
+This is currently not parsed by SpaDES;
+it is for human readers only. \cr
+\code{description} \tab Brief description of the module.
+This is currently not parsed by SpaDES;
+it is for human readers only. \cr
+\code{keywords} \tab Author-supplied keywords.
+This is currently not parsed by SpaDES;
+it is for human readers only. \cr
+\code{childModules} \tab If this contains any character vector, then it will
+be treated as a parent module. If this is a parent module,
+then only this list entry will be read. For normal,
+i.e., 'child modules', this should be \code{character(0)} or
+\code{NA}.
+If a character vector is provided, then these must be the
+names of the modules located in the same file path as this
+parent module that will be loaded during the \code{simInit}.\cr
+\code{authors} \tab Module author information (as a vector of \code{\link{person}}
+objects. This is currently not parsed by SpaDES;
+it is for human readers only.\cr
+\code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
+if a character or numeric are supplied).
+The module developer should update manually this with each change
+that is made to the module. See \url{https://semver.org/}
+for a widely accepted standard for version numbering.\cr
+\code{spatialExtent} \tab The spatial extent of the module supplied via
+\code{raster::extent}. This is currently unimplemented.
+Once implemented, this should define what spatial region this
+module is scientifically reasonable to be used in.\cr
+\code{timeframe} \tab Vector (length 2) of POSIXt dates specifying the temporal extent
+of the module. Currently unimplemented.
+Once implemented, this should define what time frame this
+module is scientifically reasonable to be used for.\cr
+\code{timeunit} \tab Time scale of the module (e.g., "day", "year"). This
+MUST be specified. It indicates what '1' unit of time
+means for this module. \code{SpaDES} interprets this
+and if modules have different \code{timeunit} values
+then it will correctly schedule each module, using the
+smallest (currently the default) timeunit as the
+'model' timeunit in the \code{spades} call.\cr
+\code{citation} \tab List of character strings specifying module citation information.
+Alternatively, a list of filenames of \code{.bib} or similar files.
+This is currently not parsed by SpaDES;
+it is for human readers only.\cr
+\code{documentation} \tab List of filenames referring to module documentation sources.
+This is currently not parsed by SpaDES;
+it is for human readers only.\cr\cr
+\code{reqdPkgs} \tab List of R package names required by the module. These
+packages will be loaded when \code{simInit} is called.
+\code{\link[Require]{Require}} will be used internally
+to load if available, and install if not available.
+Because \code{\link[Require]{Require}} can also download from
+GitHub.com, these packages can specify package names stored
+on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
+\code{parameters} \tab A data.frame specifying the parameters used in the module.
+Usually produced by \code{rbind}-ing the outputs of multiple
+\code{\link{defineParameter}} calls. These parameters indicate
+the default values that will be used unless a module user
+overrides them with the \code{params} argument in the
+\code{\link{simInit}} call. The minimum and maximum are
+currently used by the \code{SpaDES.shiny::shine} function and the
+\code{POM} function, and they should indicate the range
+of values that are reasonable scientifically.\cr
+\code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as
+inputs to the module,
+with columns \code{objectName} (class \code{character}),
+\code{objectClass} (class \code{character}),
+\code{sourceURL} (class \code{character}), and \code{other}
+(currently spades does nothing with this column).
+This data.frame identifies the objects that are expected,
+but does not do any loading of that object into the simList.
+The \code{sourceURL} gives the developer the opportunity
+to identify the source of a data file that can be used
+with the model. This URL will be
+used if the user calls \code{downloadData} (or
+\code{downloadModule(..., data = TRUE)}. If the raw data
+must be modified, the developer can use create a
+function called \code{.inputObjects} in their module. That
+function will be run during the \code{simInit} call. The
+developer should ensure that if the object is supplied
+by the module user as an argument in the \code{simInit}, then
+the \code{.inputObjects} should not be run, i.e., use an
+\code{(is.null(sim$xxx)))}.\cr
+\code{outputObjects} \tab A \code{data.frame} specifying the data objects output by
+the module, with columns identical to those in
+\code{inputObjects}. Like \code{inputObjects} above,
+this only identifies the objects that this module will output
+into the \code{simList}.
+The module developer must create the necessary functions
+that will cause these objects to be put into the
+\code{simList}.\cr
 }
 }
 

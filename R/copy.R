@@ -39,15 +39,15 @@ if (!isGeneric("Copy")) {
 #' @seealso \code{\link[reproducible]{Copy}}
 setMethod("Copy",
           signature(object = "simList"),
-          definition = function(object, filebackedDir,
-                                objects, queues) {
-            if (missing(filebackedDir)) {
-              if (!missing(objects)) {
-                if (isTRUE(objects)) {
-                  filebackedDir <- tempdir2(rndstr(1, 8))
-                }
-              }
-            }
+          definition = function(object,
+                                objects, queues, ...) {
+            # if (missing(filebackedDir)) {
+            #   if (!missing(objects)) {
+            #     if (isTRUE(objects)) {
+            #       filebackedDir <- tempdir2(rndstr(1, 8))
+            #     }
+            #   }
+            # }
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object
@@ -72,7 +72,7 @@ setMethod("Copy",
               # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
 
               # Copy the whole environment, recursively through environments
-              sim_@.xData <- Copy(object@.xData, filebackedDir = filebackedDir)
+              sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
 
               # This chunk makes the environment of each function in a module,
               #   the module itself. This is unique to functions in `simList` objs
@@ -113,3 +113,4 @@ setMethod("Copy",
             sim_@.envir <- sim_@.xData
             return(sim_)
 })
+

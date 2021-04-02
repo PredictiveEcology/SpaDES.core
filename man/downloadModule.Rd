@@ -70,10 +70,10 @@ Default \code{FALSE}.}
 }
 \value{
 A list of length 2. The first element is a character vector containing
-   a character vector of extracted files for the module. The second element is
-   a \code{tbl} with details about the data that is relevant for the function,
-   including whether it was downloaded or not, and whether it was renamed
-   (because there was a local copy that had the wrong file name).
+a character vector of extracted files for the module. The second element is
+a \code{tbl} with details about the data that is relevant for the function,
+including whether it was downloaded or not, and whether it was renamed
+(because there was a local copy that had the wrong file name).
 }
 \description{
 Download a .zip file of the module and extract (unzip) it to a user-specified location.

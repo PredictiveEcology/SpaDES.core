@@ -12,8 +12,8 @@ Description: Provides the core framework for a discrete event system (DES) to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2021-03-18
-Version: 1.0.6.9020
+Date: 2021-04-01
+Version: 1.0.6.9025
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 3.6),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.1.9007)
+    reproducible (>= 1.2.6.9014)
 Imports:
     crayon,
     data.table (>= 1.10.4),
@@ -67,6 +67,7 @@ Suggests:
     rmarkdown,
     tcltk,
     testthat (>= 1.0.2)
+Remotes: PredictiveEcology/reproducible@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
@@ -111,10 +112,12 @@ Collate:
     'reexports.R'
     'restart.R'
     'save.R'
+    'saveLoadSimList.R'
     'simulation-spades.R'
     'spades-classes.R'
     'spades-core-deprecated.R'
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

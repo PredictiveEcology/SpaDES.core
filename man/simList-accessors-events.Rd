@@ -80,19 +80,19 @@ provided to the \code{simInit} function in the \code{path} argument.
 By default, the event lists are shown when the \code{simList} object is printed,
 thus most users will not require direct use of these methods.
 \tabular{ll}{
-   \code{events} \tab Scheduled simulation events (the event queue).\cr
-   \code{completed} \tab Completed simulation events.\cr
+\code{events} \tab Scheduled simulation events (the event queue).\cr
+\code{completed} \tab Completed simulation events.\cr
 }
 
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \note{
 Each event is represented by a \code{\link{data.table}} row consisting of:
- \itemize{
-   \item \code{eventTime}: The time the event is to occur.
-   \item \code{moduleName}: The module from which the event is taken.
-   \item \code{eventType}: A character string for the programmer-defined event type.
- }
+\itemize{
+\item \code{eventTime}: The time the event is to occur.
+\item \code{moduleName}: The module from which the event is taken.
+\item \code{eventType}: A character string for the programmer-defined event type.
+}
 }
 \seealso{
 \code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.

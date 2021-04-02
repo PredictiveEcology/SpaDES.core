@@ -162,7 +162,9 @@ test_that("saving csv files does not work correctly", {
 test_that("saveSimList does not work correctly", {
   skip_if_not_installed("RandomFields")
 
-  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs"))
+  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", ""))
+  unlink(tmpfile[5])
+  unlink(tmpfile[6])
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -188,7 +190,7 @@ test_that("saveSimList does not work correctly", {
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[2], fileBackend = 2)
-  sim <- loadSimList(file = tmpfile[2])
+  sim <- loadSimList(file = tmpfile[2], paths = paths(mySim))
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
 
@@ -221,10 +223,41 @@ test_that("saveSimList does not work correctly", {
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 
-  skip(message = "zipSimList not yet testable")
-  # zipSimList not tested yet
+
+  #### zipSimList test
+
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
-  zipSimList(sim, zipfile = tmpZip, filebackedDir = tmpdir)
+  checkPath(dirname(tmpZip), create = TRUE)
+  landscape2 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1))
+  landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hi", fileBackend = 1))
+  landscape3 <- suppressWarnings(writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE))
+  landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE))
+  sim$ListOfRasters <- list(landscape2, landscape3)
+  zipSimList(sim, zipfile = tmpZip, filename = "test.qs")
+
+  unlink(Filenames(sim))
+  files <- dir()
+  unlink(grep(".*\\.zip$", files, value = TRUE, invert = TRUE), force = TRUE, recursive = TRUE)
+  unlink(paths(mySim)$rasterPath, recursive = T, force = TRUE)
+
+  pths <- paths(mySim)
+  pths$cachePath <- tmpfile[5]
+  pths$outputPath <- tmpfile[6]
+  out <- unzipSimList(tmpZip, paths = pths)
+
+  origFns <- Filenames(sim)
+  # Files all exist
+  expect_true(all(file.exists(Filenames(out))))
+  # They are in their sub-directories (2 * dirname), in the pths NOT the original paths
+  expect_true(any(normPath(unname(unlist(pths))) %in% normPath(dirname(dirname(Filenames(out))))))
+  expect_false(any(normPath(unname(origFns)) %in% unname(normPath(Filenames(out)))))
+  # capture the subdirectories
+  expect_true(all(basename(dirname(origFns)) %in% basename(dirname(Filenames(out)))))
+
+  # None of the original files exist
+  expect_true(!all(file.exists(origFns)))
+
+
 })
 
 test_that("restart does not work correctly", {

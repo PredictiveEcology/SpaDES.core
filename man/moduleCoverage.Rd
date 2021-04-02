@@ -20,10 +20,10 @@ moduleCoverage(name, path)
 }
 \value{
 Return a list of two coverage objects and two data.table objects.
-The two coverage objects are named `moduleCoverage` and `functionCoverage`.
-The `moduleCoverage` object contains the percent value of unit test coverage
+The two coverage objects are named \code{moduleCoverage} and \code{functionCoverage}.
+The \code{moduleCoverage} object contains the percent value of unit test coverage
 for the module.
-The `functionCoverage` object contains percentage values for unit test
+The \code{functionCoverage} object contains percentage values for unit test
 coverage for each function defined in the module.
 Please use \code{\link[covr]{report}} to view the coverage information.
 Two data.tables give the information of all the tested and untested functions

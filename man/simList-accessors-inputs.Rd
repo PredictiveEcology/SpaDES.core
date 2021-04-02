@@ -45,12 +45,12 @@ Accessor functions for the \code{inputs} slots in a \code{simList} object.
 These functions are one of three mechanisms to add the information about which input files
 to load in a \code{spades} call.
 \enumerate{
-  \item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
-        See \code{?simInit}.
-  \item With the \code{outputs(simList)} function call.
-  \item By adding a function called \code{.inputObjects} inside a module, which will be executed
-        during the \code{simInit} call. This last way is the most "modular" way to create
-        default data sets for your model.
+\item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
+See \code{?simInit}.
+\item With the \code{outputs(simList)} function call.
+\item By adding a function called \code{.inputObjects} inside a module, which will be executed
+during the \code{simInit} call. This last way is the most "modular" way to create
+default data sets for your model.
 }
 
 See below for more details.

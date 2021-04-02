@@ -15,9 +15,15 @@ version 1.0.6.9000
 * defineParameter can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, c("numeric", "function"), where the use can pass either a numeric or a function that would calculate that numeric.
 * new helper function `simFile` to generate file names for use with e.g., `saveSimList`
 * `zipSimList` is now exported
+* `spades` will now attempt to load `reqdPkgs`, which is already done in `simInit`. In cases where `simInit` was not run, e.g., `Cache(simInitAndSpades, ..., events = "init")`, then modules will not have access to packages. For cases where `simInit` was called, then this should add very little overhead.
+* `saveSimList` will now convert file-backed `Raster*` class objects to memory if `fileBackend = 0`. Previously, it left them as is (on disk if on disk, in memory if in memory).
+* For code/documentation contributors, markdown syntax is now turned on and can be used when writing function documentation  
+* The first event will now run if it is scheduled to be prior to `time(sim)` in the case where it is equal to or after `end(sim)`. Previously, this would not run any events if `time(sim)` >= `end(sim)` && `events(sim)[[1]] < time(sim)`
 
-## 
-* several minor bugfixes, including `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
+## Bugfixes
+* `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
+* recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directoyr of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory
+* other minor bugfixes, 
 
 version 1.0.6
 =============

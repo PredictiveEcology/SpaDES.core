@@ -80,7 +80,7 @@ there is no possibility that the file has changed, i.e., if \code{downloadData} 
 called from inside another function.}
 
 \item{urls}{Character vector of urls from which to get the data. This is automatically
- found from module metadata when this function invoked with
+found from module metadata when this function invoked with
 \code{SpaDES.core::downloadModule(..., data = TRUE)}. See also
 \code{\link{prepInputs}}.}
 
@@ -99,9 +99,9 @@ the correct one.
 }
 \details{
 \code{downloadData} requires a checksums file to work, as it will only download
- the files specified therein. Hence, module developers should make sure they
- have manually downloaded all the necessary data and ran \code{checksums} to
- build a checksums file.
+the files specified therein. Hence, module developers should make sure they
+have manually downloaded all the necessary data and ran \code{checksums} to
+build a checksums file.
 
 There is an experimental attempt to use the \pkg{googledrive} package to download
 data from a shared (publicly or with individual users) file.

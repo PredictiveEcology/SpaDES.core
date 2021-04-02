@@ -41,7 +41,7 @@ plot time and leave it.}
 \item{ggsaveArgs}{An optional list of arguments passed to \code{ggplot2::ggsave}}
 
 \item{usePlot}{Logical. If \code{TRUE}, the default, then the plot will occur
-with `quickPlot::Plot`, so it will be arranged with previously existing plots.}
+with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.}
 
 \item{...}{Anything needed by \code{fn}}
 }
@@ -55,28 +55,26 @@ and data for that plotting function. See below and examples. THIS IS STILL EXPER
 }
 \details{
 This offers up to 4 different actions for a given plot:
-    \itemize{
-      \item To screen device
-      \item To disk as raw data
-      \item To disk as a saved plot object
-      \item To disk as a png or other "image" file, like pdf
-    }
+\itemize{
+\item To screen device
+\item To disk as raw data
+\item To disk as a saved plot object
+\item To disk as a png or other "image" file, like pdf
+}
 To turn off plotting both to screen and disk, set both
 \code{.plotInititalTime = NA} and \code{.plots = NA} or any other
 value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 argument (e.g., \code{""} will omit all saving).
 
-
-
 \itemize{
-  \item \code{type}
-    \itemize{
-      \item \code{"screen"} -- Will plot to the current device, normally a plot window
-      \item \code{"object"} -- Will save the plot object, e.g., ggplot object
-      \item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
-                          the data argument
-      \item \code{"png"} -- or any other type saveble with \code{ggsave}
-    }
+\item \code{type}
+\itemize{
+\item \code{"screen"} -- Will plot to the current device, normally a plot window
+\item \code{"object"} -- Will save the plot object, e.g., ggplot object
+\item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
+the data argument
+\item \code{"png"} -- or any other type saveble with \code{ggsave}
+}
 }
 }
 \examples{

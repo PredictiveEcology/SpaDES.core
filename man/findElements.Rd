@@ -34,7 +34,7 @@ A character string with all sim objects found
 Find all references to \code{sim$}
 
 \code{.parsingSim} will pull out the various ways to use sim, e.g.,
-\code{sim$xxx}, \code{sim[['xxx']]}, \code{sim[[P(sim)$xxx]]}
+\code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
 }
 \details{
 \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
@@ -43,9 +43,9 @@ some cleaning for duplications, \code{NA} values, and cases where the element
 inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
 simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
 
-When \bold{\code{type = "get"}}, the function scans for sim$xxx or sim[["xxx"]]] on
+When \bold{\code{type = "get"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]]} on
 the RHS of an assignment operator or when there is no assignment. When
-\bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[['xxx']] on the
+\bold{\code{type = "assign"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]} on the
 LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 scans for all functions (i.e., "globals") being used. This is similar to
 \code{codetools::findGlobals}, but faster.
