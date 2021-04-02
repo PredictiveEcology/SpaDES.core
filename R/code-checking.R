@@ -582,7 +582,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 }
 
 #' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
-#' \code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
+#' \code{sim$xxx}, \code{sim[[xxx]]}, \code{sim[[P(sim)$xxx]]}
 #'
 #' @keywords internal
 #' @rdname findElements
