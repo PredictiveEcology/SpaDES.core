@@ -40,12 +40,12 @@ Find all references to \code{sim$}
 \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
 function code to a call, and then pass it to \code{.findElements}. It also does
 some cleaning for duplications, \code{NA} values, and cases where the element
-inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
+inside a \code{sim[[xxx]]} is a variable that should be evaluated, rather than
 simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
 
-When \bold{\code{type = "get"}}, the function scans for sim$xxx or sim[\link{"xxx"}]] on
+When \bold{\code{type = "get"}}, the function scans for sim$xxx or sim[\link{xxx}]] on
 the RHS of an assignment operator or when there is no assignment. When
-\bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[\link{'xxx'}] on the
+\bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[\link{xxx}] on the
 LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 scans for all functions (i.e., "globals") being used. This is similar to
 \code{codetools::findGlobals}, but faster.
