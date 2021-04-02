@@ -38,12 +38,12 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
 #' function code to a call, and then pass it to \code{.findElements}. It also does
 #' some cleaning for duplications, \code{NA} values, and cases where the element
-#' inside a \code{sim[[xxx]]} is a variable that should be evaluated, rather than
+#' inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
 #' simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
 #'
-#' When \bold{\code{type = "get"}}, the function scans for sim$xxx or sim[[xxx]]] on
+#' When \bold{\code{type = "get"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]]} on
 #' the RHS of an assignment operator or when there is no assignment. When
-#' \bold{\code{type = "assign"}}, the function scans for sim$xxx or sim[[xxx]] on the
+#' \bold{\code{type = "assign"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]} on the
 #' LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
 #' scans for all functions (i.e., "globals") being used. This is similar to
 #' \code{codetools::findGlobals}, but faster.
@@ -264,11 +264,11 @@ cantCodeCheckMessage <- ": line could not be checked "
   inputObjNames <- na.omit(sim@depends@dependencies[[k]]@inputObjects$objectName)
   outputObjNames <- na.omit(sim@depends@dependencies[[k]]@outputObjects$objectName)
 
-  # search for all sim$xx <-  or sim[[xxx]] <- in module code
+  # search for all sim$xx <-  or sim[["xxx"]] <- in module code
   simAssigns <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "assign")
   simAssigns <- simAssigns[!(simAssigns %in% ignoreObjectsAssign)]
 
-  # search for all '<- sim$' or '<- sim[[xxx]]' in module code
+  # search for all '<- sim$' or '<- sim[["xxx"]]' in module code
   simGets <- .findElementsInEnv(environment(), sim@.xData$.mods[[m]], type = "get")
   simGets <- simGets[!(simGets %in% ignoreObjectsGet)]
 
@@ -582,7 +582,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 }
 
 #' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
-#' \code{sim$xxx}, \code{sim[[xxx]]}, \code{sim[[P(sim)$xxx]]}
+#' \code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
 #'
 #' @keywords internal
 #' @rdname findElements
