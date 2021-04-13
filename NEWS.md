@@ -19,6 +19,7 @@ version 1.0.6.9000
 * `saveSimList` will now convert file-backed `Raster*` class objects to memory if `fileBackend = 0`. Previously, it left them as is (on disk if on disk, in memory if in memory).
 * For code/documentation contributors, markdown syntax is now turned on and can be used when writing function documentation  
 * The first event will now run if it is scheduled to be prior to `time(sim)` in the case where it is equal to or after `end(sim)`. Previously, this would not run any events if `time(sim)` >= `end(sim)` && `events(sim)[[1]] < time(sim)`
+* minor documentation modifications
 
 ## Bugfixes
 * `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
