@@ -108,7 +108,9 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' for successful initialization.
 #'
 #' @param times A named list of numeric simulation start and end times
-#'        (e.g., \code{times = list(start = 0.0, end = 10.0)}).
+#'        (e.g., \code{times = list(start = 0.0, end = 10.0)}), and optionally a
+#'        \code{timeunit} other than the default "smallest time unit" across all
+#'        modules. See examples.
 #'
 #' @param params A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 #' See details.
