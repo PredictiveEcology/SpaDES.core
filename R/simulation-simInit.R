@@ -392,7 +392,7 @@ setMethod(
                           ".saveInitialTime",
                           ".plotInterval",
                           ".plotInitialTime")
-    dotParamsChar <- list(".savePath", ".saveObjects")
+    dotParamsChar <- list(".savePath", ".saveObjects", ".seed")
     dotParams <- append(dotParamsChar, dotParamsReal)
 
     sim@modules <- modules  ## will be updated below

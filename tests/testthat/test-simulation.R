@@ -11,7 +11,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .seed = list("init" = 321)),
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )

@@ -214,6 +214,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         } else {
           # for future caching of modules
           cacheIt <- FALSE
+          eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
           a <- sim@params[[curModuleName]][[".useCache"]]
           if (!is.null(a)) {
             #.useCache is a parameter
@@ -247,6 +248,12 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                               removeOthers = FALSE)
 
           skipEvent <- FALSE
+          if (!is.null(eventSeed)) {
+            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
+              initialRandomSeed <- .Random.seed
+            set.seed(eventSeed) # will create .Random.seed
+          }
+
           .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
           if (useFuture) {
             # stop("using future for spades events is not yet fully implemented")
@@ -264,6 +271,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!skipEvent) {
             sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                              showSimilar = showSimilar, .pkgEnv)
+          }
+
+          if (!is.null(eventSeed)) {
+            if (exists("initialRandomSeed", inherits = FALSE))
+              .Random.seed <- initialRandomSeed
           }
 
           # browser(expr = exists("._doEvent_3"))
