@@ -14,7 +14,7 @@ defineModule(sim, list(
   timeframe = {{{timeframe}}},
   timeunit = {{{timeunit}}},
   citation = {{{citation}}},
-  documentation = deparse(list("README.txt", {{{RmdName}}})),
+  documentation = deparse(list("README.md", {{{RmdName}}})), ## same file
 {{{otherMetadata}}}
 ))
 
