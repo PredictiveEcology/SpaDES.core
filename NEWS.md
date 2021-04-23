@@ -50,6 +50,7 @@ version 1.0.5
 * enable automated module code checking with GitHub Actions (`use_gha()` and corresponding vignette; #74)
 * `newProject` creates Rstudio `.Rproj` file if invoked in Rstudio
 * moved `paddedFloatToChar` to reproducible; but re-exported here, so still usable.
+* modules can now use a parameter called `.seed` which is a named list where names are the events and the elements are the seed with which to run the event. During `doEvent`, `SpaDES.core` will now `set.seed(P(sim)$.seed[[currentEvent]])` and reset to random number stream afterwards.
 
 ## dependencies
 * completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies

@@ -52,6 +52,14 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
 #'            caribouModule = list(N = 1000))}.
 #'
+#' \code{params} can be used to set the seed for a specific event in a module. This
+#' is done using the normal \code{params} argument, specifying `.seed` as a list
+#' where the elements are a numeric for the seed and the name is the event. Since
+#' parameters must be specific to a module, this creates a module and event specific
+#' seed e.g., \code{params = list(moduleName = list(.seed = list(init = 123)))} will
+#' set the \code{init} event of module named \code{moduleName} to 123. The RN stream
+#' will be reset to its state prior to the \code{set.seed} call after the event.
+#'
 #' We implement a discrete event simulation in a more modular fashion so it is
 #' easier to add modules to the simulation. We use S4 classes and methods,
 #' and fast lists to manage the event queue.
