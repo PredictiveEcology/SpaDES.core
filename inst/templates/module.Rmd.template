@@ -10,7 +10,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, results = "hold")
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## TODO: use 'eval = TRUE'
 ```
 
 # Overview
@@ -58,7 +58,7 @@ mySimOut <- spades(mySim)
 Provide a summary of user-visible parameters.
 
 ```{r moduleParams, echo = FALSE}
-df_params <- moduleParams("{{{name}}}", "{{{path}}}")
+df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
 knitr::kable(df_params)
 ```
 
@@ -82,7 +82,7 @@ How to obtain input data, and a description of the data required by the module.
 If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
 
 ```{r moduleInputs, echo = FALSE}
-df_inputs <- moduleInputs("{{{name}}}", "{{{path}}}")
+df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs)
 ```
 
@@ -91,7 +91,7 @@ knitr::kable(df_inputs)
 Description of the module outputs.
 
 ```{r moduleOutputs, echo = FALSE}
-df_outputs <- moduleOutputs("{{{name}}}", "{{{path}}}")
+df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_outputs)
 ```
 
