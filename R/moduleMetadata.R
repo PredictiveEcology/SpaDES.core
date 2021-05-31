@@ -228,6 +228,7 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+
     # remove spaces and EOL
     md[["parameters"]][["paramDesc"]] <- rmExtraSpacesEOL(md[["parameters"]][["paramDesc"]])
     md[["parameters"]]
@@ -282,6 +283,9 @@ rmExtraSpacesEOLList <- function(xx) {
       elem
     }
   })
+
+  ## TODO: what's going on here with .seed param?
+  ## grepl("\n", xx[[13]]) # TRUE despite that element being OK above (within the loop)
 
   xx
 }

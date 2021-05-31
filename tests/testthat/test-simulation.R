@@ -425,8 +425,7 @@ test_that("conflicting function types", {
 
   xxx1 <- gsub(xxx, pattern = 'plotFun', replacement = 'Plot') # nolint
   cat(xxx1, file = fileName, sep = "\n")
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 "Plot is defined")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m), "Plot is defined")
 
   # do functions like raster::levels
   cat(xxx[1:lineWithInit], "
@@ -443,8 +442,7 @@ test_that("conflicting function types", {
 
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
-  fullMessage <- c("the following function\\(s\\) is used that",
-                   "raster::scale", "scale")
+  fullMessage <- c("the following function\\(s\\) is used that", "raster::scale", "scale")
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
   nonMessage <- c("raster::levels", "levels")
   expect_false(all(unlist(lapply(nonMessage, function(x) any(grepl(mm, pattern = x))))))
@@ -456,10 +454,8 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 "raster::scale")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m), "raster::scale")
 
-  ###
   cat(xxx[1:lineWithInit], "
       library(raster)
       poiuoiu <- raster(extent(0,10,0,10), vals = rep(1:2, length.out = 100))
@@ -468,8 +464,7 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 "poiuoiu is assigned")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m), "poiuoiu is assigned")
 
   cat(xxx[1:(lineWithInit - 1)], "
       a <- function(x) {
@@ -478,8 +473,7 @@ test_that("conflicting function types", {
       ",
       xxx[(lineWithInit):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
-  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 "a: parameter")
+  expect_message(simInit(paths = list(modulePath = tmpdir), modules = m), "a: parameter")
 
   xxx1 <- gsub(xxx, pattern = "\\.plotInitialTime", replacement = "value")
   xxx1 <- gsub(xxx1, pattern = "NA, NA, NA", replacement = "'hi', NA, NA")
@@ -536,7 +530,7 @@ test_that("conflicting function types", {
   cat(xxx[1:(lineWithInputObjects - 1)], "
       expectsInput('a', 'numeric', '', '')
       ",
-      xxx[(lineWithInputObjects+1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
+      xxx[(lineWithInputObjects + 1):length(xxx)], sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  c(paste0(m, ": module code: a is declared in metadata inputObjects")))
@@ -587,7 +581,6 @@ test_that("conflicting function types", {
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
                  c(paste0(m, ": module code: doEvent.",m," must return")))
-
 
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
@@ -673,24 +666,16 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
   x2 <- lapply(sns, function(sn) {
     slot(mySim@depends@dependencies[[m]], sn)
   })
-  expect_true(any(unlist(lapply(x2, function(v)
-    grepl("  |\n", v)))))
+  expect_true(any(unlist(lapply(x2, function(v) grepl("  |\n", v)))))
   x2 <- rmExtraSpacesEOLList(x2)
-  expect_false(any(unlist(lapply(x1, function(v)
-    grepl("  |\n", v)))))
-  expect_false(any(unlist(lapply(x2, function(v)
-    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x2, function(v) grepl("  |\n", v)))))
   x1 <- moduleParams(m, dirname(dirname(fileName)))
-  expect_false(any(unlist(lapply(x1, function(v)
-    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
   x1 <- moduleInputs(m, dirname(dirname(fileName)))
-  expect_false(any(unlist(lapply(x1, function(v)
-    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
   x1 <- moduleOutputs(m, dirname(dirname(fileName)))
-  expect_false(any(unlist(lapply(x1, function(v)
-    grepl("  |\n", v)))))
-
-
+  expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {

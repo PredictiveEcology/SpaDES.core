@@ -1,6 +1,6 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
-version 1.0.6.9000
+version 1.0.7
 =============
 
 ## new features
@@ -12,7 +12,7 @@ version 1.0.6.9000
 * several human-readable only elements of a module metadata are no longer enforced, including `spatialExtent`, as they are not used by the spades algorithms
 * new function: `anyPlotting` to test whether plotting of one form or another should occur
 * line-by-line messaging during `spades` call is now more informative, including module name (by default shortened -- can be changed with `options("spades.messagingNumCharsModule"))`) 
-* defineParameter can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, c("numeric", "function"), where the use can pass either a numeric or a function that would calculate that numeric.
+* `defineParameter` can now accept a vector of "class", so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, `c("numeric", "function")`, where the use can pass either a numeric or a function that would calculate that numeric.
 * new helper function `simFile` to generate file names for use with e.g., `saveSimList`
 * `zipSimList` is now exported
 * `spades` will now attempt to load `reqdPkgs`, which is already done in `simInit`. In cases where `simInit` was not run, e.g., `Cache(simInitAndSpades, ..., events = "init")`, then modules will not have access to packages. For cases where `simInit` was called, then this should add very little overhead.
@@ -20,6 +20,7 @@ version 1.0.6.9000
 * For code/documentation contributors, markdown syntax is now turned on and can be used when writing function documentation  
 * The first event will now run if it is scheduled to be prior to `time(sim)` in the case where it is equal to or after `end(sim)`. Previously, this would not run any events if `time(sim)` >= `end(sim)` && `events(sim)[[1]] < time(sim)`
 * minor documentation modifications
+* Add optional `.seed` parameter for modules (#163)
 
 ## Bugfixes
 * `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
