@@ -5,8 +5,7 @@ defineModule(sim, list(
   authors = c(person(c("Alex", "M."), "Chubaty", email = "alexander.chubaty@canada.ca",
                      role = c("aut", "cre"))),
   childModules = c("caribouMovement", "fireSpread", "randomLandscapes"),
-  version = list(SpaDES.core = "0.1.0", SpaDES_sampleModules = "1.3.0",
-                 randomLandscapes = "1.6.0", caribouMovement = "1.6.0"),
+  version = list(SpaDES_sampleModules = "1.3.0", randomLandscapes = "1.6.0", caribouMovement = "1.6.0"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = NA_character_, # e.g., "year"
