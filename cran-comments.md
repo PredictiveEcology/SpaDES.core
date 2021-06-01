@@ -1,6 +1,6 @@
 ## Updated release
 
-This release is to restore this package on CRAN following removal of dependency `reproducible` (which has now been fixed and restored on CRAN).
+This release is to restore this package on CRAN following removal of dependency `reproducible` (which has now been restored on CRAN).
 
 See `NEWS.md` for a full list of changes.
 

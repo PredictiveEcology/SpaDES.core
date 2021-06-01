@@ -61,11 +61,11 @@ out of date elements. See Details.}
 Saving a \code{simList} may not work using the standard approaches (e.g.,
 \code{save}, \code{saveRDS}, and \code{qs::qsave}). There are 2 primary reasons why this doesn't
 work as expected: the \code{activeBindings} that are in place within modules (these
-allow the \code{mod} and \code{Par} to exist), and file-backed Rasters. Because of these,
+allow the \code{mod} and \code{Par} to exist), and file-backed rasters. Because of these,
 a user should use \code{saveSimList} and \code{loadSimList} (and the \code{zipSimList}/\code{unzipSimList}
 alternatives).
 The most robust way if there are file-backed Raster* objects seems to be to
-set \code{fileBackend = 2}, though this may not be desireable if there are many
+set \code{fileBackend = 2}, though this may not be desirable if there are many
 large \verb{Raster*} objects. When using \code{fileBackend = 0} or \code{fileBackend = 1}, and
 when errors are noticed, please file a bug report on GitHub.
 

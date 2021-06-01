@@ -3,11 +3,11 @@
 #' Saving a \code{simList} may not work using the standard approaches (e.g.,
 #' `save`, `saveRDS`, and `qs::qsave`). There are 2 primary reasons why this doesn't
 #' work as expected: the `activeBindings` that are in place within modules (these
-#' allow the `mod` and `Par` to exist), and file-backed Rasters. Because of these,
+#' allow the `mod` and `Par` to exist), and file-backed rasters. Because of these,
 #' a user should use `saveSimList` and `loadSimList` (and the `zipSimList`/`unzipSimList`
 #' alternatives).
 #' The most robust way if there are file-backed Raster* objects seems to be to
-#' set `fileBackend = 2`, though this may not be desireable if there are many
+#' set `fileBackend = 2`, though this may not be desirable if there are many
 #' large `Raster*` objects. When using `fileBackend = 0` or `fileBackend = 1`, and
 #' when errors are noticed, please file a bug report on GitHub.
 #'
@@ -209,9 +209,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
   zip(zipfile = zipfile, files = unname(unlist(fns)))
 }
 
-
-
-#' Load a saved \code{simList} and ancilliary files
+#' Load a saved \code{simList} and ancillary files
 #'
 #' Loading a `simList` from file can be problematic as there are non-standard
 #' objects that must be rebuilt. See description in [saveSimList()] for details.
@@ -220,7 +218,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @param paths A list of character vectors for all the `simList` paths. When
 #'   loading a \code{simList}, this will replace the paths of everything to
 #'   these new paths. Experimental still.
-#' @param otherFiles A character vector of (absolute) filenames locating each of the
+#' @param otherFiles A character vector of (absolute) file names locating each of the
 #'   existing file-backed `Raster*` files that are the real paths for the possibly
 #'   incorrect paths in `Filenames(sim)` if the the `file` being read in is from
 #'   a different computer, path, or drive. This could be the output from `unzipSimList`
@@ -229,7 +227,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @return
 #'
 #' * [loadSimList()]: A `simList` object.
-#' * [unzipSimList()]: Either a character vector of filenames unzipped (if `load = FALSE`),
+#' * [unzipSimList()]: Either a character vector of file names unzipped (if `load = FALSE`),
 #'   or a `simList` object.
 #'
 #' @export

@@ -3,7 +3,7 @@
 \name{loadSimList}
 \alias{loadSimList}
 \alias{unzipSimList}
-\title{Load a saved \code{simList} and ancilliary files}
+\title{Load a saved \code{simList} and ancillary files}
 \usage{
 loadSimList(filename, paths = getPaths(), otherFiles = "")
 
@@ -16,7 +16,7 @@ unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 loading a \code{simList}, this will replace the paths of everything to
 these new paths. Experimental still.}
 
-\item{otherFiles}{A character vector of (absolute) filenames locating each of the
+\item{otherFiles}{A character vector of (absolute) file names locating each of the
 existing file-backed \verb{Raster*} files that are the real paths for the possibly
 incorrect paths in \code{Filenames(sim)} if the the \code{file} being read in is from
 a different computer, path, or drive. This could be the output from \code{unzipSimList}
@@ -32,7 +32,7 @@ also be loaded into R.}
 \value{
 \itemize{
 \item \code{\link[=loadSimList]{loadSimList()}}: A \code{simList} object.
-\item \code{\link[=unzipSimList]{unzipSimList()}}: Either a character vector of filenames unzipped (if \code{load = FALSE}),
+\item \code{\link[=unzipSimList]{unzipSimList()}}: Either a character vector of file names unzipped (if \code{load = FALSE}),
 or a \code{simList} object.
 }
 }

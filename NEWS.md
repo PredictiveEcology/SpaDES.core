@@ -24,7 +24,7 @@ version 1.0.7
 
 ## Bugfixes
 * `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
-* recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directoyr of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory
+* recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directory of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory
 * other minor bugfixes, 
 
 version 1.0.6

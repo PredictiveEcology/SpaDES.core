@@ -2,7 +2,7 @@
 % Please edit documentation in R/Plots.R
 \name{Plots}
 \alias{Plots}
-\title{Plot wrapper intended for use in a SpaDES module}
+\title{\code{Plot} wrapper intended for use in a SpaDES module}
 \usage{
 Plots(
   data,
@@ -47,35 +47,40 @@ with \code{quickPlot::Plot}, so it will be arranged with previously existing plo
 }
 \description{
 This is a single function call that allows a module to change which format in which
-the plots will occur. Specifically, the two primary formats would be to "screen" or
-to disk as an image file, such as "png". THIS CURRENTLY ONLY WORKS CORRECTLY WITH
-ggplot2 objects that can be saved. It uses \code{Plot} internally, so individual
-plots may be rearranged. This function requires at least 2 things: a plotting function
-and data for that plotting function. See below and examples. THIS IS STILL EXPERIMENTAL and could change in the next release.
+the plots will occur.
+Specifically, the two primary formats would be to "screen" or to disk as an image file,
+such as "png".
+\emph{THIS CURRENTLY ONLY WORKS CORRECTLY WITH \code{ggplot2} objects that can be saved.}
+It uses \code{Plot} internally, so individual plots may be rearranged.
+This function requires at least 2 things: a plotting function and data for that plot function.
+See below and examples.
 }
 \details{
+\itemize{
+\item \code{type}
+\itemize{
+\item \code{"screen"} -- Will plot to the current device, normally a plot window
+\item \code{"object"} -- Will save the plot object, e.g., \code{ggplot} object
+\item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
+the data argument
+\item \code{"png"} -- or any other type save-able with \code{ggsave}
+}
+}
+}
+\note{
+THIS IS STILL EXPERIMENTAL and could change in the next release.
+
 This offers up to 4 different actions for a given plot:
 \itemize{
 \item To screen device
 \item To disk as raw data
 \item To disk as a saved plot object
-\item To disk as a png or other "image" file, like pdf
+\item To disk as a \file{.png} or other image file, e.g., \file{.pdf}
 }
 To turn off plotting both to screen and disk, set both
 \code{.plotInititalTime = NA} and \code{.plots = NA} or any other
 value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 argument (e.g., \code{""} will omit all saving).
-
-\itemize{
-\item \code{type}
-\itemize{
-\item \code{"screen"} -- Will plot to the current device, normally a plot window
-\item \code{"object"} -- Will save the plot object, e.g., ggplot object
-\item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
-the data argument
-\item \code{"png"} -- or any other type saveble with \code{ggsave}
-}
-}
 }
 \examples{
 
