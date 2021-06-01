@@ -284,8 +284,10 @@ rmExtraSpacesEOLList <- function(xx) {
     }
   })
 
-  ## TODO: what's going on here with .seed param?
-  ## grepl("\n", xx[[13]]) # TRUE despite that element being OK above (within the loop)
+  ## used to diagnose long parameter descriptions that trigger insertion of `\n`
+  #id1 <- which(names(xx) == "parameters")
+  #id2 <- which(names(xx[[id1]]) == "paramDesc")
+  #grep("\n", xx[[id1]][[id2]], value = TRUE)
 
   xx
 }

@@ -1,4 +1,4 @@
-SpaDES.core.version <- "0.1.0"
+SpaDES.core.version <- "1.0.7"
 if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'randomLandscapes' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
@@ -38,6 +38,10 @@ defineModule(sim, list(
     defineParameter(".plotInterval", "numeric", NA_real_, NA, NA, "time interval between plot events"),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time to schedule first save event"),
     defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time interval between save events"),
+    defineParameter(".seed", "list", list(), NA, NA,
+                    paste("Named list of seeds to use for each event (names).",
+                          "E.g., `list('init' = 123)` will `set.seed(123)`",
+                          "for the `init` event only.")),
     defineParameter(".useCache", "logical", FALSE, c("init", "plot"), NA, "should the module result be cached for future use")
   ),
   inputObjects = bindrows(

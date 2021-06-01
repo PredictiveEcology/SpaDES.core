@@ -1,4 +1,4 @@
-SpaDES.core.version <- "0.1.0"
+SpaDES.core.version <- "1.0.7"
 if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'fireSpread' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
@@ -17,11 +17,11 @@ defineModule(sim, list(
   keywords = c("fire", "percolation model", "spread algorithm"),
   childModules = character(),
   authors = c(
-    person(c("Alex", "M"), "Chubaty", email = "alexander.chubaty@canada.ca", role = c("aut", "cre")),
+    person(c("Alex", "M"), "Chubaty", email = "achubaty@for-cast.ca", role = c("aut", "cre")),
     person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca", role = c("aut"))
   ),
-  version = list(SpaDES.core = "0.1.0", SpaDES.tools = "0.1.0", fireSpread = "1.6.0"),
+  version = list(fireSpread = "1.6.0"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
@@ -39,7 +39,11 @@ defineModule(sim, list(
     defineParameter(".plotInitialTime", "numeric", start(sim), start(sim), end(sim) + 1, "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, 1, 1, "time interval between plot events"),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time to schedule first save event"),
-    defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time interval between save events")
+    defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time interval between save events"),
+    defineParameter(".seed", "list", list(), NA, NA,
+                    paste("Named list of seeds to use for each event (names).",
+                          "E.g., `list('init' = 123)` will `set.seed(123)`",
+                          "for the `init` event only."))
   ),
   inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
