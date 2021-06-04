@@ -11,6 +11,11 @@
 #'
 #' @note THIS IS STILL EXPERIMENTAL and could change in the next release.
 #'
+#' `Plots` now has experimental support for "just a `Plot` call", ut with `types` specified.
+#' See example.
+#' The devices to save on disk will have some different behaviours to the screen representation,
+#' since "wiping" an individual plot on a device doesn't exist for a file device.
+#'
 #' This offers up to 4 different actions for a given plot:
 #'     \itemize{
 #'       \item To screen device
