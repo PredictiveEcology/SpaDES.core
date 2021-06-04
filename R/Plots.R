@@ -96,6 +96,7 @@ Plots <- function(data, fn, filename,
                   path = quote(file.path(outputPath(sim), "figures")),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = TRUE,
+                  deviceArgs = list(),
                   ...) {
 
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))){
@@ -105,6 +106,16 @@ Plots <- function(data, fn, filename,
       if (is(simIsIn, "try-error"))
         simIsIn <- NULL
     }
+  }
+
+  # Deal with non sim cases
+  if (is.null(simIsIn)) {
+    if (is.call(types) && any(grepl("sim", types)))
+      types <- "screen"
+    if (is.call(path) && any(grepl("sim", path)))
+      path = "."
+    if (is.call(.plotInitialTime) && any(grepl("sim", .plotInitialTime)))
+      .plotInitialTime <- 0L
   }
 
   if (!is.null(simIsIn))
@@ -125,28 +136,44 @@ Plots <- function(data, fn, filename,
     .plotInitialTime <- 0L
   }
 
-  ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
   ggplotClassesCanHandleBar <- paste(ggplotClassesCanHandle, collapse = "|")
   needSave <- any(grepl(paste(ggplotClassesCanHandleBar, "|object"), types))
   needScreen <- !is.na(.plotInitialTime) && any(grepl("screen", types))
-  if (needScreen || needSave) {
-    gg <- fn(data, ...)
-    ggListToScreen <- setNames(list(gg), "gg")
-    if (!is.null(gg$labels$title) && needScreen) {
-      ggListToScreen <- setNames(ggListToScreen, gg$labels$title)
-      ggListToScreen[[1]]$labels$title <- NULL
+  if (missing(fn) && isTRUE(usePlot)) {
+    fn <- Plot
+  }
+  fnIsPlot <- identical(fn, Plot)
+  if (fnIsPlot) {
+    # make dummies
+    gg <- 1
+    ggListToScreen <- list()
+  } else {
+    if ( (needScreen || needSave) ) {
+      gg <- fn(data, ...)
+      if (!is(gg, ".quickPlot")) {
+        ggListToScreen <- setNames(list(gg), "gg")
+        if (!is.null(gg$labels$title) && needScreen) {
+          ggListToScreen <- setNames(ggListToScreen, gg$labels$title)
+          ggListToScreen[[1]]$labels$title <- NULL
+        }
+      }
     }
   }
 
   if (needScreen) {
-    if (is(gg, "gg"))
-      if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-    if (usePlot) {
-      names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " ", replacement = "_")
-      Plot(ggListToScreen, addTo = gg$labels$title)
+    if (fnIsPlot) {
+      gg <- fn(data, ...)
     } else {
-      print(gg)
+      if (is(gg, "gg"))
+        if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
+      if (usePlot) {
+        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " ", replacement = "_")
+        Plot(ggListToScreen, addTo = gg$labels$title)
+      } else {
+        print(gg)
+      }
     }
+
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
@@ -178,15 +205,36 @@ Plots <- function(data, fn, filename,
   }
 
   if (needSave) {
-    ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
-    for (ggsf in ggSaveFormats) {
-      if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
-      args <- list(plot = gg,
-                   filename = file.path(path, paste0(filename, ".", ggsf)))
-      if (length(ggsaveArgs)) {
-        args <- modifyList(args, ggsaveArgs)
+    if (is.null(simIsIn)) {
+      if (is.call(path))
+        path <- "."
+      if (is.call(path))
+        path <- "."
+    }
+    if (fnIsPlot) {
+      baseSaveFormats <- intersect(baseClassesCanHandle, types)
+      for (bsf in baseSaveFormats) {
+        type <- get(bsf)
+        theFilename <- file.path(path, paste0(filename, ".", bsf))
+        browser()
+        do.call(type, modifyList(list(theFilename), deviceArgs))
+        fn(data, ...)
+        dev.off()
+        message("Saved figure to: ", theFilename)
       }
-      do.call(ggplot2::ggsave, args = args)
+    } else {
+      ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
+      for (ggsf in ggSaveFormats) {
+        theFilename <- file.path(path, paste0(filename, ".", ggsf))
+        if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
+        args <- list(plot = gg,
+                     filename = )
+        if (length(ggsaveArgs)) {
+          args <- modifyList(args, ggsaveArgs)
+        }
+        do.call(ggplot2::ggsave, args = args)
+        message("Saved figure to: ", theFilename)
+      }
     }
 
     if (any(grepl("object", types)))
@@ -215,3 +263,4 @@ anyPlotting <- function(.plots) {
 }
 
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
+baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
