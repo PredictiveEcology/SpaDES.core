@@ -40,6 +40,10 @@
 #'   compatibility. A developer should set in the module to the intended initial
 #'   plot time and leave it.
 #' @param ggsaveArgs An optional list of arguments passed to \code{ggplot2::ggsave}
+#' @param deviceArgs An optional list of arguments passed to one of \code{png},
+#'       \code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}. This is useful when
+#'       the plotting function is not creating a ggplot object.
+#'
 #' @param usePlot Logical. If \code{TRUE}, the default, then the plot will occur
 #'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
 #'
@@ -90,7 +94,11 @@
 #'       .plotInitialTime = 1
 #'       )
 #'
-#'  } # end of dontrun
+#' # Can also be used like quickPlot::Plot, but with control over output type
+#' r <- raster::raster(extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+#' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500))
+#'
+#' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
                   path = quote(file.path(outputPath(sim), "figures")),
@@ -216,11 +224,13 @@ Plots <- function(data, fn, filename,
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
         theFilename <- file.path(path, paste0(filename, ".", bsf))
-        browser()
         do.call(type, modifyList(list(theFilename), deviceArgs))
-        fn(data, ...)
+        # curDev <- dev.cur()
+        clearPlot()
+        plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
-        message("Saved figure to: ", theFilename)
+        if (!is(plotted, "try-error"))
+          message("Saved figure to: ", theFilename)
       }
     } else {
       ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
@@ -228,7 +238,7 @@ Plots <- function(data, fn, filename,
         theFilename <- file.path(path, paste0(filename, ".", ggsf))
         if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
         args <- list(plot = gg,
-                     filename = )
+                     filename = theFilename)
         if (length(ggsaveArgs)) {
           args <- modifyList(args, ggsaveArgs)
         }

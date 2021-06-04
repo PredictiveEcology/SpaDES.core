@@ -13,6 +13,7 @@ Plots(
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ggsaveArgs = list(),
   usePlot = TRUE,
+  deviceArgs = list(),
   ...
 )
 }
@@ -42,6 +43,10 @@ plot time and leave it.}
 
 \item{usePlot}{Logical. If \code{TRUE}, the default, then the plot will occur
 with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.}
+
+\item{deviceArgs}{An optional list of arguments passed to one of \code{png},
+\code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}. This is useful when
+the plotting function is not creating a ggplot object.}
 
 \item{...}{Anything needed by \code{fn}}
 }
@@ -110,5 +115,9 @@ Plots(data = sim$something, fn = fn,
       .plotInitialTime = 1
       )
 
- } # end of dontrun
+# Can also be used like quickPlot::Plot, but with control over output type
+r <- raster::raster(extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500))
+
+} # end of dontrun
 }
