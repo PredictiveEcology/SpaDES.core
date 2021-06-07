@@ -1,5 +1,11 @@
 Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
 
+version 1.0.8
+=============
+
+## new features
+* `Plots` function can be used like `Plot`, but with `types` specified. The devices to save on disk will have some different behaviours to the screen representation, since "wiping" an individual plot on a device doesn't exist for a file device.
+
 version 1.0.7
 =============
 
