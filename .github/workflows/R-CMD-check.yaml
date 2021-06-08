@@ -74,7 +74,7 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'cat(remotes::system_requirements("ubuntu", "20.04"), sep = "\n")')
+          done < <(Rscript -e 'cat(unique(c(remotes::system_requirements("ubuntu", "20.04"), remotes::system_requirements("ubuntu", "20.04", package = "sf"))), sep = "\n")')
 
       - name: Install dependencies
         run: |
