@@ -56,6 +56,7 @@ jobs:
         run: |
           remotes::install_github('PredictiveEcology/Require@development')
           remotes::install_github('PredictiveEcology/reproducible@development')
+          remotes::install_github('PredictiveEcology/quickPlot@development')
           remotes::install_github('PredictiveEcology/SpaDES.tools@development')
         shell: Rscript {0}
 
