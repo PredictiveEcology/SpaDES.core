@@ -1,16 +1,17 @@
-Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
+Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
 version 1.0.8
 =============
 
 ## new features
-* `Plots` function can be used like `Plot`, but with `types` specified. The devices to save on disk will have some different behaviours to the screen representation, since "wiping" an individual plot on a device doesn't exist for a file device.
+* `Plots` function can be used like `Plot`, but with `types` specified.
+  The devices to save on disk will have some different behaviours to the screen representation, since "wiping" an individual plot on a device doesn't exist for a file device.
 
 version 1.0.7
 =============
 
 ## new features
-* `Plots` function that will produce zero to 4 types of items that are relevant for plotting: 1) Visual on screen, 2) The plot object saved to disk, 3) The raw data that went into the plot and 4) The plot as one or more image files, e.g., png, pdf via `ggsave`
+* `Plots` function that will produce zero to 4 types of items that are relevant for plotting: 1) Visual on screen, 2) The plot object saved to disk, 3) The raw data that went into the plot and 4) The plot as one or more image files, e.g., `.png` or `.pdf` via `ggsave`
 * `spades` now accepts an `events` argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the `init` case, e.g., `spades(sim, events = "init")`. See `?spades`.
 * messaging during `simInit` now is prefixed with `Sys.time()` and `"simInit`"
 * messaging during `spades` is simplified to take up fewer characters: `INFO::` has been removed

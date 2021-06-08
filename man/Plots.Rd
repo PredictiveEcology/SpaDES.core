@@ -45,16 +45,16 @@ plot time and leave it.}
 with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.}
 
 \item{deviceArgs}{An optional list of arguments passed to one of \code{png},
-\code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}. This is useful when
-the plotting function is not creating a ggplot object.}
+\code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}.
+This is useful when the plotting function is not creating a \code{ggplot} object.}
 
 \item{...}{Anything needed by \code{fn}}
 }
 \description{
 This is a single function call that allows a module to change which format in which
 the plots will occur.
-Specifically, the two primary formats would be to "screen" or to disk as an image file,
-such as "png".
+Specifically, the two primary formats would be to \code{"screen"} or to disk as an image file,
+such as \code{"png"}.
 \emph{THIS CURRENTLY ONLY WORKS CORRECTLY WITH \code{ggplot2} objects that can be saved.}
 It uses \code{Plot} internally, so individual plots may be rearranged.
 This function requires at least 2 things: a plotting function and data for that plot function.
@@ -75,7 +75,8 @@ the data argument
 \note{
 THIS IS STILL EXPERIMENTAL and could change in the next release.
 
-\code{Plots} now has experimental support for "just a \code{Plot} call", ut with \code{types} specified.
+\code{Plots} now has experimental support for "just a \code{Plot} call",
+but with \code{types} specified.
 See example.
 The devices to save on disk will have some different behaviours to the screen representation,
 since "wiping" an individual plot on a device doesn't exist for a file device.

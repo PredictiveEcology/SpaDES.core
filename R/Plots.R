@@ -2,8 +2,8 @@
 #'
 #' This is a single function call that allows a module to change which format in which
 #' the plots will occur.
-#' Specifically, the two primary formats would be to "screen" or to disk as an image file,
-#' such as "png".
+#' Specifically, the two primary formats would be to \code{"screen"} or to disk as an image file,
+#' such as \code{"png"}.
 #' \emph{THIS CURRENTLY ONLY WORKS CORRECTLY WITH \code{ggplot2} objects that can be saved.}
 #' It uses \code{Plot} internally, so individual plots may be rearranged.
 #' This function requires at least 2 things: a plotting function and data for that plot function.
@@ -11,7 +11,8 @@
 #'
 #' @note THIS IS STILL EXPERIMENTAL and could change in the next release.
 #'
-#' `Plots` now has experimental support for "just a `Plot` call", ut with `types` specified.
+#' \code{Plots} now has experimental support for "just a \code{Plot} call",
+#' but with \code{types} specified.
 #' See example.
 #' The devices to save on disk will have some different behaviours to the screen representation,
 #' since "wiping" an individual plot on a device doesn't exist for a file device.
@@ -46,11 +47,11 @@
 #'   plot time and leave it.
 #' @param ggsaveArgs An optional list of arguments passed to \code{ggplot2::ggsave}
 #' @param deviceArgs An optional list of arguments passed to one of \code{png},
-#'       \code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}. This is useful when
-#'       the plotting function is not creating a ggplot object.
+#'       \code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}.
+#'       This is useful when the plotting function is not creating a \code{ggplot} object.
 #'
 #' @param usePlot Logical. If \code{TRUE}, the default, then the plot will occur
-#'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
+#'   with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.
 #'
 #' @param ... Anything needed by \code{fn}
 #'
