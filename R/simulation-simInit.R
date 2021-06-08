@@ -193,7 +193,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @include priority.R
 #' @importFrom reproducible basename2
 #' @importFrom utils compareVersion
-#' @importFrom Require Require trimVersionNumber
+#' @importFrom Require Require trimVersionNumber modifyList2
 #' @importFrom utils compareVersion
 #' @rdname simInit
 #'
@@ -524,7 +524,7 @@ setMethod(
 
       tmp <- list()
       lapply(pnames, function(x) {
-        tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
+        tmp[[x]] <<- suppressWarnings(modifyList2(sim@params[[x]], params[[x]]))
       })
       sim@params <- tmp
 

@@ -47,6 +47,7 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' updateList(NULL, NULL) # should return empty list
 #'
 updateList <- function(x, y) {
+  .Deprecated("Require::modifyList2", "Require")
   if (missing(x)) x <- list()
   if (missing(y)) y <- list()
   if (is.null(y)) y <- list()

@@ -23,6 +23,7 @@ if (!isGeneric(".robustDigest")) {
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
+#' @importFrom Require modifyList2
 #' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
@@ -81,7 +82,7 @@ setMethod(
       names(objects2) <- mods
       .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
       if (length(objects1ByModWhole))
-        .objects <- suppressWarnings(updateList(.objects, objects1ByModWhole))
+        .objects <- suppressWarnings(modifyList2(.objects, objects1ByModWhole))
     } else {
       .objects <- allObjsInSimList
     }
