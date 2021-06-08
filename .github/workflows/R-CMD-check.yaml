@@ -66,7 +66,7 @@ jobs:
           remotes::install_github('PredictiveEcology/Require@development')
           remotes::install_github('PredictiveEcology/reproducible@development')
           remotes::install_github('PredictiveEcology/quickPlot@development')
-          remotes::install_github('PredictiveEcology/SpaDES.tools@development')
+          remotes::install_github('PredictiveEcology/SpaDES.tools@development', build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes", if (getRversion() >= "4.2.0") "--no-multiarch"))
         shell: Rscript {0}
 
       - name: Cache R packages
