@@ -54,6 +54,7 @@ jobs:
 
       - name: Install additional dependencies
         run: |
+          install.packages('igraph', repos = 'https://cran.rstudio.com') ## need source, not RSPM binary
           remotes::install_github('PredictiveEcology/Require@development')
           remotes::install_github('PredictiveEcology/reproducible@development')
           remotes::install_github('PredictiveEcology/quickPlot@development')
