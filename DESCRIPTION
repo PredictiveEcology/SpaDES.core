@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 3.6),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.6.9014)
+    reproducible (>= 1.2.7)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -67,11 +67,6 @@ Suggests:
     rmarkdown,
     tcltk,
     testthat (>= 1.0.2)
-Remotes:
-    PredictiveEcology/quickPlot@development,
-    PredictiveEcology/Require@development,
-    PredictiveEcology/reproducible@development,
-    PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
