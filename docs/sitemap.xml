@@ -10,6 +10,9 @@
     <loc>https://spades-core.predictiveecology.org//reference/Plot.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org//reference/Plots.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org//reference/SpaDES.core-package.html</loc>
   </url>
   <url>
@@ -23,6 +26,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org//reference/all.equal.simList.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org//reference/anyPlotting.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org//reference/append_attr.html</loc>
@@ -292,6 +298,9 @@
     <loc>https://spades-core.predictiveecology.org//reference/quickCheck.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org//reference/rasterCreate.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org//reference/rasterToMemory.html</loc>
   </url>
   <url>
@@ -341,6 +350,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org//reference/simDeps-class.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org//reference/simFile.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org//reference/simInit.html</loc>
@@ -419,9 +431,6 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org//reference/zipModule.html</loc>
-  </url>
-  <url>
-    <loc>https://spades-core.predictiveecology.org//reference/zipSimList.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org//articles/i-introduction.html</loc>

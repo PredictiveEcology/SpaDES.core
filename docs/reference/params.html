@@ -83,7 +83,7 @@ params has a replace method, so can be used to update a parameter value." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -217,7 +217,7 @@ The computationally fastest way to get a parameter is to specify moduleName and 
 <code>P(sim, "moduleName", "paramName")</code> (replacing moduleName and paramName with your
 specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
 part for speed (e.g., 2-4x faster) is specifying the moduleName.
-Specifying the parameter name is &lt;5<!-- % faster. --></p>
+Specifying the parameter name is &lt;5% faster.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>, specifically the section 1.2.1 on Simulation parameters.</p>
@@ -242,18 +242,18 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
                  params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>.globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcJlADb/temp_libpath210dfc3d37b12d/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpLFlSnX/temp_libpath11ddf3d7a0fd5/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpEykBFD/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpEykBFD/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpEykBFD/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpEykBFD/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcJlADb/temp_libpath210dfc3d37b12d/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmp7dh1uL/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmp7dh1uL/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp7dh1uL/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp7dh1uL/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpLFlSnX/temp_libpath11ddf3d7a0fd5/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFields</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    RFoptions</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span><span></span></div><div class='input'>
+#&gt; <span class='message'>    RFoptions</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></span></div><div class='input'>
 <span class='co'># update some parameters using assignment -- currently only params will work</span>
 <span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>nx</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
 <span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>ny</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
@@ -292,11 +292,17 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt;   paramClass default min max                         paramDesc
 #&gt; 8    numeric      NA  NA  NA time interval between save events
 #&gt; 
+#&gt; $randomLandscapes$.seed
+#&gt;   paramClass default min max
+#&gt; 9       list          NA  NA
+#&gt;                                                                                                                       paramDesc
+#&gt; 9 Named list of seeds to use for each event (names). E.g., `list('init' = 123)` will `set.seed(123)` for the `init` event only.
+#&gt; 
 #&gt; $randomLandscapes$.useCache
-#&gt;   paramClass default        min max
-#&gt; 9    logical   FALSE init, plot  NA
-#&gt;                                           paramDesc
-#&gt; 9 should the module result be cached for future use
+#&gt;    paramClass default        min max
+#&gt; 10    logical   FALSE init, plot  NA
+#&gt;                                            paramDesc
+#&gt; 10 should the module result be cached for future use
 #&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># These next 2 are same here because they are not within a module</span>
@@ -348,6 +354,9 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; $randomLandscapes$.saveInterval
 #&gt; [1] NA
+#&gt; 
+#&gt; $randomLandscapes$.seed
+#&gt; list()
 #&gt; 
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
@@ -401,6 +410,9 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; $randomLandscapes$.saveInterval
 #&gt; [1] NA
 #&gt; 
+#&gt; $randomLandscapes$.seed
+#&gt; list()
+#&gt; 
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
 #&gt; 
@@ -443,11 +455,17 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt;   paramClass default min max                         paramDesc
 #&gt; 8    numeric      NA  NA  NA time interval between save events
 #&gt; 
+#&gt; $randomLandscapes$.seed
+#&gt;   paramClass default min max
+#&gt; 9       list          NA  NA
+#&gt;                                                                                                                       paramDesc
+#&gt; 9 Named list of seeds to use for each event (names). E.g., `list('init' = 123)` will `set.seed(123)` for the `init` event only.
+#&gt; 
 #&gt; $randomLandscapes$.useCache
-#&gt;   paramClass default        min max
-#&gt; 9    logical   FALSE init, plot  NA
-#&gt;                                           paramDesc
-#&gt; 9 should the module result be cached for future use
+#&gt;    paramClass default        min max
+#&gt; 10    logical   FALSE init, plot  NA
+#&gt;                                            paramDesc
+#&gt; 10 should the module result be cached for future use
 #&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># These next 2 are same here because they are not within a module</span>
@@ -493,6 +511,9 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; 
 #&gt; $randomLandscapes$.saveInterval
 #&gt; [1] NA
+#&gt; 
+#&gt; $randomLandscapes$.seed
+#&gt; list()
 #&gt; 
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
@@ -540,10 +561,13 @@ Specifying the parameter name is &lt;5<!-- % faster. --></p>
 #&gt; $randomLandscapes$.saveInterval
 #&gt; [1] NA
 #&gt; 
+#&gt; $randomLandscapes$.seed
+#&gt; list()
+#&gt; 
 #&gt; $randomLandscapes$.useCache
 #&gt; [1] FALSE
 #&gt; 
-#&gt; </div></span></pre>
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

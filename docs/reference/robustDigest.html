@@ -83,7 +83,7 @@ a simList would look like once it is converted to a repeatably digestible object
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -193,21 +193,9 @@ Default is <code><a href='https://rdrr.io/r/base/options.html'>getOption("reprod
     </tr>
     <tr>
       <th>quick</th>
-      <td><p>Logical. If <code>TRUE</code>,
-little or no disk-based information will be assessed, i.e., mostly its
-memory content. This is relevant for objects of class <code>character</code>,
-<code>Path</code> and <code>Raster</code> currently. For class <code>character</code>, it is ambiguous
-whether this represents a character string or a vector of file paths. The function
-will assess if it is a path to a file or directory first. If not, it will treat
-the object as a character string. If it is known that character strings should
-not be treated as paths, then <code>quick = TRUE</code> will be much faster, with no loss
-of information. If it is file or directory, then it will digest the file content,
-or <code><a href='https://rdrr.io/r/base/basename.html'>basename(object)</a></code>. For class <code>Path</code> objects, the file's metadata
-(i.e., filename and file size) will be hashed instead of the file contents if
-<code>quick = TRUE</code>.
-If set to <code>FALSE</code> (default), the contents of the file(s) are hashed.
-If <code>quick = TRUE</code>, <code>length</code> is ignored. <code>Raster</code> objects are treated
-as paths, if they are file-backed.</p></td>
+      <td><p>Logical or character. If <code>TRUE</code>,
+no disk-based information will be assessed, i.e., only
+memory content. See Details section about <code>quick</code> in <code><a href='https://reproducible.predictiveecology.org/reference/Cache.html'>Cache</a></code>.</p></td>
     </tr>
     <tr>
       <th>classOptions</th>

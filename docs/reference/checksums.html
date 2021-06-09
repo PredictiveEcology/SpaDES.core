@@ -86,7 +86,7 @@ wrapper around digest::digest." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -198,15 +198,15 @@ one checksum value per file.
 To update your <code class="file">CHECKSUMS.txt</code> files using the new algorithm:</p><ol>
 <li><p>specify your module (<code>moduleName &lt;- "my_module"</code>);</p></li>
 <li><p>use a temp dir to ensure all modules get fresh copies of the data
-        (<code>tmpdir &lt;- file.path(tempdir(), "SpaDES_modules")</code>);</p></li>
+(<code>tmpdir &lt;- file.path(tempdir(), "SpaDES_modules")</code>);</p></li>
 <li><p>download your module's data to the temp dir (<code><a href='downloadData.html'>downloadData(moduleName, tmpdir)</a></code>);</p></li>
 <li><p>initialize a dummy simulation to ensure any 'data prep' steps in the
-        <code>.inputObjects</code> section are run (<code><a href='simInit.html'>simInit(modules = moduleName)</a></code>);</p></li>
+<code>.inputObjects</code> section are run (<code><a href='simInit.html'>simInit(modules = moduleName)</a></code>);</p></li>
 <li><p>recalculate your checksums and overwrite the file
-        (<code>checksums(moduleName, tmpdir, write = TRUE)</code>);</p></li>
+(<code>checksums(moduleName, tmpdir, write = TRUE)</code>);</p></li>
 <li><p>copy the new checksums file to your working module directory
-        (the one not in the temp dir)
-        (<code><a href='https://rdrr.io/r/base/files.html'>file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+(the one not in the temp dir)
+(<code><a href='https://rdrr.io/r/base/files.html'>file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
                to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
                overwrite = TRUE)</a></code>).</p></li>
 </ol>

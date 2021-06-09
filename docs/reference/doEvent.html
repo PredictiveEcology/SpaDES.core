@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -158,7 +158,9 @@
   <span class='va'>sim</span>,
   debug <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>notOlderThan</span>,
-  useFuture <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"spades.futureEvents"</span>, <span class='cn'>FALSE</span><span class='op'>)</span>
+  useFuture <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"spades.futureEvents"</span>, <span class='cn'>FALSE</span><span class='op'>)</span>,
+  events <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -186,6 +188,22 @@ Ignored if <code>cache</code> is <code>FALSE</code>.</p></td>
       <th>useFuture</th>
       <td><p>Experimental use of future::future package. Not fully implemented.</p></td>
     </tr>
+    <tr>
+      <th>events</th>
+      <td><p>A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules. With the <code>list</code> form, all unspecified modules
+will run <em>all</em> their events, including internal spades modules, e.g., <code>save</code>,
+that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. See example.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Any. Can be used to make a unique cache identity, such as "replicate = 1".
+This will be included in the <code>Cache</code> call, so will be unique
+and thus <code>spades</code> will not use a cached copy as long as
+anything passed in <code>...</code> is unique, i.e., not cached previously.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -199,8 +217,8 @@ submodules to the simulation. We use S4 classes and methods.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Alex Chubaty</p>

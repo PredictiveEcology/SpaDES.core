@@ -41,7 +41,9 @@
 
 <meta property="og:title" content="Read raster to memory — rasterToMemory" />
 <meta property="og:description" content="Wrapper to the raster function, that creates the raster object in
-memory, even if it was read in from file." />
+memory, even if it was read in from file. There is the default method which is
+just a pass through, so this can be safely used on large complex objects,
+recursively, e.g., a simList." />
 
 
 
@@ -83,7 +85,7 @@ memory, even if it was read in from file." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -153,12 +155,23 @@ memory, even if it was read in from file." />
 
     <div class="ref-description">
     <p>Wrapper to the <code>raster</code> function, that creates the raster object in
-memory, even if it was read in from file.</p>
+memory, even if it was read in from file. There is the default method which is
+just a pass through, so this can be safely used on large complex objects,
+recursively, e.g., a <code>simList</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>rasterToMemory</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='co'># S4 method for Raster</span>
+<span class='fu'>rasterToMemory</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for list</span>
+<span class='fu'>rasterToMemory</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
 <span class='co'># S4 method for ANY</span>
+<span class='fu'>rasterToMemory</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for simList</span>
 <span class='fu'>rasterToMemory</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -170,7 +183,8 @@ memory, even if it was read in from file.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments to <code>raster</code>.</p></td>
+      <td><p>Additional arguments to <code><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster::raster</a></code>, <code><a href='https://rdrr.io/pkg/raster/man/stack.html'>raster::stack</a></code>,
+or <code><a href='https://rdrr.io/pkg/raster/man/brick.html'>raster::brick</a></code>.</p></td>
     </tr>
     </table>
 

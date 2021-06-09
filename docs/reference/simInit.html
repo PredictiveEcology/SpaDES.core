@@ -88,7 +88,7 @@ See more details below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -236,7 +236,10 @@ See more details below.</p>
     <tr>
       <th>times</th>
       <td><p>A named list of numeric simulation start and end times
-(e.g., <code>times = list(start = 0.0, end = 10.0)</code>).</p></td>
+(e.g., <code>times = list(start = 0.0, end = 10.0, timeunit = "year")</code>),
+with the final optional element, <code>timeunit</code>, overriding the default
+time unit used in the simulation which is the "smallest time unit" across all
+modules. See examples.</p></td>
     </tr>
     <tr>
       <th>params</th>
@@ -294,7 +297,7 @@ it should give "initial conditions".</p>
     </tr>
     <tr>
       <th>loadOrder</th>
-      <td><p>An optional list of module names specifying the order in
+      <td><p>An optional character vector of module names specifying the order in
 which to load the modules. If not specified, the module
 load order will be determined automatically.</p></td>
     </tr>
@@ -319,33 +322,34 @@ specified in the arguments supplied.</p>
 
     
 <h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Calling this <code>simInit</code> function does the following:</h3>
-<p></p><table class='table'>
+
+<table class='table'>
 <tr><td><b>What</b></td><td><b>Details</b></td><td><b>Argument(s) to use</b></td></tr>
 <tr><td>fills <code>simList</code> slots</td><td>places the arguments <code>times</code>,
-    <code>params</code>, <code>modules</code>, <code>paths</code> into equivalently named
-    <code>simList</code> slots</td><td><code>times</code>,
-    <code>params</code>, <code>modules</code>, <code>paths</code></td></tr>
+<code>params</code>, <code>modules</code>, <code>paths</code> into equivalently named
+<code>simList</code> slots</td><td><code>times</code>,
+<code>params</code>, <code>modules</code>, <code>paths</code></td></tr>
 <tr><td>sources all module files</td><td>places all function definitions in the
-    <code>simList</code>, specifically, into a sub-environment of the main
-    <code>simList</code> environment: e.g., <code>sim$&lt;moduleName&gt;$function1</code>
-    (see section on <b>Scoping</b>)</td><td><code>modules</code></td></tr>
+<code>simList</code>, specifically, into a sub-environment of the main
+<code>simList</code> environment: e.g., <code>sim$&lt;moduleName&gt;$function1</code>
+(see section on <b>Scoping</b>)</td><td><code>modules</code></td></tr>
 <tr><td>copies objects</td><td>from the global environment to the
-    <code>simList</code> environment</td><td><code>objects</code></td></tr>
+<code>simList</code> environment</td><td><code>objects</code></td></tr>
 <tr><td>loads objects</td><td>from disk into the <code>simList</code></td><td><code>inputs</code></td></tr>
 <tr><td>schedule object loading/copying</td><td>Objects can be loaded into the
-    <code>simList</code> at any time during a simulation</td><td><code>inputs</code></td></tr>
+<code>simList</code> at any time during a simulation</td><td><code>inputs</code></td></tr>
 <tr><td>schedule object saving</td><td>Objects can be saved to disk at any arbitrary
-    time during the simulation. If specified here, this will be in addition
-    to any saving due code inside a module (i.e., a module may manually
-    run <code><a href='https://rdrr.io/r/utils/write.table.html'>write.table(...)</a></code></td><td><code>outputs</code></td></tr>
+time during the simulation. If specified here, this will be in addition
+to any saving due code inside a module (i.e., a module may manually
+run <code><a href='https://rdrr.io/r/utils/write.table.html'>write.table(...)</a></code></td><td><code>outputs</code></td></tr>
 <tr><td>schedules "init" events</td><td>from all modules (see <code><a href='events.html'>events</a></code>)</td><td>automatic</td></tr>
 <tr><td>assesses module dependencies</td><td>via the inputs and outputs identified in their
-    metadata. This gives the order of the <code>.inputObjects</code> and <code>init</code>
-    events. This can be overridden by <code>loadOrder</code>.</td><td>automatic</td></tr>
+metadata. This gives the order of the <code>.inputObjects</code> and <code>init</code>
+events. This can be overridden by <code>loadOrder</code>.</td><td>automatic</td></tr>
 <tr><td>determines time unit</td><td>takes time units of modules
-      and how they fit together</td><td><code>times</code> or automatic</td></tr>
+and how they fit together</td><td><code>times</code> or automatic</td></tr>
 <tr><td>runs <code>.inputObjects</code> functions</td><td>from every module
-    <em>in the module order as determined above</em></td><td>automatic</td></tr>
+<em>in the module order as determined above</em></td><td>automatic</td></tr>
 </table>
 
 
@@ -359,6 +363,13 @@ Since this is a list of lists, one can override the module defaults for multiple
 parameters from multiple modules all at once, with say:
 <code><a href='https://rdrr.io/r/base/list.html'>list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))</a></code>.</p>
+<p><code>params</code> can be used to set the seed for a specific event in a module. This
+is done using the normal <code>params</code> argument, specifying <code>.seed</code> as a list
+where the elements are a numeric for the seed and the name is the event. Since
+parameters must be specific to a module, this creates a module and event specific
+seed e.g., <code>params = list(moduleName = list(.seed = list(init = 123)))</code> will
+set the <code>init</code> event of module named <code>moduleName</code> to 123. The RN stream
+will be reset to its state prior to the <code>set.seed</code> call after the event.</p>
 <p>We implement a discrete event simulation in a more modular fashion so it is
 easier to add modules to the simulation. We use S4 classes and methods,
 and fast lists to manage the event queue.</p>
@@ -390,7 +401,7 @@ for successful initialization.</p>
 
 
 <p>The <code>simInit</code> function will attempt to find usage of <code>sim$xxx</code> or <code>sim[['xxx']]</code>
- on either side of the assignment (<code>&lt;-</code>) operator.
+on either side of the assignment (<code>&lt;-</code>) operator.
 It will compare these to the module metadata, specifically <code>inputObjects</code> for cases where
 objects or "gotten" from the <code>simList</code> and <code>outputObjects</code> for cases where objects are
 assigned to the <code>simList.</code></p>
@@ -412,8 +423,8 @@ Please see the vignette dedicated to this topic.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='spades.html'>spades</a></code>,

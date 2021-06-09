@@ -81,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -148,16 +148,77 @@
       <small>Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-106" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.6">
-<a href="#version-106" class="anchor"></a>version 1.0.6<small> Unreleased </small>
+    <div id="version-108" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.8">
+<a href="#version-108" class="anchor"></a>version 1.0.8<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
+<li>
+<code>Plots</code> function can be used like <code>Plot</code>, but with <code>types</code> specified. The devices to save on disk will have some different behaviours to the screen representation, since “wiping” an individual plot on a device doesn’t exist for a file device.</li>
+</ul>
+</div>
+</div>
+    <div id="version-107" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.7">
+<a href="#version-107" class="anchor"></a>version 1.0.7<small> Unreleased </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>new features</h2>
+<ul>
+<li>
+<code>Plots</code> function that will produce zero to 4 types of items that are relevant for plotting: 1) Visual on screen, 2) The plot object saved to disk, 3) The raw data that went into the plot and 4) The plot as one or more image files, e.g., <code>.png</code> or <code>.pdf</code> via <code>ggsave</code>
+</li>
+<li>
+<code>spades</code> now accepts an <code>events</code> argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the <code>init</code> case, e.g., <code><a href="../reference/spades.html">spades(sim, events = "init")</a></code>. See <code><a href="../reference/spades.html">?spades</a></code>.</li>
+<li>messaging during <code>simInit</code> now is prefixed with <code><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time()</a></code> and <code>"simInit</code>"</li>
+<li>messaging during <code>spades</code> is simplified to take up fewer characters: <code>INFO::</code> has been removed</li>
+<li>
+<code>simInit</code> now checks for minimum version of <code>SpaDES.core</code> needed in a module and stops if it fails, giving instructions how to upgrade.</li>
+<li>several human-readable only elements of a module metadata are no longer enforced, including <code>spatialExtent</code>, as they are not used by the spades algorithms</li>
+<li>new function: <code>anyPlotting</code> to test whether plotting of one form or another should occur</li>
+<li>line-by-line messaging during <code>spades</code> call is now more informative, including module name (by default shortened – can be changed with <code>options("spades.messagingNumCharsModule"))</code>)</li>
+<li>
+<code>defineParameter</code> can now accept a vector of “class”, so a parameter can be more than one class. Presumably this should generally not be used, but a good reason could be, say, <code><a href="https://rdrr.io/r/base/c.html">c("numeric", "function")</a></code>, where the use can pass either a numeric or a function that would calculate that numeric.</li>
+<li>new helper function <code>simFile</code> to generate file names for use with e.g., <code>saveSimList</code>
+</li>
+<li>
+<code>zipSimList</code> is now exported</li>
+<li>
+<code>spades</code> will now attempt to load <code>reqdPkgs</code>, which is already done in <code>simInit</code>. In cases where <code>simInit</code> was not run, e.g., <code><a href="../reference/.robustDigest,simList-method.html">Cache(simInitAndSpades, ..., events = "init")</a></code>, then modules will not have access to packages. For cases where <code>simInit</code> was called, then this should add very little overhead.</li>
+<li>
+<code>saveSimList</code> will now convert file-backed <code>Raster*</code> class objects to memory if <code>fileBackend = 0</code>. Previously, it left them as is (on disk if on disk, in memory if in memory).</li>
+<li>For code/documentation contributors, markdown syntax is now turned on and can be used when writing function documentation<br>
+</li>
+<li>The first event will now run if it is scheduled to be prior to <code><a href="https://rdrr.io/r/stats/time.html">time(sim)</a></code> in the case where it is equal to or after <code><a href="../reference/times.html">end(sim)</a></code>. Previously, this would not run any events if <code><a href="https://rdrr.io/r/stats/time.html">time(sim)</a></code> &gt;= <code><a href="../reference/times.html">end(sim)</a></code> &amp;&amp; <code>events(sim)[[1]] &lt; time(sim)</code>.</li>
+<li>minor documentation modifications</li>
+<li>Add optional <code>.seed</code> parameter for modules (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/163'>#163</a>)</li>
+</ul>
+</div>
+<div id="bugfixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugfixes" class="anchor"></a>Bugfixes</h2>
+<ul>
+<li>
+<code>defineParameter</code> was throwing <code><a href="https://rdrr.io/r/base/NA.html">is.na(default)</a></code> warning when a parameter was not an atomic.</li>
+<li>recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directory of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory</li>
+<li>other minor bugfixes,</li>
+</ul>
+</div>
+</div>
+    <div id="version-106" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.6">
+<a href="#version-106" class="anchor"></a>version 1.0.6<small> 2021-02-20 </small>
+</h1>
+<div id="new-features-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-2" class="anchor"></a>new features</h2>
+<ul>
 <li>more informative message re: module package versions when <code>spades.useRequire = FALSE</code> (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/141'>#141</a>)</li>
-<li>now detects user-created memory leaks when a user adds a closure or formula to the <code>sim</code>
+<li>now detects user-created memory leaks when a user adds a closure or formula to the <code>sim</code>; user informed with a <code>warning</code>
 </li>
 </ul>
 </div>
@@ -174,6 +235,7 @@
 <ul>
 <li>use <code><a href="https://rdrr.io/r/base/try.html">try()</a></code> with <code><a href="https://rdrr.io/pkg/igraph/man/communities.html">communities()</a></code> to skip tests on systems without <code>igraph</code> GLPK support.</li>
 <li>prevent package (re)installation during examples, tests, vignettes.</li>
+<li>fix failures on R-devel caused by <code>RandomFields</code> being unavailable.</li>
 <li>minor bug fixes</li>
 </ul>
 </div>
@@ -182,15 +244,16 @@
 <h1 class="page-header" data-toc-text="1.0.5">
 <a href="#version-105" class="anchor"></a>version 1.0.5<small> 2021-01-07 </small>
 </h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>new features</h2>
+<a href="#new-features-3" class="anchor"></a>new features</h2>
 <ul>
 <li>New experimental <code>spades.futureEvents</code> option. If set to <code>TRUE</code>, spades will run module events in a “future” (see <code>future</code> package), if they do not produce outputs for other modules.</li>
 <li>enable automated module code checking with GitHub Actions (<code><a href="../reference/use_gha.html">use_gha()</a></code> and corresponding vignette; <a href='https://github.com/PredictiveEcology/SpaDES.core/issues/74'>#74</a>)</li>
 <li>
 <code>newProject</code> creates Rstudio <code>.Rproj</code> file if invoked in Rstudio</li>
 <li>moved <code>paddedFloatToChar</code> to reproducible; but re-exported here, so still usable.</li>
+<li>modules can now use a parameter called <code>.seed</code> which is a named list where names are the events and the elements are the seed with which to run the event. During <code>doEvent</code>, <code>SpaDES.core</code> will now <code><a href="https://rdrr.io/r/base/Random.html">set.seed(P(sim)$.seed[[currentEvent]])</a></code> and reset to random number stream afterwards.</li>
 </ul>
 </div>
 <div id="dependencies-1" class="section level2">
@@ -217,9 +280,9 @@
 <h1 class="page-header" data-toc-text="1.0.3">
 <a href="#version-103" class="anchor"></a>version 1.0.3<small> 2020-09-12 </small>
 </h1>
-<div id="new-features-2" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>new features</h2>
+<a href="#new-features-4" class="anchor"></a>new features</h2>
 <ul>
 <li>none</li>
 </ul>
@@ -246,9 +309,9 @@
 <h1 class="page-header" data-toc-text="1.0.2">
 <a href="#version-102" class="anchor"></a>version 1.0.2<small> 2020-08-28 </small>
 </h1>
-<div id="new-features-3" class="section level2">
+<div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>new features</h2>
+<a href="#new-features-5" class="anchor"></a>new features</h2>
 <ul>
 <li>
 <code>desc</code> argument in <code>defineParameter</code>, <code>expectsInput</code>, and <code>createsOutput</code> can now have extraneous spaces and End-of-Line characters. This means that they can now be written more easily with a single set of quotes, without needing <code>paste</code>. The accessor functions, <code>moduleParams</code>, <code>moduleInputs</code>, and <code>moduleOutputs</code> all will strip extraneous spaces and End-of-Line characters.</li>
@@ -280,9 +343,9 @@
 <h1 class="page-header" data-toc-text="1.0.1">
 <a href="#version-101" class="anchor"></a>version 1.0.1<small> 2020-05-15 </small>
 </h1>
-<div id="new-features-4" class="section level2">
+<div id="new-features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-4" class="anchor"></a>new features</h2>
+<a href="#new-features-6" class="anchor"></a>new features</h2>
 <ul>
 <li>
 <code>Par</code> is now an <code>activeBinding</code> (similar to <code>mod</code>) pointing to <code><a href="../reference/params.html">P(sim)</a></code>; this allows for tab autocomplete to function correctly.</li>
@@ -321,9 +384,9 @@
 <h1 class="page-header" data-toc-text="1.0.0">
 <a href="#version-100" class="anchor"></a>version 1.0.0<small> 2020-02-21 </small>
 </h1>
-<div id="new-features-5" class="section level2">
+<div id="new-features-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-5" class="anchor"></a>new features</h2>
+<a href="#new-features-7" class="anchor"></a>new features</h2>
 <ul>
 <li>several efforts made to reduce memory leaks over long simulations; if memory leaks are a problem, setting <code><a href="https://rdrr.io/r/base/options.html">options('spades.recoveryMode' = 0)</a></code> may further help</li>
 <li>Updates to deal with new backend with <code>reproducible</code>
@@ -365,9 +428,9 @@
 <h1 class="page-header" data-toc-text="0.2.8">
 <a href="#version-028" class="anchor"></a>version 0.2.8<small> Unreleased </small>
 </h1>
-<div id="new-features-6" class="section level2">
+<div id="new-features-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-6" class="anchor"></a>new features</h2>
+<a href="#new-features-8" class="anchor"></a>new features</h2>
 <ul>
 <li>Changed all internal <code>print</code> and <code>cat</code> statements to message to allow use of <code>suppressMessages</code>, as recommended by CRAN</li>
 <li>added file based logging via <code>logging</code> package, invoked by setting <code>debug</code> argument in <code>spades</code> function call to a <code><a href="https://rdrr.io/r/base/list.html">list(...)</a></code>. <code><a href="../reference/spades.html">?spades</a></code> describes details</li>
@@ -394,9 +457,9 @@
 <li>added <code>whisker</code> to Imports to facilitate module file templating (<a href='https://github.com/PredictiveEcology/SpaDES.core/issues/100'>#100</a>)</li>
 </ul>
 </div>
-<div id="new-features-7" class="section level2">
+<div id="new-features-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-7" class="anchor"></a>new features</h2>
+<a href="#new-features-9" class="anchor"></a>new features</h2>
 <ul>
 <li>memory and peak memory estimation is now available for *nix-type systems, when <code>future</code> is installed. See new vignette <code>iv-advanced</code> and <code><a href="../reference/memoryUseThisSession.html">?memoryUse</a></code>.</li>
 <li>new function and capacity: <code>restartR</code>. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <a href="https://github.com/r-lib/fastmap" class="uri">https://github.com/r-lib/fastmap</a>). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See <code><a href="../reference/restartR.html">?restartR</a></code> for instructions.</li>
@@ -441,9 +504,9 @@
 <li>improved documentation for <code>P</code>, <code>params</code>, and <code>parameters</code>, thanks to Louis-Etienne Robert.</li>
 </ul>
 </div>
-<div id="new-features-8" class="section level2">
+<div id="new-features-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-8" class="anchor"></a>new features</h2>
+<a href="#new-features-10" class="anchor"></a>new features</h2>
 <ul>
 <li>update <code>objSize.simList</code> method with 2 new arguments from <code>reproducible</code> package</li>
 <li>
@@ -497,9 +560,9 @@
 <li>minimium <code>reproducible</code> version 0.2.6</li>
 </ul>
 </div>
-<div id="new-features-9" class="section level2">
+<div id="new-features-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-9" class="anchor"></a>new features</h2>
+<a href="#new-features-11" class="anchor"></a>new features</h2>
 <ul>
 <li><p>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</p></li>
 <li>
@@ -542,9 +605,9 @@
 <li>add <code>RandomFields</code> to Suggests, as it is in the Suggests of <code>SpaDES.tools</code> and used in examples/tests.</li>
 </ul>
 </div>
-<div id="new-features-10" class="section level2">
+<div id="new-features-12" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-10" class="anchor"></a>new features</h2>
+<a href="#new-features-12" class="anchor"></a>new features</h2>
 <ul>
 <li>new option and default setting: <code><a href="https://rdrr.io/r/base/options.html">options("spades.saveSimOnExit" = TRUE)</a></code>. This will save the state of the <code>simList</code> to an object as <code>SpaDES.core:::.pkgEnv$.sim</code>, with a message, if there is a hard exist. There is virtually no computational cost to this, as the object is already in RAM.</li>
 <li>
@@ -584,9 +647,9 @@
 <li>remove <code>sp</code> from imports</li>
 </ul>
 </div>
-<div id="new-features-11" class="section level2">
+<div id="new-features-13" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-11" class="anchor"></a>new features</h2>
+<a href="#new-features-13" class="anchor"></a>new features</h2>
 <ul>
 <li>none</li>
 </ul>
@@ -610,9 +673,9 @@
 <li>requires new version of <code>reproducible</code> (&gt;=0.2.2)</li>
 </ul>
 </div>
-<div id="new-features-12" class="section level2">
+<div id="new-features-14" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-12" class="anchor"></a>new features</h2>
+<a href="#new-features-14" class="anchor"></a>new features</h2>
 <ul>
 <li>new option <code>spades.useRequire</code>: a logical which causes <code>simInit</code> to load packages with <code>Require</code> or <code>require</code>. Lower case is generally faster, but will not handle the case of uninstalled packages, so should only be used once all packages are installed.</li>
 <li><ul>
@@ -648,9 +711,9 @@
 <h1 class="page-header" data-toc-text="0.2.0">
 <a href="#version-020" class="anchor"></a>version 0.2.0<small> 2018-07-10 </small>
 </h1>
-<div id="new-features-13" class="section level2">
+<div id="new-features-15" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-13" class="anchor"></a>new features</h2>
+<a href="#new-features-15" class="anchor"></a>new features</h2>
 <ul>
 <li><p>module metadata now in <em>named</em> lists inside <code><a href="../reference/modules.html">depends(sim)</a></code></p></li>
 <li><p>new debugging – if debug is not <code>FALSE</code>, then any error will trigger a <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code> call inside the event function. User can continue (<code>c</code>) or quit (<code>Q</code>) as per normal. <code>c</code> will trigger a reparse and events will continue as scheduled.</p></li>

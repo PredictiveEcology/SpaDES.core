@@ -86,7 +86,7 @@ create the other files." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -184,17 +184,21 @@ The default is the current working directory.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments. Currently, only the following are supported:<br /><br /></p>
-<p><code>children</code>. Required when <code>type = "parent"</code>. A character vector
-             specifying the names of child modules.</p>
-<p><code>open</code>. Logical. Should the new module file be opened after creation?
-             Default <code>TRUE</code>.<br /><br /></p>
-<p><code>type</code>. Character string specifying one of <code>"child"</code> (default),
-             or <code>"parent"</code>.<br /><br /></p>
-<p><code>unitTests</code>. Logical. Should the new module include unit test files?
-             Default <code>TRUE</code>. Unit testing relies on the <span class="pkg">testthat</span> package.<br /><br /></p>
-<p><code>useGitHub</code>. Logical. Is module development happening on GitHub?
-             Default <code>TRUE</code>.</p></td>
+      <td><p>Additional arguments. Currently, only the following are supported:<br /><br /></p><pre>         \code{children}. Required when \code{type = "parent"}. A character vector
+         specifying the names of child modules.
+
+         \code{open}. Logical. Should the new module file be opened after creation?
+         Default \code{TRUE}.\cr\cr
+
+         \code{type}. Character string specifying one of \code{"child"} (default),
+         or \code{"parent"}.\cr\cr
+
+         \code{unitTests}. Logical. Should the new module include unit test files?
+         Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\cr\cr
+
+         \code{useGitHub}. Logical. Is module development happening on GitHub?
+         Default \code{TRUE}.
+</pre></td>
     </tr>
     </table>
 

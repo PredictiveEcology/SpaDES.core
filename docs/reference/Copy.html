@@ -88,7 +88,7 @@ See Copy." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -167,7 +167,7 @@ See <code><a href='https://reproducible.predictiveecology.org/reference/Copy.htm
     </div>
 
     <pre class="usage"><span class='co'># S4 method for simList</span>
-<span class='fu'>Copy</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>filebackedDir</span>, <span class='va'>objects</span>, <span class='va'>queues</span><span class='op'>)</span></pre>
+<span class='fu'>Copy</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>objects</span>, <span class='va'>queues</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -175,16 +175,6 @@ See <code><a href='https://reproducible.predictiveecology.org/reference/Copy.htm
     <tr>
       <th>object</th>
       <td><p>An R object (likely containing environments) or an environment.</p></td>
-    </tr>
-    <tr>
-      <th>filebackedDir</th>
-      <td><p>A directory to copy any files that are backing R objects,
-currently only valid for <code>Raster</code> classes. Defaults
-to <code>.reproducibleTempPath()</code>, which is unlikely to be very useful.
-Can be <code>NULL</code>, which means that the file will not be
-copied and could therefore cause a collision as the
-pre-copied object and post-copied object would have the same
-file backing them.</p></td>
     </tr>
     <tr>
       <th>objects</th>
@@ -196,6 +186,10 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></td>
       <td><p>Logical. Should the events queues (<code>events</code>,
 <code>current</code>, <code>completed</code>) be deep copied via
 <code><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>data.table::copy</a></code></p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Only used for custom Methods</p></td>
     </tr>
     </table>
 

@@ -84,7 +84,7 @@ values set to defaults" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -187,97 +187,97 @@ in which to replace element(s).</p></td>
 
 <table class='table'>
 <tr><td><code>name</code></td><td>Module name. Must match the filename (without the <code>.R</code> extension).
-                    This is currently not parsed by SpaDES;
-                        it is for human readers only.</td></tr>
+This is currently not parsed by SpaDES;
+it is for human readers only.</td></tr>
 <tr><td><code>description</code></td><td>Brief description of the module.
-                           This is currently not parsed by SpaDES;
-                           it is for human readers only.</td></tr>
+This is currently not parsed by SpaDES;
+it is for human readers only.</td></tr>
 <tr><td><code>keywords</code></td><td>Author-supplied keywords.
-                        This is currently not parsed by SpaDES;
-                        it is for human readers only.</td></tr>
+This is currently not parsed by SpaDES;
+it is for human readers only.</td></tr>
 <tr><td><code>childModules</code></td><td>If this contains any character vector, then it will
-                            be treated as a parent module. If this is a parent module,
-                            then only this list entry will be read. For normal,
-                            i.e., 'child modules', this should be <code><a href='https://rdrr.io/r/base/character.html'>character(0)</a></code> or
-                            <code>NA</code>.
-                            If a character vector is provided, then these must be the
-                            names of the modules located in the same file path as this
-                            parent module that will be loaded during the <code>simInit</code>.</td></tr>
+be treated as a parent module. If this is a parent module,
+then only this list entry will be read. For normal,
+i.e., 'child modules', this should be <code><a href='https://rdrr.io/r/base/character.html'>character(0)</a></code> or
+<code>NA</code>.
+If a character vector is provided, then these must be the
+names of the modules located in the same file path as this
+parent module that will be loaded during the <code>simInit</code>.</td></tr>
 <tr><td><code>authors</code></td><td>Module author information (as a vector of <code><a href='https://rdrr.io/r/utils/person.html'>person</a></code>
-                       objects. This is currently not parsed by SpaDES;
-                       it is for human readers only.</td></tr>
+objects. This is currently not parsed by SpaDES;
+it is for human readers only.</td></tr>
 <tr><td><code>version</code></td><td>Module version number (will be coerced to <code><a href='https://rdrr.io/r/base/numeric_version.html'>numeric_version</a></code>
-                       if a character or numeric are supplied).
-                       The module developer should update manually this with each change
-                       that is made to the module. See <a href='https://semver.org/'>https://semver.org/</a>
-                       for a widely accepted standard for version numbering.</td></tr>
+if a character or numeric are supplied).
+The module developer should update manually this with each change
+that is made to the module. See <a href='https://semver.org/'>https://semver.org/</a>
+for a widely accepted standard for version numbering.</td></tr>
 <tr><td><code>spatialExtent</code></td><td>The spatial extent of the module supplied via
-                             <code><a href='https://rdrr.io/pkg/raster/man/extent.html'>raster::extent</a></code>. This is currently unimplemented.
-                             Once implemented, this should define what spatial region this
-                             module is scientifically reasonable to be used in.</td></tr>
+<code><a href='https://rdrr.io/pkg/raster/man/extent.html'>raster::extent</a></code>. This is currently unimplemented.
+Once implemented, this should define what spatial region this
+module is scientifically reasonable to be used in.</td></tr>
 <tr><td><code>timeframe</code></td><td>Vector (length 2) of POSIXt dates specifying the temporal extent
-                         of the module. Currently unimplemented.
-                         Once implemented, this should define what time frame this
-                         module is scientifically reasonable to be used for.</td></tr>
+of the module. Currently unimplemented.
+Once implemented, this should define what time frame this
+module is scientifically reasonable to be used for.</td></tr>
 <tr><td><code>timeunit</code></td><td>Time scale of the module (e.g., "day", "year"). This
-                        MUST be specified. It indicates what '1' unit of time
-                        means for this module. <code>SpaDES</code> interprets this
-                        and if modules have different <code>timeunit</code> values
-                        then it will correctly schedule each module, using the
-                        smallest (currently the default) timeunit as the
-                        'model' timeunit in the <code>spades</code> call.</td></tr>
+MUST be specified. It indicates what '1' unit of time
+means for this module. <code>SpaDES</code> interprets this
+and if modules have different <code>timeunit</code> values
+then it will correctly schedule each module, using the
+smallest (currently the default) timeunit as the
+'model' timeunit in the <code>spades</code> call.</td></tr>
 <tr><td><code>citation</code></td><td>List of character strings specifying module citation information.
-                        Alternatively, a list of filenames of <code>.bib</code> or similar files.
-                        This is currently not parsed by SpaDES;
-                        it is for human readers only.</td></tr>
+Alternatively, a list of filenames of <code>.bib</code> or similar files.
+This is currently not parsed by SpaDES;
+it is for human readers only.</td></tr>
 <tr><td><code>documentation</code></td><td>List of filenames referring to module documentation sources.
-                             This is currently not parsed by SpaDES;
-                             it is for human readers only.</td></tr>
+This is currently not parsed by SpaDES;
+it is for human readers only.</td></tr>
 <tr><td></td><td><code>reqdPkgs</code></td></tr>
 <tr><td>List of R package names required by the module. These
-                        packages will be loaded when <code>simInit</code> is called.
-                        <code><a href='https://Require.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
-                        to load if available, and install if not available.
-                        Because <code><a href='https://Require.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
-                        GitHub.com, these packages can specify package names stored
-                        on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr>
+packages will be loaded when <code>simInit</code> is called.
+<code><a href='https://Require.predictiveecology.org/reference/Require.html'>Require</a></code> will be used internally
+to load if available, and install if not available.
+Because <code><a href='https://Require.predictiveecology.org/reference/Require.html'>Require</a></code> can also download from
+GitHub.com, these packages can specify package names stored
+on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr>
 <tr><td>A data.frame specifying the parameters used in the module.
-                          Usually produced by <code>rbind</code>-ing the outputs of multiple
-                          <code><a href='defineParameter.html'>defineParameter</a></code> calls. These parameters indicate
-                          the default values that will be used unless a module user
-                          overrides them with the <code>params</code> argument in the
-                          <code><a href='simInit.html'>simInit</a></code> call. The minimum and maximum are
-                          currently used by the <code><a href='http://spades-shiny.predictiveecology.org/reference/shine.html'>SpaDES.shiny::shine</a></code> function and the
-                          <code>POM</code> function, and they should indicate the range
-                          of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr>
+Usually produced by <code>rbind</code>-ing the outputs of multiple
+<code><a href='defineParameter.html'>defineParameter</a></code> calls. These parameters indicate
+the default values that will be used unless a module user
+overrides them with the <code>params</code> argument in the
+<code><a href='simInit.html'>simInit</a></code> call. The minimum and maximum are
+currently used by the <code>SpaDES.shiny::shine</code> function and the
+<code>POM</code> function, and they should indicate the range
+of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr>
 <tr><td>A <code>data.frame</code> specifying the data objects expected as
-                            inputs to the module,
-                            with columns <code>objectName</code> (class <code>character</code>),
-                            <code>objectClass</code> (class <code>character</code>),
-                            <code>sourceURL</code> (class <code>character</code>), and <code>other</code>
-                             (currently spades does nothing with this column).
-                            This data.frame identifies the objects that are expected,
-                            but does not do any loading of that object into the simList.
-                            The <code>sourceURL</code> gives the developer the opportunity
-                            to identify the source of a data file that can be used
-                            with the model. This URL will be
-                            used if the user calls <code>downloadData</code> (or
-                            <code><a href='downloadModule.html'>downloadModule(..., data = TRUE)</a></code>. If the raw data
-                            must be modified, the developer can use create a
-                            function called <code>.inputObjects</code> in their module. That
-                            function will be run during the <code>simInit</code> call. The
-                            developer should ensure that if the object is supplied
-                            by the module user as an argument in the <code>simInit</code>, then
-                            the <code>.inputObjects</code> should not be run, i.e., use an
-                            <code>(is.null(sim$xxx)))</code>.</td><td><code>outputObjects</code></td></tr>
+inputs to the module,
+with columns <code>objectName</code> (class <code>character</code>),
+<code>objectClass</code> (class <code>character</code>),
+<code>sourceURL</code> (class <code>character</code>), and <code>other</code>
+(currently spades does nothing with this column).
+This data.frame identifies the objects that are expected,
+but does not do any loading of that object into the simList.
+The <code>sourceURL</code> gives the developer the opportunity
+to identify the source of a data file that can be used
+with the model. This URL will be
+used if the user calls <code>downloadData</code> (or
+<code><a href='downloadModule.html'>downloadModule(..., data = TRUE)</a></code>. If the raw data
+must be modified, the developer can use create a
+function called <code>.inputObjects</code> in their module. That
+function will be run during the <code>simInit</code> call. The
+developer should ensure that if the object is supplied
+by the module user as an argument in the <code>simInit</code>, then
+the <code>.inputObjects</code> should not be run, i.e., use an
+<code>(is.null(sim$xxx)))</code>.</td><td><code>outputObjects</code></td></tr>
 <tr><td>A <code>data.frame</code> specifying the data objects output by
-                             the module, with columns identical to those in
-                             <code>inputObjects</code>. Like <code>inputObjects</code> above,
-                             this only identifies the objects that this module will output
-                             into the <code>simList</code>.
-                             The module developer must create the necessary functions
-                             that will cause these objects to be put into the
-                             <code>simList</code>.</td><td></td></tr>
+the module, with columns identical to those in
+<code>inputObjects</code>. Like <code>inputObjects</code> above,
+this only identifies the objects that this module will output
+into the <code>simList</code>.
+The module developer must create the necessary functions
+that will cause these objects to be put into the
+<code>simList</code>.</td><td></td></tr>
 </table>
 
 

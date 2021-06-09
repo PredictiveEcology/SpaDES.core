@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -198,7 +198,7 @@ about.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list of module metadata, matching the structure in
-        <code><a href='defineModule.html'>defineModule</a></code>.</p>
+<code><a href='defineModule.html'>defineModule</a></code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='defineModule.html'>defineModule</a></code></p></div>
@@ -214,7 +214,7 @@ about.</p></td>
                 <span class='st'>"spades.useRequire"</span> <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'>moduleMetadata</span><span class='op'>(</span><span class='va'>sampleModules</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Assuming sim is a module name</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'>Assuming sim is a module name</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='input'>
 <span class='co'># using simList</span>
 <span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>
    times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>2000.0</span>, end <span class='op'>=</span> <span class='fl'>2001.0</span>, timeunit <span class='op'>=</span> <span class='st'>"year"</span><span class='op'>)</span>,
@@ -226,14 +226,14 @@ about.</p></td>
 <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcJlADb/temp_libpath210dfc3d37b12d/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpLFlSnX/temp_libpath11ddf3d7a0fd5/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/RtmpEykBFD/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/RtmpEykBFD/Require/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpz5Ma2s/SpaDES/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpz5Ma2s/SpaDES/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpcJlADb/temp_libpath210dfc3d37b12d/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmp7dh1uL/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmp7dh1uL/Require/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/RtmpqaIbaC/SpaDES/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/RtmpqaIbaC/SpaDES/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpLFlSnX/temp_libpath11ddf3d7a0fd5/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: grid</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘grid’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:quickPlot’:</span>
 #&gt; <span class='message'></span>
@@ -294,26 +294,28 @@ about.</p></td>
 #&gt; 
 #&gt; 
 #&gt; $parameters
-#&gt;          paramName paramClass   default   min  max
-#&gt; 1        stackName  character landscape    NA   NA
-#&gt; 2  moveInitialTime    numeric      2001  2001 2001
-#&gt; 3     moveInterval    numeric         1     1    1
-#&gt; 4                N    numeric       100    10 1000
-#&gt; 5            torus    logical     FALSE FALSE TRUE
-#&gt; 6 .plotInitialTime    numeric      2000  -Inf  Inf
-#&gt; 7    .plotInterval    numeric         1  -Inf  Inf
-#&gt; 8 .saveInitialTime    numeric        NA  -Inf  Inf
-#&gt; 9    .saveInterval    numeric        NA  -Inf  Inf
-#&gt;                                  paramDesc
-#&gt; 1                  name of the RasterStack
-#&gt; 2    time to schedule first movement event
-#&gt; 3    time interval between movoment events
-#&gt; 4                initial number of caribou
-#&gt; 5 should the map wrap around like a torus?
-#&gt; 6        time to schedule first plot event
-#&gt; 7        time interval between plot events
-#&gt; 8        time to schedule first save event
-#&gt; 9        time interval between save events
+#&gt;           paramName paramClass   default   min  max
+#&gt; 1         stackName  character landscape    NA   NA
+#&gt; 2   moveInitialTime    numeric      2001  2001 2001
+#&gt; 3      moveInterval    numeric         1     1    1
+#&gt; 4                 N    numeric       100    10 1000
+#&gt; 5             torus    logical     FALSE FALSE TRUE
+#&gt; 6  .plotInitialTime    numeric      2000  -Inf  Inf
+#&gt; 7     .plotInterval    numeric         1  -Inf  Inf
+#&gt; 8  .saveInitialTime    numeric        NA  -Inf  Inf
+#&gt; 9     .saveInterval    numeric        NA  -Inf  Inf
+#&gt; 10            .seed       list              NA   NA
+#&gt;                                                                                                                        paramDesc
+#&gt; 1                                                                                                        name of the RasterStack
+#&gt; 2                                                                                          time to schedule first movement event
+#&gt; 3                                                                                          time interval between movoment events
+#&gt; 4                                                                                                      initial number of caribou
+#&gt; 5                                                                                       should the map wrap around like a torus?
+#&gt; 6                                                                                              time to schedule first plot event
+#&gt; 7                                                                                              time interval between plot events
+#&gt; 8                                                                                              time to schedule first save event
+#&gt; 9                                                                                              time interval between save events
+#&gt; 10 Named list of seeds to use for each event (names). E.g., `list('init' = 123)` will `set.seed(123)` for the `init` event only.
 #&gt; 
 #&gt; $inputObjects
 #&gt;   objectName            objectClass                             desc sourceURL
@@ -326,7 +328,7 @@ about.</p></td>
 #&gt; </div><div class='input'>
 <span class='co'># turn code checking back on -- don't need it here</span>
 <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span><span class='va'>opts</span><span class='op'>)</span>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

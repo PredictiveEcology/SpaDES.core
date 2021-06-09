@@ -40,8 +40,20 @@
 
 
 <meta property="og:title" content="Save a whole simList object to disk — saveSimList" />
-<meta property="og:description" content="Because of the environment slot, this is not quite as straightforward as
-just saving the object. This also has option for file-backed Rasters." />
+<meta property="og:description" content="Saving a simList may not work using the standard approaches (e.g.,
+save, saveRDS, and qs::qsave). There are 2 primary reasons why this doesn't
+work as expected: the activeBindings that are in place within modules (these
+allow the mod and Par to exist), and file-backed rasters. Because of these,
+a user should use saveSimList and loadSimList (and the zipSimList/unzipSimList
+alternatives).
+The most robust way if there are file-backed Raster* objects seems to be to
+set fileBackend = 2, though this may not be desirable if there are many
+large Raster* objects. When using fileBackend = 0 or fileBackend = 1, and
+when errors are noticed, please file a bug report on GitHub.
+zipSimList will save the simList and file-backed Raster* objects, plus,
+optionally, files identified in outputs(sim) and inputs(sim).
+This uses Copy under the hood, to not affect the original
+simList. VERY experimental." />
 
 
 
@@ -83,7 +95,7 @@ just saving the object. This also has option for file-backed Rasters." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -147,16 +159,30 @@ just saving the object. This also has option for file-backed Rasters." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Save a whole <code>simList</code> object to disk</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/save.R'><code>R/save.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/saveLoadSimList.R'><code>R/saveLoadSimList.R</code></a></small>
     <div class="hidden name"><code>saveSimList.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Because of the environment slot, this is not quite as straightforward as
-just saving the object. This also has option for file-backed Rasters.</p>
+    <p>Saving a <code>simList</code> may not work using the standard approaches (e.g.,
+<code>save</code>, <code>saveRDS</code>, and <code><a href='https://rdrr.io/pkg/qs/man/qsave.html'>qs::qsave</a></code>). There are 2 primary reasons why this doesn't
+work as expected: the <code>activeBindings</code> that are in place within modules (these
+allow the <code>mod</code> and <code>Par</code> to exist), and file-backed rasters. Because of these,
+a user should use <code>saveSimList</code> and <code>loadSimList</code> (and the <code>zipSimList</code>/<code>unzipSimList</code>
+alternatives).
+The most robust way if there are file-backed Raster* objects seems to be to
+set <code>fileBackend = 2</code>, though this may not be desirable if there are many
+large <code>Raster*</code> objects. When using <code>fileBackend = 0</code> or <code>fileBackend = 1</code>, and
+when errors are noticed, please file a bug report on GitHub.</p>
+<p><code>zipSimList</code> will save the <code>simList</code> and file-backed <code>Raster*</code> objects, plus,
+optionally, files identified in <code><a href='outputs.html'>outputs(sim)</a></code> and <code><a href='inputs.html'>inputs(sim)</a></code>.
+This uses <code>Copy</code> under the hood, to not affect the original
+<code>simList</code>. <strong>VERY experimental</strong>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>saveSimList</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>filename</span>, fileBackend <span class='op'>=</span> <span class='fl'>0</span>, filebackedDir <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>envir</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>saveSimList</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>filename</span>, fileBackend <span class='op'>=</span> <span class='fl'>0</span>, filebackedDir <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>envir</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>zipSimList</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>zipfile</span>, <span class='va'>...</span>, outputs <span class='op'>=</span> <span class='cn'>TRUE</span>, inputs <span class='op'>=</span> <span class='cn'>TRUE</span>, cache <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,7 +197,8 @@ name.</p></td>
     </tr>
     <tr>
       <th>filename</th>
-      <td><p>Character string with the path for saving <code>simList</code></p></td>
+      <td><p>Character string with the path for saving <code>simList</code> to or
+reading the <code>simList</code> from</p></td>
     </tr>
     <tr>
       <th>fileBackend</th>
@@ -197,16 +224,80 @@ It is the environment where the object named <code>sim</code> can be found.</p><
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Passed to <code>save</code>, e.g., <code>compression</code></p></td>
+      <td><p>passed to <code>saveSimList</code>, including non-optional ones
+such as <code>filename</code>. Also see <code>fileBackend</code> and <code>filebackedDir</code>
+arguments in that function.</p></td>
+    </tr>
+    <tr>
+      <th>zipfile</th>
+      <td><p>A character string indicating the filename for the zip file. Passed to <code>zip</code>.</p></td>
+    </tr>
+    <tr>
+      <th>outputs</th>
+      <td><p>Logical. If <code>TRUE</code>, all files identified in
+<code><a href='outputs.html'>outputs(sim)</a></code> will be included in the zip.</p></td>
+    </tr>
+    <tr>
+      <th>inputs</th>
+      <td><p>Logical. If <code>TRUE</code>, all files identified in
+<code><a href='inputs.html'>inputs(sim)</a></code> will be included in the zip.</p></td>
+    </tr>
+    <tr>
+      <th>cache</th>
+      <td><p>Logical. Not yet implemented. If <code>TRUE</code>, all files in <code><a href='paths.html'>cachePath(sim)</a></code> will be included in the
+zip archive. Defaults to <code>FALSE</code> as this could be large, and may include many
+out of date elements. See Details.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A saved <code>.qs</code> file in <code>filename</code> location.</p>
+    <p><code>saveSimList()</code>: A saved <code>.qs</code> file in <code>filename</code> location.</p>
+<p><code>zipSimList()</code>: A saved <code>.zip</code> file in <code>zipfile</code> location.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>There is a family of 4 functions that are mutually useful for saving and
+loading <code>simList</code> objects and their associated files (e.g., file-backed
+<code>Raster*</code>, <code>inputs</code>, <code>outputs</code>, <code>cache</code>) <code>saveSimList()</code>, <code><a href='loadSimList.html'>loadSimList()</a></code>,
+<code>zipSimList()</code>, <code><a href='loadSimList.html'>unzipSimList()</a></code></p>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Save - Move - Load</h3>
+
+
+<p>There are 3 different workflows for "save - move files - load" that work in our tests:</p><ol>
+<li><p><code>filebackend = 0</code>: No renaming of file-backed rasters, on recovery attempts to rebuild</p>
+<p>This approach is attempting to emulate a "relative filenames" approach,
+i.e., attempt to treat the file-backed raster file names as if they were
+relative (which they are not -- raster package forces absolute file
+paths). To do this, all the renaming occurs within <code>loadSimList</code> or
+<code>unzipSimList</code>. These function will use the <code>paths</code> argument to rewrite
+the paths of the files that are identified with <code>Filenames(sim)</code> so that
+they are in the equivalent (relative) position as they were. This will
+only work if all files were in one of the <code>paths</code> of the original
+<code>simList</code>, so that they can be matched up with the new <code>paths</code> passed in
+<code>loadSimList</code>. This is not guaranteed to work correctly, though it works
+in a wide array of testing.</p><pre><span class='fu'>zipSimList</span><span class='op'>(</span><span class='va'>sim</span>, zipfile <span class='op'>=</span> <span class='va'>tmpZip</span>, filename <span class='op'>=</span> <span class='st'>"sim.qs"</span><span class='op'>)</span>
+<span class='va'>pths</span> <span class='op'>&lt;-</span> <span class='fu'><a href='setPaths.html'>getPaths</a></span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>
+<span class='va'>out</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loadSimList.html'>unzipSimList</a></span><span class='op'>(</span><span class='va'>tmpZip</span>, paths <span class='op'>=</span> <span class='va'>pths</span><span class='op'>)</span>
+</pre></li>
+<li><p><code>filebackend = 1</code>: On the fly renaming of file-backed rasters;</p><ol>
+<li><p>Save the sim object with a filename, e.g.,  <code>file</code>,</p></li>
+<li><p>make a copy of all file-backed rasters to <code>fileBackedDir</code>,</p></li>
+<li><p>update all the pointers to those files so that they are correct in the raster metadata</p></li>
+</ol><pre><span class='fu'>saveSimList</span><span class='op'>(</span><span class='va'>sim</span>, file <span class='op'>=</span> <span class='st'>"sim.qs"</span>, fileBackend <span class='op'>=</span> <span class='fl'>1</span>, fileBackedDir <span class='op'>=</span> <span class='st'>"here"</span><span class='op'>)</span>
+<span class='va'>simNew</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loadSimList.html'>loadSimList</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='st'>"sim.qs"</span><span class='op'>)</span>
+</pre></li>
+<li><p><code>filebackend = 2</code>: On the fly bringing to memory of all rasters</p>
+<p>All rasters are brought to memory, and then saved into <code>sim.qs</code></p><pre><span class='fu'>saveSimList</span><span class='op'>(</span><span class='va'>sim</span>, file <span class='op'>=</span> <span class='st'>"sim.qs"</span>, fileBackend <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>simNew</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loadSimList.html'>loadSimList</a></span><span class='op'>(</span>file <span class='op'>=</span> <span class='st'>"sim.qs"</span><span class='op'>)</span>
+</pre></li>
+</ol>
+
+<p>If <code>cache</code> is used, it is likely that it should be trimmed before
+zipping, to include only cache elements that are relevant.</p>
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='zipSimList.html'>zipSimList</a></code></p></div>
+    <div class='dont-index'><p><code><a href='loadSimList.html'>loadSimList()</a></code>, <code><a href='loadSimList.html'>unzipSimList()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

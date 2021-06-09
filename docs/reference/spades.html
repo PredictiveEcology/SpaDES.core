@@ -41,8 +41,8 @@
 
 <meta property="og:title" content="Run a spatial discrete event simulation — spades" />
 <meta property="og:description" content="Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster)." />
+submodules to the simulation. We use S4 classes and methods, and use data.table
+instead of data.frame to implement the event queue (because it is much faster)." />
 
 
 
@@ -84,7 +84,7 @@ instead of `data.frame` to implement the event queue (because it is much faster)
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -154,8 +154,8 @@ instead of `data.frame` to implement the event queue (because it is much faster)
 
     <div class="ref-description">
     <p>Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).</p>
+submodules to the simulation. We use S4 classes and methods, and use <code>data.table</code>
+instead of <code>data.frame</code> to implement the event queue (because it is much faster).</p>
     </div>
 
     <pre class="usage"><span class='fu'>spades</span><span class='op'>(</span>
@@ -166,6 +166,8 @@ instead of `data.frame` to implement the event queue (because it is much faster)
   .plotInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
   .saveInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
   notOlderThan <span class='op'>=</span> <span class='cn'>NULL</span>,
+  events <span class='op'>=</span> <span class='cn'>NULL</span>,
+  .plots <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span>
 
@@ -178,6 +180,8 @@ instead of `data.frame` to implement the event queue (because it is much faster)
   .plotInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
   .saveInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
   notOlderThan <span class='op'>=</span> <span class='cn'>NULL</span>,
+  events <span class='op'>=</span> <span class='cn'>NULL</span>,
+  .plots <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span>
 
@@ -190,6 +194,8 @@ instead of `data.frame` to implement the event queue (because it is much faster)
   .plotInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
   .saveInitialTime <span class='op'>=</span> <span class='cn'>NULL</span>,
   notOlderThan <span class='op'>=</span> <span class='cn'>NULL</span>,
+  events <span class='op'>=</span> <span class='cn'>NULL</span>,
+  .plots <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -237,6 +243,28 @@ Default is <code>NULL</code>, meaning don't update the cache.
 If <code><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time()</a></code> is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
 Ignored if <code>cache</code> is <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>events</th>
+      <td><p>A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules. With the <code>list</code> form, all unspecified modules
+will run <em>all</em> their events, including internal spades modules, e.g., <code>save</code>,
+that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. See example.</p></td>
+    </tr>
+    <tr>
+      <th>.plots</th>
+      <td><p>Character. Sets the parameter of this name in all modules.
+See <code><a href='Plots.html'>Plots</a></code> for possible values. The parameter is intended to slowly
+take over from <code>.plotInitialTime</code> as a mechanism to turn on or off plotting.
+For backwards compatibility, if <code>.plotInitialTime</code> is not set
+in this <code>spades</code> call, but this
+<code>.plots</code> is used, two things will happen: setting this without <code>"screen"</code>
+will turn off all plotting; setting this with <code>"screen"</code> will trigger
+plotting for any modules that use this parameter but will have no effect on
+other modules. To get plotting, therefore, it may be necessary to also set
+<code>.plotInitialTime = start(sim)</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -314,7 +342,7 @@ must be a list (including empty <code><a href='https://rdrr.io/r/base/list.html'
 sub-list elements here:</p><table class='table'>
 <tr><td><code>console</code></td><td><code>level</code></td><td>The <code>level</code>, see below, of information shown</td></tr>
 <tr><td><code>file</code></td><td><code>append</code></td><td>Logical. If <code>TRUE</code>, the default, then
-                                      log entries are appended to file, if it exists</td></tr>
+log entries are appended to file, if it exists</td></tr>
 <tr><td></td><td><code>file</code></td><td>A filename. Defaults to <code>log.txt</code></td></tr>
 <tr><td></td><td><code>level</code></td><td>The <code>level</code>, see below, of information shown</td></tr>
 <tr><td><code>debug</code></td><td>See possible values below</td><td></td></tr>
@@ -341,21 +369,21 @@ outputs. This will be run at the start of every event. The following options for
 are available. Each of these can also be in a list to get multiple outputs:</p>
 <table class='table'>
 <tr><td><code>TRUE</code></td><td><code><a href='events.html'>current(sim)</a></code> will be printed at the start of each event as
-                    it runs</td></tr>
+it runs</td></tr>
 <tr><td>a function name (as character string)</td><td>If a function, then it will be run on the
-                                           simList, e.g., "time" will run
-                                           <code><a href='https://rdrr.io/r/stats/time.html'>time(sim)</a></code> at each event.</td></tr>
+simList, e.g., "time" will run
+<code><a href='https://rdrr.io/r/stats/time.html'>time(sim)</a></code> at each event.</td></tr>
 <tr><td>moduleName (as character string)</td><td>All calls to that module will be entered
-                                        interactively</td></tr>
+interactively</td></tr>
 <tr><td>eventName (as character string)</td><td>All calls that have that event name (in any module)
-                                       will be entered interactively</td></tr>
+will be entered interactively</td></tr>
 <tr><td><code>c(&lt;moduleName&gt;, &lt;eventName&gt;)</code></td><td>Only the event in that specified module
-                                            will be entered into.</td></tr>
+will be entered into.</td></tr>
 <tr><td>Any other R expression expressed as a character string or quoted call</td><td>Will be evaluated with access to the simList as 'sim'.
-                               If this is more than one character string, then all will
-                               be printed to the screen in their sequence.</td></tr>
+If this is more than one character string, then all will
+be printed to the screen in their sequence.</td></tr>
 <tr><td>A numeric scalar, currently 1 or 2 (maybe others)</td><td>This will print out alternative forms of event
-                                          information that users may find useful</td></tr>
+information that users may find useful</td></tr>
 </table>
 
 
@@ -371,8 +399,8 @@ with the one just edited. There may be some unexpected consequences if the
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from <a href='https://nostarch.com/artofr.htm'>https://nostarch.com/artofr.htm</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='SpaDES.core-package.html'>SpaDES.core-package</a></code>,
@@ -423,6 +451,30 @@ uses <code><a href='https://reproducible.predictiveecology.org/reference/Cache.h
  <span class='op'>)</span>
  <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>out</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, cache <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
+
+<span class='co'># E.g., with only the init events</span>
+<span class='va'>outInitsOnly</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>, events <span class='op'>=</span> <span class='st'>"init"</span><span class='op'>)</span>
+
+<span class='co'># or more fine grained control</span>
+<span class='va'>outSomeEvents</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>,
+        events <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>randomLandscapes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"init"</span><span class='op'>)</span>,
+                      fireSpread <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"init"</span>, <span class='st'>"burn"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># with outputs, the save module gets invoked and must be explicitly limited to "init"</span>
+<span class='va'>mySim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simInit.html'>simInit</a></span><span class='op'>(</span>
+ times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>0.0</span>, end <span class='op'>=</span> <span class='fl'>2.0</span>, timeunit <span class='op'>=</span> <span class='st'>"year"</span><span class='op'>)</span>,
+ params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+   .globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span>, burnStats <span class='op'>=</span> <span class='st'>"nPixelsBurned"</span><span class='op'>)</span>
+ <span class='op'>)</span>,
+ modules <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"randomLandscapes"</span>, <span class='st'>"fireSpread"</span>, <span class='st'>"caribouMovement"</span><span class='op'>)</span>,
+ outputs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>objectName <span class='op'>=</span> <span class='st'>"landscape"</span>, saveTime <span class='op'>=</span> <span class='fl'>0</span><span class='op'>:</span><span class='fl'>2</span><span class='op'>)</span>,
+ paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"sampleModules"</span>, package <span class='op'>=</span> <span class='st'>"SpaDES.core"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span>
+<span class='co'># This will print a message saying that caribouMovement will run its events</span>
+<span class='va'>outSomeEvents</span> <span class='op'>&lt;-</span> <span class='fu'>spades</span><span class='op'>(</span><span class='va'>mySim</span>,
+        events <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>randomLandscapes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"init"</span><span class='op'>)</span>,
+                      fireSpread <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"init"</span>, <span class='st'>"burn"</span><span class='op'>)</span>,
+                      save <span class='op'>=</span> <span class='st'>"init"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 </div></pre>

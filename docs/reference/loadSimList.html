@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Load a saved simList from file — loadSimList • SpaDES.core</title>
+<title>Load a saved simList and ancillary files — loadSimList • SpaDES.core</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,12 @@
 
 
 
-<meta property="og:title" content="Load a saved simList from file — loadSimList" />
-<meta property="og:description" content="Load a saved simList from file" />
+<meta property="og:title" content="Load a saved simList and ancillary files — loadSimList" />
+<meta property="og:description" content="Loading a simList from file can be problematic as there are non-standard
+objects that must be rebuilt. See description in saveSimList() for details.
+unzipSimList is a convenience wrapper around unzip and loadSimList where
+all the files are correctly identified and passed to
+loadSimList(..., otherFiles = xxx). See zipSimList for details." />
 
 
 
@@ -82,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -145,26 +149,75 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Load a saved <code>simList</code> from file</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/load.R'><code>R/load.R</code></a></small>
+    <h1>Load a saved <code>simList</code> and ancillary files</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PredictiveEcology/SpaDES.core/blob/master/R/saveLoadSimList.R'><code>R/saveLoadSimList.R</code></a></small>
     <div class="hidden name"><code>loadSimList.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Load a saved <code>simList</code> from file</p>
+    <p>Loading a <code>simList</code> from file can be problematic as there are non-standard
+objects that must be rebuilt. See description in <code><a href='saveSimList.html'>saveSimList()</a></code> for details.</p>
+<p><code>unzipSimList</code> is a convenience wrapper around <code>unzip</code> and <code>loadSimList</code> where
+all the files are correctly identified and passed to
+<code>loadSimList(..., otherFiles = xxx)</code>. See <a href='saveSimList.html'>zipSimList</a> for details.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loadSimList</span><span class='op'>(</span><span class='va'>file</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>loadSimList</span><span class='op'>(</span><span class='va'>filename</span>, paths <span class='op'>=</span> <span class='fu'><a href='setPaths.html'>getPaths</a></span><span class='op'>(</span><span class='op'>)</span>, otherFiles <span class='op'>=</span> <span class='st'>""</span><span class='op'>)</span>
+
+<span class='fu'>unzipSimList</span><span class='op'>(</span><span class='va'>zipfile</span>, load <span class='op'>=</span> <span class='cn'>TRUE</span>, paths <span class='op'>=</span> <span class='fu'><a href='setPaths.html'>getPaths</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>file</th>
+      <th>filename</th>
       <td><p>Character giving the name of a saved simulation file</p></td>
+    </tr>
+    <tr>
+      <th>paths</th>
+      <td><p>A list of character vectors for all the <code>simList</code> paths. When
+loading a <code>simList</code>, this will replace the paths of everything to
+these new paths. Experimental still.</p></td>
+    </tr>
+    <tr>
+      <th>otherFiles</th>
+      <td><p>A character vector of (absolute) file names locating each of the
+existing file-backed <code>Raster*</code> files that are the real paths for the possibly
+incorrect paths in <code>Filenames(sim)</code> if the the <code>file</code> being read in is from
+a different computer, path, or drive. This could be the output from <code>unzipSimList</code>
+(which is calls <code>loadSimList</code> internally, passing the unzipped filenames)</p></td>
+    </tr>
+    <tr>
+      <th>zipfile</th>
+      <td><p>Filename of a zipped simList</p></td>
+    </tr>
+    <tr>
+      <th>load</th>
+      <td><p>Logical. If <code>TRUE</code>, the default, then the simList will
+also be loaded into R.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>passed to <code>unzip</code></p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    
+<ul>
+<li><p><code>loadSimList()</code>: A <code>simList</code> object.</p></li>
+<li><p><code>unzipSimList()</code>: Either a character vector of file names unzipped (if <code>load = FALSE</code>),
+or a <code>simList</code> object.</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If <code>cache</code> is used, it is likely that it should be trimmed before
+zipping, to include only cache elements that are relevant.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='saveSimList.html'>saveSimList()</a></code>, <code><a href='saveSimList.html'>zipSimList()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

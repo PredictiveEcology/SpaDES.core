@@ -84,7 +84,7 @@ the correct one." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -252,7 +252,7 @@ called from inside another function.</p></td>
     <tr>
       <th>urls</th>
       <td><p>Character vector of urls from which to get the data. This is automatically
- found from module metadata when this function invoked with
+found from module metadata when this function invoked with
 <code><a href='downloadModule.html'>SpaDES.core::downloadModule(..., data = TRUE)</a></code>. See also
 <code>prepInputs</code>.</p></td>
     </tr>
@@ -273,9 +273,9 @@ run <code>downloadData</code> on</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>downloadData</code> requires a checksums file to work, as it will only download
- the files specified therein. Hence, module developers should make sure they
- have manually downloaded all the necessary data and ran <code>checksums</code> to
- build a checksums file.</p>
+the files specified therein. Hence, module developers should make sure they
+have manually downloaded all the necessary data and ran <code>checksums</code> to
+build a checksums file.</p>
 <p>There is an experimental attempt to use the <span class="pkg">googledrive</span> package to download
 data from a shared (publicly or with individual users) file.
 To try this, put the Google Drive URL in <code>sourceURL</code> argument of

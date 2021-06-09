@@ -85,7 +85,7 @@ defineOutputs" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -204,25 +204,26 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 <span class='va'>sampleModules</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>dir</a></span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span>
 
 <span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'>moduleParams</span><span class='op'>(</span><span class='va'>sampleModules</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'><span class='va'>i</span> <span class='op'>&lt;-</span> <span class='fu'>moduleInputs</span><span class='op'>(</span><span class='va'>sampleModules</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'><span class='va'>o</span> <span class='op'>&lt;-</span> <span class='fu'>moduleOutputs</span><span class='op'>(</span><span class='va'>sampleModules</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span><span></span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='input'><span class='va'>i</span> <span class='op'>&lt;-</span> <span class='fu'>moduleInputs</span><span class='op'>(</span><span class='va'>sampleModules</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='input'><span class='va'>o</span> <span class='op'>&lt;-</span> <span class='fu'>moduleOutputs</span><span class='op'>(</span><span class='va'>sampleModules</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, path <span class='op'>=</span> <span class='va'>path</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.plotInitialTime' is not of specified type 'numeric'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='input'>
 <span class='co'>#' \dontrun{</span>
 <span class='co'>## easily include these tables in Rmd files using knitr</span>
 <span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>p</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; 
-#&gt; |paramName        |paramClass |default    |min        |max   |paramDesc                                         |
-#&gt; |:----------------|:----------|:----------|:----------|:-----|:-------------------------------------------------|
-#&gt; |inRAM            |logical    |FALSE      |TRUE       |FALSE |should the raster be stored in memory?            |
-#&gt; |nx               |numeric    |100        |10         |500   |size of map (number of pixels) in the x dimension |
-#&gt; |ny               |numeric    |100        |10         |500   |size of map (number of pixels) in the y dimension |
-#&gt; |stackName        |character  |landscape  |NA         |NA    |name of the RasterStack                           |
-#&gt; |.plotInitialTime |numeric    |start(sim) |start(sim) |NA    |time to schedule first plot event                 |
-#&gt; |.plotInterval    |numeric    |NA         |NA         |NA    |time interval between plot events                 |
-#&gt; |.saveInitialTime |numeric    |NA         |NA         |NA    |time to schedule first save event                 |
-#&gt; |.saveInterval    |numeric    |NA         |NA         |NA    |time interval between save events                 |
-#&gt; |.useCache        |logical    |FALSE      |init, plot |NA    |should the module result be cached for future use |</div><div class='input'><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span>
+#&gt; |paramName        |paramClass |default    |min        |max   |paramDesc                                                                                                                     |
+#&gt; |:----------------|:----------|:----------|:----------|:-----|:-----------------------------------------------------------------------------------------------------------------------------|
+#&gt; |inRAM            |logical    |FALSE      |TRUE       |FALSE |should the raster be stored in memory?                                                                                        |
+#&gt; |nx               |numeric    |100        |10         |500   |size of map (number of pixels) in the x dimension                                                                             |
+#&gt; |ny               |numeric    |100        |10         |500   |size of map (number of pixels) in the y dimension                                                                             |
+#&gt; |stackName        |character  |landscape  |NA         |NA    |name of the RasterStack                                                                                                       |
+#&gt; |.plotInitialTime |numeric    |start(sim) |start(sim) |NA    |time to schedule first plot event                                                                                             |
+#&gt; |.plotInterval    |numeric    |NA         |NA         |NA    |time interval between plot events                                                                                             |
+#&gt; |.saveInitialTime |numeric    |NA         |NA         |NA    |time to schedule first save event                                                                                             |
+#&gt; |.saveInterval    |numeric    |NA         |NA         |NA    |time interval between save events                                                                                             |
+#&gt; |.seed            |list       |           |NA         |NA    |Named list of seeds to use for each event (names). E.g., `list('init' = 123)` will `set.seed(123)` for the `init` event only. |
+#&gt; |.useCache        |logical    |FALSE      |init, plot |NA    |should the module result be cached for future use                                                                             |</div><div class='input'><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; 
 #&gt; |objectName |objectClass |desc |sourceURL |other |
@@ -233,7 +234,7 @@ Default is to use the <code>spades.modulePath</code> option.</p></td>
 #&gt; |objectName                                        |objectClass |desc |other |
 #&gt; |:-------------------------------------------------|:-----------|:----|:-----|
 #&gt; |SpaDES.core::P(sim, "randomLandscapes")$stackName |RasterStack |NA   |NA    |</div><div class='input'><span class='co'>#' }</span>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -85,7 +85,7 @@ to spades." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -175,6 +175,7 @@ to <code>spades</code>.</p>
   <span class='va'>cache</span>,
   <span class='va'>.plotInitialTime</span>,
   <span class='va'>.saveInitialTime</span>,
+  <span class='va'>events</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -184,7 +185,10 @@ to <code>spades</code>.</p>
     <tr>
       <th>times</th>
       <td><p>A named list of numeric simulation start and end times
-(e.g., <code>times = list(start = 0.0, end = 10.0)</code>).</p></td>
+(e.g., <code>times = list(start = 0.0, end = 10.0, timeunit = "year")</code>),
+with the final optional element, <code>timeunit</code>, overriding the default
+time unit used in the simulation which is the "smallest time unit" across all
+modules. See examples.</p></td>
     </tr>
     <tr>
       <th>params</th>
@@ -242,7 +246,7 @@ it should give "initial conditions".</p>
     </tr>
     <tr>
       <th>loadOrder</th>
-      <td><p>An optional list of module names specifying the order in
+      <td><p>An optional character vector of module names specifying the order in
 which to load the modules. If not specified, the module
 load order will be determined automatically.</p></td>
     </tr>
@@ -286,6 +290,15 @@ parameter for all modules. See Details.</p></td>
       <th>.saveInitialTime</th>
       <td><p>Numeric. Temporarily override the <code>.plotInitialTime</code>
 parameter for all modules. See Details.</p></td>
+    </tr>
+    <tr>
+      <th>events</th>
+      <td><p>A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules. With the <code>list</code> form, all unspecified modules
+will run <em>all</em> their events, including internal spades modules, e.g., <code>save</code>,
+that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. See example.</p></td>
     </tr>
     <tr>
       <th>...</th>

@@ -81,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
       </span>
     </div>
 
@@ -182,6 +182,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="Plots.html">Plots()</a></code> </p>
+        </td>
+        <td><p><code>Plot</code> wrapper intended for use in a SpaDES module</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="SpaDES.core-package.html">SpaDES.core-package</a></code> </p>
         </td>
         <td><p>Categorized overview of the <code>SpaDES.core</code> package</p></td>
@@ -203,6 +209,12 @@
           <p><code><a href="all.equal.simList.html">all(<i>&lt;equal.simList&gt;</i>)</a></code> </p>
         </td>
         <td><p>All equal method for simLists</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="anyPlotting.html">anyPlotting()</a></code> </p>
+        </td>
+        <td><p>Test whether there should be any plotting from .plot parameter</p></td>
       </tr><tr>
         
         <td>
@@ -393,9 +405,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="loadSimList.html">loadSimList()</a></code> </p>
+          <p><code><a href="loadSimList.html">loadSimList()</a></code> <code><a href="loadSimList.html">unzipSimList()</a></code> </p>
         </td>
-        <td><p>Load a saved <code>simList</code> from file</p></td>
+        <td><p>Load a saved <code>simList</code> and ancillary files</p></td>
       </tr><tr>
         
         <td>
@@ -585,6 +597,15 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="rasterCreate.html">rasterCreate()</a></code> </p>
+        </td>
+        <td><p>Simple wrapper to load any <code>Raster*</code> object
+This wraps either <code>raster::raster</code>, <code>raster::stack</code>,
+or <code>raster::brick</code>, allowing a single function to be used
+to create a new object of the same class as a template.</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="rasterToMemory.html">rasterToMemory()</a></code> </p>
         </td>
         <td><p>Read raster to memory</p></td>
@@ -627,7 +648,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="saveSimList.html">saveSimList()</a></code> </p>
+          <p><code><a href="saveSimList.html">saveSimList()</a></code> <code><a href="saveSimList.html">zipSimList()</a></code> </p>
         </td>
         <td><p>Save a whole <code>simList</code> object to disk</p></td>
       </tr><tr>
@@ -648,6 +669,12 @@
           <p><code><a href="show-method.html">show(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
         <td><p>Show an Object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="simFile.html">simFile()</a></code> </p>
+        </td>
+        <td><p>Generate simulation file name</p></td>
       </tr><tr>
         
         <td>
@@ -786,12 +813,6 @@
           <p><code><a href="zipModule.html">zipModule()</a></code> </p>
         </td>
         <td><p>Create a zip archive of a module subdirectory</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="zipSimList.html">zipSimList()</a></code> </p>
-        </td>
-        <td><p>Zip many of the files in a <code>simList</code></p></td>
       </tr>
     </tbody>
     </table>
