@@ -29,8 +29,8 @@ of all essential module files listed below.
 }
 \details{
 \itemize{
-  \item \file{data/CHECKSUMS.txt}
-  \item \file{name.R}
+\item \file{data/CHECKSUMS.txt}
+\item \file{name.R}
 }
 }
 \author{

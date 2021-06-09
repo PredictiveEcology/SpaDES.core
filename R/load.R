@@ -288,11 +288,14 @@ setMethod("loadFiles",
 #' Read raster to memory
 #'
 #' Wrapper to the \code{raster} function, that creates the raster object in
-#' memory, even if it was read in from file.
+#' memory, even if it was read in from file. There is the default method which is
+#' just a pass through, so this can be safely used on large complex objects,
+#' recursively, e.g., a \code{simList}.
 #'
 #' @param x An object passed directly to the function raster (e.g., character string of a filename).
 #'
-#' @param ... Additional arguments to \code{raster}.
+#' @param ... Additional arguments to \code{raster::raster}, \code{raster::stack},
+#' or \code{raster::brick}.
 #'
 #' @return A raster object whose values are stored in memory.
 #'
@@ -311,29 +314,84 @@ setGeneric("rasterToMemory", function(x, ...) {
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
-          signature = c(x = "ANY"),
+          signature = c(x = "Raster"),
           definition = function(x, ...) {
-            r <- raster(x, ...)
-            r <- setValues(r, getValues(r))
-            return(r)
+            if (any(nchar(Filenames(x)) > 0)) {
+              r <- rasterCreate(x, ...)
+              r[] <- getValues(x)
+              if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+                r <- raster::stack(r, ...)
+              }
+              x <- r
+            }
+            return(x)
 })
 
-#' Load a saved \code{simList} from file
-#'
-#' @param file Character giving the name of a saved simulation file
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "list"),
+          definition = function(x, ...) {
+            lapply(x, rasterToMemory, ...)
+})
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "ANY"),
+          definition = function(x, ...) {
+            x
+})
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
+          signature = c(x = "simList"),
+          definition = function(x, ...) {
+            obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
+            list2env(obj, envir = envir(x))
+            return(x)
+})
+
+
+#' Simple wrapper to load any \code{Raster*} object
+#' This wraps either \code{raster::raster}, \code{raster::stack},
+#' or \code{raster::brick}, allowing a single function to be used
+#' to create a new object of the same class as a template.
 #'
 #' @export
-#' @importFrom qs qread
-loadSimList <- function(file) {
-  sim <- qs::qread(file, nthreads = getOption("spades.nThreads", 1))
-
-  mods <- setdiff(sim@modules, .coreModules())
-  ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
-  lapply(mods, function(mod) {
-    if (!is.null(sim$.mods[[mod]]))
-      rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
-    makeModActiveBinding(sim = sim, mod = mod)
-  })
-
-  return(sim)
+#' @param x An object, notably a \code{Raster*} object. All others will simply
+#'   be passed through with no effect.
+#' @param ... Passed to \code{raster::raster}, \code{raster::stack},
+#' or \code{raster::brick}
+#'
+#' @details
+#' A new (empty) object of same class as the original.
+#'
+rasterCreate <- function(x, ...) {
+  UseMethod("rasterCreate")
 }
+
+#' @describeIn rasterCreate Simply passes through argument with no effect
+rasterCreate.default <- function(x, ...) {
+  x
+}
+
+#' @describeIn rasterCreate Uses \code{raster::brick}
+rasterCreate.RasterBrick <- function(x, ...) {
+  raster::brick(x, ...)
+}
+
+#' @describeIn rasterCreate Uses \code{raster::raster}
+rasterCreate.RasterLayer <- function(x, ...) {
+  raster::raster(x, ...)
+}
+
+#' @describeIn rasterCreate Uses \code{raster::stack}
+rasterCreate.RasterStack <- function(x, ...) {
+  raster::stack(x, ...)
+}
+
+#' @describeIn rasterCreate Uses \code{raster::raster} when one of the other,
+#'   less commonly used \code{Raster*} classes, e.g., \code{RasterLayerSparse}
+rasterCreate.Raster <- function(x, ...) {
+  raster::raster(x, ...)
+}
+

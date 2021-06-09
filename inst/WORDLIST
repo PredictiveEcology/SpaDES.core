@@ -2,6 +2,7 @@
 4x
 Amongst
 Autogenerate
+Bugfixes
 Checkpointing
 Checksums
 Codecov
@@ -11,7 +12,6 @@ Etienne
 GDAL
 GLPK
 Gantt
-GitHub
 Gitter
 GoogleDrive
 IBMs
@@ -29,9 +29,6 @@ Pre
 PredictiveEcology
 README
 RStudio
-RasterLayer
-RasterStack
-Rasters
 Replots
 Rstudio
 S3
@@ -39,8 +36,6 @@ S4
 SELES
 SpaDES
 StackOverflow
-Versioned
-Workflow
 activeBindings
 ageMap
 amongst
@@ -50,9 +45,9 @@ autocomplete
 automata
 basedir
 benchmarking
+bugfixes
 checkUsage
 checkpointing
-checksum
 checksums
 childModule
 choosealicense
@@ -85,12 +80,10 @@ fileTable
 filelist
 filepath
 franca
-functionCoverage
 ganttStatus
 getOption
 github
 globals
-google
 googledrive
 gowlland
 https
@@ -103,7 +96,6 @@ inputObject
 inputObjects
 julia
 lingua
-login
 macOS
 memoisable
 memoise
@@ -114,7 +106,6 @@ modeler
 modeling
 modularity
 modularize
-moduleCoverage
 moduleDefaults
 moduleDiagram
 moduleName
@@ -125,7 +116,6 @@ namespacing
 natively
 novo
 oldrel
-optimizations
 outputObjects
 overplot
 paramName
@@ -139,13 +129,11 @@ rasters
 recache
 reparse
 reparsed
-repo
 reproducibility
 reproducibly
 rmarkdown
 rstudio
 scalable
-sim
 sim2gantt
 simInit
 simList
@@ -167,7 +155,4 @@ useCache
 userSuppliedObjNames
 v1
 vectorized
-versioning
-workflow
-workflows
 www

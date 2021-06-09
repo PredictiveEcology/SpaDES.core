@@ -14,6 +14,8 @@ spades(
   .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
+  events = NULL,
+  .plots = NULL,
   ...
 )
 
@@ -25,6 +27,8 @@ spades(
   .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
+  events = NULL,
+  .plots = NULL,
   ...
 )
 
@@ -36,6 +40,8 @@ spades(
   .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
+  events = NULL,
+  .plots = NULL,
   ...
 )
 }
@@ -68,6 +74,24 @@ If \code{Sys.time()} is provided, then it will force a recache,
 i.e., remove old value and replace with new value.
 Ignored if \code{cache} is \code{FALSE}.}
 
+\item{events}{A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules. With the \code{list} form, all unspecified modules
+will run \emph{all} their events, including internal spades modules, e.g., \code{save},
+that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
+
+\item{.plots}{Character. Sets the parameter of this name in all modules.
+See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
+For backwards compatibility, if \code{.plotInitialTime} is not set
+in this \code{spades} call, but this
+\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+will turn off all plotting; setting this with \code{"screen"} will trigger
+plotting for any modules that use this parameter but will have no effect on
+other modules. To get plotting, therefore, it may be necessary to also set
+\code{.plotInitialTime = start(sim)}.}
+
 \item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
 This will be included in the \code{Cache} call, so will be unique
 and thus \code{spades} will not use a cached copy as long as
@@ -78,8 +102,8 @@ Invisibly returns the modified \code{simList} object.
 }
 \description{
 Here, we implement a simulation in a more modular fashion so it's easier to add
-submodules to the simulation. We use S4 classes and methods, and use `data.table`
-instead of `data.frame` to implement the event queue (because it is much faster).
+submodules to the simulation. We use S4 classes and methods, and use \code{data.table}
+instead of \code{data.frame} to implement the event queue (because it is much faster).
 }
 \details{
 The is the workhorse function in the SpaDES package. It runs simulations by
@@ -144,13 +168,13 @@ named elements:
 must be a list (including empty \code{list()} for defaults) with the
 sub-list elements here:
 \tabular{lll}{
-  \code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-  \code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
-                                      log entries are appended to file, if it exists\cr
-              \tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
-              \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-  \code{debug} \tab See possible values below\cr
-  }
+\code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
+\code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
+log entries are appended to file, if it exists\cr
+\tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
+\tab \code{level} \tab The \code{level}, see below, of information shown\cr
+\code{debug} \tab See possible values below\cr
+}
 
 \code{level} can be a number from 0 to 100 or a character string matching one
 of the values in \code{logging::loglevels}. These are hierarchical levels of
@@ -173,23 +197,23 @@ outputs. This will be run at the start of every event. The following options for
 are available. Each of these can also be in a list to get multiple outputs:
 
 \tabular{ll}{
-  \code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
-                    it runs\cr
-  a function name (as character string) \tab If a function, then it will be run on the
-                                           simList, e.g., "time" will run
-                                           \code{time(sim)} at each event.\cr
-  moduleName (as character string) \tab All calls to that module will be entered
-                                        interactively\cr
-  eventName (as character string) \tab All calls that have that event name (in any module)
-                                       will be entered interactively\cr
-  \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
-                                            will be entered into. \cr
-  Any other R expression expressed as a character string or quoted call \tab
-                                Will be evaluated with access to the simList as 'sim'.
-                               If this is more than one character string, then all will
-                               be printed to the screen in their sequence. \cr
-  A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
-                                          information that users may find useful \cr
+\code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
+it runs\cr
+a function name (as character string) \tab If a function, then it will be run on the
+simList, e.g., "time" will run
+\code{time(sim)} at each event.\cr
+moduleName (as character string) \tab All calls to that module will be entered
+interactively\cr
+eventName (as character string) \tab All calls that have that event name (in any module)
+will be entered interactively\cr
+\code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+will be entered into. \cr
+Any other R expression expressed as a character string or quoted call \tab
+Will be evaluated with access to the simList as 'sim'.
+If this is more than one character string, then all will
+be printed to the screen in their sequence. \cr
+A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
+information that users may find useful \cr
 
 }
 
@@ -245,13 +269,37 @@ for (i in 1:2) {
  )
  print(system.time(out <- spades(mySim, cache = TRUE)))
 }
+
+# E.g., with only the init events
+outInitsOnly <- spades(mySim, events = "init")
+
+# or more fine grained control
+outSomeEvents <- spades(mySim,
+        events = list(randomLandscapes = c("init"),
+                      fireSpread = c("init", "burn")))
+
+# with outputs, the save module gets invoked and must be explicitly limited to "init"
+mySim <- simInit(
+ times = list(start = 0.0, end = 2.0, timeunit = "year"),
+ params = list(
+   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+ ),
+ modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+ outputs = data.frame(objectName = "landscape", saveTime = 0:2),
+ paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+)
+# This will print a message saying that caribouMovement will run its events
+outSomeEvents <- spades(mySim,
+        events = list(randomLandscapes = c("init"),
+                      fireSpread = c("init", "burn"),
+                      save = "init"))
 }
 
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
 \code{\link{SpaDES.core-package}},

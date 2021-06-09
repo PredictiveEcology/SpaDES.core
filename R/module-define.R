@@ -25,7 +25,7 @@ moduleDefaults <- list(
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
-  reqdPkgs = list()
+  reqdPkgs = list("ggplot2")
 )
 
 ################################################################################
@@ -168,13 +168,20 @@ setMethod(
     metadataRequired <- slotNames(new(".moduleDeps"))
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
+
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation")
     if (!all(metadataProvided)) {
-      warning(paste0(
-        "The \'", x$name, "\' module is missing the metadata for:\n",
-        paste(" - ", metadataMissing, collapse = "\n"), "\n",
-        "Using default values, which may not be desirable.\n",
-        "See moduleDefaults"
-      ))
+      # inputObjects and outputObjects are dealt with differently in parseModule
+      #   don't trigger a warning here.
+      metadataMissing <- setdiff(metadataMissing, c("inputObjects", "outputObjects"))
+      metadataMissingHard <- setdiff(metadataMissing, notEnforced)
+      if (length(metadataMissingHard))
+        warning(paste0(
+          "The \'", x$name, "\' module is missing the metadata for:\n",
+          paste(" - ", metadataMissing, collapse = "\n"), "\n",
+          "Using default values, which may not be desirable.\n",
+          "See moduleDefaults"
+        ))
     }
 
     ## enforce/coerce types for the user-supplied param list
@@ -396,11 +403,15 @@ setMethod("defineParameter",
             # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
             # we can't just coerece these because it wouldn't allow for character,
             #  e.g., start(sim)
-            anyNAs <- c(is.na(default), is.na(min), is.na(max))
+            anyNAs <- suppressWarnings(c(is.na(default), is.na(min), is.na(max)))
             if (!all(anyNAs)) {
               # if some or all are NA -- need to check
-              if (!all(is(c(default, min, max)[!anyNAs], class))) {
-                #if (!all(is(default, class), is(min, class), is(max, class))) {
+              wrongClass <- lapply(class, function(cla)
+                # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
+                lapply(c(default, min, max)[!anyNAs], function(val)
+                  is(val, cla)))
+              classWrong <- all(!unlist(wrongClass))
+              if (classWrong) {
                 # any messages here are captured if this is run from .parseModule
                 #   It will append module name
                 message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
@@ -411,7 +422,7 @@ setMethod("defineParameter",
             # previously used `substitute()` instead of `I()`,
             # but it did not allow for a vector to be passed with `c()`
             df <- data.frame(
-              paramName = name, paramClass = class, default = I(list(default)),
+              paramName = name, paramClass = I(list(class)), default = I(list(default)),
               min = I(list(min)), max = I(list(max)), paramDesc = desc,
               stringsAsFactors = FALSE)
             return(df)
@@ -432,12 +443,9 @@ setMethod("defineParameter",
               min <- NA
               max <- NA
             }
+            df <- defineParameter(name = name, class = class, default = default,
+                            min = min, max = max, desc = desc)
 
-            df <- data.frame(
-              paramName = name, paramClass = class, default = I(list(default)),
-              min = I(list(substitute(min))), max = I(list(substitute(max))),
-              paramDesc = desc, stringsAsFactors = FALSE
-            )
             return(df)
 })
 

@@ -19,7 +19,7 @@ doEvent.{{{name}}} = function(sim, eventTime, eventType) {
       # ! ----- EDIT BELOW ----- ! #
       # do stuff for this event
 
-      #plotFun(sim) # uncomment this, replace with object to plot
+      plotFun(sim) # example of a plotting function
       # schedule future event(s)
 
       # e.g.,
@@ -101,7 +101,8 @@ Save <- function(sim) {
 plotFun <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # do stuff for this event
-  #Plot(sim$object)
+  sampleData <- data.frame("TheSample" = sample(1:10, replace = TRUE))
+  Plots(sampleData, fn = ggplotFn)
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
@@ -152,6 +153,11 @@ Event2 <- function(sim) {
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
+}
+
+ggplotFn <- function(data, ...) {
+  ggplot(data, aes(TheSample)) +
+    geom_histogram(...)
 }
 
 ### add additional events as needed by copy/pasting from above

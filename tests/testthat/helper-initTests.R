@@ -20,7 +20,8 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   a <- list(reproducible.inputPaths = NULL,
             reproducible.showSimilar = FALSE,
             spades.moduleCodeChecks = smcc,
-            spades.useRequire = FALSE)
+            spades.useRequire = FALSE,
+            reproducible.useNewDigestAlgorithm = 2)
   a[names(opts)] <- opts
   opts1 <- a
 

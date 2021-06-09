@@ -70,7 +70,10 @@ simInit(
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times
-(e.g., \code{times = list(start = 0.0, end = 10.0)}).}
+(e.g., \code{times = list(start = 0.0, end = 10.0, timeunit = "year")}),
+with the final optional element, \code{timeunit}, overriding the default
+time unit used in the simulation which is the "smallest time unit" across all
+modules. See examples.}
 
 \item{params}{A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 See details.}
@@ -115,7 +118,7 @@ it should give "initial conditions".
 See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
-\item{loadOrder}{An optional list of module names specifying the order in
+\item{loadOrder}{An optional character vector of module names specifying the order in
 which to load the modules. If not specified, the module
 load order will be determined automatically.}
 
@@ -143,35 +146,35 @@ See more details below.
 }
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
-  \tabular{lll}{
-  \bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
-  fills \code{simList} slots \tab places the arguments \code{times},
-    \code{params}, \code{modules}, \code{paths} into equivalently named
-    \code{simList} slots \tab \code{times},
-    \code{params}, \code{modules}, \code{paths}\cr
-  sources all module files \tab places all function definitions in the
-    \code{simList}, specifically, into a sub-environment of the main
-    \code{simList} environment: e.g., \code{sim$<moduleName>$function1}
-    (see section on \bold{Scoping}) \tab \code{modules} \cr
-  copies objects \tab from the global environment to the
-    \code{simList} environment \tab \code{objects} \cr
-  loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
-  schedule object loading/copying \tab Objects can be loaded into the
-    \code{simList} at any time during a simulation  \tab \code{inputs} \cr
-  schedule object saving \tab Objects can be saved to disk at any arbitrary
-    time during the simulation. If specified here, this will be in addition
-    to any saving due code inside a module (i.e., a module may manually
-    run \code{write.table(...)} \tab \code{outputs} \cr
-  schedules "init" events \tab from all modules (see \code{\link{events}})
-       \tab automatic  \cr
-  assesses module dependencies \tab via the inputs and outputs identified in their
-    metadata. This gives the order of the \code{.inputObjects} and \code{init}
-    events. This can be overridden by \code{loadOrder}. \tab automatic \cr
-  determines time unit \tab takes time units of modules
-      and how they fit together \tab \code{times} or automatic \cr
-  runs \code{.inputObjects} functions \tab from every module
-    \emph{in the module order as determined above} \tab automatic \cr
-  }
+\tabular{lll}{
+\bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
+fills \code{simList} slots \tab places the arguments \code{times},
+\code{params}, \code{modules}, \code{paths} into equivalently named
+\code{simList} slots \tab \code{times},
+\code{params}, \code{modules}, \code{paths}\cr
+sources all module files \tab places all function definitions in the
+\code{simList}, specifically, into a sub-environment of the main
+\code{simList} environment: e.g., \code{sim$<moduleName>$function1}
+(see section on \bold{Scoping}) \tab \code{modules} \cr
+copies objects \tab from the global environment to the
+\code{simList} environment \tab \code{objects} \cr
+loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
+schedule object loading/copying \tab Objects can be loaded into the
+\code{simList} at any time during a simulation  \tab \code{inputs} \cr
+schedule object saving \tab Objects can be saved to disk at any arbitrary
+time during the simulation. If specified here, this will be in addition
+to any saving due code inside a module (i.e., a module may manually
+run \code{write.table(...)} \tab \code{outputs} \cr
+schedules "init" events \tab from all modules (see \code{\link{events}})
+\tab automatic  \cr
+assesses module dependencies \tab via the inputs and outputs identified in their
+metadata. This gives the order of the \code{.inputObjects} and \code{init}
+events. This can be overridden by \code{loadOrder}. \tab automatic \cr
+determines time unit \tab takes time units of modules
+and how they fit together \tab \code{times} or automatic \cr
+runs \code{.inputObjects} functions \tab from every module
+\emph{in the module order as determined above} \tab automatic \cr
+}
 }
 
 \code{params} can only contain updates to any parameters that are defined in
@@ -184,6 +187,14 @@ parameters from multiple modules all at once, with say:
 \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))}.
 
+\code{params} can be used to set the seed for a specific event in a module. This
+is done using the normal \code{params} argument, specifying \code{.seed} as a list
+where the elements are a numeric for the seed and the name is the event. Since
+parameters must be specific to a module, this creates a module and event specific
+seed e.g., \code{params = list(moduleName = list(.seed = list(init = 123)))} will
+set the \code{init} event of module named \code{moduleName} to 123. The RN stream
+will be reset to its state prior to the \code{set.seed} call after the event.
+
 We implement a discrete event simulation in a more modular fashion so it is
 easier to add modules to the simulation. We use S4 classes and methods,
 and fast lists to manage the event queue.
@@ -193,13 +204,13 @@ the data input files, and the saving output files. If no paths are specified
 the defaults are as follows:
 
 \itemize{
-  \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
+\item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 
-  \item \code{inputPath}: \code{getOption("spades.modulePath")};
+\item \code{inputPath}: \code{getOption("spades.modulePath")};
 
-  \item \code{modulePath}: \code{getOption("spades.inputPath")};
+\item \code{modulePath}: \code{getOption("spades.inputPath")};
 
-  \item \code{inputPath}: \code{getOption("spades.outputPath")}.
+\item \code{inputPath}: \code{getOption("spades.outputPath")}.
 }
 }
 \note{
@@ -219,7 +230,7 @@ for successful initialization.
 
 
 The \code{simInit} function will attempt to find usage of \code{sim$xxx} or \code{sim[['xxx']]}
- on either side of the assignment (\code{<-}) operator.
+on either side of the assignment (\code{<-}) operator.
 It will compare these to the module metadata, specifically \code{inputObjects} for cases where
 objects or "gotten" from the \code{simList} and \code{outputObjects} for cases where objects are
 assigned to the \code{simList.}
@@ -352,8 +363,8 @@ if (require(rgdal)) {
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
 \code{\link{spades}},

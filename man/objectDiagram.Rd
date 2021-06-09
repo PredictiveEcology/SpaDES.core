@@ -18,7 +18,7 @@ Useful for specifying \code{height} and \code{width}.}
 }
 \value{
 Plots a sequence diagram, invisibly returning a
-  \code{DiagrammeR::mermaid} object.
+\code{DiagrammeR::mermaid} object.
 }
 \description{
 Create a sequence diagram illustrating the data object dependencies of a

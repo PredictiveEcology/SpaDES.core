@@ -58,7 +58,7 @@ The computationally fastest way to get a parameter is to specify moduleName and 
 \code{P(sim, "moduleName", "paramName")} (replacing moduleName and paramName with your
 specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
 part for speed (e.g., 2-4x faster) is specifying the moduleName.
-Specifying the parameter name is <5% faster.
+Specifying the parameter name is <5\% faster.
 }
 \examples{
 modules <- list("randomLandscapes")

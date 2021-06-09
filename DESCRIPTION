@@ -12,8 +12,8 @@ Description: Provides the core framework for a discrete event system (DES) to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2021-02-18
-Version: 1.0.6
+Date: 2021-06-08
+Version: 1.0.8
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -31,10 +31,10 @@ Authors@R: c(
 Depends:
     R (>= 3.6),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.1.9007)
+    reproducible (>= 1.2.6.9014)
 Imports:
     crayon,
-    data.table (>= 1.10.4),
+    data.table (>= 1.11.0),
     fastdigest,
     igraph (>= 1.0.1),
     methods,
@@ -51,6 +51,7 @@ Suggests:
     dplyr,
     future,
     future.callr,
+    ggplot2,
     googledrive,
     httr,
     knitr,
@@ -66,6 +67,11 @@ Suggests:
     rmarkdown,
     tcltk,
     testthat (>= 1.0.2)
+Remotes:
+    PredictiveEcology/quickPlot@development,
+    PredictiveEcology/Require@development,
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
@@ -73,6 +79,7 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
+    'Plots.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'environment.R'
@@ -109,10 +116,12 @@ Collate:
     'reexports.R'
     'restart.R'
     'save.R'
+    'saveLoadSimList.R'
     'simulation-spades.R'
     'spades-classes.R'
     'spades-core-deprecated.R'
     'spades-core-package.R'
     'suppliedElsewhere.R'
     'zzz.R'
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

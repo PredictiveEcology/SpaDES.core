@@ -5,6 +5,7 @@
 #' See Details below.
 #'
 #' @export
+#' @noMd
 #' @details
 #'
 #' Below are options that can be set with \code{options("spades.xxx" = newValue)},
@@ -46,6 +47,10 @@
 #'   \code{spades.lowMemory} \tab \code{FALSE}
 #'     \tab If true, some functions will use more memory
 #'     efficient (but slower) algorithms. \cr
+#'
+#'   \code{spades.messagingNumCharsModule} \tab \code{21}
+#'     \tab The number of characters to use for the messaging preamble on each
+#'     line of the messaging during spades calls\cr
 #'
 #'   \code{spades.moduleCodeChecks}
 #'     \tab \code{list(suppressParamUnused = FALSE,
@@ -116,6 +121,7 @@ spadesOptions <- function() {
     spades.inputPath = file.path(.spadesTempDir, "inputs"),
     spades.lowMemory = FALSE,
     spades.memoryUseInterval = 0,
+    spades.messagingNumCharsModule = 21,
     spades.moduleCodeChecks = list(
       skipWith = TRUE,
       suppressNoLocalFun = TRUE,

@@ -18,7 +18,7 @@ checkParams(sim, coreParams, ...)
 }
 \value{
 Invisibly return \code{TRUE} indicating object exists; \code{FALSE} if not.
-         Sensible messages are be produced identifying missing parameters.
+Sensible messages are be produced identifying missing parameters.
 }
 \description{
 Checks that all parameters passed are used in a module,

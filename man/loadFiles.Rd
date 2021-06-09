@@ -39,9 +39,9 @@ not to be used by a user.
 A \code{data.frame} with information on how to load various types of files in R,
 containing the columns:
 \itemize{
-  \item \code{exts}: the file extension;
-  \item \code{fun}: the function to use for files with this file extension;
-  \item \code{package}: the package from which to load \code{fun}.
+\item \code{exts}: the file extension;
+\item \code{fun}: the function to use for files with this file extension;
+\item \code{package}: the package from which to load \code{fun}.
 }
 }
 \examples{

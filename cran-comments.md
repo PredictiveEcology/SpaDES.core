@@ -1,36 +1,32 @@
 ## Updated release
 
-This release fixes several problems revealed during CRAN checks, including fixes for changes in dependency packages.
-Dependency package `RandomFields` is currently unavailable for R-devel, as it fails to load:
-
-    Error: package or namespace load failed for 'RandomFields':
-     .onLoad failed in loadNamespace() for 'RandomFields', details:
-      call: fun(libname, pkgname)
-      error: function 'getErrorString' not provided by package 'RandomFieldsUtils'
-
+This release is to restore this package on CRAN following removal of dependency `reproducible` (which has now been restored on CRAN).
+Please note, the CRAN URL to a package vignette will work once the package is restored.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 18.04                 (GitHub), R 3.6.3
+* Ubuntu 20.04                 (GitHub), R 3.6.3
+* Ubuntu 20.04                 (GitHub), R 4.0.5
 * Windows                      (GitHub), R 3.6.3
-* Windows                 (win-builder), R 3.6.3
+* Windows                      (GitHub), R 4.0.5
+* Windows                 (win-builder), R 4.0.5
 
 ### Current R versions
-* macOS 10.15.6 Catalina       (GitHub), R 4.0.4
-* macOS 11.1 Big Sur            (local), R 4.0.4
-* Ubuntu 18.04                 (GitHub), R 4.0.4
-* Ubuntu 20.04                  (local), R 4.0.4
-* Windows                      (GitHub), R 4.0.4
-* Windows                       (local), R 4.0.4
-* Windows                 (win-builder), R 4.0.4
+* macOS 10.15.6 Catalina       (GitHub), R 4.1.0
+* macOS 11.1 Big Sur            (local), R 4.1.0
+* Ubuntu 20.04                 (GitHub), R 4.1.0
+* Ubuntu 20.04                  (local), R 4.1.0
+* Windows                      (GitHub), R 4.1.0
+* Windows                       (local), R 4.1.0
+* Windows                 (win-builder), R 4.1.0
 
 ### Development R version
-* Ubuntu 18.04                 (GitHub), R 4.1.0 (2021-02-16 r80015)
-* Ubuntu 20.04                  (local), R 4.1.0 (2021-02-15 r80012)
-* Windows                      (GitHub), R 4.1.0 (2021-02-17 r80023)
-* Windows                 (win-builder), R 4.1.0 (2021-02-18 r80027)
+* Ubuntu 20.04                 (GitHub), R-devel (2021-06-07 r80458)
+* Ubuntu 20.04                  (local), R-devel (2021-05-31 r80426)
+* Windows                      (GitHub), R-devel (2021-06-07 r80458)
+* Windows                 (win-builder), R-devel (2021-06-07 r80458)
 
 ## R CMD check results
 
@@ -44,10 +40,13 @@ There were 2 NOTEs:
           workflow (6:58)
           workflows (10:64)
 
-2. Unable to reach the default time server:
+2. Temporarily unavailable CRAN URL, because package was previously archived.
 
-        > checking for future file timestamps ... NOTE
-          unable to verify current time
+        Found the following (possibly) invalid URLs:
+          URL: https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html
+          From: man/spades.Rd
+          Status: 404
+          Message: Not Found
 
 ## Downstream dependencies
 

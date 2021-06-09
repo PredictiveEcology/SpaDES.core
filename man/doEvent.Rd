@@ -8,7 +8,9 @@ doEvent(
   sim,
   debug = FALSE,
   notOlderThan,
-  useFuture = getOption("spades.futureEvents", FALSE)
+  useFuture = getOption("spades.futureEvents", FALSE),
+  events = NULL,
+  ...
 )
 }
 \arguments{
@@ -25,6 +27,18 @@ i.e., remove old value and replace with new value.
 Ignored if \code{cache} is \code{FALSE}.}
 
 \item{useFuture}{Experimental use of future::future package. Not fully implemented.}
+
+\item{events}{A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules. With the \code{list} form, all unspecified modules
+will run \emph{all} their events, including internal spades modules, e.g., \code{save},
+that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
+
+\item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
+This will be included in the \code{Cache} call, so will be unique
+and thus \code{spades} will not use a cached copy as long as
+anything passed in \code{...} is unique, i.e., not cached previously.}
 }
 \value{
 Returns the modified \code{simList} object.
@@ -40,8 +54,8 @@ submodules to the simulation. We use S4 classes and methods.
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \author{
 Alex Chubaty

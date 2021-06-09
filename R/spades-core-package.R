@@ -6,6 +6,7 @@
 
 #' Categorized overview of the \code{SpaDES.core} package
 #'
+#' @noMd
 #' @description
 #'
 #' \if{html}{\figure{SpaDES.png}{options: width=100 alt="SpaDES logo" align="right"}}

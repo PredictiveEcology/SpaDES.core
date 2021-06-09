@@ -1,4 +1,4 @@
-utils::globalVariables(".")
+utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 
 #' Initialize a new simulation
 #'
@@ -51,6 +51,14 @@ utils::globalVariables(".")
 #' parameters from multiple modules all at once, with say:
 #' \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
 #'            caribouModule = list(N = 1000))}.
+#'
+#' \code{params} can be used to set the seed for a specific event in a module. This
+#' is done using the normal \code{params} argument, specifying `.seed` as a list
+#' where the elements are a numeric for the seed and the name is the event. Since
+#' parameters must be specific to a module, this creates a module and event specific
+#' seed e.g., \code{params = list(moduleName = list(.seed = list(init = 123)))} will
+#' set the \code{init} event of module named \code{moduleName} to 123. The RN stream
+#' will be reset to its state prior to the \code{set.seed} call after the event.
 #'
 #' We implement a discrete event simulation in a more modular fashion so it is
 #' easier to add modules to the simulation. We use S4 classes and methods,
@@ -108,7 +116,10 @@ utils::globalVariables(".")
 #' for successful initialization.
 #'
 #' @param times A named list of numeric simulation start and end times
-#'        (e.g., \code{times = list(start = 0.0, end = 10.0)}).
+#'        (e.g., \code{times = list(start = 0.0, end = 10.0, timeunit = "year")}),
+#'        with the final optional element, \code{timeunit}, overriding the default
+#'        time unit used in the simulation which is the "smallest time unit" across all
+#'        modules. See examples.
 #'
 #' @param params A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 #' See details.
@@ -153,7 +164,7 @@ utils::globalVariables(".")
 #' See \code{\link{outputs}} and
 #' \code{vignette("ii-modules")} section about outputs.
 #'
-#' @param loadOrder  An optional list of module names specifying the order in
+#' @param loadOrder  An optional character vector of module names specifying the order in
 #'                   which to load the modules. If not specified, the module
 #'                   load order will be determined automatically.
 #'
@@ -327,11 +338,6 @@ setMethod(
                         loadOrder,
                         notOlderThan) {
 
-    # For namespacing of each module; keep a snapshot of the search path
-    # .pkgEnv$searchPath <- search()
-    # on.exit({
-    #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
-    # })
     paths <- lapply(paths, function(p)
       checkPath(p, create = TRUE)
     )
@@ -350,8 +356,6 @@ setMethod(
     sim <- new("simList")
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
-    #sim@.xData[[".parsedFiles"]] <- new.env(parent = as.environment("package:SpaDES.core"))
-    #  sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
 
     # paths
@@ -396,105 +400,26 @@ setMethod(
                           ".saveInitialTime",
                           ".plotInterval",
                           ".plotInitialTime")
-    dotParamsChar <- list(".savePath", ".saveObjects")
+    dotParamsChar <- list(".savePath", ".saveObjects", ".seed")
     dotParams <- append(dotParamsChar, dotParamsReal)
 
     sim@modules <- modules  ## will be updated below
 
     mBase <- basename2(unlist(modules))
 
+    # Load packages
     reqdPkgs <- packages(modules = sim@modules,
                          filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
-
-    # Load only needed packages -- compare to current search path
-    uniqueReqdPkgs <- unique(unlist(reqdPkgs))
-
-    if (length(uniqueReqdPkgs)) {
-      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
-      if (getOption("spades.useRequire")) {
-        Require(allPkgs, upgrade = FALSE)
-      } else {
-        loadedPkgs <- search();
-        neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
-        names(neededPkgs) <- uniqueReqdPkgs
-        allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
-        versionSpecs <- Require::getPkgVersions(allPkgs)
-        if (any(versionSpecs$hasVersionSpec)) {
-          out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
-            comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-                                   versionSpecs$versionSpec[iii])
-            if (comp < 0)
-              warning(versionSpecs$Package[iii], " needs to be updated to at least ",
-                      versionSpecs$versionSpec[iii])
-          })
-
-        }
-        allPkgs <- unique(Require::extractPkgName(allPkgs))
-        loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
-      }
-    }
-
-    ## timeunit is needed before all parsing of modules.
-    ## It could be used within modules within defineParameter statements.
-    # timeunits <- .parseModulePartial(sim, modules(sim), defineModuleElement = "timeunit")
+    loadPkgs(reqdPkgs)
 
     allTimeUnits <- FALSE
-
-    findSmallestTU <- function(sim, mods, childModules) { # recursive function
-      out <- mods
-
-      modsForTU <- names(childModules)
-      stillFinding <- TRUE
-      recurseLevel <- 1
-      ## Time unit could be NA, in which case, it should find the smallest one that is inside a parent...
-      ## if none there, then inside grandparent etc.
-      while (stillFinding && length(modsForTU)) {
-        tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
-                                  envir = sim@.xData[[".parsedFiles"]])
-        hasTU <- !is.na(tu)
-        innerNames <- .findModuleName(childModules, recursive = recurseLevel)
-        modsForTU <- innerNames[nzchar(names(innerNames))]
-        stillFinding <- all(!hasTU)
-        recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
-      }
-      if (!exists("tu", inherits = FALSE)) {
-        return(list("year")) # default
-      }
-      minTU <- minTimeunit(as.list(unlist(tu)))
-      if (isTRUE(is.na(minTU[[1]]))) {
-        minTU[[1]] <- "year"
-      }
-      return(minTU)
-    }
-
-    # recursive function to extract parent and child structures
-    buildParentChildGraph <- function(sim, mods, childModules) {
-      out <- childModules
-
-      # A child module will be a list inside a list of parent modules
-      isParent <- sapply(out, function(x) is.list(x))
-      if (length(isParent)) {
-        from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
-        to <- unlist(lapply(out, function(x) names(x)))
-        if (is.null(to)) to <- character(0)
-        outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
-        aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
-        aa <- rbindlist(aa)
-        outDF <- rbind(outDF, aa)
-      } else {
-        outDF <- data.frame(from = character(0), to = character(0), stringsAsFactors = FALSE)
-      }
-      outDF
-    }
 
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
     parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
 
     timeunits <- findSmallestTU(sim, modulePaths, childModules)
-
-    if (length(timeunits) == 0) timeunits <- list(moduleDefaults$timeunit) # no timeunits or no modules at all
 
     if (!is.null(times$unit)) {
       message(
@@ -569,183 +494,183 @@ setMethod(
       }
     }
 
-    # Force SpaDES.core to front of search path
-    #.modifySearchPath("SpaDES.core", skipNamespacing = FALSE)
+    # From here, capture messaging and prepend it
+    withCallingHandlers({
 
-    #rm(".userSuppliedObjNames", envir=envir(sim))
-    ## add name to depends
-    if (!is.null(names(sim@depends@dependencies))) {
-      names(sim@depends@dependencies) <- sim@depends@dependencies %>%
-        lapply(., function(x)
-          x@name) %>%
-        unlist()
-    }
-
-    ## load core modules
-    for (c in core) {
-      # schedule each module's init event:
-      #.refreshEventQueues()
-      sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
-                           c, "init", .first() - 1)
-    }
-
-    ## assign user-specified non-global params, while
-    ## keeping defaults for params not specified by user
-    omit <- c(which(core == "load"), which(core == "save"))
-    pnames <- unique(c(paste0(".", core[-omit]), names(sim@params)))
-
-    if (is.null(params$.progress) || any(is.na(params$.progress))) {
-      params$.progress <- .pkgEnv$.progressEmpty
-    }
-
-    tmp <- list()
-    lapply(pnames, function(x) {
-      tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
-    })
-    sim@params <- tmp
-
-    ## check user-supplied load order
-    if (!all(length(loadOrder),
-             all(sim@modules %in% loadOrder),
-             all(loadOrder %in% sim@modules))) {
-      loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
-    }
-
-    mBase <- basename2(unlist(sim@modules))
-    loadOrderBase <- basename2(loadOrder)
-    names(loadOrder) <- names(unlist(sim@modules))[na.omit(match(mBase, loadOrderBase))]
-    loadOrder[] <- loadOrderBase
-    loadOrderNames <- names(loadOrder)
-
-    # This is a quick override so that .runInputObjects has access to these
-    #   synonynms
-    if (!is.null(objects$objectSynonyms)) {
-      sim$objectSynonyms <- objects$objectSynonyms
-      sim <- .checkObjectSynonyms(sim)
-    }
-
-    # Make local activeBindings to mod
-    lapply(as.character(sim@modules), function(mod) {
-      makeModActiveBinding(sim = sim, mod = mod)
-      # sim$.mods$caribouMovement$mod <- list()
-    })
-
-    lapply(sim@modules, function(mod) {
-      makeParActiveBinding(sim = sim, mod = mod)
-    })
-
-    ## load user-defined modules
-    # browser(expr = exists("._simInit_4"))
-
-    for (m in loadOrder) {
-      mFullPath <- loadOrderNames[match(m, loadOrder)]
-      ## run .inputObjects() for each module
-      sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
-
-      ## schedule each module's init event:
-      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
-
-      ### add module name to the loaded list
-      names(m) <- mFullPath
-      modulesLoaded <- append(modulesLoaded, m)
-
-
-      ### add NAs to any of the dotParams that are not specified by user
-      # ensure the modules sublist exists by creating a tmp value in it
-      if (is.null(sim@params[[m]])) {
-        sim@params[[m]] <- list(.tmp = NA_real_)
+      ## add name to depends
+      if (!is.null(names(sim@depends@dependencies))) {
+        names(sim@depends@dependencies) <- sim@depends@dependencies %>%
+          lapply(., function(x)
+            x@name) %>%
+          unlist()
       }
 
-      ## add the necessary values to the sublist
-      for (x in dotParamsReal) {
-        if (is.null(sim@params[[m]][[x]])) {
-          sim@params[[m]][[x]] <- NA_real_
-        } else if (is.na(sim@params[[m]][[x]])) {
-          sim@params[[m]][[x]] <- NA_real_
+      ## load core modules
+      for (c in core) {
+        # schedule each module's init event:
+        #.refreshEventQueues()
+        sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
+                             c, "init", .first() - 1)
+      }
+
+      ## assign user-specified non-global params, while
+      ## keeping defaults for params not specified by user
+      omit <- c(which(core == "load"), which(core == "save"))
+      pnames <- unique(c(paste0(".", core[-omit]), names(sim@params)))
+
+      if (is.null(params$.progress) || any(is.na(params$.progress))) {
+        params$.progress <- .pkgEnv$.progressEmpty
+      }
+
+      tmp <- list()
+      lapply(pnames, function(x) {
+        tmp[[x]] <<- suppressWarnings(updateList(sim@params[[x]], params[[x]]))
+      })
+      sim@params <- tmp
+
+      ## check user-supplied load order
+      if (!all(length(loadOrder),
+               all(sim@modules %in% loadOrder),
+               all(loadOrder %in% sim@modules))) {
+        loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
+      }
+
+      mBase <- basename2(unlist(sim@modules))
+      loadOrderBase <- basename2(loadOrder)
+      names(loadOrder) <- names(unlist(sim@modules))[na.omit(match(mBase, loadOrderBase))]
+      loadOrder[] <- loadOrderBase
+      loadOrderNames <- names(loadOrder)
+
+      # This is a quick override so that .runInputObjects has access to these
+      #   synonynms
+      if (!is.null(objects$objectSynonyms)) {
+        sim$objectSynonyms <- objects$objectSynonyms
+        sim <- .checkObjectSynonyms(sim)
+      }
+
+      # Make local activeBindings to mod
+      lapply(as.character(sim@modules), function(mod) {
+        makeModActiveBinding(sim = sim, mod = mod)
+        # sim$.mods$caribouMovement$mod <- list()
+      })
+
+      lapply(sim@modules, function(mod) {
+        makeParActiveBinding(sim = sim, mod = mod)
+      })
+
+      ## load user-defined modules
+      # browser(expr = exists("._simInit_4"))
+
+      for (m in loadOrder) {
+        mFullPath <- loadOrderNames[match(m, loadOrder)]
+        ## run .inputObjects() for each module
+        sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+
+        ## schedule each module's init event:
+        sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+
+        ### add module name to the loaded list
+        names(m) <- mFullPath
+        modulesLoaded <- append(modulesLoaded, m)
+
+
+        ### add NAs to any of the dotParams that are not specified by user
+        # ensure the modules sublist exists by creating a tmp value in it
+        if (is.null(sim@params[[m]])) {
+          sim@params[[m]] <- list(.tmp = NA_real_)
+        }
+
+        ## add the necessary values to the sublist
+        for (x in dotParamsReal) {
+          if (is.null(sim@params[[m]][[x]])) {
+            sim@params[[m]][[x]] <- NA_real_
+          } else if (is.na(sim@params[[m]][[x]])) {
+            sim@params[[m]][[x]] <- NA_real_
+          }
+        }
+
+        ## remove the tmp value from the module sublist
+        sim@params[[m]]$.tmp <- NULL
+
+        ### Currently, everything in dotParamsChar is being checked for NULL
+        ### values where used (i.e., in save.R).
+      }
+
+      ## check that modules all loaded correctly and store result
+      if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
+        modules(sim) <- modulesLoaded
+      } else {
+        stop("There was a problem loading some modules.")
+      }
+
+      ## Add the data.frame as an attribute
+      attr(sim@modules, "modulesGraph") <- parentChildGraph
+
+      ## END OF MODULE PARSING AND LOADING
+      if (length(objects)) {
+        if (is.list(objects)) {
+          if (length(objNames) == length(objects)) {
+            objs(sim) <- objects
+          } else {
+            stop(
+              paste(
+                "objects must be a character vector of object names",
+                "to retrieve from the .GlobalEnv, or a named list of",
+                "objects"
+              )
+            )
+          }
+        } else {
+          newInputs <- data.frame(
+            objectName = objNames,
+            loadTime = as.numeric(sim@simtimes[["current"]]),
+            stringsAsFactors = FALSE
+          ) %>%
+            .fillInputRows(startTime = start(sim))
+          inputs(sim) <- newInputs
         }
       }
 
-      ## remove the tmp value from the module sublist
-      sim@params[[m]]$.tmp <- NULL
-
-      ### Currently, everything in dotParamsChar is being checked for NULL
-      ### values where used (i.e., in save.R).
-    }
-
-    ## check that modules all loaded correctly and store result
-    if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
-      modules(sim) <- modulesLoaded
-    } else {
-      stop("There was a problem loading some modules.")
-    }
-
-    ## Add the data.frame as an attribute
-    attr(sim@modules, "modulesGraph") <- parentChildGraph
-
-    ## END OF MODULE PARSING AND LOADING
-    if (length(objects)) {
-      if (is.list(objects)) {
-        if (length(objNames) == length(objects)) {
-          objs(sim) <- objects
-        } else {
-          stop(
-            paste(
-              "objects must be a character vector of object names",
-              "to retrieve from the .GlobalEnv, or a named list of",
-              "objects"
+      ## load files in the filelist
+      if (NROW(inputs) | NROW(inputs(sim))) {
+        inputs(sim) <- rbind(inputs(sim), inputs)
+        if (NROW(events(sim)[moduleName == "load" &
+                             eventType == "inputs" &
+                             eventTime == start(sim)]) > 0) {
+          sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
+          events(sim) <- events(sim)[!(eventTime == time(sim) &
+                                         moduleName == "load" &
+                                         eventType == "inputs"), ]
+        }
+        if (any(events(sim)[["eventTime"]] < start(sim))) {
+          warning(
+            paste0(
+              "One or more objects in the inputs filelist was ",
+              "scheduled to load before start(sim). ",
+              "It is being be removed and not loaded. To ensure loading, loadTime ",
+              "must be start(sim) or later. See examples using ",
+              "loadTime in ?simInit"
             )
           )
+          events(sim) <- events(sim)[eventTime >= start(sim)]
         }
-      } else {
-        newInputs <- data.frame(
-          objectName = objNames,
-          loadTime = as.numeric(sim@simtimes[["current"]]),
-          stringsAsFactors = FALSE
-        ) %>%
-          .fillInputRows(startTime = start(sim))
-        inputs(sim) <- newInputs
       }
-      # if (exists("objectSynonyms", envir = sim, inherits = FALSE)) {
-      #   sim <- .checkObjectSynonyms(sim)
-      # }
-    }
 
-    ## load files in the filelist
-    if (NROW(inputs) | NROW(inputs(sim))) {
-      inputs(sim) <- rbind(inputs(sim), inputs)
-      if (NROW(events(sim)[moduleName == "load" &
-                           eventType == "inputs" &
-                           eventTime == start(sim)]) > 0) {
-        sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-        events(sim) <- events(sim)[!(eventTime == time(sim) &
-                                                 moduleName == "load" &
-                                                 eventType == "inputs"), ]
+      if (length(outputs)) {
+        outputs(sim) <- outputs
       }
-      if (any(events(sim)[["eventTime"]] < start(sim))) {
-        warning(
-          paste0(
-            "One or more objects in the inputs filelist was ",
-            "scheduled to load before start(sim). ",
-            "It is being be removed and not loaded. To ensure loading, loadTime ",
-            "must be start(sim) or later. See examples using ",
-            "loadTime in ?simInit"
-          )
-        )
-        events(sim) <- events(sim)[eventTime >= start(sim)]
-      }
+
+      ## check the parameters supplied by the user
+      checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
+
+    },
+    message = function(m) {
+      message(loggingMessage(m$message, prefix = " simInit:"))
+      # message(Sys.time(), " simInit::", gsub("\\n", "", m$message))
+      # This will "muffle" the original message
+      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
     }
-
-    if (length(outputs)) {
-      outputs(sim) <- outputs
-    }
-
-    ## check the parameters supplied by the user
-    checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
-
-    ## keep session info for debugging & checkpointing
-    # sim$.sessionInfo <- sessionInfo() # commented out because it gives too much information
-                                        # i.e., it includes all packages in a user search
-                                        #  path, which is not necessarily the correct info
+    )
 
     return(invisible(sim))
 })
@@ -1003,7 +928,7 @@ setMethod(
 #' @rdname simInitAnd
 simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
                              notOlderThan, debug, progress, cache,
-                             .plotInitialTime, .saveInitialTime, ...) {
+                             .plotInitialTime, .saveInitialTime, events, ...) {
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
   lsAllNames <- ls(all.names = TRUE)
@@ -1279,4 +1204,104 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   }
   modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
     poss[exist][1])
+}
+
+checkSpaDES.coreMinVersion <- function(allPkgs) {
+  versionSpecs <- Require::getPkgVersions(allPkgs)
+  sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
+  if (NROW(sc)) {
+    out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
+      comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
+                             sc$versionSpec[iii])}))
+    if (any(out11 < 0))
+      stop("One of the modules needs a newer version of SpaDES.core. Please ",
+           "restart R and install with: \n",
+           "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+  }
+
+}
+
+findSmallestTU <- function(sim, mods, childModules) { # recursive function
+  out <- mods
+
+  modsForTU <- names(childModules)
+  stillFinding <- TRUE
+  recurseLevel <- 1
+  ## Time unit could be NA, in which case, it should find the smallest one that is inside a parent...
+  ## if none there, then inside grandparent etc.
+  while (stillFinding && length(modsForTU)) {
+    tu <- .parseModulePartial(sim, as.list(modsForTU), defineModuleElement = "timeunit",
+                              envir = sim@.xData[[".parsedFiles"]])
+    hasTU <- !is.na(tu)
+    innerNames <- .findModuleName(childModules, recursive = recurseLevel)
+    modsForTU <- innerNames[nzchar(names(innerNames))]
+    stillFinding <- all(!hasTU)
+    recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
+  }
+  if (!exists("tu", inherits = FALSE)) {
+    return(list("year")) # default
+  }
+  minTU <- minTimeunit(as.list(unlist(tu)))
+  if (isTRUE(is.na(minTU[[1]]))) {
+    minTU[[1]] <- "year"
+  }
+
+  # no timeunits or no modules at all
+  if (length(minTU) == 0) minTU <- list(moduleDefaults$timeunit)
+
+  return(minTU)
+}
+
+# recursive function to extract parent and child structures
+buildParentChildGraph <- function(sim, mods, childModules) {
+  out <- childModules
+
+  # A child module will be a list inside a list of parent modules
+  isParent <- sapply(out, function(x) is.list(x))
+  if (length(isParent)) {
+    from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
+    to <- unlist(lapply(out, function(x) names(x)))
+    if (is.null(to)) to <- character(0)
+    outDF <- data.frame(from = from, to = to, stringsAsFactors = FALSE)
+    aa <- lapply(childModules[isParent], function(x) buildParentChildGraph(sim, mods, x))
+    aa <- rbindlist(aa)
+    outDF <- rbind(outDF, aa)
+  } else {
+    outDF <- data.frame(from = character(0), to = character(0), stringsAsFactors = FALSE)
+  }
+  outDF
+}
+
+loadPkgs <- function(reqdPkgs) {
+  uniqueReqdPkgs <- unique(unlist(reqdPkgs))
+
+  if (length(uniqueReqdPkgs)) {
+    allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+
+    # Check for SpaDES.core minimum version
+    checkSpaDES.coreMinVersion(allPkgs)
+
+    if (getOption("spades.useRequire")) {
+      Require(allPkgs, upgrade = FALSE)
+    } else {
+      loadedPkgs <- search();
+      neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
+      names(neededPkgs) <- uniqueReqdPkgs
+      allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
+      versionSpecs <- Require::getPkgVersions(allPkgs)
+      if (any(versionSpecs$hasVersionSpec)) {
+        out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
+          comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
+                                 versionSpecs$versionSpec[iii])
+          if (comp < 0)
+            warning(versionSpecs$Package[iii], " needs to be updated to at least ",
+                    versionSpecs$versionSpec[iii])
+        })
+
+      }
+      allPkgs <- unique(Require::extractPkgName(allPkgs))
+      loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
+    }
+  }
+
 }

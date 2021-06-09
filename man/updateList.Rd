@@ -13,8 +13,8 @@ updateList(x, y)
 }
 \value{
 A named list, with elements sorted by name.
-         The values of matching elements in list \code{y}
-         replace the values in list \code{x}.
+The values of matching elements in list \code{y}
+replace the values in list \code{x}.
 }
 \description{
 Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or

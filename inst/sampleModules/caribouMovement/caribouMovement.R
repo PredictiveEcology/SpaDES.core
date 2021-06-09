@@ -1,4 +1,4 @@
-SpaDES.core.version <- "0.1.0"
+SpaDES.core.version <- "1.0.7"
 if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'caribouMovement' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
@@ -14,7 +14,7 @@ defineModule(sim, list(
   childModules = character(),
   authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
                      role = c("aut", "cre"))),
-  version = list(SpaDES.core = "0.1.0", SpaDES.tools = "0.1.0", caribouMovement = "1.6.0"),
+  version = list(caribouMovement = "1.6.0"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "month",
@@ -37,7 +37,11 @@ defineModule(sim, list(
     defineParameter(".saveInitialTime", "numeric", NA_real_, -Inf, Inf,
                     "time to schedule first save event"),
     defineParameter(".saveInterval", "numeric", NA_real_, -Inf, Inf,
-                    "time interval between save events")
+                    "time interval between save events"),
+    defineParameter(".seed", "list", list(), NA, NA,
+                    paste("Named list of seeds to use for each event (names).",
+                          "E.g., `list('init' = 123)` will `set.seed(123)`",
+                          "for the `init` event only."))
   ),
   inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, "caribouMovement")$stackName,

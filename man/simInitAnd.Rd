@@ -19,12 +19,16 @@ simInitAndSpades(
   cache,
   .plotInitialTime,
   .saveInitialTime,
+  events,
   ...
 )
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times
-(e.g., \code{times = list(start = 0.0, end = 10.0)}).}
+(e.g., \code{times = list(start = 0.0, end = 10.0, timeunit = "year")}),
+with the final optional element, \code{timeunit}, overriding the default
+time unit used in the simulation which is the "smallest time unit" across all
+modules. See examples.}
 
 \item{params}{A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
 See details.}
@@ -69,7 +73,7 @@ it should give "initial conditions".
 See \code{\link{outputs}} and
 \code{vignette("ii-modules")} section about outputs.}
 
-\item{loadOrder}{An optional list of module names specifying the order in
+\item{loadOrder}{An optional character vector of module names specifying the order in
 which to load the modules. If not specified, the module
 load order will be determined automatically.}
 
@@ -101,6 +105,13 @@ parameter for all modules. See Details.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
 parameter for all modules. See Details.}
+
+\item{events}{A character vector or a named list of character vectors. If specified,
+the simulations will only do the events indicated here. If a named list, the names
+must correspond to the modules and the character vectors can be specific events within
+each of the named modules. With the \code{list} form, all unspecified modules
+will run \emph{all} their events, including internal spades modules, e.g., \code{save},
+that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
 
 \item{...}{Arguments passed to simInit and spades}
 }

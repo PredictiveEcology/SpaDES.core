@@ -1,11 +1,49 @@
-Known issues: https://github.com/PredictiveEcology/SpaDES.core/issues
+Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
+
+version 1.0.8
+=============
+
+## new features
+* `Plots` function can be used like `Plot`, but with `types` specified.
+  The devices to save on disk will have some different behaviours to the screen representation, since "wiping" an individual plot on a device doesn't exist for a file device.
+
+version 1.0.7
+=============
+
+## new features
+* `Plots` function that will produce zero to 4 types of items that are relevant for plotting: 1) Visual on screen, 2) The plot object saved to disk, 3) The raw data that went into the plot and 4) The plot as one or more image files, e.g., `.png` or `.pdf` via `ggsave`
+* `spades` now accepts an `events` argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the `init` case, e.g., `spades(sim, events = "init")`. See `?spades`.
+* messaging during `simInit` now is prefixed with `Sys.time()` and `"simInit`"
+* messaging during `spades` is simplified to take up fewer characters: `INFO::` has been removed
+* `simInit` now checks for minimum version of `SpaDES.core` needed in a module and stops if it fails, giving instructions how to upgrade.
+* several human-readable only elements of a module metadata are no longer enforced, including `spatialExtent`, as they are not used by the spades algorithms
+* new function: `anyPlotting` to test whether plotting of one form or another should occur
+* line-by-line messaging during `spades` call is now more informative, including module name (by default shortened -- can be changed with `options("spades.messagingNumCharsModule"))`) 
+* `defineParameter` can now accept a vector of "class", so a parameter can be more than one class.
+  Presumably this should generally not be used, but a good reason could be, say, `c("numeric", "function")`, where the use can pass either a numeric or a function that would calculate that numeric.
+* new helper function `simFile` to generate file names for use with e.g., `saveSimList`
+* `zipSimList` is now exported
+* `spades` will now attempt to load `reqdPkgs`, which is already done in `simInit`.
+  In cases where `simInit` was not run, e.g., `Cache(simInitAndSpades, ..., events = "init")`, then modules will not have access to packages.
+  For cases where `simInit` was called, then this should add very little overhead.
+* `saveSimList` will now convert file-backed `Raster*` class objects to memory if `fileBackend = 0`.
+  Previously, it left them as is (on disk if on disk, in memory if in memory).
+* For code/documentation contributors, markdown syntax is now turned on and can be used when writing function documentation  
+* The first event will now run if it is scheduled to be prior to `time(sim)` in the case where it is equal to or after `end(sim)`. Previously, this would not run any events if `time(sim)` >= `end(sim)` && `events(sim)[[1]] < time(sim)`.
+* minor documentation modifications
+* Add optional `.seed` parameter for modules (#163)
+
+## Bugfixes
+* `defineParameter` was throwing `is.na(default)` warning when a parameter was not an atomic.
+* recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directory of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory
+* other minor bugfixes, 
 
 version 1.0.6
 =============
 
 ## new features
 * more informative message re: module package versions when `spades.useRequire = FALSE` (#141)
-* now detects user-created memory leaks when a user adds a closure or formula to the `sim`
+* now detects user-created memory leaks when a user adds a closure or formula to the `sim`; user informed with a `warning`
 
 ## dependencies
 * no changes
@@ -24,6 +62,7 @@ version 1.0.5
 * enable automated module code checking with GitHub Actions (`use_gha()` and corresponding vignette; #74)
 * `newProject` creates Rstudio `.Rproj` file if invoked in Rstudio
 * moved `paddedFloatToChar` to reproducible; but re-exported here, so still usable.
+* modules can now use a parameter called `.seed` which is a named list where names are the events and the elements are the seed with which to run the event. During `doEvent`, `SpaDES.core` will now `set.seed(P(sim)$.seed[[currentEvent]])` and reset to random number stream afterwards.
 
 ## dependencies
 * completely removed `dplyr`, `lubridate`, `R.utils`, `tools`, `backports` and `rlang` from dependencies

@@ -4,18 +4,10 @@
 \alias{Copy,simList-method}
 \title{Copy for simList class objects}
 \usage{
-\S4method{Copy}{simList}(object, filebackedDir, objects, queues)
+\S4method{Copy}{simList}(object, objects, queues, ...)
 }
 \arguments{
 \item{object}{An R object (likely containing environments) or an environment.}
-
-\item{filebackedDir}{A directory to copy any files that are backing R objects,
-currently only valid for \code{Raster} classes. Defaults
-to \code{.reproducibleTempPath()}, which is unlikely to be very useful.
-Can be \code{NULL}, which means that the file will not be
-copied and could therefore cause a collision as the
-pre-copied object and post-copied object would have the same
-file backing them.}
 
 \item{objects}{Whether the objects contained within the simList environment
 should be copied. Default \code{TRUE}, which may be slow.}
@@ -23,6 +15,8 @@ should be copied. Default \code{TRUE}, which may be slow.}
 \item{queues}{Logical. Should the events queues (\code{events},
 \code{current}, \code{completed}) be deep copied via
 \code{data.table::copy}}
+
+\item{...}{Only used for custom Methods}
 }
 \description{
 Because a simList works with an environment to hold all objects,

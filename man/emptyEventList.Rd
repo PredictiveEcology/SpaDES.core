@@ -49,10 +49,10 @@ Internal function called from \code{spades}, returning an empty event list.
 Event lists are sorted (keyed) first by time, second by priority.
 Each event is represented by a \code{\link{data.table}} row consisting of:
 \tabular{ll}{
-  \code{eventTime} \tab The time the event is to occur.\cr
-  \code{moduleName} \tab The module from which the event is taken.\cr
-  \code{eventType} \tab A character string for the programmer-defined event type.\cr
-  \code{eventPriority} \tab The priority given to the event. \cr
+\code{eventTime} \tab The time the event is to occur.\cr
+\code{moduleName} \tab The module from which the event is taken.\cr
+\code{eventType} \tab A character string for the programmer-defined event type.\cr
+\code{eventPriority} \tab The priority given to the event. \cr
 }
 }
 \author{

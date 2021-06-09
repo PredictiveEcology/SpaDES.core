@@ -228,6 +228,7 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+
     # remove spaces and EOL
     md[["parameters"]][["paramDesc"]] <- rmExtraSpacesEOL(md[["parameters"]][["paramDesc"]])
     md[["parameters"]]
@@ -282,6 +283,11 @@ rmExtraSpacesEOLList <- function(xx) {
       elem
     }
   })
+
+  ## used to diagnose long parameter descriptions that trigger insertion of `\n`
+  #id1 <- which(names(xx) == "parameters")
+  #id2 <- which(names(xx[[id1]]) == "paramDesc")
+  #grep("\n", xx[[id1]][[id2]], value = TRUE)
 
   xx
 }

@@ -87,14 +87,14 @@ saving/loading a list behaves more reliably than saving/loading an environment.
 Several slot (and sub-slot) accessor methods are provided for use, and
 categorized into separate help pages:
 \tabular{ll}{
-  \code{\link{simList-accessors-envir}} \tab Simulation environment. \cr
-  \code{\link{simList-accessors-events}} \tab Scheduled and completed events. \cr
-  \code{\link{simList-accessors-inout}} \tab Passing data in to / out of simulations. \cr
-  \code{\link{simList-accessors-modules}} \tab Modules loaded and used; module dependencies. \cr
-  \code{\link{simList-accessors-objects}} \tab Accessing objects used in the simulation. \cr
-  \code{\link{simList-accessors-params}} \tab Global and module-specific parameters. \cr
-  \code{\link{simList-accessors-paths}} \tab File paths for modules, inputs, and outputs. \cr
-  \code{\link{simList-accessors-times}} \tab Simulation times. \cr
+\code{\link{simList-accessors-envir}} \tab Simulation environment. \cr
+\code{\link{simList-accessors-events}} \tab Scheduled and completed events. \cr
+\code{\link{simList-accessors-inout}} \tab Passing data in to / out of simulations. \cr
+\code{\link{simList-accessors-modules}} \tab Modules loaded and used; module dependencies. \cr
+\code{\link{simList-accessors-objects}} \tab Accessing objects used in the simulation. \cr
+\code{\link{simList-accessors-params}} \tab Global and module-specific parameters. \cr
+\code{\link{simList-accessors-paths}} \tab File paths for modules, inputs, and outputs. \cr
+\code{\link{simList-accessors-times}} \tab Simulation times. \cr
 }
 }
 
@@ -106,17 +106,17 @@ The completed event list is an ordered list in the exact order that the events
 were executed.
 Each event is represented by a \code{\link{data.table}} row consisting of:
 \tabular{ll}{
-  \code{eventTime} \tab The time the event is to occur.\cr
-  \code{moduleName} \tab The module from which the event is taken.\cr
-  \code{eventType} \tab A character string for the programmer-defined event type.\cr
-  \code{eventPriority} \tab The priority given to the event. \cr
+\code{eventTime} \tab The time the event is to occur.\cr
+\code{moduleName} \tab The module from which the event is taken.\cr
+\code{eventType} \tab A character string for the programmer-defined event type.\cr
+\code{eventPriority} \tab The priority given to the event. \cr
 }
 }
 
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-            San Francisco, CA: No Starch Press, Inc..
-            Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc..
+Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \author{
 Alex Chubaty and Eliot McIntire

@@ -316,7 +316,7 @@ setMethod(
         })
 
         mess <- capture.output({
-          out <- try(suppressWarnings(eval(pf, envir = env)))
+          out <- try(eval(pf, envir = env))
         }, type = "message")
         if (is(out, "try-error")) stop(out)
         opt <- getOption("spades.moduleCodeChecks")
