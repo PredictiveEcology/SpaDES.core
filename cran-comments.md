@@ -14,7 +14,7 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.0.5
 
 ### Current R versions
-* macOS 10.15.6 Catalina       (GitHub), R 4.1.0
+* macOS 10.15.7 Catalina       (GitHub), R 4.1.0
 * macOS 11.1 Big Sur            (local), R 4.1.0
 * Ubuntu 20.04                 (GitHub), R 4.1.0
 * Ubuntu 20.04                  (local), R 4.1.0
