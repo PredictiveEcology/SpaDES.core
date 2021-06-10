@@ -1,7 +1,7 @@
 ## Updated release
 
 This release is to restore this package on CRAN following removal of dependency `reproducible` (which has now been restored on CRAN).
-
+Please note, the CRAN URL to a package vignette will work once the package is restored.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
@@ -23,10 +23,10 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.1.0
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2021-05-29 r80411)
+* Ubuntu 20.04                 (GitHub), R-devel (2021-06-07 r80458)
 * Ubuntu 20.04                  (local), R-devel (2021-05-31 r80426)
-* Windows                      (GitHub), R-devel (2021-05-30 r80415)
-* Windows                 (win-builder), R-devel (2021-05-30 r80415)
+* Windows                      (GitHub), R-devel (2021-06-07 r80458)
+* Windows                 (win-builder), R-devel (2021-06-07 r80458)
 
 ## R CMD check results
 
@@ -40,10 +40,13 @@ There were 2 NOTEs:
           workflow (6:58)
           workflows (10:64)
 
-2. Unable to reach the default time server:
+2. Temporarily unavailable CRAN URL, because package was previously archived.
 
-        > checking for future file timestamps ... NOTE
-          unable to verify current time
+        Found the following (possibly) invalid URLs:
+          URL: https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html
+          From: man/spades.Rd
+          Status: 404
+          Message: Not Found
 
 ## Downstream dependencies
 
