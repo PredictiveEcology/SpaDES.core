@@ -4,7 +4,7 @@ version 1.0.8.9000
 =============
 
 ## new features
-* none
+* `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
 
 ## dependencies
 * no changes

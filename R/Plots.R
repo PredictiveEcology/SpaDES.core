@@ -161,7 +161,14 @@ Plots <- function(data, fn, filename,
   if (fnIsPlot) {
     # make dummies
     gg <- 1
-    ggListToScreen <- list()
+    objNamePassedToData <- deparse1(substitute(data))
+    origEnv <- parent.frame()
+
+    # Try to see if the object is in the parent.frame(). If it isn't, default back to here.
+    if (!objNamePassedToData %in% ls(origEnv))
+      origEnv <- environment()
+    ggListToScreen <- list(data)
+    names(ggListToScreen) <- objNamePassedToData
   } else {
     if ( (needScreen || needSave) ) {
       gg <- fn(data, ...)
@@ -177,7 +184,15 @@ Plots <- function(data, fn, filename,
 
   if (needScreen) {
     if (fnIsPlot) {
-      gg <- fn(data, ...)
+      gg <- fn(ggListToScreen, ...)
+      .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+      qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
+      objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
+      objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
+      curPlotDev <- paste0("quickPlot", dev.cur())
+      ignore <- lapply(objNamesInQuickPlotObj, function(x) {
+        slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
+      })
     } else {
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
