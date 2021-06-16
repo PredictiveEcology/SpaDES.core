@@ -1459,7 +1459,7 @@ messageInterrupt1 <- function(recoverMode) {
 
 setupDebugger <- function(debug = getOption("spades.debug")) {
   if (!missing(debug)) {
-    if (!.isFALSE(debug)) {
+    if (!isFALSE(debug)) {
       if (is.list(debug)) {
         needInstall("logging",
                     messageStart = "debug cannot be a list unless logging package is installed: ")
@@ -1501,7 +1501,7 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
           }
           logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
           cat(file = debug$file$file, "##################################\n",
-              append = !.isFALSE(debug$file$append)) # default append it TRUE
+              append = !isFALSE(debug$file$append)) # default append it TRUE
         }
         # with(getLogger(), names(handlers))
 

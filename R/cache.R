@@ -411,7 +411,7 @@ setMethod(
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
-      whSimList2 <- if (is.null(internalSimList) || .isFALSE(internalSimList)) {
+      whSimList2 <- if (is.null(internalSimList) || isFALSE(internalSimList)) {
         1
       } else {
         # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st

@@ -321,4 +321,3 @@ needInstall <- function(pkg = "methods", minVersion = NULL,
 
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 
-.isFALSE <- function(x) is.logical(x) && length(x) == 1L && !is.na(x) && !x
