@@ -355,10 +355,16 @@ setMethod(
 #'                  \code{spades}. These are primarily for human use, i.e., to
 #'                  tell a module user what values the module expects.
 #' @param desc      Text string providing a brief description of the parameter.
+#'                  If there are extra spaces or carriage returns, these will be stripped,
+#'                  allowing for multi-line character strings without using \code{paste}
+#'                  or multiple quotes.
+#' @param ...       A convenience that allows writing a long \code{desc} without
+#'                  having to use \code{paste}; any character strings after \code{desc}
+#'                  will be \code{paste}d together with \code{desc}.
 #'
 #' @return data.frame
 #'
-#' @author Alex Chubaty
+#' @author Alex Chubaty and Eliot McIntire
 #' @export
 #' @rdname defineParameter
 #'
@@ -367,7 +373,19 @@ setMethod(
 #' @examples
 #' parameters = rbind(
 #'   defineParameter("lambda", "numeric", 1.23, desc = "intrinsic rate of increase"),
-#'   defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack")
+#'   defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack"),
+#'
+#'   # multi-line desc without quotes on each line -- spaces and carriage returns are stripped
+#'   defineParameter("rate", "numeric", 0.2, 0, 1,
+#'                   "rate of arrival. This is in individuals
+#'                   per day. This can be modified
+#'                   by the user"),
+#'   # multi-line desc with quotes on each line
+#'   defineParameter("times", "numeric", 0.2, 0, 1,
+#'                   desc = "The times during the year ",
+#'                          "that events will occur ",
+#'                          "with possibility of random arrival times")
+#'
 #' )
 #'
 #' \dontrun{
@@ -391,7 +409,7 @@ setMethod(
 #' P(mySim, "testModule")$.useCache
 #' }
 #'
-setGeneric("defineParameter", function(name, class, default, min, max, desc) {
+setGeneric("defineParameter", function(name, class, default, min, max, desc, ...) {
   standardGeneric("defineParameter")
 })
 
@@ -399,7 +417,7 @@ setGeneric("defineParameter", function(name, class, default, min, max, desc) {
 setMethod("defineParameter",
           signature(name = "character", class = "character", default = "ANY",
                     min = "ANY", max = "ANY", desc = "character"),
-          definition = function(name, class, default, min, max, desc) {
+          definition = function(name, class, default, min, max, desc, ...) {
             # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
             # we can't just coerece these because it wouldn't allow for character,
             #  e.g., start(sim)
@@ -419,6 +437,12 @@ setMethod("defineParameter",
               }
             }
 
+            moreDesc <- list(...)
+            desc <- append(list(desc), moreDesc)
+            desc <- unlist(desc)
+            desc <- paste(desc, collapse = "")
+            desc <- gsub("  +|\n +", " ", desc)
+
             # previously used `substitute()` instead of `I()`,
             # but it did not allow for a vector to be passed with `c()`
             df <- data.frame(
@@ -433,7 +457,7 @@ setMethod("defineParameter",
           signature(name = "character", class = "character",
                     default = "ANY", min = "missing", max = "missing",
                     desc = "character"),
-          definition = function(name, class, default, desc) {
+          definition = function(name, class, default, desc, ...) {
             NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
             if (class %in% NAtypes) {
               # coerce `min` and `max` to same type as `default`
@@ -444,7 +468,7 @@ setMethod("defineParameter",
               max <- NA
             }
             df <- defineParameter(name = name, class = class, default = default,
-                            min = min, max = max, desc = desc)
+                            min = min, max = max, desc = desc, ...)
 
             return(df)
 })

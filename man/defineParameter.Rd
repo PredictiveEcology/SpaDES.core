@@ -7,11 +7,11 @@
 \alias{defineParameter,missing,missing,missing,missing,missing,missing-method}
 \title{Define a parameter used in a module}
 \usage{
-defineParameter(name, class, default, min, max, desc)
+defineParameter(name, class, default, min, max, desc, ...)
 
-\S4method{defineParameter}{character,character,ANY,ANY,ANY,character}(name, class, default, min, max, desc)
+\S4method{defineParameter}{character,character,ANY,ANY,ANY,character}(name, class, default, min, max, desc, ...)
 
-\S4method{defineParameter}{character,character,ANY,missing,missing,character}(name, class, default, desc)
+\S4method{defineParameter}{character,character,ANY,missing,missing,character}(name, class, default, min, max, desc, ...)
 
 \S4method{defineParameter}{missing,missing,missing,missing,missing,missing}()
 }
@@ -35,7 +35,14 @@ Non-standard evaluation is used for the expression.
 \code{spades}. These are primarily for human use, i.e., to
 tell a module user what values the module expects.}
 
-\item{desc}{Text string providing a brief description of the parameter.}
+\item{desc}{Text string providing a brief description of the parameter.
+If there are extra spaces or carriage returns, these will be stripped,
+allowing for multi-line character strings without using \code{paste}
+or multiple quotes.}
+
+\item{...}{A convenience that allows writing a long \code{desc} without
+having to use \code{paste}; any character strings after \code{desc}
+will be \code{paste}d together with \code{desc}.}
 }
 \value{
 data.frame
@@ -56,6 +63,15 @@ See \code{\link{NA}}.
 parameters = rbind(
   defineParameter("lambda", "numeric", 1.23, desc = "intrinsic rate of increase"),
   defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack")
+  # multi-line desc without quotes on each line -- spaces and carriage returns are stripped
+  defineParameter("rate", "numeric", 0.2, 0, 1,
+                  desc = "rate of arrival. This is in individuals
+                          per day")
+  # multi-line desc with quotes on each line
+  defineParameter("times", "numeric", 0.2, 0, 1,
+                  desc = "The times during the year ",
+                         "that events will occur")
+
 )
 
 \dontrun{
@@ -85,5 +101,5 @@ P(mySim, "testModule")$.useCache
 a module.
 }
 \author{
-Alex Chubaty
+Alex Chubaty and Eliot McIntire
 }
