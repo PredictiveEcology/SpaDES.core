@@ -6,6 +6,7 @@ version 1.0.8.9000
 ## new features
 * `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
 * removed `.isFALSE`: use `base::isFALSE` now
+* `defineParameter` now allows multi-line `desc` or multiple strings; `paste` is no longer needed for long `desc`
 
 ## dependencies
 * no changes
