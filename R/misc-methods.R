@@ -582,6 +582,6 @@ bindrows <- function(...) {
 #' @export
 #' @inheritParams simInit
 moduleCodeFiles <- function(paths, modules) {
-  path.expand(c(dir(file.path(paths3$modulePath, modules3, "R"), full.names = TRUE),
+  path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
 }
