@@ -574,3 +574,14 @@ bindrows <- function(...) {
     rbindlist(rws, fill = TRUE, use.names = TRUE)
   }
 }
+
+#' Extract the full file paths for R source code
+#'
+#' This can be used e.g., for Caching, to identify which files have changed.
+#'
+#' @export
+#' @inheritParams simInit
+moduleCodeFiles <- function(paths, modules) {
+  path.expand(c(dir(file.path(paths3$modulePath, modules3, "R"), full.names = TRUE),
+    file.path(paths$modulePath, modules, paste0(modules, ".R"))))
+}

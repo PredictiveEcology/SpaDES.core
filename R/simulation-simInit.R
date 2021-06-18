@@ -494,6 +494,25 @@ setMethod(
       }
     }
 
+    # push globals onto parameters within each module
+    if (length(sim@params$.globals)) {
+      globalsUsed <- globalsUsedInModules <- NULL
+      globalsDF <- list()
+      for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
+        common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
+        if (length(common)) {
+          globalsUsed <- paste(common, sep = ", ")
+          globalsUsedInModules <- rep(mod, length(common))
+          globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
+          sim@params[[mod]][common] <- sim@params$.globals[common]
+        }
+      }
+      if (!is.null(globalsUsed)) {
+        globalsDF <- rbindlist(globalsDF)
+        message("The following .globals were used:")
+        reproducible::messageDF(globalsDF)
+      }
+    }
     # From here, capture messaging and prepend it
     withCallingHandlers({
 

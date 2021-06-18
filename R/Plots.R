@@ -55,7 +55,7 @@
 #'
 #' @param ... Anything needed by \code{fn}
 #'
-#' @importFrom grDevices dev.off
+#' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs qsave
 #' @importFrom raster writeRaster
 #' @importFrom quickPlot clearPlot Plot whereInStack

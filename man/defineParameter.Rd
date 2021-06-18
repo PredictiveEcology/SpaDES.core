@@ -62,15 +62,18 @@ See \code{\link{NA}}.
 \examples{
 parameters = rbind(
   defineParameter("lambda", "numeric", 1.23, desc = "intrinsic rate of increase"),
-  defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack")
+  defineParameter("P", "numeric", 0.2, 0, 1, "probability of attack"),
+
   # multi-line desc without quotes on each line -- spaces and carriage returns are stripped
   defineParameter("rate", "numeric", 0.2, 0, 1,
-                  desc = "rate of arrival. This is in individuals
-                          per day")
+                  "rate of arrival. This is in individuals
+                  per day. This can be modified
+                  by the user"),
   # multi-line desc with quotes on each line
   defineParameter("times", "numeric", 0.2, 0, 1,
                   desc = "The times during the year ",
-                         "that events will occur")
+                         "that events will occur ",
+                         "with possibility of random arrival times")
 
 )
 

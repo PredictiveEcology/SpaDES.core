@@ -7,6 +7,8 @@ version 1.0.8.9000
 * `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
 * removed `.isFALSE`: use `base::isFALSE` now
 * `defineParameter` now allows multi-line `desc` or multiple strings; `paste` is no longer needed for long `desc`
+* `moduleCodeFiles` a new function that identifies all the code files in a collection of modules
+* `.globals` functionality is modified. If a user specifies a `.globals` in the parameters object (passed into `simInit`), then all identical parameters in all modules will be overridden with these `.global` values
 
 ## dependencies
 * no changes
