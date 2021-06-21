@@ -52,6 +52,11 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
 #'            caribouModule = list(N = 1000))}.
 #'
+#' The \code{params} list can contain a list (named `.globals`) of named objects
+#' e.g., `.globals = list(climateURL = "https:\\something.com")` entry. Any and every
+#' module that has a parameter with that name (in this case `climateURL`) will be
+#' overridden with this value as passed.
+#'
 #' \code{params} can be used to set the seed for a specific event in a module. This
 #' is done using the normal \code{params} argument, specifying `.seed` as a list
 #' where the elements are a numeric for the seed and the name is the event. Since
