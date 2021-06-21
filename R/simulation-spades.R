@@ -932,7 +932,7 @@ setMethod(
           unspecifiedEvents <- setdiff(unspecifiedEvents, "save")
         if (NROW(sim@inputs) == 0L)
           unspecifiedEvents <- setdiff(unspecifiedEvents, "load")
-        useChkpnt <- !any(is.na(P(sim, ".checkpoint")))
+        useChkpnt <- !any(is.na(P(sim, "checkpoint")))
         if (!useChkpnt)
           unspecifiedEvents <- setdiff(unspecifiedEvents, "checkpoint")
         if (length(unspecifiedEvents)) {

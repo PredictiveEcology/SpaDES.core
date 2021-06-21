@@ -153,7 +153,7 @@ setMethod("initialize",
 
             if (any(2 == haves))
               .Object@params = list(
-                .checkpoint = list(interval = NA_real_, file = NULL),
+                checkpoint = list(interval = NA_real_, file = NULL),
                 .progress = list(type = NULL, interval = NULL)
               )
             if (any(3 == haves))

@@ -166,8 +166,8 @@
 #' \subsection{3.9 Checkpointing}{
 #'   \tabular{lll}{
 #'      Accessor method \tab Module \tab Description\cr
-#'      \code{\link{checkpointFile}} \tab \code{.checkpoint} \tab Name of the checkpoint file. (advanced)\cr
-#'      \code{\link{checkpointInterval}} \tab \code{.checkpoint} \tab The simulation checkpoint interval. (advanced)\cr
+#'      \code{\link{checkpointFile}} \tab \code{checkpoint} \tab Name of the checkpoint file. (advanced)\cr
+#'      \code{\link{checkpointInterval}} \tab \code{checkpoint} \tab The simulation checkpoint interval. (advanced)\cr
 #'    }
 #'  }
 #'

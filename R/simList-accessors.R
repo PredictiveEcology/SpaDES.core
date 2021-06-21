@@ -494,22 +494,34 @@ P.simList <- function(sim, param, module) {
   }
   # }
 
-  browser()
+  reversalMessage <- paste0("P has changed the order of its parameters, with 'param' now second to ",
+                            " allow for easier access to specific parameters inside a module. ",
+                            "It looks like this call to P is still using the old order with 'module' second. ",
+                            "Returning the old behaviour for now; this may not reliably work in the future. ",
+                            "Please change the order")
   # This is to catch cases of reverse order -- order of args changed to sim, params, then module
   if (!missing(param)) {
-    if (param %in% names(sim@params)) # test if the param is a module name
+    if (param %in% names(sim@params)) {# test if the param is a module name
       if (!missing(module)) {
         if (module %in% ls(sim@params[[param]], all.names = TRUE) ||
             module %in% .knownDotParams) {
-          warning("P has changed the order of its parameters, with 'param' now second to ",
-                  " allow for easier access to specific parameters inside a module. ",
-                  "It looks like this call to P is still using the old order with 'module' second. ",
-                  "Returning the old behaviour for now; this may not reliably work in the future. ",
-                  "Please change the order")
+          warning(reversalMessage)
           module1 <- param
           param <- module
         }
+      } else {
+
+        # Module missing, only have parameter --> this could be old case of P(sim, module = "something")
+        if (param %in% ls(sim@params[[param]], all.names = TRUE) ||
+            module1 %in% ls(sim@params)) {
+          # module1 is in list of modules; param is not in parameters --> this is likely a reversal
+          warning(reversalMessage)
+          param <- NULL
+        }
       }
+    } # param is not a module name --> probably using new parameter order --> correct
+  } else {
+    param <- NULL
   }
   module <- module1
 
@@ -517,7 +529,7 @@ P.simList <- function(sim, param, module) {
     return(sim@params)
   }
 
-  if (missing(param)) {
+  if (is.null(param)) {
     return(sim@params[[module]])
   } else {
     return(sim@params[[module]][[param]])
@@ -712,7 +724,7 @@ setGeneric("checkpointFile", function(sim) {
 setMethod("checkpointFile",
           signature = "simList",
           definition = function(sim) {
-            return(sim@params$.checkpoint$file)
+            return(sim@params$checkpoint$file)
 })
 
 #' @export
@@ -729,7 +741,7 @@ setGeneric("checkpointFile<-",
 setReplaceMethod("checkpointFile",
                  signature = "simList",
                  function(sim, value) {
-                   sim@params$.checkpoint$file <- value
+                   sim@params$checkpoint$file <- value
                    validObject(sim)
                    return(sim)
 })
@@ -749,7 +761,7 @@ setGeneric("checkpointInterval", function(sim) {
 setMethod("checkpointInterval",
           signature = "simList",
           definition = function(sim) {
-            return(sim@params$.checkpoint$interval)
+            return(sim@params$checkpoint$interval)
 })
 
 #' @export
@@ -766,7 +778,7 @@ setGeneric("checkpointInterval<-",
 setReplaceMethod("checkpointInterval",
                  signature = "simList",
                  function(sim, value) {
-                   sim@params$.checkpoint$interval <- value
+                   sim@params$checkpoint$interval <- value
                    validObject(sim)
                    return(sim)
 })
@@ -797,7 +809,7 @@ setReplaceMethod("checkpointInterval",
 #'   times = list(start=0.0, end=100.0),
 #'   params = list(.globals = list(stackName = "landscape"),
 #'   .progress = list(type = "text", interval = 10),
-#'   .checkpoint = list(interval = 10, file = "chkpnt.RData")),
+#'   checkpoint = list(interval = 10, file = "chkpnt.RData")),
 #'   modules = list("randomLandscapes"),
 #'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
 #'
@@ -807,7 +819,7 @@ setReplaceMethod("checkpointInterval",
 #'
 #' # parameters
 #' params(mySim) # returns all parameters in all modules
-#'               # including .global, .progress, .checkpoint
+#'               # including .global, .progress, checkpoint
 #' globals(mySim) # returns only global parameters
 #'
 #' # checkpoint

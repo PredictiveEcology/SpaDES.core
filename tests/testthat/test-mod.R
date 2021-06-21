@@ -88,6 +88,7 @@ test_that("local mod object", {
       if (isTRUE(P(sim)$testParB >= 1100)) {
          P(sim, "testParB") <-  P(sim)$testParB + 756
       }
+
       mod$a <- 1
       sim$testPar2 <- Par$testParB
       sim <- scheduleEvent(sim, start(sim), "test2", "event1", .skipChecks = TRUE)
@@ -105,6 +106,10 @@ test_that("local mod object", {
       .inputObjects <- function(sim) {
       if (isTRUE(P(sim)$testParB >= 543)) {
          P(sim, "testParB") <-  P(sim)$testParB + 654
+      }
+
+      if (isTRUE(P(sim)$testParB > 321321)) {
+         P(sim, "checkpoint")
       }
       mod$y <- "This module"
         return(sim)
@@ -190,7 +195,9 @@ test_that("local mod object", {
   end(mySim6) <- 2
   mySim7 <- Cache(spades, Copy(mySim6)) # should get cached
   expect_true(P(mySim7)$test2$testParB == 1953 + 800 * 2)
-  browser()
 
-
+  warns <- capture_warnings(mySim3 <- simInit(times = list(start = 0, end = 0),
+                    paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                    params = list(.globals = list(testParB = 321321))))
+  expect_true(grepl("P has changed", warns))
 })

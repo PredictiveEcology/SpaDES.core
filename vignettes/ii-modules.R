@@ -90,17 +90,17 @@ P(mySim)$N  # Only one parameter
 #    if (eventType == "init") {
 #      # do stuff for this event
 #      sim <- randomLandscapesInit(sim)
-#  
+#
 #      # schedule the next events
 #      sim <- scheduleEvent(sim, params(sim)$randomLandscapes$.plotInitialTime,
 #                           "randomLandscapes", "plot")
 #      sim <- scheduleEvent(sim, params(sim)$randomLandscapes$.saveInitialTime,
 #                           "randomLandscapes", "save")
-#  
+#
 #    } else if (eventType=="plot") {
 #      # do stuff for this event
 #      Plot(sim[[globals(sim)$stackName]])
-#  
+#
 #      # schedule the next event
 #      sim <- scheduleEvent(sim, time(sim) +
 #                             params(sim)$randomLandscapes$.plotInterval,
@@ -108,12 +108,12 @@ P(mySim)$N  # Only one parameter
 #    } else if (eventType == "save") {
 #      # do stuff for this event
 #      saveFiles(sim)
-#  
+#
 #      # schedule the next event
 #      sim <- scheduleEvent(sim, time(sim) +
 #                             params(sim)$randomLandscapes$.saveInterval,
 #                           "randomLandscapes", "save")
-#  
+#
 #    } else {
 #      warning(paste("Undefined event type: \'",
 #                    events(sim)[1, "eventType", with = FALSE],
@@ -128,7 +128,7 @@ P(mySim)$N  # Only one parameter
 #  ## sample event functions from the default `randomLandscapes` module
 #  library(raster)
 #  if (require(SpaDES.tools)) {
-#  
+#
 #    randomLandscapesInit <- function(sim) {
 #      if (is.null(params(sim)$randomLandscapes$inRAM)) {
 #        inMemory <- FALSE
@@ -151,15 +151,15 @@ P(mySim)$N  # Only one parameter
 #      percentPine <- gaussMap(template, scale = 50, var = 1,
 #                              speedup = speedup, inMemory = inMemory)
 #      percentPine[] <- round(getValues(percentPine), 1)
-#  
+#
 #      # Scale them as needed
 #      forestAge <- forestAge / maxValue(forestAge) * 100
 #      percentPine <- percentPine / maxValue(percentPine) * 100
-#  
+#
 #      # Make layers that are derived from other layers
 #      habitatQuality <- (DEM + 10 + (forestAge + 2.5) * 10) / 100
 #      habitatQuality <- habitatQuality / maxValue(habitatQuality)
-#  
+#
 #      # Stack them into a single stack and assign to sim envir
 #      mapStack <- stack(DEM, forestAge, habitatQuality, percentPine)
 #      names(mapStack) <- c("DEM", "forestAge", "habitatQuality", "percentPine")
@@ -196,7 +196,7 @@ mySim <- simInit(
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-  ) %>% 
+  ) %>%
   spades()
 dev.off()
 unlink(ftmp)
@@ -208,19 +208,19 @@ eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 ## ----checksums, eval=FALSE----------------------------------------------------
 #  ## 1. specify your module here
 #  moduleName <- "my_module"
-#  
+#
 #  ## 2. use a temp dir to ensure all modules get fresh copies of the data
 #  tmpdir <- file.path(tempdir(), "SpaDES_modules")
-#  
+#
 #  ## 3. download your module's data to the temp dir
 #  downloadData(moduleName, tmpdir)
-#  
+#
 #  ## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run
 #  simInit(modules = moduleName)
-#  
+#
 #  ## 5. recalculate your checksums and overwrite the file
 #  checksums(moduleName, tmpdir, write = TRUE)
-#  
+#
 #  ## 6. copy the new checksums file to your working module directory (the one not in the temp dir)
 #  file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
 #            to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
@@ -254,7 +254,7 @@ objectDiagram(mySim, width = 720)
 times <- list(start = 0, end = 30)
 parameters <- list(
   .globals = list(stackName = "landscape"),
-  .checkpoint = list(interval = 10, file = "chkpnt.RData")
+  checkpoint = list(interval = 10, file = "chkpnt.RData")
 )
 modules <- list("randomLandscapes", "caribouMovement")
 paths <- list(
@@ -323,7 +323,7 @@ unlink(ftmp)
 
 ## ----save-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
 #  ### WITHIN A MODULE:
-#  
+#
 #  # schedule a recurring save event
 #  nextSave <- time(mySim) + params(mySim)$randomLandscapes$.saveInterval
 #  sim <- scheduleEvent(mySim, nextSave, "randomLandscapes", "save")
@@ -338,14 +338,14 @@ unlink(ftmp)
 #                   modules = list("randomLandscapes"),
 #                   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #  )
-#  
+#
 #  # retrieve the plotting params from the simulation object
 #  params(mySim)$randomLandscapes$.plotInitialTime
 #  params(mySim)$randomLandscapes$.plotInterval
 
 ## ----plot-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
 #  ### WITHIN A MODULE:
-#  
+#
 #  # schedule a recurring plot event
 #  nextPlot <- time(mySim) + params(mySim)$randomLandscapes$.plotInterval
 #  mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
@@ -364,7 +364,7 @@ unlink(ftmp)
 ## ----module-group-init, eval=FALSE--------------------------------------------
 #  library(DiagrammeR)
 #  library(SpaDES.core)
-#  
+#
 #  outputDir <- file.path(tempdir(), "simOutputs")
 #  times <- list(start = 0.0, end = 20.0)
 #  parameters <- list(
@@ -387,10 +387,10 @@ unlink(ftmp)
 #    modulePath = system.file("sampleModules", package = "SpaDES.core"),
 #    outputPath = outputDir
 #  )
-#  
+#
 #  mySim <- simInit(times = times, params = parameters, modules = modules,
 #                   objects = objects, paths = paths)
-#  
+#
 #  modules(mySim) # note the child modules are initialized
 
 ## ----module-group-dl, eval=FALSE----------------------------------------------

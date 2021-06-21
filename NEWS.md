@@ -4,6 +4,8 @@ version 1.0.8.9000
 =============
 
 ## new features
+* `P` now has a replacement method. So, to update a parameter within a module (where it is namespaced, i.e., don't have to specify the module name): `P(sim, "paramName") <- 1`. If using this outside a module, then `module` (3rd argument) will have to be specified.
+* `P` argument order changed to accommodate the fact that namespacing is used to detect module name: the user does not need to supply `module`, so it should not be second. This is for the normal `P` method and the new replace method above: it is now `P(sim, param, module)`; there are attempts to capture errors (i.e., parameter supplied that matches a module, but not a parameter; vice versa) and give a warning for user to change code. This may have little downstream effect as all known cases use the `P(sim)$paramName`, which will still work fine, instead of `P(sim, "paramName")`.
 * `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
 * removed `.isFALSE`: use `base::isFALSE` now
 * `defineParameter` now allows multi-line `desc` or multiple strings; `paste` is no longer needed for long `desc`

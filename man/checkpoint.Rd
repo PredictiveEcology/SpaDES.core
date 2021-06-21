@@ -49,7 +49,7 @@ will be printed (default \code{debug = FALSE}).}
 
 \item{file}{The checkpoint file.}
 
-\item{value}{The object to be stored at the slot.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
 \value{
 Returns the modified \code{simList} object.
