@@ -407,7 +407,7 @@ setMethod(
 #'
 #' @inheritParams objs
 #'
-#' @param value The object to be stored at the slot.
+#' @param value The parameter value to be set (in the corresponding `module` and `param`).
 #'
 #' @param module Optional character string indicating which module params should come from.
 #'
@@ -473,32 +473,81 @@ setReplaceMethod("params",
 #' @importFrom reproducible .grepSysCalls
 #' @include simList-class.R
 #' @rdname params
-P <- function(sim, module, param) {
+P <- function(sim, module, param) UseMethod("P")
+
+#' @export
+P.simList <- function(sim, param, module) {
   if (missing(sim)) stop("P takes a simList as first argument")
-  if (missing(module)) {
-    module <- sim@current$moduleName
-  }
-  if (length(module) > 0) {
-    if (missing(param)) {
-      return(sim@params[[module]])
-    } else {
-      return(sim@params[[module]][[param]])
-    }
-  } else {
-    #scallsFirstElement <- lapply(sys.calls(), function(x) x[1])
+
+  # First check for changed order
+
+
+  # if (missing(module)) {
+  # first check if inside an event
+  module1 <- sim@current$moduleName
+  if (length(module1) == 0) {
+    # then check if inside a .inputObjects call
     inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
-    #inSimInit <- grep(sys.calls(), pattern = ".parseModule")
     if (any(inSimInit)) {
-      #module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
-      module <- get("m", sys.frame(inSimInit[2]))
-      if (missing(param)) {
-        return(sim@params[[module]])
-      } else {
-        return(sim@params[[module]][[param]])
-      }
+      module1 <- get("m", sys.frame(inSimInit[2]))
     }
+  }
+  # }
+
+  browser()
+  # This is to catch cases of reverse order -- order of args changed to sim, params, then module
+  if (!missing(param)) {
+    if (param %in% names(sim@params)) # test if the param is a module name
+      if (!missing(module)) {
+        if (module %in% ls(sim@params[[param]], all.names = TRUE) ||
+            module %in% .knownDotParams) {
+          warning("P has changed the order of its parameters, with 'param' now second to ",
+                  " allow for easier access to specific parameters inside a module. ",
+                  "It looks like this call to P is still using the old order with 'module' second. ",
+                  "Returning the old behaviour for now; this may not reliably work in the future. ",
+                  "Please change the order")
+          module1 <- param
+          param <- module
+        }
+      }
+  }
+  module <- module1
+
+  if (length(module) == 0) {
     return(sim@params)
   }
+
+  if (missing(param)) {
+    return(sim@params[[module]])
+  } else {
+    return(sim@params[[module]][[param]])
+  }
+}
+
+#' @rdname params
+#' @export
+`P<-` <- function(value, sim, param, module) {
+  if (missing(sim)) stop("P takes a simList as first argument")
+  if (missing(module)) {
+    # first check if inside an event
+    module <- sim@current$moduleName
+    if (length(module) == 0) {
+      # then check if inside a .inputObjects call
+      inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
+      if (any(inSimInit)) {
+        module <- get("m", sys.frame(inSimInit[2]))
+      }
+    }
+    if (length(module) == 0) {
+      # if not in either place, it is a fail
+      stop("Please specify module")
+    }
+  }
+  if (missing(param)) {
+    stop("Please specify param")
+  }
+  sim@params[[module]][[param]] <- value
+  return(sim)
 }
 
 ################################################################################
@@ -2885,3 +2934,6 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   }
   return(ret[])
 }
+
+
+.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")

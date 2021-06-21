@@ -31,7 +31,7 @@ progressType(sim) <- value
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{The object to be stored at the slot.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
 \description{
 The progress bar can be set in two ways in SpaDES. First, by setting values

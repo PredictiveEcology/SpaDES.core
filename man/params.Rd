@@ -8,6 +8,7 @@
 \alias{params<-}
 \alias{params<-,simList-method}
 \alias{P}
+\alias{P<-}
 \alias{parameters,simList-method}
 \title{Get and set simulation parameters}
 \usage{
@@ -21,6 +22,8 @@ params(sim) <- value
 
 P(sim, module, param)
 
+P(sim, param, module) <- value
+
 parameters(sim, asDF = FALSE)
 
 \S4method{parameters}{simList}(sim, asDF = FALSE)
@@ -29,7 +32,7 @@ parameters(sim, asDF = FALSE)
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{The object to be stored at the slot.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 
 \item{module}{Optional character string indicating which module params should come from.}
 

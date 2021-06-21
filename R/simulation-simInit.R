@@ -1078,7 +1078,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       # browser(expr = exists("._runModuleInputObjects_2"))
       list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
                envir = sim@.xData)
-      a <- P(sim, mBase, ".useCache")
+      a <- P(sim, ".useCache", mBase)
       if (!is.null(a)) {
         if (!identical(FALSE, a)) {
           if (isTRUE(a)) {

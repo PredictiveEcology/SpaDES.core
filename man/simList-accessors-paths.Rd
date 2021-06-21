@@ -86,7 +86,7 @@ dataPath(sim)
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{The object to be stored at the slot.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 
 \item{module}{The optional character string of the module(s) whose
 paths are desired. If omitted, will return all modulePaths,
