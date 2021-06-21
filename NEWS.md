@@ -14,7 +14,7 @@ version 1.0.8.9000
 * no changes
 
 ## bug fixes
-* none
+* When `.inputObjects` was cached (via setting `useCache = '.inputObjects'` parameter), it was "too sensitive". Changes to any module's parameters, not just the current module, would cause rerun of `.inputObjects`. Now it correctly identifies parameter changes only in the current module. THIS WILL CAUSE some existing caches to trigger a rerun once; after this, it will be less sensitive
 
 version 1.0.8
 =============
