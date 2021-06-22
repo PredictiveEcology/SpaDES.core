@@ -61,8 +61,8 @@ test_that("Plots function 1", {
       })
       return(invisible(sim))
       }
-      fn1 <- function(d, bins, ...) {
-          ggplot(d, aes(a)) +
+      fn1 <- function(d1, bins, ...) {
+          ggplot(d1, aes(a)) +
           geom_histogram(bins = bins, ...) +
           labs(title = "hello")
         }
@@ -95,8 +95,8 @@ test_that("Plots function 1", {
 
   if (interactive()) {
     something <- data.frame(a = sample(1:10, replace = TRUE))
-    fn1 <- function(d, bins, title = "hello", ...) {
-      ggplot(d, aes(a)) +
+    fn1 <- function(d1, bins, title = "hello", ...) {
+      ggplot(d1, aes(a)) +
         geom_histogram(bins = bins, ...) +
         labs(title = title)
     }
@@ -106,6 +106,10 @@ test_that("Plots function 1", {
     # Should clear plot windows and each of following will be a new plot on its own
     Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run3", usePlot = FALSE)
     Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
+    clearPlot()
+    # avoid using `data` arg; just use all named args
+    Plots(d1 = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
+
   }
 
 })
@@ -198,7 +202,7 @@ test_that("Plots function 2", {
 })
 
 
-test_that("Plots function 3", {
+test_that("Plots function 3 - use as Plot", {
   if (interactive()) {
     testInitOut <- testInit("raster")
     on.exit({

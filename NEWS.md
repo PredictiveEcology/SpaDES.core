@@ -8,6 +8,7 @@ version 1.0.8.9000
 * `P` argument order changed to accommodate the fact that namespacing is used to detect module name: the user does not need to supply `module`, so it should not be second. This is for the normal `P` method and the new replace method above: it is now `P(sim, param, module)`; there are attempts to capture errors (i.e., parameter supplied that matches a module, but not a parameter; vice versa) and give a warning for user to change code. This may have little downstream effect as all known cases use the `P(sim)$paramName`, which will still work fine, instead of `P(sim, "paramName")`.
 * `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
 * removed `.isFALSE`: use `base::isFALSE` now
+* `Plots` can now omit the `data` argument; just use the named arguments in ...
 * `defineParameter` now allows multi-line `desc` or multiple strings; `paste` is no longer needed for long `desc`
 * `moduleCodeFiles` a new function that identifies all the code files in a collection of modules
 * `.globals` functionality is modified. If a user specifies a `.globals` in the parameters object (passed into `simInit`), then all identical parameters in all modules will be overridden with these `.global` values
