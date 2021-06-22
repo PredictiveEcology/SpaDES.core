@@ -478,11 +478,8 @@ P <- function(sim, module, param) UseMethod("P")
 #' @export
 P.simList <- function(sim, param, module) {
   if (missing(sim)) stop("P takes a simList as first argument")
+  # Check for changed order
 
-  # First check for changed order
-
-
-  # if (missing(module)) {
   # first check if inside an event
   module1 <- sim@current$moduleName
   if (length(module1) == 0) {
@@ -492,7 +489,6 @@ P.simList <- function(sim, param, module) {
       module1 <- get("m", sys.frame(inSimInit[2]))
     }
   }
-  # }
 
   reversalMessage <- paste0("P has changed the order of its parameters, with 'param' now second to ",
                             " allow for easier access to specific parameters inside a module. ",
@@ -522,6 +518,8 @@ P.simList <- function(sim, param, module) {
     } # param is not a module name --> probably using new parameter order --> correct
   } else {
     param <- NULL
+    if (!missing(module))
+      module1 <- module
   }
   module <- module1
 
