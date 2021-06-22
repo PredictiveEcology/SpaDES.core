@@ -224,3 +224,39 @@ test_that("3 levels of parent and child modules load and show correctly", {
     }
   }
 })
+
+
+test_that("Test cleaning up of desc in createsOutputs, expectsInputs, defineParameters", {
+  testInitOut <- testInit("raster", smcc = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  aList <- list()
+  aList[[1]] <- expectsInput("ROCList", "list", sourceURL = NA,
+               "Hi ", "Ho ", "its off
+              to work we go", otherCol = "lala")
+  aList[[2]] <- createsOutput("ROCList", "list", # sourceURL = NA,
+                    "Hi ", "Ho ", "its off
+              to work we go", otherCol = "lala")
+  aList[[3]] <- defineParameter("ROCList", "list", NA, NA, NA, # sourceURL = NA,
+                              "Hi ", "Ho ", "its off
+              to work we go", otherCol = "lala")
+  tests <- Map(a = aList,
+               nam = c("expectsInput", "createsOutput", "defineParameter"),
+               function(a, nam) {
+                 expect_true(is(a, "data.frame"))
+                 cn <- colnames(a)
+                 cn <- tolower(gsub("param", "", cn))
+                 actuallyIs <- tolower(sort(c("...", cn)))
+                 shouldBe <- tolower(sort(c(formalArgs(get(nam)))))
+                 if (!grepl("Param", nam))
+                   shouldBe <- sort(c(shouldBe, "othercol"))
+                 expect_true(identical(actuallyIs, shouldBe))
+                 desc <- a[[grep("desc", tolower(colnames(a)))]]
+                 expect_false(grepl("  ", desc))
+                 expect_false(grepl("\n", desc))
+               })
+
+
+})

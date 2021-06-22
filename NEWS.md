@@ -12,6 +12,7 @@ version 1.0.8.9000
 * `defineParameter` now allows multi-line `desc` or multiple strings; `paste` is no longer needed for long `desc`
 * `moduleCodeFiles` a new function that identifies all the code files in a collection of modules
 * `.globals` functionality is modified. If a user specifies a `.globals` in the parameters object (passed into `simInit`), then all identical parameters in all modules will be overridden with these `.global` values
+* `defineParameter`, `expectsInput` and `createsOuptut` can all now have multi-line `desc`, without needing to use `paste` or `past0`. Extraneous spaces and carriage returns will all be stripped. This can either be using a single multi-line quote or via multiple lines, each with its own `""`. 
 
 ## dependencies
 * no changes

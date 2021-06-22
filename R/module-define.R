@@ -437,11 +437,7 @@ setMethod("defineParameter",
               }
             }
 
-            moreDesc <- list(...)
-            desc <- append(list(desc), moreDesc)
-            desc <- unlist(desc)
-            desc <- paste(desc, collapse = "")
-            desc <- gsub("  +|\n +", " ", desc)
+            desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
 
             # previously used `substitute()` instead of `I()`,
             # but it did not allow for a vector to be passed with `c()`
@@ -497,6 +493,9 @@ setMethod(
 #' @param objectClass  Character string to specify the input object's class.
 #'
 #' @param desc         Text string providing a brief description of the input object.
+#'                  If there are extra spaces or carriage returns, these will be stripped,
+#'                  allowing for multi-line character strings without using \code{paste}
+#'                  or multiple quotes.
 #'
 #' @param sourceURL    Character string to specify an URL to reach the input object,
 #'                     default is \code{NA}.
@@ -542,10 +541,15 @@ setMethod(
   signature = signature(objectName = "character", objectClass = "character",
                         desc = "character", sourceURL = "character"),
   definition = function(objectName, objectClass, desc, sourceURL, ...) {
+
+    desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
+
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc, sourceURL),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "expectsInput")
+    if (!is.null(names(templist)))
+      returnDataframe <- addNamedEntry(returnDataframe, templist[nzchar(names(templist))],
+                                     objectName, fn = "expectsInput")
     return(returnDataframe)
 })
 
@@ -556,6 +560,9 @@ setMethod(
   signature = signature(objectName = "character", objectClass = "character",
                         desc = "character", sourceURL = "missing"),
   definition = function(objectName, objectClass, desc, ...) {
+
+    desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
+
     return(expectsInput(objectName, objectClass, desc, sourceURL = NA_character_, ...))
 })
 
@@ -569,6 +576,9 @@ setMethod(
 #' @param objectClass  Character string to specify the output object's class.
 #'
 #' @param desc         Text string providing a brief description of the output object.
+#'                  If there are extra spaces or carriage returns, these will be stripped,
+#'                  allowing for multi-line character strings without using \code{paste}
+#'                  or multiple quotes.
 #'
 #' @param ...          Other specifications of the output object.
 #'
@@ -601,6 +611,7 @@ setMethod(
   signature = signature(objectName = "ANY", objectClass = "ANY",
                         desc = "ANY"),
   definition = function(objectName, objectClass, desc, ...) {
+    desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
     return(createsOutput(as.character(objectName), as.character(objectClass),
                          as.character(desc)))
 })
@@ -612,10 +623,15 @@ setMethod(
   signature = signature(objectName = "character", objectClass = "character",
                         desc = "character"),
   definition = function(objectName, objectClass, desc, ...) {
+
+    desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
+
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName, fn = "createsOutput")
+    if (!is.null(names(templist)))
+      returnDataframe <- addNamedEntry(returnDataframe, templist[nzchar(names(templist))],
+                                       objectName, fn = "createsOutput")
     return(returnDataframe)
 })
 
