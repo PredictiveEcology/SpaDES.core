@@ -5,13 +5,13 @@ utils::globalVariables(c(
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    if (is.null(P(sim, ".restartR")$.restartRInterval))
+    if (is.null(P(sim, module = ".restartR")$.restartRInterval))
       params(sim)$restartR$.restartRInterval <- getOption("spades.restartRInterval")
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, ".restartR")$.restartRInterval,
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, module = ".restartR")$.restartRInterval,
                          "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    nextTime <- time(sim, timeunit(sim)) + P(sim, ".restartR")$.restartRInterval
+    nextTime <- time(sim, timeunit(sim)) + P(sim, module = ".restartR")$.restartRInterval
 
     # This next step of creating this list is critical -- it is the trigger for on.exit in spades
     sim$._restartRList <- list()

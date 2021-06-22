@@ -50,7 +50,7 @@ defineModule(sim, list(
                  other = NA_character_)
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = SpaDES.core::P(sim, "randomLandscapes")$stackName, objectClass = "RasterStack",
+    createsOutput(objectName = SpaDES.core::P(sim, module = "randomLandscapes")$stackName, objectClass = "RasterStack",
                   desc = NA_character_, other = NA_character_)
   )
 ))
