@@ -515,6 +515,8 @@ P.simList <- function(sim, param, module) {
           param <- NULL
         }
       }
+    } else {
+      module1 <- module
     } # param is not a module name --> probably using new parameter order --> correct
   } else {
     param <- NULL
@@ -554,9 +556,18 @@ P.simList <- function(sim, param, module) {
     }
   }
   if (missing(param)) {
-    stop("Please specify param")
+    if (is(value, "list")) {
+      if (all(names(P(sim, module = module)) %in% names(value))) {
+        sim@params[[module]] <- value
+      } else {
+        stop("Please specify param as an argument")
+      }
+    } else {
+      stop("Please specify param as an argument")
+    }
+  } else {
+    sim@params[[module]][[param]] <- value
   }
-  sim@params[[module]][[param]] <- value
   return(sim)
 }
 

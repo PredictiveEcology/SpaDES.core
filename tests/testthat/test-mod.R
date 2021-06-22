@@ -71,7 +71,9 @@ test_that("local mod object", {
       documentation = list("README.txt", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
-        defineParameter("testParB", "numeric", 2, NA, NA, "")
+        defineParameter("testParB", "numeric", 2, NA, NA, ""),
+        defineParameter("testParC", "numeric", 22, NA, NA, ""),
+        defineParameter("testParD", "numeric", 12, NA, NA, "")
       ),
       inputObjects = bindrows(
         expectsInput("sdf", "sdf", "sdfd")
@@ -82,6 +84,10 @@ test_that("local mod object", {
       ))
 
       doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
+      P(sim)$testParF <- 77
+      P(sim)$testParA <- 42
+      P(sim, "testParG") <- 79
+      P(sim, "testParH") <- 48
       switch(
       eventType,
       init = {
@@ -200,4 +206,12 @@ test_that("local mod object", {
                     paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                     params = list(.globals = list(testParB = 321321))))
   expect_true(grepl("P has changed", warns))
+  # test different ways of setting parameters
+  expect_true(identical(P(mySim7, module = "test2", "testParA"), 42))
+  expect_true(identical(P(mySim7, module = "test2", "testParF"), 77))
+  expect_true(identical(P(mySim7, module = "test2", "testParG"), 79))
+  expect_true(identical(P(mySim7, module = "test2", "testParH"), 48))
+  expect_true(identical(P(mySim7, module = "test2", "testParAB"), 234))
+
 })
+?
