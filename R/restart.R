@@ -130,9 +130,11 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
       fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) fastdigest(obj)))
       objNames <- objNames[objNames %in% ls(sim@.xData)]
       fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) fastdigest(obj)))
-      fd1 <- fd1[match(names(fd2), names(fd1))]
-      stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
-      fd1 <- fd1[fd1 != fd2]
+      if (!is.null(fd2)) {
+        fd1 <- fd1[match(names(fd2), names(fd1))]
+        stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
+        fd1 <- fd1[fd1 != fd2]
+      }
       list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
     }
     message(crayon::blue("Reversing event: ",
