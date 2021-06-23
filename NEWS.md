@@ -19,6 +19,7 @@ version 1.0.8.9000
 
 ## bug fixes
 * When `.inputObjects` was cached (via setting `useCache = '.inputObjects'` parameter), it was "too sensitive". Changes to any module's parameters, not just the current module, would cause rerun of `.inputObjects`. Now it correctly identifies parameter changes only in the current module. THIS WILL CAUSE some existing caches to trigger a rerun once; after this, it will be less sensitive
+* `restartSpades` did not correctly deal with objects that did not yet exist prior to the event. Fixed with: 24b9cd12973aa81a9a4923a02225e095fa28f77a
 
 version 1.0.8
 =============
