@@ -1076,10 +1076,11 @@ setMethod(
         existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
         prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
         prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
-        if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]] &&
-            (time(sim, unit = attr(prevStart[["eventTime"]], "unit")) ==
-             start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
-          sim@completed <- new.env(parent = emptyenv())
+        if (length(.grepSysCalls(sys.calls(), "restartSpades")) == 0)
+          if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]] &&
+              (time(sim, unit = attr(prevStart[["eventTime"]], "unit")) ==
+               start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
+            sim@completed <- new.env(parent = emptyenv())
       }
 
       if (recoverMode > 0) {

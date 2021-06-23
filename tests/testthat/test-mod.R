@@ -95,6 +95,11 @@ test_that("local mod object", {
          P(sim, "testParB") <-  P(sim)$testParB + 756
       }
 
+
+      if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
+        stop("testing restartSpades")#browser()
+      }
+
       mod$a <- 1
       sim$testPar2 <- Par$testParB
       sim <- scheduleEvent(sim, start(sim), "test2", "event1", .skipChecks = TRUE)
@@ -211,7 +216,19 @@ test_that("local mod object", {
   expect_true(identical(P(mySim7, module = "test2", "testParF"), 77))
   expect_true(identical(P(mySim7, module = "test2", "testParG"), 79))
   expect_true(identical(P(mySim7, module = "test2", "testParH"), 48))
-  expect_true(identical(P(mySim7, module = "test2", "testParAB"), 234))
+  # expect_true(identical(P(mySim7, module = "test2", "testParAB"), 234))
 
+  # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
+  if (interactive()) {
+    mySim8 <- simInit(times = list(start = 0, end = 0),
+                      paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                      params = list(test2 = list(testRestartSpades = 1)))
+    err <- capture_error(ss <- spades(mySim8))
+
+    err <- capture_error(sim2 <- restartSpades(.pkgEnv$.sim)) # is missing completed events
+    err <- capture_error(sim3 <- restartSpades(.pkgEnv$.sim)) # is missing completed events
+    .pkgEnv$.sim@params$test2$testRestartSpades <- NULL
+    sim3 <- restartSpades(.pkgEnv$.sim)
+    expect_true(NROW(completed(sim3)) == 7)
+  }
 })
-?
