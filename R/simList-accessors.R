@@ -485,8 +485,18 @@ P.simList <- function(sim, param, module) {
   if (length(module1) == 0) {
     # then check if inside a .inputObjects call
     inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
-    if (any(inSimInit)) {
+    if (length(inSimInit)) {
       module1 <- get("m", sys.frame(inSimInit[2]))
+    } else {
+      inManualCall <- .grepSysCalls(sys.calls(), pattern = "(\\.mods\\$|\\[)")
+      if (length(inManualCall)) { # this is the case where a user calls the function using the full path
+        #   sim$.mods$module$fn(sim)
+        pp <- parse(text = sys.calls()[[inManualCall[1]]])
+        gg <- gsub("^.+\\.mods(\\$|\\[\\[)", "", as.character(pp)[[1]])
+        module1 <- strsplit(gg, split = "\\$|\\[")[[1]][1]
+      } else {
+        warning("P is supposed to be only used within the context of a SpaDES module; perhaps change to use `params` instead?")
+      }
     }
   }
 
