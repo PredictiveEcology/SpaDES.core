@@ -550,7 +550,8 @@ setMethod(
       lapply(pnames, function(x) {
         tmp[[x]] <<- suppressWarnings(modifyList2(sim@params[[x]], params[[x]]))
       })
-      sim@params <- tmp
+      list2env(tmp, envir = sim@params)
+      # sim@params <- tmp
 
       ## check user-supplied load order
       if (!all(length(loadOrder),
@@ -575,7 +576,6 @@ setMethod(
       # Make local activeBindings to mod
       lapply(as.character(sim@modules), function(mod) {
         makeModActiveBinding(sim = sim, mod = mod)
-        # sim$.mods$caribouMovement$mod <- list()
       })
 
       lapply(sim@modules, function(mod) {

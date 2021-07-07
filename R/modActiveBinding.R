@@ -33,12 +33,15 @@ activeParBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
+    print(paste("parent.frame: ", format(parent.frame())))
+    print(paste("simEnv: ", format(simEnv)))
+
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
         mod <- currentModule(sim)
         if (length(mod))
-          ret <- sim@params[[mod]]
+          ret <- get(mod, envir = sim@params, inherits = FALSE)#[[mod]]
       }
     }
   } else {

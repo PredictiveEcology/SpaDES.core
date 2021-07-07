@@ -107,7 +107,7 @@ setClass(
   "simList",
   contains = "environment",
   slots = list(
-    modules = "list", params = "list", events = "list",#data.table",
+    modules = "list", params = "environment", events = "list",#data.table",
     current = "list", #"data.table",
     completed = "environment", depends = ".simDeps",
     simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
@@ -151,11 +151,14 @@ setMethod("initialize",
             if (any(1 == haves))
               .Object@modules = as.list(NULL)
 
-            if (any(2 == haves))
-              .Object@params = list(
+            if (any(2 == haves)) {
+              .Object@params <- new.env(parent = emptyenv())
+              list2env(list(
                 checkpoint = list(interval = NA_real_, file = NULL),
                 .progress = list(type = NULL, interval = NULL)
-              )
+              ), envir = .Object@params)
+
+            }
             if (any(3 == haves))
               .Object@depends = .emptySimDeps #new(".simDeps", dependencies = list(NULL))
             if (any(4 == haves))
@@ -200,7 +203,7 @@ setClass("simList_",
 setAs(from = "simList_", to = "simList", def = function(from) {
   x <- new(to,
            modules = from@modules,
-           params = from@params,
+           params = new.envr(parent = emptyenv()), #from@params,
            events = from@events,
            current = from@current,
            completed = new.env(parent = emptyenv()),
@@ -213,6 +216,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
   x@.envir <- x@.xData
   list2env(from, envir = x@.xData)
   list2env(from@completed, envir = x@completed)
+  list2env(from@params, envir = x@params)
   x <- .keepAttrs(from, x) # the as methods don't keep attributes
   if (!is.null(x$objectSynonyms)) {
     x <- .checkObjectSynonyms(x)
@@ -223,7 +227,7 @@ setAs(from = "simList_", to = "simList", def = function(from) {
 setAs(from = "simList", to = "simList_", def = function(from, to) {
   x <- new(to,
            modules = from@modules,
-           params = from@params,
+           params = as.list(from@params, all.names = TRUE, sorted = TRUE),#from@params,
            events = from@events,
            current = from@current,
            completed = as.list(from@completed, all.names = TRUE, sorted = TRUE),

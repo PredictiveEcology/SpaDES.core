@@ -1681,7 +1681,13 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
+  outMess <- list()
   for (i in seq_along(debug)) {
+    browser()
+    if (is.numeric(debug[[i]])) {
+      debug[[i]] <- as.character(debug[[i]])
+    }
+
     if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
       if (length(cur) > 0) {
         if (debug[[i]] == "step") {
@@ -1700,58 +1706,88 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
           evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), names(evnts2)),
                                    sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), evnts2))
 
-          outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
-          outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
+          outMess[[i]] <- paste(unname(evnts2[1, ]), collapse = ' ')
+          outMess[[i]] <- c(outMess[[i]], paste(unname(evnts2[2, ]), collapse = ' '))
           # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
           .pkgEnv[[".spadesDebugFirst"]] <- FALSE
         } else {
           colnames(evnts1) <- NULL
           # write.table(evnts1, quote = FALSE, row.names = FALSE)
-          outMess <- paste(unname(evnts1), collapse = ' ')
+          outMess[[i]] <- paste(unname(evnts1), collapse = ' ')
         }
       }
-    } else if (identical(debug[[i]], 1)) {
-      outMess <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
+    } else if (identical(debug[[i]], "1")) {
+      outMess[[i]] <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
-    } else if (identical(debug[[i]], 2)) {
+    } else if (identical(debug[[i]], "2")) {
       compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                          attr(sim, "completedCounter") == 1) {
         sim@.xData$._startClockTime
       } else {
         .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
       }
-      outMess <- paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
+      outMess[[i]] <- paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
     } else {
       if (is(debug[[i]], "call")) {
-        outMess <- try(eval(debug[[i]]))
+        outMess[[i]] <- try(eval(debug[[i]]))
       } else if (identical(debug[[i]], "simList")) {
-        outMess <- try(capture.output(sim))
+        outMess[[i]] <- try(capture.output(sim))
       } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
-        outMess <- try(eval(parse(text = debug[[i]])))
+        outMess[[i]] <- try(eval(parse(text = debug[[i]])))
+      } else if (is.language(debug[[i]])) {
+        outMess[[i]] <- eval(debug[[i]])
       } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
         if (is.environment(fnEnv)) {
-          if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
-            debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
-            on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+          if (all(debug %in% unlist(cur[c("moduleName", "eventType")])  )) {
+            needDebug <- curModuleName
           }
         }
+        outMess[[i]] <- NULL
       } else if (!any(debug[[i]] %in% c("browser"))) { # any other
         if (!is.function(debug[[i]])) {
-          outMess <- try(do.call(debug[[i]], list(sim)))
+          browser()
+          outMess[[i]] <- try(do.call(debug[[i]], list(sim)), silent = TRUE)
         } else  {
-          outMess <- try(debug[[i]](sim))
+          outMess[[i]] <- try(debug[[i]](sim))
         }
       }
-    }
-    if (is.data.frame(outMess)) {
-      reproducible::messageDF(outMess, colour = "green", colnames = FALSE)
-    } else {
-      w <- getOption("width")
-      suppress <- lapply(outMess, function(x)
-        message(crayon::green(substring(x, first = 1, last = w - 30))))
+      if (is(outMess[[i]], "try-error")) {
+        outMess[[i]] <- tryCatch(eval(debug[[i]]), error = function(e) NULL)
+      }
+
     }
   }
+
+
+  w <- getOption("width")
+  isDF <- sapply(outMess, is.data.frame)
+  if (any(isDF)) {
+    browser()
+    ignore <- lapply(outMess[isDF], reproducible::messageDF, colour = "green", colnames = FALSE )
+    # reproducible::messageDF(outMess[[i]], colour = "green", colnames = FALSE)
+    outMess <- outMess[!isDF]
+  }
+  isList <- sapply(outMess, function(x) is(x, "list"))
+  if (any(isList)) {
+    browser()
+    ignore <- lapply(outMess[isList], function(om) {
+      suppress <- lapply(om, function(x)
+        message(crayon::green(substring(x, first = 1, last = w - 10))))
+      # reproducible::messageDF, colour = "green", colnames = FALSE )
+    # reproducible::messageDF(outMess[[i]], colour = "green", colnames = FALSE)
+    })
+    outMess <- outMess[!isList]
+  }
+
+  if (length(outMess)) {
+    browser()
+    outMess <- unlist(outMess, recursive = FALSE)
+    message(crayon::green(substring(paste(outMess, collapse = " "), first = 1, last = w - 10)))
+  }
+  if (exists("needDebug", inherits = FALSE))
+    debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+
 
 }
 
