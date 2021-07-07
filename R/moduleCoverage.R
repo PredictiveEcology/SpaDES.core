@@ -35,114 +35,34 @@
 #'
 #' @examples
 #' \dontrun{
-#'  library(igraph) # for %>%
-#'  library(SpaDES.core)
-#'  tmpdir <- file.path(tempdir(), "coverage")
-#'  modulePath <- file.path(tmpdir, "Modules") %>% checkPath(create = TRUE)
-#'  moduleName <- "forestAge" # sample module to test
-#'  downloadModule(name = moduleName, path = modulePath) # download sample module
-#'  testResults <- moduleCoverage(name = moduleName, path = modulePath)
-#'  report(testResults$moduleCoverage)
-#'  report(testResults$functionCoverage)
-#'  unlink(tmpdir, recursive = TRUE)
+#'   tmpdir <- file.path(tempdir(), "coverage")
+#'   modulePath <- file.path(tmpdir, "Modules") %>% checkPath(create = TRUE)
+#'   moduleName <- "forestAge" # sample module to test
+#'   downloadModule(name = moduleName, path = modulePath) # download sample module
+#'   testResults <- moduleCoverage(name = moduleName, path = modulePath)
+#'   report(testResults$moduleCoverage)
+#'   report(testResults$functionCoverage)
+#'   unlink(tmpdir, recursive = TRUE)
+#'   mc1 <- moduleCoverage("Biomass_core", modulePath = "..")
 #' }
-setGeneric("moduleCoverage", function(name, path) {
-  standardGeneric("moduleCoverage")
-})
-
-#' @export
-#' @rdname moduleCoverage
-setMethod(
-  "moduleCoverage",
-  signature(name = "character", path = "character"),
-  definition = function(name, path) {
-    tmpdir <- file.path(tempdir(), "moduleCoverage")
-    dir.create(tmpdir); on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
-    fnDir <- file.path(tmpdir, "moduleFunctions") %>% checkPath(create = TRUE)
-    testDir <- file.path(path, name, "tests", "testthat")
-
-    if (!requireNamespace("covr", quietly = TRUE) ||
-        !requireNamespace("testthat", quietly = TRUE)) {
-      stop("Suggested packages `covr` and `testthat` not found. ",
-           "Both must be installed to test module coverage.")
-    }
-    stopifnot(dir.exists(testDir))
-
-    fnCoverage <- list()
-    mCoverage <- list()
-    untestedFunctions <- data.table(FunctionName = character())
-    testedFunctions <- data.table(FunctionName = character(), Coverage = numeric())
-    dummyTestFile <- file.path(tmpdir, "test-dummyTestFile.R")
-    cat("test_that(\"this is a temporary dummy test file. \", {\n",
-        "  expect_equal(1, 1) \n",
-        "})\n", file = dummyTestFile, fill = FALSE, sep = "")
-    # read the module
-    mySim <- simInit(times = list(start = 0, end = 1),
-                     params = list(),
-                     modules = list(paste0(name)),
-                     objects = list(),
-                     paths = list(modulePath = path, outputPath = tmpdir))
-
-    objects <- mget(objects(mySim), envir(mySim))
-    objects <- objects[which(lapply(objects, is.function) == TRUE)]
-    fnIndex <- which(names(objects) != paste("doEvent.", name, sep = ""))
-
-    for (i in fnIndex) {
-      fnName <- file.path(fnDir, paste0(names(objects[i]), ".R", sep = ""))
-      fnLines <- deparse(objects[i][[1]])
-      cat(names(objects[i]), " <- ", fnLines[1:2], "\n", sep = "", file = fnName)
-      cat(fnLines[3:length(fnLines)], sep = "\n", file = fnName, append = TRUE)
-      source(fnName)
-    }
-    rm(i)
-
-    for (i in fnIndex) {
-      testfiles <- file.path(testDir, paste0("test-", objects(mySim)[i], ".R"))
-      if (file.exists(testfiles)) {
-        mTest <- covr::function_coverage(
-          objects(mySim)[i], env = envir(mySim),
-          testthat::test_file(testfiles, env = envir(mySim))
-        )
-        fnTest <- covr::function_coverage(objects(mySim)[i],
-                                          testthat::test_file(testfiles))
-        testedFunctions <- rbind(
-          testedFunctions,
-          data.table(FunctionName = objects(mySim)[i],
-                     Coverage = round(covr::percent_coverage(fnTest), 2))
-        )
-        mCoverage <- append(mCoverage, mTest)
-        fnCoverage <- append(fnCoverage, fnTest)
-
-      } else {
-        mTest <- covr::function_coverage(
-          objects(mySim)[i], env = envir(mySim),
-          testthat::test_file(dummyTestFile, env = envir(mySim))
-        )
-        fnTest <- covr::function_coverage(
-          objects(mySim)[i], testthat::test_file(dummyTestFile)
-        )
-        untestedFunctions <- rbind(
-          untestedFunctions,
-          data.table(FunctionName = objects(mySim)[i])
-        )
-        mCoverage <- append(mCoverage, mTest)
-        fnCoverage <- append(fnCoverage, fnTest)
-      }
-    }
-    class(mCoverage) <- "coverage"
-    class(fnCoverage) <- "coverage"
-    unlink(tmpdir, recursive = TRUE)
-    return(list(moduleCoverage = mCoverage,
-                functionCoverage = fnCoverage,
-                testedFunctions = testedFunctions,
-                untestedFunctions = untestedFunctions))
-})
-
-#' @export
-#' @rdname moduleCoverage
-setMethod(
-  "moduleCoverage",
-  signature(name = "character", path = "missing"),
-  definition = function(name) {
-    moduleCoverage(name = name, path = ".")
-})
+moduleCoverage <- function(mod, modulePath = "..") {
+  if (requireNamespace("testthat")) {
+    # require("testthat")
+    tmpFile <- "R/tmpDeleteMeForCoverageOnly.R"
+    modFileNam <- file.path(modulePath, mod, paste0(mod, ".R"))
+    b <- parse(file = modFileNam)
+    defModLine <- grep("defineModule", b)
+    tf <- tempfile(fileext = ".R")
+    file.move(modFileNam, tf)
+    on.exit(file.move(tf, modFileNam, overwrite = TRUE), add = TRUE)
+    cat(do.call(c, lapply(b[-defModLine], function(x) format(x))),
+        file = tmpFile, sep = "\n")
+    cat(do.call(c, lapply(b[defModLine], function(x) format(x))),
+        file = modFileNam, sep = "\n")
+    on.exit(unlink(tmpFile), add = TRUE)
+    covr::file_coverage(source_files = dir("R", full.names = TRUE),
+                  test_files = dir("tests/testthat", full.names = TRUE) )
+  } else {
+    stop("moduleCoverage doesn't work without testthat and covr; install.packages(c('testthat', 'covr'))")
+  }
+}

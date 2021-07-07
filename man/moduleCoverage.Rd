@@ -2,15 +2,9 @@
 % Please edit documentation in R/moduleCoverage.R
 \name{moduleCoverage}
 \alias{moduleCoverage}
-\alias{moduleCoverage,character,character-method}
-\alias{moduleCoverage,character,missing-method}
 \title{Calculate module coverage of unit tests}
 \usage{
-moduleCoverage(name, path)
-
-\S4method{moduleCoverage}{character,character}(name, path)
-
-\S4method{moduleCoverage}{character,missing}(name)
+moduleCoverage(mod, modulePath = "..")
 }
 \arguments{
 \item{name}{Character string. The module's name.}
@@ -42,16 +36,15 @@ To accurately test your module, the test filename must follow the format
 }
 \examples{
 \dontrun{
- library(igraph) # for \%>\%
- library(SpaDES.core)
- tmpdir <- file.path(tempdir(), "coverage")
- modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
- moduleName <- "forestAge" # sample module to test
- downloadModule(name = moduleName, path = modulePath) # download sample module
- testResults <- moduleCoverage(name = moduleName, path = modulePath)
- report(testResults$moduleCoverage)
- report(testResults$functionCoverage)
- unlink(tmpdir, recursive = TRUE)
+  tmpdir <- file.path(tempdir(), "coverage")
+  modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
+  moduleName <- "forestAge" # sample module to test
+  downloadModule(name = moduleName, path = modulePath) # download sample module
+  testResults <- moduleCoverage(name = moduleName, path = modulePath)
+  report(testResults$moduleCoverage)
+  report(testResults$functionCoverage)
+  unlink(tmpdir, recursive = TRUE)
+  mc1 <- moduleCoverage("Biomass_core", modulePath = "..")
 }
 }
 \seealso{
