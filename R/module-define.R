@@ -544,7 +544,7 @@ setMethod(
 
     desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
 
-    returnDataframe <- data.frame(cbind(objectName, objectClass, desc, sourceURL),
+    returnDataframe <- as.data.frame(cbind(objectName, objectClass, desc, sourceURL),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
     if (!is.null(names(templist)))
