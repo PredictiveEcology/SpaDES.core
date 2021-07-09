@@ -575,7 +575,6 @@ setMethod(
       # Make local activeBindings to mod
       lapply(as.character(sim@modules), function(mod) {
         makeModActiveBinding(sim = sim, mod = mod)
-        # sim$.mods$caribouMovement$mod <- list()
       })
 
       lapply(sim@modules, function(mod) {
@@ -587,8 +586,25 @@ setMethod(
 
       for (m in loadOrder) {
         mFullPath <- loadOrderNames[match(m, loadOrder)]
+
         ## run .inputObjects() for each module
-        sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+        if (is.character(getOption("spades.covr", FALSE))  ) {
+          mod <- getOption("spades.covr")
+          tf <- tmpfile();
+          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "',m,'", notOlderThan = ',notOlderThan,')'))
+          # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+          unlockBinding(mod, sim$.mods)
+          if (length(objects))
+            list2env(objects, envir(sim))
+          sim$.mods[[mod]]$sim <- sim
+          aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
+          sim <- sim$.mods[[mod]]$sim
+          rm(list = "sim", envir = sim$.mods[[mod]])
+          if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+          .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+        } else {
+          sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+        }
 
         ## schedule each module's init event:
         sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
@@ -1081,8 +1097,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   if (!all(allObjsProvided)) {
     if (!is.null(sim@.xData$.mods[[mBase]][[".inputObjects"]])) {
       # browser(expr = exists("._runModuleInputObjects_2"))
-      list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
-               envir = sim@.xData)
+      if (!missing(objects))
+        list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
+                 envir = sim@.xData)
       a <- P(sim, ".useCache", mBase)
       if (!is.null(a)) {
         if (!identical(FALSE, a)) {
@@ -1234,16 +1251,19 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 }
 
 checkSpaDES.coreMinVersion <- function(allPkgs) {
-  versionSpecs <- Require::getPkgVersions(allPkgs)
-  sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
-  if (NROW(sc)) {
-    out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
-      comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
-                             sc$versionSpec[iii])}))
-    if (any(out11 < 0))
-      stop("One of the modules needs a newer version of SpaDES.core. Please ",
-           "restart R and install with: \n",
-           "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+  whSC <- startsWith(allPkgs, "SpaDES.core")
+  if (any(whSC)) {
+    versionSpecs <- Require::getPkgVersions(allPkgs[whSC])
+    sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
+    if (NROW(sc)) {
+      out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
+        comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
+                               sc$versionSpec[iii])}))
+      if (any(out11 < 0))
+        stop("One of the modules needs a newer version of SpaDES.core. Please ",
+             "restart R and install with: \n",
+             "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+    }
   }
 
 }
@@ -1315,17 +1335,18 @@ loadPkgs <- function(reqdPkgs) {
       neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
       names(neededPkgs) <- uniqueReqdPkgs
       allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
-      versionSpecs <- Require::getPkgVersions(allPkgs)
-      if (any(versionSpecs$hasVersionSpec)) {
-        out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
-          comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-                                 versionSpecs$versionSpec[iii])
-          if (comp < 0)
-            warning(versionSpecs$Package[iii], " needs to be updated to at least ",
-                    versionSpecs$versionSpec[iii])
-        })
-
-      }
+      message("options('spades.useRequire' = FALSE), so not checking minimum package version requirements")
+      # versionSpecs <- Require::getPkgVersions(allPkgs)
+      # if (any(versionSpecs$hasVersionSpec)) {
+      #   out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
+      #     comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
+      #                            versionSpecs$versionSpec[iii])
+      #     if (comp < 0)
+      #       warning(versionSpecs$Package[iii], " needs to be updated to at least ",
+      #               versionSpecs$versionSpec[iii])
+      #   })
+      #
+      # }
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
     }

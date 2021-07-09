@@ -7,10 +7,10 @@
 moduleCoverage(mod, modulePath = "..")
 }
 \arguments{
-\item{name}{Character string. The module's name.}
+\item{mod}{Character string. The module's name. Default is \code{basename(getwd())}}
 
-\item{path}{Character string. The path to the module directory
-(default is the current working directory).}
+\item{modulePath}{Character string. The path to the module directory
+(default is "..", i.e., one level up from working directory).}
 }
 \value{
 Return a list of two coverage objects and two data.table objects.

@@ -3,10 +3,10 @@
 #'
 #' Calculate the test coverage by unit tests for the module and its functions.
 #'
-#' @param name  Character string. The module's name.
+#' @param mod  Character string. The module's name. Default is \code{basename(getwd())}
 #'
-#' @param path  Character string. The path to the module directory
-#'              (default is the current working directory).
+#' @param modulePath  Character string. The path to the module directory
+#'              (default is "..", i.e., one level up from working directory).
 #'
 #' @return Return a list of two coverage objects and two data.table objects.
 #' The two coverage objects are named `moduleCoverage` and `functionCoverage`.
@@ -47,21 +47,24 @@
 #' }
 moduleCoverage <- function(mod, modulePath = "..") {
   if (requireNamespace("testthat")) {
-    # require("testthat")
-    tmpFile <- "R/tmpDeleteMeForCoverageOnly.R"
-    modFileNam <- file.path(modulePath, mod, paste0(mod, ".R"))
-    b <- parse(file = modFileNam)
-    defModLine <- grep("defineModule", b)
-    tf <- tempfile(fileext = ".R")
-    file.move(modFileNam, tf)
-    on.exit(file.move(tf, modFileNam, overwrite = TRUE), add = TRUE)
-    cat(do.call(c, lapply(b[-defModLine], function(x) format(x))),
-        file = tmpFile, sep = "\n")
-    cat(do.call(c, lapply(b[defModLine], function(x) format(x))),
-        file = modFileNam, sep = "\n")
-    on.exit(unlink(tmpFile), add = TRUE)
-    covr::file_coverage(source_files = dir("R", full.names = TRUE),
-                  test_files = dir("tests/testthat", full.names = TRUE) )
+    require("testthat")
+
+    if (missing(mod))
+      mod <- basename(getwd())
+
+
+    # this is the trigger that causes 2 behaviours to occur
+    #   inside `simInit` and `spades`
+    opts <- options("spades.covr" = mod)
+
+    on.exit(opts)
+    .pkgEnv$._covr <- list()
+
+    test_files <- dir(file.path(modulePath, mod, "tests", "testthat"), full.names = TRUE)
+    ignore <- lapply(test_files, source)
+    covr <- do.call(c, .pkgEnv$._covr)
+    class(covr) <-  "coverage"
+    return(covr)
   } else {
     stop("moduleCoverage doesn't work without testthat and covr; install.packages(c('testthat', 'covr'))")
   }

@@ -868,6 +868,22 @@ setMethod(
                         .plots,
                         ...) {
 
+    if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
+      modNam <- getOption("spades.covr")
+      tf <- tmpfile();
+      on.exit(unlink(tf))
+      cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+      unlockBinding(modNam, sim$.mods)
+      sim$.mods[[modNam]]$sim <- sim
+      opts <- options("spades.covr2" = FALSE) # turn off this chunk 2nd time through
+      on.exit(options(opts), add = TRUE)
+      aa <- covr::environment_coverage(sim$.mods[[modNam]], test_files = tf)
+      rm(list = "sim", envir = sim$.mods[[modNam]])
+      options("spades.covr2" = TRUE)
+      if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+      .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+      return(.pkgEnv$.sim)
+    }
     oldWd <- getwd()
     on.exit({
       setwd(oldWd)
