@@ -495,7 +495,30 @@ P.simList <- function(sim, param, module) {
         gg <- gsub("^.+\\.mods(\\$|\\[\\[)", "", as.character(pp)[[1]])
         module1 <- strsplit(gg, split = "\\$|\\[")[[1]][1]
       } else {
-        warning("P is supposed to be only used within the context of a SpaDES module; perhaps change to use `params` instead?")
+        mods <- modules(sim)
+        modFilePaths <- checkPath(names(mods))
+
+        scalls <- sys.calls();
+        whereInSC <-  .grepSysCalls(scalls, "^P\\(")
+        while (whereInSC > 0) {
+          poss <- scalls[whereInSC - 1]
+          fn <- as.character(poss[[1]][[1]])
+          fn <- get(fn, envir = sys.frames()[whereInSC - 1][[1]])
+
+          modulePath <- getSrcFilename(fn, full.names = TRUE)
+          browser()
+          if (length(modulePath) > 0) {
+            module1 <- lapply(modFilePaths, function(x) grep(pattern = x, checkPath(modulePath)))
+            if (length(module1[[1]]) > 0)  break
+          }
+          whereInSC <- whereInSC - 1
+        }
+
+        if (length(module1[[1]])) {
+          module1 <- mods[[module1[[1]]]]
+        } else {
+          warning("P is supposed to be only used within the context of a SpaDES module; perhaps change to use `params` instead?")
+        }
       }
     }
   }
