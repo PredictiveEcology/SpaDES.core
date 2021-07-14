@@ -55,17 +55,68 @@ moduleCoverage <- function(mod, modulePath = "..") {
 
     # this is the trigger that causes 2 behaviours to occur
     #   inside `simInit` and `spades`
-    opts <- options("spades.covr" = mod)
+    opts <- options("spades.covr" = mod, "spades.covr2" = TRUE)
 
-    on.exit(opts)
+    on.exit(options(opts))
     .pkgEnv$._covr <- list()
 
+    # Copy all functions new file in R subfolder
+    tmpFile <- paste0("R/",mod,"_main.R")
+    modFileNam <- file.path(modulePath, mod, paste0(mod, ".R"))
+    b <- parse(file = modFileNam)
+    defModLine <- grep("defineModule", b)
+    tf <- tempfile(fileext = ".R")
+    file.move(modFileNam, tf)
+    on.exit(file.move(tf, modFileNam, overwrite = TRUE), add = TRUE)
+    cat(do.call(c, lapply(b[-defModLine], function(x) format(x))),
+        file = tmpFile, sep = "\n")
+    cat(do.call(c, lapply(b[defModLine], function(x) format(x))),
+        file = modFileNam, sep = "\n")
+    on.exit(unlink(tmpFile), add = TRUE)
+
     test_files <- dir(file.path(modulePath, mod, "tests", "testthat"), full.names = TRUE)
+
+
+    # run test files
+
+    ################
+    options(opts)
+    test_files <- dir(file.path("tests", "testthat"), full.names = TRUE)
+    bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE)),
+                              test_files = grep("Ward", test_files, value = TRUE) )
+    #################
+    browser()
+
+
     ignore <- lapply(test_files, source)
+
     covr <- do.call(c, .pkgEnv$._covr)
     class(covr) <-  "coverage"
-    return(covr)
+
+    options(opts)
+
+    # Now do tests all 2nd time, but this time testing unique function calls without `spades` or `simInit`
+    browser()
+    # test_files <- dir(file.path(modulePath, mod, "tests"), pattern = ".R$", full.names = TRUE)
+    bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE)),
+                        test_files = test_files )
+
+    # Need to update file names of the bb so that they are the same as the covr
+    #bb2 <- bb
+    #covr2 <- covr
+    # names(bb) <- gsub(paste0(mod, ".R"), "tmpDeleteMeForCoverageOnly", names(bb))
+    # bbChar <- sapply(bb[grep(basename(tmpFile), names(bb))], function(x) as.character(x$srcref))
+    # covrChar <- sapply(covr[grep("Biomass_core", names(covr))], function(x) as.character(x$srcref))
+    # mm <- match(unname(bbChar), unname(covrChar))
+    # whNoNA <- which(!is.na(mm));
+    # bb[whNoNA] <- covr[mm[whNoNA]]
+    # names(bb)[whNoNA] <- names(covr[mm[whNoNA]])
+
+    covr2 <- c(covr, bb)
+    class(covr2) <-  "coverage"
+    return(covr2)
   } else {
     stop("moduleCoverage doesn't work without testthat and covr; install.packages(c('testthat', 'covr'))")
   }
 }
+
