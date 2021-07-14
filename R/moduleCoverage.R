@@ -48,6 +48,9 @@
 moduleCoverage <- function(mod, modulePath = "..") {
   if (requireNamespace("testthat")) {
     require("testthat")
+    if (is.null(getOption("testthat.progress.max_fails"))) {
+      options(testthat.progress.max_fails = Inf)
+    }
 
     if (missing(mod))
       mod <- basename(getwd())
