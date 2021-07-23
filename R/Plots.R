@@ -32,7 +32,7 @@
 #' @export
 #' @param data An arbitrary data object. It should be used inside the \code{Plots}
 #'   function, and should contain all the data required for the inner plotting
-#' @param fn An arbitrary plotting function.
+#' @param fn An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}
 #' @param filename A name that will be the base for the files that will be saved, i.e,
 #'   do not supply the file extension, as this will be determined based on \code{types}.
 #'   If a user provides this as an absolute path, it will override the \code{path}
