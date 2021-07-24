@@ -31,7 +31,9 @@
 #'
 #' @export
 #' @param data An arbitrary data object. It should be used inside the \code{Plots}
-#'   function, and should contain all the data required for the inner plotting
+#'   function, and should contain all the data required for the inner plotting. If passing a `RasterLayer`
+#'   and using \code{quickPlot::Plot}, it may be a good idea to set \code{names(RasterLayer)} so that
+#'   multiple layers can be plotted without overlapping eachother. See example.
 #' @param fn An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}
 #' @param filename A name that will be the base for the files that will be saved, i.e,
 #'   do not supply the file extension, as this will be determined based on \code{types}.
@@ -177,7 +179,17 @@ Plots <- function(data, fn, filename,
 
   if (needScreen) {
     if (fnIsPlot) {
-      gg <- fn(data, ...)
+      if (is.list(data) || !is(data, "RasterStack") || !is(data, "RasterBrick")) {
+        dataListToScreen <- data
+      } else {
+        dataListToScreen <- list(data)
+      }
+      if (!is.null(names(data))) {
+        dataListToScreen <- setNames(dataListToScreen, names(data))
+      } else {
+        dataListToScreen <- setNames(dataListToScreen, "data")
+      }
+      gg <- fn(dataListToScreen, ...)
     } else {
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
