@@ -182,7 +182,7 @@ Plots <- function(data, fn, filename,
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
       if (usePlot) {
-        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " ", replacement = "_")
+        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
         print(gg)
