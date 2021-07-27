@@ -184,11 +184,20 @@ Plots <- function(data, fn, filename,
       } else {
         dataListToScreen <- list(data)
       }
-      if (!is.null(names(data))) {
-        dataListToScreen <- setNames(dataListToScreen, names(data))
+      if (is(data, "ggplot")) {
+        dataListToScreen <- setNames(list(data), "gg")
+        if (!is.null(data$labels$title) && needScreen) {
+          dataListToScreen <- setNames(dataListToScreen, data$labels$title)
+          dataListToScreen[[1]]$labels$title <- NULL
+        }
       } else {
-        dataListToScreen <- setNames(dataListToScreen, "data")
+        if (!is.null(names(data))) {
+          dataListToScreen <- setNames(dataListToScreen, names(data))
+        } else {
+          dataListToScreen <- setNames(dataListToScreen, "data")
+        }
       }
+
       gg <- fn(dataListToScreen, ...)
     } else {
       if (is(gg, "gg"))
