@@ -216,7 +216,7 @@ Plots <- function(data, fn, filename,
     if (missing(filename)) {
       filename <- tempfile(fileext = "")
     }
-    isDefaultPath <-  identical(eval(formals(Plots)$path), path)
+    isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
         path <- eval(path, envir = simIsIn)
@@ -233,7 +233,7 @@ Plots <- function(data, fn, filename,
 
   if (needSaveRaw) {
     if (is(data, "Raster")) {
-      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")))
+      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")), overwrite = TRUE)
     } else {
       qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
     }
