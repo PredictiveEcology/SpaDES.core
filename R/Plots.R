@@ -31,8 +31,10 @@
 #'
 #' @export
 #' @param data An arbitrary data object. It should be used inside the \code{Plots}
-#'   function, and should contain all the data required for the inner plotting
-#' @param fn An arbitrary plotting function.
+#'   function, and should contain all the data required for the inner plotting. If passing a `RasterLayer`
+#'   and using \code{quickPlot::Plot}, it may be a good idea to set \code{names(RasterLayer)} so that
+#'   multiple layers can be plotted without overlapping eachother. See example.
+#' @param fn An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}
 #' @param filename A name that will be the base for the files that will be saved, i.e,
 #'   do not supply the file extension, as this will be determined based on \code{types}.
 #'   If a user provides this as an absolute path, it will override the \code{path}
@@ -177,12 +179,31 @@ Plots <- function(data, fn, filename,
 
   if (needScreen) {
     if (fnIsPlot) {
-      gg <- fn(data, ...)
+      if (is.list(data) || !is(data, "RasterStack") || !is(data, "RasterBrick")) {
+        dataListToScreen <- data
+      } else {
+        dataListToScreen <- list(data)
+      }
+      if (is(data, "ggplot")) {
+        dataListToScreen <- setNames(list(data), "gg")
+        if (!is.null(data$labels$title) && needScreen) {
+          dataListToScreen <- setNames(dataListToScreen, data$labels$title)
+          dataListToScreen[[1]]$labels$title <- NULL
+        }
+      } else {
+        if (!is.null(names(data))) {
+          dataListToScreen <- setNames(dataListToScreen, names(data))
+        } else {
+          dataListToScreen <- setNames(dataListToScreen, "data")
+        }
+      }
+
+      gg <- fn(dataListToScreen, ...)
     } else {
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
       if (usePlot) {
-        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " ", replacement = "_")
+        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
         print(gg)
@@ -195,7 +216,7 @@ Plots <- function(data, fn, filename,
     if (missing(filename)) {
       filename <- tempfile(fileext = "")
     }
-    isDefaultPath <-  identical(eval(formals(Plots)$path), path)
+    isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
         path <- eval(path, envir = simIsIn)
@@ -212,7 +233,7 @@ Plots <- function(data, fn, filename,
 
   if (needSaveRaw) {
     if (is(data, "Raster")) {
-      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")))
+      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")), overwrite = TRUE)
     } else {
       qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
     }
