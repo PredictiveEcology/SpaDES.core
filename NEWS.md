@@ -5,7 +5,7 @@ version 1.0.9
 =============
 
 ## new features
-* `moduleCoverage2` is a new, alternative function () to estimate code coverage of a module.
+* `moduleCoverage` has been rewritten to estimate code coverage of a module using `covr` package.
 * `P` now has a replacement method. So, to update a parameter within a module (where it is namespaced, i.e., don't have to specify the module name): `P(sim, "paramName") <- 1`. If using this outside a module, then `module` (3rd argument) will have to be specified.
 * `P` argument order changed to accommodate the fact that namespacing is used to detect module name: the user does not need to supply `module`, so it should not be second. This is for the normal `P` method and the new replace method above: it is now `P(sim, param, module)`; there are attempts to capture errors (i.e., parameter supplied that matches a module, but not a parameter; vice versa) and give a warning for user to change code. This may have little downstream effect as all known cases use the `P(sim)$paramName`, which will still work fine, instead of `P(sim, "paramName")`.
 * `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
@@ -15,6 +15,7 @@ version 1.0.9
 * `moduleCodeFiles` a new function that identifies all the code files in a collection of modules
 * `.globals` functionality is modified. If a user specifies a `.globals` in the parameters object (passed into `simInit`), then all identical parameters in all modules will be overridden with these `.global` values
 * `defineParameter`, `expectsInput` and `createsOuptut` can all now have multi-line `desc`, without needing to use `paste` or `past0`. Extraneous spaces and carriage returns will all be stripped. This can either be using a single multi-line quote or via multiple lines, each with its own `""`. 
+* the module environment is no longer "locked" with `lockBinding`. It is already hidden in `sim$.mods`, and since `sim$.mods` can be modified, this was a weak caution against user modification. Further, for `moduleCoverage`, the module environment needed to be unlocked, which is not allowed by CRAN.
 
 ## dependencies
 * no changes
