@@ -968,7 +968,7 @@ setMethod(
 #' @aliases simInitAndSpades
 #' @rdname simInitAnd
 simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
-                             notOlderThan, debug, progress, cache,
+                             notOlderThan, debug, progress, cache, .plots,
                              .plotInitialTime, .saveInitialTime, events, ...) {
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)

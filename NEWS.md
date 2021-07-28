@@ -1,5 +1,17 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
+version 1.0.8.9001
+=============
+
+## new features
+* none
+
+## dependencies
+* no changes
+
+## bug fixes
+* Plots - fixed issues with plot layer names and plot overlaying when passing `data` only (e.g. `quickPlot::Plot`-like behaviour) 
+
 version 1.0.8.9000
 =============
 
