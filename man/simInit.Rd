@@ -187,6 +187,11 @@ parameters from multiple modules all at once, with say:
 \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))}.
 
+The \code{params} list can contain a list (named \code{.globals}) of named objects
+e.g., \code{.globals = list(climateURL = "https:\\\\something.com")} entry. Any and every
+module that has a parameter with that name (in this case \code{climateURL}) will be
+overridden with this value as passed.
+
 \code{params} can be used to set the seed for a specific event in a module. This
 is done using the normal \code{params} argument, specifying \code{.seed} as a list
 where the elements are a numeric for the seed and the name is the event. Since

@@ -5,13 +5,13 @@ utils::globalVariables(c(
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    if (is.null(P(sim, ".restartR")$.restartRInterval))
+    if (is.null(P(sim, module = ".restartR")$.restartRInterval))
       params(sim)$restartR$.restartRInterval <- getOption("spades.restartRInterval")
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, ".restartR")$.restartRInterval,
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, module = ".restartR")$.restartRInterval,
                          "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    nextTime <- time(sim, timeunit(sim)) + P(sim, ".restartR")$.restartRInterval
+    nextTime <- time(sim, timeunit(sim)) + P(sim, module = ".restartR")$.restartRInterval
 
     # This next step of creating this list is critical -- it is the trigger for on.exit in spades
     sim$._restartRList <- list()
@@ -119,14 +119,22 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
   # browser(expr = exists("._restartSpades_2"))
   out <- lapply(eventIndices, function(event) {
     objNames <- names(sim$.recoverableObjs[[event]])
+    notYetCreated <- setdiff(outputObjects(sim)[[module]]$objectName, objNames)
+    names(notYetCreated) <- notYetCreated
+    notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
+    sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
+    sim$.recoverableObjs[[event]]
+    objNames <- names(sim$.recoverableObjs[[event]])
     if (!is.null(objNames)) {
       # only take objects that changed -- determine which ones are changed
       fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) fastdigest(obj)))
       objNames <- objNames[objNames %in% ls(sim@.xData)]
       fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) fastdigest(obj)))
-      fd1 <- fd1[match(names(fd2), names(fd2))]
-      stopifnot(all.equal(names(fd1), names(fd2)))
-      fd1 <- fd1[fd1 != fd2]
+      if (!is.null(fd2)) {
+        fd1 <- fd1[match(names(fd2), names(fd1))]
+        stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
+        fd1 <- fd1[fd1 != fd2]
+      }
       list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
     }
     message(crayon::blue("Reversing event: ",

@@ -73,16 +73,15 @@ mySim <- simInit(times = times, params = parameters, modules = modules,
                  objects = objects, paths = paths)
 
 # Access parameters
-params(mySim)               # shows all parameters
-P(mySim)                    # same, but more concise
-P(mySim, "caribouMovement") # only parameters in caribouMovement
+P(mySim)                    # shows all parameters
+P(mySim, module = "caribouMovement") # only parameters in caribouMovement module
 P(mySim)$caribouMovement    # same
 P(mySim)$caribouMovement$N  # Only one parameter
 
 # If used within the module source code, then module name can be omitted:
 # This will return NULL here, but will return the actual value if used
 # in a module
-P(mySim)$N  # Only one parameter
+P(mySim)$N  # Only one parameter if used within a module
 
 ## ----event-types, echo=TRUE, eval=FALSE---------------------------------------
 #  ## sample event type definitions from the default `randomLandscapes` module
@@ -315,7 +314,7 @@ mySim2 <- spades(mySim)
 outputs(mySim) <- data.frame(
   objectName = "landscape", fun = "writeRaster", package = "raster",
   saveTime = c(3,6), arguments = I(lapply(c(3,6), function(x) {
-    list(dataType = "FLT4S", format = "raster", overwrite = TRUE)
+    list(datatype = "FLT4S", format = "raster", overwrite = TRUE)
 })))
 mySim2 <- spades(mySim)
 dev.off()

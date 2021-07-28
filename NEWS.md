@@ -1,28 +1,31 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.0.8.9001
+
+version 1.0.9
 =============
 
 ## new features
-* none
+* `moduleCoverage` has been rewritten to estimate code coverage of a module using `covr` package.
+* `P` now has a replacement method. So, to update a parameter within a module (where it is namespaced, i.e., don't have to specify the module name): `P(sim, "paramName") <- 1`. If using this outside a module, then `module` (3rd argument) will have to be specified.
+* `P` argument order changed to accommodate the fact that namespacing is used to detect module name: the user does not need to supply `module`, so it should not be second. This is for the normal `P` method and the new replace method above: it is now `P(sim, param, module)`; there are attempts to capture errors (i.e., parameter supplied that matches a module, but not a parameter; vice versa) and give a warning for user to change code. This may have little downstream effect as all known cases use the `P(sim)$paramName`, which will still work fine, instead of `P(sim, "paramName")`.
+* `Plots` does a better job with rasterStack objects plotted to screen without `ggplot2`
+* removed `.isFALSE`: use `base::isFALSE` now
+* `Plots` can now omit the `data` argument; just use the named arguments in ...
+* `defineParameter` now allows multi-line `desc` or multiple strings; `paste` is no longer needed for long `desc`
+* `moduleCodeFiles` a new function that identifies all the code files in a collection of modules
+* `.globals` functionality is modified. If a user specifies a `.globals` in the parameters object (passed into `simInit`), then all identical parameters in all modules will be overridden with these `.global` values
+* `defineParameter`, `expectsInput` and `createsOuptut` can all now have multi-line `desc`, without needing to use `paste` or `past0`. Extraneous spaces and carriage returns will all be stripped. This can either be using a single multi-line quote or via multiple lines, each with its own `""`. 
+* the module environment is no longer "locked" with `lockBinding`. It is already hidden in `sim$.mods`, and since `sim$.mods` can be modified, this was a weak caution against user modification. Further, for `moduleCoverage`, the module environment needed to be unlocked, which is not allowed by CRAN.
 
 ## dependencies
 * no changes
 
 ## bug fixes
-* Plots - fixed issues with plot layer names and plot overlaying when passing `data` only (e.g. `quickPlot::Plot`-like behaviour) 
-
-version 1.0.8.9000
-=============
-
-## new features
-* none
-
-## dependencies
-* no changes
-
-## bug fixes
-* none
+* When `.inputObjects` was cached (via setting `useCache = '.inputObjects'` parameter), it was "too sensitive". Changes to any module's parameters, not just the current module, would cause rerun of `.inputObjects`. Now it correctly identifies parameter changes only in the current module. THIS WILL CAUSE some existing caches to trigger a rerun once; after this, it will be less sensitive
+* `restartSpades` did not correctly deal with objects that did not yet exist prior to the event. Fixed with: 24b9cd12973aa81a9a4923a02225e095fa28f77a
+* `restartSpades` was losing the previous completed events list. This has been fixed; it is now kept after `restartSpades`
+* Plots - fixed issues with plot layer names and plot overlaying when passing `data` only (e.g. `quickPlot::Plot`-like behaviour)
+* `simInitAndSpades` now has `.plots` arg to match `spades`
 
 version 1.0.8
 =============

@@ -266,7 +266,7 @@ test_that("test .robustDigest for simLists", {
     try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
     mess1 <- capture_messages(do.call(simInit, args))
-    msgGrep <- "Running .input|module code|ggplot2|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
+    msgGrep <- "Running .input|module code|so not checking minimum package|ggplot2|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
     expect_true(all(grepl(msgGrep, mess1)))
 
     msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -282,7 +282,7 @@ test_that("test .robustDigest for simLists", {
     xxx[editBelowLine + 1] <- newCode
     cat(xxx, file = fileName, sep = "\n")
 
-    msgGrep <- "Running .input|module code|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
+    msgGrep <- "Running .input|module code|so not checking minimum package|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
     mess1 <- capture_messages(do.call(simInit, args))
     expect_true(all(grepl(msgGrep, mess1)))
 

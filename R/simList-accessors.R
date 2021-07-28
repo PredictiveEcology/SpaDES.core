@@ -407,7 +407,7 @@ setMethod(
 #'
 #' @inheritParams objs
 #'
-#' @param value The object to be stored at the slot.
+#' @param value The parameter value to be set (in the corresponding `module` and `param`).
 #'
 #' @param module Optional character string indicating which module params should come from.
 #'
@@ -418,7 +418,7 @@ setMethod(
 #' @note The differences between P, params and being explicit with passing arguments
 #' are mostly a question of speed and code compactness.
 #' The computationally fastest way to get a parameter is to specify moduleName and parameter name, as in:
-#' \code{P(sim, "moduleName", "paramName")} (replacing moduleName and paramName with your
+#' \code{P(sim, "paramName", "moduleName")} (replacing moduleName and paramName with your
 #' specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
 #' part for speed (e.g., 2-4x faster) is specifying the moduleName.
 #' Specifying the parameter name is <5% faster.
@@ -471,34 +471,137 @@ setReplaceMethod("params",
 #' @aliases simList-accessors-params
 #' @export
 #' @importFrom reproducible .grepSysCalls
+#' @importFrom utils getSrcFilename
 #' @include simList-class.R
 #' @rdname params
-P <- function(sim, module, param) {
+P <- function(sim, param, module) UseMethod("P")
+
+#' @export
+P.simList <- function(sim, param, module) {
   if (missing(sim)) stop("P takes a simList as first argument")
-  if (missing(module)) {
-    module <- sim@current$moduleName
-  }
-  if (length(module) > 0) {
-    if (missing(param)) {
-      return(sim@params[[module]])
-    } else {
-      return(sim@params[[module]][[param]])
-    }
-  } else {
-    #scallsFirstElement <- lapply(sys.calls(), function(x) x[1])
+  # Check for changed order
+
+  # first check if inside an event
+  module1 <- sim@current$moduleName
+  if (length(module1) == 0) {
+    # then check if inside a .inputObjects call
     inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
-    #inSimInit <- grep(sys.calls(), pattern = ".parseModule")
-    if (any(inSimInit)) {
-      #module <- get("m", sys.frame(grep(sys.calls(), pattern = ".parseModule")[2]))
-      module <- get("m", sys.frame(inSimInit[2]))
-      if (missing(param)) {
-        return(sim@params[[module]])
+    if (length(inSimInit)) {
+      module1 <- get("m", sys.frame(inSimInit[2]))
+    } else {
+      inManualCall <- .grepSysCalls(sys.calls(), pattern = "(\\.mods\\$|\\[)")
+      if (length(inManualCall)) { # this is the case where a user calls the function using the full path
+        #   sim$.mods$module$fn(sim)
+        pp <- parse(text = sys.calls()[[inManualCall[1]]])
+        gg <- gsub("^.+\\.mods(\\$|\\[\\[)", "", as.character(pp)[[1]])
+        module1 <- strsplit(gg, split = "\\$|\\[")[[1]][1]
       } else {
-        return(sim@params[[module]][[param]])
+        mods <- modules(sim)
+        modFilePaths <- checkPath(names(mods))
+
+        scalls <- sys.calls();
+        whereInSC <-  .grepSysCalls(scalls, "^P\\(")
+        while (whereInSC > 1) {
+          poss <- scalls[whereInSC - 1]
+          fn <- as.character(poss[[1]][[1]])
+          fn <- try(get(fn, envir = sys.frames()[whereInSC - 1][[1]]), silent = TRUE)
+          if (!is(fn, "try-error")) {
+
+            modulePath <- getSrcFilename(fn, full.names = TRUE)
+            if (length(modulePath) > 0) {
+              module1 <- lapply(modFilePaths, function(x) grep(pattern = x, checkPath(modulePath)))
+              if (length(module1[[1]]) > 0)  break
+            }
+          }
+          whereInSC <- whereInSC - 1
+        }
+
+        if (length(module1[[1]])) {
+          module1 <- mods[[module1[[1]]]]
+        }
       }
     }
+  }
+
+  reversalMessage <- paste0("P has changed the order of its parameters, with 'param' now second to ",
+                            " allow for easier access to specific parameters inside a module. ",
+                            "It looks like this call to P is still using the old order with 'module' second. ",
+                            "Returning the old behaviour for now; this may not reliably work in the future. ",
+                            "Please change the order")
+  # This is to catch cases of reverse order -- order of args changed to sim, params, then module
+  if (!missing(param)) {
+    if (param %in% names(sim@params)) {# test if the param is a module name
+      if (!missing(module)) {
+        if (module %in% ls(sim@params[[param]], all.names = TRUE) ||
+            module %in% .knownDotParams) {
+          warning(reversalMessage)
+          module1 <- param
+          param <- module
+        }
+      } else {
+
+        # Module missing, only have parameter --> this could be old case of P(sim, module = "something")
+        if (param %in% ls(sim@params[[param]], all.names = TRUE) ||
+            module1 %in% ls(sim@params)) {
+          # module1 is in list of modules; param is not in parameters --> this is likely a reversal
+          warning(reversalMessage)
+          param <- NULL
+        }
+      }
+    } else {
+      module1 <- module
+    } # param is not a module name --> probably using new parameter order --> correct
+  } else {
+    param <- NULL
+    if (!missing(module))
+      module1 <- module
+  }
+  module <- module1
+
+  if (length(module) == 0) {
     return(sim@params)
   }
+
+  if (is.null(param)) {
+    return(sim@params[[module]])
+  } else {
+    return(sim@params[[module]][[param]])
+  }
+}
+
+#' @rdname params
+#' @export
+`P<-` <- function(sim, param, module, value) {
+  if (missing(sim)) stop("P takes a simList as first argument")
+  if (missing(module)) {
+    # first check if inside an event
+    module <- sim@current$moduleName
+    if (length(module) == 0) {
+      # then check if inside a .inputObjects call
+      inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
+      if (any(inSimInit)) {
+        module <- get("m", sys.frame(inSimInit[2]))
+      }
+    }
+    if (length(module) == 0) {
+      # if not in either place, it is a fail
+      stop("Please specify module")
+    }
+  }
+  if (missing(param)) {
+    if (is(value, "list")) {
+      if (all(names(P(sim, module = module)) %in% names(value))) {
+        sim@params[[module]] <- value
+      } else {
+        stop("Please specify param as an argument")
+      }
+    } else {
+      stop("Please specify param as an argument")
+    }
+  } else {
+    sim@params[[module]][[param]] <- value
+  }
+  return(sim)
 }
 
 ################################################################################
@@ -663,7 +766,7 @@ setGeneric("checkpointFile", function(sim) {
 setMethod("checkpointFile",
           signature = "simList",
           definition = function(sim) {
-            return(sim@params$.checkpoint$file)
+            return(sim@params$checkpoint$file)
 })
 
 #' @export
@@ -680,7 +783,7 @@ setGeneric("checkpointFile<-",
 setReplaceMethod("checkpointFile",
                  signature = "simList",
                  function(sim, value) {
-                   sim@params$.checkpoint$file <- value
+                   sim@params$checkpoint$file <- value
                    validObject(sim)
                    return(sim)
 })
@@ -700,7 +803,7 @@ setGeneric("checkpointInterval", function(sim) {
 setMethod("checkpointInterval",
           signature = "simList",
           definition = function(sim) {
-            return(sim@params$.checkpoint$interval)
+            return(sim@params$checkpoint$interval)
 })
 
 #' @export
@@ -717,7 +820,7 @@ setGeneric("checkpointInterval<-",
 setReplaceMethod("checkpointInterval",
                  signature = "simList",
                  function(sim, value) {
-                   sim@params$.checkpoint$interval <- value
+                   sim@params$checkpoint$interval <- value
                    validObject(sim)
                    return(sim)
 })
@@ -748,7 +851,7 @@ setReplaceMethod("checkpointInterval",
 #'   times = list(start=0.0, end=100.0),
 #'   params = list(.globals = list(stackName = "landscape"),
 #'   .progress = list(type = "text", interval = 10),
-#'   .checkpoint = list(interval = 10, file = "chkpnt.RData")),
+#'   checkpoint = list(interval = 10, file = "chkpnt.RData")),
 #'   modules = list("randomLandscapes"),
 #'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
 #'
@@ -758,7 +861,7 @@ setReplaceMethod("checkpointInterval",
 #'
 #' # parameters
 #' params(mySim) # returns all parameters in all modules
-#'               # including .global, .progress, .checkpoint
+#'               # including .global, .progress, checkpoint
 #' globals(mySim) # returns only global parameters
 #'
 #' # checkpoint
@@ -2885,3 +2988,6 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   }
   return(ret[])
 }
+
+
+.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")

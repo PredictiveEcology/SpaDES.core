@@ -15,7 +15,7 @@ utils::globalVariables(".")
 setGeneric(".unparsed",
            function(modules) {
              standardGeneric(".unparsed")
-})
+           })
 
 #' @rdname unparsed
 setMethod(
@@ -26,7 +26,7 @@ setMethod(
       (attr(x, "parsed") == FALSE)
     }) %>% `==`(., TRUE) %>% which()
     return(ids)
-})
+  })
 
 #' @param filename The filename of the module to be parsed.
 #'
@@ -51,7 +51,7 @@ setMethod(
 setGeneric(".parseModulePartial",
            function(sim, modules, filename, defineModuleElement, envir = NULL) {
              standardGeneric(".parseModulePartial")
-})
+           })
 
 #' @rdname parseModule
 setMethod(
@@ -93,7 +93,7 @@ setMethod(
       out <- NULL
     }
     return(out)
-})
+  })
 
 #' @rdname parseModule
 setMethod(
@@ -140,7 +140,7 @@ setMethod(
                                       envir = envir)
     }
     return(out)
-})
+  })
 
 #' Parse and initialize a module
 #'
@@ -174,7 +174,7 @@ setGeneric(".parseModule",
            function(sim, modules, userSuppliedObjNames = NULL, envir = NULL,
                     notOlderThan, ...) {
              standardGeneric(".parseModule")
-})
+           })
 
 #' @rdname parseModule
 setMethod(
@@ -253,8 +253,8 @@ setMethod(
                   "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
           #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
           out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                             sim@.xData$.mods,
-                             sim = sim)
+                                     sim@.xData$.mods,
+                                     sim = sim)
           #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
         }
 
@@ -410,7 +410,7 @@ setMethod(
           codeCheckMsgs <- c(codeCheckMsgs, mess)
         } ## End of code checking
 
-        lockBinding(mBase, sim@.xData$.mods)
+        # lockBinding(mBase, sim@.xData$.mods)
         names(sim@depends@dependencies)[[k]] <- mBase
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% mBase
@@ -464,7 +464,7 @@ setMethod(
 
     finishedClean <- TRUE
     return(sim)
-})
+  })
 
 #' @importFrom utils getParseData
 .parseConditional <- function(envir = NULL, filename = character()) {

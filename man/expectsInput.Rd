@@ -20,7 +20,10 @@ expectsInput(objectName, objectClass, desc, sourceURL, ...)
 
 \item{objectClass}{Character string to specify the input object's class.}
 
-\item{desc}{Text string providing a brief description of the input object.}
+\item{desc}{Text string providing a brief description of the input object.
+If there are extra spaces or carriage returns, these will be stripped,
+allowing for multi-line character strings without using \code{paste}
+or multiple quotes.}
 
 \item{sourceURL}{Character string to specify an URL to reach the input object,
 default is \code{NA}.}

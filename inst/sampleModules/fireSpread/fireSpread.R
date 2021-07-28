@@ -46,13 +46,13 @@ defineModule(sim, list(
                           "for the `init` event only."))
   ),
   inputObjects = bindrows(
-    expectsInput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
+    expectsInput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName, objectClass = "RasterStack",
                  desc = NA_character_, sourceURL = NA_character_),
     expectsInput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                  desc = NA_character_, sourceURL = NA_character_)
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = SpaDES.core::P(sim, "fireSpread")$stackName, objectClass = "RasterStack",
+    createsOutput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName, objectClass = "RasterStack",
                   desc = NA_character_, other = NA_character_),
     createsOutput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                   desc = NA_character_, other = NA_character_)

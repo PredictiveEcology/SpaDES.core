@@ -2,21 +2,15 @@
 % Please edit documentation in R/moduleCoverage.R
 \name{moduleCoverage}
 \alias{moduleCoverage}
-\alias{moduleCoverage,character,character-method}
-\alias{moduleCoverage,character,missing-method}
 \title{Calculate module coverage of unit tests}
 \usage{
-moduleCoverage(name, path)
-
-\S4method{moduleCoverage}{character,character}(name, path)
-
-\S4method{moduleCoverage}{character,missing}(name)
+moduleCoverage(mod, modulePath = "..")
 }
 \arguments{
-\item{name}{Character string. The module's name.}
+\item{mod}{Character string. The module's name. Default is \code{basename(getwd())}}
 
-\item{path}{Character string. The path to the module directory
-(default is the current working directory).}
+\item{modulePath}{Character string. The path to the module directory
+(default is "..", i.e., one level up from working directory).}
 }
 \value{
 Return a list of two coverage objects and two data.table objects.
@@ -42,16 +36,15 @@ To accurately test your module, the test filename must follow the format
 }
 \examples{
 \dontrun{
- library(igraph) # for \%>\%
- library(SpaDES.core)
- tmpdir <- file.path(tempdir(), "coverage")
- modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
- moduleName <- "forestAge" # sample module to test
- downloadModule(name = moduleName, path = modulePath) # download sample module
- testResults <- moduleCoverage(name = moduleName, path = modulePath)
- report(testResults$moduleCoverage)
- report(testResults$functionCoverage)
- unlink(tmpdir, recursive = TRUE)
+  tmpdir <- file.path(tempdir(), "coverage")
+  modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
+  moduleName <- "forestAge" # sample module to test
+  downloadModule(name = moduleName, path = modulePath) # download sample module
+  testResults <- moduleCoverage(name = moduleName, path = modulePath)
+  report(testResults$moduleCoverage)
+  report(testResults$functionCoverage)
+  unlink(tmpdir, recursive = TRUE)
+  mc1 <- moduleCoverage("Biomass_core", modulePath = "..")
 }
 }
 \seealso{

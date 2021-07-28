@@ -71,7 +71,9 @@ test_that("local mod object", {
       documentation = list("README.txt", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
-        defineParameter("testParB", "numeric", 2, NA, NA, "")
+        defineParameter("testParB", "numeric", 2, NA, NA, ""),
+        defineParameter("testParC", "numeric", 22, NA, NA, ""),
+        defineParameter("testParD", "numeric", 12, NA, NA, "")
       ),
       inputObjects = bindrows(
         expectsInput("sdf", "sdf", "sdfd")
@@ -82,14 +84,30 @@ test_that("local mod object", {
       ))
 
       doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
+      P(sim)$testParF <- 77
+      P(sim)$testParA <- 42
+      P(sim, "testParG") <- 79
+      P(sim, "testParH") <- 48
       switch(
       eventType,
       init = {
+      if (isTRUE(P(sim)$testParB >= 1100)) {
+         P(sim, "testParB") <-  P(sim)$testParB + 756
+      }
+
+
+      if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
+        stop("testing restartSpades")#browser()
+      }
+
       mod$a <- 1
       sim$testPar2 <- Par$testParB
       sim <- scheduleEvent(sim, start(sim), "test2", "event1", .skipChecks = TRUE)
       },
       event1 = {
+      if (isTRUE(P(sim)$testParB >= 1100)) {
+         P(sim, "testParB") <-  P(sim)$testParB + 800
+      }
       mod$b <- mod$a + 1
       mod$y <- paste0(mod$y, " is test2")
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
@@ -97,6 +115,13 @@ test_that("local mod object", {
       return(invisible(sim))
       }
       .inputObjects <- function(sim) {
+      if (isTRUE(P(sim)$testParB >= 543)) {
+         P(sim, "testParB") <-  P(sim)$testParB + 654
+      }
+
+      if (isTRUE(P(sim)$testParB > 321321)) {
+         P(sim, "checkpoint")
+      }
       mod$y <- "This module"
         return(sim)
       }
@@ -157,4 +182,53 @@ test_that("local mod object", {
   expect_true(is.null(out4$.mods$test2$.objects$x))
   expect_true(!is.null(out4$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
   expect_true(out4$.mods$test2$.objects$y == "This module is test2")
+
+  # Test P replace method
+  mySim3 <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                   params = list(.globals = list(testParB = 543)))
+
+  # Need "Copy" in this sequence because the event queue is actually an environment :)
+  #   so the LHS will have the updated event queue, but the parameters will be at initial conditions
+  expect_true(P(mySim3)$test2$testParB == 1197) # .globals + .inputObjects
+  mySim4 <- spades(Copy(mySim3), events = "init")
+  expect_true(P(mySim4)$test2$testParB == 1953) ## .globals + .inputObjects + init
+  mySim4 <- spades(Copy(mySim3))
+  expect_true(P(mySim4)$test2$testParB == 1953 + 800) # # .globals + .inputObjects + init + event1 ran
+
+  mySim5 <- Cache(spades, Copy(mySim3)) # should get cached -- event1 runs 1x
+  expect_true(P(mySim5)$test2$testParB == 1953 + 800)
+
+  end(mySim5) <- 1
+  mySim6 <- Cache(spades, Copy(mySim5)) # doesn't change because only test1 is scheduled
+  expect_true(P(mySim6)$test2$testParB == 1953 + 800)
+
+  end(mySim6) <- 2
+  mySim7 <- Cache(spades, Copy(mySim6)) # should get cached
+  expect_true(P(mySim7)$test2$testParB == 1953 + 800 * 2)
+
+  warns <- capture_warnings(mySim3 <- simInit(times = list(start = 0, end = 0),
+                    paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                    params = list(.globals = list(testParB = 321321))))
+  expect_true(grepl("P has changed", warns))
+  # test different ways of setting parameters
+  expect_true(identical(P(mySim7, module = "test2", "testParA"), 42))
+  expect_true(identical(P(mySim7, module = "test2", "testParF"), 77))
+  expect_true(identical(P(mySim7, module = "test2", "testParG"), 79))
+  expect_true(identical(P(mySim7, module = "test2", "testParH"), 48))
+  # expect_true(identical(P(mySim7, module = "test2", "testParAB"), 234))
+
+  # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
+  if (interactive()) {
+    mySim8 <- simInit(times = list(start = 0, end = 0),
+                      paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                      params = list(test2 = list(testRestartSpades = 1)))
+    err <- capture_error(ss <- spades(mySim8))
+
+    err <- capture_error(sim2 <- restartSpades(.pkgEnv$.sim)) # is missing completed events
+    err <- capture_error(sim3 <- restartSpades(.pkgEnv$.sim)) # is missing completed events
+    .pkgEnv$.sim@params$test2$testRestartSpades <- NULL
+    sim3 <- restartSpades(.pkgEnv$.sim)
+    expect_true(NROW(completed(sim3)) == 7)
+  }
 })

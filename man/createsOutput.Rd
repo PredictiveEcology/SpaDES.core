@@ -17,7 +17,10 @@ createsOutput(objectName, objectClass, desc, ...)
 
 \item{objectClass}{Character string to specify the output object's class.}
 
-\item{desc}{Text string providing a brief description of the output object.}
+\item{desc}{Text string providing a brief description of the output object.
+If there are extra spaces or carriage returns, these will be stripped,
+allowing for multi-line character strings without using \code{paste}
+or multiple quotes.}
 
 \item{...}{Other specifications of the output object.}
 }
