@@ -42,19 +42,17 @@ See details.}
 and a new one made; if \code{FALSE}, then the \code{...} plots will be
 added to the current device, adding or rearranging the plot layout
 as necessary. Default is \code{FALSE}. This currently works best if
-there is only one object being plotted in a given \code{Plot} call. However,
+there is only one object being plotted in a given Plot call. However,
 it is possible to pass a list of logicals to this, matching the
 length of the ... objects. Use \code{clearPlot} to clear the whole
-plotting device. NOTE if \code{TRUE}: \emph{Everything that was there,
-including the legend and the end points of the colour palette, will
-be removed and re-initiated}.}
+plotting device.}
 
 \item{addTo}{Character vector, with same length as \code{...}.
 This is for overplotting, when the overplot is not to occur on
 the plot with the same name, such as plotting a
 \code{SpatialPoints*} object on a \code{RasterLayer}.}
 
-\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot:grid-functions]{gpar}},
+\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot]{gpar}} function,
 to change plotting parameters (see \pkg{grid} package).}
 
 \item{gpText}{A \code{gpar} object for the title text.
@@ -63,7 +61,8 @@ Default \code{gpar(col = "black")}.}
 \item{gpAxis}{A \code{gpar} object for the axes.
 Default \code{gpar(col = "black")}.}
 
-\item{axes}{Logical or \code{"L"}, representing the left and bottom axes, over all plots.}
+\item{axes}{Logical or \code{"L"}, representing the left and bottom axes,
+over all plots.}
 
 \item{speedup}{Numeric. The factor by which the number of pixels is divided
 by to plot rasters. See Details.}
@@ -113,12 +112,12 @@ not the title. Default NULL, which means print the object
 name as title, if no other already exists on the plot, in
 which case, keep the previous title.}
 
-\item{na.color}{Character string indicating the colour for \code{NA} values.
+\item{na.color}{Character string indicating the color for \code{NA} values.
 Default transparent.}
 
-\item{zero.color}{Character string indicating the colour for zero values,
+\item{zero.color}{Character string indicating the color for zero values,
 when zero is the minimum value, otherwise, zero is
-treated as any other colour. Default transparent.}
+treated as any other color. Default transparent.}
 
 \item{length}{Numeric. Optional length, in inches, of the arrow head.}
 
