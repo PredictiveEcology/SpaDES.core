@@ -410,7 +410,7 @@ setMethod(
           codeCheckMsgs <- c(codeCheckMsgs, mess)
         } ## End of code checking
 
-        lockBinding(mBase, sim@.xData$.mods)
+        # lockBinding(mBase, sim@.xData$.mods)
         names(sim@depends@dependencies)[[k]] <- mBase
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% mBase

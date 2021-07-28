@@ -30,6 +30,7 @@
 #' @author Yong Luo
 #' @export
 #' @importFrom data.table data.table
+#' @importFrom reproducible file.move
 #' @include simList-class.R
 #' @rdname moduleCoverage
 #'
@@ -47,7 +48,6 @@
 #' }
 moduleCoverage <- function(mod, modulePath = "..") {
   if (requireNamespace("testthat")) {
-    require("testthat")
     if (is.null(getOption("testthat.progress.max_fails"))) {
       options(testthat.progress.max_fails = Inf)
     }

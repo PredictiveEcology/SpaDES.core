@@ -590,11 +590,11 @@ setMethod(
         ## run .inputObjects() for each module
         if (is.character(getOption("spades.covr", FALSE))  ) {
           mod <- getOption("spades.covr")
-          tf <- tmpfile();
+          tf <- tempfile();
           if (is.null(notOlderThan)) notOlderThan <- "NULL"
           cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "',m,'", notOlderThan = ',notOlderThan,')'))
           # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-          unlockBinding(mod, sim$.mods)
+          # unlockBinding(mod, sim$.mods)
           if (length(objects))
             list2env(objects, envir(sim))
           sim$.mods[[mod]]$sim <- sim

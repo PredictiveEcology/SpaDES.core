@@ -471,9 +471,10 @@ setReplaceMethod("params",
 #' @aliases simList-accessors-params
 #' @export
 #' @importFrom reproducible .grepSysCalls
+#' @importFrom utils getSrcFilename
 #' @include simList-class.R
 #' @rdname params
-P <- function(sim, module, param) UseMethod("P")
+P <- function(sim, param, module) UseMethod("P")
 
 #' @export
 P.simList <- function(sim, param, module) {
@@ -503,7 +504,7 @@ P.simList <- function(sim, param, module) {
         while (whereInSC > 1) {
           poss <- scalls[whereInSC - 1]
           fn <- as.character(poss[[1]][[1]])
-          fn <- try(get(fn, envir = sys.frames()[whereInSC - 1][[1]]))
+          fn <- try(get(fn, envir = sys.frames()[whereInSC - 1][[1]]), silent = TRUE)
           if (!is(fn, "try-error")) {
 
             modulePath <- getSrcFilename(fn, full.names = TRUE)

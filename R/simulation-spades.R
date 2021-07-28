@@ -870,10 +870,10 @@ setMethod(
 
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
       modNam <- getOption("spades.covr")
-      tf <- tmpfile();
+      tf <- tempfile();
       on.exit(unlink(tf))
       cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-      unlockBinding(modNam, sim$.mods)
+      # unlockBinding(modNam, sim$.mods)
       sim$.mods[[modNam]]$sim <- sim
       opts <- options("spades.covr2" = FALSE) # turn off this chunk 2nd time through
       on.exit(options(opts), add = TRUE)

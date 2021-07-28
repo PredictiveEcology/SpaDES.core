@@ -20,7 +20,7 @@ params(sim) <- value
 
 \S4method{params}{simList}(sim) <- value
 
-P(sim, module, param)
+P(sim, param, module)
 
 P(sim, param, module) <- value
 
@@ -34,9 +34,9 @@ in which to replace element(s).}
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 
-\item{module}{Optional character string indicating which module params should come from.}
-
 \item{param}{Optional character string indicating which parameter to choose.}
+
+\item{module}{Optional character string indicating which module params should come from.}
 
 \item{asDF}{Logical. For \code{parameters}, if TRUE, this will produce a single
 data.frame of all model parameters. If FALSE, then it will return
