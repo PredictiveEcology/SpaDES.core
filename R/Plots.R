@@ -37,15 +37,14 @@
 #' argument (e.g., \code{""} will omit all saving).
 #'
 #' @export
-#' @param data An arbitrary data object. It should be used inside the \code{Plots}
-#'   function, and should contain all the data required for the inner plotting. If passing a `RasterLayer`
-#'   and using \code{quickPlot::Plot}, it may be a good idea to set \code{names(RasterLayer)} so that
-#'   multiple layers can be plotted without overlapping eachother. See example.
+#' @param data An (optional) arbitrary data object. If supplied, it will be passed as
+#'   the first argument to \code{Plot} function, and should contain all the data
+#'   required for the inner plotting. If passing a `RasterLayer`,
+#'   it may be a good idea to set \code{names(RasterLayer)} so that
+#'   multiple layers can be plotted without overlapping eachother. When a custom `fn`
+#'   is used and all arguments for `fn` are supplied and named, then this can be omitted.
+#'   See examples.
 #' @param fn An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}
-#' @param data An arbitrary data object. It will be passed as the first
-#'   argument to \code{Plot}. When a custom `fn` is used and all arguments are supplied
-#'   and named, then this can be omitted.
-#' @param fn An arbitrary plotting function e.g., to make a `ggplot` object.
 #' @param filename A name that will be the base for the files that will be saved, i.e,
 #'   do not supply the file extension, as this will be determined based on \code{types}.
 #'   If a user provides this as an absolute path, it will override the \code{path}
