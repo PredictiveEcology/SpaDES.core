@@ -557,6 +557,7 @@ test_that("conflicting function types", {
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
   expect_true(all(grepl(mm,
                         pattern = c(paste0(m, ": module code: b is declared in metadata outputObjects|",
+                                           "so not checking minimum package|",
                                            m, ": module code: a is declared in metadata inputObjects|",
                                            "Running .inputObjects|",
                                            "Setting:|Paths set to:|",
@@ -666,7 +667,8 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
   x2 <- lapply(sns, function(sn) {
     slot(mySim@depends@dependencies[[m]], sn)
   })
-  expect_true(any(unlist(lapply(x2, function(v) grepl("  |\n", v)))))
+  # Now extra spaces are removed automatically on load
+  expect_false(any(unlist(lapply(x2, function(v) grepl("  |\n", v)))))
   x2 <- rmExtraSpacesEOLList(x2)
   expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
   expect_false(any(unlist(lapply(x2, function(v) grepl("  |\n", v)))))

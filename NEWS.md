@@ -1,18 +1,7 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.0.8.9001
-=============
 
-## new features
-* none
-
-## dependencies
-* no changes
-
-## bug fixes
-* Plots - fixed issues with plot layer names and plot overlaying when passing `data` only (e.g. `quickPlot::Plot`-like behaviour) 
-
-version 1.0.8.9000
+version 1.0.9
 =============
 
 ## new features
@@ -34,6 +23,8 @@ version 1.0.8.9000
 * When `.inputObjects` was cached (via setting `useCache = '.inputObjects'` parameter), it was "too sensitive". Changes to any module's parameters, not just the current module, would cause rerun of `.inputObjects`. Now it correctly identifies parameter changes only in the current module. THIS WILL CAUSE some existing caches to trigger a rerun once; after this, it will be less sensitive
 * `restartSpades` did not correctly deal with objects that did not yet exist prior to the event. Fixed with: 24b9cd12973aa81a9a4923a02225e095fa28f77a
 * `restartSpades` was losing the previous completed events list. This has been fixed; it is now kept after `restartSpades`
+* Plots - fixed issues with plot layer names and plot overlaying when passing `data` only (e.g. `quickPlot::Plot`-like behaviour)
+* `simInitAndSpades` now has `.plots` arg to match `spades`
 
 version 1.0.8
 =============
