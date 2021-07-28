@@ -571,7 +571,7 @@ P.simList <- function(sim, param, module) {
 
 #' @rdname params
 #' @export
-`P<-` <- function(value, sim, param, module) {
+`P<-` <- function(sim, param, module, value) {
   if (missing(sim)) stop("P takes a simList as first argument")
   if (missing(module)) {
     # first check if inside an event

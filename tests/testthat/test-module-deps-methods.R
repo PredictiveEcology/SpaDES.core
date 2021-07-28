@@ -44,7 +44,8 @@ test_that("defineModule correctly handles different inputs", {
     )
   )
 
-  expect_true(any(unlist(lapply(x1, function(v)
+  # This is now corrected automatically
+  expect_false(any(unlist(lapply(x1, function(v)
     grepl("  |\n", v)))))
   x1 <- rmExtraSpacesEOLList(x1)
   expect_false(any(unlist(lapply(x1, function(v)
