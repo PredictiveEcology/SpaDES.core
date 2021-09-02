@@ -25,7 +25,7 @@ outputs(sim) # To see that it was saved, when, what filename.
 tempObj2 <- paste("val",1:10)
 df1 <- data.frame(col1 = tempObj, col2 = tempObj2)
 sim <- simInit(objects = c("tempObj", "tempObj2", "df1"),
-  paths=list(outputPath = tmpdir))
+  paths = list(outputPath = tmpdir))
 outputs(sim) = data.frame(
      objectName = c(rep("tempObj", 2), rep("tempObj2", 3), "df1"),
      saveTime = c(c(1,4), c(2,6,7), end(sim)),
@@ -34,7 +34,7 @@ outputs(sim) = data.frame(
      stringsAsFactors = FALSE)
 # since write.csv has a default of adding a column, x, with rownames, must add additional
 #   argument for 6th row in data.frame (corresponding to the write.csv function)
-outputArgs(sim)[[6]] <- list(row.names=FALSE)
+outputArgs(sim)[[6]] <- list(row.names = FALSE)
 sim <- spades(sim)
 outputs(sim)
 
@@ -62,7 +62,7 @@ if (require(rgdal)) {
   outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
   simOut <- spades(sim)
   outputs(simOut)
-  newRas <- raster(dir(tmpdir, full.name = TRUE, pattern = ".tif"))
+  newRas <- raster(dir(tmpdir, full.name = TRUE, pattern = ".tif")[1])
   all.equal(newRas, ras) # Should be TRUE
 }
 # Clean up after
