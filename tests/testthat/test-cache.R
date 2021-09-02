@@ -516,14 +516,14 @@ test_that("test showSimilar", {
   mess <- capture_messages({
     out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_true(any(grepl("This call to cache differs", mess))) ## TODO: no longer true; confirm why.
+  expect_true(any(grepl("Cache of.*differs", mess))) ## TODO: no longer true; confirm why.
   mySim$a <- 2
   mess <- capture_messages({
     out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_true(any(grepl("This call to cache differs", mess))) ## TODO: no longer true; confirm why.
+  expect_true(any(grepl("Cache of.*differs", mess))) ## TODO: no longer true; confirm why.
   mess <- capture_messages({
     out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_false(any(grepl("This call to cache differs", mess)))
+  expect_false(any(grepl("Cache of.*differs", mess)))
 })
