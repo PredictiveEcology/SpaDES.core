@@ -13,7 +13,7 @@ URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2021-07-28
-Version: 1.0.8.9014
+Version: 1.0.9
 Authors@R: c(
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -32,7 +32,7 @@ Authors@R: c(
 Depends:
     R (>= 3.6),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.7)
+    reproducible (>= 1.2.8)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -120,4 +120,4 @@ Collate:
     'suppliedElsewhere.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

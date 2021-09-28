@@ -195,6 +195,8 @@ test_that("test module-level cache", {
 })
 
 test_that("test .prepareOutput", {
+  skip_if_not_installed("SpaDES.tools")
+
   testInitOut <- testInit("raster", smcc = FALSE)
   opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({

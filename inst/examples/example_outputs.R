@@ -22,7 +22,7 @@ sim <- spades(sim)
 outputs(sim) # To see that it was saved, when, what filename.
 
 # can do highly variable saving
-tempObj2 <- paste("val",1:10)
+tempObj2 <- paste("val", 1:10)
 df1 <- data.frame(col1 = tempObj, col2 = tempObj2)
 sim <- simInit(objects = c("tempObj", "tempObj2", "df1"),
   paths = list(outputPath = tmpdir))
