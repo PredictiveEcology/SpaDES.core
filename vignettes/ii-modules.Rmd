@@ -301,7 +301,6 @@ Modules may also include `"save"` and `"plot"` events, though these are optional
 ## sample event functions from the default `randomLandscapes` module
 library(raster)
 if (require(SpaDES.tools)) {
-
   randomLandscapesInit <- function(sim) {
     if (is.null(params(sim)$randomLandscapes$inRAM)) {
       inMemory <- FALSE
@@ -381,7 +380,7 @@ mySim <- simInit(
   ) %>% 
   spades()
 dev.off()
-unlink(ftmp)
+unlink(normalizePath(ftmp))
 ```
   
 ```{r eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7}
@@ -666,7 +665,7 @@ params(mySim)$randomLandscapes$.saveInitialTime
 params(mySim)$randomLandscapes$.saveInterval
 params(mySim)$randomLandscapes$.saveObjects
 params(mySim)$randomLandscapes$.savePath
-ftmp <- file.path(tempdir(), "spades_vignetteOutputs")
+ftmp <- tempfile(pattern = "spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
 mySim2 <- spades(mySim)
@@ -679,7 +678,7 @@ outputs(mySim) <- data.frame(
 })))
 mySim2 <- spades(mySim)
 dev.off()
-unlink(ftmp)
+unlink(normalizePath(ftmp))
 ```
 
 Saving within a module -- scheduling save events.

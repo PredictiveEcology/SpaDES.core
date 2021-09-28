@@ -127,7 +127,6 @@ P(mySim)$N  # Only one parameter if used within a module
 #  ## sample event functions from the default `randomLandscapes` module
 #  library(raster)
 #  if (require(SpaDES.tools)) {
-#  
 #    randomLandscapesInit <- function(sim) {
 #      if (is.null(params(sim)$randomLandscapes$inRAM)) {
 #        inMemory <- FALSE
@@ -198,7 +197,7 @@ mySim <- simInit(
   ) %>% 
   spades()
 dev.off()
-unlink(ftmp)
+unlink(normalizePath(ftmp))
 
 ## ----eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7----
 # overview of the events in the simulation
@@ -305,7 +304,7 @@ params(mySim)$randomLandscapes$.saveInitialTime
 params(mySim)$randomLandscapes$.saveInterval
 params(mySim)$randomLandscapes$.saveObjects
 params(mySim)$randomLandscapes$.savePath
-ftmp <- file.path(tempdir(), "spades_vignetteOutputs")
+ftmp <- tempfile(pattern = "spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
 mySim2 <- spades(mySim)
@@ -318,7 +317,7 @@ outputs(mySim) <- data.frame(
 })))
 mySim2 <- spades(mySim)
 dev.off()
-unlink(ftmp)
+unlink(normalizePath(ftmp))
 
 ## ----save-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
 #  ### WITHIN A MODULE:
