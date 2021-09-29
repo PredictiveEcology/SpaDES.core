@@ -16,7 +16,7 @@ See `NEWS.md` for a full list of changes.
 
 ### Current R versions
 * macOS 10.15.7 Catalina       (GitHub), R 4.1.1
-* macOS 11.1 Big Sur            (local), R 4.1.1
+* macOS 11.6 Big Sur            (local), R 4.1.1
 * macOs (m1) Big Sur             (rhub), R 4.1.1
 * Ubuntu 20.04                 (GitHub), R 4.1.1
 * Ubuntu 20.04                  (local), R 4.1.1
