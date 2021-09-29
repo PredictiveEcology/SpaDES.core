@@ -1,6 +1,8 @@
-## Updated release
+## Maintenance release
 
 This release fixes several issue detected by CRAN checks.
+I was unable to reproduce the previous errors seen on Fedora and Solaris.
+Checks using `rhub` for those platforms came back clean.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
@@ -32,21 +34,13 @@ See `NEWS.md` for a full list of changes.
 
 There are no ERRORs nor WARNINGs.
 
-There were 2 NOTEs:
+There was 1 NOTEs:
 
 1. Some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
           workflow (6:58)
           workflows (10:64)
-
-2. Temporarily unavailable CRAN URL, because package was previously archived.
-
-        Found the following (possibly) invalid URLs:
-          URL: https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html
-          From: man/spades.Rd
-          Status: 404
-          Message: Not Found
 
 ## Downstream dependencies
 
