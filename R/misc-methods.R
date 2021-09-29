@@ -32,7 +32,7 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom utils modifyList
+#' @importFrom Require modifyList2
 #' @rdname updateList
 #'
 updateList <- function(x, y) {
@@ -41,7 +41,7 @@ updateList <- function(x, y) {
   if (missing(y)) y <- list()
   if (is.null(y)) y <- list()
   if (is.null(x)) x <- list()
-  modifyList(x = x, val = y)
+  modifyList2(x = x, val = y)
 }
 
 
