@@ -31,7 +31,7 @@ progressType(sim) <- value
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{The object to be stored at the slot.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
 \description{
 The progress bar can be set in two ways in SpaDES. First, by setting values
@@ -52,7 +52,7 @@ mySim <- simInit(
   times = list(start=0.0, end=100.0),
   params = list(.globals = list(stackName = "landscape"),
   .progress = list(type = "text", interval = 10),
-  .checkpoint = list(interval = 10, file = "chkpnt.RData")),
+  checkpoint = list(interval = 10, file = "chkpnt.RData")),
   modules = list("randomLandscapes"),
   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
 
@@ -62,7 +62,7 @@ progressInterval(mySim) # 10
 
 # parameters
 params(mySim) # returns all parameters in all modules
-              # including .global, .progress, .checkpoint
+              # including .global, .progress, checkpoint
 globals(mySim) # returns only global parameters
 
 # checkpoint

@@ -8,6 +8,7 @@
 \alias{params<-}
 \alias{params<-,simList-method}
 \alias{P}
+\alias{P<-}
 \alias{parameters,simList-method}
 \title{Get and set simulation parameters}
 \usage{
@@ -19,7 +20,9 @@ params(sim) <- value
 
 \S4method{params}{simList}(sim) <- value
 
-P(sim, module, param)
+P(sim, param, module)
+
+P(sim, param, module) <- value
 
 parameters(sim, asDF = FALSE)
 
@@ -29,11 +32,11 @@ parameters(sim, asDF = FALSE)
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{The object to be stored at the slot.}
-
-\item{module}{Optional character string indicating which module params should come from.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 
 \item{param}{Optional character string indicating which parameter to choose.}
+
+\item{module}{Optional character string indicating which module params should come from.}
 
 \item{asDF}{Logical. For \code{parameters}, if TRUE, this will produce a single
 data.frame of all model parameters. If FALSE, then it will return
@@ -55,7 +58,7 @@ NOT the current values that may be overwritten by a user. See examples.
 The differences between P, params and being explicit with passing arguments
 are mostly a question of speed and code compactness.
 The computationally fastest way to get a parameter is to specify moduleName and parameter name, as in:
-\code{P(sim, "moduleName", "paramName")} (replacing moduleName and paramName with your
+\code{P(sim, "paramName", "moduleName")} (replacing moduleName and paramName with your
 specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
 part for speed (e.g., 2-4x faster) is specifying the moduleName.
 Specifying the parameter name is <5\% faster.

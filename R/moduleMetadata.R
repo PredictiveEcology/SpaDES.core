@@ -291,3 +291,14 @@ rmExtraSpacesEOLList <- function(xx) {
 
   xx
 }
+
+rmExtraSpacesEOLCollapse <- function(lis, useOnlyUnnamed = TRUE) {
+  # moreDesc <- list(...)
+  if (isTRUE(useOnlyUnnamed))
+    if (!is.null(names(lis))) {
+      lis <- lis[!nzchar(names(lis))]
+    }
+  lis <- unlist(lis)
+  lis <- paste(lis, collapse = "")
+  lis <- rmExtraSpacesEOL(lis)
+}

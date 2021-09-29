@@ -1,14 +1,14 @@
 #' @importFrom stats na.omit
 doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    ids <- na.omit(match(names(P(sim, ".progress")), c("type", "interval")))
+    ids <- na.omit(match(names(P(sim, module = ".progress")), c("type", "interval")))
     if (interactive()) {
       tu <- sim@simtimes[["timeunit"]]
       defaults <- list(type = "text", interval = (end(sim, tu) - start(sim, tu)) / (end(sim, tu) - start(sim, tu)))
 
       # Check whether a .progress is specified in the simList
-      if ( is.null(P(sim, ".progress")$type) &&
-             is.null(P(sim, ".progress")$interval) ) {
+      if ( is.null(P(sim, module = ".progress")$type) &&
+             is.null(P(sim, module = ".progress")$interval) ) {
         sim@params[[".progress"]] <- defaults
       } else {
         sim@params[[".progress"]][names(defaults)[-ids]] <- defaults[-ids]
@@ -20,7 +20,7 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
     }
 
     # if NA then don't use progress bar
-    if (any(!is.na(P(sim, ".progress")))) {
+    if (any(!is.na(P(sim, module = ".progress")))) {
       newProgressBar(sim)
       sim <- scheduleEvent(sim, start(sim, tu), "progress", "set", .last())
       sim <- scheduleEvent(sim, end(sim, tu), "progress", "set", .last())
@@ -30,7 +30,7 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
       setProgressBar(sim)
 
       # schedule the next save
-      timeNextUpdate <- time(sim, sim@simtimes[["timeunit"]]) + P(sim, ".progress")$interval
+      timeNextUpdate <- time(sim, sim@simtimes[["timeunit"]]) + P(sim, module = ".progress")$interval
 
       sim <- scheduleEvent(sim, timeNextUpdate, "progress", "set", .last())
   } else {
@@ -62,7 +62,7 @@ newProgressBar <- function(sim) {
   }
   tu <- sim@simtimes[["timeunit"]]
   OS <- tolower(Sys.info()["sysname"])
-  wantGraphical <- isTRUE(P(sim, ".progress")$type == "graphical")
+  wantGraphical <- isTRUE(P(sim, module = ".progress")$type == "graphical")
   if (!requireNamespace("tcltk", quietly = TRUE)) {
     if (wantGraphical && (OS != "windows")) {
       warning("Can't use graphical progress bar without tcltk package: ",
@@ -80,10 +80,10 @@ newProgressBar <- function(sim) {
       pb <- tcltk::tkProgressBar(min = start(sim, tu), max = end(sim, tu),
                           initial = start(sim, tu))
     }
-  } else if (P(sim, ".progress")$type == "shiny") {
+  } else if (P(sim, module = ".progress")$type == "shiny") {
     ## see https://shiny.rstudio.com/articles/progress.html
     stop("shiny progress bar not yet implemented")
-  } else  if (P(sim, ".progress")$type == "text") {
+  } else  if (P(sim, module = ".progress")$type == "text") {
     pb <- utils::txtProgressBar(min = start(sim, tu), max = end(sim, tu),
                          initial = start(sim, tu), char = ".", style = 3)
   }
@@ -96,7 +96,7 @@ setProgressBar <- function(sim) {
   OS <- tolower(Sys.info()["sysname"])
   tu <- sim@simtimes[["timeunit"]]
   pb <- get(".pb", envir = .pkgEnv)
-  wantGraphical <- isTRUE(P(sim, ".progress")$type == "graphical")
+  wantGraphical <- isTRUE(P(sim, module = ".progress")$type == "graphical")
   if (!requireNamespace("tcltk", quietly = TRUE)) {
     if (wantGraphical && (OS != "windows")) {
       warning("Can't use graphical progress bar without tcltk package: ",
@@ -119,10 +119,10 @@ setProgressBar <- function(sim) {
                                      round(time(sim, tu), 3),
                                      "of total", end(sim, tu)))
     }
-  } else if (P(sim, ".progress")$type == "shiny") {
+  } else if (P(sim, module = ".progress")$type == "shiny") {
     ## see https://shiny.rstudio.com/articles/progress.html
     stop("shiny progress bar not yet implemented")
-  } else if (P(sim, ".progress")$type == "text") {
+  } else if (P(sim, module = ".progress")$type == "text") {
     utils::setTxtProgressBar(pb, round(time(sim, tu), 3))
   }
   assign(".pb", pb, envir = .pkgEnv)

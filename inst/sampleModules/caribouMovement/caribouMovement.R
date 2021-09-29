@@ -44,7 +44,7 @@ defineModule(sim, list(
                           "for the `init` event only."))
   ),
   inputObjects = bindrows(
-    expectsInput(objectName = SpaDES.core::P(sim, "caribouMovement")$stackName,
+    expectsInput(objectName = SpaDES.core::P(sim, module = "caribouMovement")$stackName,
                  objectClass = "RasterStack", desc = "layername = \"habitatQuality\"",
                  sourceURL = NA_character_),
     expectsInput(objectName = "caribou",

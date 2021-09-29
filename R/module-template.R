@@ -162,7 +162,7 @@ setMethod(
                   type = type, children = children)
 
     if (type == "child" && unitTests) {
-      newModuleTests(name = name, path = path, open = !.isFALSE(open), useGitHub = useGitHub)
+      newModuleTests(name = name, path = path, open = !isFALSE(open), useGitHub = useGitHub)
     }
 
     ### Make R Markdown file for module documentation

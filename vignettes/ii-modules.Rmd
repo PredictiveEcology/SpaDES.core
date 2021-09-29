@@ -226,16 +226,15 @@ mySim <- simInit(times = times, params = parameters, modules = modules,
                  objects = objects, paths = paths)
 
 # Access parameters
-params(mySim)               # shows all parameters
-P(mySim)                    # same, but more concise
-P(mySim, "caribouMovement") # only parameters in caribouMovement
+P(mySim)                    # shows all parameters
+P(mySim, module = "caribouMovement") # only parameters in caribouMovement module
 P(mySim)$caribouMovement    # same
 P(mySim)$caribouMovement$N  # Only one parameter
 
 # If used within the module source code, then module name can be omitted:
 # This will return NULL here, but will return the actual value if used
 # in a module
-P(mySim)$N  # Only one parameter
+P(mySim)$N  # Only one parameter if used within a module
 ```
 
 ### Event types
@@ -302,7 +301,6 @@ Modules may also include `"save"` and `"plot"` events, though these are optional
 ## sample event functions from the default `randomLandscapes` module
 library(raster)
 if (require(SpaDES.tools)) {
-
   randomLandscapesInit <- function(sim) {
     if (is.null(params(sim)$randomLandscapes$inRAM)) {
       inMemory <- FALSE
@@ -382,7 +380,7 @@ mySim <- simInit(
   ) %>% 
   spades()
 dev.off()
-unlink(ftmp)
+unlink(normalizePath(ftmp))
 ```
   
 ```{r eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7}
@@ -667,7 +665,7 @@ params(mySim)$randomLandscapes$.saveInitialTime
 params(mySim)$randomLandscapes$.saveInterval
 params(mySim)$randomLandscapes$.saveObjects
 params(mySim)$randomLandscapes$.savePath
-ftmp <- file.path(tempdir(), "spades_vignetteOutputs")
+ftmp <- tempfile(pattern = "spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
 mySim2 <- spades(mySim)
@@ -676,11 +674,11 @@ mySim2 <- spades(mySim)
 outputs(mySim) <- data.frame(
   objectName = "landscape", fun = "writeRaster", package = "raster",
   saveTime = c(3,6), arguments = I(lapply(c(3,6), function(x) {
-    list(dataType = "FLT4S", format = "raster", overwrite = TRUE)
+    list(datatype = "FLT4S", format = "raster", overwrite = TRUE)
 })))
 mySim2 <- spades(mySim)
 dev.off()
-unlink(ftmp)
+unlink(normalizePath(ftmp))
 ```
 
 Saving within a module -- scheduling save events.

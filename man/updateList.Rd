@@ -20,18 +20,6 @@ replace the values in list \code{x}.
 Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
 \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
 }
-\examples{
-L1 <- list(a = "hst", b = NA_character_, c = 43)
-L2 <- list(a = "gst", c = 42, d = list(letters))
-updateList(L1, L2)
-
-updateList(L1, NULL)
-updateList(L1)
-updateList(y = L2)
-updateList(NULL, L2)
-updateList(NULL, NULL) # should return empty list
-
-}
 \author{
 Alex Chubaty
 }

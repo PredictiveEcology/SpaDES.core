@@ -23,6 +23,7 @@ if (!isGeneric(".robustDigest")) {
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
 #' @importFrom fastdigest fastdigest
+#' @importFrom Require modifyList2
 #' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
@@ -81,7 +82,7 @@ setMethod(
       names(objects2) <- mods
       .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
       if (length(objects1ByModWhole))
-        .objects <- suppressWarnings(updateList(.objects, objects1ByModWhole))
+        .objects <- suppressWarnings(modifyList2(.objects, objects1ByModWhole))
     } else {
       .objects <- allObjsInSimList
     }
@@ -410,7 +411,7 @@ setMethod(
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
-      whSimList2 <- if (is.null(internalSimList) || .isFALSE(internalSimList)) {
+      whSimList2 <- if (is.null(internalSimList) || isFALSE(internalSimList)) {
         1
       } else {
         # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st

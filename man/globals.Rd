@@ -31,7 +31,7 @@ G(sim) <- value
 \item{sim}{A \code{simList} object from which to extract element(s) or
 in which to replace element(s).}
 
-\item{value}{The object to be stored at the slot.}
+\item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
 \description{
 \code{globals}, and the alias \code{G}, accesses or sets the "globals"

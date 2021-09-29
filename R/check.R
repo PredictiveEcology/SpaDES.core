@@ -178,7 +178,7 @@ setMethod(
         #if (length(globalParams) > 0) {
           for (i in seq(globalParams)) {
             gP <- names(globalParams[i])
-            result <- grep(gP, readFile[[uM]], value = FALSE)
+            result <- grep(gP, readFile[[uM]], value = FALSE, fixed = TRUE)
             if (length(result) > 0) {
               globalsFound <- append(globalsFound, gP)
             }
@@ -187,16 +187,25 @@ setMethod(
 
         # check user params
         userParams <- params[[uM]][-which(names(params[[uM]]) %in% coreParams)]
-        #if (length(userParams) > 0) {
-          for (i in seq(userParams)) {
-            uP <- names(userParams[i])
-            result <- grep(uP, readFile[[uM]], value = FALSE)
-            if (length(result) <= 0) {
-              allFound <- FALSE
-              message(paste("Parameter", uP, "is not used in module", uM))
-            }
-          }
-        #}
+        collapsedSrc <- paste(readFile[[uM]], collapse = "");
+        isInCode <- sapply(names(userParams), function(pp) grepl(pp, collapsedSrc, fixed = TRUE))
+        if (any(!isInCode)) {
+          allFound <- FALSE
+          lapply(names(userParams)[!isInCode], function(uP)
+            message(paste("Parameter", uP, "is not used in module", uM)))
+        }
+
+        #
+        # #if (length(userParams) > 0) {
+        #   for (i in seq(userParams)) {
+        #     uP <- names(userParams[i])
+        #     result <- grep(uP, readFile[[uM]], value = FALSE, fixed = TRUE)
+        #     if (length(result) <= 0) {
+        #       allFound <- FALSE
+        #       message(paste("Parameter", uP, "is not used in module", uM))
+        #     }
+        #   }
+        # #}
       }
 
       globalsFound <- unique(globalsFound)

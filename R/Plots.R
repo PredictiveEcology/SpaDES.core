@@ -1,12 +1,17 @@
 #' \code{Plot} wrapper intended for use in a SpaDES module
 #'
-#' This is a single function call that allows a module to change which format in which
+#' This is a single function call that allows a user to change which format in which
 #' the plots will occur.
-#' Specifically, the two primary formats would be to \code{"screen"} or to disk as an image file,
+#' Specifically, the two common formats would be to \code{"screen"} or to disk as an image file,
 #' such as \code{"png"}.
-#' \emph{THIS CURRENTLY ONLY WORKS CORRECTLY WITH \code{ggplot2} objects that can be saved.}
-#' It uses \code{Plot} internally, so individual plots may be rearranged.
-#' This function requires at least 2 things: a plotting function and data for that plot function.
+#' \emph{THIS CURRENTLY HAS BEEN TESTED WITH \code{ggplot2}, \code{RasterLayer}, and
+#' \code{tmap} objects.}
+#' It uses \code{Plot} internally, so individual plots may be rearranged. When saved to
+#' disk (e.g., via `type = 'png'`), then `Plot` will not be used and the single object
+#' that is the result of this `Plots` call will be saved to disk.
+#' This function requires at least 2 things: a plotting function and arguments passed
+#' to that function (which could include `data`, but commonly would simply be named
+#' arguments required by `fn`).
 #' See below and examples.
 #'
 #' @note THIS IS STILL EXPERIMENTAL and could change in the next release.
@@ -20,42 +25,51 @@
 #' This offers up to 4 different actions for a given plot:
 #'     \itemize{
 #'       \item To screen device
-#'       \item To disk as raw data
-#'       \item To disk as a saved plot object
+#'       \item To disk as raw data (limited testing)
+#'       \item To disk as a saved plot object  (limited testing)
 #'       \item To disk as a \file{.png} or other image file, e.g., \file{.pdf}
 #'     }
+#'
+#'
 #' To turn off plotting both to screen and disk, set both
 #' \code{.plotInititalTime = NA} and \code{.plots = NA} or any other
 #' value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 #' argument (e.g., \code{""} will omit all saving).
 #'
 #' @export
-#' @param data An arbitrary data object. It should be used inside the \code{Plots}
-#'   function, and should contain all the data required for the inner plotting
-#' @param fn An arbitrary plotting function.
+#' @param data An (optional) arbitrary data object. If supplied, it will be passed as
+#'   the first argument to \code{Plot} function, and should contain all the data
+#'   required for the inner plotting. If passing a `RasterLayer`,
+#'   it may be a good idea to set \code{names(RasterLayer)} so that
+#'   multiple layers can be plotted without overlapping eachother. When a custom `fn`
+#'   is used and all arguments for `fn` are supplied and named, then this can be omitted.
+#'   See examples.
+#' @param fn An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}
 #' @param filename A name that will be the base for the files that will be saved, i.e,
 #'   do not supply the file extension, as this will be determined based on \code{types}.
 #'   If a user provides this as an absolute path, it will override the \code{path}
 #'   argument.
-#' @param types Character vector, zero or more of types. See below.
+#' @param types Character vector, zero or more of types. If used within a module, this
+#'   will be deduced from the `P(sim)$type` and can be omitted. See below.
 #' @param path Currently a single path for the saved objects on disk. If \code{filename}
 #'   is supplied as an absolute path, \code{path} will be set to \code{dirname(filename)},
 #'   overriding this argument value.
 #' @param .plotInitialTime A numeric. If \code{NA} then no visual on screen. Anything
 #'   else will have visuals plotted to screen device. This is here for backwards
 #'   compatibility. A developer should set in the module to the intended initial
-#'   plot time and leave it.
+#'   plot time and leave it, i.e., \emph{not} `NA`.
 #' @param ggsaveArgs An optional list of arguments passed to \code{ggplot2::ggsave}
 #' @param deviceArgs An optional list of arguments passed to one of \code{png},
 #'       \code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}.
-#'       This is useful when the plotting function is not creating a \code{ggplot} object.
+#'       This is useful when the plotting function is not creating a \code{ggplot} object,
+#'       e.g., plotting a `RasterLayer`.
 #'
 #' @param usePlot Logical. If \code{TRUE}, the default, then the plot will occur
 #'   with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.
 #'
-#' @param ... Anything needed by \code{fn}
+#' @param ... Anything needed by \code{fn}, all named.
 #'
-#' @importFrom grDevices dev.off
+#' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs qsave
 #' @importFrom raster writeRaster
 #' @importFrom quickPlot clearPlot Plot whereInStack
@@ -161,10 +175,22 @@ Plots <- function(data, fn, filename,
   if (fnIsPlot) {
     # make dummies
     gg <- 1
-    ggListToScreen <- list()
+    objNamePassedToData <- deparse1(substitute(data))
+    origEnv <- parent.frame()
+
+    # Try to see if the object is in the parent.frame(). If it isn't, default back to here.
+    if (!objNamePassedToData %in% ls(origEnv))
+      origEnv <- environment()
+    ggListToScreen <- list(data)
+    names(ggListToScreen) <- objNamePassedToData
   } else {
     if ( (needScreen || needSave) ) {
-      gg <- fn(data, ...)
+      if (missing(data)) {
+        gg <- fn(...)
+      } else {
+        gg <- fn(data, ...)
+      }
+
       if (!is(gg, ".quickPlot")) {
         ggListToScreen <- setNames(list(gg), "gg")
         if (!is.null(gg$labels$title) && needScreen) {
@@ -177,12 +203,39 @@ Plots <- function(data, fn, filename,
 
   if (needScreen) {
     if (fnIsPlot) {
-      gg <- fn(data, ...)
+      if (is.list(data) || !is(data, "RasterStack") || !is(data, "RasterBrick")) {
+        dataListToScreen <- data
+      } else {
+        dataListToScreen <- list(data)
+      }
+      if (is(data, "ggplot")) {
+        dataListToScreen <- setNames(list(data), "gg")
+        if (!is.null(data$labels$title) && needScreen) {
+          dataListToScreen <- setNames(dataListToScreen, data$labels$title)
+          dataListToScreen[[1]]$labels$title <- NULL
+        }
+      } else {
+        if (!is.null(names(data))) {
+          dataListToScreen <- setNames(dataListToScreen, names(data))
+        } else {
+          dataListToScreen <- setNames(dataListToScreen, "data")
+        }
+      }
+
+      gg <- fn(ggListToScreen, ...)
+      .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+      qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
+      objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
+      objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
+      curPlotDev <- paste0("quickPlot", dev.cur())
+      ignore <- lapply(objNamesInQuickPlotObj, function(x) {
+        slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
+      })
     } else {
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
       if (usePlot) {
-        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " ", replacement = "_")
+        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
         print(gg)
@@ -195,7 +248,7 @@ Plots <- function(data, fn, filename,
     if (missing(filename)) {
       filename <- tempfile(fileext = "")
     }
-    isDefaultPath <-  identical(eval(formals(Plots)$path), path)
+    isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
         path <- eval(path, envir = simIsIn)
@@ -212,7 +265,7 @@ Plots <- function(data, fn, filename,
 
   if (needSaveRaw) {
     if (is(data, "Raster")) {
-      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")))
+      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")), overwrite = TRUE)
     } else {
       qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
     }
