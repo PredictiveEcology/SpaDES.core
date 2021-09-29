@@ -223,9 +223,8 @@ test_that("saveSimList does not work correctly", {
   # test file-backed raster is gone
   expect_warning(expect_error(mySim$landscape$DEM[]))
 
-
   #### zipSimList test
-
+  skip_if_not(nzchar(Sys.which("zip")))
   tmpZip <- file.path(tmpdir, paste0(rndstr(1, 6), ".zip"))
   checkPath(dirname(tmpZip), create = TRUE)
   landscape2 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1))

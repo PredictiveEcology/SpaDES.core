@@ -35,6 +35,7 @@ test_that("module templates work", {
     zipModule(name = moduleName, path = tmpdir, version = "0.0.2", flags = "-q -r9X")
   )
 
+  skip_if_not(nzchar(Sys.which("zip")))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, "_0.0.2.zip"))))
 
   # Test that the .Rmd file actually can run with knitr
