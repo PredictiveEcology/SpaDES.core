@@ -40,13 +40,18 @@
 
 
 <meta property="og:title" content="Plot wrapper intended for use in a SpaDES module — Plots" />
-<meta property="og:description" content="This is a single function call that allows a module to change which format in which
+<meta property="og:description" content="This is a single function call that allows a user to change which format in which
 the plots will occur.
-Specifically, the two primary formats would be to &quot;screen&quot; or to disk as an image file,
+Specifically, the two common formats would be to &quot;screen&quot; or to disk as an image file,
 such as &quot;png&quot;.
-THIS CURRENTLY ONLY WORKS CORRECTLY WITH ggplot2 objects that can be saved.
-It uses Plot internally, so individual plots may be rearranged.
-This function requires at least 2 things: a plotting function and data for that plot function.
+THIS CURRENTLY HAS BEEN TESTED WITH ggplot2, RasterLayer, and
+tmap objects.
+It uses Plot internally, so individual plots may be rearranged. When saved to
+disk (e.g., via type = 'png'), then Plot will not be used and the single object
+that is the result of this Plots call will be saved to disk.
+This function requires at least 2 things: a plotting function and arguments passed
+to that function (which could include data, but commonly would simply be named
+arguments required by fn).
 See below and examples." />
 
 
@@ -89,7 +94,7 @@ See below and examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -158,13 +163,18 @@ See below and examples." />
     </div>
 
     <div class="ref-description">
-    <p>This is a single function call that allows a module to change which format in which
+    <p>This is a single function call that allows a user to change which format in which
 the plots will occur.
-Specifically, the two primary formats would be to <code>"screen"</code> or to disk as an image file,
+Specifically, the two common formats would be to <code>"screen"</code> or to disk as an image file,
 such as <code>"png"</code>.
-<em>THIS CURRENTLY ONLY WORKS CORRECTLY WITH <code>ggplot2</code> objects that can be saved.</em>
-It uses <code>Plot</code> internally, so individual plots may be rearranged.
-This function requires at least 2 things: a plotting function and data for that plot function.
+<em>THIS CURRENTLY HAS BEEN TESTED WITH <code>ggplot2</code>, <code>RasterLayer</code>, and
+<code>tmap</code> objects.</em>
+It uses <code>Plot</code> internally, so individual plots may be rearranged. When saved to
+disk (e.g., via <code>type = 'png'</code>), then <code>Plot</code> will not be used and the single object
+that is the result of this <code>Plots</code> call will be saved to disk.
+This function requires at least 2 things: a plotting function and arguments passed
+to that function (which could include <code>data</code>, but commonly would simply be named
+arguments required by <code>fn</code>).
 See below and examples.</p>
     </div>
 
@@ -186,12 +196,17 @@ See below and examples.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>An arbitrary data object. It should be used inside the <code>Plots</code>
-function, and should contain all the data required for the inner plotting</p></td>
+      <td><p>An (optional) arbitrary data object. If supplied, it will be passed as
+the first argument to <code>Plot</code> function, and should contain all the data
+required for the inner plotting. If passing a <code>RasterLayer</code>,
+it may be a good idea to set <code><a href='https://rdrr.io/r/base/names.html'>names(RasterLayer)</a></code> so that
+multiple layers can be plotted without overlapping eachother. When a custom <code>fn</code>
+is used and all arguments for <code>fn</code> are supplied and named, then this can be omitted.
+See examples.</p></td>
     </tr>
     <tr>
       <th>fn</th>
-      <td><p>An arbitrary plotting function.</p></td>
+      <td><p>An arbitrary plotting function. If not provided, defaults to using <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'>quickPlot::Plot</a></code></p></td>
     </tr>
     <tr>
       <th>filename</th>
@@ -202,7 +217,8 @@ argument.</p></td>
     </tr>
     <tr>
       <th>types</th>
-      <td><p>Character vector, zero or more of types. See below.</p></td>
+      <td><p>Character vector, zero or more of types. If used within a module, this
+will be deduced from the <code>P(sim)$type</code> and can be omitted. See below.</p></td>
     </tr>
     <tr>
       <th>path</th>
@@ -215,7 +231,7 @@ overriding this argument value.</p></td>
       <td><p>A numeric. If <code>NA</code> then no visual on screen. Anything
 else will have visuals plotted to screen device. This is here for backwards
 compatibility. A developer should set in the module to the intended initial
-plot time and leave it.</p></td>
+plot time and leave it, i.e., <em>not</em> <code>NA</code>.</p></td>
     </tr>
     <tr>
       <th>ggsaveArgs</th>
@@ -230,11 +246,12 @@ with <code><a href='http://quickplot.predictiveecology.org//reference/Plot.html'
       <th>deviceArgs</th>
       <td><p>An optional list of arguments passed to one of <code>png</code>,
 <code>pdf</code>, <code>tiff</code>, <code>bmp</code>, or <code>jgeg</code>.
-This is useful when the plotting function is not creating a <code>ggplot</code> object.</p></td>
+This is useful when the plotting function is not creating a <code>ggplot</code> object,
+e.g., plotting a <code>RasterLayer</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Anything needed by <code>fn</code></p></td>
+      <td><p>Anything needed by <code>fn</code>, all named.</p></td>
     </tr>
     </table>
 
@@ -261,10 +278,12 @@ The devices to save on disk will have some different behaviours to the screen re
 since "wiping" an individual plot on a device doesn't exist for a file device.</p>
 <p>This offers up to 4 different actions for a given plot:</p><ul>
 <li><p>To screen device</p></li>
-<li><p>To disk as raw data</p></li>
-<li><p>To disk as a saved plot object</p></li>
+<li><p>To disk as raw data (limited testing)</p></li>
+<li><p>To disk as a saved plot object  (limited testing)</p></li>
 <li><p>To disk as a <code class="file">.png</code> or other image file, e.g., <code class="file">.pdf</code></p></li>
-</ul><p>To turn off plotting both to screen and disk, set both
+</ul>
+
+<p>To turn off plotting both to screen and disk, set both
 <code>.plotInititalTime = NA</code> and <code>.plots = NA</code> or any other
 value that will not trigger a TRUE with a <code>grepl</code> with the <code>types</code>
 argument (e.g., <code>""</code> will omit all saving).</p>

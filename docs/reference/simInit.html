@@ -88,7 +88,7 @@ See more details below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -363,6 +363,10 @@ Since this is a list of lists, one can override the module defaults for multiple
 parameters from multiple modules all at once, with say:
 <code><a href='https://rdrr.io/r/base/list.html'>list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
            caribouModule = list(N = 1000))</a></code>.</p>
+<p>The <code>params</code> list can contain a list (named <code>.globals</code>) of named objects
+e.g., <code>.globals = list(climateURL = "https:\\something.com")</code> entry. Any and every
+module that has a parameter with that name (in this case <code>climateURL</code>) will be
+overridden with this value as passed.</p>
 <p><code>params</code> can be used to set the seed for a specific event in a module. This
 is done using the normal <code>params</code> argument, specifying <code>.seed</code> as a list
 where the elements are a numeric for the seed and the name is the event. Since

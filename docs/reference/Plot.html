@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -199,10 +199,12 @@ See details.</p></td>
 and a new one made; if <code>FALSE</code>, then the <code>...</code> plots will be
 added to the current device, adding or rearranging the plot layout
 as necessary. Default is <code>FALSE</code>. This currently works best if
-there is only one object being plotted in a given Plot call. However,
+there is only one object being plotted in a given <code>Plot</code> call. However,
 it is possible to pass a list of logicals to this, matching the
 length of the ... objects. Use <code>clearPlot</code> to clear the whole
-plotting device.</p></td>
+plotting device. NOTE if <code>TRUE</code>: <em>Everything that was there,
+including the legend and the end points of the colour palette, will
+be removed and re-initiated</em>.</p></td>
     </tr>
     <tr>
       <th>addTo</th>
@@ -213,7 +215,7 @@ the plot with the same name, such as plotting a
     </tr>
     <tr>
       <th>gp</th>
-      <td><p>A <code>gpar</code> object, created by <code><a href='http://quickplot.predictiveecology.org//reference/grid-functions.html'>gpar</a></code> function,
+      <td><p>A <code>gpar</code> object, created by <code>gpar</code>,
 to change plotting parameters (see <span class="pkg">grid</span> package).</p></td>
     </tr>
     <tr>
@@ -228,8 +230,7 @@ Default <code>gpar(col = "black")</code>.</p></td>
     </tr>
     <tr>
       <th>axes</th>
-      <td><p>Logical or <code>"L"</code>, representing the left and bottom axes,
-over all plots.</p></td>
+      <td><p>Logical or <code>"L"</code>, representing the left and bottom axes, over all plots.</p></td>
     </tr>
     <tr>
       <th>speedup</th>
@@ -303,14 +304,14 @@ which case, keep the previous title.</p></td>
     </tr>
     <tr>
       <th>na.color</th>
-      <td><p>Character string indicating the color for <code>NA</code> values.
+      <td><p>Character string indicating the colour for <code>NA</code> values.
 Default transparent.</p></td>
     </tr>
     <tr>
       <th>zero.color</th>
-      <td><p>Character string indicating the color for zero values,
+      <td><p>Character string indicating the colour for zero values,
 when zero is the minimum value, otherwise, zero is
-treated as any other color. Default transparent.</p></td>
+treated as any other colour. Default transparent.</p></td>
     </tr>
     <tr>
       <th>length</th>

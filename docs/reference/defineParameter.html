@@ -86,7 +86,7 @@ code." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -162,13 +162,13 @@ a range of values, the module developer should use assertions in their module
 code.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,ANY,ANY,ANY,character</span>
-<span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span><span class='op'>)</span>
+<span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for character,character,ANY,missing,missing,character</span>
-<span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>desc</span><span class='op'>)</span>
+<span class='fu'>defineParameter</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>class</span>, <span class='va'>default</span>, <span class='va'>min</span>, <span class='va'>max</span>, <span class='va'>desc</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for missing,missing,missing,missing,missing,missing</span>
 <span class='fu'>defineParameter</span><span class='op'>(</span><span class='op'>)</span></pre>
@@ -207,7 +207,16 @@ tell a module user what values the module expects.</p></td>
     </tr>
     <tr>
       <th>desc</th>
-      <td><p>Text string providing a brief description of the parameter.</p></td>
+      <td><p>Text string providing a brief description of the parameter.
+If there are extra spaces or carriage returns, these will be stripped,
+allowing for multi-line character strings without using <code>paste</code>
+or multiple quotes.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>A convenience that allows writing a long <code>desc</code> without
+having to use <code>paste</code>; any character strings after <code>desc</code>
+will be <code>paste</code>d together with <code>desc</code>.</p></td>
     </tr>
     </table>
 
@@ -225,12 +234,24 @@ See <code><a href='https://rdrr.io/r/base/NA.html'>NA</a></code>.</p>
 a module.</p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <p>Alex Chubaty</p>
+    <p>Alex Chubaty and Eliot McIntire</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='va'>parameters</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span>
   <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"lambda"</span>, <span class='st'>"numeric"</span>, <span class='fl'>1.23</span>, desc <span class='op'>=</span> <span class='st'>"intrinsic rate of increase"</span><span class='op'>)</span>,
-  <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='st'>"probability of attack"</span><span class='op'>)</span>
+  <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='st'>"probability of attack"</span><span class='op'>)</span>,
+
+  <span class='co'># multi-line desc without quotes on each line -- spaces and carriage returns are stripped</span>
+  <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"rate"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>,
+                  <span class='st'>"rate of arrival. This is in individuals
+                  per day. This can be modified
+                  by the user"</span><span class='op'>)</span>,
+  <span class='co'># multi-line desc with quotes on each line</span>
+  <span class='fu'>defineParameter</span><span class='op'>(</span><span class='st'>"times"</span>, <span class='st'>"numeric"</span>, <span class='fl'>0.2</span>, <span class='fl'>0</span>, <span class='fl'>1</span>,
+                  desc <span class='op'>=</span> <span class='st'>"The times during the year "</span>,
+                         <span class='st'>"that events will occur "</span>,
+                         <span class='st'>"with possibility of random arrival times"</span><span class='op'>)</span>
+
 <span class='op'>)</span>
 
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>

@@ -83,7 +83,7 @@ params has a replace method, so can be used to update a parameter value." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -166,7 +166,9 @@ params has a replace method, so can be used to update a parameter value." />
 <span class='co'># S4 method for simList</span>
 <span class='fu'>params</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>P</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>module</span>, <span class='va'>param</span><span class='op'>)</span>
+<span class='fu'>P</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>param</span>, <span class='va'>module</span><span class='op'>)</span>
+
+<span class='fu'>P</span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>param</span>, <span class='va'>module</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='fu'>parameters</span><span class='op'>(</span><span class='va'>sim</span>, asDF <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
@@ -183,15 +185,15 @@ in which to replace element(s).</p></td>
     </tr>
     <tr>
       <th>value</th>
-      <td><p>The object to be stored at the slot.</p></td>
-    </tr>
-    <tr>
-      <th>module</th>
-      <td><p>Optional character string indicating which module params should come from.</p></td>
+      <td><p>The parameter value to be set (in the corresponding <code>module</code> and <code>param</code>).</p></td>
     </tr>
     <tr>
       <th>param</th>
       <td><p>Optional character string indicating which parameter to choose.</p></td>
+    </tr>
+    <tr>
+      <th>module</th>
+      <td><p>Optional character string indicating which module params should come from.</p></td>
     </tr>
     <tr>
       <th>asDF</th>
@@ -214,7 +216,7 @@ NOT the current values that may be overwritten by a user. See examples.</p>
     <p>The differences between P, params and being explicit with passing arguments
 are mostly a question of speed and code compactness.
 The computationally fastest way to get a parameter is to specify moduleName and parameter name, as in:
-<code>P(sim, "moduleName", "paramName")</code> (replacing moduleName and paramName with your
+<code>P(sim, "paramName", "moduleName")</code> (replacing moduleName and paramName with your
 specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
 part for speed (e.g., 2-4x faster) is specifying the moduleName.
 Specifying the parameter name is &lt;5% faster.</p>
@@ -242,18 +244,18 @@ Specifying the parameter name is &lt;5% faster.</p>
                  params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>.globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Setting:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpLFlSnX/temp_libpath11ddf3d7a0fd5/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp1DjJzq/temp_libpath333183212b05e0/SpaDES.core/sampleModules'</span>
 #&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Paths set to:</span>
 #&gt; <span class='message'>  options(</span>
-#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmp7dh1uL/raster'</span>
-#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmp7dh1uL/myProject/cache'</span>
-#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmp7dh1uL/myProject/inputs'</span>
-#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmp7dh1uL/myProject/outputs'</span>
-#&gt; <span class='message'>    spades.modulePath = '/tmp/RtmpLFlSnX/temp_libpath11ddf3d7a0fd5/SpaDES.core/sampleModules'</span>
-#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFields</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>    rasterTmpDir = '/tmp/Rtmpk4BZF8/raster'</span>
+#&gt; <span class='message'>    reproducible.cachePath = '/tmp/Rtmpk4BZF8/myProject/cache'</span>
+#&gt; <span class='message'>    spades.inputPath = '/tmp/Rtmpk4BZF8/myProject/inputs'</span>
+#&gt; <span class='message'>    spades.outputPath = '/tmp/Rtmpk4BZF8/myProject/outputs'</span>
+#&gt; <span class='message'>    spades.modulePath = '/tmp/Rtmp1DjJzq/temp_libpath333183212b05e0/SpaDES.core/sampleModules'</span>
+#&gt; <span class='message'>  )</span></div><div class='output co'>#&gt; <span class='message'>options('spades.useRequire' = FALSE), so not checking minimum package version requirements</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFields</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    RFoptions</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></span></div><div class='input'>
+#&gt; <span class='message'>    RFoptions</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RColorBrewer</span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>defineParameter: '.useCache' is not of specified type 'logical'.</span></span></div><div class='output co'>#&gt; <span class='message'><span style='color: #BB00BB;'>randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></span></div><div class='output co'>#&gt; <span class='message'>The following .globals were used:</span></div><div class='output co'>#&gt; <span class='message'>             module    global</span></div><div class='output co'>#&gt; <span class='message'>1: randomLandscapes stackName</span></div><div class='input'>
 <span class='co'># update some parameters using assignment -- currently only params will work</span>
 <span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>nx</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
 <span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span><span class='op'>$</span><span class='va'>randomLandscapes</span><span class='op'>$</span><span class='va'>ny</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
@@ -307,15 +309,8 @@ Specifying the parameter name is &lt;5% faster.</p>
 #&gt; </div><div class='input'>
 <span class='co'># These next 2 are same here because they are not within a module</span>
 <span class='fu'>P</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>          <span class='co'># Does contain the user overridden values</span>
-</div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$interval
-#&gt; [1] NA
-#&gt; 
-#&gt; $.checkpoint$file
-#&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; $.progress
+</div><div class='output co'>#&gt; <span class='error'>Error in as.character(poss[[1]][[1]]): cannot coerce type 'closure' to vector of type 'character'</span></div><div class='input'><span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>     <span class='co'># Does contain the user overridden values</span>
+</div><div class='output co'>#&gt; $.progress
 #&gt; $.progress$type
 #&gt; [1] NA
 #&gt; 
@@ -323,59 +318,12 @@ Specifying the parameter name is &lt;5% faster.</p>
 #&gt; [1] NA
 #&gt; 
 #&gt; 
-#&gt; $.globals
-#&gt; $.globals$stackName
-#&gt; [1] "landscape"
-#&gt; 
-#&gt; 
-#&gt; $randomLandscapes
-#&gt; $randomLandscapes$inRAM
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$nx
-#&gt; [1] 200
-#&gt; 
-#&gt; $randomLandscapes$ny
-#&gt; [1] 200
-#&gt; 
-#&gt; $randomLandscapes$stackName
-#&gt; [1] "landscape"
-#&gt; 
-#&gt; $randomLandscapes$.plotInitialTime
-#&gt; [1] 0
-#&gt; attr(,"unit")
-#&gt; [1] "year"
-#&gt; 
-#&gt; $randomLandscapes$.plotInterval
+#&gt; $checkpoint
+#&gt; $checkpoint$interval
 #&gt; [1] NA
 #&gt; 
-#&gt; $randomLandscapes$.saveInitialTime
-#&gt; [1] NA
-#&gt; 
-#&gt; $randomLandscapes$.saveInterval
-#&gt; [1] NA
-#&gt; 
-#&gt; $randomLandscapes$.seed
-#&gt; list()
-#&gt; 
-#&gt; $randomLandscapes$.useCache
-#&gt; [1] FALSE
-#&gt; 
-#&gt; </div><div class='input'><span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>     <span class='co'># Does contain the user overridden values</span>
-</div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$interval
-#&gt; [1] NA
-#&gt; 
-#&gt; $.checkpoint$file
+#&gt; $checkpoint$file
 #&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; $.progress
-#&gt; $.progress$type
-#&gt; [1] NA
-#&gt; 
-#&gt; $.progress$interval
-#&gt; [1] NA
 #&gt; 
 #&gt; 
 #&gt; $.globals
@@ -470,15 +418,8 @@ Specifying the parameter name is &lt;5% faster.</p>
 #&gt; </div><div class='input'>
 <span class='co'># These next 2 are same here because they are not within a module</span>
 <span class='fu'>P</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>          <span class='co'># nx and ny are Gone</span>
-</div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$interval
-#&gt; [1] NA
-#&gt; 
-#&gt; $.checkpoint$file
-#&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; $.progress
+</div><div class='output co'>#&gt; <span class='error'>Error in as.character(poss[[1]][[1]]): cannot coerce type 'closure' to vector of type 'character'</span></div><div class='input'><span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>     <span class='co'># nx and ny are Gone</span>
+</div><div class='output co'>#&gt; $.progress
 #&gt; $.progress$type
 #&gt; [1] NA
 #&gt; 
@@ -486,53 +427,12 @@ Specifying the parameter name is &lt;5% faster.</p>
 #&gt; [1] NA
 #&gt; 
 #&gt; 
-#&gt; $.globals
-#&gt; $.globals$stackName
-#&gt; [1] "landscape"
-#&gt; 
-#&gt; 
-#&gt; $randomLandscapes
-#&gt; $randomLandscapes$inRAM
-#&gt; [1] FALSE
-#&gt; 
-#&gt; $randomLandscapes$stackName
-#&gt; [1] "landscape"
-#&gt; 
-#&gt; $randomLandscapes$.plotInitialTime
-#&gt; [1] 0
-#&gt; attr(,"unit")
-#&gt; [1] "year"
-#&gt; 
-#&gt; $randomLandscapes$.plotInterval
+#&gt; $checkpoint
+#&gt; $checkpoint$interval
 #&gt; [1] NA
 #&gt; 
-#&gt; $randomLandscapes$.saveInitialTime
-#&gt; [1] NA
-#&gt; 
-#&gt; $randomLandscapes$.saveInterval
-#&gt; [1] NA
-#&gt; 
-#&gt; $randomLandscapes$.seed
-#&gt; list()
-#&gt; 
-#&gt; $randomLandscapes$.useCache
-#&gt; [1] FALSE
-#&gt; 
-#&gt; </div><div class='input'><span class='fu'>params</span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span>     <span class='co'># nx and ny are Gone</span>
-</div><div class='output co'>#&gt; $.checkpoint
-#&gt; $.checkpoint$interval
-#&gt; [1] NA
-#&gt; 
-#&gt; $.checkpoint$file
+#&gt; $checkpoint$file
 #&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; $.progress
-#&gt; $.progress$type
-#&gt; [1] NA
-#&gt; 
-#&gt; $.progress$interval
-#&gt; [1] NA
 #&gt; 
 #&gt; 
 #&gt; $.globals

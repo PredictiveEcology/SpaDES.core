@@ -83,7 +83,7 @@ other specifications." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -180,7 +180,10 @@ other specifications.</p>
     </tr>
     <tr>
       <th>desc</th>
-      <td><p>Text string providing a brief description of the input object.</p></td>
+      <td><p>Text string providing a brief description of the input object.
+If there are extra spaces or carriage returns, these will be stripped,
+allowing for multi-line character strings without using <code>paste</code>
+or multiple quotes.</p></td>
     </tr>
     <tr>
       <th>sourceURL</th>

@@ -85,7 +85,7 @@ to spades." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -173,6 +173,7 @@ to <code>spades</code>.</p>
   <span class='va'>debug</span>,
   <span class='va'>progress</span>,
   <span class='va'>cache</span>,
+  <span class='va'>.plots</span>,
   <span class='va'>.plotInitialTime</span>,
   <span class='va'>.saveInitialTime</span>,
   <span class='va'>events</span>,
@@ -280,6 +281,19 @@ This means that if the call is made again with the same <code>simList</code>,
 then `spades`` will return the return value from the previous run
 of that exact same <code>simList</code>. Default <code>FALSE</code>. See Details.
 See also the vignette on caching for examples.</p></td>
+    </tr>
+    <tr>
+      <th>.plots</th>
+      <td><p>Character. Sets the parameter of this name in all modules.
+See <code><a href='Plots.html'>Plots</a></code> for possible values. The parameter is intended to slowly
+take over from <code>.plotInitialTime</code> as a mechanism to turn on or off plotting.
+For backwards compatibility, if <code>.plotInitialTime</code> is not set
+in this <code>spades</code> call, but this
+<code>.plots</code> is used, two things will happen: setting this without <code>"screen"</code>
+will turn off all plotting; setting this with <code>"screen"</code> will trigger
+plotting for any modules that use this parameter but will have no effect on
+other modules. To get plotting, therefore, it may be necessary to also set
+<code>.plotInitialTime = start(sim)</code>.</p></td>
     </tr>
     <tr>
       <th>.plotInitialTime</th>

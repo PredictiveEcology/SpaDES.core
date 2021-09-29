@@ -84,7 +84,7 @@ Second, at the spades call itself, which can be simpler. See examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.9</span>
       </span>
     </div>
 
@@ -188,7 +188,7 @@ in which to replace element(s).</p></td>
     </tr>
     <tr>
       <th>value</th>
-      <td><p>The object to be stored at the slot.</p></td>
+      <td><p>The parameter value to be set (in the corresponding <code>module</code> and <code>param</code>).</p></td>
     </tr>
     </table>
 
@@ -222,7 +222,7 @@ See examples.</p>
   times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start<span class='op'>=</span><span class='fl'>0.0</span>, end<span class='op'>=</span><span class='fl'>100.0</span><span class='op'>)</span>,
   params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>.globals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>stackName <span class='op'>=</span> <span class='st'>"landscape"</span><span class='op'>)</span>,
   .progress <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>type <span class='op'>=</span> <span class='st'>"text"</span>, interval <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>,
-  .checkpoint <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>interval <span class='op'>=</span> <span class='fl'>10</span>, file <span class='op'>=</span> <span class='st'>"chkpnt.RData"</span><span class='op'>)</span><span class='op'>)</span>,
+  checkpoint <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>interval <span class='op'>=</span> <span class='fl'>10</span>, file <span class='op'>=</span> <span class='st'>"chkpnt.RData"</span><span class='op'>)</span><span class='op'>)</span>,
   modules <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"randomLandscapes"</span><span class='op'>)</span>,
   paths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>modulePath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"sampleModules"</span>, package <span class='op'>=</span> <span class='st'>"SpaDES.core"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
@@ -232,7 +232,7 @@ See examples.</p>
 
 <span class='co'># parameters</span>
 <span class='fu'><a href='params.html'>params</a></span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span> <span class='co'># returns all parameters in all modules</span>
-              <span class='co'># including .global, .progress, .checkpoint</span>
+              <span class='co'># including .global, .progress, checkpoint</span>
 <span class='fu'><a href='globals.html'>globals</a></span><span class='op'>(</span><span class='va'>mySim</span><span class='op'>)</span> <span class='co'># returns only global parameters</span>
 
 <span class='co'># checkpoint</span>
