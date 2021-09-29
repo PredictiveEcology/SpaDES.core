@@ -284,7 +284,7 @@ Plots <- function(data, fn, filename,
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
         theFilename <- file.path(path, paste0(filename, ".", bsf))
-        do.call(type, modifyList(list(theFilename), deviceArgs))
+        do.call(type, modifyList2(list(theFilename), deviceArgs))
         # curDev <- dev.cur()
         clearPlot()
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
@@ -300,7 +300,7 @@ Plots <- function(data, fn, filename,
         args <- list(plot = gg,
                      filename = theFilename)
         if (length(ggsaveArgs)) {
-          args <- modifyList(args, ggsaveArgs)
+          args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
         message("Saved figure to: ", theFilename)

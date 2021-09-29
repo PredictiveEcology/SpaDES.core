@@ -333,11 +333,11 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   outFilenames <- unzip(zipfile = zipfile, list = TRUE)
 
   dots <- list(...)
-  dots <- modifyList(
+  dots <- modifyList2(
     list(exdir = tempdir2(sub = "TransferFolder2"),
          junkpaths = TRUE),
     dots)
-  dots <- modifyList(list(zipfile = zipfile),
+  dots <- modifyList2(list(zipfile = zipfile),
                      dots)
   checkPath(dots$exdir, create = TRUE)
   unzippedFiles <- do.call(unzip, dots)
