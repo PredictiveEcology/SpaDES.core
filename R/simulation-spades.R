@@ -1746,6 +1746,7 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
       } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
         outMess <- try(eval(parse(text = debug[[i]])))
       } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
+        outMess <- NULL
         if (is.environment(fnEnv)) {
           if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
             debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))

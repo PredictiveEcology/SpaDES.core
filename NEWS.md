@@ -1,5 +1,13 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
+version 1.0.10
+=============
+
+## new features
+
+## bug fixes
+* minor bugfix when `debug` arg of `spades` is set to an event type that is also in the core modules (e.g., save, load), such as "init"
+
 version 1.0.9
 =============
 
