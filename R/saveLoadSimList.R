@@ -54,6 +54,12 @@
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   dots <- list(...)
 
+  quiet <- if (is.null(dots$quiet)) {
+    FALSE
+  } else {
+    if (isTRUE(dots$quiet)) TRUE else FALSE
+  }
+
   # clean up misnamed arguments
   if (!is.null(dots$fileBackedDir)) if (is.null(filebackedDir)) {
     filebackedDir <- dots$fileBackedDir
@@ -84,7 +90,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   sim@.xData$._rng.kind <- RNGkind()
 
-  if (isFALSE(dots$quiet)) message("Saving simList object to file '", filename, "'.")
+  if (isFALSE(quiet)) message("Saving simList object to file '", filename, "'.")
 
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
@@ -96,7 +102,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     qs::qsave(sim, file = filename)
   }
 
-  if (isFALSE(dots$quiet)) message("    ... saved!")
+  if (isFALSE(quiet)) message("    ... saved!")
 
   return(invisible())
 }
