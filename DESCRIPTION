@@ -30,7 +30,7 @@ Authors@R: c(
            role = "cph")
     )
 Depends:
-    R (>= 3.6),
+    R (>= 4.0),
     quickPlot (>= 0.1.4),
     reproducible (>= 1.2.7)
 Imports:

@@ -1,7 +1,10 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.0.10
+version 1.0.9.9000
 =============
+
+## dependency changes
+* drop support for R 3.6 (#178)
 
 ## new features
 * There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.

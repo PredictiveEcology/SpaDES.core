@@ -54,6 +54,12 @@
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   dots <- list(...)
 
+  quiet <- if (is.null(dots$quiet)) {
+    FALSE
+  } else {
+    if (isTRUE(dots$quiet)) TRUE else FALSE
+  }
+
   # clean up misnamed arguments
   if (!is.null(dots$fileBackedDir)) if (is.null(filebackedDir)) {
     filebackedDir <- dots$fileBackedDir
@@ -69,9 +75,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     sim <- get(simName, envir = envir)
   }
   if (isTRUE(fileBackend[1] > 0)) {
-    mess <- capture.output(type = "message",
-                           sim <- do.call(Copy, append(list(sim, filebackedDir = filebackedDir), dots))
-    )
+    mess <- capture.output(type = "message", {
+      sim <- do.call(Copy, append(list(sim, filebackedDir = filebackedDir), dots))
+    })
     mess <- grep("Hardlinked version", mess, invert = TRUE)
     if (length(mess))
       lapply(mess, message)
@@ -83,6 +89,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   sim@.xData$._rng.kind <- RNGkind()
+
+  if (isFALSE(quiet)) message("Saving simList object to file '", filename, "'.")
+
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
     assign(simName, sim, envir = tmpEnv)
@@ -92,6 +101,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     #save(sim, file = filename)
     qs::qsave(sim, file = filename)
   }
+
+  if (isFALSE(quiet)) message("    ... saved!")
+
   return(invisible())
 }
 
@@ -379,4 +391,3 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   }
   return(unzippedFiles)
 }
-
