@@ -2631,8 +2631,8 @@ setMethod(
         if (missing(modules)) {
           modules <- sub(basename(paths), replacement = "", pattern = ".R")
         }
-      } else if (!missing("modules")) {
-        prefix <- if (!file.exists(modules)) {
+      } else if (!missing(modules)) {
+        prefix <- if (!all(file.exists(modules))) {
           if (!missing("paths")) {
             pre <- paths
           } else {
