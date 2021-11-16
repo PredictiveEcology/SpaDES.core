@@ -238,6 +238,29 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
   sim <- qs::qread(filename, nthreads = getOption("spades.nThreads", 1))
 
+  # Work around for bug in qs that recovers data.tables as lists
+  objectName <- ls(sim)
+  names(objectName) <- objectName
+  objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
+  dt <- data.table(objectName, objectClassInSim)
+
+  io <- inputObjects(sim)
+  oo <- outputObjects(sim)
+  objs <- rbindlist(append(io, oo), fill = TRUE)
+  objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
+
+  objs <- objs[dt, on = "objectName"]
+  objs <- objs[objectClass == "data.table"]
+  objs <- objs[objectClass != objectClassInSim]
+  if (NROW(objs)) {
+    message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
+    message("Converting all known data.table objects (according to metadata) from list to data.table")
+    simEnv <- envir(sim)
+    out <- lapply(objs$objectName, function(on) {
+      assign(on, as.data.table(sim[[on]]), envir = simEnv)
+    })
+  }
+
   mods <- setdiff(sim@modules, .coreModules())
   ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
   lapply(mods, function(mod) {
