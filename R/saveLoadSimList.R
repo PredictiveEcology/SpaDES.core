@@ -258,7 +258,8 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 
   io <- inputObjects(sim)
   oo <- outputObjects(sim)
-  objs <- rbindlist(list(io, oo), fill = TRUE)
+  objs <- rbindlist(list(rbindlist(io, fill = TRUE),
+                         rbindlist(oo, fill = TRUE)), fill = TRUE)
   objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
 
   objs <- objs[dt, on = "objectName"]
