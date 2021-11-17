@@ -8,6 +8,7 @@ version 1.0.9.9000
 
 ## new features
 * There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.
+* new function: `paramCheckOtherMods`. Can be used within a module to assert that a parameter has the same value as the same parameter in other modules. This is therefore a check of a parameter that might be considered a `.global` and passed within `simInit(..., params = list(.globals = list(someParam = "someValue")))`, but the user did not do that.
 
 ## bug fixes
 * minor bugfix when `debug` arg of `spades` is set to an event type that is also in the core modules (e.g., save, load), such as "init"
