@@ -95,7 +95,16 @@ test_that("local mod object", {
          P(sim, "testParB") <-  P(sim)$testParB + 756
       }
 
-
+      if (any(grepl("testCommonPar", names(unlist(params(sim)))))) {
+            errorText <- try(paramCheckOtherMods(sim, "testCommonPar"), silent = TRUE)
+            if (identical("try-error", attr(errorText, "class")))
+              message("There was an error")
+            warn <- capture_warnings(paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "warning"))
+            if (length(warn))
+              message("There was a warning")
+            paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "message")
+            paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "silent")
+      }
       if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
         stop("testing restartSpades")#browser()
       }
@@ -216,19 +225,43 @@ test_that("local mod object", {
   expect_true(identical(P(mySim7, module = "test2", "testParF"), 77))
   expect_true(identical(P(mySim7, module = "test2", "testParG"), 79))
   expect_true(identical(P(mySim7, module = "test2", "testParH"), 48))
-  # expect_true(identical(P(mySim7, module = "test2", "testParAB"), 234))
+
+  # Test common parameters i.e., globals
+  # Set one to NULL
+  vals <- list("sdfd", "default", NULL, "ffff")
+  lens <- list(0,0,0,1)
+  out <- Map(len = lens, val = vals, function(len, val) {
+    mySim11 <- simInit(times = list(start = 0, end = 0),
+                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                       params = list(test = list(testCommonPar = vals[[1]]),
+                                     test2 = list(testCommonPar = val)))
+    mess <- capture_messages(spades(mySim11, debug = FALSE))
+    expect_true(sum(grepl("multiple values", mess)) == len)
+    expect_true(sum(grepl("There was a warning", mess)) == len)
+    expect_true(sum(grepl("There was an error", mess)) == len)
+  })
+
+
+
 
   # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
   if (interactive()) {
+    opt <- options("spades.recoveryMode" = TRUE)
+    on.exit(opt, add = TRUE)
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
-    err <- capture_error(ss <- spades(mySim8))
+    err <- try(ss <- spades(mySim8, debug = FALSE), silent = TRUE)
 
-    err <- capture_error(sim2 <- restartSpades(.pkgEnv$.sim)) # is missing completed events
-    err <- capture_error(sim3 <- restartSpades(.pkgEnv$.sim)) # is missing completed events
-    .pkgEnv$.sim@params$test2$testRestartSpades <- NULL
-    sim3 <- restartSpades(.pkgEnv$.sim)
+    sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
+    err <- capture_error(sim2 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+
+    sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
+    err <- capture_error(sim3 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+
+    sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
+    sim@params$test2$testRestartSpades <- NULL
+    sim3 <- restartSpades(sim, debug = FALSE)
     expect_true(NROW(completed(sim3)) == 7)
   }
 })

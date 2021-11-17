@@ -633,30 +633,32 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   newVal <- paramInThisMod
   fail <- FALSE
 
-  if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
-    if (length(paramInOtherMods) == 1) {
-      newVal <- paramInOtherMods
-      message(paramToCheck, " in ", currentModule," is set to 'default' or NULL;")
-      message("... setting to '", newVal,
-              "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
-    } else if (length(paramInOtherMods) > 1) {
-      mess <- paste0("Modules in this simList have multiple values for ",paramToCheck," (",
-                     paste(paramInOtherMods, collapse = ", "),
-                     messSuff)
-      fail <- TRUE
+  if (!identical(paramInThisMod, paramInOtherMods)) {
+    if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
+      if (length(paramInOtherMods) == 1) {
+        newVal <- paramInOtherMods
+        message(paramToCheck, " in ", currentModule," is set to 'default' or NULL;")
+        message("... setting to '", newVal,
+                "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
+      } else if (length(paramInOtherMods) > 1) {
+        mess <- paste0("Modules in this simList have multiple values for ",paramToCheck," (",
+                       paste(paramInOtherMods, collapse = ", "),
+                       messSuff)
+        fail <- TRUE
+      }
+    } else {
+      if (length(paramInOtherMods) > 0) {
+        mess <- paste0("Including this module, there are multiple values for ",paramToCheck," (",
+                       paste(c(paramInThisMod, paramInOtherMods), collapse = ", "),
+                       messSuff)
+        fail <- TRUE
+      }
     }
-  } else {
-    if (length(paramInOtherMods) > 0) {
-      mess <- paste0("Including this module, there are multiple values for ",paramToCheck," (",
-                     paste(c(paramInThisMod, paramInOtherMods), collapse = ", "),
-                     messSuff)
-      fail <- TRUE
+    if (isTRUE(fail)) {
+      if (identical(ifSetButDifferent[1], "error")) stop(mess)
+      if (identical(ifSetButDifferent[1], "warning")) warning(mess)
+      if (identical(ifSetButDifferent[1], "message")) message(mess)
     }
-  }
-  if (isTRUE(fail)) {
-    if (identical(ifSetButDifferent[1], "error")) stop(mess)
-    if (identical(ifSetButDifferent[1], "warning")) warning(mess)
-    if (identical(ifSetButDifferent[1], "message")) message(mess)
   }
 
   newVal
