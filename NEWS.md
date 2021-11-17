@@ -7,7 +7,7 @@ version 1.0.9.9000
 * drop support for R 3.6 (#178)
 
 ## new features
-* none
+* There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.
 
 ## bug fixes
 * minor bugfix when `debug` arg of `spades` is set to an event type that is also in the core modules (e.g., save, load), such as "init"
