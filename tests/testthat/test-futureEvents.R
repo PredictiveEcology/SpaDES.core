@@ -1,9 +1,8 @@
 test_that("test spades.futureEvents", {
   if (interactive()) {
     skip_on_os("windows")
-    testInitOut <- testInit( smcc = FALSE, libraries = "future",
-                            opts = list("reproducible.useMemoise" = FALSE,
-                                                      "spades.futureEvents" = TRUE))
+    testInitOut <- testInit(smcc = FALSE, libraries = "future",
+                            opts = list("reproducible.useMemoise" = FALSE, "spades.futureEvents" = TRUE))
     tmpdir <- tempdir()
     modPath <- system.file("sampleModules", package = "SpaDES.core")
     newModule("test", path = modPath)
@@ -35,8 +34,7 @@ test_that("test spades.futureEvents", {
     },
     add = TRUE)
 
-
-    future::plan(future::multiprocess(workers = 3))
+    future::plan(future::multisession(workers = 3))
 
     mods <- c("caribouMovement", "randomLandscapes", "fireSpread", "test")
     # Example of changing parameter values
