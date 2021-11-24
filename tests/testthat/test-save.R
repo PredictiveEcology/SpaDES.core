@@ -13,7 +13,7 @@ test_that("saving files (and memoryUse)", {
 
   origPlan <- future::plan()
   if (is(origPlan, "sequential"))
-    pl <- suppressWarnings(future::plan("multiprocess", workers = 2)) ## suppressed for checks in Rstudio
+    pl <- suppressWarnings(future::plan("multisession", workers = 2)) ## suppressed for checks in Rstudio
   on.exit({
     future::plan(origPlan)
   }, add = TRUE)

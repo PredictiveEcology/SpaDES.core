@@ -1111,7 +1111,7 @@ setMethod(
 
         message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
                 "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
-                "User must manage future::plan, e.g., \nfuture::plan(multiprocess(workers = 2))")
+                "User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))")
         sim$.futureEventsSkipped <- 0
         sim$simFuture <- list()
       }
