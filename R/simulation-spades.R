@@ -882,7 +882,7 @@ setMethod(
       options("spades.covr2" = TRUE)
       if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
       .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-      return(.pkgEnv$.sim)
+      return(.simBackup)
     }
     oldWd <- getwd()
     on.exit({
@@ -917,9 +917,9 @@ setMethod(
       # If there already is a sim object saved in the .pkgEnv, it may have objects,
       #   and those objects may have temporary files from file-backed objects stored.
       #   This will remove those file-backed temp files
-      clearFileBackedObjs(.pkgEnv$.sim$.recoverableObjs, recoverMode)
-      .pkgEnv$.sim <- NULL # Clear anything that was here.
-      .pkgEnv$.sim <- sim # set up pointer
+      clearFileBackedObjs(.pkgEnv$.recoverableObjs, recoverMode)
+      assign(".simBackup", NULL, envir = .GlobalEnv)
+      .simBackup <<- sim # set up pointer
 
       # set the options("spades.xxxPath") to the values in the sim@paths
       oldGetPaths <- getPaths()
@@ -1004,10 +1004,10 @@ setMethod(
             messageInterrupt1(recoverMode)
           } else {
             message(crayon::magenta("simList saved in\n",
-                                    crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
+                                    crayon::blue(".simBackup"),
                                     "\nIt will be deleted at next spades() call."))
           }
-          .pkgEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+          .simBackup <<- sim # no copy of objects -- essentially 2 pointers throughout
           .pkgEnv$.cleanEnd <- NULL
         }
         # For restarting R -- a few extra pieces, including saving the simList as the last thing
@@ -1456,7 +1456,7 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
                                  format(rmo$recoverModeTiming, units = "auto", digits = 3),
                                  " and ", format(recoverableObjsSize, units = "auto"))))
   message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
-                          "in the simList located at SpaDES.core:::.pkgEnv$.sim,",
+                          "in the simList located at .simBackup,",
                           "as sim$.recoverableObjs, with the most recent event",
                           "the first element in the list, 2nd most recent event = the second most recent event, etc.",
                           " The objects contained in each of those are only the objects that may have",
@@ -1470,7 +1470,7 @@ messageInterrupt1 <- function(recoverMode) {
   message(
     crayon::magenta("Because of an interrupted spades call, the sim object ",
                     c("at the time of interruption ", "at the start of the interrupted event ")[(recoverMode > 0) + 1],
-                    "was saved in \n", crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
+                    "was saved in \n", crayon::blue(".simBackup"),
                     "\nIt will be deleted on next call to spades"))
 }
 

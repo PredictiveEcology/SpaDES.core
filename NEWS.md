@@ -1,6 +1,6 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.0.9.9000
+version 1.0.10
 =============
 
 ## dependency changes
@@ -9,6 +9,9 @@ version 1.0.9.9000
 ## new features
 * There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.
 * new function: `paramCheckOtherMods`. Can be used within a module to assert that a parameter has the same value as the same parameter in other modules. This is therefore a check of a parameter that might be considered a `.global` and passed within `simInit(..., params = list(.globals = list(someParam = "someValue")))`, but the user did not do that.
+
+## Changes
+* the default behaviour was to keep a live pointer of the active `simList` in the hidden package environment (`asNamespace("SpaDES.core"):::.pkgEnv$.sim`). This may cause a memory leak. That pointer is now being put into the `.GlobalEnv`.
 
 ## bug fixes
 * minor bugfix when `debug` arg of `spades` is set to an event type that is also in the core modules (e.g., save, load), such as "init"

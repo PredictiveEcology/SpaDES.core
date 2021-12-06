@@ -53,7 +53,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' The \code{simList} will be in the state it was at the time of the error.
 #'
 #' @param sim A simList. If not supplied (the default), this will take the sim from
-#'    \code{SpaDES.core:::.pkgEnv$.sim}, i.e., the one that was interrupted
+#'    \code{.simBackup}, i.e., the one that was interrupted
 #' @param module A character string length one naming the module that caused the error and
 #'   whose source code was fixed. This module will be reparsed and placed into the simList
 #' @param restart Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
@@ -75,7 +75,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- simInit()
 #' s <- spades(s) # if this is interrupted or fails
 #' s <- restartSpades() # don't need to put simList
-#'                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
+#'                      # will take from .simBackup automatically
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
                           restart = TRUE, ...) {
@@ -84,7 +84,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
-    sim <- .pkgEnv$.sim
+    sim <- .simBackup
   }
 
   if (is.null(module)) {
@@ -458,7 +458,7 @@ First <- function(...) {
     sim <- eval(.spadesCall)
     message(crayon::green("Because restartR was used, the simList is located in the location above.",
                           " It should be assigned to an object immediately: e.g.,\n",
-                          "sim <- SpaDES.core:::.pkgEnv$.sim"))
+                          "sim <- .simBackup"))
   } else {
     message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
                           " named 'sim' (which may not be the same as the original assignment)"))
