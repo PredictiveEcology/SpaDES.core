@@ -1468,7 +1468,7 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
 #' @keywords internal
 messageInterrupt1 <- function(recoverMode) {
   message(
-    crayon::magenta("Because of an interrupted spades call, the sim object ",
+    crayon::magenta("\nBecause of an interrupted spades call, the sim object ",
                     c("at the time of interruption ", "at the start of the interrupted event ")[(recoverMode > 0) + 1],
                     "was saved in \n", crayon::blue(".simBackup"),
                     "\nIt will be deleted on next call to spades"))
