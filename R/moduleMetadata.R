@@ -20,7 +20,7 @@
 #'
 #' @example inst/examples/example_moduleMetadata.R
 #'
-setGeneric("moduleMetadata", function(sim, module, path,
+setGeneric("moduleMetadata", function(sim, module, path = getOption("spades.modulePath", NULL),
                                       defineModuleListItems = c(
                                         "name", "description", "keywords", "childModules", "authors",
                                         "version", "spatialExtent", "timeframe", "timeunit", "citation",
@@ -85,8 +85,9 @@ setMethod(
 setMethod(
   "moduleMetadata",
   signature = c(sim = "missing", module = "character", path = "missing"),
-  definition = function(module) {
-    moduleMetadata(module = module, path = getOption("spades.modulePath"))
+  definition = function(module, defineModuleListItems) {
+    moduleMetadata(module = module, path = getOption("spades.modulePath"),
+                   defineModuleListItems = defineModuleListItems)
 })
 
 #' @export
@@ -94,13 +95,13 @@ setMethod(
 setMethod(
   "moduleMetadata",
   signature = c(sim = "ANY", module = "ANY", path = "ANY"),
-  definition = function(sim, module, path) {
+  definition = function(sim, module, path, defineModuleListItems) {
     if (is.character(sim)) {
       message("Assuming sim is a module name")
       if (missing(path)) {
-        metadataList <- moduleMetadata(module = sim)
+        metadataList <- moduleMetadata(module = sim, defineModuleListItems = defineModuleListItems)
       } else {
-        metadataList <- moduleMetadata(module = sim, path = path)
+        metadataList <- moduleMetadata(module = sim, path = path, defineModuleListItems = defineModuleListItems)
       }
 
     } else {
