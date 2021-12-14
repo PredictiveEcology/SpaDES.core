@@ -3,6 +3,9 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 version 1.0.9.9000
 =============
 
+## new features
+* `newModule` now correctly places the `SpaDES.core` package dependency in the `reqdPkgs` element of the metadata, instead of `version`. It will put the full Github reference if SpaDES.core was installed directly from GitHub.
+
 ## dependency changes
 * drop support for R 3.6 (#178)
 
