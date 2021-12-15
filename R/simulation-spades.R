@@ -1802,7 +1802,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
     #  That will be sufficient
     if (length(sim$._simPrevs)) {
-      if (startsWith(mess, format(st, format = stForm1))) {
+      if (startsWith(mess, strftime(st, format = "%h%d"))) {
         mess <- gsub("^.{11,14} ", ": ", mess) # remove date
         sim <- get("sim", sim$._simPrevs[[1]])
       }
@@ -1836,6 +1836,5 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   mess <- paste0(modName8Chars, mess)
   mess <- gsub("\\n", "", mess)
 
-  paste0(format(st, format = stForm2),
-         mess)
+  paste0(strftime(st, format = stForm2), mess)
 }
