@@ -99,7 +99,7 @@ setMethod(
                          a <- mget(objs, envir = allEnvsInSimList[[name]])
                          nonZero <- unlist(lapply(a, function(x) length(x) > 0))
                          .robustDigest(a[nonZero],
-                                       quick = quick,
+                                       quick = !isFALSE(quick), # can be character or TRUE --> TRUE
                                        length = length)
                        } else {
                          list()
