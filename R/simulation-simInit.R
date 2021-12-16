@@ -359,13 +359,13 @@ setMethod(
     modulesLoaded <- list()
 
     # If this is being run inside a module, then it needs to know
-    simPrev <- try(whereInStack("sim"), silent = TRUE)
+    simPrev <- .grepSysCalls(sys.calls(), ".runEvent")
 
     # create simList object for the simulation
     sim <- new("simList")
 
-    if (is(simPrev, "environment") && !identical(simPrev, .GlobalEnv)) {
-      sim$._simPrevs <- append(simPrev, sim$._simPrev)
+    if (length(simPrev) > 0) {
+      sim$._simPrevs <- append(sys.frames()[tail(simPrev, 1)], sim$._simPrev)
     } else {
       sim$._simPrevs <- list()
     }
