@@ -1790,10 +1790,24 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
+  st <- Sys.time()
+  stForm1 <- "%h%d"
+  stForm2 <- paste(stForm1, "%H:%M:%S")
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
   if (numCharsMax > 0) {
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
-    sim <- get("sim", whereInStack("sim"), inherits = FALSE)
+    simEnv <- whereInStack("sim")
+    sim <- get("sim", simEnv, inherits = FALSE)
+
+    # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
+    #  That will be sufficient
+    if (length(sim$._simPrevs)) {
+      if (startsWith(mess, strftime(st, format = "%h%d"))) {
+        mess <- gsub("^.{11,14} ", ": ", mess) # remove date
+        sim <- get("sim", sim$._simPrevs[[1]])
+      }
+    }
+
     if (length(sim@current)) {
       modName <- sim@current$moduleName
 
@@ -1822,6 +1836,5 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   mess <- paste0(modName8Chars, mess)
   mess <- gsub("\\n", "", mess)
 
-  paste0(format(Sys.time(), format = "%h%d %H:%M:%S"),
-         mess)
+  paste0(strftime(st, format = stForm2), mess)
 }

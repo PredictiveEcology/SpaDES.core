@@ -10,7 +10,7 @@
 moduleMetadata(
   sim,
   module,
-  path,
+  path = getOption("spades.modulePath", NULL),
   defineModuleListItems = c("name", "description", "keywords", "childModules",
     "authors", "version", "spatialExtent", "timeframe", "timeunit", "citation",
     "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects")
@@ -18,9 +18,16 @@ moduleMetadata(
 
 \S4method{moduleMetadata}{missing,character,character}(module, path, defineModuleListItems)
 
-\S4method{moduleMetadata}{missing,character,missing}(module)
+\S4method{moduleMetadata}{missing,character,missing}(module, defineModuleListItems)
 
-\S4method{moduleMetadata}{ANY,ANY,ANY}(sim, module, path)
+\S4method{moduleMetadata}{ANY,ANY,ANY}(
+  sim,
+  module,
+  path = getOption("spades.modulePath", NULL),
+  defineModuleListItems = c("name", "description", "keywords", "childModules",
+    "authors", "version", "spatialExtent", "timeframe", "timeunit", "citation",
+    "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects")
+)
 }
 \arguments{
 \item{sim}{A \code{simList} simulation object, generally produced by \code{simInit}.}

@@ -357,8 +357,19 @@ setMethod(
 
     # user modules
     modulesLoaded <- list()
+
+    # If this is being run inside a module, then it needs to know
+    simPrev <- .grepSysCalls(sys.calls(), ".runEvent")
+
     # create simList object for the simulation
     sim <- new("simList")
+
+    if (length(simPrev) > 0) {
+      sim$._simPrevs <- append(sys.frames()[tail(simPrev, 1)], sim$._simPrev)
+    } else {
+      sim$._simPrevs <- list()
+    }
+
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
     on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
