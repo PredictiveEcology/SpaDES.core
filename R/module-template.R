@@ -232,7 +232,7 @@ setMethod(
       lapply(children, function(x) version[[x]] <<- "0.0.1")
 
     SpaDES.core.version <- as.character(utils::packageVersion("SpaDES.core"))
-    DESCtxt <- Require:::DESCRIPTIONFile(system.file("DESCRIPTION", package = "SpaDES.core"))
+    DESCtxt <- readLines(system.file("DESCRIPTION", package = "SpaDES.core"))
     if (any(grepl("GithubRepo", DESCtxt))) {
       Grepo <- gsub(".+: ", "", grep("GithubRepo", DESCtxt, value = TRUE))
       Guser <- gsub(".+: ", "", grep("GithubUsername", DESCtxt, value = TRUE))
