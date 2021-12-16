@@ -364,7 +364,7 @@ setMethod(
     # create simList object for the simulation
     sim <- new("simList")
 
-    if (is(simPrev, "environment")) {
+    if (is(simPrev, "environment") && !identical(simPrev, .GlobalEnv)) {
       sim$._simPrevs <- append(simPrev, sim$._simPrev)
     } else {
       sim$._simPrevs <- list()
