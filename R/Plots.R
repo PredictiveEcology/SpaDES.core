@@ -176,7 +176,7 @@ Plots <- function(data, fn, filename,
   needSave <- any(grepl(paste(ggplotClassesCanHandleBar, "|object"), types))
 
   # has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
-  needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))`
+  needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
   if (missing(fn) && isTRUE(usePlot)) {
     fn <- Plot
   }
