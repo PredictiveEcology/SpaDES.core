@@ -158,15 +158,18 @@ Plots <- function(data, fn, filename,
 
     if (is(simIsIn, "try-error")) {
       .plotInitialTime <- 0L
-    } else if (is(.plotInitialTime, "call")) {
-      .plotInitialTime = try(eval(.plotInitialTime, envir = simIsIn), silent = TRUE)
-      if (is(.plotInitialTime, "try-error"))
-        .plotInitialTime <- 0L
     } else {
       sim <- get("sim", envir = simIsIn)
+      # only look in the metadata -- not the simList (which will have a default of NA)
       isPlotITinSim <- ".plotInitialTime" %in% moduleMetadata(sim, currentModule(sim))$parameters$paramName
       if (isFALSE(isPlotITinSim))
         .plotInitialTime <- NULL
+
+      if (is(.plotInitialTime, "call")) {
+        .plotInitialTime = try(eval(.plotInitialTime, envir = simIsIn), silent = TRUE)
+        if (is(.plotInitialTime, "try-error"))
+          .plotInitialTime <- 0L
+      }
     }
   } else {
     .plotInitialTime <- 0L
