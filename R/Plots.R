@@ -6,7 +6,8 @@
 #' such as \code{"png"}.
 #' \emph{THIS CURRENTLY HAS BEEN TESTED WITH \code{ggplot2}, \code{RasterLayer}, and
 #' \code{tmap} objects.}
-#' It uses \code{Plot} internally, so individual plots may be rearranged. When saved to
+#' The default (or change with e.g., \code{fn = "print", usePlot = FALSE}) uses
+#' \code{Plot} internally, so individual plots may be rearranged. When saved to
 #' disk (e.g., via `type = 'png'`), then `Plot` will not be used and the single object
 #' that is the result of this `Plots` call will be saved to disk.
 #' This function requires at least 2 things: a plotting function and arguments passed
@@ -154,12 +155,18 @@ Plots <- function(data, fn, filename,
     types <- unlist(types)
 
   if (!is.null(simIsIn)) {
+
     if (is(simIsIn, "try-error")) {
       .plotInitialTime <- 0L
     } else if (is(.plotInitialTime, "call")) {
       .plotInitialTime = try(eval(.plotInitialTime, envir = simIsIn), silent = TRUE)
       if (is(.plotInitialTime, "try-error"))
         .plotInitialTime <- 0L
+    } else {
+      sim <- get("sim", envir = simIsIn)
+      isPlotITinSim <- ".plotInitialTime" %in% moduleMetadata(sim, currentModule(sim))$parameters$paramName
+      if (isFALSE(isPlotITinSim))
+        .plotInitialTime <- NULL
     }
   } else {
     .plotInitialTime <- 0L
@@ -167,7 +174,9 @@ Plots <- function(data, fn, filename,
 
   ggplotClassesCanHandleBar <- paste(ggplotClassesCanHandle, collapse = "|")
   needSave <- any(grepl(paste(ggplotClassesCanHandleBar, "|object"), types))
-  needScreen <- !is.na(.plotInitialTime) && any(grepl("screen", types))
+
+  # has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
+  needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))`
   if (missing(fn) && isTRUE(usePlot)) {
     fn <- Plot
   }
