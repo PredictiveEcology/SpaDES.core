@@ -1107,7 +1107,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
-    if (!is.null(sim@.xData$.mods[[mBase]][[".inputObjects"]])) {
+    if (!is.null(.getModuleInputObjects(sim, m))) {
       # browser(expr = exists("._runModuleInputObjects_2"))
       if (!missing(objects))
         list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],

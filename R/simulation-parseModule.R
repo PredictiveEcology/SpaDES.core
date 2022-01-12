@@ -223,68 +223,78 @@ setMethod(
 
         #sim@.xData$.mods[[mBase]] <- new.env(parent = sim@.xData$.mods)
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        tmp <- .parseConditional(envir = envir, filename = filename)
+        activeCode <- list()
         sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
-        # sim@.xData$.mods[[mBase]] <- new.env(parent = emptyenv())
         attr(sim@.xData$.mods[[mBase]], "name") <- mBase
-        # sim@.xData$.objects[[mBase]]<- new.env(parent = emptyenv())
         sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
-        tmp <- .parseConditional(envir = envir, filename = filename)
+        if (.isPackage(m, sim)) {
+          if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
+          # pkgload::load_all(m)
+          roxygen2::roxygenise(m, roclets = NULL)
+          pkgload::dev_topic_index_reset(m)
+          activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                                                     asNamespace(.moduleNameNoUnderscore(mBase)),
+                                                     sim = sim)
+        } else {
 
-        # load all code into simList@.xData[[moduleName]]
-        # The simpler line commented below will not allow actual code to be put into module,
-        #  e.g., startSim <- start(sim)
-        #  The more complex one following will allow that.
-        # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
-        activeCode <- list()
-        activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                                                   sim@.xData$.mods[[mBase]],
-                                                   sim = sim)
+          #Eliot tmp <- .parseConditional(envir = envir, filename = filename)
 
-        # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
-        doesntUseNamespacing <- !.isNamespaced(sim, mBase)
+          # load all code into simList@.xData[[moduleName]]
+          # The simpler line commented below will not allow actual code to be put into module,
+          #  e.g., startSim <- start(sim)
+          #  The more complex one following will allow that.
+          # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
+          activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                                                     sim@.xData$.mods[[mBase]],
+                                                     sim = sim)
 
-        # evaluate the rest of the parsed file
-        if (doesntUseNamespacing) {
-          message("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
-                  "It is now recommended to define functions that are not prefixed with the module name\n  ",
-                  "and to no longer call the functions with sim$functionName.\n  ",
-                  "Simply call functions in your module with their name: e.g.,\n  ",
-                  "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
-          #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
-          out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-                                     sim@.xData$.mods,
-                                     sim = sim)
-          #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
-        }
+          # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
+          doesntUseNamespacing <- !.isNamespaced(sim, mBase)
 
-        # attach source code to simList in a hidden spot
-        opt <- getOption("spades.moduleCodeChecks")
-
-        if (isTRUE(opt) || length(names(opt)) > 1)
-          list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.xData$.mods[[mBase]])
-        sim@.xData$.mods[[mBase]][["._sourceFilename"]] <- grep(paste0(mBase,".R"),
-                                                                ls(sim@.xData[[".parsedFiles"]]), value = TRUE)
-
-        # parse any scripts in R subfolder
-        RSubFolder <- file.path(dirname(filename), "R")
-        RScript <- dir(RSubFolder, pattern = "([.]R$|[.]r$)") ## only R files
-        if (length(RScript) > 0) {
-          for (Rfiles in RScript) {
-            parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
-            if (doesntUseNamespacing) {
-              #eval(parsedFile1, envir = sim@.xData)
-              evalWithActiveCode(parsedFile1, sim@.xData$.mods,
-                                 sim = sim)
-            }
-
-            # duplicate -- put in namespaces location
-            #eval(parsedFile1, envir = sim@.xData$.mods[[mBase]])
-            activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData$.mods[[mBase]],
-                                                       sim = sim)
+          # evaluate the rest of the parsed file
+          if (doesntUseNamespacing) {
+            message("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
+                    "It is now recommended to define functions that are not prefixed with the module name\n  ",
+                    "and to no longer call the functions with sim$functionName.\n  ",
+                    "Simply call functions in your module with their name: e.g.,\n  ",
+                    "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
+            #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
+            out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
+                                       sim@.xData$.mods,
+                                       sim = sim)
+            #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
           }
-        }
 
+          # attach source code to simList in a hidden spot
+          opt <- getOption("spades.moduleCodeChecks")
+
+          if (isTRUE(opt) || length(names(opt)) > 1)
+            list2env(list(._parsedData = tmp[["._parsedData"]]), sim@.xData$.mods[[mBase]])
+          sim@.xData$.mods[[mBase]][["._sourceFilename"]] <- grep(paste0(mBase,".R"),
+                                                                  ls(sim@.xData[[".parsedFiles"]]), value = TRUE)
+
+          # parse any scripts in R subfolder
+          RSubFolder <- file.path(dirname(filename), "R")
+          RScript <- dir(RSubFolder, pattern = "([.]R$|[.]r$)") ## only R files
+          if (length(RScript) > 0) {
+            for (Rfiles in RScript) {
+              parsedFile1 <- parse(file.path(RSubFolder, Rfiles))
+              if (doesntUseNamespacing) {
+                #eval(parsedFile1, envir = sim@.xData)
+                evalWithActiveCode(parsedFile1, sim@.xData$.mods,
+                                   sim = sim)
+              }
+
+              # duplicate -- put in namespaces location
+              #eval(parsedFile1, envir = sim@.xData$.mods[[mBase]])
+              activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData$.mods[[mBase]],
+                                                         sim = sim)
+            }
+          }
+
+        }
         # evaluate all but inputObjects and outputObjects part of 'defineModule'
         #  This allow user to use params(sim) in their inputObjects
         namesParsedList <- names(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]])
@@ -534,8 +544,13 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #'
 #' @keywords internal
 #' @rdname getModuleInputObjects
+#' @include helpers.R
 .getModuleInputObjects <- function(sim, m) {
-  sim@.xData$.mods[[basename(m)]][[".inputObjects"]]
+  if (.isPackage(m, sim)) {
+    getFromNamespace(".inputObjects", .moduleNameNoUnderscore(m))
+  } else {
+    sim@.xData$.mods[[basename(m)]][[".inputObjects"]]
+  }
 }
 
 #' Check is module uses module namespacing
@@ -546,4 +561,11 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 #' @rdname isNamespaced
 .isNamespaced <- function(sim, m) {
   !isTRUE(any(grepl(paste0("^", basename(m)), ls(sim@.xData$.mods[[basename(m)]]))))
+}
+
+.isPackage <- function(fullModulePath, sim) {
+  if (!isAbsolutePath(fullModulePath)) {
+    fullModulePath <- file.path(modulePath(sim), fullModulePath)
+  }
+  file.exists(file.path(fullModulePath, "DESCRIPTION"))
 }

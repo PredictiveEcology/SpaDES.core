@@ -219,11 +219,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE))
+          if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE)) {
+            if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
+                                      silent = TRUE, error = function(x) FALSE)
+                             ))
             stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
                  "sim$", curModuleName, ". ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
+          }
         }
       } else {
         stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
