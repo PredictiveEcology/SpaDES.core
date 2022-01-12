@@ -7,9 +7,11 @@ test_that("local mod object", {
 
   newModule("test", tmpdir, open = FALSE)
   newModule("test2", tmpdir, open = FALSE)
+  testFilePath <- file.path(tmpdir, "test", "test.R")
+  test2FilePath <- file.path(tmpdir, "test2", "test2.R")
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  cat(file = file.path(tmpdir, "test", "test.R"),'
+  cat(file = testFilePath,'
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",
@@ -41,6 +43,10 @@ test_that("local mod object", {
       mod$a <- 2
       sim$testPar1 <- Par$testParA
 
+      if (tryCatch(exists("Init", envir = asNamespace("test"), inherits = FALSE), error = function(x) FALSE)) {
+        sim <- Init(sim)
+      }
+
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       },
       event1 = {
@@ -50,13 +56,15 @@ test_that("local mod object", {
       }
 
       .inputObjects <- function(sim) {
+      if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
+        browser()
         mod$x <- "sdf"
         return(sim)
 
       }
       ', fill = TRUE)
 
-  cat(file = file.path(tmpdir, "test2", "test2.R"),'
+  cat(file = test2FilePath,'
       defineModule(sim, list(
       name = "test2",
       description = "insert module description here",
@@ -91,6 +99,10 @@ test_that("local mod object", {
       switch(
       eventType,
       init = {
+      if (tryCatch(exists("Init", envir = asNamespace("test2"), inherits = FALSE), error = function(x) FALSE)) {
+        sim <- Init(sim)
+      }
+
       if (isTRUE(P(sim)$testParB >= 1100)) {
          P(sim, "testParB") <-  P(sim)$testParB + 756
       }
@@ -263,5 +275,90 @@ test_that("local mod object", {
     sim@params$test2$testRestartSpades <- NULL
     sim3 <- restartSpades(sim, debug = FALSE)
     expect_true(NROW(completed(sim3)) == 7)
+    options("spades.recoveryMode" = FALSE)
   }
+
+
+  # Test converting these to packages
+  if (interactive()) {
+    if (requireNamespace("pkgload")) {
+      cat(file = testFilePath,'
+      Init <- function(sim) {
+      browser()
+        sim$aaaa <- Run(1)
+        return(sim)
+      }
+
+      Run <- function(a) {
+        return(a + 1)
+      }
+      ', fill = TRUE, append = TRUE)
+
+      cat(file = test2FilePath,'
+      Init <- function(sim) {
+      browser()
+        sim$bbbb <- Run2(1)
+        sim$cccc <- try(Run(1), silent = TRUE)
+        return(sim)
+      }
+
+      Run2 <- function(a) {
+        return(a + 2)
+      }
+      ', fill = TRUE, append = TRUE)
+
+      aaaaa <<- 1
+
+      for (tt in c("test", "test2")) {
+        expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+        expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+      }
+      convertToPackage(module = "test", path = tmpdir)
+      convertToPackage(module = "test2", path = tmpdir)
+      for (tt in c("test", "test2")) {
+        expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+        expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+        expect_true(dir.exists(file.path(tmpdir, tt, "R")))
+      }
+      expect_true(file.exists(file.path(tmpdir, "test", "R", "Init.R")))
+      expect_true(file.exists(file.path(tmpdir, "test2", "R", "Init.R")))
+      expect_true(file.exists(file.path(tmpdir, "test", "R", "Run.R")))
+      expect_true(file.exists(file.path(tmpdir, "test2", "R", "Run2.R")))
+
+      mySim9 <- simInit(times = list(start = 0, end = 0),
+                        paths = list(modulePath = tmpdir), modules = c("test", "test2"))
+
+      # doesn't document
+      for (tt in c("test", "test2")) {
+        expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+        expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+        expect_true(dir.exists(file.path(tmpdir, tt, "R")))
+      }
+
+      # document
+      out <- lapply(c("test", "test2"), function(tt) {
+        roxygen2::roxygenise(file.path(tmpdir, tt))
+      })
+
+      # Will run document() so will have the NAMESPACE and
+      for (tt in c("test", "test2")) {
+        expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+        expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+        expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
+      }
+
+      # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
+      working <- spades(mySim9, debug = FALSE)
+      expect_true(is(working, "simList"))
+      expect_true(working$aaaa == 2)
+      expect_true(working$bbbb == 4)
+      expect_true(is(working$cccc), "try-error")
+      bbb <- Run2(2)
+      expect_true(bbb == 4)
+      pkgload::unload("test")
+      pkgload::unload("test2")
+    }
+  }
+
+
 })

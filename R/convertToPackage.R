@@ -76,6 +76,12 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
     cat(format(aa[[element]]), file = filePath, sep = "\n", append = TRUE)
   })
+
+  filePathImportSpadesCore <- file.path(dirname(mainModuleFile), "R", "zzz.R")
+  cat(file = filePathImportSpadesCore,
+      "#' @import SpaDES.core
+      NULL", fill = TRUE)
+
   cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
   d <- list()
@@ -107,7 +113,9 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   cat(paste("Description:", d$Description), file = dFile, sep = "\n", append = TRUE)
   cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
-  cat(c("Depends:", paste("   ", d$Depends, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+
+  if (length(d$Depends))
+    cat(c("Depends:", paste("   ", d$Depends, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
   cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
   cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)

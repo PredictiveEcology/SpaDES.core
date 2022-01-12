@@ -1,9 +1,13 @@
 makeModActiveBinding <- function(sim, mod) {
-  env <- if (.isPackage(fullModulePath = mod, sim = sim)) {
-    asNamespace(.moduleNameNoUnderscore(mod))
-  } else {
+  env <- #if (.isPackage(fullModulePath = mod, sim = sim)) {
+    #browser()
+    #asNamespace(.moduleNameNoUnderscore(mod))
+  #} else {
     sim@.xData$.mods[[mod]]
-  }
+  #}
+  if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
+    browser()
+
   makeActiveBinding(sym = "mod",
                     fun = activeModBindingFunction,
                     env = env)
@@ -25,6 +29,8 @@ activeModBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
+    if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
+      browser()
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
