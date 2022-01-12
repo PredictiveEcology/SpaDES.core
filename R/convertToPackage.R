@@ -17,13 +17,14 @@
 #' @param path Character string of modulePath. Defaults to
 #'   \code{getOption("spades.modulePath")}
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath")) {
-  e <- new.env(parent = asNamespace("SpaDES.core"))
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
   aa <- parse(mainModuleFile)
   defModule <- grepl("^defineModule", aa)
   whDefModule <- which(defModule)
   whNotDefModule <- which(!defModule)
 
+  RsubFolder <- file.path(dirname(mainModuleFile), "R")
+  checkPath(RsubFolder, create = TRUE)
   fileNames <- lapply(whNotDefModule, function(element) {
     fn <- aa[[element]][[2]]
 
@@ -51,6 +52,9 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   versionNumb <- Require::extractVersionNumber(deps)
   hasVersionNumb <- !is.na(versionNumb)
   inequality <- paste0("(", gsub("(.+)\\((.+)\\)", "\\2", deps[hasVersionNumb]), ")")
+  missingSpace <- !grepl("[[:space:]]", inequality)
+  if (any(missingSpace))
+    inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
   d$Depends <- Require::extractPkgName(deps)
   d$Depends[hasVersionNumb] <- paste(d$Depends[hasVersionNumb], inequality)
 
@@ -65,6 +69,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
   cat(c("Depends:", paste("   ", d$Depends, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
+  cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
 
   return(invisible())
 

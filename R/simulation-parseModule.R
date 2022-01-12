@@ -566,14 +566,21 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
 .isPackage <- function(fullModulePath, sim) {
   modEnv <- sim@.xData$.mods[[basename2(fullModulePath)]]
-  if (exists(".isPackage", envir = modEnv))
-    modEnv$.isPackage
-  else
-    isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(fullModulePath)),
-                         silent = TRUE, error = function(x) FALSE))
-  # if (!isAbsolutePath(fullModulePath)) {
-  #   fullModulePath <- file.path(modulePath(sim), fullModulePath)
-  # }
-  # file.exists(file.path(fullModulePath, "DESCRIPTION"))
+  # There are 3 ways to check ... existence of .isPackage is fastest, but may be wrong
+  # if the namespace exists ... 2nd fastest, but also may be wrong if FALSE
+  # finally, the presence of a DESCRIPTION file -- slowest
+  if (exists(".isPackage", envir = modEnv, inherits = FALSE)) {
+    isPack <- modEnv$.isPackage
+  } else {
+    isPack <- isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(fullModulePath)),
+                                     silent = TRUE, error = function(x) FALSE))
+    if (isFALSE(isPack)) {
+      if (!isAbsolutePath(fullModulePath)) {
+        fullModulePath <- file.path(modulePath(sim), fullModulePath)
+      }
+      isPack <- file.exists(file.path(fullModulePath, "DESCRIPTION"))
+    }
+  }
+  return(isPack)
 }
 
