@@ -228,16 +228,17 @@ setMethod(
         sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         attr(sim@.xData$.mods[[mBase]], "name") <- mBase
         sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
-
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
           # pkgload::load_all(m)
           roxygen2::roxygenise(m, roclets = NULL)
           pkgload::dev_topic_index_reset(m)
+          sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      asNamespace(.moduleNameNoUnderscore(mBase)),
                                                      sim = sim)
         } else {
+          sim@.xData$.mods[[mBase]]$.isPackage <- FALSE
 
           #Eliot tmp <- .parseConditional(envir = envir, filename = filename)
 
@@ -564,8 +565,15 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 }
 
 .isPackage <- function(fullModulePath, sim) {
-  if (!isAbsolutePath(fullModulePath)) {
-    fullModulePath <- file.path(modulePath(sim), fullModulePath)
-  }
-  file.exists(file.path(fullModulePath, "DESCRIPTION"))
+  modEnv <- sim@.xData$.mods[[basename2(fullModulePath)]]
+  if (exists(".isPackage", envir = modEnv))
+    modEnv$.isPackage
+  else
+    isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(fullModulePath)),
+                         silent = TRUE, error = function(x) FALSE))
+  # if (!isAbsolutePath(fullModulePath)) {
+  #   fullModulePath <- file.path(modulePath(sim), fullModulePath)
+  # }
+  # file.exists(file.path(fullModulePath, "DESCRIPTION"))
 }
+
