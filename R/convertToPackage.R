@@ -47,31 +47,40 @@
 #'
 #' The \code{DESCRIPTION} file that is created with this function will have
 #' several elements that a user may wish to change. Notably, all packages that were
-#' in \code{reqdPkgs} in the SpaDES module metadata will be in the \code{Depends}
-#' section of the \code{DESCRIPTION}. A user should likely follow standard R package
+#' in \code{reqdPkgs} in the SpaDES module metadata will be in the \code{Imports}
+#' section of the \code{DESCRIPTION}. Furthermore, if a module already has used
+#' \code{@importFrom} for importing a function from a package, then the generic
+#' \code{@import} will be omitted for that (those) package(s).
+#' So, a user should likely follow standard R package
 #' best practices and use \code{@importFrom} to identify the specific functions that
-#' are required within external packages. These packages can then be moved from
-#' \code{Depends} to \code{Imports} in the \code{DESCRIPTION} file.
+#' are required within external packages, thereby limiting function name collisions
+#' (and the warnings that come with them).
 #'
 #' Other elements of a standard \code{DESCRIPTION} file that will be missing or possibly
 #' inappropriately short are \code{Title}, \code{Description}, \code{URL},
 #' \code{BugReports}.
 #'
-#' A user may wish to run \code{devtools::document} to build documentation.
-#'
 #' @export
 #' @param module Character string of module name, without path
 #' @param path Character string of modulePath. Defaults to
 #'   \code{getOption("spades.modulePath")}
-convertToPackage <- function(module = NULL, path = getOption("spades.modulePath")) {
+#' @param buildDocuments A logical. If \code{TRUE}, the default, then the documentation
+#'   will be built, if any exists, using \code{roxygen2::roxygenise}
+convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
+                             buildDocuments = TRUE) {
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
   aa <- parse(mainModuleFile)
+
   defModule <- grepl("^defineModule", aa)
   whDefModule <- which(defModule)
   whNotDefModule <- which(!defModule)
 
+  NAMESPACEFile <- file.path(dirname(mainModuleFile), "NAMESPACE")
+  hasNamespaceFile <- file.exists(NAMESPACEFile)
+
   RsubFolder <- file.path(dirname(mainModuleFile), "R")
   checkPath(RsubFolder, create = TRUE)
+
   fileNames <- lapply(whNotDefModule, function(element) {
     fn <- aa[[element]][[2]]
 
@@ -109,7 +118,20 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   hasSC <- grepl("SpaDES.core", d$Imports)
   if (all(!hasSC))
     d$Imports <- c("SpaDES.core", d$Imports)
-  cat(paste0("#' @import ", d$Imports, "\nNULL\n"), sep = "\n",
+
+  namespaceImports <- d$Imports
+  # Create "import all" for each of the packages, unless it is already in an @importFrom
+  if (hasNamespaceFile) {
+    nsTxt <- readLines(NAMESPACEFile)
+    hasImportFrom <- grepl("importFrom", nsTxt)
+    if (any(hasImportFrom)) {
+      pkgsNotNeeded <- unique(gsub(".+\\((.+)\\,.+\\)", "\\1", nsTxt[hasImportFrom]))
+      namespaceImports <- grep(paste(pkgsNotNeeded, collapse = "|"),
+                               namespaceImports, invert = TRUE, value = TRUE)
+    }
+  }
+
+  cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
       file = filePathImportSpadesCore, fill = TRUE)
 
   d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
@@ -134,6 +156,14 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
 
   message("New/updated DESCRIPTION file is: ", dFile)
+
+  if (isTRUE(buildDocuments)) {
+    message("Building documentation")
+    m <- dirname(mainModuleFile)
+    roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
+    pkgload::dev_topic_index_reset(m)
+    pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
+  }
 
   return(invisible())
 

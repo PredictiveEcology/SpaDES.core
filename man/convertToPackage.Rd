@@ -4,13 +4,20 @@
 \alias{convertToPackage}
 \title{Convert standard module code into an R package}
 \usage{
-convertToPackage(module = NULL, path = getOption("spades.modulePath"))
+convertToPackage(
+  module = NULL,
+  path = getOption("spades.modulePath"),
+  buildDocuments = TRUE
+)
 }
 \arguments{
 \item{module}{Character string of module name, without path}
 
 \item{path}{Character string of modulePath. Defaults to
 \code{getOption("spades.modulePath")}}
+
+\item{buildDocuments}{A logical. If \code{TRUE}, the default, then the documentation
+will be built, if any exists, using \code{roxygen2::roxygenise}}
 }
 \value{
 This is run for its side effects. There will be a new or modified
@@ -62,16 +69,17 @@ package from \code{.libPaths} and delete the \code{DESCRIPTION} file and
 
 The \code{DESCRIPTION} file that is created with this function will have
 several elements that a user may wish to change. Notably, all packages that were
-in \code{reqdPkgs} in the SpaDES module metadata will be in the \code{Depends}
-section of the \code{DESCRIPTION}. A user should likely follow standard R package
+in \code{reqdPkgs} in the SpaDES module metadata will be in the \code{Imports}
+section of the \code{DESCRIPTION}. Furthermore, if a module already has used
+\code{@importFrom} for importing a function from a package, then the generic
+\code{@import} will be omitted for that (those) package(s).
+So, a user should likely follow standard R package
 best practices and use \code{@importFrom} to identify the specific functions that
-are required within external packages. These packages can then be moved from
-\code{Depends} to \code{Imports} in the \code{DESCRIPTION} file.
+are required within external packages, thereby limiting function name collisions
+(and the warnings that come with them).
 
 Other elements of a standard \code{DESCRIPTION} file that will be missing or possibly
 inappropriately short are \code{Title}, \code{Description}, \code{URL},
 \code{BugReports}.
-
-A user may wish to run \code{devtools::document} to build documentation.
 }
 

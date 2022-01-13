@@ -64,6 +64,12 @@ The following options are likely of interest to most users
   during \code{simInit}. These are passed to codetools::checkUsage.
   Default is given by the function, plus these  \cr
 
+  \code{moduleDocument} \tab  \code{NULL}
+    \tab  When a module is an R package e.g., via \code{convertToPackage},
+    it will not, by default, rebuild documentation during \code{simInit}. If
+    the user would like this to happen on every call to \code{simInit},
+    set this option to \code{TRUE} \cr
+
   \code{spades.modulePath} \tab \code{file.path(tempdir(), "SpaDES", "modules")})
     \tab The default local directory where modules and data will be downloaded and stored.
     Default is a temporary directory  \cr
