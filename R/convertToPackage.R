@@ -85,10 +85,6 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   })
 
   filePathImportSpadesCore <- file.path(dirname(mainModuleFile), "R", "zzz.R")
-  cat(file = filePathImportSpadesCore,
-      "#' @import SpaDES.core
-      NULL
-      ", fill = TRUE)
 
   cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
@@ -103,14 +99,20 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   d$Authors <- md$authors
   d$Authors <- c(paste0("  ", format(d$Authors)[1]), format(d$Authors)[-1])
   deps <- unlist(eval(md$reqdPkgs))
+  d$Imports <- Require::extractPkgName(deps)
   versionNumb <- Require::extractVersionNumber(deps)
   hasVersionNumb <- !is.na(versionNumb)
   inequality <- paste0("(", gsub("(.+)\\((.+)\\)", "\\2", deps[hasVersionNumb]), ")")
   missingSpace <- !grepl("[[:space:]]", inequality)
   if (any(missingSpace))
     inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
-  d$Depends <- Require::extractPkgName(deps)
-  d$Depends[hasVersionNumb] <- paste(d$Depends[hasVersionNumb], inequality)
+  hasSC <- grepl("SpaDES.core", d$Imports)
+  if (all(!hasSC))
+    d$Imports <- c("SpaDES.core", d$Imports)
+  cat(paste0("#' @import ", d$Imports, "\nNULL\n"), sep = "\n",
+      file = filePathImportSpadesCore, fill = TRUE)
+
+  d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
 
   dFile <- file.path(dirname(mainModuleFile), "DESCRIPTION")
 
@@ -122,8 +124,8 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
 
-  if (length(d$Depends))
-    cat(c("Depends:", paste("   ", d$Depends, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+  if (length(d$Imports))
+    cat(c("Imports:", paste("   ", d$Imports, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
   cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
   cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)
@@ -131,6 +133,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   cat("Roxygen: list(markdown = TRUE)", sep = "\n", file = dFile, append = TRUE)
 
 
+  message("New/updated DESCRIPTION file is: ", dFile)
 
   return(invisible())
 
