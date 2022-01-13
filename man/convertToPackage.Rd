@@ -36,10 +36,18 @@ is not a package.
 The only function that will be exported by default is the \code{doEvent.xxx},
 where \code{xxx} is the module name. If any other module is to be exported, it must
 be explicitly exported with e.g., \code{@export}, and then building the \code{NAMESPACE}
-file, e.g., via \code{devtools::document(moduleRootPath)}.
+file, e.g., via \code{devtools::document(moduleRootPath)}. NOTE: as long as all
+the functions are being used inside each other, and they all can be traced back
+to a call in \code{doEvent.xxx}, then there is no need to export anything else.
 }
 \description{
-\emph{EXPERIMENTAL -- USE WITH CAUTION}
+\emph{EXPERIMENTAL -- USE WITH CAUTION}. This function will only create the
+necessary source files so that all the code can be used (and installed) like an R package.
+This function does not install anything (e.g., \code{devtools::install}). After
+running this function, \code{simInit} will automatically detect that this is now
+a package and will load the functions (via \code{pkgload::load_all}) from the source files.
+This will have the effect that it emulates the "non-package" behaviour of a
+SpaDES module exactly.
 }
 \details{
 This will move all functions that are not already in an \code{.R} file

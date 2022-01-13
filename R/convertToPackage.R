@@ -1,6 +1,12 @@
 #' Convert standard module code into an R package
 #'
-#' \emph{EXPERIMENTAL -- USE WITH CAUTION}
+#' \emph{EXPERIMENTAL -- USE WITH CAUTION}. This function will only create the
+#' necessary source files so that all the code can be used (and installed) like an R package.
+#' This function does not install anything (e.g., \code{devtools::install}). After
+#' running this function, \code{simInit} will automatically detect that this is now
+#' a package and will load the functions (via \code{pkgload::load_all}) from the source files.
+#' This will have the effect that it emulates the "non-package" behaviour of a
+#' SpaDES module exactly.
 #'
 #' This will move all functions that are not already in an \code{.R} file
 #' in the \code{R} folder into that folder, one function per file, including the
@@ -41,7 +47,9 @@
 #' The only function that will be exported by default is the \code{doEvent.xxx},
 #' where \code{xxx} is the module name. If any other module is to be exported, it must
 #' be explicitly exported with e.g., \code{@export}, and then building the \code{NAMESPACE}
-#' file, e.g., via \code{devtools::document(moduleRootPath)}.
+#' file, e.g., via \code{devtools::document(moduleRootPath)}. NOTE: as long as all
+#' the functions are being used inside each other, and they all can be traced back
+#' to a call in \code{doEvent.xxx}, then there is no need to export anything else.
 #'
 #' @section DESCRIPTION:
 #'
@@ -148,6 +156,10 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
   if (length(d$Imports))
     cat(c("Imports:", paste("   ", d$Imports, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+
+  Suggests = c('knitr', 'rmarkdown')
+  cat(c("Suggests:", paste("   ", Suggests, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
   cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
   cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)
@@ -164,6 +176,34 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
     pkgload::dev_topic_index_reset(m)
     pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
   }
+
+  RBuildIgnoreFile <- file.path(dirname(mainModuleFile), ".Rbuildignore")
+  cat("^.*\\.Rproj$
+^\\.Rproj\\.user$
+^_pkgdown\\.yml$
+.*\\.tar\\.gz$
+.*\\.toc$
+.*\\.zip$
+^\\.lintr$
+CONTRIBUTING\\.md
+cran-comments\\.md
+^docs$
+^LICENSE$
+vignettes/.*_cache$
+vignettes/.*\\.log$
+^\\.httr-oauth$
+^revdep$
+^\\.github$
+^codecov\\.yml$
+^CRAN-RELEASE$
+^data/*
+^.git
+^.gitignore
+^.gitmodules
+    ", sep = "\n",
+      file = RBuildIgnoreFile, fill = TRUE)
+
+
 
   return(invisible())
 
