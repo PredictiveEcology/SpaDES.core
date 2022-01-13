@@ -321,3 +321,4 @@ needInstall <- function(pkg = "methods", minVersion = NULL,
 
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 
+.moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))

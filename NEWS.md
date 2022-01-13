@@ -4,6 +4,7 @@ version 1.0.10
 =============
 
 ## new features
+* **experimental new feature** `SpaDES` modules can now be R packages. The simplest way to convert a module to a package is using the new function `convertToPackage`. Benefits of doing this are so that a SpaDES module can benefit from the infrastructure of an R package (e.g., `devtools::document`, `devtools::check`, setting up Continuous Integration systems etc.)
 * `newModule` now correctly places the `SpaDES.core` package dependency in the `reqdPkgs` element of the metadata, instead of `version`. It will put the full Github reference if SpaDES.core was installed directly from GitHub.
 * There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.
 * new function: `paramCheckOtherMods`. Can be used within a module to assert that a parameter has the same value as the same parameter in other modules. This is therefore a check of a parameter that might be considered a `.global` and passed within `simInit(..., params = list(.globals = list(someParam = "someValue")))`, but the user did not do that.

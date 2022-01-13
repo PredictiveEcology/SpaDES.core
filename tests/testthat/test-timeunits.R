@@ -18,29 +18,29 @@ test_that("timeunit works correctly", {
 
   expect_equal(maxTimeunit(sim = mySim), "year")
 
-  x1 <- list(
-    name = "testModule",
-    description = "this is a test.",
-    keywords = c("test"),
-    authors = c(person(c("Alex", "M"), "Chubaty",
-                       email = "alexander.chubaty@canada.ca",
-                       role = c("aut", "cre"))),
-    version = list(testModule = "0.0.1"),
-    spatialExtent = raster::extent(rep(NA_real_, 4)),
-    timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = NA_character_,
-    citation = list(),
-    reqdPkgs = list("grid", "raster", "sp"),
-    parameters = rbind(
-      defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description")
-    ),
-    inputObjects = bindrows(
-      expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_)
-    ),
-    outputObjects = bindrows(
-      createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_)
-    )
-  )
+  # x1 <- list(
+  #   name = "testModule",
+  #   description = "this is a test.",
+  #   keywords = c("test"),
+  #   authors = c(person(c("Alex", "M"), "Chubaty",
+  #                      email = "alexander.chubaty@canada.ca",
+  #                      role = c("aut", "cre"))),
+  #   version = list(testModule = "0.0.1"),
+  #   spatialExtent = raster::extent(rep(NA_real_, 4)),
+  #   timeframe = as.POSIXlt(c(NA, NA)),
+  #   timeunit = NA_character_,
+  #   citation = list(),
+  #   reqdPkgs = list("grid", "raster", "sp"),
+  #   parameters = rbind(
+  #     defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description")
+  #   ),
+  #   inputObjects = bindrows(
+  #     expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_)
+  #   ),
+  #   outputObjects = bindrows(
+  #     createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_)
+  #   )
+  # )
 
   # Test for numerics, or character strings that are not recognized
   expect_message(timeunit(mySim) <- 1, "^unknown timeunit provided:")
