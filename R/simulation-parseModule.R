@@ -231,17 +231,20 @@ setMethod(
 
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
-          #devtools::document(m)
-          #roxygen2::roxygenise(m, roclets = NULL)
-          #pkgload::unload(basename2(m))
+          if (isTRUE(getOption("spades.moduleDocument", NULL))) {
+            roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
+            pkgload::dev_topic_index_reset(m)
+            pkgload::unload(.moduleNameNoUnderscore(mBase)) # so, unload here before reloading without exporting
+          } else {
+            message(crayon::blue("    To rebuild documentation, set options('spades.moduleDocument' = TRUE)"))
+          }
           pkgload::load_all(m, export_all = FALSE)
 
-          # Have to redo these -- needed them above because of `.isPackage`
-          sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace(mBase))
+          # Have to redo these -- needed them above because .isPackage needed an environment for module
+          sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace(.moduleNameNoUnderscore(mBase)))
           attr(sim@.xData$.mods[[mBase]], "name") <- mBase
           sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
-          # pkgload::dev_topic_index_reset(m)
           sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      asNamespace(.moduleNameNoUnderscore(mBase)),
