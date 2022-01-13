@@ -1,5 +1,7 @@
 #' Convert standard module code into an R package
 #'
+#' \emph{EXPERIMENTAL -- USE WITH CAUTION}
+#'
 #' This will move all functions that are not already in an \code{.R} file
 #' in the \code{R} folder into that folder, one function per file, including the
 #' \code{doEvent.xxx} function. It will not
@@ -35,6 +37,11 @@
 #' within the \code{simInit} call. This means that any modifications to source code
 #' will be read in at the next \code{simInit} call, as is the practice when a module
 #' is not a package.
+#'
+#' The only function that will be exported by default is the \code{doEvent.xxx},
+#' where \code{xxx} is the module name. If any other module is to be exported, it must
+#' be explicitly exported with e.g., \code{@export}, and then building the \code{NAMESPACE}
+#' file, e.g., via \code{devtools::document(moduleRootPath)}.
 #'
 #' @section DESCRIPTION:
 #'

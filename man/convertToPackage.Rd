@@ -25,8 +25,16 @@ Currently, \code{SpaDES.core} will not install the package, but will load it via
 within the \code{simInit} call. This means that any modifications to source code
 will be read in at the next \code{simInit} call, as is the practice when a module
 is not a package.
+
+The only function that will be exported by default is the \code{doEvent.xxx},
+where \code{xxx} is the module name. If any other module is to be exported, it must
+be explicitly exported with e.g., \code{@export}, and then building the \code{NAMESPACE}
+file, e.g., via \code{devtools::document(moduleRootPath)}.
 }
 \description{
+\emph{EXPERIMENTAL -- USE WITH CAUTION}
+}
+\details{
 This will move all functions that are not already in an \code{.R} file
 in the \code{R} folder into that folder, one function per file, including the
 \code{doEvent.xxx} function. It will not
@@ -38,8 +46,7 @@ package to be considered a SpaDES module. With these changes, the module should
 still function normally (still experimental), but will be able to act like an
 R package, e.g., for writing function documentation, using the \code{testthat}
 infrastructure, etc.
-}
-\details{
+
 This function is intended to be run once for a module that was created using
 the "standard" SpaDES module structure (e.g., from a \code{newModule} call). There
 is currently no way to "revert" the changes from R (though it can be done using
