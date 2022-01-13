@@ -80,7 +80,8 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   filePathImportSpadesCore <- file.path(dirname(mainModuleFile), "R", "zzz.R")
   cat(file = filePathImportSpadesCore,
       "#' @import SpaDES.core
-      NULL", fill = TRUE)
+      NULL
+      ", fill = TRUE)
 
   cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]

@@ -56,8 +56,6 @@ test_that("local mod object", {
       }
 
       .inputObjects <- function(sim) {
-      if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
-        browser()
         mod$x <- "sdf"
         return(sim)
 
@@ -284,7 +282,6 @@ test_that("local mod object", {
     if (requireNamespace("pkgload")) {
       cat(file = testFilePath,'
       Init <- function(sim) {
-      browser()
         sim$aaaa <- Run(1)
         return(sim)
       }
@@ -296,8 +293,6 @@ test_that("local mod object", {
 
       cat(file = test2FilePath,'
       Init <- function(sim) {
-      browser()
-        sim$bbbb <- Run2(1)
         sim$cccc <- try(Run(1), silent = TRUE)
         return(sim)
       }
@@ -307,7 +302,7 @@ test_that("local mod object", {
       }
       ', fill = TRUE, append = TRUE)
 
-      aaaaa <<- 1
+      # aaaaa <<- 1
 
       for (tt in c("test", "test2")) {
         expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
@@ -334,8 +329,9 @@ test_that("local mod object", {
         expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
         expect_true(dir.exists(file.path(tmpdir, tt, "R")))
       }
+      working <- spades(mySim9, debug = FALSE)
 
-      # document
+      # document -- this exports all functions!! Danger for testing later
       out <- lapply(c("test", "test2"), function(tt) {
         roxygen2::roxygenise(file.path(tmpdir, tt))
       })
@@ -348,11 +344,9 @@ test_that("local mod object", {
       }
 
       # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
-      working <- spades(mySim9, debug = FALSE)
       expect_true(is(working, "simList"))
       expect_true(working$aaaa == 2)
-      expect_true(working$bbbb == 4)
-      expect_true(is(working$cccc), "try-error")
+      expect_true(is(working$cccc, "try-error"))
       bbb <- Run2(2)
       expect_true(bbb == 4)
       pkgload::unload("test")

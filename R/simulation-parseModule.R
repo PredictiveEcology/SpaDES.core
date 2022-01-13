@@ -226,14 +226,20 @@ setMethod(
         tmp <- .parseConditional(envir = envir, filename = filename)
         activeCode <- list()
         sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+        sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
+
         if (.isPackage(m, sim)) {
-          browser()
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
           #devtools::document(m)
           #roxygen2::roxygenise(m, roclets = NULL)
           #pkgload::unload(basename2(m))
           pkgload::load_all(m, export_all = FALSE)
+
+          # Have to redo these -- needed them above because of `.isPackage`
           sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace(mBase))
+          attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+          sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
           # pkgload::dev_topic_index_reset(m)
           sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
@@ -299,9 +305,6 @@ setMethod(
           }
 
         }
-
-        attr(sim@.xData$.mods[[mBase]], "name") <- mBase
-        sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         # evaluate all but inputObjects and outputObjects part of 'defineModule'
         #  This allow user to use params(sim) in their inputObjects

@@ -1,10 +1,10 @@
 makeModActiveBinding <- function(sim, mod) {
-  env <- #if (.isPackage(fullModulePath = mod, sim = sim)) {
+  env <- if (.isPackage(fullModulePath = mod, sim = sim)) {
     #browser()
-    #asNamespace(.moduleNameNoUnderscore(mod))
-  #} else {
+    asNamespace(.moduleNameNoUnderscore(mod))
+  } else {
     sim@.xData$.mods[[mod]]
-  #}
+  }
   if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
     browser()
 
@@ -16,7 +16,7 @@ makeModActiveBinding <- function(sim, mod) {
 #' @include helpers.R
 makeParActiveBinding <- function(sim, mod) {
   env <- if (.isPackage(fullModulePath = mod, sim = sim)) {
-    asNamespace(.moduleNameNoUnderscore(mod))
+     asNamespace(.moduleNameNoUnderscore(mod))
   } else {
     sim@.xData$.mods[[mod]]
   }
