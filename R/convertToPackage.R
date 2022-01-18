@@ -97,7 +97,9 @@
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE) {
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
-  aa <- parse(mainModuleFile)
+  aa <- parse(mainModuleFile, keep.source = TRUE)
+  rlaa <- readLines(mainModuleFile)
+  gpd <- getParseData(aa)
 
   defModule <- grepl("^defineModule", aa)
   whDefModule <- which(defModule)
@@ -109,17 +111,49 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   RsubFolder <- file.path(dirname(mainModuleFile), "R")
   checkPath(RsubFolder, create = TRUE)
 
+  parseWithRoxygen <- gpd[grep("#'", gpd$text), ]
+  linesWithRoxygen <- parseWithRoxygen[, "line1"]
+
   fileNames <- lapply(whNotDefModule, function(element) {
     fn <- aa[[element]][[2]]
-
     filePath <- file.path(dirname(mainModuleFile), "R", paste0(gsub("\\.", "", fn), ".R"))
+
+    fnCh <- as.character(fn)
+    parseWithFn <- gpd[which(gpd$text == fnCh & gpd$token == "SYMBOL"),]
+    lineWithFn <- parseWithFn[, "line1"]
+    wh <- which((lineWithFn - linesWithRoxygen) == 1) # is the roxygen next to function
+    if (length(wh)) {
+      # This means there is a roxygen block for this function -- must keep it with the function code
+      lastRoxygenLine <- lineWithFn - 1 == linesWithRoxygen
+      ff <- diff(linesWithRoxygen)
+      ff[ff == 1] <- 0
+      ff[ff > 0] <- 1
+      ff <- cumsum(ff)
+      ff <- c(0, ff)
+      roxygenLinesForThisFn <- linesWithRoxygen[ff == ff[lastRoxygenLine]]
+
+      # This removes lines if they are put into a file. That means, if there are
+      #   any left over at the end, we will put them into their own file
+      linesWithRoxygen <<- setdiff(linesWithRoxygen, roxygenLinesForThisFn)
+      cat(rlaa[roxygenLinesForThisFn], file = filePath, sep = "\n", append = FALSE)
+
+    }
+
     if (isTRUE(grepl("^doEvent", fn))) {
       if (!any(grepl("@export", aa[[element]][[3]])))
-        cat("#' @export", file = filePath, sep = "\n", append = FALSE)
+        cat("#' @export", file = filePath, sep = "\n", append = TRUE)
     }
 
     cat(format(aa[[element]]), file = filePath, sep = "\n", append = TRUE)
   })
+  if (length(linesWithRoxygen) > 0) {
+    message("There was some roxygen2 documentation that was not immediately above ",
+            "a function; it is being saved in R/documentation.R ... please confirm that ",
+            "the documentation is correct.")
+    cat(rlaa[linesWithRoxygen], file = file.path(dirname(mainModuleFile), "R", "documentation.R")
+          , sep = "\n", append = FALSE)
+    linesWithRoxygen <- character()
+  }
 
   filePathImportSpadesCore <- file.path(dirname(mainModuleFile), "R", "imports.R")
 
