@@ -207,11 +207,11 @@ the module will get it here:</p>
 <span class="r-in"><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp36Xc0H/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp36Xc0H/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp36Xc0H/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp36Xc0H/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp36Xc0H/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpqFmubO/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpqFmubO/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpqFmubO/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpqFmubO/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpqFmubO/myProject/modules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">test</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span>
@@ -223,22 +223,22 @@ the module will get it here:</p>
 <span class="r-in"><span class="fu">inputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">tmpFile</span><span class="op">)</span> <span class="co"># using only required column, "file"</span></span>
 <span class="r-in"><span class="fu">inputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># see that it is not yet loaded, but when it is scheduled to be loaded</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              file     fun package objectName loadTime loaded</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/Rtmp36Xc0H/inputs/test.rds readRDS    base       test        0     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/RtmpqFmubO/inputs/test.rds readRDS    base       test        0     NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   arguments intervals</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        NA        NA</span>
 <span class="r-in"><span class="va">simOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 chckpn <span style="color: #00BB00;"> total elpsd: 0.00025 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 save   <span style="color: #00BB00;"> total elpsd: 0.0012 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 prgrss <span style="color: #00BB00;"> total elpsd: 0.0021 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.0029 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.0037 secs | 0 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   test read from /tmp/Rtmp36Xc0H/inputs/test.rds using readRDS</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 chckpn <span style="color: #00BB00;"> total elpsd: 0.00025 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 save   <span style="color: #00BB00;"> total elpsd: 0.0012 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 prgrss <span style="color: #00BB00;"> total elpsd: 0.0021 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 load   <span style="color: #00BB00;"> total elpsd: 0.0029 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 load   <span style="color: #00BB00;"> total elpsd: 0.0037 secs | 0 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 load   test read from /tmp/RtmpqFmubO/inputs/test.rds using readRDS</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span class="fu">inputs</span><span class="op">(</span><span class="va">simOut</span><span class="op">)</span> <span class="co"># confirm it was loaded</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              file     fun package objectName loadTime loaded</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/Rtmp36Xc0H/inputs/test.rds readRDS    base       test        0   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/RtmpqFmubO/inputs/test.rds readRDS    base       test        0   TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   arguments intervals</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        NA        NA</span>
 <span class="r-in"><span class="va">simOut</span><span class="op">$</span><span class="va">test</span></span>
@@ -296,29 +296,29 @@ the module will get it here:</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp36Xc0H/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp36Xc0H/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp36Xc0H/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp36Xc0H/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp36Xc0H/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpqFmubO/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpqFmubO/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpqFmubO/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpqFmubO/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpqFmubO/myProject/modules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 simInit:       DEM read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 simInit:       forestAge read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 simInit:       forestCover read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 simInit:       habitatQuality read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 simInit:       percentPine read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 chckpn <span style="color: #00BB00;"> total elpsd: 0.00024 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 save   <span style="color: #00BB00;"> total elpsd: 0.0012 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 prgrss <span style="color: #00BB00;"> total elpsd: 0.002 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.0028 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 0 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   Maps1 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   Maps2 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   Maps3 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   Maps4 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.029 secs | 10 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)  at time 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:21 simInit:       DEM read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 simInit:       forestAge read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 simInit:       forestCover read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 simInit:       habitatQuality read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 simInit:       percentPine read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 chckpn <span style="color: #00BB00;"> total elpsd: 0.00025 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 save   <span style="color: #00BB00;"> total elpsd: 0.0013 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 prgrss <span style="color: #00BB00;"> total elpsd: 0.0022 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   <span style="color: #00BB00;"> total elpsd: 0.003 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   <span style="color: #00BB00;"> total elpsd: 0.0037 secs | 0 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   Maps1 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/DEM.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   Maps2 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestAge.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   Maps3 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/forestCover.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   Maps4 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/habitatQuality.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   <span style="color: #00BB00;"> total elpsd: 0.03 secs | 10 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   Maps5 read from /home/achubaty/R/x86_64-pc-linux-gnu-library/4.1/quickPlot/maps/percentPine.tif using raster(inMemory=FALSE)  at time 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -338,19 +338,19 @@ the module will get it here:</p>
 <span class="r-in"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>inputs <span class="op">=</span> <span class="va">inputs</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp36Xc0H/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp36Xc0H/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp36Xc0H/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp36Xc0H/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp36Xc0H/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpqFmubO/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpqFmubO/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpqFmubO/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpqFmubO/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpqFmubO/myProject/modules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-in"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 chckpn <span style="color: #00BB00;"> total elpsd: 0.00024 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 save   <span style="color: #00BB00;"> total elpsd: 0.0012 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 prgrss <span style="color: #00BB00;"> total elpsd: 0.002 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.0028 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 1 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   a loaded into simList</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 chckpn <span style="color: #00BB00;"> total elpsd: 0.00025 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 save   <span style="color: #00BB00;"> total elpsd: 0.0012 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 prgrss <span style="color: #00BB00;"> total elpsd: 0.0021 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   <span style="color: #00BB00;"> total elpsd: 0.0029 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 1 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   a loaded into simList</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -359,8 +359,8 @@ the module will get it here:</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span class="r-in"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="co"># different object (a2) loaded onto a$a</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   <span style="color: #00BB00;"> total elpsd: 0.012 secs | 2 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:14 load   a loaded into simList</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   <span style="color: #00BB00;"> total elpsd: 0.013 secs | 2 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:22 load   a loaded into simList</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>

@@ -241,32 +241,32 @@ of the simulation:</p>
 <span class="r-in"><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp36Xc0H/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp36Xc0H/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp36Xc0H/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp36Xc0H/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp36Xc0H/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpqFmubO/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpqFmubO/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpqFmubO/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpqFmubO/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpqFmubO/myProject/modules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-in"><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:16 chckpn <span style="color: #00BB00;"> total elpsd: 0.00025 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:16 save   <span style="color: #00BB00;"> total elpsd: 0.0013 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:16 prgrss <span style="color: #00BB00;"> total elpsd: 0.0022 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:13:16 load   <span style="color: #00BB00;"> total elpsd: 0.003 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:23 chckpn <span style="color: #00BB00;"> total elpsd: 0.00025 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:23 save   <span style="color: #00BB00;"> total elpsd: 0.0013 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:23 prgrss <span style="color: #00BB00;"> total elpsd: 0.0022 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan18 19:19:23 load   <span style="color: #00BB00;"> total elpsd: 0.003 secs | 0 load init 0</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    moduleName eventType       elapsedTime</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 0.0010488033 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 0.0009009838 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 0.0008490086 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 0.0007939339 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 0.0010240078 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 0.0009107590 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 0.0008361340 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 0.0008413792 secs</span>
 <span class="r-in"><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">s2</span>, units <span class="op">=</span> <span class="st">"mins"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    moduleName eventType       elapsedTime</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 1.748006e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 1.501640e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 1.415014e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 1.323223e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 1.706680e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 1.517932e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 1.393557e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 1.402299e-05 mins</span>
 </code></pre></div>
     </div>
   </div>
