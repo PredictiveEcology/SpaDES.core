@@ -226,13 +226,26 @@ setMethod(
       capture.output(dput(children))
     }
 
-    version <- list(SpaDES.core = as.character(utils::packageVersion("SpaDES.core")))
+    version <- list()
     version[[name]] <- moduleDefaults[["version"]]
     if (type == "parent")
       lapply(children, function(x) version[[x]] <<- "0.0.1")
 
+    SpaDES.core.version <- as.character(utils::packageVersion("SpaDES.core"))
+    DESCtxt <- readLines(system.file("DESCRIPTION", package = "SpaDES.core"))
+    if (any(grepl("GithubRepo", DESCtxt))) {
+      Grepo <- gsub(".+: ", "", grep("GithubRepo", DESCtxt, value = TRUE))
+      Guser <- gsub(".+: ", "", grep("GithubUsername", DESCtxt, value = TRUE))
+      Gref <- gsub(".+: ", "", grep("GithubRef", DESCtxt, value = TRUE))
+      SpaDES.core.pkgName <- paste0(Guser, "/", Grepo, "@", Gref)
+    } else {
+      SpaDES.core.pkgName <- "SpaDES.core"
+    }
+    SpaDES.core.Fullname <- paste0(SpaDES.core.pkgName, " (>=",SpaDES.core.version,")")
+
     modulePartialMeta <- list(
-      reqdPkgs = deparse(moduleDefaults[["reqdPkgs"]])
+      reqdPkgs = deparse(c(SpaDES.core.Fullname,
+                                moduleDefaults[["reqdPkgs"]]))
     )
     modulePartialMetaTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
                                                      "modulePartialMeta.R.template"))

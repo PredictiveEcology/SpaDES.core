@@ -2631,8 +2631,8 @@ setMethod(
         if (missing(modules)) {
           modules <- sub(basename(paths), replacement = "", pattern = ".R")
         }
-      } else if (!missing("modules")) {
-        prefix <- if (!file.exists(modules)) {
+      } else if (!missing(modules)) {
+        prefix <- if (!all(file.exists(modules))) {
           if (!missing("paths")) {
             pre <- paths
           } else {
@@ -2698,15 +2698,20 @@ setMethod("inputObjects",
           signature(sim = "simList"),
           definition = function(sim, module, path) {
             if (missing(module)) {
-              module <- current(sim)
+              module <- current(sim)[["moduleName"]]
               if (NROW(module) == 0)
                 module <- unlist(modules(sim))
             }
-            out <- if (length(module) > 1) {
-              lapply(sim@depends@dependencies[module], function(deps)
-                deps@inputObjects)
+            module <- setdiff(module, .coreModules())
+            out <- if (length(module) > 0) {
+              if (length(module) > 1) {
+                lapply(sim@depends@dependencies[module], function(deps)
+                  deps@inputObjects)
+              } else {
+                sim@depends@dependencies[[module]]@inputObjects
+              }
             } else {
-              sim@depends@dependencies[[module]]@inputObjects
+              ._inputObjectsDF()
             }
             return(out)
 })
@@ -2749,18 +2754,23 @@ setMethod("outputObjects",
           signature = "simList",
           definition = function(sim, module, path) {
             if (missing(module)) {
-              module <- current(sim)
+              module <- current(sim)[["moduleName"]]
               if (NROW(module) == 0)
                 module <- unlist(modules(sim))
             }
-            out <- if (length(module) > 1) {
-              lapply(sim@depends@dependencies[module], function(deps)
-                deps@outputObjects)
+            module <- setdiff(module, .coreModules())
+            out <- if (length(module) > 0) {
+              if (length(module) > 1) {
+                lapply(sim@depends@dependencies[module], function(deps)
+                  deps@outputObjects)
+              } else {
+                sim@depends@dependencies[[module]]@outputObjects
+              }
             } else {
-              sim@depends@dependencies[[module]]@outputObjects
+              ._outputObjectsDF()
             }
             return(out)
-})
+          })
 
 #' @export
 #' @rdname simList-accessors-metadata

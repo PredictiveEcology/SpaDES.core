@@ -574,3 +574,92 @@ moduleCodeFiles <- function(paths, modules) {
   path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
 }
+
+
+
+#' Test and update a parameter against same parameter in other modules
+#'
+#' This function is intended to be part of module code and will test whether
+#' the value of a parameter within the current module matches the value of the
+#' same parameter in other modules. This is a test for parameters that might expect
+#' to be part of a \code{params = list(.globals = list(someParam = "test"))} passed
+#' to the \code{simInit}
+#'
+#' @return
+#' If the value of the \code{paramToCheck} in the current module is either \code{NULL} or
+#' \code{"default"}, and there is only one other value across all modules named in \code{moduleToUse},
+#' then this will return a character string with the value of the single parameter value
+#' in the other module(s). It will return the current value if there are no other modules
+#' with the same parameter.
+#'
+#' It is considered a "fail" under several conditions:
+#' \enumerate{
+#'   \item current module has a value that is not \code{NULL} or \code{"default"} and another module
+#'     has a different value;
+#'   \item there is more than one value for the \code{paramToCheck} in the other modules,
+#'     so it is ambiguous which one to return.
+#' }
+#'
+#' \code{} either the current module is different than other modules,
+#' unless it is "default" or NULL.
+#'
+#' @export
+#' @rdname paramCheckOtherMods
+#' @param sim A simList
+#' @param paramToCheck A character string, length one, of a parameter name to
+#'   check and compare between the current module and one or more or all others
+#' @param moduleToUse A character vector of module names to check against. This can be
+#'   \code{"all"} which will compare against all other modules.
+#' @param ifSetButDifferent A character string indicating whether to \code{"error"}
+#'   the default, or send a \code{"warning"}, \code{message} or just silently continue
+#'   (any other value).
+paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
+                                ifSetButDifferent = c("error", "warning", "message", "silent")) {
+  currentModule <- currentModule(sim)
+  paramsInSim <- params(sim)
+  paramInCurrentMod <- P(sim)[[paramToCheck]]
+  if (identical(moduleToUse, "all")) {
+    moduleToUse <- names(paramsInSim)
+  }
+  paramInThisMod <- paramsInSim[[currentModule]][[paramToCheck]]
+  params <- paramsInSim[setdiff(moduleToUse, currentModule)]
+
+  paramToUpdateValInOtherMods <- unlist(lapply(params, function(p) p[[paramToCheck]]))
+  paramInOtherMods <- unique(paramToUpdateValInOtherMods)
+
+  messSuff <- paste0("); they should not. Perhaps pass params = list(.globals = list(",
+                     paramToCheck, " = '", paramInOtherMods[1], "')) in the simInit call?")
+
+  newVal <- paramInThisMod
+  fail <- FALSE
+
+  if (!identical(paramInThisMod, paramInOtherMods)) {
+    if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
+      if (length(paramInOtherMods) == 1) {
+        newVal <- paramInOtherMods
+        message(paramToCheck, " in ", currentModule," is set to 'default' or NULL;")
+        message("... setting to '", newVal,
+                "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
+      } else if (length(paramInOtherMods) > 1) {
+        mess <- paste0("Modules in this simList have multiple values for ",paramToCheck," (",
+                       paste(paramInOtherMods, collapse = ", "),
+                       messSuff)
+        fail <- TRUE
+      }
+    } else {
+      if (length(paramInOtherMods) > 0) {
+        mess <- paste0("Including this module, there are multiple values for ",paramToCheck," (",
+                       paste(c(paramInThisMod, paramInOtherMods), collapse = ", "),
+                       messSuff)
+        fail <- TRUE
+      }
+    }
+    if (isTRUE(fail)) {
+      if (identical(ifSetButDifferent[1], "error")) stop(mess)
+      if (identical(ifSetButDifferent[1], "warning")) warning(mess)
+      if (identical(ifSetButDifferent[1], "message")) message(mess)
+    }
+  }
+
+  newVal
+}

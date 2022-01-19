@@ -219,11 +219,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE))
+          if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE)) {
+            if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
+                                      silent = TRUE, error = function(x) FALSE)
+                             ))
             stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
                  "sim$", curModuleName, ". ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
+          }
         }
       } else {
         stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
@@ -1111,7 +1115,7 @@ setMethod(
 
         message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
                 "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
-                "User must manage future::plan, e.g., \nfuture::plan(multiprocess(workers = 2))")
+                "User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))")
         sim$.futureEventsSkipped <- 0
         sim$simFuture <- list()
       }
@@ -1746,6 +1750,7 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
       } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
         outMess <- try(eval(parse(text = debug[[i]])))
       } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
+        outMess <- NULL
         if (is.environment(fnEnv)) {
           if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
             debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
@@ -1789,10 +1794,24 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
+  st <- Sys.time()
+  stForm1 <- "%h%d"
+  stForm2 <- paste(stForm1, "%H:%M:%S")
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
   if (numCharsMax > 0) {
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
-    sim <- get("sim", whereInStack("sim"), inherits = FALSE)
+    simEnv <- whereInStack("sim")
+    sim <- get("sim", simEnv, inherits = FALSE)
+
+    # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
+    #  That will be sufficient
+    if (length(sim$._simPrevs)) {
+      if (startsWith(mess, strftime(st, format = "%h%d"))) {
+        mess <- gsub("^.{11,14} ", ": ", mess) # remove date
+        sim <- get("sim", sim$._simPrevs[[1]])
+      }
+    }
+
     if (length(sim@current)) {
       modName <- sim@current$moduleName
 
@@ -1821,6 +1840,5 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   mess <- paste0(modName8Chars, mess)
   mess <- gsub("\\n", "", mess)
 
-  paste0(format(Sys.time(), format = "%h%d %H:%M:%S"),
-         mess)
+  paste0(strftime(st, format = stForm2), mess)
 }

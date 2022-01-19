@@ -57,7 +57,7 @@ mySimOut <- spades(mySim)
 
 Provide a summary of user-visible parameters.
 
-```{r moduleParams, echo = FALSE}
+```{r moduleParams, echo = FALSE, eval = TRUE}
 df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
 knitr::kable(df_params)
 ```
@@ -81,7 +81,7 @@ Write what is saved.
 How to obtain input data, and a description of the data required by the module.
 If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
 
-```{r moduleInputs, echo = FALSE}
+```{r moduleInputs, echo = FALSE, eval = TRUE}
 df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs)
 ```
@@ -90,7 +90,7 @@ knitr::kable(df_inputs)
 
 Description of the module outputs.
 
-```{r moduleOutputs, echo = FALSE}
+```{r moduleOutputs, echo = FALSE, eval = TRUE}
 df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_outputs)
 ```

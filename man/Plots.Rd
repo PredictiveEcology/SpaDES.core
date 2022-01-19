@@ -64,7 +64,8 @@ Specifically, the two common formats would be to \code{"screen"} or to disk as a
 such as \code{"png"}.
 \emph{THIS CURRENTLY HAS BEEN TESTED WITH \code{ggplot2}, \code{RasterLayer}, and
 \code{tmap} objects.}
-It uses \code{Plot} internally, so individual plots may be rearranged. When saved to
+The default (or change with e.g., \code{fn = "print", usePlot = FALSE}) uses
+\code{Plot} internally, so individual plots may be rearranged. When saved to
 disk (e.g., via \code{type = 'png'}), then \code{Plot} will not be used and the single object
 that is the result of this \code{Plots} call will be saved to disk.
 This function requires at least 2 things: a plotting function and arguments passed
