@@ -20,7 +20,7 @@
 #'        It is the environment where the object named \code{sim} can be found.
 #'
 #' @param filename Character string with the path for saving \code{simList} to or
-#'   reading the `simList` from
+#'   reading the `simList` from. Currently, only `.rds` and `.qs` filetypes are supported.
 #'
 #' @param fileBackend Numeric. \code{0} means don't do anything with
 #'        file backed rasters. Leave their file intact as is, in its place.
@@ -49,9 +49,12 @@
 #' @export
 #' @importFrom qs qsave
 #' @importFrom stats runif
+#' @importFrom tools file_ext
 #' @rdname saveSimList
 #' @aliases saveSim
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
+  stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
+
   dots <- list(...)
 
   quiet <- if (is.null(dots$quiet)) {
@@ -95,11 +98,17 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
     assign(simName, sim, envir = tmpEnv)
-    #save(list = simName, envir = tmpEnv, file = filename)
-    qs::qsave(get(simName, envir = tmpEnv), file = filename)
+    if (tolower(tools::file_ext(filename)) == "rds") {
+      save(list = simName, envir = tmpEnv, file = filename)
+    } else if (tolower(tools::file_ext(filename)) == "qs") {
+      qs::qsave(get(simName, envir = tmpEnv), file = filename)
+    }
   } else {
-    #save(sim, file = filename)
-    qs::qsave(sim, file = filename)
+    if (tolower(tools::file_ext(filename)) == "rds") {
+      save(sim, file = filename)
+    } else if (tolower(tools::file_ext(filename)) == "qs") {
+      qs::qsave(sim, file = filename)
+    }
   }
 
   if (isFALSE(quiet)) message("    ... saved!")
@@ -226,7 +235,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' Loading a `simList` from file can be problematic as there are non-standard
 #' objects that must be rebuilt. See description in [saveSimList()] for details.
 #'
-#' @param filename Character giving the name of a saved simulation file
+#' @param filename Character giving the name of a saved simulation file.
+#'   Currently, only filetypes `.qs` or `.rds` are supported.
 #' @param paths A list of character vectors for all the `simList` paths. When
 #'   loading a \code{simList}, this will replace the paths of everything to
 #'   these new paths. Experimental still.
@@ -247,32 +257,39 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @seealso [saveSimList()], [zipSimList()]
 #' @importFrom qs qread
 #' @importFrom reproducible updateFilenameSlots
+#' @importFrom tools file_ext
 loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
-  sim <- qs::qread(filename, nthreads = getOption("spades.nThreads", 1))
+  stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
-  # Work around for bug in qs that recovers data.tables as lists
-  objectName <- ls(sim)
-  names(objectName) <- objectName
-  objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
-  dt <- data.table(objectName, objectClassInSim)
+  if (tolower(tools::file_ext(filename)) == "rds") {
+    load(filename)
+  } else if (tolower(tools::file_ext(filename)) == "qs") {
+    sim <- qs::qread(filename, nthreads = getOption("spades.nThreads", 1))
 
-  io <- inputObjects(sim)
-  oo <- outputObjects(sim)
-  if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
-  if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
-  objs <- rbindlist(list(io, oo), fill = TRUE)
-  objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
+    # Work around for bug in qs that recovers data.tables as lists
+    objectName <- ls(sim)
+    names(objectName) <- objectName
+    objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
+    dt <- data.table(objectName, objectClassInSim)
 
-  objs <- objs[dt, on = "objectName"]
-  objs <- objs[objectClass == "data.table"]
-  objs <- objs[objectClass != objectClassInSim]
-  if (NROW(objs)) {
-    message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
-    message("Converting all known data.table objects (according to metadata) from list to data.table")
-    simEnv <- envir(sim)
-    out <- lapply(objs$objectName, function(on) {
-      assign(on, copy(as.data.table(sim[[on]])), envir = simEnv)
-    })
+    io <- inputObjects(sim)
+    oo <- outputObjects(sim)
+    if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
+    if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
+    objs <- rbindlist(list(io, oo), fill = TRUE)
+    objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
+
+    objs <- objs[dt, on = "objectName"]
+    objs <- objs[objectClass == "data.table"]
+    objs <- objs[objectClass != objectClassInSim]
+    if (NROW(objs)) {
+      message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
+      message("Converting all known data.table objects (according to metadata) from list to data.table")
+      simEnv <- envir(sim)
+      out <- lapply(objs$objectName, function(on) {
+        assign(on, copy(as.data.table(sim[[on]])), envir = simEnv)
+      })
+    }
   }
 
   mods <- setdiff(sim@modules, .coreModules())
@@ -311,13 +328,15 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
       newPaths <- dirname(newFns[namedObj])
       names(newPaths) <- names(newFns[namedObj])
       dups <- duplicated(newPaths)
-      if (any(dups))
+      if (any(dups)) {
         newPaths <- newPaths[!dups]
+      }
 
       dups2ndLayer <- duplicated(newPaths)
-      if (any(dups2ndLayer))
+      if (any(dups2ndLayer)) {
         stop("Cannot unzip and rebuild lists with rasters with multiple different paths; ",
              "Please simplify the list of Rasters so they all share a same dirname(Filenames(ras))")
+      }
 
       # These won't exist because they are the filenames from the old
       #   (possibly temporary following saveSimList) simList
@@ -333,9 +352,9 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
       # First must update the filename slots so that they point to real files (in the exdir)
       sim[[objName]] <- updateFilenameSlots(sim[[objName]],
                                                            newFilenames = currentDir)
-      mess <- capture.output(type = "message",
-                              sim[[objName]] <- (Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths))
-      )
+      mess <- capture.output(type = "message", {
+        sim[[objName]] <- (Copy(sim[[objName]], fileBackend = 1, filebackedDir = newPaths))
+      })
       mess <- grep("Hardlinked version", mess, invert = TRUE)
       if (length(mess))
         lapply(mess, message)
@@ -365,8 +384,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 #' If \code{cache} is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
 unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
-
-  zipfile = normPath(zipfile)
+  zipfile <- normPath(zipfile)
   outFilenames <- unzip(zipfile = zipfile, list = TRUE)
 
   dots <- list(...)

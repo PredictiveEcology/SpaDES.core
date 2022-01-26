@@ -4,13 +4,13 @@ version 1.0.10.9000
 ==============
 
 ## new features
-* none
+* `saveSimList()` and `loadSimList()` accept `.qs` or `.rds` files
 
 ## dependency changes
 * none
 
 ## bug fixes
-* none
+* improved handling of `data.table` objects using `loadSimList()`
 
 version 1.0.10
 ==============

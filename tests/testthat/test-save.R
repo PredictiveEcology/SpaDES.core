@@ -188,11 +188,21 @@ test_that("saveSimList does not work correctly", {
   mySim <- spades(mySim)
   mySim$landscape[] <- round(mySim$landscape[], 4) # after saving, these come back different, unless rounded
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
+
+  ## test using qs
   # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[2], fileBackend = 2)
   sim <- loadSimList(file = tmpfile[2], paths = paths(mySim))
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
+
+  ## test using rds
+  # removes the file-backing, loading it into R as an inMemory object
+  saveSimList(mySim, filename = extension(tmpfile[2], "rds"), fileBackend = 2)
+  sim <- loadSimList(file = extension(tmpfile[2], "rds"), paths = paths(mySim))
+  # on the saved/loaded one, it is there because it is not file-backed
+  expect_true(is.numeric(sim$landscape$DEM[]))
+  unlink(extension(tmpfile[2], "rds"))
 
   # Now put it back to disk for subsequent test
   unlink(c(tmpfile[1], extension(tmpfile[1], "gri"))) ## needed because of hardlink shenanigans
@@ -255,8 +265,6 @@ test_that("saveSimList does not work correctly", {
 
   # None of the original files exist
   expect_true(!all(file.exists(origFns)))
-
-
 })
 
 test_that("restart does not work correctly", {
