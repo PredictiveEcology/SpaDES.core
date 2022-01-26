@@ -271,7 +271,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
     message("Converting all known data.table objects (according to metadata) from list to data.table")
     simEnv <- envir(sim)
     out <- lapply(objs$objectName, function(on) {
-      assign(on, as.data.table(sim[[on]]), envir = simEnv)
+      assign(on, copy(as.data.table(sim[[on]])), envir = simEnv)
     })
   }
 
