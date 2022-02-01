@@ -19,9 +19,10 @@
 #'   \code{spades.browserOnError} \tab \code{FALSE} \tab If \code{TRUE}, the default, then any
 #'   error rerun the same event with \code{debugonce} called on it to allow editing
 #'   to be done. When that browser is continued (e.g., with 'c'), then it will save it
-#'   reparse it into the simList and rerun the edited version. This may allow a spades
-#'   call to be recovered on error, though in many cases that may not be the correct
-#'   behaviour. For example, if the simList gets updated inside that event in an iterative
+#'   reparse it into the \code{simList} and rerun the edited version.
+#'   This may allow a \code{spades()} call to be recovered on error,
+#'   though in many cases that may not be the correct behaviour.
+#'   For example, if the \code{simList} gets updated inside that event in an iterative
 #'   manner, then each run through the event will cause that iteration to occur.
 #'   When this option is \code{TRUE}, then the event will be run at least 3 times: the
 #'   first time makes the error, the second time has \code{debugonce} and the third time
@@ -31,18 +32,22 @@
 #'      \tab The default local directory in which to cache simulation outputs.
 #'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).\cr
 #'
-#'   \code{spades.inputPath}
-#'      \tab Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs})
-#'      \tab The default local directory in which to look for simulation inputs.  \cr
-#'
 #'   \code{spades.debug} \tab \code{TRUE}
 #'     \tab  The default debugging value \code{debug} argument in \code{spades()} \cr
+#'
+#'   \code{spades.DTthreads} \tab \code{1L}
+#'     \tab  The default number of \pkg{data.table} threads to use.
+#'     See also \code{?data.table::setDTthreads}. \cr
 #'
 #'   \code{spades.futureEvents} \tab \code{FALSE}
 #'     \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
 #'     whose outputs are not needed (by other events in the sim) into a future. In some
 #'     cases, this will speed up simulations, by running some events in parallel.
 #'     Still VERY experimental. Use cautiously. \cr
+#'
+#'   \code{spades.inputPath}
+#'      \tab Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs})
+#'      \tab The default local directory in which to look for simulation inputs.  \cr
 #'
 #'   \code{spades.lowMemory} \tab \code{FALSE}
 #'     \tab If true, some functions will use more memory
@@ -122,6 +127,7 @@ spadesOptions <- function() {
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
+    spades.DTthreads = 1L,
     spades.futureEvents = FALSE,
     spades.futurePlan = "callr",
     spades.inputPath = file.path(.spadesTempDir, "inputs"),

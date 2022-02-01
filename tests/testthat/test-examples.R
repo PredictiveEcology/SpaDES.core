@@ -2,8 +2,7 @@ test_that("all exported functions have examples", {
   fns <- ls("package:SpaDES.core")
   omit <- which(fns == "cache") ## cache is deprecated, so omit it
   sapply(fns[-omit], function(x) {
-    expect_warning(example(x, package = "SpaDES.core", character.only = TRUE,
-                           echo = FALSE), NA)
+    expect_warning(example(x, package = "SpaDES.core", character.only = TRUE, echo = FALSE), NA)
   })
 })
 
