@@ -268,7 +268,9 @@ test_that("test .robustDigest for simLists", {
     try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
 
     mess1 <- capture_messages(do.call(simInit, args))
-    msgGrep <- "Running .input|module code|so not checking minimum package|ggplot2|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
+    msgGrep <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
+                     "Setting", "Paths", "using dataPath", "Using setDTthreads",
+                     "There is no similar item in the cacheRepo", sep = "|")
     expect_true(all(grepl(msgGrep, mess1)))
 
     msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -284,7 +286,9 @@ test_that("test .robustDigest for simLists", {
     xxx[editBelowLine + 1] <- newCode
     cat(xxx, file = fileName, sep = "\n")
 
-    msgGrep <- "Running .input|module code|so not checking minimum package|Setting|Paths|using dataPath|There is no similar item in the cacheRepo"
+    msgGrep <- paste("Running .input", "module code", "so not checking minimum package",
+                     "Setting", "Paths", "using dataPath", "Using setDTthreads",
+                     "There is no similar item in the cacheRepo", sep = "|")
     mess1 <- capture_messages(do.call(simInit, args))
     expect_true(all(grepl(msgGrep, mess1)))
 
@@ -305,7 +309,9 @@ test_that("test .robustDigest for simLists", {
     args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
     bbb <- do.call(simInit, args)
     opts <- options(spades.saveSimOnExit = FALSE)
-    expect_silent(aaMess <- capture_messages(spades(bbb, debug = FALSE)))
+    expect_silent({
+      aaMess <- capture_messages(spades(bbb, debug = FALSE))
+    })
     options(opts)
     expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
 

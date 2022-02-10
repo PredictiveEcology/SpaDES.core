@@ -196,8 +196,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
+#' @importFrom data.table setDTthreads
 #' @importFrom reproducible basename2
-#' @importFrom utils compareVersion
 #' @importFrom Require Require trimVersionNumber modifyList2
 #' @importFrom utils compareVersion
 #' @rdname simInit
@@ -430,6 +430,11 @@ setMethod(
                          envir = sim@.xData[[".parsedFiles"]])
     loadPkgs(reqdPkgs)
 
+    simDTthreads <- getOption("spades.DTthreads", 1L)
+    message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
+    origDTthreads <- setDTthreads(simDTthreads)
+    on.exit(setDTthreads(origDTthreads), add = TRUE)
+
     allTimeUnits <- FALSE
 
     ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
@@ -603,7 +608,8 @@ setMethod(
           mod <- getOption("spades.covr")
           tf <- tempfile();
           if (is.null(notOlderThan)) notOlderThan <- "NULL"
-          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "',m,'", notOlderThan = ',notOlderThan,')'))
+          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
+                                '", notOlderThan = ', notOlderThan,')'))
           # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
           # unlockBinding(mod, sim$.mods)
           if (length(objects))

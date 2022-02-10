@@ -214,7 +214,6 @@ If this is more than one character string, then all will
 be printed to the screen in their sequence. \cr
 A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
 information that users may find useful \cr
-
 }
 
 If not specified in the function call, the package

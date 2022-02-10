@@ -32,7 +32,6 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_equivalent(end(mySim), 1.0)
   expect_true(all.equal(mySim2, mySim))
 
-
   # Test events argument in spades call
   expect_true(!all("init" == completed(mySim)$eventType))
   expect_true(max(events(mySim)$eventTime) > end(mySim)) # didn't schedule next event
@@ -116,10 +115,10 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
                           # events = "init",
                           outputs = data.frame(objectName = "landscape", saveTime = 2000:2010,
                                                eventPriority = 1))
-  mess <- capture_messages(mySimEvent11Out <- spades(Copy(mySimEvent11),
-                                                     event = list(randomLandscapes = "init")))
+  mess <- capture_messages({
+    mySimEvent11Out <- spades(Copy(mySimEvent11), event = list(randomLandscapes = "init"))
+  })
   expect_true(any(grepl("not specified", mess)))
-
 })
 
 test_that("spades calls - diff't signatures", {
@@ -136,25 +135,24 @@ test_that("spades calls - diff't signatures", {
   a1 <- Copy(a)
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_message(spades(a, debug = TRUE), "eventTime")
-  expect_silent(spades(a, debug = FALSE))
-  expect_silent(spades(a, debug = FALSE, .plotInitialTime = NA))
-  expect_silent(spades(a, debug = FALSE, .saveInitialTime = NA))
+  expect_silent(expect_message(spades(a, debug = FALSE), "DTthreads"))
+  expect_silent(expect_message(spades(a, debug = FALSE, .plotInitialTime = NA), "DTthreads"))
+  expect_silent(expect_message(spades(a, debug = FALSE, .saveInitialTime = NA), "DTthreads"))
   opts <- options(opts)
   expect_message(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
   expect_message(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
   expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
                     capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
 
-  if (requireNamespace("logging", quietly = TRUE))
+  if (requireNamespace("logging", quietly = TRUE)) {
     expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
         "eventTime *moduleName *eventType *eventPriority")
-  else
+  } else {
     expect_warning(expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
                    "eventTime *moduleName *eventType *eventPriority"))
-  expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA),
-                "moduleName")
-  expect_message(spades(a, debug = "simList", .plotInitialTime = NA),
-                "Completed Events")
+  }
+  expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA), "moduleName")
+  expect_message(spades(a, debug = "simList", .plotInitialTime = NA), "Completed Events")
 
   if (interactive()) {
     expect_output(spades(a, progress = "text", debug = TRUE), "10%")
@@ -162,8 +160,8 @@ test_that("spades calls - diff't signatures", {
     expect_output(spades(a, progress = "text"), "..........| 100%")
   }
   opts <- options(spades.saveSimOnExit = FALSE)
-  expect_silent(spades(a, debug = FALSE, progress = FALSE))
-  expect_silent(spades(a, debug = FALSE, progress = "rr"))
+  expect_silent(expect_message(spades(a, debug = FALSE, progress = FALSE), "DTthreads"))
+  expect_silent(expect_message(spades(a, debug = FALSE, progress = "rr"), "DTthreads"))
   opts <- options(opts)
 
   paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
@@ -196,9 +194,11 @@ test_that("spades calls - diff't signatures", {
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = c(nx = 20, ny = 20)
   )
-  expect_error(a <- simInit(times, params1, modules, paths = paths))
-  expect_error(a <- simInit(list(3, "a", "s"), params, modules, paths = paths))
-  err <- capture_error(a <- simInit(list(3, "years", start = 1), params, modules, paths = paths))
+  expect_error({ a <- simInit(times, params1, modules, paths = paths) })
+  expect_error({ a <- simInit(list(3, "a", "s"), params, modules, paths = paths) })
+  err <- capture_error({
+    a <- simInit(list(3, "years", start = 1), params, modules, paths = paths)
+  })
   expect_true(is.null(err))
 
   #expect_gt(st1[1], st2[1]) ## no longer true on R >= 3.5.1 ??
@@ -506,16 +506,6 @@ test_that("conflicting function types", {
 
   mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
-  # cat(paste("################################################"), file = tempfile(), append = FALSE)
-  # for (x in seq(fullMessage)) {
-  #   lineNum <- "444"
-  #   theGrepEach <- grepl(mm, pattern = fullMessage[x])
-  #   theGrep <- any(theGrepEach)
-  #   if (!theGrep) {
-  #     cat(paste("\nline ", lineNum, theGrep, fullMessage[x], "\n              ", paste(mm, collapse = "\n               "), collapse = ""), file = tempfile(), append = TRUE)
-  #   }
-  #   expect_true(theGrep)
-  # }
 
   cat(xxx[1:lineWithInit], "
       sim$child4 <- 1
@@ -561,12 +551,14 @@ test_that("conflicting function types", {
                                            m, ": module code: a is declared in metadata inputObjects|",
                                            "Running .inputObjects|",
                                            "Setting:|Paths set to:|",
+                                           "Using setDTthreads|",
                                            m, ": using dataPath")))))
 
   # assign to sim for functions like scheduleEvent
   lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
   xxx1 <- xxx
-  xxx1[lineWithScheduleEvent] <- sub(xxx[lineWithScheduleEvent], pattern = "sim <- scheduleEvent", replacement = "scheduleEvent")
+  xxx1[lineWithScheduleEvent] <- sub(xxx[lineWithScheduleEvent], pattern = "sim <- scheduleEvent",
+                                     replacement = "scheduleEvent")
   cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
@@ -652,15 +644,7 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
   })
   mm <- cleanMessage(mm)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm, pattern = x))))))
-  # for (x in seq(fullMessage)) {
-  #   lineNum <- "566"
-  #   theGrepEach <- grepl(mm, pattern = fullMessage[x])
-  #   theGrep <- any(theGrepEach)
-  #   if (!theGrep) {
-  #     cat(paste("\nline ", lineNum, theGrep, fullMessage[x], "\n              ", paste(mm, collapse = "\n               "), collapse = ""), file = tempfile(), append = TRUE)
-  #   }
-  #   expect_true(theGrep)
-  # }
+
   x1 <- moduleMetadata(mySim)
   sns <- slotNames(mySim@depends@dependencies[[m]])
   names(sns) <- sns
@@ -1071,5 +1055,3 @@ test_that("debug using logging", {
     expect_true(length(mess1) == 0)
   }
 })
-
-

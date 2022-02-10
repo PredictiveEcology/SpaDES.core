@@ -98,7 +98,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     }
   }
 
-
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <<- sim@current
@@ -409,7 +408,7 @@ scheduleEvent <- function(sim,
         if (eventTimeInSeconds > sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
         } else if (eventTimeInSeconds == sim@events[[numEvents]][[1]] &&
-                   eventPriority >= sim@events[[numEvents]][[4]]){
+                   eventPriority >= sim@events[[numEvents]][[4]]) {
           needSort <- FALSE
         }
         if (needSort) {
@@ -566,7 +565,7 @@ scheduleConditionalEvent <- function(sim,
       if (minEventTimeInSeconds > sim$._conditionalEvents[[numEvents]]$minEventTime) {
         needSort <- FALSE
       } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &
-                 eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority){
+                 eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority) {
         needSort <- FALSE
       }
       if (needSort) {
@@ -753,7 +752,6 @@ scheduleConditionalEvent <- function(sim,
 #'                                be printed to the screen in their sequence. \cr
 #'   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
 #'                                           information that users may find useful \cr
-#'
 #' }
 #'
 #' If not specified in the function call, the package
@@ -767,9 +765,6 @@ scheduleConditionalEvent <- function(sim,
 #' with the one just edited. There may be some unexpected consequences if the
 #' \code{simList} objects had already been changed before the error occurred.
 #'
-#'
-#'
-#'
 #' @note The debug option is primarily intended to facilitate building simulation
 #' models by the user.
 #' Will print additional outputs informing the user of updates to the values of
@@ -777,6 +772,7 @@ scheduleConditionalEvent <- function(sim,
 #' See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
+#' @importFrom data.table setDTthreads
 #' @export
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -855,7 +851,7 @@ setGeneric(
            .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
            events = NULL, .plots = NULL, ...) {
     standardGeneric("spades")
-  })
+})
 
 #' @rdname spades
 setMethod(
@@ -961,8 +957,6 @@ setMethod(
                   unspecifiedEvents[1], "= 'init')")
         }
       }
-
-
 
       # This sets up checking for memory leaks
       if (is.null(sim@.xData[["._knownObjects"]])) {
@@ -1127,6 +1121,11 @@ setMethod(
           sim@simtimes[["current"]] > sim@simtimes[["end"]]
         if (isTRUE(specialStart)) sim@simtimes[["current"]] <- sim@events[[1]][["eventTime"]]
       }
+
+      simDTthreads <- getOption("spades.DTthreads", 1L)
+      message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
+      origDTthreads <- setDTthreads(simDTthreads)
+      on.exit(setDTthreads(origDTthreads), add = TRUE)
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         if (recoverMode > 0) {

@@ -4,6 +4,9 @@ version 1.0.10.9000
 ==============
 
 ## new features
+* new option `spades.DTthreads` to limit the number of threads used by `data.table` (default 1).
+  Users can override this default if needed; modules can `setDTthreads()` as needed,
+  but should restore the original value `on.exit`.
 * `saveSimList()` and `loadSimList()` accept `.qs` or `.rds` files
 
 ## dependency changes
