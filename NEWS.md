@@ -8,12 +8,14 @@ version 1.0.10.9000
   Users can override this default if needed; modules can `setDTthreads()` as needed,
   but should restore the original value `on.exit`.
 * `saveSimList()` and `loadSimList()` accept `.qs` or `.rds` files
+* `spades` and `simInit` now force UTF-8 encoding; this is reset `on.exit`. If a module needs a different character encoding, then it can be set within the module code.
 
 ## dependency changes
 * none
 
 ## bug fixes
 * improved handling of `data.table` objects using `loadSimList()`
+* caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
 
 version 1.0.10
 ==============
