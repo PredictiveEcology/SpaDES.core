@@ -868,6 +868,9 @@ setMethod(
                         .plots,
                         ...) {
 
+    opt <- options("encoding" = "UTF-8")
+    on.exit(options(opt), add = TRUE)
+
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
       modNam <- getOption("spades.covr")
       tf <- tempfile();

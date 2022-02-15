@@ -343,6 +343,9 @@ setMethod(
                         loadOrder,
                         notOlderThan) {
 
+    opt <- options("encoding" = "UTF-8")
+    on.exit(options(opt), add = TRUE)
+
     paths <- lapply(paths, function(p)
       checkPath(p, create = TRUE)
     )
