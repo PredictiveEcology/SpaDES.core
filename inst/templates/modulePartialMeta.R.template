@@ -1,5 +1,5 @@
   reqdPkgs = {{{reqdPkgs}}},
-  parameters = rbind(
+  parameters = bindrows(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
     defineParameter(".plots", "character", "screen", NA, NA,
                     "Used by Plots function, which can be optionally used here"),
