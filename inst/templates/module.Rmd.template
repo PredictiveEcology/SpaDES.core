@@ -29,7 +29,15 @@ R Markdown syntax allows R code, outputs, and figures to be rendered in the docu
 
 For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 
-## Module Parameters
+## Module inputs and parameters
+
+Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
+If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
+
+```{r moduleInputs, echo = FALSE, eval = TRUE}
+df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
+knitr::kable(df_inputs)
+```
 
 Provide a summary of user-visible parameters.
 
@@ -49,16 +57,6 @@ Write what is plotted.
 ## Saving
 
 Write what is saved.
-
-## Module inputs
-
-Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
-If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
-
-```{r moduleInputs, echo = FALSE, eval = TRUE}
-df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
-knitr::kable(df_inputs)
-```
 
 ## Module outputs
 
