@@ -13,12 +13,15 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## TODO: use 'eval = TRUE'
 ```
 
-# Overview
+# Module Overview
 
-Provide an overview of what the module does / how to use the module.
+## Summary
+
+Provide a brief summary of what the module does / how to use the module.
 
 Module documentation should be written so that others can use your module.
 This is a template for module documentation, and should be changed to reflect your module.
+
 
 ## R Markdown
 
@@ -28,8 +31,6 @@ For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 
 ## Module Parameters
 
-# Parameters
-
 Provide a summary of user-visible parameters.
 
 ```{r moduleParams, echo = FALSE, eval = TRUE}
@@ -37,7 +38,7 @@ df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
 knitr::kable(df_params)
 ```
 
-# Events
+## Events
 
 Describe what happens for each event type.
 
@@ -49,11 +50,9 @@ Write what is plotted.
 
 Write what is saved.
 
-# Data dependencies
+## Module inputs
 
-## Input data
-
-How to obtain input data, and a description of the data required by the module.
+Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
 If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
 
 ```{r moduleInputs, echo = FALSE, eval = TRUE}
@@ -61,7 +60,7 @@ df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs)
 ```
 
-## Output data
+## Module outputs
 
 Description of the module outputs.
 
@@ -70,6 +69,6 @@ df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_outputs)
 ```
 
-# Links to other modules
+## Links to other modules
 
-Describe any anticipated linkages to other modules.
+Describe any anticipated linkages to other modules, such as modules that supply input data or do post-hoc analysis.
