@@ -6,8 +6,6 @@ date: "Last updated: `r Sys.Date()`"
 output:
 output:
   bookdown::html_document2:
-    tufte_variant: "envisioned"
-    base_format: tufte::tufte_html
     toc: true
     toc_float: true
     number_sections: false
