@@ -4,10 +4,10 @@ subtitle: "v.`r SpaDES.core::moduleMetadata(module = '{{{name}}}', path = '..')$
 author: "`r SpaDES.core::moduleMetadata(module = '{{{name}}}', path = '..')$authors`"
 date: "Last updated: `r Sys.Date()`"
 output:
-output:
   bookdown::html_document2:
     toc: true
     toc_float: true
+    theme: sandstone
     number_sections: false
     df_print: paged
     keep_md: yes
@@ -17,16 +17,18 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## TODO: use 'eval = TRUE'
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
+
 if (!require(dplyr)) {
-  install.packages(dplyr); library(dplyr)
+  install.packages("dplyr")
+  library(dplyr)
 }
 ```
 [![made-with-Markdown](https://img.shields.io/badge/Made%20with-Markdown-1f425f.svg)](http://commonmark.org)
 
 # Module Overview
 
-## Summary
+## Module summary
 
 Provide a brief summary of what the module does / how to use the module.
 
@@ -47,7 +49,7 @@ If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be s
 Table \@ref(tab:moduleInputs) shows the full list of module inputs.
 
 ::: fullwidth
-```{r moduleInputs, echo = FALSE, eval = TRUE}
+```{r moduleInputs, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs,
              caption = "List of {{{name}}} input objects and their description.") %>%
@@ -58,7 +60,7 @@ knitr::kable(df_inputs,
 Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams))
 
 ::: fullwidth
-```{r moduleParams, echo = FALSE, eval = TRUE}
+```{r moduleParams, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
 knitr::kable(df_params, caption = "List of {{{name}}} parameters and their description.") %>%
   kableExtra::kable_styling(latex_options = "scale_down")
@@ -79,10 +81,10 @@ Write what is saved.
 
 ## Module outputs
 
-Description of the module outputs (Table \@ref(tab:moduleOutputs))
+Description of the module outputs (Table \@ref(tab:moduleOutputs)).
 
 ::: fullwidth
-```{r moduleOutputs, echo = FALSE, eval = TRUE}
+```{r moduleOutputs, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_outputs, caption = "List of {{{name}}} outputs and their description.") %>%
   kableExtra::kable_styling(latex_options = "scale_down")
@@ -92,3 +94,7 @@ knitr::kable(df_outputs, caption = "List of {{{name}}} outputs and their descrip
 ## Links to other modules
 
 Describe any anticipated linkages to other modules, such as modules that supply input data or do post-hoc analysis.
+
+## Getting help
+
+-   provide a way for people to obtain help (e.g., module repository issues page)
