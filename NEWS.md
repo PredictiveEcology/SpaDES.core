@@ -19,6 +19,7 @@ version 1.0.10.9000
 ## bug fixes
 * improved handling of `data.table` objects using `loadSimList()`
 * caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
+* fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
 
 version 1.0.10
 ==============

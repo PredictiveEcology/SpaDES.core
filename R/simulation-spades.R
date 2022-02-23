@@ -1416,7 +1416,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     mess <- capture.output(type = "message",
                            rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
                              Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-                                  filebackedDir = tempdir2("._rmo"))
+                                  filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
                            } else {
                              list()
                            }), rmo$recoverableObjs)
