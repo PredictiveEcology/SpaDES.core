@@ -90,6 +90,11 @@ The following options are likely of interest to most users
     \tab \code{file.path(tempdir(), "SpaDES", "outputs")}
     \tab The default local directory in which to save simulation outputs.\cr
 
+  \code{spades.scratchPath} \tab \code{file.path(tempdir(), "SpaDES", "scratch")})
+    \tab The default local directory where transient files from modules and data will written.
+    This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
+    Default is a temporary directory. \cr
+
   \code{spades.recoveryMode} \tab \code{1L} \tab
   If this a numeric > 0 or TRUE, then the
   discrete event simulator will take a snapshot of the objects in the simList
