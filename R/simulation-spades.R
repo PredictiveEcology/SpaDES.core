@@ -1408,9 +1408,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
   }
 
-
   if (length(sim@events) > 0) {
-
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
     mess <- capture.output(type = "message",
@@ -1424,7 +1422,6 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     mess <- grep("Hardlinked version", mess, invert = TRUE)
     if (length(mess) > 0)
       lapply(mess, message)
-
   }
   endTime <- Sys.time()
   rmo$preEvents <- sim@events

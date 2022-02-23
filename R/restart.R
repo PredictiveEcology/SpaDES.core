@@ -77,10 +77,9 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- restartSpades() # don't need to put simList
 #'                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
 #' }
-restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf,
-                          restart = TRUE, ...) {
+restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...) {
   message("This is very experimental and will only work if the event that caused the error has not yet changed the simList.\n",
-          "This should be used with caution")
+          "This should be used with caution.")
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
