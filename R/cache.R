@@ -554,6 +554,18 @@ setMethod(
         lsObjectModsEnv <- ls(object@.xData$.mods, all.names = TRUE)
         list2env(mget(lsObjectModsEnv[lsObjectModsEnv %in% changedOutputs | lsObjectModsEnv %in% expectsInputs],
                       envir = object@.xData$.mods), envir = object2@.xData$.mods)
+        silent <- lapply(currModules, function(module) {
+          if (exists(module, envir = object@.xData$.mods, inherits = FALSE)) {
+            lsObjectModeEnvInner <- ls(object@.xData$.mods[[module]]$.objects, all.names = TRUE)
+            # The environment from the original --> this is the user's active simList and will have the new
+            #   parsed functions --> can't take cached versions of functions because
+            #   caching is not intended for the function definitions in the simList
+            list2env(mget(module, envir = origEnv$.mods), envir = object2@.xData$.mods)
+            # The elements in .objects
+            list2env(mget(lsObjectModeEnvInner, envir = object@.xData$.mods[[module]]$.objects),
+                     envir = object2@.xData$.mods[[module]]$.objects)
+          }
+        })
 
 
         if (length(object2@current) == 0) {
