@@ -16,6 +16,8 @@ editor_options:
 always_allow_html: true
 ---
 
+# {{{name}}} Module
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
 
@@ -26,9 +28,9 @@ if (!require(dplyr)) {
 ```
 [![made-with-Markdown](https://img.shields.io/badge/Made%20with-Markdown-1f425f.svg)](http://commonmark.org)
 
-# Module Overview
+## Module Overview
 
-## Module summary
+### Module summary
 
 Provide a brief summary of what the module does / how to use the module.
 
@@ -36,13 +38,13 @@ Module documentation should be written so that others can use your module.
 This is a template for module documentation, and should be changed to reflect your module.
 
 
-## R Markdown
+### R Markdown
 
 R Markdown syntax allows R code, outputs, and figures to be rendered in the documentation.
 
 For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 
-## Module inputs and parameters
+### Module inputs and parameters
 
 Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
 If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
@@ -67,15 +69,15 @@ knitr::kable(df_params, caption = "List of {{{name}}} parameters and their descr
 ```
 :::
 
-## Events
+### Events
 
 Describe what happens for each event type.
 
-## Plotting
+### Plotting
 
 Write what is plotted.
 
-## Saving
+### Saving
 
 Write what is saved.
 
@@ -91,10 +93,10 @@ knitr::kable(df_outputs, caption = "List of {{{name}}} outputs and their descrip
 ```
 :::
 
-## Links to other modules
+### Links to other modules
 
 Describe any anticipated linkages to other modules, such as modules that supply input data or do post-hoc analysis.
 
-## Getting help
+### Getting help
 
 -   provide a way for people to obtain help (e.g., module repository issues page)
