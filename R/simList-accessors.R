@@ -1541,7 +1541,8 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+# cachePath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1583,7 +1584,8 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+# inputPath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1625,7 +1627,9 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+
+# outputPath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1675,7 +1679,8 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+# modulePath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @param module The optional character string of the module(s) whose
 #'               paths are desired. If omitted, will return all modulePaths,
@@ -1723,7 +1728,53 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+
+# scratchPath ---------------------------------------------------------------------------------
+
+#' @inheritParams paths
+#'
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setGeneric("scratchPath", function(sim) {
+  standardGeneric("scratchPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("scratchPath",
+          signature = "simList",
+          definition = function(sim) {
+            sim@paths$scratchPath
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("scratchPath<-",
+           function(sim, value) {
+             standardGeneric("scratchPath<-")
+})
+
+#' @name scratchPath<-
+#' @aliases scratchPath<-,simList-method
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#' @export
+setReplaceMethod(
+  "scratchPath",
+  signature = "simList",
+  function(sim, value) {
+    sim@paths$scratchPath <- unname(unlist(value))
+    checkPath(sim@paths$scratchPath, create = TRUE)
+    validObject(sim)
+    return(sim)
+})
+
+
+# rasterPath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #'
 #' @include simList-class.R

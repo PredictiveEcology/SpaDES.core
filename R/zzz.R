@@ -13,7 +13,9 @@
 #   message("Bye from Name space Finalizer")
 # }
 
-.spadesTempDir <- file.path(tempdir(), "SpaDES")
+.spadesTempDir <- function() {
+  file.path(tempdir(), "SpaDES")
+}
 
 .onLoad <- function(libname, pkgname) {
   ## set options using the approach used by devtools
@@ -91,16 +93,16 @@
 
 .onUnload <- function(libpath) {
   ## if temp session dir is being used, ensure it gets reset each session
-  #if (.getOption("spades.cachePath") == file.path(.spadesTempDir, "cache")) {
+  #if (.getOption("spades.cachePath") == file.path(.spadesTempDir(), "cache")) {
   #  options(spades.cachePath = NULL)
   #}
-  if (getOption("spades.inputPath") == file.path(.spadesTempDir, "inputs")) {
+  if (getOption("spades.inputPath") == file.path(.spadesTempDir(), "inputs")) {
     options(spades.inputPath = NULL)
   }
-  if (all(getOption("spades.modulePath") %in% file.path(.spadesTempDir, "modules"))) {
+  if (all(getOption("spades.modulePath") %in% file.path(.spadesTempDir(), "modules"))) {
     options(spades.modulePath = NULL)
   }
-  if (getOption("spades.outputPath") == file.path(.spadesTempDir, "outputs")) {
+  if (getOption("spades.outputPath") == file.path(.spadesTempDir(), "outputs")) {
     options(spades.outputPath = NULL)
   }
 }

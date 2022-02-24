@@ -11,6 +11,9 @@ version 1.0.10.9000
 * `spades` and `simInit` now force UTF-8 encoding; this is reset `on.exit`. If a module needs a different character encoding, then it can be set within the module code.
 * `.studyAreaName` parameter added to default module metadata when using `newModule`.
 * changes to template module documentation - removal of "module usage" as it is not relevant *within* a module, and minor restructuring
+* new option `spades.scratchPath`, to be used for e.g., temporary raster files and temparary SpaDES recovery mode objects.
+  The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
+  **`rasterPath` will be deprecated in a future release.**
 
 ## dependency changes
 * none
@@ -18,6 +21,7 @@ version 1.0.10.9000
 ## bug fixes
 * improved handling of `data.table` objects using `loadSimList()`
 * caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
+* fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
 
 version 1.0.10
 ==============

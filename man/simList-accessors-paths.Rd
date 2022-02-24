@@ -22,6 +22,10 @@
 \alias{modulePath,simList-method}
 \alias{modulePath<-}
 \alias{modulePath<-,simList-method}
+\alias{scratchPath}
+\alias{scratchPath,simList-method}
+\alias{scratchPath<-}
+\alias{scratchPath<-,simList-method}
 \alias{rasterPath}
 \alias{rasterPath,simList-method}
 \alias{rasterPath<-}
@@ -69,6 +73,14 @@ modulePath(sim, module)
 modulePath(sim) <- value
 
 \S4method{modulePath}{simList}(sim) <- value
+
+scratchPath(sim)
+
+\S4method{scratchPath}{simList}(sim)
+
+scratchPath(sim) <- value
+
+\S4method{scratchPath}{simList}(sim) <- value
 
 rasterPath(sim)
 
