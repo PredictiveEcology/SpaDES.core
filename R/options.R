@@ -86,6 +86,11 @@
 #'     \tab \code{file.path(tempdir(), "SpaDES", "outputs")}
 #'     \tab The default local directory in which to save simulation outputs.\cr
 #'
+#'   \code{spades.scratchPath} \tab \code{file.path(tempdir(), "SpaDES", "scratch")})
+#'     \tab The default local directory where transient files from modules and data will written.
+#'     This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
+#'     Default is a temporary directory. \cr
+#'
 #'   \code{spades.recoveryMode} \tab \code{1L} \tab
 #'   If this a numeric > 0 or TRUE, then the
 #'   discrete event simulator will take a snapshot of the objects in the simList
@@ -130,7 +135,7 @@ spadesOptions <- function() {
     spades.DTthreads = 1L,
     spades.futureEvents = FALSE,
     spades.futurePlan = "callr",
-    spades.inputPath = file.path(.spadesTempDir, "inputs"),
+    spades.inputPath = file.path(.spadesTempDir(), "inputs"),
     spades.lowMemory = FALSE,
     spades.memoryUseInterval = 0,
     spades.messagingNumCharsModule = 21,
@@ -141,17 +146,18 @@ spadesOptions <- function() {
       suppressPartialMatchArgs = FALSE,
       suppressUndefined = TRUE
     ),
-    spades.modulePath = file.path(.spadesTempDir, "modules"),
+    spades.modulePath = file.path(.spadesTempDir(), "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.moduleDocument = NULL,
     spades.nCompleted = 10000L,
-    spades.outputPath = file.path(.spadesTempDir, "outputs"),
+    spades.outputPath = file.path(.spadesTempDir(), "outputs"),
     spades.recoveryMode = 1,
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
-    spades.restartR.restartDir = file.path(.spadesTempDir, "outputs"),
+    spades.restartR.restartDir = file.path(.spadesTempDir(), "outputs"),
     spades.saveSimOnExit = TRUE,
+    spades.scratchPath = file.path(.spadesTempDir(), "scratch"),
     spades.switchPkgNamespaces = FALSE,
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,

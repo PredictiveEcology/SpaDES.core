@@ -44,7 +44,6 @@ updateList <- function(x, y) {
   modifyList2(x = x, val = y)
 }
 
-
 ################################################################################
 #' Add a module to a \code{moduleList}
 #'
@@ -444,11 +443,12 @@ setMethod(
   }
 
   list(
-    cachePath = .getOption("reproducible.cachePath"),
-    inputPath = getOption("spades.inputPath"),
-    modulePath = getOption("spades.modulePath"),
-    outputPath = getOption("spades.outputPath"),
-    rasterPath = tmpDir()
+    cachePath = .getOption("reproducible.cachePath"), # nolint
+    inputPath = getOption("spades.inputPath"), # nolint
+    modulePath = getOption("spades.modulePath"), # nolint
+    outputPath = getOption("spades.outputPath"), # nolint
+    rasterPath = file.path(getOption("spades.scratchPath"), "raster"), # nolint
+    scratchPath = getOption("spades.scratchPath") # nolint
   )
 }
 
@@ -467,13 +467,14 @@ Paths <- .paths()
 #' @importFrom raster tmpDir
 #' @importFrom Require checkPath
 #' @param silent Logical. Should the messaging occur.
-setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath, silent = FALSE) {
   defaults <- list(
     CP = FALSE,
     IP = FALSE,
     MP = FALSE,
     OP = FALSE,
-    RP = FALSE
+    RP = FALSE,
+    SP = FALSE
   )
   if (missing(cachePath)) {
     cachePath <- .getOption("reproducible.cachePath") # nolint
@@ -491,19 +492,26 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     outputPath <- getOption("spades.outputPath") # nolint
     defaults$OP <- TRUE
   }
-  if (missing(rasterPath)) {
-    rasterPath <- tmpDir()
-    defaults$RP <- TRUE
+  if (missing(rasterPath)) { ## TODO: deprecate
+    rasterPath <- file.path(getOption("spades.scratchPath"), "raster") # nolint
+    defaults$SP <- TRUE
+  }
+  if (missing(scratchPath)) {
+    scratchPath <- getOption("spades.scratchPath") # nolint
+    defaults$SP <- TRUE
   }
 
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
-  options(rasterTmpDir = rasterPath,
-          reproducible.cachePath = cachePath,
-          spades.inputPath = inputPath,
-          spades.modulePath = unlist(modulePath),
-          spades.outputPath = outputPath)
+  options(
+    rasterTmpDir = file.path(scratchPath, "raster"),
+    reproducible.cachePath = cachePath,
+    spades.inputPath = inputPath,
+    spades.modulePath = unlist(modulePath),
+    spades.outputPath = outputPath,
+    spades.scratchPath = scratchPath
+  )
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
@@ -516,11 +524,11 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
       message(
         "Setting:\n",
         "  options(\n",
-        if (!defaults$RP) paste0("    rasterTmpDir = '", normPath(rasterPath), "'\n"),
         if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"),
         if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
         if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
         if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
+        if (!defaults$RP) paste0("    spades.scratchPath = '", normPath(scratchPath), "'\n"),
         "  )"
       )
     }
@@ -534,6 +542,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
         "    spades.inputPath = '", normPath(inputPath), "'\n",
         "    spades.outputPath = '", normPath(outputPath), "'\n",
         "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
+        "    spades.scratchPath = '", normPath(scratchPath), "'\n",
         "  )"
       )
     }
@@ -574,8 +583,6 @@ moduleCodeFiles <- function(paths, modules) {
   path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
 }
-
-
 
 #' Test and update a parameter against same parameter in other modules
 #'
