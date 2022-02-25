@@ -18,7 +18,7 @@ always_allow_html: true
 
 # {{{name}}} Module
 
-```{r setup, include=FALSE}
+```{r setup{{{name}}}, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
 
 if (!require(dplyr)) {
@@ -48,9 +48,9 @@ For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 
 Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
 If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
-Table \@ref(tab:moduleInputs) shows the full list of module inputs.
+Table \@ref(tab:moduleInputs{{{name}}}) shows the full list of module inputs.
 
-::: fullwidth
+```{r moduleInputs{{{name}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 ```{r moduleInputs, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs,
@@ -59,10 +59,10 @@ knitr::kable(df_inputs,
 ```
 :::
 
-Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams))
+Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams{{{name}}}))
 
 ::: fullwidth
-```{r moduleParams, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+```{r moduleParams{{{name}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
 knitr::kable(df_params, caption = "List of {{{name}}} parameters and their description.") %>%
   kableExtra::kable_styling(latex_options = "scale_down")
@@ -83,9 +83,9 @@ Write what is saved.
 
 ## Module outputs
 
-Description of the module outputs (Table \@ref(tab:moduleOutputs)).
+Description of the module outputs (Table \@ref(tab:moduleOutputs{{{name}}})).
 
-::: fullwidth
+```{r moduleOutputs{{{name}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 ```{r moduleOutputs, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_outputs, caption = "List of {{{name}}} outputs and their description.") %>%
