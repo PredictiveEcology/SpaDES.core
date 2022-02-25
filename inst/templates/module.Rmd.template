@@ -51,23 +51,20 @@ If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be s
 Table \@ref(tab:moduleInputs{{{name}}}) shows the full list of module inputs.
 
 ```{r moduleInputs{{{name}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-```{r moduleInputs, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs,
              caption = "List of {{{name}}} input objects and their description.") %>%
-  kableExtra::kable_styling(latex_options = "scale_down")
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
-:::
 
 Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams{{{name}}}))
 
-::: fullwidth
+
 ```{r moduleParams{{{name}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
 knitr::kable(df_params, caption = "List of {{{name}}} parameters and their description.") %>%
-  kableExtra::kable_styling(latex_options = "scale_down")
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
-:::
 
 ### Events
 
@@ -86,12 +83,10 @@ Write what is saved.
 Description of the module outputs (Table \@ref(tab:moduleOutputs{{{name}}})).
 
 ```{r moduleOutputs{{{name}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-```{r moduleOutputs, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_outputs, caption = "List of {{{name}}} outputs and their description.") %>%
-  kableExtra::kable_styling(latex_options = "scale_down")
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
-:::
 
 ### Links to other modules
 
