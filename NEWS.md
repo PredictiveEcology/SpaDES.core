@@ -1,6 +1,6 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.0.10.9000
+version 1.0.11
 ==============
 
 ## new features
@@ -20,6 +20,7 @@ version 1.0.10.9000
 * improved handling of `data.table` objects using `loadSimList()`
 * caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
+* several minor, including in `Plots`
 
 version 1.0.10
 ==============
