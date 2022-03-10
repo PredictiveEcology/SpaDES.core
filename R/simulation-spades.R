@@ -899,7 +899,7 @@ setMethod(
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
       } else {
-        warning("debug cannot be a list unless logging package is installed: install.package('logging')\n",
+        warning("debug cannot be a list unless logging package is installed: install.packages('logging')\n",
                 "setting debug to non-list using unlist(debug)")
         debug <- unlist(debug)
 
