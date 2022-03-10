@@ -533,6 +533,7 @@ setMethod(
       }
       if (!is.null(globalsUsed)) {
         globalsDF <- rbindlist(globalsDF)
+        setkeyv(globalsDF, c("global", "module"))
         message("The following .globals were used:")
         reproducible::messageDF(globalsDF)
       }
