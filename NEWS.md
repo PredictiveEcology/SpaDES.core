@@ -20,6 +20,7 @@ version 1.0.11
 * improved handling of `data.table` objects using `loadSimList()`
 * caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
+* `objSize` could have infinite recursion problem if there are simLists inside simLists. This is fixed.
 * several minor, including in `Plots`
 
 version 1.0.10
