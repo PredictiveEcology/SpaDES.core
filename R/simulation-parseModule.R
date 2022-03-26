@@ -268,7 +268,7 @@ setMethod(
 
           # evaluate the rest of the parsed file
           if (doesntUseNamespacing) {
-            message("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
+            stop("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
                     "It is now recommended to define functions that are not prefixed with the module name\n  ",
                     "and to no longer call the functions with sim$functionName.\n  ",
                     "Simply call functions in your module with their name: e.g.,\n  ",
