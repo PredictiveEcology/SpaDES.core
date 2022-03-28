@@ -12,8 +12,9 @@ version 1.0.11
 * `.studyAreaName` parameter added to default module metadata when using `newModule`.
 * changes to template module documentation - removal of "module usage" as it is not relevant *within* a module, and minor restructuring
 * new option `spades.scratchPath`, to be used for e.g., temporary raster files and temparary SpaDES recovery mode objects.
-  The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
+* The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
   **`rasterPath` will be deprecated in a future release.**
+* Old way of naming module functions with full module name plus "Init" ('non namespaced') no longer works. Message now converted to `stop`. 
 
 ## dependency changes
 * none
@@ -22,6 +23,7 @@ version 1.0.11
 * improved handling of `data.table` objects using `loadSimList()`
 * caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
+* `objSize` could have infinite recursion problem if there are simLists inside simLists. This is fixed.
 * several minor, including in `Plots`
 
 version 1.0.10

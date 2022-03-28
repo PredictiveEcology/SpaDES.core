@@ -774,9 +774,7 @@ if (!exists("objSize")) {
 objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE),
                             enclosingEnvs = TRUE, .prevEnvirs = list(), ...) {
   xObjName <- deparse(substitute(x))
-  aa <- objSize(x@.xData, quick = quick, ...)
-  #bb <- as(x, "simList_")
-  #bb@.Data <- list()
+  aa <- objSize(x@.xData, quick = quick, .prevEnvirs = .prevEnvirs, ...)
   otherParts <- objSize(lapply(
     grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE),
     function(slotNam) slot(x, slotNam)))
