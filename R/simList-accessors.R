@@ -2122,15 +2122,16 @@ setReplaceMethod(
   if (is.null(x)) return(NULL)
   #if (!is(x, "simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
-  out <- if (length(mod) > 0) {
-    if (!is.null(x@.xData[[".timeunits"]])) {
-      x@.xData[[".timeunits"]][[mod]]
-    } else {
-      timeunits(x)[[mod]]
+  out <- x@simtimes[["timeunit"]] # default -- whole simList
+  if (!is.null(x@.xData[[".timeunits"]])) {
+    if (length(mod) > 0) {
+      if (!is.null(x@.xData[[".timeunits"]])) {
+        outPoss <- x@.xData[[".timeunits"]][[mod]]
+      } else {
+        outPoss <- timeunits(x)[[mod]]
+      }
+      if (!is.null(outPoss)) out <- outPoss
     }
-
-  } else {
-    x@simtimes[["timeunit"]]
   }
   return(out)
 }
@@ -2237,7 +2238,7 @@ setMethod(
       }
     }))
     if (all(unlist(lapply(x@depends@dependencies[isNonParent], is.null)))) {
-      timestepUnits <- NULL
+      timestepUnits <- list(simInitDefaults()$times$timeunit)
     } else {
       timestepUnits <- lapply(x@depends@dependencies[isNonParent], function(y) {
         y@timeunit

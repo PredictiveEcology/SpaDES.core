@@ -1210,7 +1210,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(sim)
 }
 
-.timesDefault <- function() list(start = 0, end = 10)
+.timesDefault <- function() list(start = 0, end = 10, timeunit = "year")
 .paramsDefault <- function() list()
 .modulesDefault <- function() list()
 .objectsDefault <- function() list()
@@ -1219,6 +1219,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 .outputsDefault <- function() as.data.frame(NULL)
 .loadOrderDefault <- function() character(0)
 .notOlderThanDefault <- function() NULL
+
+#' `simInit` default values
+#' @export
+#' @rdname simInit
+simInitDefaults <- function(...) {
+  .fillInSimInit(list(), namesMatchCall = names(match.call()))
+}
 
 .fillInSimInit <- function(li, namesMatchCall) {
 
