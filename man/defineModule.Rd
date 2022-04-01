@@ -132,7 +132,7 @@ that will cause these objects to be put into the
 
 }
 \seealso{
-moduleDefaults
+moduleDefaults \code{\link{defineEvent}}
 }
 \author{
 Alex Chubaty
