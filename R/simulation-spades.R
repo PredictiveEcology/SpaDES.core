@@ -112,9 +112,19 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
       fnEnv <- sim@.xData$.mods[[curModuleName]]
+
+      # This allows spades to run even if all the functions are in the .GlobalEnv;
+      #   while this is generally bad practice, and none of the tools in spades
+      #   enable this to happen, this allows a user can manually run individual functions
+      #   like `doEvent.XXX` and `scheduleEvent`, then run `spades(sim)` without failing
+      if (is.null(fnEnv)) {
+        if (!curModuleName %in% .coreModules())
+          fnEnv <- asNamespace("SpaDES.core")
+      }
+      fnEnvIsSpaDES.core <- identical(fnEnv, asNamespace("SpaDES.core"))
+
       # update current simulated time
       # Test replacement for speed
-      #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
       st <- slot(sim, "simtimes")
       st[["current"]] <- cur[["eventTime"]]
       slot(sim, "simtimes", check = FALSE) <- st
@@ -135,10 +145,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      if (curModuleName %in% sim@modules) {
-        if (curModuleName %in% core) {
-          sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
-        } else {
+      moduleIsInSim <- curModuleName %in% sim@modules
+      if (!moduleIsInSim && !fnEnvIsSpaDES.core)
+        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
+      # if (curModuleName %in% sim@modules) {
+      if (curModuleName %in% core) {
+        sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
+      } else {
           # for future caching of modules
           cacheIt <- FALSE
           eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
@@ -203,9 +216,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!is.null(eventSeed)) {
             if (exists("initialRandomSeed", inherits = FALSE))
               .Random.seed <- initialRandomSeed
-          }
+        }
 
-          # browser(expr = exists("._doEvent_3"))
+        # browser(expr = exists("._doEvent_3"))
+        if (!fnEnvIsSpaDES.core) {
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
@@ -225,14 +239,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
             stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
                  "sim$", curModuleName, ". ",
                  "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
+                   cur[["eventType"]])
           }
         }
-      } else {
-        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
       }
+        # }
 
-      # add to list of completed events
+        # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
@@ -1275,9 +1288,10 @@ setMethod(
 
 #' @keywords internal
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
-  createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
-  if (cacheIt) { # means that a module or event is to be cached
-    fns <- ls(fnEnv, all.names = TRUE)
+  if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
+    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    if (cacheIt) { # means that a module or event is to be cached
+      fns <- ls(fnEnv, all.names = TRUE)
     moduleSpecificObjects <-
       c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
         paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
@@ -1286,8 +1300,9 @@ setMethod(
     #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
     moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
     classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                         params = sim@params[[cur[["moduleName"]]]],
-                         modules = cur[["moduleName"]])
+                           params = sim@params[[cur[["moduleName"]]]],
+                           modules = cur[["moduleName"]])
+    }
   }
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     expression(Cache(FUN = get(moduleCall, envir = fnEnv),
@@ -1312,11 +1327,13 @@ setMethod(
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
   # Test for memory leaks
-  if (getOption("spades.testMemoryLeaks", TRUE))
-    sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
-                                          modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
-                                          modName = cur[["moduleName"]],
-                                          knownObjects = sim@.xData$._knownObjects)
+  if (getOption("spades.testMemoryLeaks", TRUE)) {
+    if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))
+      sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
+                                            modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
+                                            modName = cur[["moduleName"]],
+                                            knownObjects = sim@.xData$._knownObjects)
+  }
 
   return(sim)
 }
