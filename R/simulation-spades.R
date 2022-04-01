@@ -131,6 +131,14 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", curModuleName, sep = ".")
+      # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
+      if (!is.null(fnEnv))
+        if (!exists(moduleCall, envir = fnEnv)) {
+          moduleCall2 <- paste("doEvent", curModuleName, cur$eventType, sep = ".")
+          if (exists(moduleCall2, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+            moduleCall <- moduleCall2
+          }
+        }
 
       # if debug is TRUE
       if (is.null(attr(sim, "needDebug"))) {
@@ -1858,3 +1866,53 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 
   paste0(strftime(st, format = stForm2), mess)
 }
+
+
+#' Alternative way to define events in SpaDES.core
+#'
+#' There are two ways to define what occurs during an event: defining a function
+#' called doEvent.<moduleName>, where <moduleName> is the actual module name. This
+#' approach is the original approach used in SpaDES.core, and it must have an
+#' explicit \code{switch} statement branching on \code{eventType}. The newer approach
+#' (still experimental) uses \code{defineEvent}. This may be a little bit cleaner,
+#' but it requires that a user pass a quoted expression to the \code{code} argument.
+#'
+#' @param sim A simList
+#' @param eventName Character string of the desired event name to define. Default is "init"
+#' @param moduleName Character string of the name of the module. If this function is
+#'    used within a module, then it will try to find the module name.
+#' @param code A quoted expression that defines the code to execute during the event.
+#' @param envir An optional environment to specify where to put the resulting function.
+#'     Normally, this should be left missing.
+#' @export
+#' @seealso \code{\link{defineModule}}
+defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
+  code <- substitute(code)
+  curMod <- currentModule(sim)
+  if (is.null(moduleName))
+    moduleName <- currentModule(sim)
+
+  if (missing(envir)) {
+    useSimModsEnv <- FALSE
+    if (is.null(moduleName)) {
+      if (length(curMod) > 0) {
+        useSimModsEnv <- TRUE
+      }
+    } else {
+      if (exists(moduleName, sim$.mods, inherits = FALSE))
+        useSimModsEnv <- TRUE
+    }
+    envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else .GlobalEnv
+  }
+  fn <- paste0("
+    fn <- function(sim, eventTime, eventType, priority) {
+    ",
+         paste(format(substitute(code)), collapse = "\n")
+    ,"
+    return(sim)
+    }
+  ")
+  assign(paste0("doEvent.", moduleName, ".", eventName), eval(parse(text = fn)), envir = envir)
+  return(invisible(sim))
+}
+

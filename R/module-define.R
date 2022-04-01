@@ -143,7 +143,7 @@ moduleDefaults <- list(
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
-#' @seealso moduleDefaults
+#' @seealso moduleDefaults \code{\link{defineEvent}}
 #'
 #' @examples
 #' \dontrun{
