@@ -160,70 +160,70 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       if (curModuleName %in% core) {
         sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
       } else {
-          # for future caching of modules
-          cacheIt <- FALSE
-          eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-          a <- sim@params[[curModuleName]][[".useCache"]]
-          if (!is.null(a)) {
-            #.useCache is a parameter
-            if (!identical(FALSE, a)) {
-              #.useCache is not FALSE
-              if (!isTRUE(a)) {
-                #.useCache is not TRUE
-                if (cur[["eventType"]] %in% a) {
-                  cacheIt <- TRUE
-                } else if (is(a, "POSIXt")) {
-                  cacheIt <- TRUE
-                  notOlderThan <- a
-                }
-              } else {
+        # for future caching of modules
+        cacheIt <- FALSE
+        eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
+        a <- sim@params[[curModuleName]][[".useCache"]]
+        if (!is.null(a)) {
+          #.useCache is a parameter
+          if (!identical(FALSE, a)) {
+            #.useCache is not FALSE
+            if (!isTRUE(a)) {
+              #.useCache is not TRUE
+              if (cur[["eventType"]] %in% a) {
                 cacheIt <- TRUE
+              } else if (is(a, "POSIXt")) {
+                cacheIt <- TRUE
+                notOlderThan <- a
               }
-            }
-          }
-
-          # browser(expr = exists("._doEvent_2"))
-          showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
-            isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
-              isTRUE(getOption("reproducible.showSimilar", FALSE))
             } else {
-              isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
-            }
-
-          # This is to create a namespaced module call
-          if (!.pkgEnv[["skipNamespacing"]])
-            .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
-                              removeOthers = FALSE)
-
-          skipEvent <- FALSE
-          if (!is.null(eventSeed)) {
-            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-              initialRandomSeed <- .Random.seed
-            set.seed(eventSeed) # will create .Random.seed
-          }
-
-          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
-          if (useFuture) {
-            # stop("using future for spades events is not yet fully implemented")
-            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                          curModName = cur[["moduleName"]])
-
-            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
-              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
-                                     futureNeeds = futureNeeds)
-              skipEvent <- TRUE
+              cacheIt <- TRUE
             }
           }
+        }
 
-          if (!skipEvent) {
-            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                             showSimilar = showSimilar, .pkgEnv)
+        # browser(expr = exists("._doEvent_2"))
+        showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
+                           isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
+          isTRUE(getOption("reproducible.showSimilar", FALSE))
+        } else {
+          isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
+        }
+
+        # This is to create a namespaced module call
+        if (!.pkgEnv[["skipNamespacing"]])
+          .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
+                            removeOthers = FALSE)
+
+        skipEvent <- FALSE
+        if (!is.null(eventSeed)) {
+          if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
+            initialRandomSeed <- .Random.seed
+          set.seed(eventSeed) # will create .Random.seed
+        }
+
+        .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+        if (useFuture) {
+          # stop("using future for spades events is not yet fully implemented")
+          futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                        curModName = cur[["moduleName"]])
+
+          if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
+            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                   showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                   futureNeeds = futureNeeds)
+            skipEvent <- TRUE
           }
+        }
 
-          if (!is.null(eventSeed)) {
-            if (exists("initialRandomSeed", inherits = FALSE))
-              .Random.seed <- initialRandomSeed
+        if (!skipEvent) {
+          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                           showSimilar = showSimilar, .pkgEnv)
+        }
+
+        if (!is.null(eventSeed)) {
+          if (exists("initialRandomSeed", inherits = FALSE))
+            .Random.seed <- initialRandomSeed
         }
 
         # browser(expr = exists("._doEvent_3"))
@@ -243,10 +243,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE)) {
             if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
                                       silent = TRUE, error = function(x) FALSE)
-                             ))
-            stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
-                 "sim$", curModuleName, ". ",
-                 "Please remove the section of code that does this in the event named: ",
+            ))
+              stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+                   "sim$", curModuleName, ". ",
+                   "Please remove the section of code that does this in the event named: ",
                    cur[["eventType"]])
           }
         }
@@ -1300,14 +1300,14 @@ setMethod(
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     if (cacheIt) { # means that a module or event is to be cached
       fns <- ls(fnEnv, all.names = TRUE)
-    moduleSpecificObjects <-
-      c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
-        paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
-        na.omit(createsOutputs)) # objects outputted by module
-    #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
-    #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
-    moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
-    classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+      moduleSpecificObjects <-
+        c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
+          paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
+          na.omit(createsOutputs)) # objects outputted by module
+      #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
+      #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
+      moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
+      classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                            params = sim@params[[cur[["moduleName"]]]],
                            modules = cur[["moduleName"]])
     }
