@@ -1210,7 +1210,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(sim)
 }
 
-.timesDefault <- function() list(start = 0, end = 10, timeunit = "year")
+.timeunitDefault <- function() "year"
+.timesDefault <- function() list(start = 0, end = 10)
 .paramsDefault <- function() list()
 .modulesDefault <- function() list()
 .objectsDefault <- function() list()
@@ -1316,11 +1317,11 @@ findSmallestTU <- function(sim, mods, childModules) { # recursive function
     recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
   }
   if (!exists("tu", inherits = FALSE)) {
-    return(list("year")) # default
+    return(list(.timeunitDefault())) # default
   }
   minTU <- minTimeunit(as.list(unlist(tu)))
   if (isTRUE(is.na(minTU[[1]]))) {
-    minTU[[1]] <- "year"
+    minTU[[1]] <- .timeunitDefault()
   }
 
   # no timeunits or no modules at all

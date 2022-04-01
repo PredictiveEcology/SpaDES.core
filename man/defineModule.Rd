@@ -60,8 +60,9 @@ module is scientifically reasonable to be used in.\cr
 of the module. Currently unimplemented.
 Once implemented, this should define what time frame this
 module is scientifically reasonable to be used for.\cr
-\code{timeunit} \tab Time scale of the module (e.g., "day", "year"). This
-MUST be specified. It indicates what '1' unit of time
+\code{timeunit} \tab Time scale of the module (e.g., "day", "year"). If this is
+not specified, then \code{.timeunitDefault()} will be used.
+It indicates what '1' unit of time
 means for this module. \code{SpaDES} interprets this
 and if modules have different \code{timeunit} values
 then it will correctly schedule each module, using the

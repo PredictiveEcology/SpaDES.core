@@ -2238,7 +2238,7 @@ setMethod(
       }
     }))
     if (all(unlist(lapply(x@depends@dependencies[isNonParent], is.null)))) {
-      timestepUnits <- list(simInitDefaults()$times$timeunit)
+      timestepUnits <- NULL
     } else {
       timestepUnits <- lapply(x@depends@dependencies[isNonParent], function(y) {
         y@timeunit
