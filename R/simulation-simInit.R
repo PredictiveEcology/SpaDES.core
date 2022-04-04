@@ -1224,8 +1224,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' `simInit` default values
 #' @export
 #' @rdname simInit
-simInitDefaults <- function(...) {
-  .fillInSimInit(list(), namesMatchCall = names(match.call()))
+simInitDefaults <- function() {
+
+  times <- append(.timesDefault(), list(timeunit = .timeunitDefault()))
+  simInitCall <- call("simInit", times = times)
+
+  .fillInSimInit(list(times = times), namesMatchCall = names(simInitCall))
 }
 
 .fillInSimInit <- function(li, namesMatchCall) {

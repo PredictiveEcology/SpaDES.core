@@ -69,7 +69,7 @@ simInit(
   notOlderThan = NULL
 )
 
-simInitDefaults(...)
+simInitDefaults()
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times

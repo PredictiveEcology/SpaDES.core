@@ -27,7 +27,7 @@ Normally, especially, if used within SpaDES module code, this should be left mis
 }
 \description{
 There are two ways to define what occurs during an event: defining a function
-called doEvent.\emph{moduleName}, where \empy{moduleName} is the actual module name. This
+called doEvent.\emph{moduleName}, where \emph{moduleName} is the actual module name. This
 approach is the original approach used in SpaDES.core, and it must have an
 explicit \code{switch} statement branching on \code{eventType}. The newer approach
 (still experimental) uses \code{defineEvent}. Instead of creating the
