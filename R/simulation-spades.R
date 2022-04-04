@@ -22,7 +22,7 @@ utils::globalVariables(c(".", ".I", "whi"))
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table data.table rbindlist setkey fread
+#' @importFrom data.table data.table rbindlist fread
 #' @importFrom reproducible Cache messageDF
 #' @importFrom utils write.table
 #' @include helpers.R memory-leaks.R
@@ -345,7 +345,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #' @return Returns the modified \code{simList} object.
 #'
-#' @importFrom data.table setkey
+#' @importFrom data.table
 #' @include priority.R
 #' @export
 #' @rdname scheduleEvent
@@ -483,7 +483,7 @@ scheduleEvent <- function(sim,
 #' then a possible strategy would be to set \code{eventPriority} of the conditional event
 #' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
-#' @importFrom data.table setkey
+#' @importFrom data.table
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
