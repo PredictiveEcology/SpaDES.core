@@ -11,7 +11,10 @@ defineEvent(sim, eventName = "init", code, moduleName = NULL, envir)
 
 \item{eventName}{Character string of the desired event name to define. Default is "init"}
 
-\item{code}{A quoted expression that defines the code to execute during the event.}
+\item{code}{An expression that defines the code to execute during the event. This will
+be captured, and pasted into a new function (\code{doEvent.XXXX.YYYY}), where \code{XXXX} is the
+\code{moduleName} and \code{YYYY} is the \code{eventName}, remaining unevaluated until
+that new function is called.}
 
 \item{moduleName}{Character string of the name of the module. If this function is
 used within a module, then it will try to find the module name.}
@@ -24,11 +27,13 @@ Normally, especially, if used within SpaDES module code, this should be left mis
 }
 \description{
 There are two ways to define what occurs during an event: defining a function
-called doEvent.<moduleName>, where <moduleName> is the actual module name. This
+called doEvent.\emph{moduleName}, where \empy{moduleName} is the actual module name. This
 approach is the original approach used in SpaDES.core, and it must have an
 explicit \code{switch} statement branching on \code{eventType}. The newer approach
-(still experimental) uses \code{defineEvent}. This may be a little bit cleaner,
-but it requires that a user pass a quoted expression to the \code{code} argument.
+(still experimental) uses \code{defineEvent}. Instead of creating the
+function called, \code{doEvent.XXXX}, where XXXX is the module name, it creates one function
+for each event, each with the name \code{doEvent.XXXX.YYYY}, where \code{YYYY} is the event
+name. This may be a little bit cleaner, but both with still work.
 }
 \examples{
 defineEvent(sim, "init", moduleName = "thisTestModule", code = {

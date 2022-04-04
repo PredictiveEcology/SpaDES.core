@@ -345,7 +345,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #' @return Returns the modified \code{simList} object.
 #'
-#' @importFrom data.table
 #' @include priority.R
 #' @export
 #' @rdname scheduleEvent
@@ -483,7 +482,6 @@ scheduleEvent <- function(sim,
 #' then a possible strategy would be to set \code{eventPriority} of the conditional event
 #' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
-#' @importFrom data.table
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
@@ -1871,17 +1869,22 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #' Alternative way to define events in SpaDES.core
 #'
 #' There are two ways to define what occurs during an event: defining a function
-#' called doEvent.<moduleName>, where <moduleName> is the actual module name. This
+#' called doEvent.\emph{moduleName}, where \empy{moduleName} is the actual module name. This
 #' approach is the original approach used in SpaDES.core, and it must have an
 #' explicit \code{switch} statement branching on \code{eventType}. The newer approach
-#' (still experimental) uses \code{defineEvent}. This may be a little bit cleaner,
-#' but it requires that a user pass a quoted expression to the \code{code} argument.
+#' (still experimental) uses \code{defineEvent}. Instead of creating the
+#' function called, `doEvent.XXXX`, where XXXX is the module name, it creates one function
+#' for each event, each with the name `doEvent.XXXX.YYYY`, where `YYYY` is the event
+#' name. This may be a little bit cleaner, but both with still work.
 #'
 #' @param sim A simList
 #' @param eventName Character string of the desired event name to define. Default is "init"
 #' @param moduleName Character string of the name of the module. If this function is
 #'    used within a module, then it will try to find the module name.
-#' @param code A quoted expression that defines the code to execute during the event.
+#' @param code An expression that defines the code to execute during the event. This will
+#'    be captured, and pasted into a new function (`doEvent.XXXX.YYYY`), where `XXXX` is the
+#'    \code{moduleName} and \code{YYYY} is the \code{eventName}, remaining unevaluated until
+#'    that new function is called.
 #' @param envir An optional environment to specify where to put the resulting function.
 #'     The default will place a function called `doEvent.moduleName.eventName` in the
 #'     module function location, i.e., `sim$.mods[[moduleName]]`. However, if this
