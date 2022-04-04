@@ -36,14 +36,18 @@ for each event, each with the name \code{doEvent.XXXX.YYYY}, where \code{YYYY} i
 name. This may be a little bit cleaner, but both with still work.
 }
 \examples{
+sim <- simInit()
 defineEvent(sim, "init", moduleName = "thisTestModule", code = {
-sim <- Init(sim) # initialize
-sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+  sim <- Init(sim) # initialize
+  # Now schedule some different event for "current time", i.e., will
+  #   be put in the event queue to run *after* this current event is finished
+  sim <- scheduleEvent(sim, time(sim), "thisTestModule", "grow")
 })
 
 defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
   sim <- grow(sim) # grow
-  sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+  # Now schedule this same event for "current time plus 1", i.e., a "loop"
+  sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # for "time plus 1"
 })
 
 Init <- function(sim) {
@@ -59,11 +63,11 @@ grow <- function(sim) {
   return(sim)
 }
 
-sim <- simInit()                                        # initialize the sim
-sim <- scheduleEvent(sim, 0, "thisTestModule", "init") # schedule that first init event
+# schedule that first "init" event
+sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
 out <- spades(sim)
 
 }
 \seealso{
-\code{\link{defineModule}}
+\code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
 }

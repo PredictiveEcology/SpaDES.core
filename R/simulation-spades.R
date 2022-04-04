@@ -1891,16 +1891,20 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'     location does not exist, then it will place it in the `parent.frame()`, with a message.
 #'     Normally, especially, if used within SpaDES module code, this should be left missing.
 #' @export
-#' @seealso \code{\link{defineModule}}
+#' @seealso \code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
 #' @examples
+#' sim <- simInit()
 #' defineEvent(sim, "init", moduleName = "thisTestModule", code = {
-#' sim <- Init(sim) # initialize
-#' sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+#'   sim <- Init(sim) # initialize
+#'   # Now schedule some different event for "current time", i.e., will
+#'   #   be put in the event queue to run *after* this current event is finished
+#'   sim <- scheduleEvent(sim, time(sim), "thisTestModule", "grow")
 #' })
 #'
 #' defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
 #'   sim <- grow(sim) # grow
-#'   sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+#'   # Now schedule this same event for "current time plus 1", i.e., a "loop"
+#'   sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # for "time plus 1"
 #' })
 #'
 #' Init <- function(sim) {
@@ -1916,8 +1920,8 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'   return(sim)
 #' }
 #'
-#' sim <- simInit()                                        # initialize the sim
-#' sim <- scheduleEvent(sim, 0, "thisTestModule", "init") # schedule that first init event
+#' # schedule that first "init" event
+#' sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
 #' out <- spades(sim)
 #'
 defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
