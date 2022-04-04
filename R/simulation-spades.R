@@ -1883,9 +1883,40 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'    used within a module, then it will try to find the module name.
 #' @param code A quoted expression that defines the code to execute during the event.
 #' @param envir An optional environment to specify where to put the resulting function.
-#'     Normally, this should be left missing.
+#'     The default will place a function called `doEvent.moduleName.eventName` in the
+#'     module function location, i.e., `sim$.mods[[moduleName]]`. However, if this
+#'     location does not exist, then it will place it in the `parent.frame()`, with a message.
+#'     Normally, especially, if used within SpaDES module code, this should be left missing.
 #' @export
 #' @seealso \code{\link{defineModule}}
+#' @examples
+#' defineEvent(sim, "init", moduleName = "thisTestModule", code = {
+#' sim <- Init(sim) # initialize
+#' sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+#' })
+#'
+#' defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
+#'   sim <- grow(sim) # grow
+#'   sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+#' })
+#'
+#' Init <- function(sim) {
+#'   sim$messageToWorld <- "Now the sim has an object in it that can be accessed"
+#'   sim$size <- 1 # initializes the size object --> this can be anything, Raster, list, whatever
+#'   message(sim$messageToWorld)
+#'   return(sim)   # returns all the things you added to sim as they are in the simList
+#' }
+#'
+#' grow <- function(sim) {
+#'   sim$size <- sim$size + 1 # increments the size
+#'   message(sim$size)
+#'   return(sim)
+#' }
+#'
+#' sim <- simInit()                                        # initialize the sim
+#' sim <- scheduleEvent(sim, 0, "thisTestModule", "init") # schedule that first init event
+#' out <- spades(sim)
+#'
 defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
   code <- substitute(code)
   curMod <- currentModule(sim)
@@ -1902,7 +1933,7 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir)
       if (exists(moduleName, sim$.mods, inherits = FALSE))
         useSimModsEnv <- TRUE
     }
-    envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else .GlobalEnv
+    envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
   }
   fn <- paste0("
     fn <- function(sim, eventTime, eventType, priority) {

@@ -17,7 +17,10 @@ defineEvent(sim, eventName = "init", code, moduleName = NULL, envir)
 used within a module, then it will try to find the module name.}
 
 \item{envir}{An optional environment to specify where to put the resulting function.
-Normally, this should be left missing.}
+The default will place a function called \code{doEvent.moduleName.eventName} in the
+module function location, i.e., \code{sim$.mods[[moduleName]]}. However, if this
+location does not exist, then it will place it in the \code{parent.frame()}, with a message.
+Normally, especially, if used within SpaDES module code, this should be left missing.}
 }
 \description{
 There are two ways to define what occurs during an event: defining a function
@@ -26,6 +29,35 @@ approach is the original approach used in SpaDES.core, and it must have an
 explicit \code{switch} statement branching on \code{eventType}. The newer approach
 (still experimental) uses \code{defineEvent}. This may be a little bit cleaner,
 but it requires that a user pass a quoted expression to the \code{code} argument.
+}
+\examples{
+defineEvent(sim, "init", moduleName = "thisTestModule", code = {
+sim <- Init(sim) # initialize
+sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+})
+
+defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
+  sim <- grow(sim) # grow
+  sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # schedule this for "current time plus 1"
+})
+
+Init <- function(sim) {
+  sim$messageToWorld <- "Now the sim has an object in it that can be accessed"
+  sim$size <- 1 # initializes the size object --> this can be anything, Raster, list, whatever
+  message(sim$messageToWorld)
+  return(sim)   # returns all the things you added to sim as they are in the simList
+}
+
+grow <- function(sim) {
+  sim$size <- sim$size + 1 # increments the size
+  message(sim$size)
+  return(sim)
+}
+
+sim <- simInit()                                        # initialize the sim
+sim <- scheduleEvent(sim, 0, "thisTestModule", "init") # schedule that first init event
+out <- spades(sim)
+
 }
 \seealso{
 \code{\link{defineModule}}
