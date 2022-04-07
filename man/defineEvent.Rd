@@ -37,12 +37,14 @@ name. This may be a little bit cleaner, but both with still work.
 }
 \examples{
 sim <- simInit()
+
+# these put the functions in the parent.frame() which is .GlobalEnv for an interactive user
 defineEvent(sim, "init", moduleName = "thisTestModule", code = {
   sim <- Init(sim) # initialize
   # Now schedule some different event for "current time", i.e., will
   #   be put in the event queue to run *after* this current event is finished
   sim <- scheduleEvent(sim, time(sim), "thisTestModule", "grow")
-})
+}, envir = envir(sim))
 
 defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
   sim <- grow(sim) # grow
@@ -65,7 +67,12 @@ grow <- function(sim) {
 
 # schedule that first "init" event
 sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
-out <- spades(sim)
+# Look at event queue
+events(sim) # shows the "init" we just added
+\dontrun{
+  # this is skipped when running in automated tests; it is fine in interactive use
+  out <- spades(sim)
+}
 
 }
 \seealso{

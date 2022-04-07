@@ -134,9 +134,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
       if (!is.null(fnEnv))
         if (!exists(moduleCall, envir = fnEnv)) {
-          moduleCall2 <- paste("doEvent", curModuleName, cur$eventType, sep = ".")
-          if (exists(moduleCall2, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
-            moduleCall <- moduleCall2
+          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur$eventType)
+          if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
+            fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
+            moduleCall <- moduleCallSeparateEventFns
+          } else {
+            if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+              moduleCall <- moduleCallSeparateEventFns
+            }
+
           }
         }
 
@@ -1894,12 +1900,14 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #' @seealso \code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
 #' @examples
 #' sim <- simInit()
+#'
+#' # these put the functions in the parent.frame() which is .GlobalEnv for an interactive user
 #' defineEvent(sim, "init", moduleName = "thisTestModule", code = {
 #'   sim <- Init(sim) # initialize
 #'   # Now schedule some different event for "current time", i.e., will
 #'   #   be put in the event queue to run *after* this current event is finished
 #'   sim <- scheduleEvent(sim, time(sim), "thisTestModule", "grow")
-#' })
+#' }, envir = envir(sim))
 #'
 #' defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
 #'   sim <- grow(sim) # grow
@@ -1922,7 +1930,12 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'
 #' # schedule that first "init" event
 #' sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
-#' out <- spades(sim)
+#' # Look at event queue
+#' events(sim) # shows the "init" we just added
+#' \dontrun{
+#'   # this is skipped when running in automated tests; it is fine in interactive use
+#'   out <- spades(sim)
+#' }
 #'
 defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
   code <- substitute(code)
@@ -1930,8 +1943,8 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir)
   if (is.null(moduleName))
     moduleName <- currentModule(sim)
 
+  useSimModsEnv <- FALSE
   if (missing(envir)) {
-    useSimModsEnv <- FALSE
     if (is.null(moduleName)) {
       if (length(curMod) > 0) {
         useSimModsEnv <- TRUE
@@ -1950,7 +1963,27 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir)
     return(sim)
     }
   ")
-  assign(paste0("doEvent.", moduleName, ".", eventName), eval(parse(text = fn)), envir = envir)
+
+  eventFnName <-  makeEventFn(moduleName, eventName)
+  parsedFn <- parse(text = fn)
+  if (!useSimModsEnv) {
+    if (is.null(sim@.xData[[eventFnElementEnvir()]])) {
+      sim@.xData[[eventFnElementEnvir()]] <- new.env(parent = asNamespace("SpaDES.core"))
+    }
+    sim@.xData[[eventFnElementEnvir()]][[eventFnName]] <- list(envir = envir,
+                                                          digest = .robustDigest(parsedFn))
+  }
+
+  assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
+         envir = envir)
+  theEvalEnvir <- environment(get(eventFnName, envir = envir))
+  rm(list = ls(theEvalEnvir), envir = theEvalEnvir)
   return(invisible(sim))
 }
 
+makeEventFn <- function(curModuleName, eventType) {
+  paste("doEvent", curModuleName, eventType, sep = ".")
+}
+
+eventFnElement <- function() ".eventFnDigest"
+eventFnElementEnvir <- function() ".eventFnEnvir"

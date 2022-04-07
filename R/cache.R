@@ -100,7 +100,7 @@ setMethod(
                          nonZero <- unlist(lapply(a, function(x) length(x) > 0))
                          .robustDigest(a[nonZero],
                                        quick = !isFALSE(quick), # can be character or TRUE --> TRUE
-                                       length = length)
+                                       length = length, classOptions = classOptions) # need classOptions
                        } else {
                          list()
                        }
@@ -518,42 +518,51 @@ setMethod(
         # Convert to numeric index, as some modules don't have names
 
         # hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
-        namesAllMods <- names(tmpl[[whSimList]]@depends@dependencies)
-        hasCurrModule <- match(currModules, names(tmpl[[whSimList]]@depends@dependencies))
-        if (length(currModules) == 0) currModules <- namesAllMods
 
-        createOutputs <- if (length(hasCurrModule)) {
-          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
-        } else {
-          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
-            dep@outputObjects$objectName)
-          unique(unlist(aa))
-        }
-        createOutputs <- na.omit(createOutputs)
+        lsObjectEnv <- ls(object@.xData, all.names = TRUE)
+        if (!is.null(object@.xData$.mods))
+          lsObjectModsEnv <- ls(object@.xData$.mods, all.names = TRUE)
+
+
+
+        deps <- tmpl[[whSimList]]@depends@dependencies
+        namesAllMods <- names(deps)
+        if (!is.null(namesAllMods)) {
+          hasCurrModule <- match(currModules, names(deps))
+          if (length(currModules) == 0) currModules <- namesAllMods
+
+          createOutputs <- if (length(hasCurrModule)) {
+            deps[[hasCurrModule]]@outputObjects$objectName
+          } else {
+            aa <- lapply(deps, function(dep) dep@outputObjects$objectName)
+            unique(unlist(aa))
+          }
+          createOutputs <- na.omit(createOutputs)
 
         # add the environments for each module - allow local objects
         createOutputs <- c(createOutputs, currModules)
 
         # take only the ones that the file changed, based on attr(object, ".Cache")$changed
-        changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+          changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
-        expectsInputs <- if (length(hasCurrModule)) {
-          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
-        } else {
-          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
-            dep@inputObjects$objectName)
-          unique(unlist(aa))
+          expectsInputs <- if (length(hasCurrModule)) {
+            deps[[hasCurrModule]]@inputObjects$objectName
+          } else {
+            aa <- lapply(deps, function(dep)
+              dep@inputObjects$objectName)
+            unique(unlist(aa))
+          }
+          lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
+          if (!is.null(object@.xData$.mods))
+            lsObjectModsEnv <- lsObjectModsEnv[lsObjectModsEnv %in% changedOutputs | lsObjectModsEnv %in% expectsInputs]
         }
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
-        lsObjectEnv <- ls(object@.xData, all.names = TRUE)
-        list2env(mget(lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs],
-                      envir = object@.xData), envir = object2@.xData)
+        list2env(mget(lsObjectEnv, envir = object@.xData), envir = object2@.xData)
 
         # Deal with .mods objects
-        lsObjectModsEnv <- ls(object@.xData$.mods, all.names = TRUE)
-        list2env(mget(lsObjectModsEnv[lsObjectModsEnv %in% changedOutputs | lsObjectModsEnv %in% expectsInputs],
-                      envir = object@.xData$.mods), envir = object2@.xData$.mods)
+        if (!is.null(object@.xData$.mods))
+          list2env(mget(lsObjectModsEnv, envir = object@.xData$.mods), envir = object2@.xData$.mods)
 
 
         if (length(object2@current) == 0) {
