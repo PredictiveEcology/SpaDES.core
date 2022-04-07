@@ -4,13 +4,7 @@
 \alias{objSize.simList}
 \title{Object size for \code{simList}}
 \usage{
-\method{objSize}{simList}(
-  x,
-  quick = getOption("reproducible.quick", FALSE),
-  enclosingEnvs = TRUE,
-  .prevEnvirs = list(),
-  ...
-)
+\method{objSize}{simList}(x, quick = TRUE, ...)
 }
 \arguments{
 \item{x}{An object}
@@ -19,18 +13,15 @@
 \code{Path} class objects. In which case, \code{file.size} will be
 used instead of \code{object.size}.}
 
-\item{enclosingEnvs}{Logical indicating whether to include enclosing environments.
-Default \code{TRUE}.}
-
-\item{.prevEnvirs}{For internal account keeping to identify and prevent duplicate counting}
-
 \item{...}{Additional arguments (currently unused)}
 }
 \description{
 Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 so it estimates the correct size of functions stored there (e.g., with their enclosing
 environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-\code{objSize(completed(sim))}.
+\code{objSize(completed(sim))}. The output is structured into 2 elemenst: the sim environment
+and all its objects, and the other slots in the simList (e.g., events, completed, modules, etc.).
+The returned object also has an attribute, "total", which shows the total size.
 }
 \examples{
 a <- simInit(objects = list(d = 1:10, b = 2:20))

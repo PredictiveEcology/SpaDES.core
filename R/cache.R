@@ -539,10 +539,10 @@ setMethod(
           }
           createOutputs <- na.omit(createOutputs)
 
-        # add the environments for each module - allow local objects
-        createOutputs <- c(createOutputs, currModules)
+          # add the environments for each module - allow local objects
+          createOutputs <- c(createOutputs, currModules)
 
-        # take only the ones that the file changed, based on attr(object, ".Cache")$changed
+          # take only the ones that the file changed, based on attr(object, ".Cache")$changed
           changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
           expectsInputs <- if (length(hasCurrModule)) {
@@ -770,26 +770,33 @@ if (!exists("objSize")) {
 #' Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
 #' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-#' \code{objSize(completed(sim))}.
+#' \code{objSize(completed(sim))}. The output is structured into 2 elemenst: the sim environment
+#' and all its objects, and the other slots in the simList (e.g., events, completed, modules, etc.).
+#' The returned object also has an attribute, "total", which shows the total size.
 #'
-#' @export
 #' @importFrom reproducible objSize
 #' @inheritParams reproducible::objSize
+#' @export
 #'
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' utils::object.size(a)
-objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE),
-                            enclosingEnvs = TRUE, .prevEnvirs = list(), ...) {
-  xObjName <- deparse(substitute(x))
-  aa <- objSize(x@.xData, quick = quick, .prevEnvirs = .prevEnvirs, ...)
-  otherParts <- objSize(lapply(
-    grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE),
-    function(slotNam) slot(x, slotNam)))
-  bbOs <- list(simListWithoutObjects = otherParts)
-  aa <- append(aa, bbOs)
-  return(aa)
+objSize.simList <- function(x, quick = TRUE, ...) {
+
+  varName <- deparse(substitute(x))
+  aa <- objSize(x@.xData, quick = quick, ...)
+
+  simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
+  names(simSlots) <- simSlots
+  otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
+
+  total <- obj_size(x, quick = TRUE)
+  if (!quick)
+    attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
+                                    other = attr(otherParts, "objSize"))
+
+  return(total)
 }
 
 #' Make \code{simList} correctly work with \code{memoise}
