@@ -791,7 +791,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   names(simSlots) <- simSlots
   otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-  total <- obj_size(x, quick = TRUE)
+  total <- objSize(x, quick = TRUE)
   if (!quick)
     attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
                                     other = attr(otherParts, "objSize"))
