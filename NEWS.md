@@ -9,9 +9,10 @@ version 1.0.11
   but should restore the original value `on.exit`.
 * `saveSimList()` and `loadSimList()` accept `.qs` or `.rds` files
 * `spades` and `simInit` now force UTF-8 encoding; this is reset `on.exit`. If a module needs a different character encoding, then it can be set within the module code.
-* new option `spades.scratchPath`, to be used for e.g., temporary raster files and temparary SpaDES recovery mode objects.
+* new option `spades.scratchPath`, to be used for e.g., temporary raster files and temporary SpaDES recovery mode objects.
 * The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
   **`rasterPath` will be deprecated in a future release.**
+* New default temporary `terraTmpDir` set as a subdirectory of `scratchPath`.
 * Old way of naming module functions with full module name plus "Init" ('non namespaced') no longer works. Message now converted to `stop`. 
 
 ## dependency changes
@@ -19,9 +20,9 @@ version 1.0.11
 
 ## bug fixes
 * improved handling of `data.table` objects using `loadSimList()`
-* caching of `.inputObjects` did not correctly capture objects that were assigned to `mod$xxx`. This is now fixed.
+* Fixed caching of `.inputObjects` to correctly capture objects that were assigned to `mod$xxx`.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
-* `objSize` could have infinite recursion problem if there are simLists inside simLists. This is fixed.
+* Fixed infinite recursion problem in `objSize` when there are `simList`s inside `simList`s.
 * several minor, including in `Plots`
 
 version 1.0.10

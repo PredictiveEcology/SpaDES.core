@@ -403,17 +403,28 @@ setMethod(
 #'                    If not specified, defaults to \code{getOption("spades.outputPath")}.
 #'
 #' @param rasterPath  The default local directory in which to save transient raster files.
-#'                    If not specified, defaults to \code{\link[raster:rasterOptions]{tmpDir}}.
+#'                    If not specified, defaults to
+#'                    \code{file.path(getOption("spades.scratchPath"), "raster")}.
 #'                    \emph{Important note:} this location may not be cleaned up automatically,
 #'                    so be sure to monitor this directory and remove unnecessary temp files
 #'                    that may contribute to excessive disk usage.
+#'                     \emph{This option will be deprecated in a future release.}
+#'
+#' @param scratchPath The default local directory in which to save transient files.
+#'                    If not specified, defaults to \code{getOption("spades.scratchPath")}.
+#'
+#' @param terraPath  The default local directory in which to save transient terra files.
+#'                   If not specified, defaults to
+#'                   \code{file.path(getOption("spades.scratchPath"), "terra")}.
+#'                   \emph{Important note:} this location may not be cleaned up automatically,
+#'                   so be sure to monitor this directory and remove unnecessary temp files
+#'                   that may contribute to excessive disk usage.
 #'
 #' @return Returns a named list of the user's default working directories.
 #' \code{setPaths} is invoked for the side effect of setting these directories.
 #'
 #' @author Alex Chubaty
 #' @keywords internal
-#' @importFrom raster tmpDir
 #' @name setPaths
 #' @rdname setPaths
 #' @export
@@ -421,16 +432,19 @@ setMethod(
 #' @examples
 #' \dontrun{
 #' getPaths()                       ## returns the current default working paths
-#' setPaths(cachePath = tempdir())  ## sets custom cachePath with other paths default
-#' setPaths(inputPath = tempdir())  ## sets custom inputPath with other paths default
-#' setPaths(modulePath = tempdir()) ## sets custom modulePath with other paths default
-#' setPaths(outputPath = tempdir()) ## sets custom outputPath with other paths default
+#'
+#' ## set individual custom paths
+#' setPaths(cachePath = file.path(tempdir(), "cache"))
+#' setPaths(inputPath = file.path(tempdir(), "inputs"))
+#' setPaths(modulePath = file.path(tempdir(), "modules"))
+#' setPaths(outputPath = file.path(tempdir(), "outputs"))
+#' setPaths(scratchPath = file.path(tempdir(), "scratch"))
 #'
 #' # NOTE: on loading and attaching SpaDES.core,
 #' # an active binding is made to "Paths"
 #'
 #' getPaths()
-#' Paths # same
+#' Paths ## same as getPaths() above
 #' setPaths(outputPath = tempdir())
 #' Paths # shows change
 #' }
@@ -448,7 +462,8 @@ setMethod(
     modulePath = getOption("spades.modulePath"), # nolint
     outputPath = getOption("spades.outputPath"), # nolint
     rasterPath = file.path(getOption("spades.scratchPath"), "raster"), # nolint
-    scratchPath = getOption("spades.scratchPath") # nolint
+    scratchPath = getOption("spades.scratchPath"), # nolint
+    terraPath = file.path(getOption("spades.scratchPath"), "terra") # nolint
   )
 }
 
@@ -467,14 +482,16 @@ Paths <- .paths()
 #' @importFrom raster tmpDir
 #' @importFrom Require checkPath
 #' @param silent Logical. Should the messaging occur.
-setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath, silent = FALSE) {
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
+                     terraPath, silent = FALSE) {
   defaults <- list(
     CP = FALSE,
     IP = FALSE,
     MP = FALSE,
     OP = FALSE,
     RP = FALSE,
-    SP = FALSE
+    SP = FALSE,
+    TP = FALSE
   )
   if (missing(cachePath)) {
     cachePath <- .getOption("reproducible.cachePath") # nolint
@@ -494,24 +511,31 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
   }
   if (missing(rasterPath)) { ## TODO: deprecate
     rasterPath <- file.path(getOption("spades.scratchPath"), "raster") # nolint
-    defaults$SP <- TRUE
+    defaults$RP <- TRUE
   }
   if (missing(scratchPath)) {
     scratchPath <- getOption("spades.scratchPath") # nolint
     defaults$SP <- TRUE
+  }
+  if (missing(terraPath)) {
+    terraPath <- file.path(getOption("spades.scratchPath"), "terra") # nolint
+    defaults$TP <- TRUE
   }
 
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
   options(
-    rasterTmpDir = file.path(scratchPath, "raster"),
+    rasterTmpDir = rasterPath,
     reproducible.cachePath = cachePath,
     spades.inputPath = inputPath,
     spades.modulePath = unlist(modulePath),
     spades.outputPath = outputPath,
     spades.scratchPath = scratchPath
   )
+  if (requireNamespace("terra", quietly = TRUE)) {
+    terra::terraOptions(tempdir = terraPath)
+  }
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
@@ -528,7 +552,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
         if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
         if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
         if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
-        if (!defaults$RP) paste0("    spades.scratchPath = '", normPath(scratchPath), "'\n"),
+        if (!defaults$SP) paste0("    spades.scratchPath = '", normPath(scratchPath), "'\n"),
         "  )"
       )
     }
@@ -543,7 +567,8 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
         "    spades.outputPath = '", normPath(outputPath), "'\n",
         "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
         "    spades.scratchPath = '", normPath(scratchPath), "'\n",
-        "  )"
+        "  )\n",
+        "  terra::terraOptions(tempdir = '", normPath(terraPath), "'"
       )
     }
   }

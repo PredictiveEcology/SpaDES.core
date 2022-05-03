@@ -59,7 +59,7 @@ The following options are likely of interest to most users
 
   \code{spades.messagingNumCharsModule} \tab \code{21}
     \tab The number of characters to use for the messaging preamble on each
-    line of the messaging during spades calls\cr
+    line of the messaging during spades calls.\cr
 
   \code{spades.moduleCodeChecks}
     \tab \code{list(suppressParamUnused = FALSE,
@@ -67,7 +67,7 @@ The following options are likely of interest to most users
   skipWith = TRUE)}
     \tab Should the various code checks be run
   during \code{simInit}. These are passed to codetools::checkUsage.
-  Default is given by the function, plus these  \cr
+  Default is given by the function, plus these: \cr
 
   \code{moduleDocument} \tab  \code{NULL}
     \tab  When a module is an R package e.g., via \code{convertToPackage},
@@ -84,16 +84,11 @@ The following options are likely of interest to most users
     downloading modules via \code{downloadModule} \cr
 
   \code{spades.nCompleted} \tab \code{1000L} \tab The maximum number of completed events to
-    retain in the \code{completed} event queue\cr
+    retain in the \code{completed} event queue. \cr
 
   \code{spades.outputPath}
     \tab \code{file.path(tempdir(), "SpaDES", "outputs")}
     \tab The default local directory in which to save simulation outputs.\cr
-
-  \code{spades.scratchPath} \tab \code{file.path(tempdir(), "SpaDES", "scratch")})
-    \tab The default local directory where transient files from modules and data will written.
-    This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
-    Default is a temporary directory. \cr
 
   \code{spades.recoveryMode} \tab \code{1L} \tab
   If this a numeric > 0 or TRUE, then the
@@ -108,6 +103,11 @@ The following options are likely of interest to most users
   at the start of the current event. This can be recovered with \code{restartSpades}
   and the differences can be seen in a hidden object in the stashed simList.
   There is a message which describes how to find that. \cr
+
+  \code{spades.scratchPath} \tab \code{file.path(tempdir(), "SpaDES", "scratch")})
+    \tab The default local directory where transient files from modules and data will written.
+    This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
+    Default is a temporary directory. \cr
 
   \code{spades.switchPkgNamespaces} \tab \code{FALSE} to keep computational
   overhead down. \tab Should the search path be modified

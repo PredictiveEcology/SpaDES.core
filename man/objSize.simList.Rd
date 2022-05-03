@@ -15,16 +15,15 @@
 \arguments{
 \item{x}{An object}
 
-\item{quick}{Logical. Only some methods use this. e.g.,
-\code{Path} class objects. In which case, \code{file.size} will be
-used instead of \code{object.size}.}
+\item{quick}{Logical. If \code{FALSE}, then an attribute, "objSize" will be added to
+the returned value, with each of the elements' object size returned also.}
 
 \item{enclosingEnvs}{Logical indicating whether to include enclosing environments.
 Default \code{TRUE}.}
 
 \item{.prevEnvirs}{For internal account keeping to identify and prevent duplicate counting}
 
-\item{...}{Additional arguments (currently unused)}
+\item{...}{Additional arguments (currently unused), enables backwards compatible use.}
 }
 \description{
 Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
