@@ -1366,24 +1366,8 @@ loadPkgs <- function(reqdPkgs) {
     if (getOption("spades.useRequire")) {
       Require(allPkgs, upgrade = FALSE)
     } else {
-      loadedPkgs <- search();
-      neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
-      names(neededPkgs) <- uniqueReqdPkgs
-      allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
-      message("options('spades.useRequire' = FALSE), so not checking minimum package version requirements")
-      # versionSpecs <- Require::getPkgVersions(allPkgs)
-      # if (any(versionSpecs$hasVersionSpec)) {
-      #   out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
-      #     comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-      #                            versionSpecs$versionSpec[iii])
-      #     if (comp < 0)
-      #       warning(versionSpecs$Package[iii], " needs to be updated to at least ",
-      #               versionSpecs$versionSpec[iii])
-      #   })
-      #
-      # }
       allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
+      loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }
   }
 

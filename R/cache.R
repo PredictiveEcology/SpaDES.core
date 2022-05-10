@@ -775,6 +775,7 @@ if (!exists("objSize")) {
 #' The returned object also has an attribute, "total", which shows the total size.
 #'
 #' @importFrom reproducible objSize
+#' @importFrom lobstr obj_size
 #' @inheritParams reproducible::objSize
 #' @export
 #'
@@ -791,7 +792,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   names(simSlots) <- simSlots
   otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-  total <- objSize(x, quick = TRUE)
+  total <- obj_size(x, quick = TRUE)
   if (!quick)
     attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
                                     other = attr(otherParts, "objSize"))
