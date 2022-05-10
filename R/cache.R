@@ -562,7 +562,8 @@ setMethod(
 
         # Deal with .mods objects
         if (!is.null(object@.xData$.mods))
-          list2env(mget(lsObjectModsEnv, envir = object@.xData$.mods), envir = object2@.xData$.mods)
+          if (length(lsObjectModsEnv))
+            list2env(mget(lsObjectModsEnv, envir = tmpl[[whSimList]]@.xData$.mods), envir = object2@.xData$.mods)
 
 
         if (length(object2@current) == 0) {
