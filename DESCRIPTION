@@ -64,12 +64,13 @@ Suggests:
     RandomFields (>= 3.3.4),
     RColorBrewer (>= 1.1-2),
     rgdal,
+    rmarkdown,
     roxygen2,
     rstudioapi,
     sp,
     SpaDES.tools (>= 0.2.0),
-    rmarkdown,
     tcltk,
+    terra,
     testthat (>= 1.0.2)
 Encoding: UTF-8
 Language: en-CA
