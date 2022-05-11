@@ -387,7 +387,7 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os) == 2)
+  expect_true(length(os) == 1)
 })
 
 test_that("Cache sim objs via .Cache attr", {
@@ -535,3 +535,4 @@ test_that("test showSimilar", {
   })
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
+

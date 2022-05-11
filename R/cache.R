@@ -562,8 +562,22 @@ setMethod(
 
         # Deal with .mods objects
         if (!is.null(object@.xData$.mods))
-          if (length(lsObjectModsEnv))
-            list2env(mget(lsObjectModsEnv, envir = tmpl[[whSimList]]@.xData$.mods), envir = object2@.xData$.mods)
+          if (length(lsObjectModsEnv)) {
+            # override everything first -- this includes .objects -- take from Cache
+            list2env(mget(lsObjectModsEnv, envir = object@.xData$.mods), envir = object2@.xData$.mods)
+            # BUT functions are so lightweight that they should always return current
+            objsInModule <- ls(object@.xData$.mods[[currModules]], all.names = TRUE)
+            currMods <- tmpl[[whSimList]]@.xData$.mods[[currModules]]
+            objsInModuleActive <- ls(currMods, all.names = TRUE)
+            dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
+            objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
+            # objsInModule <- setdiff(objsInModule, dontCopyObjs)
+            # objsInModule <- setdiff(objsInModuleActive, objsInModule)
+            if (length(objsInModuleActive))
+              list2env(mget(objsInModuleActive, envir = tmpl[[whSimList]]@.xData$.mods[[currModules]]),
+                       envir = object2@.xData$.mods[[currModules]])
+          }
+
 
 
         if (length(object2@current) == 0) {
