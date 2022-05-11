@@ -308,8 +308,8 @@ test_that("local mod object", {
         expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
         expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
       }
-      convertToPackage(module = "test", path = tmpdir)
-      convertToPackage(module = "test2", path = tmpdir)
+      convertToPackage(module = "test", path = tmpdir, buildDocuments = FALSE)
+      convertToPackage(module = "test2", path = tmpdir, buildDocuments = FALSE)
       for (tt in c("test", "test2")) {
         expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
         expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))

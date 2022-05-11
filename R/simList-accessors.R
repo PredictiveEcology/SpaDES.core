@@ -2163,18 +2163,19 @@ setReplaceMethod(
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
   if (is.null(x)) return(NULL)
-  #if (!is(x, "simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
-  out <- if (length(mod) > 0) {
-    if (!is.null(x@.xData[[".timeunits"]])) {
-      x@.xData[[".timeunits"]][[mod]]
-    } else {
-      timeunits(x)[[mod]]
-    }
-
+  out <- x@simtimes[["timeunit"]] # default -- whole simList
+  if (!is.null(x@.xData[[".timeunits"]])) {
+    outPoss <- x@.xData[[".timeunits"]]
   } else {
-    x@simtimes[["timeunit"]]
+    outPoss <- timeunits(x)
   }
+  outPoss <- if (length(mod) > 0) {
+    outPoss[[mod]]
+  } else {
+    out
+  }
+  if (!is.null(outPoss)) out <- unlist(outPoss)
   return(out)
 }
 

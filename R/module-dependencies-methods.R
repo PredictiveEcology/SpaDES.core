@@ -24,7 +24,7 @@ selectMethod("show", "igraph")
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table := data.table rbindlist setkey setorder
+#' @importFrom data.table := data.table rbindlist setkeyv setorder
 #' @include simList-class.R
 #' @rdname depsEdgeList
 #'
@@ -69,8 +69,8 @@ setMethod("depsEdgeList",
     return(invisible(NULL)) # return from the lapply
   })
 
-  setkey(sim.in, "objectName")
-  setkey(sim.out, "objectName")
+  setkeyv(sim.in, "objectName")
+  setkeyv(sim.out, "objectName")
 
   if ((nrow(sim.in)) && (nrow(sim.out))) {
     dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]

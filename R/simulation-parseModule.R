@@ -530,6 +530,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
   simCopy <- Copy(sim, objects = FALSE)
+  simCopy$.mods <- Copy(sim$.mods)
   tmpEnvir$sim <- simCopy
 
   ll <- lapply(parsedModuleNoDefineModule,

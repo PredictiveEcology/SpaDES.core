@@ -100,7 +100,7 @@ setMethod(
                          nonZero <- unlist(lapply(a, function(x) length(x) > 0))
                          .robustDigest(a[nonZero],
                                        quick = !isFALSE(quick), # can be character or TRUE --> TRUE
-                                       length = length)
+                                       length = length, classOptions = classOptions) # need classOptions
                        } else {
                          list()
                        }
@@ -518,42 +518,68 @@ setMethod(
         # Convert to numeric index, as some modules don't have names
 
         # hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
-        namesAllMods <- names(tmpl[[whSimList]]@depends@dependencies)
-        hasCurrModule <- match(currModules, names(tmpl[[whSimList]]@depends@dependencies))
-        if (length(currModules) == 0) currModules <- namesAllMods
 
-        createOutputs <- if (length(hasCurrModule)) {
-          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@outputObjects$objectName
-        } else {
-          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
-            dep@outputObjects$objectName)
-          unique(unlist(aa))
-        }
-        createOutputs <- na.omit(createOutputs)
+        lsObjectEnv <- ls(object@.xData, all.names = TRUE)
+        if (!is.null(object@.xData$.mods))
+          lsObjectModsEnv <- ls(object@.xData$.mods, all.names = TRUE)
 
-        # add the environments for each module - allow local objects
-        createOutputs <- c(createOutputs, currModules)
 
-        # take only the ones that the file changed, based on attr(object, ".Cache")$changed
-        changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
 
-        expectsInputs <- if (length(hasCurrModule)) {
-          tmpl[[whSimList]]@depends@dependencies[[hasCurrModule]]@inputObjects$objectName
-        } else {
-          aa <- lapply(tmpl[[whSimList]]@depends@dependencies, function(dep)
-            dep@inputObjects$objectName)
-          unique(unlist(aa))
+        deps <- tmpl[[whSimList]]@depends@dependencies
+        namesAllMods <- names(deps)
+        if (!is.null(namesAllMods)) {
+          hasCurrModule <- match(currModules, names(deps))
+          if (length(currModules) == 0) currModules <- namesAllMods
+
+          createOutputs <- if (length(hasCurrModule)) {
+            deps[[hasCurrModule]]@outputObjects$objectName
+          } else {
+            aa <- lapply(deps, function(dep) dep@outputObjects$objectName)
+            unique(unlist(aa))
+          }
+          createOutputs <- na.omit(createOutputs)
+
+          # add the environments for each module - allow local objects
+          createOutputs <- c(createOutputs, currModules)
+
+          # take only the ones that the file changed, based on attr(object, ".Cache")$changed
+          changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+
+          expectsInputs <- if (length(hasCurrModule)) {
+            deps[[hasCurrModule]]@inputObjects$objectName
+          } else {
+            aa <- lapply(deps, function(dep)
+              dep@inputObjects$objectName)
+            unique(unlist(aa))
+          }
+          lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
+          if (!is.null(object@.xData$.mods))
+            lsObjectModsEnv <- lsObjectModsEnv[lsObjectModsEnv %in% changedOutputs | lsObjectModsEnv %in% expectsInputs]
         }
 
         # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
-        lsObjectEnv <- ls(object@.xData, all.names = TRUE)
-        list2env(mget(lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs],
-                      envir = object@.xData), envir = object2@.xData)
+        list2env(mget(lsObjectEnv, envir = object@.xData), envir = object2@.xData)
 
         # Deal with .mods objects
-        lsObjectModsEnv <- ls(object@.xData$.mods, all.names = TRUE)
-        list2env(mget(lsObjectModsEnv[lsObjectModsEnv %in% changedOutputs | lsObjectModsEnv %in% expectsInputs],
-                      envir = object@.xData$.mods), envir = object2@.xData$.mods)
+        if (!is.null(object@.xData$.mods))
+          if (length(lsObjectModsEnv)) {
+            # override everything first -- this includes .objects -- take from Cache
+            list2env(mget(lsObjectModsEnv, envir = object@.xData$.mods), envir = object2@.xData$.mods)
+            # BUT functions are so lightweight that they should always return current
+            if (length(currModules)) {
+              lapply(currModules, function(currModule) {
+                currMods <- tmpl[[whSimList]]@.xData$.mods[[currModule]]
+                objsInModuleActive <- ls(currMods, all.names = TRUE)
+                dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
+                objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
+                if (length(objsInModuleActive))
+                  list2env(mget(objsInModuleActive, envir = tmpl[[whSimList]]@.xData$.mods[[currModule]]),
+                           envir = object2@.xData$.mods[[currModule]])
+              })
+
+            }
+          }
+
 
 
         if (length(object2@current) == 0) {
@@ -761,26 +787,34 @@ if (!exists("objSize")) {
 #' Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
 #' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-#' \code{objSize(completed(sim))}.
+#' \code{objSize(completed(sim))}. The output is structured into 2 elemenst: the sim environment
+#' and all its objects, and the other slots in the simList (e.g., events, completed, modules, etc.).
+#' The returned object also has an attribute, "total", which shows the total size.
 #'
-#' @export
 #' @importFrom reproducible objSize
+#' @importFrom lobstr obj_size
 #' @inheritParams reproducible::objSize
+#' @export
 #'
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' utils::object.size(a)
-objSize.simList <- function(x, quick = getOption("reproducible.quick", FALSE),
-                            enclosingEnvs = TRUE, .prevEnvirs = list(), ...) {
-  xObjName <- deparse(substitute(x))
-  aa <- objSize(x@.xData, quick = quick, .prevEnvirs = .prevEnvirs, ...)
-  otherParts <- objSize(lapply(
-    grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE),
-    function(slotNam) slot(x, slotNam)))
-  bbOs <- list(simListWithoutObjects = otherParts)
-  aa <- append(aa, bbOs)
-  return(aa)
+objSize.simList <- function(x, quick = TRUE, ...) {
+
+  varName <- deparse(substitute(x))
+  aa <- objSize(x@.xData, quick = quick, ...)
+
+  simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
+  names(simSlots) <- simSlots
+  otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
+
+  total <- obj_size(x, quick = TRUE)
+  if (!quick)
+    attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
+                                    other = attr(otherParts, "objSize"))
+
+  return(total)
 }
 
 #' Make \code{simList} correctly work with \code{memoise}
