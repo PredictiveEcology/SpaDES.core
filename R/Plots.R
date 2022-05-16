@@ -88,6 +88,12 @@
 #'     }
 #' }
 #'
+#' @section Recording of files saved:
+#' In cases where files are saved, and where `Plots` is used within a SpaDES module,
+#' the file(s) that is/are saved will be appended to the `outputs` slot of the
+#' `simList` of the module. This will, therefore, keep a record of figures saved
+#' \emph{within} the `simList`
+#'
 #' @examples
 #'
 #' \dontrun{
@@ -279,16 +285,18 @@ Plots <- function(data, fn, filename,
     if (is(data, "Raster")) {
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
-      sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                   objectName = reproducible:::filePathSansExt(basename(rasterFilename)),
-                                   file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = reproducible:::filePathSansExt(basename(rasterFilename)),
+                                     file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
 
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
-      sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                   objectName = reproducible:::filePathSansExt(basename(rawFilename)),
-                                   file = rawFilename, fun = "qs::qsave", args = NA,  ...)
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = reproducible:::filePathSansExt(basename(rawFilename)),
+                                     file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
 
   }
@@ -311,9 +319,11 @@ Plots <- function(data, fn, filename,
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
         if (!is(plotted, "try-error")) {
-          sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                       objectName = reproducible:::filePathSansExt(basename(theFilename)),
-                                       file = theFilename, fun = "unknown", args = NA,  ...)
+          browser()
+          if (exists("sim", inherits = FALSE))
+            sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                         objectName = reproducible:::filePathSansExt(basename(theFilename)),
+                                         file = theFilename, fun = "unknown", args = NA,  ...)
           message("Saved figure to: ", theFilename)
         }
 
@@ -329,9 +339,10 @@ Plots <- function(data, fn, filename,
           args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                     objectName = reproducible:::filePathSansExt(basename(theFilename)),
-                                     file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
+        if (exists("sim", inherits = FALSE))
+          sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                       objectName = reproducible:::filePathSansExt(basename(theFilename)),
+                                       file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
         message("Saved figure to: ", theFilename)
       }
     }
@@ -339,12 +350,16 @@ Plots <- function(data, fn, filename,
     if (any(grepl("object", types))) {
       filename11 <- file.path(path, paste0(filename, "_gg.qs"))
       qs::qsave(gg, file = filename11)
-      sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                           objectName = reproducible:::filePathSansExt(basename(filename11)),
-                           file = filename11, fun = "qs::qsave", args = NA,  ...)
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = reproducible:::filePathSansExt(basename(filename11)),
+                                     file = filename11, fun = "qs::qsave", args = NA,  ...)
     }
 
   }
+  if (exists("sim", inherits = FALSE))
+    assign("sim", sim, envir = simIsIn)
+  return(invisible(NULL))
 }
 
 
