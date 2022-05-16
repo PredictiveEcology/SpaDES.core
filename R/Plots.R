@@ -277,9 +277,18 @@ Plots <- function(data, fn, filename,
 
   if (needSaveRaw) {
     if (is(data, "Raster")) {
-      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")), overwrite = TRUE)
+      rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
+      writeRaster(data, filename = rasterFilename, overwrite = TRUE)
+      sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                   objectName = reproducible:::filePathSansExt(basename(rasterFilename)),
+                                   file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
+
     } else {
-      qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
+      rawFilename <- file.path(path, paste0(filename, "_data.qs"))
+      qs::qsave(data, rawFilename)
+      sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                   objectName = reproducible:::filePathSansExt(basename(rawFilename)),
+                                   file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
 
   }
@@ -301,8 +310,13 @@ Plots <- function(data, fn, filename,
         clearPlot()
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
-        if (!is(plotted, "try-error"))
+        if (!is(plotted, "try-error")) {
+          sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                       objectName = reproducible:::filePathSansExt(basename(theFilename)),
+                                       file = theFilename, fun = "unknown", args = NA,  ...)
           message("Saved figure to: ", theFilename)
+        }
+
       }
     } else {
       ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
@@ -315,15 +329,31 @@ Plots <- function(data, fn, filename,
           args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = reproducible:::filePathSansExt(basename(theFilename)),
+                                     file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
         message("Saved figure to: ", theFilename)
       }
     }
 
-    if (any(grepl("object", types)))
-      qs::qsave(gg, file = file.path(path, paste0(filename, "_gg.qs")))
+    if (any(grepl("object", types))) {
+      filename11 <- file.path(path, paste0(filename, "_gg.qs"))
+      qs::qsave(gg, file = filename11)
+      sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                           objectName = reproducible:::filePathSansExt(basename(filename11)),
+                           file = filename11, fun = "qs::qsave", args = NA,  ...)
+    }
+
   }
 }
 
+
+outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
+  outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
+                                     saved = TRUE, arguments = args),
+                          endTime = endTime)
+  rbind(outputs, outs)
+}
 #' Test whether there should be any plotting from .plot parameter
 #'
 #' This will do all the various tests needed to determine whether
