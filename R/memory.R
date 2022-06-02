@@ -145,7 +145,10 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
 
     # Set up element in simList for recording the memory use stuff
     sim@.xData$.memoryUse <- list()
-    sim@.xData$.memoryUse$filename <- file.path(cachePath(sim), paste0("._memoryUseFilename", Sys.getpid(),".txt"))
+
+    st <- format(Sys.time(), format = "%Y-%m-%d_%H-%M-%S")
+    sim@.xData$.memoryUse$filename <-
+      file.path(logPath(sim), paste0("_memoryUse_", st, "_", Sys.getpid(),".csv"))
     sim@.xData$.memoryUse$futureObj <-
       futureOngoingMemoryThisPid(seconds = Inf,
                                  interval = getOption("spades.memoryUseInterval", 0.2),

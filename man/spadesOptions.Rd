@@ -57,6 +57,12 @@ The following options are likely of interest to most users
     \tab If true, some functions will use more memory
     efficient (but slower) algorithms. \cr
 
+  \code{spades.memoryUseInterval} \tab \code{FALSE}
+    \tab A numeric in seconds indicating how often sample the memory use. This will
+    be run in a separate "future" process so it can monitor the main process.
+    To access the resulting memory use table, use `memoryUse(sim)` after the simulation
+    has terminated. \cr
+
   \code{spades.messagingNumCharsModule} \tab \code{21}
     \tab The number of characters to use for the messaging preamble on each
     line of the messaging during spades calls.\cr
