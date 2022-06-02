@@ -7,6 +7,7 @@ test_that("testing memoryUse", {
   if (!requireNamespace("future", quietly = TRUE)) {
     skip("future package required")
   }
+  rm(list = ls())
   testInitOut <- testInit(c("raster", "future.callr", "future"),
                           opts = list("spades.moduleCodeChecks" = FALSE,
                                       "spades.memoryUseInterval" = 0.2,
@@ -20,7 +21,6 @@ test_that("testing memoryUse", {
   }, add = TRUE)
 
   system.time(future::plan(future.callr::callr))
-  system.time(future::plan("sequential"))
 
   #set.seed(42)
 
@@ -47,5 +47,7 @@ test_that("testing memoryUse", {
   suppressWarnings({
     memUse <- memoryUse(mySim3, max = FALSE)
   })
+  if (length(unique(memUse$maxMemory)) == 1)
+    browser()
   expect_true(length(unique(memUse$maxMemory)) > 1) # i.e., the join had to result in multiple values
 })
