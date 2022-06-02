@@ -75,6 +75,7 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
                       globals = list(memoryUseThisSession = memoryUseThisSession,
                                      outputFile = outputFile, thisPid = thisPid,
                                      seconds = seconds, interval = interval))
+  return(a)
 }
 
 # b <- futureOngoingMemoryThisPid()
@@ -96,15 +97,17 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #'   the raw memory used during each event will be shown.
 #' @seealso The \code{vignette("iv-modules")}
 memoryUse <- function(sim, max = TRUE) {
-  compl <- completed(sim)
-  mem <- sim@.xData$.memoryUse$obj
+  compl <- Copy(completed(sim))
+  mem <- Copy(sim@.xData$.memoryUse$obj)
   if (is.null(mem)) {
     message("There are no data in the sim@.xData$.memoryUse$obj ... try running spades again?")
   } else {
-    if (is.character(mem$time))
-      mem[, time := as.POSIXct(time)]
+
+    # make sure same tz
     if (any(grepl("^time$", names(mem))))
       setnames(mem, old = "time", new = "clockTime")
+    mem[, clockTime := as.POSIXct(as.character(clockTime))] # In case these two objects are in different tz
+    compl[, clockTime := as.POSIXct(as.character(clockTime))]
     a <- mem[compl, on = c("clockTime"), roll = TRUE, allow.cartesian = TRUE]
     if (isTRUE(max)) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
@@ -190,7 +193,7 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
 }
 
 stopFilename <- function(outputFile) {
-  gsub("\\.txt", "done.txt", outputFile)
+  gsub("\\.csv", "done.csv", outputFile)
 }
 
 outputFilename <- function(thisPid) {

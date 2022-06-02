@@ -20,9 +20,11 @@ test_that("testing memoryUse", {
   }, add = TRUE)
 
   system.time(future::plan(future.callr::callr))
+  system.time(future::plan("sequential"))
 
   #set.seed(42)
 
+  gc()
   times <- list(start = 0.0, end = if (isWindows()) 60 else 30, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
@@ -45,4 +47,5 @@ test_that("testing memoryUse", {
   suppressWarnings({
     memUse <- memoryUse(mySim3, max = FALSE)
   })
+  expect_true(length(unique(memUse$maxMemory)) > 1) # i.e., the join had to result in multiple values
 })
