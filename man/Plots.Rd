@@ -107,6 +107,14 @@ To turn off plotting both to screen and disk, set both
 value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 argument (e.g., \code{""} will omit all saving).
 }
+\section{Recording of files saved}{
+
+In cases where files are saved, and where \code{Plots} is used within a SpaDES module,
+the file(s) that is/are saved will be appended to the \code{outputs} slot of the
+\code{simList} of the module. This will, therefore, keep a record of figures saved
+\emph{within} the \code{simList}
+}
+
 \examples{
 
 \dontrun{
