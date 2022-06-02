@@ -1211,15 +1211,21 @@ setMethod(
       .pkgEnv$.cleanEnd <- TRUE
       return(invisible(sim))
     },
-    warning = function(w) { if (requireNamespace("logging", quietly = TRUE)) {
-      logging::logwarn(paste0(collapse = " ", c(names(w), w)))
+    warning = function(w) {
+      if (requireNamespace("logging", quietly = TRUE)) {
+        logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
     },
-    error = function(e) { if (requireNamespace("logging", quietly = TRUE)) {
-      logging::logerror(e)
-    } else {
-      stop(e)
-    }},
+    error = function(e) {
+      if (requireNamespace("logging", quietly = TRUE)) {
+        logging::logerror(e)
+      } else {
+        fn <- get0("onError")
+        if (!is.null(fn))
+          fn(sim)
+        stop(e)
+      }
+    },
     message = function(m) {
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
@@ -1229,7 +1235,6 @@ setMethod(
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-      # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
     return(invisible(sim))
