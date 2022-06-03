@@ -3,22 +3,22 @@
 \name{moduleDiagram}
 \alias{moduleDiagram}
 \alias{moduleDiagram,simList,character,logical-method}
-\alias{moduleDiagram,simList,missing,ANY-method}
+\alias{moduleDiagram,simList,ANY,ANY-method}
 \title{Simulation module dependency diagram}
 \usage{
-moduleDiagram(sim, type, showParents, ...)
+moduleDiagram(sim, type, showParents = TRUE, ...)
 
-\S4method{moduleDiagram}{simList,character,logical}(sim, type, showParents, ...)
+\S4method{moduleDiagram}{simList,character,logical}(sim, type = "plot", showParents = TRUE, ...)
 
-\S4method{moduleDiagram}{simList,missing,ANY}(sim, type, showParents, ...)
+\S4method{moduleDiagram}{simList,ANY,ANY}(sim, type, showParents = TRUE, ...)
 }
 \arguments{
 \item{sim}{A \code{simList} object (typically corresponding to a
 completed simulation).}
 
 \item{type}{Character string, either \code{"rgl"} for \code{igraph::rglplot}
-or \code{"tk"} for \code{igraph::tkplot}. Default missing, which uses regular
-\code{plot}.}
+or \code{"tk"} for \code{igraph::tkplot}, \code{"Plot"} to use quickPlot::Plot
+or \code{"plot"} to use base::plot, the default.}
 
 \item{showParents}{Logical. If TRUE, then any children that are grouped into parent
 modules will be grouped together by colored blobs. Internally,
