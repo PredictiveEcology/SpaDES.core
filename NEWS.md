@@ -4,6 +4,7 @@ version 1.0.11
 ==============
 
 ## new features
+* `Plots` now appends the filename any file saved during `Plots` to the `outputs` slot of the `sim`, i.e., it will show up in `outputs(sim)`
 * `logPath` is now a function that points to a sub-folder of `file.path(outputPath(sim), "log")`
 * `defineEvent` is a new function that allows a different way of specifying events than the `doEvent` function. This is not yet being used in the module templates, so does not appear with `newModule`.
 * `spades` can now run correctly, with "incomplete" modules that don't have metadata or even a module file. Now, a "module" will work with `simInit` and `spades` if a `doEvent.XXX` exists somewhere e.g., in the `.GlobalEnv`. `spades` will find it through inheritance and no longer complain if specific structures are absent. This may make it easier to learn how to use `SpaDES` as it mimicks a more normal user experience where functions are all in the `.GlobalEnv`.
@@ -22,6 +23,7 @@ version 1.0.11
 * none
 
 ## bug fixes
+* `memoryUse` was not correctly handling timezones; if the system call to get time stamps was in a different timezone compared to the internal SpaDES event queue, then the memory stamps were not correctly associated with the correct events.
 * improved handling of `data.table` objects using `loadSimList()`
 * Fixed caching of `.inputObjects` to correctly capture objects that were assigned to `mod$xxx`.
 * Fixed caching of `simList` objects where changes to functions appeared to be undetected, and so a Cache call would return a stale module with function code from the Cached `simList`, which was incorrect.
