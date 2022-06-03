@@ -1267,6 +1267,7 @@ setReplaceMethod(
   "outputs",
   signature = "simList",
   function(sim, value) {
+    browser()
     if (NROW(value)) {
        if (!is.data.frame(value)) {
          if (!is.list(value)) {
