@@ -287,7 +287,7 @@ Plots <- function(data, fn, filename,
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                     objectName = reproducible:::filePathSansExt(basename(rasterFilename)),
+                                     objectName = filePathSansExt(basename(rasterFilename)),
                                      file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
 
     } else {
@@ -295,7 +295,7 @@ Plots <- function(data, fn, filename,
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                     objectName = reproducible:::filePathSansExt(basename(rawFilename)),
+                                     objectName = filePathSansExt(basename(rawFilename)),
                                      file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
 
@@ -319,10 +319,9 @@ Plots <- function(data, fn, filename,
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
         if (!is(plotted, "try-error")) {
-          browser()
           if (exists("sim", inherits = FALSE))
             sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                         objectName = reproducible:::filePathSansExt(basename(theFilename)),
+                                         objectName = filePathSansExt(basename(theFilename)),
                                          file = theFilename, fun = "unknown", args = NA,  ...)
           message("Saved figure to: ", theFilename)
         }
@@ -341,7 +340,7 @@ Plots <- function(data, fn, filename,
         do.call(ggplot2::ggsave, args = args)
         if (exists("sim", inherits = FALSE))
           sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                       objectName = reproducible:::filePathSansExt(basename(theFilename)),
+                                       objectName = filePathSansExt(basename(theFilename)),
                                        file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
         message("Saved figure to: ", theFilename)
       }
@@ -352,7 +351,7 @@ Plots <- function(data, fn, filename,
       qs::qsave(gg, file = filename11)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                     objectName = reproducible:::filePathSansExt(basename(filename11)),
+                                     objectName = filePathSansExt(basename(filename11)),
                                      file = filename11, fun = "qs::qsave", args = NA,  ...)
     }
 
@@ -391,3 +390,5 @@ anyPlotting <- function(.plots) {
 
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
+
+filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
