@@ -1680,6 +1680,32 @@ setReplaceMethod(
     return(sim)
 })
 
+
+
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#'
+setGeneric("logPath", function(sim) {
+  standardGeneric("logPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("logPath",
+          signature = "simList",
+          definition = function(sim) {
+            lp <- file.path(sim@paths$outputPath, "log")
+            lp <- checkPath(lp, create = TRUE)
+            return(lp)
+})
+
+
+
+
 # modulePath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
