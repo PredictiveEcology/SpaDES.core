@@ -4,6 +4,7 @@ version 1.0.11
 ==============
 
 ## new features
+* messaging in a module can now handle "same line" messages --> simply use the standard `"\b"` in the message, and it will occur on same line as previous message
 * `Plots` now appends the filename any file saved during `Plots` to the `outputs` slot of the `sim`, i.e., it will show up in `outputs(sim)`
 * `logPath` is now a function that points to a sub-folder of `file.path(outputPath(sim), "log")`
 * `defineEvent` is a new function that allows a different way of specifying events than the `doEvent` function. This is not yet being used in the module templates, so does not appear with `newModule`.

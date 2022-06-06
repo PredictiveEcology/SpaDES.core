@@ -1231,7 +1231,11 @@ setMethod(
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        message(loggingMessage(m$message))
+        if (startsWith(m$message, "\b")) {
+          message(gsub("\n$", "", m$message))
+        } else {
+          message(loggingMessage(m$message))
+        }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
