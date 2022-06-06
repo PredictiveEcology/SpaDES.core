@@ -1,5 +1,5 @@
 test_that("testing memoryUse", {
-  skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+  # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
 
   if (!interactive())
     skip("This memoryUse is still very experimental")
