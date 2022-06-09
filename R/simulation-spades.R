@@ -1321,22 +1321,25 @@ setMethod(
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                           paths = FALSE, outputs = FALSE,
                            params = sim@params[[cur[["moduleName"]]]],
                            modules = cur[["moduleName"]])
     }
   }
   browser()
+  useCloud <- sim@params[[cur[["moduleName"]]]][[".useCloud"]]
+  cloudFolderID <- sim@params[[cur[["moduleName"]]]][[".cloudFolderID"]]
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
-    expression(Cache(FUN = get(moduleCall, envir = fnEnv), useCloud = TRUE,
-                sim = sim,
+    expression(Cache(FUN = get(moduleCall, envir = fnEnv),
+                     useCloud = useCloud, cloudFolderID = cloudFolderID,
+                     sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
-                showSimilar = showSimilar,
+                     showSimilar = showSimilar,
                      cacheRepo = sim@paths[["cachePath"]]))
+
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
