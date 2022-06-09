@@ -602,16 +602,26 @@ test_that("test module-level cloud caching", {
                                       "reproducible.cacheSaveFormat" = "qs"))
 
   opts <- options("reproducible.cachePath" = tmpdir)
+
+  if (FALSE) {
+    devtools::load_all("~/GitHub/reproducible"); devtools::load_all("~/GitHub/SpaDES.core")
+    setwd("~/GitHub/SpaDES.core")
+    googledrive::drive_auth(email = "eliotmcintire@gmail.com", cache = "c:/Eliot/.secret")
+  }
+  if (!exists("tmpdir", inherits = FALSE)) {
+    testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
+                            opts = list("reproducible.useMemoise" = FALSE,
+                                        "reproducible.cacheSaveFormat" = "qs"))
+    opts <- options("reproducible.cachePath" = tmpdir)
+  }
   on.exit({
     options(opts)
     testOnExit(testInitOut)
   }, add = TRUE)
-
   tmpfile <- tempfile(fileext = ".pdf")
   tmpfile1 <- tempfile(fileext = ".pdf")
   expect_true(file.create(tmpfile))
   tmpfile <- normPath(tmpfile)
-
   # Example of changing parameter values
   times <- list(start = 0.0, end = 2.0, timeunit = "year")
   mySim <- simInit(
@@ -621,9 +631,9 @@ test_that("test module-level cloud caching", {
       # Turn off interactive plotting
       fireSpread = list(.plotInitialTime = NA),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE#,
-                              #.useCloud = TRUE, .cloudFolderID = "1-gsai_2sJpsoUHphl6HBOglslDolgl5D"
-                              )
+      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE,
+                              .useCloud = TRUE, .cloudFolderID = "1K21C1hj4KXUo-4uOvyTOk7FhTCKSx-5e"
+      )
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
@@ -632,10 +642,9 @@ test_that("test module-level cloud caching", {
     # Save final state of landscape and caribou
     outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
-
-  set.seed(1123)
-  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
-
+  #set.seed(1123)
+  sims <- spades(Copy(mySim), #notOlderThan = Sys.time(),
+                 debug = T)
   sim2 <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
 
 )}
