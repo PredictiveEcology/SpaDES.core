@@ -1325,13 +1325,13 @@ setMethod(
                            modules = cur[["moduleName"]])
     }
   }
-  browser()
   useCloud <- sim@params[[cur[["moduleName"]]]][[".useCloud"]]
   cloudFolderID <- sim@params[[cur[["moduleName"]]]][[".cloudFolderID"]]
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     expression(Cache(FUN = get(moduleCall, envir = fnEnv),
                      useCloud = useCloud, cloudFolderID = cloudFolderID,
                      sim = sim,
+                     #debugCache = "quick",
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
@@ -1352,6 +1352,7 @@ setMethod(
     #fnEnv[[moduleCall]](sim, cur[["eventTime"]], cur[["eventType"]])
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
+  browser()
   # Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
     if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))

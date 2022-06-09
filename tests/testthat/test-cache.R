@@ -593,3 +593,45 @@ test_that("test showSimilar", {
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
 
+
+test_that("test module-level cloud caching", {
+  skip_if_not_installed("RandomFields")
+
+  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
+                          opts = list("reproducible.useMemoise" = FALSE))
+
+  opts <- options("reproducible.cachePath" = tmpdir)
+  on.exit({
+    options(opts)
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  tmpfile <- tempfile(fileext = ".pdf")
+  tmpfile1 <- tempfile(fileext = ".pdf")
+  expect_true(file.create(tmpfile))
+  tmpfile <- normPath(tmpfile)
+
+  # Example of changing parameter values
+  times <- list(start = 0.0, end = 1.0, timeunit = "year")
+  mySim <- simInit(
+    times = times,
+    params = list(
+      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+      # Turn off interactive plotting
+      fireSpread = list(.plotInitialTime = NA),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE,
+                              .useCloud = TRUE, .cloudFolderID = "1-gsai_2sJpsoUHphl6HBOglslDolgl5D")
+    ),
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    # Save final state of landscape and caribou
+    outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
+  )
+
+  set.seed(1123)
+  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+
+)}
