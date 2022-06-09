@@ -22,7 +22,6 @@ if (!isGeneric(".robustDigest")) {
 #' @aliases Cache
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
-#' @importFrom fastdigest fastdigest
 #' @importFrom Require modifyList2
 #' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
@@ -424,8 +423,8 @@ setMethod(
         newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
         newObjs <- newObjs[!startsWith(newObjs, "._")]
         existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
-        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
+        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
         changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
         changed <- c(newObjs, changedObjs)
       } else {

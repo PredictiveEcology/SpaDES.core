@@ -126,9 +126,9 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     objNames <- names(sim$.recoverableObjs[[event]])
     if (!is.null(objNames)) {
       # only take objects that changed -- determine which ones are changed
-      fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) fastdigest(obj)))
+      fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) .robustDigest(obj)))
       objNames <- objNames[objNames %in% ls(sim@.xData)]
-      fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) fastdigest(obj)))
+      fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj)))
       if (!is.null(fd2)) {
         fd1 <- fd1[match(names(fd2), names(fd1))]
         stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))

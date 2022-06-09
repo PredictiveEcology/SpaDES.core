@@ -1321,12 +1321,14 @@ setMethod(
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                           paths = FALSE, outputs = FALSE,
                            params = sim@params[[cur[["moduleName"]]]],
                            modules = cur[["moduleName"]])
     }
   }
+  browser()
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
-    expression(Cache(FUN = get(moduleCall, envir = fnEnv),
+    expression(Cache(FUN = get(moduleCall, envir = fnEnv), useCloud = TRUE,
                 sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,

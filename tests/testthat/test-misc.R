@@ -27,7 +27,7 @@ test_that(".emptyEventList tests", {
 })
 
 test_that("modify search path", {
-  testInitOut <- testInit(smcc = FALSE, "fastdigest")
+  testInitOut <- testInit(smcc = FALSE, "digest")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -47,14 +47,14 @@ test_that("modify search path", {
   a <- .modifySearchPath(pkgs = pkgToAttach, removeOthers = TRUE, skipNamespacing = FALSE)
   spPost <- search()
   expect_true(any(grep(pkgToAttach[1], spPost) == 2L))
-  expect_true(identical(grep("fastdigest", spPost), integer()))
+  expect_true(identical(grep("digest", spPost), integer()))
   detach("package:crayon")
   spPost2 <- search()
   expect_false(any(grep(pkgToAttach[1], spPost2) == 2L))
 })
 
 test_that("test all.equal.simList", {
-  testInitOut <- testInit(smcc = FALSE, "fastdigest")
+  testInitOut <- testInit(smcc = FALSE, "digest")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
