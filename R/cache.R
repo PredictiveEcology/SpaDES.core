@@ -147,8 +147,8 @@ setMethod(
       object@params <- list(classOptions$params)
       names(object@params) <- classOptions$modules
     }
+    object@modules <- list()
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
-      object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
     }
 
