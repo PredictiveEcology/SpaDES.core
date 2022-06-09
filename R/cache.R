@@ -190,7 +190,7 @@ setMethod(
       })
     }
 
-    obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
+    obj[nonDotList] <- lapply(nonDotList, function(x) .robustDigest(slot(object, x), algo = algo))
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
