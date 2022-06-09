@@ -598,7 +598,8 @@ test_that("test module-level cloud caching", {
   skip_if_not_installed("RandomFields")
 
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
-                          opts = list("reproducible.useMemoise" = FALSE))
+                          opts = list("reproducible.useMemoise" = FALSE,
+                                      "reproducible.cacheSaveFormat" = "qs"))
 
   opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
@@ -612,7 +613,7 @@ test_that("test module-level cloud caching", {
   tmpfile <- normPath(tmpfile)
 
   # Example of changing parameter values
-  times <- list(start = 0.0, end = 1.0, timeunit = "year")
+  times <- list(start = 0.0, end = 2.0, timeunit = "year")
   mySim <- simInit(
     times = times,
     params = list(
@@ -620,8 +621,9 @@ test_that("test module-level cloud caching", {
       # Turn off interactive plotting
       fireSpread = list(.plotInitialTime = NA),
       caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE,
-                              .useCloud = TRUE, .cloudFolderID = "1-gsai_2sJpsoUHphl6HBOglslDolgl5D")
+      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE#,
+                              #.useCloud = TRUE, .cloudFolderID = "1-gsai_2sJpsoUHphl6HBOglslDolgl5D"
+                              )
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
@@ -633,5 +635,7 @@ test_that("test module-level cloud caching", {
 
   set.seed(1123)
   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+
+  sim2 <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
 
 )}
