@@ -419,7 +419,7 @@ setMethod(
                           ".saveInitialTime",
                           ".plotInterval",
                           ".plotInitialTime")
-    dotParamsChar <- list(".savePath", ".saveObjects", ".seed")
+    dotParamsChar <- list(".savePath", ".saveObjects", ".seed", ".useCache", ".useCloud", ".cloudFolderID")
     dotParams <- append(dotParamsChar, dotParamsReal)
 
     sim@modules <- modules  ## will be updated below
@@ -523,7 +523,9 @@ setMethod(
       globalsUsed <- globalsUsedInModules <- NULL
       globalsDF <- list()
       for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
-        common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
+        curModuleParams <- names(sim@params[[mod]])
+        curModuleParams <- union(curModuleParams, unlist(dotParams))
+        common <- intersect(curModuleParams, names(sim@params$.globals))
         if (length(common)) {
           globalsUsed <- paste(common, sep = ", ")
           globalsUsedInModules <- rep(mod, length(common))
