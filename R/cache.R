@@ -189,7 +189,10 @@ setMethod(
       })
     }
 
-    obj[nonDotList] <- lapply(nonDotList, function(x) .robustDigest(slot(object, x), algo = algo))
+    obj[nonDotList] <- lapply(nonDotList, function(x) {
+      quick = (x == "outputs") # outputs is always a "quick"
+      .robustDigest(slot(object, x), algo = algo, quick = quick)
+      })
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
