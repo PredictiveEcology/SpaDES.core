@@ -86,3 +86,29 @@ testOnExit <- function(testInitOut) {
     try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
   )
 }
+
+
+skip_if_no_token <- function() {
+
+  emailCh <- "gargle_oauth_email"
+  email <- if (!is.null(getOption(emailCh))) {
+    getOption(emailCh)
+  } else if (!identical("", Sys.getenv(toupper(emailCh)))){
+    Sys.getenv(toupper(emailCh))
+  } else { NULL }
+
+  cacheCh <- "gargle_oauth_cache"
+  cache <- if (!is.null(getOption(cacheCh)) && !identical(getOption(cacheCh), ".secret")) {
+    getOption(cacheCh)
+  } else if (!identical("", Sys.getenv(toupper(cacheCh)))){
+    Sys.getenv(toupper(cacheCh))
+  } else { NULL }
+
+  opts <- list(email, cache)
+  names(opts) <- c(emailCh, cacheCh)
+  options(opts)
+
+  googledrive::drive_auth()
+
+  testthat::skip_if_not(googledrive::drive_has_token(), "No Drive token")
+}

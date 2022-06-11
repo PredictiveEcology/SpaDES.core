@@ -595,23 +595,29 @@ test_that("test showSimilar", {
 
 
 test_that("test module-level cloud caching", {
-  skip_if_not_installed("RandomFields")
 
-  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
-                          opts = list("reproducible.useMemoise" = FALSE,
-                                      "reproducible.cacheSaveFormat" = "qs"))
+  # if (!identical("", Sys.getenv("GARGLE_OAUTH_EMAIL")))
+  #   options(gargle_oauth_email = Sys.getenv("GARGLE_OAUTH_EMAIL"))
+  # if (!identical("", Sys.getenv("GARGLE_OAUTH_CACHE")))
+  #   options(gargle_oauth_cache = Sys.getenv("GARGLE_OAUTH_CACHE"))
+  #
+  # googledrive::drive_auth()
+
+  skip_if_no_token()
 
   opts <- options("reproducible.cachePath" = tmpdir)
 
   if (FALSE) {
     devtools::load_all("~/GitHub/reproducible"); devtools::load_all("~/GitHub/SpaDES.core")
     setwd("~/GitHub/SpaDES.core")
-    googledrive::drive_auth(email = "eliotmcintire@gmail.com", cache = "c:/Eliot/.secret")
   }
   if (!exists("tmpdir", inherits = FALSE)) {
     testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                             opts = list("reproducible.useMemoise" = FALSE,
-                                        "reproducible.cacheSaveFormat" = "qs"))
+                                        "reproducible.cacheSaveFormat" = "qs",
+                                        "reproducible.verbose" = 2,
+                                        "reproducible.showSimilar" = TRUE,
+                                        "reproducible.showSimilarDepth" = 6))
     opts <- options("reproducible.cachePath" = tmpdir)
   }
   on.exit({
@@ -624,16 +630,18 @@ test_that("test module-level cloud caching", {
   tmpfile <- normPath(tmpfile)
   # Example of changing parameter values
   times <- list(start = 0.0, end = 2.0, timeunit = "year")
+
   mySim <- simInit(
     times = times,
     params = list(
-      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"
+                      #.cloudFolderID = "1K21C1hj4KXUo-4uOvyTOk7FhTCKSx-5e",
+                      , .useCloud = TRUE
+                      ),
       # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE,
-                              .useCloud = TRUE, .cloudFolderID = "1K21C1hj4KXUo-4uOvyTOk7FhTCKSx-5e"
-      )
+      fireSpread = list(.plotInitialTime = NA, .useCache = "init"),
+      caribouMovement = list(.plotInitialTime = NA, .useCache = "init"),
+      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE)
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
@@ -642,9 +650,17 @@ test_that("test module-level cloud caching", {
     # Save final state of landscape and caribou
     outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
-  #set.seed(1123)
-  sims <- spades(Copy(mySim), #notOlderThan = Sys.time(),
-                 debug = T)
-  sim2 <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+  set.seed(1123)
+  sims <- spades(Copy(mySim), debug = TRUE)
+
+  gdriveLs <- googledrive::drive_ls(getOption("reproducible.cloudFolderID"))
+  expect_true(NROW(gdriveLs) == 5) # 3x init events, plus 1x plot, plus db file
+
+  # Again, should put no new ones
+  sim2 <- spades(Copy(mySim), debug = TRUE)
+  gdriveLs <- googledrive::drive_ls(getOption("reproducible.cloudFolderID"))
+  expect_true(NROW(gdriveLs) == 5) # 3x init events, plus 1x plot, plus db file
+
+  cloudShowCache()
 
 )}
