@@ -202,7 +202,8 @@ unlink(normalizePath(ftmp))
 
 ## ----eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7----
 # overview of the events in the simulation
-eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
+if (requireNamespace("DiagrammeR"))
+  eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
 ## ----checksums, eval=FALSE----------------------------------------------------
 #  ## 1. specify your module here

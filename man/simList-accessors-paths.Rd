@@ -18,6 +18,8 @@
 \alias{outputPath,simList-method}
 \alias{outputPath<-}
 \alias{outputPath<-,simList-method}
+\alias{logPath}
+\alias{logPath,simList-method}
 \alias{modulePath}
 \alias{modulePath,simList-method}
 \alias{modulePath<-}
@@ -30,6 +32,10 @@
 \alias{rasterPath,simList-method}
 \alias{rasterPath<-}
 \alias{rasterPath<-,simList-method}
+\alias{terraPath}
+\alias{terraPath,simList-method}
+\alias{terraPath<-}
+\alias{terraPath<-,simList-method}
 \alias{dataPath}
 \alias{dataPath,simList-method}
 \title{Specify paths for modules, inputs, outputs, and temporary rasters}
@@ -66,6 +72,10 @@ outputPath(sim) <- value
 
 \S4method{outputPath}{simList}(sim) <- value
 
+logPath(sim)
+
+\S4method{logPath}{simList}(sim)
+
 modulePath(sim, module)
 
 \S4method{modulePath}{simList}(sim, module)
@@ -89,6 +99,14 @@ rasterPath(sim)
 rasterPath(sim) <- value
 
 \S4method{rasterPath}{simList}(sim) <- value
+
+terraPath(sim)
+
+\S4method{terraPath}{simList}(sim)
+
+terraPath(sim) <- value
+
+\S4method{terraPath}{simList}(sim) <- value
 
 dataPath(sim)
 
@@ -130,7 +148,9 @@ If no paths are specified, the defaults are as follows:
 \item \code{inputPath}: \code{getOption("spades.modulePath")};
 \item \code{modulePath}: \code{getOption("spades.inputPath")};
 \item \code{outputPath}: \code{getOption("spades.outputPath")};
-\item \code{rasterPath}: \code{raster::tmpDir()}
+\item \code{rasterPath}: \code{file.path(getOption("spades.scratchPath"), "raster")};
+\item \code{scratchPath}: \code{getOption("spades.scratchPath")};
+\item \code{terraPath}: \code{file.path(getOption("spades.scratchPath"), "terra")}
 }
 }
 \seealso{

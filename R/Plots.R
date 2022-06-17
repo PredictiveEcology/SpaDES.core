@@ -88,6 +88,12 @@
 #'     }
 #' }
 #'
+#' @section Recording of files saved:
+#' In cases where files are saved, and where `Plots` is used within a SpaDES module,
+#' the file(s) that is/are saved will be appended to the `outputs` slot of the
+#' `simList` of the module. This will, therefore, keep a record of figures saved
+#' \emph{within} the `simList`
+#'
 #' @examples
 #'
 #' \dontrun{
@@ -277,9 +283,20 @@ Plots <- function(data, fn, filename,
 
   if (needSaveRaw) {
     if (is(data, "Raster")) {
-      writeRaster(data, filename = file.path(path, paste0(filename, "_data.tif")), overwrite = TRUE)
+      rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
+      writeRaster(data, filename = rasterFilename, overwrite = TRUE)
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = filePathSansExt(basename(rasterFilename)),
+                                     file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
+
     } else {
-      qs::qsave(data, file.path(path, paste0(filename, "_data.qs")))
+      rawFilename <- file.path(path, paste0(filename, "_data.qs"))
+      qs::qsave(data, rawFilename)
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = filePathSansExt(basename(rawFilename)),
+                                     file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
 
   }
@@ -301,8 +318,14 @@ Plots <- function(data, fn, filename,
         clearPlot()
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
-        if (!is(plotted, "try-error"))
+        if (!is(plotted, "try-error")) {
+          if (exists("sim", inherits = FALSE))
+            sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                         objectName = filePathSansExt(basename(theFilename)),
+                                         file = theFilename, fun = "unknown", args = NA,  ...)
           message("Saved figure to: ", theFilename)
+        }
+
       }
     } else {
       ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
@@ -315,15 +338,36 @@ Plots <- function(data, fn, filename,
           args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
+        if (exists("sim", inherits = FALSE))
+          sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                       objectName = filePathSansExt(basename(theFilename)),
+                                       file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
         message("Saved figure to: ", theFilename)
       }
     }
 
-    if (any(grepl("object", types)))
-      qs::qsave(gg, file = file.path(path, paste0(filename, "_gg.qs")))
+    if (any(grepl("object", types))) {
+      filename11 <- file.path(path, paste0(filename, "_gg.qs"))
+      qs::qsave(gg, file = filename11)
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+                                     objectName = filePathSansExt(basename(filename11)),
+                                     file = filename11, fun = "qs::qsave", args = NA,  ...)
+    }
+
   }
+  if (exists("sim", inherits = FALSE))
+    assign("sim", sim, envir = simIsIn)
+  return(invisible(NULL))
 }
 
+
+outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
+  outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
+                                     saved = TRUE, arguments = I(args)),
+                          endTime = endTime)
+  rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
+}
 #' Test whether there should be any plotting from .plot parameter
 #'
 #' This will do all the various tests needed to determine whether
@@ -346,3 +390,5 @@ anyPlotting <- function(.plots) {
 
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
+
+filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")

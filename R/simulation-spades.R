@@ -22,7 +22,7 @@ utils::globalVariables(c(".", ".I", "whi"))
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table data.table rbindlist setkey fread
+#' @importFrom data.table data.table rbindlist fread
 #' @importFrom reproducible Cache messageDF
 #' @importFrom utils write.table
 #' @include helpers.R memory-leaks.R
@@ -112,15 +112,39 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
       fnEnv <- sim@.xData$.mods[[curModuleName]]
+
+      # This allows spades to run even if all the functions are in the .GlobalEnv;
+      #   while this is generally bad practice, and none of the tools in spades
+      #   enable this to happen, this allows a user can manually run individual functions
+      #   like `doEvent.XXX` and `scheduleEvent`, then run `spades(sim)` without failing
+      if (is.null(fnEnv)) {
+        if (!curModuleName %in% .coreModules())
+          fnEnv <- asNamespace("SpaDES.core")
+      }
+      fnEnvIsSpaDES.core <- identical(fnEnv, asNamespace("SpaDES.core"))
+
       # update current simulated time
       # Test replacement for speed
-      #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
       st <- slot(sim, "simtimes")
       st[["current"]] <- cur[["eventTime"]]
       slot(sim, "simtimes", check = FALSE) <- st
 
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", curModuleName, sep = ".")
+      # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
+      if (!is.null(fnEnv))
+        if (!exists(moduleCall, envir = fnEnv)) {
+          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur$eventType)
+          if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
+            fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
+            moduleCall <- moduleCallSeparateEventFns
+          } else {
+            if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+              moduleCall <- moduleCallSeparateEventFns
+            }
+
+          }
+        }
 
       # if debug is TRUE
       if (is.null(attr(sim, "needDebug"))) {
@@ -135,77 +159,81 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      if (curModuleName %in% sim@modules) {
-        if (curModuleName %in% core) {
-          sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
-        } else {
-          # for future caching of modules
-          cacheIt <- FALSE
-          eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-          a <- sim@params[[curModuleName]][[".useCache"]]
-          if (!is.null(a)) {
-            #.useCache is a parameter
-            if (!identical(FALSE, a)) {
-              #.useCache is not FALSE
-              if (!isTRUE(a)) {
-                #.useCache is not TRUE
-                if (cur[["eventType"]] %in% a) {
-                  cacheIt <- TRUE
-                } else if (is(a, "POSIXt")) {
-                  cacheIt <- TRUE
-                  notOlderThan <- a
-                }
-              } else {
+      moduleIsInSim <- curModuleName %in% sim@modules
+      if (!moduleIsInSim && !fnEnvIsSpaDES.core)
+        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
+      # if (curModuleName %in% sim@modules) {
+      if (curModuleName %in% core) {
+        sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
+      } else {
+        # for future caching of modules
+        cacheIt <- FALSE
+        eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
+        a <- sim@params[[curModuleName]][[".useCache"]]
+        if (!is.null(a)) {
+          #.useCache is a parameter
+          if (!identical(FALSE, a)) {
+            #.useCache is not FALSE
+            if (!isTRUE(a)) {
+              #.useCache is not TRUE
+              if (cur[["eventType"]] %in% a) {
                 cacheIt <- TRUE
+              } else if (is(a, "POSIXt")) {
+                cacheIt <- TRUE
+                notOlderThan <- a
               }
-            }
-          }
-
-          # browser(expr = exists("._doEvent_2"))
-          showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
-            isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
-              isTRUE(getOption("reproducible.showSimilar", FALSE))
             } else {
-              isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
-            }
-
-          # This is to create a namespaced module call
-          if (!.pkgEnv[["skipNamespacing"]])
-            .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
-                              removeOthers = FALSE)
-
-          skipEvent <- FALSE
-          if (!is.null(eventSeed)) {
-            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-              initialRandomSeed <- .Random.seed
-            set.seed(eventSeed) # will create .Random.seed
-          }
-
-          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
-          if (useFuture) {
-            # stop("using future for spades events is not yet fully implemented")
-            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                          curModName = cur[["moduleName"]])
-
-            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
-              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
-                                     futureNeeds = futureNeeds)
-              skipEvent <- TRUE
+              cacheIt <- TRUE
             }
           }
+        }
 
-          if (!skipEvent) {
-            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                             showSimilar = showSimilar, .pkgEnv)
+        # browser(expr = exists("._doEvent_2"))
+        showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
+                           isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
+          isTRUE(getOption("reproducible.showSimilar", FALSE))
+        } else {
+          isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
+        }
+
+        # This is to create a namespaced module call
+        if (!.pkgEnv[["skipNamespacing"]])
+          .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
+                            removeOthers = FALSE)
+
+        skipEvent <- FALSE
+        if (!is.null(eventSeed)) {
+          if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
+            initialRandomSeed <- .Random.seed
+          set.seed(eventSeed) # will create .Random.seed
+        }
+
+        .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+        if (useFuture) {
+          # stop("using future for spades events is not yet fully implemented")
+          futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                        curModName = cur[["moduleName"]])
+
+          if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
+            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                   showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                   futureNeeds = futureNeeds)
+            skipEvent <- TRUE
           }
+        }
 
-          if (!is.null(eventSeed)) {
-            if (exists("initialRandomSeed", inherits = FALSE))
-              .Random.seed <- initialRandomSeed
-          }
+        if (!skipEvent) {
+          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                           showSimilar = showSimilar, .pkgEnv)
+        }
 
-          # browser(expr = exists("._doEvent_3"))
+        if (!is.null(eventSeed)) {
+          if (exists("initialRandomSeed", inherits = FALSE))
+            .Random.seed <- initialRandomSeed
+        }
+
+        # browser(expr = exists("._doEvent_3"))
+        if (!fnEnvIsSpaDES.core) {
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
@@ -221,18 +249,17 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE)) {
             if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
                                       silent = TRUE, error = function(x) FALSE)
-                             ))
-            stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
-                 "sim$", curModuleName, ". ",
-                 "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
+            ))
+              stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+                   "sim$", curModuleName, ". ",
+                   "Please remove the section of code that does this in the event named: ",
+                   cur[["eventType"]])
           }
         }
-      } else {
-        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
       }
+        # }
 
-      # add to list of completed events
+        # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
@@ -324,7 +351,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #' @return Returns the modified \code{simList} object.
 #'
-#' @importFrom data.table setkey
 #' @include priority.R
 #' @export
 #' @rdname scheduleEvent
@@ -462,7 +488,6 @@ scheduleEvent <- function(sim,
 #' then a possible strategy would be to set \code{eventPriority} of the conditional event
 #' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
-#' @importFrom data.table setkey
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
@@ -1186,25 +1211,34 @@ setMethod(
       .pkgEnv$.cleanEnd <- TRUE
       return(invisible(sim))
     },
-    warning = function(w) { if (requireNamespace("logging", quietly = TRUE)) {
-      logging::logwarn(paste0(collapse = " ", c(names(w), w)))
+    warning = function(w) {
+      if (requireNamespace("logging", quietly = TRUE)) {
+        logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
     },
-    error = function(e) { if (requireNamespace("logging", quietly = TRUE)) {
-      logging::logerror(e)
-    } else {
-      stop(e)
-    }},
+    error = function(e) {
+      if (requireNamespace("logging", quietly = TRUE)) {
+        logging::logerror(e)
+      } else {
+        fn <- get0("onError")
+        if (!is.null(fn))
+          fn(sim)
+        stop(e)
+      }
+    },
     message = function(m) {
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        message(loggingMessage(m$message))
+        if (startsWith(m$message, "\b")) {
+          message(gsub("\n$", "", m$message))
+        } else {
+          message(loggingMessage(m$message))
+        }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-      # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
     return(invisible(sim))
@@ -1275,19 +1309,21 @@ setMethod(
 
 #' @keywords internal
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
-  createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
-  if (cacheIt) { # means that a module or event is to be cached
-    fns <- ls(fnEnv, all.names = TRUE)
-    moduleSpecificObjects <-
-      c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
-        paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
-        na.omit(createsOutputs)) # objects outputted by module
-    #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
-    #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
-    moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
-    classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                         params = sim@params[[cur[["moduleName"]]]],
-                         modules = cur[["moduleName"]])
+  if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
+    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    if (cacheIt) { # means that a module or event is to be cached
+      fns <- ls(fnEnv, all.names = TRUE)
+      moduleSpecificObjects <-
+        c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
+          paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
+          na.omit(createsOutputs)) # objects outputted by module
+      #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
+      #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
+      moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
+      classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                           params = sim@params[[cur[["moduleName"]]]],
+                           modules = cur[["moduleName"]])
+    }
   }
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     expression(Cache(FUN = get(moduleCall, envir = fnEnv),
@@ -1312,11 +1348,13 @@ setMethod(
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
   # Test for memory leaks
-  if (getOption("spades.testMemoryLeaks", TRUE))
-    sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
-                                          modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
-                                          modName = cur[["moduleName"]],
-                                          knownObjects = sim@.xData$._knownObjects)
+  if (getOption("spades.testMemoryLeaks", TRUE)) {
+    if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))
+      sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
+                                            modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
+                                            modName = cur[["moduleName"]],
+                                            knownObjects = sim@.xData$._knownObjects)
+  }
 
   return(sim)
 }
@@ -1841,3 +1879,120 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 
   paste0(strftime(st, format = stForm2), mess)
 }
+
+
+#' Alternative way to define events in SpaDES.core
+#'
+#' There are two ways to define what occurs during an event: defining a function
+#' called doEvent.\emph{moduleName}, where \emph{moduleName} is the actual module name. This
+#' approach is the original approach used in SpaDES.core, and it must have an
+#' explicit \code{switch} statement branching on \code{eventType}. The newer approach
+#' (still experimental) uses \code{defineEvent}. Instead of creating the
+#' function called, `doEvent.XXXX`, where XXXX is the module name, it creates one function
+#' for each event, each with the name `doEvent.XXXX.YYYY`, where `YYYY` is the event
+#' name. This may be a little bit cleaner, but both with still work.
+#'
+#' @param sim A simList
+#' @param eventName Character string of the desired event name to define. Default is "init"
+#' @param moduleName Character string of the name of the module. If this function is
+#'    used within a module, then it will try to find the module name.
+#' @param code An expression that defines the code to execute during the event. This will
+#'    be captured, and pasted into a new function (`doEvent.XXXX.YYYY`), where `XXXX` is the
+#'    \code{moduleName} and \code{YYYY} is the \code{eventName}, remaining unevaluated until
+#'    that new function is called.
+#' @param envir An optional environment to specify where to put the resulting function.
+#'     The default will place a function called `doEvent.moduleName.eventName` in the
+#'     module function location, i.e., `sim$.mods[[moduleName]]`. However, if this
+#'     location does not exist, then it will place it in the `parent.frame()`, with a message.
+#'     Normally, especially, if used within SpaDES module code, this should be left missing.
+#' @export
+#' @seealso \code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
+#' @examples
+#' sim <- simInit()
+#'
+#' # these put the functions in the parent.frame() which is .GlobalEnv for an interactive user
+#' defineEvent(sim, "init", moduleName = "thisTestModule", code = {
+#'   sim <- Init(sim) # initialize
+#'   # Now schedule some different event for "current time", i.e., will
+#'   #   be put in the event queue to run *after* this current event is finished
+#'   sim <- scheduleEvent(sim, time(sim), "thisTestModule", "grow")
+#' }, envir = envir(sim))
+#'
+#' defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
+#'   sim <- grow(sim) # grow
+#'   # Now schedule this same event for "current time plus 1", i.e., a "loop"
+#'   sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # for "time plus 1"
+#' })
+#'
+#' Init <- function(sim) {
+#'   sim$messageToWorld <- "Now the sim has an object in it that can be accessed"
+#'   sim$size <- 1 # initializes the size object --> this can be anything, Raster, list, whatever
+#'   message(sim$messageToWorld)
+#'   return(sim)   # returns all the things you added to sim as they are in the simList
+#' }
+#'
+#' grow <- function(sim) {
+#'   sim$size <- sim$size + 1 # increments the size
+#'   message(sim$size)
+#'   return(sim)
+#' }
+#'
+#' # schedule that first "init" event
+#' sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
+#' # Look at event queue
+#' events(sim) # shows the "init" we just added
+#' \dontrun{
+#'   # this is skipped when running in automated tests; it is fine in interactive use
+#'   out <- spades(sim)
+#' }
+#'
+defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
+  code <- substitute(code)
+  curMod <- currentModule(sim)
+  if (is.null(moduleName))
+    moduleName <- currentModule(sim)
+
+  useSimModsEnv <- FALSE
+  if (missing(envir)) {
+    if (is.null(moduleName)) {
+      if (length(curMod) > 0) {
+        useSimModsEnv <- TRUE
+      }
+    } else {
+      if (exists(moduleName, sim$.mods, inherits = FALSE))
+        useSimModsEnv <- TRUE
+    }
+    envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
+  }
+  fn <- paste0("
+    fn <- function(sim, eventTime, eventType, priority) {
+    ",
+         paste(format(substitute(code)), collapse = "\n")
+    ,"
+    return(sim)
+    }
+  ")
+
+  eventFnName <-  makeEventFn(moduleName, eventName)
+  parsedFn <- parse(text = fn)
+  if (!useSimModsEnv) {
+    if (is.null(sim@.xData[[eventFnElementEnvir()]])) {
+      sim@.xData[[eventFnElementEnvir()]] <- new.env(parent = asNamespace("SpaDES.core"))
+    }
+    sim@.xData[[eventFnElementEnvir()]][[eventFnName]] <- list(envir = envir,
+                                                          digest = .robustDigest(parsedFn))
+  }
+
+  assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
+         envir = envir)
+  theEvalEnvir <- environment(get(eventFnName, envir = envir))
+  rm(list = ls(theEvalEnvir), envir = theEvalEnvir)
+  return(invisible(sim))
+}
+
+makeEventFn <- function(curModuleName, eventType) {
+  paste("doEvent", curModuleName, eventType, sep = ".")
+}
+
+eventFnElement <- function() ".eventFnDigest"
+eventFnElementEnvir <- function() ".eventFnEnvir"

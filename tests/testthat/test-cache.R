@@ -387,7 +387,7 @@ test_that("test objSize", {
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
-  expect_true(length(os) == 6) # 4 objects, the environment, the rest
+  expect_true(length(os) == 1)
 })
 
 test_that("Cache sim objs via .Cache attr", {
@@ -482,6 +482,63 @@ test_that("Cache sim objs via .Cache attr", {
   # Test mod
   expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
   expect_true(any(grepl("loaded cached copy", mess1)))
+
+
+  # Capture failed Cache, when a function is changed, that is not the .inputObjects,
+  #   Cache should return the .inputObjects cached copy, but not the cached copy of the
+  #   functions
+  mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
+                   objects = list(co4 = 3, co3 = 2, co1 = 4), params =
+                     list(test = list(.useCache = c(".inputObjects", "init"))))
+
+  cat(append = TRUE, sep = "\n", fill = FALSE, file = fileNames[1],
+  "newFun <- function(sim) return(invisible(sim))")
+  mess10 <- capture_messages({
+    mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
+                   objects = list(co4 = 3, co3 = 2, co1 = 4), params =
+                     list(test = list(.useCache = c(".inputObjects", "init"))))
+  })
+  expect_true(sum(grepl("loaded cached copy of .inputObjects", mess10)) == 1)
+  expect_true(exists("newFun", envir = mySim$.mods$test))
+
+
+
+  # Test 2 in the "capture failed Cache"...
+  # This should not recover the cache because it has a new .inputObjects function
+  cat(xxx1[[1]][1:(lineWithInputObjects - 1)], "
+      expectsInput('ei1', 'numeric', '', ''),
+      expectsInput('ei2', 'numeric', '', ''),
+      expectsInput('ei3', 'numeric', '', ''),
+      expectsInput('ei4', 'numeric', '', '')
+      ",
+      xxx1[[1]][(lineWithInputObjects + 1):(lineWithOutputObjects - 1)], "
+      createsOutput('co1', 'numeric', ''),
+      createsOutput('co2', 'numeric', ''),
+      createsOutput('co3', 'numeric', ''),
+      createsOutput('co4', 'numeric', '')
+      ",
+      xxx1[[1]][(lineWithOutputObjects + 1):lineWithInit], "
+      sim$co1 <- 1
+      sim$co2 <- 1
+      sim$co3 <- 1
+      sim$.mods$test$hi <- 1
+      mod$hello <- 2
+      ",
+      xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
+      aaa <- 2
+      ",
+      xxx1[[1]][(lineWithDotInputObjects + 1):length(xxx1[[1]])],
+      sep = "\n", fill = FALSE, file = fileNames[1])
+  mess11 <- capture_messages({
+    mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
+                     objects = list(co4 = 3, co3 = 2, co1 = 4), params =
+                       list(test = list(.useCache = c(".inputObjects", "init"))))
+  })
+  expect_true(sum(grepl("loaded cached copy of .inputObjects", mess11)) == 0)
+  expect_true(sum(grepl("Running .inputObjects", mess11)) == 1)
+  expect_true(!exists("newFun", envir = mySim$.mods$test))
+  expect_true(sum(grepl("aaa <- 2", format(mySim$.mods$test$.inputObjects))) == 1)
+
 })
 
 test_that("test showSimilar", {
@@ -535,3 +592,4 @@ test_that("test showSimilar", {
   })
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
+

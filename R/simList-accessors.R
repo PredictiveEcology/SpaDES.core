@@ -1453,7 +1453,9 @@ setReplaceMethod(
 #'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
 #'   \item \code{modulePath}: \code{getOption("spades.inputPath")};
 #'   \item \code{outputPath}: \code{getOption("spades.outputPath")};
-#'   \item \code{rasterPath}: \code{raster::tmpDir()}
+#'   \item \code{rasterPath}: \code{file.path(getOption("spades.scratchPath"), "raster")};
+#'   \item \code{scratchPath}: \code{getOption("spades.scratchPath")};
+#'   \item \code{terraPath}: \code{file.path(getOption("spades.scratchPath"), "terra")}
 #' }
 #'
 #' @inheritParams params
@@ -1498,10 +1500,10 @@ setReplaceMethod(
   "paths",
   signature = "simList",
   function(sim, value) {
-    N <- 4 # total number of named paths (cache, madule, input, output)
+    N <- 5 # total number of named paths (cache, module, input, output)
 
     # get named elements and their position in value list
-    wh <- pmatch(names(sim@paths), names(value)) # always length 4, NA if no name match, number if yes
+    wh <- pmatch(names(sim@paths), names(value)) # always length 5, NA if no name match, number if yes
     whValueNamed <- which(!is.na(pmatch(names(value), names(sim@paths)))) # length of names of value
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
@@ -1533,8 +1535,7 @@ setReplaceMethod(
       sim@paths[whichUnnamed][seq_len(sum(whValueUnnamed))] <- value[whValueUnnamed]
     }
 
-    # Don't need to create an archive in the paths directory, just have to create
-    #  the directory
+    ## Don't need to create an archive in the paths directory, just have to create the directory
     checkPath(sim@paths$cachePath, create = TRUE)
 
     validObject(sim)
@@ -1679,6 +1680,32 @@ setReplaceMethod(
     return(sim)
 })
 
+
+
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#'
+setGeneric("logPath", function(sim) {
+  standardGeneric("logPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("logPath",
+          signature = "simList",
+          definition = function(sim) {
+            lp <- file.path(sim@paths$outputPath, "log")
+            lp <- checkPath(lp, create = TRUE)
+            return(lp)
+})
+
+
+
+
 # modulePath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
@@ -1772,7 +1799,6 @@ setReplaceMethod(
     return(sim)
 })
 
-
 # rasterPath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
@@ -1812,6 +1838,49 @@ setReplaceMethod(
   function(sim, value) {
     sim@paths$rasterPath <- unname(unlist(value))
     checkPath(sim@paths$rasterPath, create = TRUE)
+    validObject(sim)
+    return(sim)
+})
+
+# terraPath ----------------------------------------------------------------------------------
+
+#' @inheritParams paths
+#'
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setGeneric("terraPath", function(sim) {
+  standardGeneric("terraPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("terraPath",
+          signature = "simList",
+          definition = function(sim) {
+            sim@paths$terraPath
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("terraPath<-",
+           function(sim, value) {
+             standardGeneric("terraPath<-")
+})
+
+#' @name terraPath<-
+#' @aliases terraPath<-,simList-method
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#' @export
+setReplaceMethod(
+  "terraPath",
+  signature = "simList",
+  function(sim, value) {
+    sim@paths$terraPath <- unname(unlist(value))
+    checkPath(sim@paths$terraPath, create = TRUE)
     validObject(sim)
     return(sim)
 })
@@ -2120,18 +2189,19 @@ setReplaceMethod(
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
   if (is.null(x)) return(NULL)
-  #if (!is(x, "simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
-  out <- if (length(mod) > 0) {
-    if (!is.null(x@.xData[[".timeunits"]])) {
-      x@.xData[[".timeunits"]][[mod]]
-    } else {
-      timeunits(x)[[mod]]
-    }
-
+  out <- x@simtimes[["timeunit"]] # default -- whole simList
+  if (!is.null(x@.xData[[".timeunits"]])) {
+    outPoss <- x@.xData[[".timeunits"]]
   } else {
-    x@simtimes[["timeunit"]]
+    outPoss <- timeunits(x)
   }
+  outPoss <- if (length(mod) > 0) {
+    outPoss[[mod]]
+  } else {
+    out
+  }
+  if (!is.null(outPoss)) out <- unlist(outPoss)
   return(out)
 }
 
