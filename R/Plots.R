@@ -131,7 +131,7 @@ Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
                   path = quote(file.path(outputPath(sim), "figures")),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
-                  ggsaveArgs = list(), usePlot = TRUE,
+                  ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
                   deviceArgs = list(),
                   ...) {
 
