@@ -366,6 +366,8 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
   outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
                                      saved = TRUE, arguments = I(args)),
                           endTime = endTime)
+  if (!is(outputs[["arguments"]], "AsIs"))
+    outputs[["arguments"]] <- I(outputs[["arguments"]])
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
 #' Test whether there should be any plotting from .plot parameter
