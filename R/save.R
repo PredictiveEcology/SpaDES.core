@@ -144,8 +144,8 @@ saveFiles <- function(sim) {
   if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
-      if (exists(outputs(sim)[i, "objectName"], envir = sim@.xData)) {
-        args <- append(list(get(outputs(sim)[i, "objectName"], envir = sim@.xData),
+      if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
+        args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
                             file = outputs(sim)[i, "file"]),
                        outputArgs(sim)[[i]])
         args <- args[!sapply(args, is.null)]
