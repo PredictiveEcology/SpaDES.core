@@ -121,15 +121,10 @@ saveFiles <- function(sim) {
   # extract the current module name that called this function
   moduleName <- sim@current[["moduleName"]]
 
-  ## several steps below rely on this being a data.table
-  if (!is.data.table(outputs(sim))) {
-    outputs(sim) <- data.table(outputs(sim))
-  }
-
   if (length(moduleName) == 0) {
     moduleName <- "save"
     if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime, ])) {
-      outputs(sim)[outputs(sim)$saveTime == curTime, saved := NA]
+      outputs(sim)[["save"]][outputs(sim)$saveTime == curTime] <- NA
     }
   }
 
@@ -142,7 +137,9 @@ saveFiles <- function(sim) {
 
     # don't need to save exactly same thing more than once - use data.table here because distinct
     # from dplyr does not do as expected
-    outputs(sim) <- unique(outputs(sim), by = c("objectName", "saveTime", "file", "fun", "package"))
+    outputs(sim) <- data.table(outputs(sim)) %>%
+      unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
+      data.frame(.)
   }
 
   if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
@@ -161,10 +158,10 @@ saveFiles <- function(sim) {
         do.call(outputs(sim)[["fun"]][i], args = args,
                 envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        outputs(sim)[i, saved := TRUE]
+        outputs(sim)[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[i, saved := FALSE]
+        outputs(sim)[["saved"]][i] <- FALSE
       }
     }
   }
