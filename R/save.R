@@ -120,6 +120,12 @@ saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   # extract the current module name that called this function
   moduleName <- sim@current[["moduleName"]]
+
+  ## several steps below rely on this being a data.table
+  if (!is.data.table(outputs(sim))) {
+    outputs(sim) <- data.table(outputs(sim))
+  }
+
   if (length(moduleName) == 0) {
     moduleName <- "save"
     if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime, ])) {
@@ -136,9 +142,7 @@ saveFiles <- function(sim) {
 
     # don't need to save exactly same thing more than once - use data.table here because distinct
     # from dplyr does not do as expected
-    outputs(sim) <- data.table(outputs(sim)) %>%
-      unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
-      data.frame()
+    outputs(sim) <- unique(outputs(sim), by = c("objectName", "saveTime", "file", "fun", "package"))
   }
 
   if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
