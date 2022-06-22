@@ -4,10 +4,10 @@ utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
-      firstSave <- min(outputs(sim)[, "saveTime"], na.rm = TRUE)
-      firstSaveWh <- which.min(outputs(sim)[, "saveTime"])
+      firstSave <- min(outputs(sim)[["saveTime"]], na.rm = TRUE)
+      firstSaveWh <- which.min(outputs(sim)[["saveTime"]])
       if ("eventPriority" %in% colnames(outputs(sim))) {
-        firstPriority <- outputs(sim)[firstSaveWh, "eventPriority"]
+        firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
       if (!exists("firstPriority", inherits = FALSE))
         firstPriority <- .last()
@@ -120,10 +120,11 @@ saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   # extract the current module name that called this function
   moduleName <- sim@current[["moduleName"]]
+
   if (length(moduleName) == 0) {
     moduleName <- "save"
     if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime, ])) {
-      outputs(sim)[outputs(sim)$saveTime == curTime, "saved"] <- NA
+      outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime] <- NA
     }
   }
 
@@ -138,15 +139,15 @@ saveFiles <- function(sim) {
     # from dplyr does not do as expected
     outputs(sim) <- data.table(outputs(sim)) %>%
       unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
-      data.frame()
+      data.frame(.)
   }
 
-  if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
+  if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
       if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
         args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
-                            file = outputs(sim)[i, "file"]),
+                            file = outputs(sim)[["file"]][i]),
                        outputArgs(sim)[[i]])
         args <- args[!sapply(args, is.null)]
         args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
@@ -154,24 +155,27 @@ saveFiles <- function(sim) {
         }))])
 
         # The actual save line
-        do.call(outputs(sim)[i, "fun"], args = args,
-                envir = getNamespace(outputs(sim)[i, "package"]))
+        do.call(outputs(sim)[["fun"]][i], args = args,
+                envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        outputs(sim)[i, "saved"] <- TRUE
+        ## using @ works when outputs is a DT
+        outputs(sim)[["saved"]][i] <- TRUE
+        # sim@outputs[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[i, "saved"] <- FALSE
+        outputs(sim)[["saved"]][i] <- FALSE
+        # sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
 
   # Schedule an event for the next time in the saveTime column
-  if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
+  if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
     isNA <- is.na(outputs(sim)$saved)
-    nextTime <- min(outputs(sim)[isNA, "saveTime"], na.rm = TRUE)
-    nextTimeWh <- which.min(outputs(sim)[isNA, "saveTime"])
+    nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
+    nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
     if ("eventPriority" %in% colnames(outputs(sim))) {
-      nextPriority <- outputs(sim)[isNA, "eventPriority"][nextTimeWh]
+      nextPriority <- outputs(sim)[["eventPriority"]][isNA][nextTimeWh]
     }
     if (!exists("nextPriority", inherits = FALSE))
       nextPriority <- .last()
