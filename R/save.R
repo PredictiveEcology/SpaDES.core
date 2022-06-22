@@ -129,7 +129,7 @@ saveFiles <- function(sim) {
   if (length(moduleName) == 0) {
     moduleName <- "save"
     if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime, ])) {
-      outputs(sim)[outputs(sim)$saveTime == curTime, "saved"] <- NA
+      outputs(sim)[outputs(sim)$saveTime == curTime, saved := NA]
     }
   }
 
