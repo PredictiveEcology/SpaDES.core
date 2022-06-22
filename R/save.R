@@ -4,10 +4,10 @@ utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
-      firstSave <- min(outputs(sim)[, "saveTime"], na.rm = TRUE)
-      firstSaveWh <- which.min(outputs(sim)[, "saveTime"])
+      firstSave <- min(outputs(sim)[["saveTime"]], na.rm = TRUE)
+      firstSaveWh <- which.min(outputs(sim)[["saveTime"]])
       if ("eventPriority" %in% colnames(outputs(sim))) {
-        firstPriority <- outputs(sim)[firstSaveWh, "eventPriority"]
+        firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
       if (!exists("firstPriority", inherits = FALSE))
         firstPriority <- .last()
@@ -124,7 +124,7 @@ saveFiles <- function(sim) {
   if (length(moduleName) == 0) {
     moduleName <- "save"
     if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime, ])) {
-      outputs(sim)[["save"]][outputs(sim)$saveTime == curTime] <- NA
+      outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime] <- NA
     }
   }
 
@@ -142,7 +142,7 @@ saveFiles <- function(sim) {
       data.frame(.)
   }
 
-  if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
+  if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
       if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
@@ -159,16 +159,18 @@ saveFiles <- function(sim) {
                 envir = getNamespace(outputs(sim)[["package"]][i]))
 
         ## using @ works when outputs is a DT
-        sim@outputs[["saved"]][i] <- TRUE
+        outputs(sim)[["saved"]][i] <- TRUE
+        # sim@outputs[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
-        sim@outputs[["saved"]][i] <- FALSE
+        outputs(sim)[["saved"]][i] <- FALSE
+        # sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
 
   # Schedule an event for the next time in the saveTime column
-  if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
+  if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
     isNA <- is.na(outputs(sim)$saved)
     nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
     nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
