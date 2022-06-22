@@ -14,6 +14,8 @@ version 1.0.11
   but should restore the original value `on.exit`.
 * `saveSimList()` and `loadSimList()` accept `.qs` or `.rds` files
 * `spades` and `simInit` now force UTF-8 encoding; this is reset `on.exit`. If a module needs a different character encoding, then it can be set within the module code.
+* `.studyAreaName` parameter added to default module metadata when using `newModule`.
+* changes to template module documentation - removal of "module usage" as it is not relevant *within* a module, and minor restructuring
 * new option `spades.scratchPath`, to be used for e.g., temporary raster files and temporary SpaDES recovery mode objects.
 * The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
   **`rasterPath` will be deprecated in a future release.**
