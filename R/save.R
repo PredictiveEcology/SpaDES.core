@@ -154,13 +154,13 @@ saveFiles <- function(sim) {
         }))])
 
         # The actual save line
-        do.call(outputs(sim)[i, "fun"], args = args,
-                envir = getNamespace(outputs(sim)[i, "package"]))
+        do.call(outputs(sim)[["fun"]][i], args = args,
+                envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        outputs(sim)[i, "saved"] <- TRUE
+        outputs(sim)[i, saved := TRUE]
       } else {
         warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[i, "saved"] <- FALSE
+        outputs(sim)[i, saved := FALSE]
       }
     }
   }
