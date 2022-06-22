@@ -158,10 +158,11 @@ saveFiles <- function(sim) {
         do.call(outputs(sim)[["fun"]][i], args = args,
                 envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        outputs(sim)[["saved"]][i] <- TRUE
+        ## using @ works when outputs is a DT
+        sim@outputs[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[["saved"]][i] <- FALSE
+        sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
