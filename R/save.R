@@ -146,7 +146,7 @@ saveFiles <- function(sim) {
     for (i in wh) {
       if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
         args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
-                            file = outputs(sim)[i, "file"]),
+                            file = outputs(sim)[["file"]][i]),
                        outputArgs(sim)[[i]])
         args <- args[!sapply(args, is.null)]
         args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
@@ -168,10 +168,10 @@ saveFiles <- function(sim) {
   # Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
     isNA <- is.na(outputs(sim)$saved)
-    nextTime <- min(outputs(sim)[isNA, "saveTime"], na.rm = TRUE)
+    nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
     nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
     if ("eventPriority" %in% colnames(outputs(sim))) {
-      nextPriority <- outputs(sim)[isNA, "eventPriority"][nextTimeWh]
+      nextPriority <- outputs(sim)[["eventPriority"]][isNA][nextTimeWh]
     }
     if (!exists("nextPriority", inherits = FALSE))
       nextPriority <- .last()
