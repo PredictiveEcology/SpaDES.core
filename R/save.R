@@ -169,7 +169,7 @@ saveFiles <- function(sim) {
   if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
     isNA <- is.na(outputs(sim)$saved)
     nextTime <- min(outputs(sim)[isNA, "saveTime"], na.rm = TRUE)
-    nextTimeWh <- which.min(outputs(sim)[isNA, "saveTime"])
+    nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
     if ("eventPriority" %in% colnames(outputs(sim))) {
       nextPriority <- outputs(sim)[isNA, "eventPriority"][nextTimeWh]
     }
