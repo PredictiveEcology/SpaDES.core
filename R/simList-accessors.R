@@ -1109,22 +1109,22 @@ setReplaceMethod(
      # 2 things: 1. if relative, concatenate inputPath
      #           2. if absolute, don't use inputPath
    if (NROW(value) > 0) {
-     sim@inputs[is.na(sim@inputs$file), "file"] <- NA
+     sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
 
      # If a filename is provided, determine if it is absolute path, if so,
      # use that, if not, then append it to inputPath(sim)
      isAP <- isAbsolutePath(as.character(sim@inputs$file))
-     sim@inputs[!isAP & !is.na(sim@inputs$file), "file"] <-
+     sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
        file.path(inputPath(sim),
-                 sim@inputs$file[!isAP & !is.na(sim@inputs$file)])
+                 sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
 
      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
        stop(paste("input table can only have columns named",
                   paste(.fileTableInCols, collapse = ", ")))
      }
-     if (any(is.na(sim@inputs[, "loaded"]))) {
-       if (!all(is.na(sim@inputs[, "loadTime"]))) {
-         newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"]
+     if (any(is.na(sim@inputs[["loaded"]]))) {
+       if (!all(is.na(sim@inputs[["loadTime"]]))) {
+         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
          for (nT in newTime) {
@@ -1140,9 +1140,9 @@ setReplaceMethod(
          }
 
        } else {
-         sim@inputs[is.na(sim@inputs$loadTime), "loadTime"] <-
+         sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
            sim@simtimes[["current"]]
-         newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"] %>%
+         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
            min(., na.rm = TRUE)
          attributes(newTime)$unit <- "seconds"
          sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
