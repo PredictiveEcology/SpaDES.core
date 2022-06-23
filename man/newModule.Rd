@@ -18,7 +18,9 @@ newModule(name, path, ...)
 \item{path}{Character string. Subdirectory in which to place the new module code file.
 The default is the current working directory.}
 
-\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr\preformatted{         \code{children}. Required when \code{type = "parent"}. A character vector
+\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{         \code{children}. Required when \code{type = "parent"}. A character vector
          specifying the names of child modules.
 
          \code{open}. Logical. Should the new module file be opened after creation?
@@ -32,7 +34,7 @@ The default is the current working directory.}
 
          \code{useGitHub}. Logical. Is module development happening on GitHub?
          Default \code{TRUE}.
-}}
+}\if{html}{\out{</div>}}}
 }
 \value{
 Nothing is returned. The new module file is created at

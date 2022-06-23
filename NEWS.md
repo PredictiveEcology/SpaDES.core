@@ -32,7 +32,8 @@ version 1.0.11
 * Fixed caching of `simList` objects where changes to functions appeared to be undetected, and so a Cache call would return a stale module with function code from the Cached `simList`, which was incorrect.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
 * `objSize` could have infinite recursion problem if there are simLists inside simLists. Fixed with new `reproducible::objSize`, which uses `lobstr::obj_size`.
-* several minor, including in `Plots`
+* several minor fixes, including in `Plots`
+* fixes to `saveFiles` related to `data.table` assignment and use in `outputs(sim)`
 
 version 1.0.10
 ==============

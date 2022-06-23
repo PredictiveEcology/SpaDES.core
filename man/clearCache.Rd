@@ -24,7 +24,7 @@
   userTags = character(),
   after = NULL,
   before = NULL,
-  drv = getOption("reproducible.drv"),
+  drv = getOption("reproducible.drv", RSQLite::SQLite()),
   conn = getOption("reproducible.conn", NULL),
   ...
 )
@@ -35,7 +35,7 @@
   after = NULL,
   before = NULL,
   ask = getOption("reproducible.ask"),
-  drv = getOption("reproducible.drv"),
+  drv = getOption("reproducible.drv", RSQLite::SQLite()),
   conn = getOption("reproducible.conn", NULL),
   ...
 )

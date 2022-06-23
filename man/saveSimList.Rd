@@ -96,23 +96,29 @@ they are in the equivalent (relative) position as they were. This will
 only work if all files were in one of the \code{paths} of the original
 \code{simList}, so that they can be matched up with the new \code{paths} passed in
 \code{loadSimList}. This is not guaranteed to work correctly, though it works
-in a wide array of testing.\preformatted{zipSimList(sim, zipfile = tmpZip, filename = "sim.qs")
+in a wide array of testing.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{zipSimList(sim, zipfile = tmpZip, filename = "sim.qs")
 pths <- getPaths(mySim)
 out <- unzipSimList(tmpZip, paths = pths)
-}
+}\if{html}{\out{</div>}}
 \item \code{filebackend = 1}: On the fly renaming of file-backed rasters;
 \enumerate{
 \item Save the sim object with a filename, e.g.,  \code{file},
 \item make a copy of all file-backed rasters to \code{fileBackedDir},
 \item update all the pointers to those files so that they are correct in the raster metadata
-}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
-simNew <- loadSimList(file = "sim.qs")
 }
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
+simNew <- loadSimList(file = "sim.qs")
+}\if{html}{\out{</div>}}
 \item \code{filebackend = 2}: On the fly bringing to memory of all rasters
 
-All rasters are brought to memory, and then saved into \code{sim.qs}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 2)
+All rasters are brought to memory, and then saved into \code{sim.qs}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 2)
 simNew <- loadSimList(file = "sim.qs")
-}
+}\if{html}{\out{</div>}}
 }
 
 If \code{cache} is used, it is likely that it should be trimmed before
