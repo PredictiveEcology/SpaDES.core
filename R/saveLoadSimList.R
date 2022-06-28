@@ -46,12 +46,12 @@
 #' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()],
 #' [zipSimList()], [unzipSimList()]
 #'
+#' @aliases saveSim
 #' @export
 #' @importFrom qs qsave
 #' @importFrom stats runif
 #' @importFrom tools file_ext
 #' @rdname saveSimList
-#' @aliases saveSim
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
@@ -121,7 +121,8 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' `zipSimList` will save the `simList` and file-backed `Raster*` objects, plus,
 #' optionally, files identified in \code{outputs(sim)} and \code{inputs(sim)}.
 #' This uses \code{Copy} under the hood, to not affect the original
-#' \code{simList}. **VERY experimental**.
+#' \code{simList}.
+#' **VERY experimental**.
 #'
 #' @param ... passed to \code{\link{saveSimList}}, including non-optional ones
 #'    such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}

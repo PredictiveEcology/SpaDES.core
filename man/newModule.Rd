@@ -18,20 +18,18 @@ newModule(name, path, ...)
 \item{path}{Character string. Subdirectory in which to place the new module code file.
 The default is the current working directory.}
 
-\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr\preformatted{         \code{children}. Required when \code{type = "parent"}. A character vector
-         specifying the names of child modules.
-
-         \code{open}. Logical. Should the new module file be opened after creation?
-         Default \code{TRUE}.\\cr\\cr
-
-         \code{type}. Character string specifying one of \code{"child"} (default),
-         or \code{"parent"}.\\cr\\cr
-
-         \code{unitTests}. Logical. Should the new module include unit test files?
-         Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.\\cr\\cr
-
-         \code{useGitHub}. Logical. Is module development happening on GitHub?
-         Default \code{TRUE}.
+\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr
+\describe{
+\item{\code{children}}{Required when \code{type = "parent"}. A character vector
+specifying the names of child modules.}
+\item{\code{open}}{Logical. Should the new module file be opened after creation?
+Default \code{TRUE}.}
+\item{\code{type}}{Character string specifying one of \code{"child"} (default),
+or \code{"parent"}.}
+\item{\code{unitTests}}{Logical. Should the new module include unit test files?
+Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.}
+\item{\code{useGitHub}}{Logical. Is module development happening on GitHub?
+Default \code{TRUE}.}
 }}
 }
 \value{
@@ -40,7 +38,7 @@ Nothing is returned. The new module file is created at
 \file{LICENSE}, \file{README}, and \file{tests} directory.
 }
 \description{
-Autogenerate a skeleton for a new SpaDES module, a template for a
+Generate a skeleton for a new SpaDES module, a template for a
 documentation file, a citation file, a license file, a \file{README.txt} file,
 and a folder that contains unit tests information.
 The \code{newModuleDocumentation} will not generate the module file, but will
@@ -50,29 +48,25 @@ create the other files.
 All files will be created within a subdirectory named \code{name} within the
 \code{path}:
 
-\itemize{
-\item \code{path/}
-\itemize{
-\item \code{name/}
-\item \code{R/               # contains additional module R scripts}
-\item \code{data/            # directory for all included data}
-\itemize{
-\item \code{CHECKSUMS.txt  # contains checksums for data files}
-}
-\item \code{tests/           # contains unit tests for module code}
-\item \code{citation.bib     # bibtex citation for the module}
-\item \code{LICENSE.txt      # describes module's legal usage}
-\item \code{README.txt       # provide overview of key aspects}
-\item \code{name.R           # module code file (incl. metadata)}
-\item \code{name.Rmd         # documentation, usage info, etc.}
-}
+\preformatted{
+  <path>/
+    |_ <name>/
+    |_ R/               # contains additional module R scripts
+    |_ data/            # directory for all included data
+      |_ CHECKSUMS.txt  # contains checksums for data files
+    |_ tests/           # contains unit tests for module code
+    |_ citation.bib     # bibtex citation for the module
+    |_ LICENSE          # describes module's legal usage
+    |_ README.md        # provide overview of key aspects
+    |_ <name>.R         # module code file (incl. metadata)
+    |_ <name>.Rmd       # documentation, usage info, etc.
 }
 }
 \note{
 On Windows there is currently a bug in RStudio that prevents the editor
 from opening when \code{file.edit} is called.
 Similarly, in RStudio on macOS, there is an issue opening files where they
-are opened in an overlayed window rather than a new tab.
+are opened in an overlaid window rather than a new tab.
 \code{file.edit} does work if the user types it at the command prompt.
 A message with the correct lines to copy and paste is provided.
 }

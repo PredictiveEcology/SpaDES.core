@@ -18,14 +18,15 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @export
 #' @rdname getModuleVersion
 #'
-#' @details \code{getModuleVersion} extracts a module's most recent version by
-#'          looking at the module \file{.zip} files contained in the module directory.
-#'          It takes the most recent version, based on the name of the zip file.
+#' @details
+#' \code{getModuleVersion} extracts a module's most recent version by
+#' looking at the module \file{.zip} files contained in the module directory.
+#' It takes the most recent version, based on the name of the zip file.
 #'
-#'          See the modules vignette for details of module directory structure
-#'          (\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
-#'          and see our SpaDES-modules repo for details of module repository structure
-#'          (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
+#' See the modules vignette for details of module directory structure
+#' (\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+#' and see our SpaDES-modules repo for details of module repository structure
+#' (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 #'
 #' @author Alex Chubaty
 #'
