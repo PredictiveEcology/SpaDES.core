@@ -164,7 +164,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'     out <- unzipSimList(tmpZip, paths = pths)
 #'     ```
 #'
-#' 1. `filebackend = 1`: On the fly renaming of file-backed rasters;
+#' 1. `filebackend = 1`: On-the-fly renaming of file-backed rasters;
 #'
 #'     1. Save the sim object with a filename, e.g.,  `file`,
 #'     2. make a copy of all file-backed rasters to `fileBackedDir`,
@@ -174,7 +174,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'     saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
 #'     simNew <- loadSimList(file = "sim.qs")
 #'     ```
-#' 2. `filebackend = 2`: On the fly bringing to memory of all rasters
+#' 2. `filebackend = 2`: On-the-fly bringing to memory of all rasters
 #'
 #'     All rasters are brought to memory, and then saved into \code{sim.qs}
 #'

@@ -12,7 +12,7 @@ Plots(
   path = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ggsaveArgs = list(),
-  usePlot = TRUE,
+  usePlot = getOption("spades.PlotsUsePlot", FALSE),
   deviceArgs = list(),
   ...
 )
