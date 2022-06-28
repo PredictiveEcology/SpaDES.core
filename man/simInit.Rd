@@ -6,6 +6,7 @@
 \alias{simInit,ANY,ANY,ANY,character,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,character,ANY,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
+\alias{simInitDefaults}
 \title{Initialize a new simulation}
 \usage{
 simInit(
@@ -67,6 +68,8 @@ simInit(
   loadOrder,
   notOlderThan = NULL
 )
+
+simInitDefaults()
 }
 \arguments{
 \item{times}{A named list of numeric simulation start and end times

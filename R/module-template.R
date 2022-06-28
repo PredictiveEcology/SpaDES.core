@@ -317,6 +317,7 @@ setMethod(
       author = Sys.getenv("USER"),
       date = format(Sys.Date(), "%d %B %Y"),
       name = name,
+      name2 = gsub("_", "-", name),  ## for chunk names
       path = path
     )
     moduleRmdTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.Rmd.template"))

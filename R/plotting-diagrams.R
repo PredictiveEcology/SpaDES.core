@@ -276,12 +276,13 @@ setMethod(
 #'             completed simulation).
 #'
 #' @param type  Character string, either \code{"rgl"} for \code{igraph::rglplot}
-#' or \code{"tk"} for \code{igraph::tkplot}. Default missing, which uses regular
-#' \code{plot}.
+#' or \code{"tk"} for \code{igraph::tkplot}, \code{"Plot"} to use quickPlot::Plot
+#' or \code{"plot"} to use base::plot, the default.
 #'
 #' @param showParents Logical. If TRUE, then any children that are grouped into parent
 #'                    modules will be grouped together by colored blobs. Internally,
 #'                    this is calling \code{\link{moduleGraph}}. Default \code{FALSE}.
+#'
 #'
 #' @param ...  Additional arguments passed to plotting function specified by \code{type}.
 #'
@@ -320,7 +321,7 @@ setMethod(
 #' }
 #'
 # igraph is being imported in spades-package.R
-setGeneric("moduleDiagram", function(sim, type, showParents, ...) {
+setGeneric("moduleDiagram", function(sim, type, showParents = TRUE, ...) {
   standardGeneric("moduleDiagram")
 })
 
@@ -329,13 +330,16 @@ setGeneric("moduleDiagram", function(sim, type, showParents, ...) {
 setMethod(
   "moduleDiagram",
   signature = c(sim = "simList", type = "character", showParents = "logical"),
-  definition = function(sim, type, showParents, ...) {
+  definition = function(sim, type = "plot", showParents = TRUE,  ...) {
     if (type == "rgl") {
       rglplot(depsGraph(sim, TRUE), ...)
     } else if (type == "tk") {
       tkplot(depsGraph(sim, TRUE), ...)
     } else {
-      moduleDiagram(sim)
+      if (grep("plot", type, ignore.case = TRUE))
+        moduleDiagram(sim, showParents = showParents, plot = type, ... )
+      else
+        stop("type must be one of 'rgl', 'tk', 'Plot' or 'plot'")
     }
 })
 
@@ -343,7 +347,7 @@ setMethod(
 #' @rdname moduleDiagram
 setMethod(
   "moduleDiagram",
-  signature = c(sim = "simList", type = "missing"),
+  signature = c(sim = "simList"),
   definition = function(sim, ...) {
     modDia <- depsGraph(sim, TRUE)
     dots <- list(...)
@@ -417,16 +421,34 @@ setMethod(
         ylim2 <- if (!("ylim" %in% nDots)) c(-1.1, 1.1) else dots$ylim
         asp2 <-  if (!("asp" %in% nDots)) 0 else dots$asp
 
-        Plot(modDia, plotFn = "plot", axes = FALSE,
-             vertex.color = vcol,
-             vertex.size = vertexSize,
-             vertex.size2 = vertexSize2,
-             vertex.shape = vertexShape,
-             vertex.label.cex = vertexLabelCex,
-             vertex.label.family = vertexLabelFamily,
-             layout = layout2,
-             rescale = rescale2,
-             xlim = xlim2, ylim = ylim2, asp = asp2, ...)
+        notPlot <- isTRUE(dots$plot)
+        if (!isTRUE(notPlot)) {
+          plotTry <- try(Plot(modDia, plotFn = "plot", axes = FALSE,
+               vertex.color = vcol,
+               vertex.size = vertexSize,
+               vertex.size2 = vertexSize2,
+               vertex.shape = vertexShape,
+               vertex.label.cex = vertexLabelCex,
+               vertex.label.family = vertexLabelFamily,
+               layout = layout2,
+               rescale = rescale2,
+               xlim = xlim2, ylim = ylim2, asp = asp2, ...), silent = TRUE)
+          notPlot <- is(plotTry, "try-error")
+          if (notPlot)
+            message("Plot encountered an error; trying base::plot")
+        }
+        if (notPlot)
+          plot(modDia, axes = FALSE,
+               vertex.color = vcol,
+               vertex.size = vertexSize,
+               vertex.size2 = vertexSize2,
+               vertex.shape = vertexShape,
+               vertex.label.cex = vertexLabelCex,
+               vertex.label.family = vertexLabelFamily,
+               layout = layout2,
+               rescale = rescale2,
+               xlim = xlim2, ylim = ylim2, asp = asp2, ...)
+
       }
 
       if ("title" %in% nDots) {

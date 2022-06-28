@@ -1109,22 +1109,22 @@ setReplaceMethod(
      # 2 things: 1. if relative, concatenate inputPath
      #           2. if absolute, don't use inputPath
    if (NROW(value) > 0) {
-     sim@inputs[is.na(sim@inputs$file), "file"] <- NA
+     sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
 
      # If a filename is provided, determine if it is absolute path, if so,
      # use that, if not, then append it to inputPath(sim)
      isAP <- isAbsolutePath(as.character(sim@inputs$file))
-     sim@inputs[!isAP & !is.na(sim@inputs$file), "file"] <-
+     sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
        file.path(inputPath(sim),
-                 sim@inputs$file[!isAP & !is.na(sim@inputs$file)])
+                 sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
 
      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
        stop(paste("input table can only have columns named",
                   paste(.fileTableInCols, collapse = ", ")))
      }
-     if (any(is.na(sim@inputs[, "loaded"]))) {
-       if (!all(is.na(sim@inputs[, "loadTime"]))) {
-         newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"]
+     if (any(is.na(sim@inputs[["loaded"]]))) {
+       if (!all(is.na(sim@inputs[["loadTime"]]))) {
+         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
          for (nT in newTime) {
@@ -1140,9 +1140,9 @@ setReplaceMethod(
          }
 
        } else {
-         sim@inputs[is.na(sim@inputs$loadTime), "loadTime"] <-
+         sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
            sim@simtimes[["current"]]
-         newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"] %>%
+         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
            min(., na.rm = TRUE)
          attributes(newTime)$unit <- "seconds"
          sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
@@ -1279,11 +1279,11 @@ setReplaceMethod(
 
        # coerce any factors to the correct class
        for (col in which(sapply(sim@outputs, is.factor))) {
-         sim@outputs[, col] <- as(sim@outputs[[col]], class(.fileTableOut()[[col]]))
+         sim@outputs[[col]] <- as(sim@outputs[[col]], class(.fileTableOut()[[col]]))
        }
 
        # if saveTime not provided, give it end(sim)
-       sim@outputs[is.na(sim@outputs$saveTime), "saveTime"] <-
+       sim@outputs[["saveTime"]][is.na(sim@outputs$saveTime)] <-
          end(sim, sim@simtimes[["timeunit"]])
        attributes(sim@outputs$saveTime)$unit <- sim@simtimes[["timeunit"]]
 
@@ -1292,7 +1292,7 @@ setReplaceMethod(
        #           2. if absolute, don't use outputPath
        #           3. concatenate time to file name in all cases
        # If no filename provided, use the object name
-       sim@outputs[is.na(sim@outputs$file), "file"] <-
+       sim@outputs[["file"]][is.na(sim@outputs$file)] <-
          paste0(sim@outputs$objectName[is.na(sim@outputs$file)])
        # If a filename is provided, determine if it is absolute path, if so,
        # use that, if not, then append it to outputPath(sim)
@@ -1300,13 +1300,13 @@ setReplaceMethod(
        if (any(!alreadyWithOutputPath)) {
          isAP <- isAbsolutePath(as.character(sim@outputs$file))
 
-         sim@outputs[!isAP[!alreadyWithOutputPath], "file"] <-
-           file.path(outputPath(sim), sim@outputs$file[!isAP])
+         sim@outputs[["file"]][!isAP[!alreadyWithOutputPath]] <-
+           file.path(outputPath(sim), sim@outputs[["file"]][!isAP])
        }
 
        # If there is no function provided, then use saveRDS, from package base
-       sim@outputs[is.na(sim@outputs$fun), "fun"] <- "saveRDS"
-       sim@outputs[is.na(sim@outputs$package), "package"] <- "base"
+       sim@outputs[["fun"]][is.na(sim@outputs$fun)] <- "saveRDS"
+       sim@outputs[["package"]][is.na(sim@outputs$package)] <- "base"
 
        # file extension stuff
        fileExts <- .saveFileExtensions()
@@ -1315,23 +1315,24 @@ setReplaceMethod(
        # grep allows for file extensions from 1 to 5 characters
        wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) &
          (nzchar(fe, keepNA = TRUE))
-       sim@outputs[wh, "file"] <- paste0(sim@outputs[wh, "file"], ".", fe[wh])
+       sim@outputs[["file"]][wh] <- paste0(sim@outputs[["file"]][wh], ".", fe[wh])
 
        # If the file name already has a time unit on it,
        # i.e., passed explicitly by user, then don't postpend again
-       txtTimeA <- paste0(attr(sim@outputs[, "saveTime"], "unit"))
+       txtTimeA <- paste0(attr(sim@outputs[["saveTime"]], "unit"))
        txtTimeB <- paddedFloatToChar(
-         sim@outputs[, "saveTime"],
+         sim@outputs[["saveTime"]],
          ceiling(log10(end(sim, sim@simtimes[["timeunit"]]) + 1))
        )
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !grepl(txtTimeA, sim@outputs$file)
-       sim@outputs[wh, "file"] <- paste0(
-         filePathSansExt(sim@outputs[wh, "file"]),
+       fns <- sim@outputs[["file"]][wh]
+       sim@outputs[["file"]][wh] <- paste0(
+         filePathSansExt(fns),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) ,
-                fileExt(sim@outputs[wh, "file"]),
+         ifelse(nzchar(fileExt(fns), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(fileExt(fns), keepNA = TRUE) ,
+                fileExt(fns),
                 "")
        )
      } else {
@@ -1679,6 +1680,32 @@ setReplaceMethod(
     validObject(sim)
     return(sim)
 })
+
+
+
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#'
+setGeneric("logPath", function(sim) {
+  standardGeneric("logPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("logPath",
+          signature = "simList",
+          definition = function(sim) {
+            lp <- file.path(sim@paths$outputPath, "log")
+            lp <- checkPath(lp, create = TRUE)
+            return(lp)
+})
+
+
+
 
 # modulePath ----------------------------------------------------------------------------------
 
@@ -2163,18 +2190,19 @@ setReplaceMethod(
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
   if (is.null(x)) return(NULL)
-  #if (!is(x, "simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
-  out <- if (length(mod) > 0) {
-    if (!is.null(x@.xData[[".timeunits"]])) {
-      x@.xData[[".timeunits"]][[mod]]
-    } else {
-      timeunits(x)[[mod]]
-    }
-
+  out <- x@simtimes[["timeunit"]] # default -- whole simList
+  if (!is.null(x@.xData[[".timeunits"]])) {
+    outPoss <- x@.xData[[".timeunits"]]
   } else {
-    x@simtimes[["timeunit"]]
+    outPoss <- timeunits(x)
   }
+  outPoss <- if (length(mod) > 0) {
+    outPoss[[mod]]
+  } else {
+    out
+  }
+  if (!is.null(outPoss)) out <- unlist(outPoss)
   return(out)
 }
 
@@ -2763,6 +2791,7 @@ setMethod(
     if (isTRUE(clean)) {
       pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
       pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
+      pkgs <- sub("[[:space:]]*\\(>=.*", "", pkgs)
     }
     return(pkgs)
 })

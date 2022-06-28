@@ -3,33 +3,30 @@ utils::globalVariables(c("memory", "maxMemory"))
 #' @importFrom reproducible tempfile2
 ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
                                  thisPid, outputFile) {
-    numTimes = 1
-    if (missing(thisPid)) thisPid <- Sys.getpid()
-    if (missing(outputFile)) {
-      outputFile <- outputFilename(thisPid)
-      # outputFile <-
+  numTimes = 1
+  if (missing(thisPid)) thisPid <- Sys.getpid()
+  if (missing(outputFile)) {
+    outputFile <- outputFilename(thisPid)
+    # outputFile <-
+  }
+  #cat("memory,  time", "\n", file = outputFile, append = FALSE)
+  suppressWarnings(file.remove(outputFile))
+  if (interval > 0) {
+    op <- options(digits.secs = 5)
+    stopFilename <- stopFilename(outputFile)
+    while(numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
+      Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
+      a <- memoryUseThisSession(thisPid)
+      data.table::fwrite(list(memory = a, time = Sys.time()),
+                         dateTimeAs = "write.csv",
+                         append = file.exists(outputFile), file = outputFile)
+      numTimes <- numTimes + 1
     }
-    #cat("memory,  time", "\n", file = outputFile, append = FALSE)
-    suppressWarnings(file.remove(outputFile))
-    if (interval > 0) {
-      #data.table::fwrite(list(a, Sys.time()), dateTimeAs = "ISO", append = FALSE, file = outputFile)
-      #data.table::fwrite(list("mem", "time"), append = FALSE, file = outputFile)
-      op <- options(digits.secs = 5)
-      stopFilename <- stopFilename(outputFile)
-      while(numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
-        Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
-        a <- memoryUseThisSession(thisPid)
-        #cat(a, ", ", format(Sys.time()), "\n", file = outputFile, append = TRUE)
-        data.table::fwrite(list(memory = a, time = Sys.time()),
-                           dateTimeAs = "write.csv",
-                           append = file.exists(outputFile), file = outputFile)
-        numTimes <- numTimes + 1
-      }
-      options(op)
-    } else {
-      message("interval is 0; no memoryUse activated")
-    }
-    invisible(outputFile)
+    options(op)
+  } else {
+    message("interval is 0; no memoryUse activated")
+  }
+  invisible(outputFile)
 }
 
 #' Estimate memory used with \code{system("ps")}
@@ -45,11 +42,15 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
 memoryUseThisSession <- function(thisPid) {
   ps <- Sys.which("ps")
   if (missing(thisPid)) thisPid <- Sys.getpid()
-  if (nzchar(ps)) {
-    #aa <- try(system(paste("ps -eo rss,pid --sort -rss | grep", thisPid), intern = TRUE), silent = TRUE)
-    aa <- try(system(paste("ps -eo rss,pid | grep", thisPid), intern = TRUE), silent = TRUE)
-    aa2 <- strsplit(aa, split = " +")[[1]][1]
-  } else {
+  needTasklist <- isWindows()
+  if (nzchar(ps) && !needTasklist) {
+    aa <- try(suppressWarnings(system(paste("ps -eo rss,pid | grep", thisPid), intern = TRUE)), silent = TRUE)
+    needTasklist <- !is.null(attr(aa, "status"))
+    if (!needTasklist)
+      aa2 <- try(strsplit(aa, split = " +")[[1]][1], silent = TRUE)
+  }
+
+  if (!nzchar(ps) || needTasklist) {
     aa <- try(system(paste0('tasklist /fi "pid eq ', thisPid, '"'), intern = TRUE), silent = TRUE)
     aa2 <- strsplit(aa[grepl(thisPid, aa)], split = " +")[[1]][5] # pull out 5th item in character string
     aa2 <- gsub(",", "", aa2) # comes with human readable comma -- must remove
@@ -69,12 +70,13 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
   message("Writing memory to ", outputFile)
   a <- future::future(
     getFromNamespace("ongoingMemoryThisPid", "SpaDES.core")(seconds = seconds,
-                                       interval = interval,
-                                       thisPid = thisPid,
-                                       outputFile = outputFile),
-                      globals = list(memoryUseThisSession = memoryUseThisSession,
-                                     outputFile = outputFile, thisPid = thisPid,
-                                     seconds = seconds, interval = interval))
+                                                            interval = interval,
+                                                            thisPid = thisPid,
+                                                            outputFile = outputFile),
+    globals = list(memoryUseThisSession = memoryUseThisSession,
+                   outputFile = outputFile, thisPid = thisPid,
+                   seconds = seconds, interval = interval))
+  return(a)
 }
 
 # b <- futureOngoingMemoryThisPid()
@@ -96,15 +98,17 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #'   the raw memory used during each event will be shown.
 #' @seealso The \code{vignette("iv-modules")}
 memoryUse <- function(sim, max = TRUE) {
-  compl <- completed(sim)
-  mem <- sim@.xData$.memoryUse$obj
+  compl <- Copy(completed(sim))
+  mem <- Copy(sim@.xData$.memoryUse$obj)
   if (is.null(mem)) {
     message("There are no data in the sim@.xData$.memoryUse$obj ... try running spades again?")
   } else {
-    if (is.character(mem$time))
-      mem[, time := as.POSIXct(time)]
+
+    # make sure same tz
     if (any(grepl("^time$", names(mem))))
       setnames(mem, old = "time", new = "clockTime")
+    mem[, clockTime := as.POSIXct(as.character(clockTime))] # In case these two objects are in different tz
+    compl[, clockTime := as.POSIXct(as.character(clockTime))]
     a <- mem[compl, on = c("clockTime"), roll = TRUE, allow.cartesian = TRUE]
     if (isTRUE(max)) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
@@ -145,18 +149,32 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
 
     # Set up element in simList for recording the memory use stuff
     sim@.xData$.memoryUse <- list()
-    sim@.xData$.memoryUse$filename <- file.path(cachePath(sim), paste0("._memoryUseFilename", Sys.getpid(),".txt"))
+
+    st <- format(Sys.time(), format = "%Y-%m-%d_%H-%M-%S")
+    sim@.xData$.memoryUse$filename <-
+      file.path(logPath(sim), paste0("_memoryUse_", st, "_", Sys.getpid(),".csv"))
     sim@.xData$.memoryUse$futureObj <-
       futureOngoingMemoryThisPid(seconds = Inf,
                                  interval = getOption("spades.memoryUseInterval", 0.2),
                                  outputFile = sim@.xData$.memoryUse$filename)
-    if (!file.exists(sim@.xData$.memoryUse$filename))
-      message("Pausing while memoryUse infrastructure is set up")
-
-    while (!file.exists(sim@.xData$.memoryUse$filename)) {
-      Sys.sleep(0.4)
-      message("... setting up memoryUse infrastructure")
+    initialFileDoesntExist <- !file.exists(sim@.xData$.memoryUse$filename)
+    if (initialFileDoesntExist) {
+      message("Pausing while memoryUse infrastructure is set up (should take <5 seconds)")
     }
+
+    counterForMax <- 0
+    maxCounterForMax <- 30
+    while (!file.exists(sim@.xData$.memoryUse$filename) && counterForMax < maxCounterForMax) {
+      Sys.sleep(0.5)
+      counterForMax <- counterForMax + 1
+      message("\b.")
+    }
+    if (counterForMax >= maxCounterForMax)
+      stop("memoryUse encountered an error; perhaps logPath(sim) not writable?")
+
+    if (initialFileDoesntExist)
+      message("\bDone!")
+
   } else {
     message(futureMessage)
   }
@@ -169,6 +187,9 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
   if (requireNamespace("future", quietly = TRUE)) {
     # May not have killed it ... kill it manually
     x <- data.frame(x = 1)
+
+    # This is the trigger that causes the future to end ... every "interval", the function that is
+    #   being run searches for this file
     data.table::fwrite(x = x, file = stopFilename(sim$.memoryUse$filename))
     while (!future::resolved(sim$.memoryUse$futureObj)) {
       Sys.sleep(0.1)
@@ -190,7 +211,7 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
 }
 
 stopFilename <- function(outputFile) {
-  gsub("\\.txt", "done.txt", outputFile)
+  gsub("\\.csv", "done.csv", outputFile)
 }
 
 outputFilename <- function(thisPid) {

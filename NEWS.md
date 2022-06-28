@@ -4,11 +4,18 @@ version 1.0.11
 ==============
 
 ## new features
+* messaging in a module can now handle "same line" messages --> simply use the standard `"\b"` in the message, and it will occur on same line as previous message
+* `Plots` now appends the filename any file saved during `Plots` to the `outputs` slot of the `sim`, i.e., it will show up in `outputs(sim)`
+* `logPath` is now a function that points to a sub-folder of `file.path(outputPath(sim), "log")`
+* `defineEvent` is a new function that allows a different way of specifying events than the `doEvent` function. This is not yet being used in the module templates, so does not appear with `newModule`.
+* `spades` can now run correctly, with "incomplete" modules that don't have metadata or even a module file. Now, a "module" will work with `simInit` and `spades` if a `doEvent.XXX` exists somewhere e.g., in the `.GlobalEnv`. `spades` will find it through inheritance and no longer complain if specific structures are absent. This may make it easier to learn how to use `SpaDES` as it mimicks a more normal user experience where functions are all in the `.GlobalEnv`.
 * new option `spades.DTthreads` to limit the number of threads used by `data.table` (default 1).
   Users can override this default if needed; modules can `setDTthreads()` as needed,
   but should restore the original value `on.exit`.
 * `saveSimList()` and `loadSimList()` accept `.qs` or `.rds` files
 * `spades` and `simInit` now force UTF-8 encoding; this is reset `on.exit`. If a module needs a different character encoding, then it can be set within the module code.
+* `.studyAreaName` parameter added to default module metadata when using `newModule`.
+* changes to template module documentation - removal of "module usage" as it is not relevant *within* a module, and minor restructuring
 * new option `spades.scratchPath`, to be used for e.g., temporary raster files and temporary SpaDES recovery mode objects.
 * The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
   **`rasterPath` will be deprecated in a future release.**
@@ -19,10 +26,12 @@ version 1.0.11
 * none
 
 ## bug fixes
+* `memoryUse` was not correctly handling timezones; if the system call to get time stamps was in a different timezone compared to the internal SpaDES event queue, then the memory stamps were not correctly associated with the correct events.
 * improved handling of `data.table` objects using `loadSimList()`
 * Fixed caching of `.inputObjects` to correctly capture objects that were assigned to `mod$xxx`.
+* Fixed caching of `simList` objects where changes to functions appeared to be undetected, and so a Cache call would return a stale module with function code from the Cached `simList`, which was incorrect.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
-* Fixed infinite recursion problem in `objSize` when there are `simList`s inside `simList`s.
+* `objSize` could have infinite recursion problem if there are simLists inside simLists. Fixed with new `reproducible::objSize`, which uses `lobstr::obj_size`.
 * several minor, including in `Plots`
 
 version 1.0.10

@@ -1210,6 +1210,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(sim)
 }
 
+.timeunitDefault <- function() "year"
 .timesDefault <- function() list(start = 0, end = 10)
 .paramsDefault <- function() list()
 .modulesDefault <- function() list()
@@ -1219,6 +1220,17 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 .outputsDefault <- function() as.data.frame(NULL)
 .loadOrderDefault <- function() character(0)
 .notOlderThanDefault <- function() NULL
+
+#' `simInit` default values
+#' @export
+#' @rdname simInit
+simInitDefaults <- function() {
+
+  times <- append(.timesDefault(), list(timeunit = .timeunitDefault()))
+  simInitCall <- call("simInit", times = times)
+
+  .fillInSimInit(list(times = times), namesMatchCall = names(simInitCall))
+}
 
 .fillInSimInit <- function(li, namesMatchCall) {
 
@@ -1309,11 +1321,11 @@ findSmallestTU <- function(sim, mods, childModules) { # recursive function
     recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
   }
   if (!exists("tu", inherits = FALSE)) {
-    return(list("year")) # default
+    return(list(.timeunitDefault())) # default
   }
   minTU <- minTimeunit(as.list(unlist(tu)))
   if (isTRUE(is.na(minTU[[1]]))) {
-    minTU[[1]] <- "year"
+    minTU[[1]] <- .timeunitDefault()
   }
 
   # no timeunits or no modules at all
@@ -1354,24 +1366,8 @@ loadPkgs <- function(reqdPkgs) {
     if (getOption("spades.useRequire")) {
       Require(allPkgs, upgrade = FALSE)
     } else {
-      loadedPkgs <- search();
-      neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
-      names(neededPkgs) <- uniqueReqdPkgs
-      allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
-      message("options('spades.useRequire' = FALSE), so not checking minimum package version requirements")
-      # versionSpecs <- Require::getPkgVersions(allPkgs)
-      # if (any(versionSpecs$hasVersionSpec)) {
-      #   out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
-      #     comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-      #                            versionSpecs$versionSpec[iii])
-      #     if (comp < 0)
-      #       warning(versionSpecs$Package[iii], " needs to be updated to at least ",
-      #               versionSpecs$versionSpec[iii])
-      #   })
-      #
-      # }
       allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
+      loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }
   }
 
