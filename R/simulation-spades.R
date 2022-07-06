@@ -937,7 +937,6 @@ setMethod(
     loadPkgs(pkgs)
 
     sim <- withCallingHandlers({
-
       recoverModeWrong <- getOption("spades.recoverMode")
       if (!is.null(recoverModeWrong))
         warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
@@ -1582,7 +1581,8 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
 }
 
 spadesDefaultFormatter <- function(record) {
-  text <- paste(record$timestamp, paste(record$levelname, record$logger, gsub("\n$", "", record$msg), sep=':'), sep = "")
+  text <- paste(record$timestamp, paste(record$levelname, record$logger,
+                                        gsub("\n$", "", record$msg), sep = ":"), sep = "")
 }
 
 #' @importFrom reproducible Filenames
@@ -1680,7 +1680,6 @@ getFutureNeeds <- function(deps, curModName) {
     out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
   }
   out
-
 }
 
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
