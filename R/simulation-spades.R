@@ -36,7 +36,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
-  if (class(sim) != "simList") { # faster than `is` and `inherits`
+  if (!inherits(sim, "simList")) {  ## July 2022: R 4.2 flags against using class()
     stop("doEvent can only accept a simList object")
   }
 
@@ -385,7 +385,9 @@ scheduleEvent <- function(sim,
   if (missing(moduleName)) moduleName <- currentModule(sim)
 
   if (!.skipChecks) {
-    if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+    if (!inherits(sim, "simList")) {
+      stop("sim must be a simList")  ## July 2022: R 4.2 flags against using class()
+    }
 
     if (!is.numeric(eventTime)) {
       if (is.na(eventTime)) {
@@ -520,7 +522,9 @@ scheduleConditionalEvent <- function(sim,
                                      eventPriority = .normal(),
                                      minEventTime = start(sim),
                                      maxEventTime = end(sim)) {
-  if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+  if (!inherits(sim, "simList")) {
+    stop("sim must be a simList") ## July 2022: R 4.2 flags against using class()
+  }
 
   if (!is.numeric(minEventTime)) {
     if (is.na(minEventTime)) {
@@ -1259,7 +1263,7 @@ setMethod(
                         events,
                         .plots,
                         ...) {
-    stopifnot(class(sim) == "simList")
+    stopifnot(inherits(sim, "simList")) ## July 2022: R 4.2 flags against using class()
 
     oldGetPaths <- getPaths()
     do.call(setPaths, append(list(silent = TRUE), sim@paths))
