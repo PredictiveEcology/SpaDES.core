@@ -2,9 +2,7 @@
 #' Open a file for editing
 #'
 #' RStudio's \code{file.edit} behaves differently than \code{utils::file.edit}.
-#' The workaround is to have the user manually open the file if they are using
-#' RStudio, as suggested in the RStudio support ticket at
-#' \url{https://support.rstudio.com/hc/en-us/community/posts/206011308-file-edit-vs-utils-file-edit}.
+#' The workaround is to have the user manually open the file if they are using RStudio.
 #'
 #' @param file  Character string giving the file path to open.
 #'
@@ -26,7 +24,6 @@
     file.edit(file)
   }
   message(paste0("file.edit('", file, "')"))
-
 }
 
 ################################################################################
