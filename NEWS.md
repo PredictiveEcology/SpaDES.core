@@ -34,6 +34,7 @@ version 1.0.11
 * `objSize` could have infinite recursion problem if there are simLists inside simLists. Fixed with new `reproducible::objSize`, which uses `lobstr::obj_size`.
 * several minor fixes, including in `Plots`
 * fixes to `saveFiles` related to `data.table` assignment and use in `outputs(sim)`
+* fix to `paramCheckOtherMods` to deal with `call` parameters
 
 version 1.0.10
 ==============
