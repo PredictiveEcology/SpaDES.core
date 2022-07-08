@@ -533,16 +533,16 @@ These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModu
 \code{\link{spadesOptions}}
 }
 \author{
-\strong{Maintainer}: Alex M Chubaty \email{ahubaty@for-cast.ca} (\href{https://orcid.org/0000-0001-7146-8135}{ORCID})
+\strong{Maintainer}: Alex M Chubaty \email{achubaty@for-cast.ca} (\href{https://orcid.org/0000-0001-7146-8135}{ORCID})
 
 Authors:
 \itemize{
-  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
+  \item Eliot J B McIntire \email{eliot.mcintire@nrcan-rncan.gc.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
 }
 
 Other contributors:
 \itemize{
-  \item Yong Luo \email{yluo1@lakeheadu.ca} [contributor]
+  \item Yong Luo \email{Yong.Luo@gov.bc.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
   \item Ceres Barros \email{cbarros@mail.ubc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID}) [contributor]
   \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]

@@ -36,7 +36,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
-  if (class(sim) != "simList") { # faster than `is` and `inherits`
+  if (!inherits(sim, "simList")) {  ## July 2022: R 4.2 flags against using class()
     stop("doEvent can only accept a simList object")
   }
 
@@ -385,7 +385,9 @@ scheduleEvent <- function(sim,
   if (missing(moduleName)) moduleName <- currentModule(sim)
 
   if (!.skipChecks) {
-    if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+    if (!inherits(sim, "simList")) {
+      stop("sim must be a simList")  ## July 2022: R 4.2 flags against using class()
+    }
 
     if (!is.numeric(eventTime)) {
       if (is.na(eventTime)) {
@@ -462,7 +464,8 @@ scheduleEvent <- function(sim,
 #'
 #' Adds a new event to the simulation's conditional event queue,
 #' updating the simulation object by creating or appending to
-#' \code{sim$._conditionalEvents}. This is very experimental. Use with caution.
+#' \code{sim$._conditionalEvents}.
+#' \emph{This is very experimental. Use with caution.}
 #'
 #' @inheritParams scheduleEvent
 #'
@@ -516,10 +519,12 @@ scheduleConditionalEvent <- function(sim,
                                      condition,
                                      moduleName,
                                      eventType,
-                                     eventPriority = .pkgEnv$.normalVal,
+                                     eventPriority = .normal(),
                                      minEventTime = start(sim),
                                      maxEventTime = end(sim)) {
-  if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+  if (!inherits(sim, "simList")) {
+    stop("sim must be a simList") ## July 2022: R 4.2 flags against using class()
+  }
 
   if (!is.numeric(minEventTime)) {
     if (is.na(minEventTime)) {
@@ -936,7 +941,6 @@ setMethod(
     loadPkgs(pkgs)
 
     sim <- withCallingHandlers({
-
       recoverModeWrong <- getOption("spades.recoverMode")
       if (!is.null(recoverModeWrong))
         warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
@@ -1259,7 +1263,7 @@ setMethod(
                         events,
                         .plots,
                         ...) {
-    stopifnot(class(sim) == "simList")
+    stopifnot(inherits(sim, "simList")) ## July 2022: R 4.2 flags against using class()
 
     oldGetPaths <- getPaths()
     do.call(setPaths, append(list(silent = TRUE), sim@paths))
@@ -1581,7 +1585,8 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
 }
 
 spadesDefaultFormatter <- function(record) {
-  text <- paste(record$timestamp, paste(record$levelname, record$logger, gsub("\n$", "", record$msg), sep=':'), sep = "")
+  text <- paste(record$timestamp, paste(record$levelname, record$logger,
+                                        gsub("\n$", "", record$msg), sep = ":"), sep = "")
 }
 
 #' @importFrom reproducible Filenames
@@ -1679,7 +1684,6 @@ getFutureNeeds <- function(deps, curModName) {
     out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
   }
   out
-
 }
 
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,

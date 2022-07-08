@@ -28,11 +28,10 @@ Modified from \url{https://stackoverflow.com/a/25485782/1380598}.
 looking at the module \file{.zip} files contained in the module directory.
 It takes the most recent version, based on the name of the zip file.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{     See the modules vignette for details of module directory structure
-     (\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
-     and see our SpaDES-modules repo for details of module repository structure
-     (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
-}\if{html}{\out{</div>}}
+See the modules vignette for details of module directory structure
+(\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+and see our SpaDES-modules repo for details of module repository structure
+(\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 }
 \seealso{
 \code{\link{zipModule}} for creating module \file{.zip} folders.

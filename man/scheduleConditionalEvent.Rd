@@ -9,7 +9,7 @@ scheduleConditionalEvent(
   condition,
   moduleName,
   eventType,
-  eventPriority = .pkgEnv$.normalVal,
+  eventPriority = .normal(),
   minEventTime = start(sim),
   maxEventTime = end(sim)
 )
@@ -57,7 +57,8 @@ to very low or even negative to ensure it gets inserted at the top of the event 
 \description{
 Adds a new event to the simulation's conditional event queue,
 updating the simulation object by creating or appending to
-\code{sim$._conditionalEvents}. This is very experimental. Use with caution.
+\code{sim$._conditionalEvents}.
+\emph{This is very experimental. Use with caution.}
 }
 \examples{
   sim <- simInit(times = list(start = 0, end = 2))
