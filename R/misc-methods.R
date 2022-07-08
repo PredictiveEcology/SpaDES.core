@@ -665,7 +665,14 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   newVal <- paramInThisMod
   fail <- FALSE
 
-  if (!identical(paramInThisMod, paramInOtherMods)) {
+  test <- if (is.list(paramInOtherMods)) {
+    all(sapply(paramInOtherMods, function(x, paramInThisMod) identical(paramInThisMod, x),
+           paramInThisMod = paramInThisMod))
+  } else {
+    identical(paramInThisMod, paramInOtherMods)
+  }
+
+  if (!test) {
     if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
       if (length(paramInOtherMods) == 1) {
         newVal <- paramInOtherMods
