@@ -70,6 +70,7 @@ jobs:
       - name: Install additional dependencies
         run: |
           options(install.packages.check.source = "no", install.packages.compile.from.source = "never")
+          install.packages("Rcpp", repos = "https://cran.rstudio.com") ## need source on Linux, not RSPM binary
           install.packages("terra", repos = "https://rspatial.r-universe.dev") ## TEMPORARY: July 2022
           install.packages(c("raster", "sf", "sp", "lwgeom", "rgdal", "rgeos"), repos = "https://cran.rstudio.com") ## need source on Linux, not RSPM binary
           install.packages(c("foreach", "R.utils")) ## TEMPORARY: July 2022
