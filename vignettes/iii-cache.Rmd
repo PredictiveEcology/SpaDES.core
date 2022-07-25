@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{magrittr, RandomFields, raster, reproducible, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{magrittr, raster, reproducible, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,9 +20,7 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
-
-knitr::opts_chunk$set(eval = RFavailable)
+knitr::opts_chunk$set(eval = TRUE)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)

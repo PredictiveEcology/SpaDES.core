@@ -1,7 +1,5 @@
 ## ----setup, include = FALSE---------------------------------------------------
-RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
-
-knitr::opts_chunk$set(eval = RFavailable)
+knitr::opts_chunk$set(eval = TRUE)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)

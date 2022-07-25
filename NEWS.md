@@ -23,7 +23,7 @@ version 1.0.11
 * Old way of naming module functions with full module name plus "Init" ('non namespaced') no longer works. Message now converted to `stop`. 
 
 ## dependency changes
-* none
+* removed `RandomFields` dependency
 
 ## bug fixes
 * `memoryUse` was not correctly handling timezones; if the system call to get time stamps was in a different timezone compared to the internal SpaDES event queue, then the memory stamps were not correctly associated with the correct events.

@@ -11,9 +11,9 @@ moduleMetadata(
   sim,
   module,
   path = getOption("spades.modulePath", NULL),
-  defineModuleListItems = c("name", "description", "keywords", "childModules",
-    "authors", "version", "spatialExtent", "timeframe", "timeunit", "citation",
-    "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects")
+  defineModuleListItems = c("name", "description", "keywords", "childModules", "authors",
+    "version", "spatialExtent", "timeframe", "timeunit", "citation", "documentation",
+    "reqdPkgs", "parameters", "inputObjects", "outputObjects")
 )
 
 \S4method{moduleMetadata}{missing,character,character}(module, path, defineModuleListItems)
@@ -24,9 +24,9 @@ moduleMetadata(
   sim,
   module,
   path = getOption("spades.modulePath", NULL),
-  defineModuleListItems = c("name", "description", "keywords", "childModules",
-    "authors", "version", "spatialExtent", "timeframe", "timeunit", "citation",
-    "documentation", "reqdPkgs", "parameters", "inputObjects", "outputObjects")
+  defineModuleListItems = c("name", "description", "keywords", "childModules", "authors",
+    "version", "spatialExtent", "timeframe", "timeunit", "citation", "documentation",
+    "reqdPkgs", "parameters", "inputObjects", "outputObjects")
 )
 }
 \arguments{

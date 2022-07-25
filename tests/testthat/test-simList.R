@@ -196,15 +196,12 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
   ## test with outputs
-  ras <- raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
-  abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
+  abundRasters <- list(raster(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
 
   tmpdir <- tempdir()
   newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
