@@ -1,6 +1,4 @@
 test_that("test objectSynonyms", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
                                       spades.useRequire = FALSE#,
                                       #reproducible.useMemoise = FALSE
@@ -168,5 +166,4 @@ test_that("test objectSynonyms", {
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
-
-  })
+})

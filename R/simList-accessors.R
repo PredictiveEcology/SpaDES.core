@@ -2690,6 +2690,17 @@ setMethod(
     return(sim)
 })
 
+#' strip GitHub repo info from vector of packages
+#'
+#' @keywords internal
+.cleanPkgs <- function(pkgs) {
+  pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
+  pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
+  pkgs <- sub("[[:space:]]*\\(>=.*", "", pkgs)
+
+  return(pkgs)
+}
+
 ################################################################################
 #' Get module or simulation package dependencies
 #'
@@ -2789,11 +2800,9 @@ setMethod(
       names(pkgs) <- modules
     }
     if (isTRUE(clean)) {
-      pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
-      pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
-      pkgs <- sub("[[:space:]]*\\(>=.*", "", pkgs)
+      pkgs <- .cleanPkgs(pkgs)
     }
-    return(pkgs)
+    return(unique(pkgs))
 })
 
 ################################################################################

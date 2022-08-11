@@ -170,17 +170,18 @@ test_that("simList object initializes correctly (1)", {
   expect_equal("second", attr(mySim@simtimes$current, "unit"))
 
   ### required packages
-  pkgs <- c("grid", "methods", "RandomFields", "raster", "RColorBrewer", "sp",
-            "SpaDES.tools", "SpaDES.core", "stats")
-  expect_equal(sort(packages(mySim)), sort(pkgs))
+  pkgs <- c("grid", "methods", "NLMR", "raster", "RColorBrewer", "sp",
+            "SpaDES.core", "SpaDES.tools", "stats")
+  expect_equal(sort(packages(mySim, clean = TRUE)), sort(pkgs))
 
   reqdPkgs <- lapply(modules, function(m) {
     mfile <- file.path(system.file("sampleModules", package = "SpaDES.core"), m, paste0(m, ".R"))
     packages(filename = mfile)
   }) %>%
     unlist() %>%
-    unique() %>%
-    sort()
+    sort() %>%
+    SpaDES.core:::.cleanPkgs() %>%
+    unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
   mdir <- getOption("spades.modulePath")
@@ -188,8 +189,9 @@ test_that("simList object initializes correctly (1)", {
   on.exit(options(spades.modulePath = mdir), add = TRUE)
   reqdPkgs <- lapply(modules, function(m) packages(module = m)) %>%
     unlist() %>%
-    unique() %>%
-    sort()
+    sort() %>%
+    SpaDES.core:::.cleanPkgs() %>%
+    unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
   rm(mySim)

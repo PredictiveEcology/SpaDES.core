@@ -1,7 +1,5 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
-
-knitr::opts_chunk$set(eval = RFavailable)
+knitr::opts_chunk$set(eval = TRUE)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
@@ -14,7 +12,7 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----passing-params, eval=RFavailable, echo=TRUE------------------------------
+## ----passing-params, eval=TRUE, echo=TRUE-------------------------------------
 library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
@@ -69,7 +67,7 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----sim-eventDiagram, eval=RFavailable, echo=FALSE, message=FALSE, warning=FALSE----
+## ----sim-eventDiagram, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE----
 library(magrittr)
 library(SpaDES.core)
 
@@ -98,7 +96,7 @@ mySim <- simInit(
 dev.off()
 unlink(normalizePath(ftmp))
 
-## ----eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7----
+## ----eventDiagram, echo=FALSE, eval=TRUE, fig.height=10, fig.width=7----------
 # overview of the events in the simulation
 if (requireNamespace("DiagrammeR"))
   eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
@@ -124,7 +122,7 @@ if (requireNamespace("DiagrammeR"))
 #            to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
 #            overwrite = TRUE)
 
-## ----module-object-diagrams, eval=RFavailable, echo=TRUE, message=FALSE, fig.width=7----
+## ----module-object-diagrams, eval=TRUE, echo=TRUE, message=FALSE, fig.width=7----
 library(SpaDES.core)
 
 times <- list(start = 0.0, end = 20)
@@ -147,7 +145,7 @@ moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module gr
 # detailed visual representation of objects
 objectDiagram(mySim, width = 720)
 
-## ----checkpoints, echo=TRUE, eval=RFavailable, message=FALSE------------------
+## ----checkpoints, echo=TRUE, eval=TRUE, message=FALSE-------------------------
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 30)
 parameters <- list(
@@ -165,7 +163,7 @@ mySim <- simInit(times = times, params = parameters, modules = modules, paths = 
 checkpointFile(mySim)
 checkpointInterval(mySim)
 
-## ----progress, echo=TRUE, eval=RFavailable, message=FALSE---------------------
+## ----progress, echo=TRUE, eval=TRUE, message=FALSE----------------------------
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 100.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -177,7 +175,7 @@ mySim <- simInit(times = list(start = 0.0, end = 100.0),
 progressType(mySim)
 progressInterval(mySim)
 
-## ----load-save, echo=TRUE, eval=RFavailable, message=FALSE--------------------
+## ----load-save, echo=TRUE, eval=TRUE, message=FALSE---------------------------
 # initialize a new simulation, setting the load and save parameters
 library(data.table)
 
@@ -294,6 +292,6 @@ unlink(normalizePath(ftmp))
 ## ----module-group-dl, eval=FALSE----------------------------------------------
 #  downloadModule("SpaDES_sampleModules")
 
-## ----cleanup, eval=RFavailable, echo=FALSE------------------------------------
+## ----cleanup, eval=TRUE, echo=FALSE-------------------------------------------
 unlink(outputDir, recursive = TRUE)
 

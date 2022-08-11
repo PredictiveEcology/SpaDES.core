@@ -1,5 +1,4 @@
 test_that("saving files (and memoryUse)", {
-  skip_if_not_installed("RandomFields")
   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
 
   if (!requireNamespace("future", quietly = TRUE)) {
@@ -160,8 +159,6 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", ""))
   unlink(tmpfile[5])
   unlink(tmpfile[6])

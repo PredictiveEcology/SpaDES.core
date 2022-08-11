@@ -1,6 +1,4 @@
 test_that("test event-level cache & memory leaks", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit(smcc = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
   opts <- options("reproducible.cachePath" = tmpdir)
@@ -100,7 +98,11 @@ test_that("test event-level cache & memory leaks", {
 
   sims$.mods$caribouMovement$.objects$crazyFunction <- function() { rnorm(1)}
   end(sims) <- end(sims) + 0.1
-  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFunction <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFunction) > 0)
   expect_true(grepl("function", warnsFunction))
   expect_true(grepl("crazyFunction", warnsFunction))
@@ -110,20 +112,20 @@ test_that("test event-level cache & memory leaks", {
 
   sims$.mods$caribouMovement$.objects$crazyFormula <-  formula(hi ~ test)
   end(sims) <- end(sims) + 0.1
-  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFormula <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFormula) > 0)
   expect_true(grepl("formula", warnsFormula))
   expect_true(grepl("mod", warnsFormula))
   expect_true(grepl("crazyFormula", warnsFormula))
   expect_true(!grepl("crazyFunction", warnsFormula))
   expect_true(!grepl("function", warnsFormula))
-
-
 })
 
 test_that("test module-level cache", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
 
@@ -542,8 +544,6 @@ test_that("Cache sim objs via .Cache attr", {
 })
 
 test_that("test showSimilar", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit(smcc = FALSE, "raster")
   opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
@@ -592,4 +592,3 @@ test_that("test showSimilar", {
   })
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
-

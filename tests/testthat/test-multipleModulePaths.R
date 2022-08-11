@@ -1,8 +1,6 @@
 if (interactive()) library(testthat)
 
 test_that("simulation runs with simInit and spades", {
-  skip_if_not_installed("RandomFields")
-
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
   on.exit({
     testOnExit(testInitOut)
@@ -111,5 +109,4 @@ test_that("simulation runs with simInit and spades", {
 
   # Test for integer values in scheduleEvent
   expect_true(completed(mySim)[moduleName == "test" & eventType == 'event1', eventTime == 2])
-
 })

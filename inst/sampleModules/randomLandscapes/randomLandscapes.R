@@ -17,18 +17,22 @@ defineModule(sim, list(
   keywords = c("random map", "random landscape"),
   childModules = character(),
   authors = c(
-    person(c("Alex", "M"), "Chubaty", email = "alexander.chubaty@canada.ca",
+    person(c("Alex", "M"), "Chubaty", email = "achubaty@for-cast.ca",
            role = c("aut", "cre")),
-    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
+    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
            role = c("aut", "cre"))
   ),
-  version = list(SpaDES.core = "0.1.0", SpaDES.tools = "0.1.0", randomLandscapes = "1.6.0"),
+  version = list(randomLandscapes = "1.7.0"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("RandomFields", "raster", "RColorBrewer", "SpaDES.tools"),
+  reqdPkgs = list(
+    "achubaty/NLMR", ## TODO: use ropensci/NLMR once they accept my PR#96
+    "raster", "RColorBrewer",
+    "PredictiveEcology/SpaDES.tools@development"
+  ),
   parameters = rbind(
     defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
     defineParameter("nx", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the x dimension"),
@@ -46,12 +50,13 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     expectsInput(objectName = NA_character_, objectClass = NA_character_,
-                 sourceURL = NA_character_, desc = NA_character_,
-                 other = NA_character_)
+                 sourceURL = NA_character_, desc = NA_character_)
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = SpaDES.core::P(sim, module = "randomLandscapes")$stackName, objectClass = "RasterStack",
-                  desc = NA_character_, other = NA_character_)
+    createsOutput(objectName = SpaDES.core::P(sim, module = "randomLandscapes")$stackName,
+                  objectClass = "RasterStack",
+                  desc = paste("NOTE: resulting stack may be slightly smaller than specified",
+                               "because `nlm_mpd()` may drop pixels along raster edges."))
   )
 ))
 
@@ -69,7 +74,7 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot = {
       # do stuff for this event
-      stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long variables
+      stackName <- SpaDES.core::P(sim)$stackName ## Plot doesn't like long variables
       Plot(sim[[stackName]])
     },
     save = {
@@ -94,22 +99,56 @@ Init <- function(sim) {
   } else {
     inMemory <- SpaDES.core::P(sim)$inRAM
   }
-  # Give dimensions of dummy raster
+  ## Give dimensions of dummy raster
   nx <- SpaDES.core::P(sim)$nx
   ny <- SpaDES.core::P(sim)$ny
   template <- raster(nrows = ny, ncols = nx, xmn = -nx / 2, xmx = nx / 2,
                      ymn = -ny / 2, ymx = ny / 2)
-  speedup <- max(1, nx / 5e2)
 
-  # Make dummy maps for testing of models
-  DEM <- gaussMap(template, scale = 10, var = 0.03, speedup = speedup, inMemory = inMemory)
+  ## Make dummy maps for testing of models
+  ## NOTE: nlm_mpd drops row + columns along outer edge so new raster won't always match nx & ny
+
+  # DEM <- gaussMap(template, scale = 10, var = 0.03, speedup = speedup, inMemory = inMemory)
+  DEM <- NLMR::nlm_mpd(
+    ncol = ncol(template),
+    nrow = nrow(template),
+    resolution = unique(res(template)),
+    roughness = 0.3,
+    rand_dev = 10,
+    rescale = TRUE,
+    verbose = FALSE
+  )
   DEM[] <- round(getValues(DEM), 1) * 300
-  forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
-  forestAge[] <- round(getValues(forestAge), 1) * 20
-  percentPine <- gaussMap(template, scale = 10, var = 1, speedup = speedup, inMemory = inMemory)
-  percentPine[] <- round(getValues(percentPine), 1)
+  # plot(DEM)
 
-  # Scale them as needed
+  # forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
+  forestAge <- NLMR::nlm_mpd(
+    ncol = ncol(template),
+    nrow = nrow(template),
+    resolution = unique(res(template)),
+    roughness = 0.7,
+    rand_dev = 10,
+    rescale = FALSE,
+    verbose = FALSE
+  )
+  forestAge[] <- round(getValues(forestAge), 1) * 10
+  # plot(forestAge)
+
+  # percentPine <- gaussMap(template, scale = 10, var = 1, speedup = speedup, inMemory = inMemory)
+  percentPine <- NLMR::nlm_mpd(
+    ncol = ncol(template),
+    nrow = nrow(template),
+    resolution = unique(res(template)),
+    roughness = 0.5,
+    rand_dev = 10,
+    rescale = TRUE,
+    verbose = FALSE
+  )
+  percentPine[] <- round(getValues(percentPine), 1)
+  # plot(percentPine)
+
+  ## Scale them as needed
+  forestAge <- forestAge + abs(minValue(forestAge))
   forestAge <- forestAge / maxValue(forestAge) * 100
   percentPine <- percentPine / maxValue(percentPine) * 100
 

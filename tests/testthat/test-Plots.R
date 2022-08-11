@@ -111,15 +111,11 @@ test_that("Plots function 1", {
     clearPlot()
     # avoid using `data` arg; just use all named args
     Plots(d1 = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
-
   }
-
 })
 
 test_that("testing .plotInitialTime & .plots", {
   if (interactive()) {
-    skip_if_not_installed("RandomFields")
-
     testInitOut <- testInit()
     on.exit({
       testOnExit(testInitOut)
@@ -147,7 +143,6 @@ test_that("testing .plotInitialTime & .plots", {
     # Makes no plots
     spades(mySim, .plots = NA)
     spades(mySim, .plotInitialTime = NA)
-
   }
 })
 
