@@ -30,9 +30,14 @@ jobs:
         with:
           extra-packages: |
             any::covr
-            github::achubaty/NLMR
             github::PredictiveEcology/Require@development
             github::PredictiveEcology/reproducible@development
+            github::PredictiveEcology/quickPlot@development
+            github::PredictiveEcology/SpaDES.tools@development
+
+      - name: Install additional package dependencies
+        run: pak::pkg_install("achubaty/NLMR")
+        shell: Rscript {0}
 
       - name: Test coverage
         run: covr::codecov()
