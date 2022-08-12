@@ -30,6 +30,7 @@ jobs:
         with:
           extra-packages: |
             any::covr
+            NLMR=?ignore
             github::PredictiveEcology/Require@development
             github::PredictiveEcology/reproducible@development
             github::PredictiveEcology/quickPlot@development
