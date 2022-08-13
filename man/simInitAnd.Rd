@@ -104,9 +104,8 @@ See also the vignette on caching for examples.}
 \item{.plots}{Character. Sets the parameter of this name in all modules.
 See \code{\link{Plots}} for possible values. The parameter is intended to slowly
 take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-For backwards compatibility, if \code{.plotInitialTime} is not set
-in this \code{spades} call, but this
-\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
+but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
 will turn off all plotting; setting this with \code{"screen"} will trigger
 plotting for any modules that use this parameter but will have no effect on
 other modules. To get plotting, therefore, it may be necessary to also set
