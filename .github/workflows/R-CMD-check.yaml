@@ -59,7 +59,7 @@ jobs:
       - name: Install additional package dependencies
         run: |
           pak::pkg_install("achubaty/NLMR")
-          pak::pkg_install("s-u/fastshp")
+          remotes::install_github("s-u/fastshp")
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
