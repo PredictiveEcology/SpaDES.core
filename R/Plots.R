@@ -1,13 +1,13 @@
-#' \code{Plot} wrapper intended for use in a SpaDES module
+#' `Plot` wrapper intended for use in a SpaDES module
 #'
 #' This is a single function call that allows a user to change which format in which
 #' the plots will occur.
-#' Specifically, the two common formats would be to \code{"screen"} or to disk as an image file,
-#' such as \code{"png"}.
-#' \emph{THIS CURRENTLY HAS BEEN TESTED WITH \code{ggplot2}, \code{RasterLayer}, and
-#' \code{tmap} objects.}
-#' The default (or change with e.g., \code{fn = "print", usePlot = FALSE}) uses
-#' \code{Plot} internally, so individual plots may be rearranged. When saved to
+#' Specifically, the two common formats would be to `"screen"` or to disk as an image file,
+#' such as `"png"`.
+#' *THIS CURRENTLY HAS BEEN TESTED WITH `ggplot2`, `RasterLayer`, and
+#' `tmap` objects.*
+#' The default (or change with e.g., `fn = "print", usePlot = FALSE`) uses
+#' `Plot` internally, so individual plots may be rearranged. When saved to
 #' disk (e.g., via `type = 'png'`), then `Plot` will not be used and the single object
 #' that is the result of this `Plots` call will be saved to disk.
 #' This function requires at least 2 things: a plotting function and arguments passed
@@ -17,8 +17,8 @@
 #'
 #' @note THIS IS STILL EXPERIMENTAL and could change in the next release.
 #'
-#' \code{Plots} now has experimental support for "just a \code{Plot} call",
-#' but with \code{types} specified.
+#' `Plots` now has experimental support for "just a `Plot` call",
+#' but with `types` specified.
 #' See example.
 #' The devices to save on disk will have some different behaviours to the screen representation,
 #' since "wiping" an individual plot on a device doesn't exist for a file device.
@@ -33,42 +33,42 @@
 #'
 #'
 #' To turn off plotting both to screen and disk, set both
-#' \code{.plotInititalTime = NA} and \code{.plots = NA} or any other
-#' value that will not trigger a TRUE with a \code{grepl} with the \code{types}
-#' argument (e.g., \code{""} will omit all saving).
+#' `.plotInititalTime = NA` and `.plots = NA` or any other
+#' value that will not trigger a TRUE with a `grepl` with the `types`
+#' argument (e.g., `""` will omit all saving).
 #'
 #' @export
 #' @param data An (optional) arbitrary data object. If supplied, it will be passed as
-#'   the first argument to \code{Plot} function, and should contain all the data
+#'   the first argument to `Plot` function, and should contain all the data
 #'   required for the inner plotting. If passing a `RasterLayer`,
-#'   it may be a good idea to set \code{names(RasterLayer)} so that
-#'   multiple layers can be plotted without overlapping eachother. When a custom `fn`
+#'   it may be a good idea to set `names(RasterLayer)` so that
+#'   multiple layers can be plotted without overlapping each other. When a custom `fn`
 #'   is used and all arguments for `fn` are supplied and named, then this can be omitted.
 #'   See examples.
-#' @param fn An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}
+#' @param fn An arbitrary plotting function. If not provided, defaults to using `quickPlot::Plot`
 #' @param filename A name that will be the base for the files that will be saved, i.e,
-#'   do not supply the file extension, as this will be determined based on \code{types}.
-#'   If a user provides this as an absolute path, it will override the \code{path}
+#'   do not supply the file extension, as this will be determined based on `types`.
+#'   If a user provides this as an absolute path, it will override the `path`
 #'   argument.
 #' @param types Character vector, zero or more of types. If used within a module, this
 #'   will be deduced from the `P(sim)$type` and can be omitted. See below.
-#' @param path Currently a single path for the saved objects on disk. If \code{filename}
-#'   is supplied as an absolute path, \code{path} will be set to \code{dirname(filename)},
+#' @param path Currently a single path for the saved objects on disk. If `filename`
+#'   is supplied as an absolute path, `path` will be set to `dirname(filename)`,
 #'   overriding this argument value.
-#' @param .plotInitialTime A numeric. If \code{NA} then no visual on screen. Anything
+#' @param .plotInitialTime A numeric. If `NA` then no visual on screen. Anything
 #'   else will have visuals plotted to screen device. This is here for backwards
 #'   compatibility. A developer should set in the module to the intended initial
-#'   plot time and leave it, i.e., \emph{not} `NA`.
-#' @param ggsaveArgs An optional list of arguments passed to \code{ggplot2::ggsave}
-#' @param deviceArgs An optional list of arguments passed to one of \code{png},
-#'       \code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}.
-#'       This is useful when the plotting function is not creating a \code{ggplot} object,
+#'   plot time and leave it, i.e., *not* `NA`.
+#' @param ggsaveArgs An optional list of arguments passed to `ggplot2::ggsave`
+#' @param deviceArgs An optional list of arguments passed to one of `png`,
+#'       `pdf`, `tiff`, `bmp`, or `jgeg`.
+#'       This is useful when the plotting function is not creating a `ggplot` object,
 #'       e.g., plotting a `RasterLayer`.
 #'
-#' @param usePlot Logical. If \code{TRUE}, the default, then the plot will occur
-#'   with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.
+#' @param usePlot Logical. If `TRUE`, the default, then the plot will occur
+#'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
 #'
-#' @param ... Anything needed by \code{fn}, all named.
+#' @param ... Anything needed by `fn`, all named.
 #'
 #' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs qsave
@@ -78,13 +78,13 @@
 #' @details
 #'
 #' \itemize{
-#'   \item \code{type}
+#'   \item `type`
 #'     \itemize{
-#'       \item \code{"screen"} -- Will plot to the current device, normally a plot window
-#'       \item \code{"object"} -- Will save the plot object, e.g., \code{ggplot} object
-#'       \item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
+#'       \item `"screen"` -- Will plot to the current device, normally a plot window
+#'       \item `"object"` -- Will save the plot object, e.g., `ggplot` object
+#'       \item `"raw"` -- Will save the raw data prior to plotting, e.g.,
 #'                           the data argument
-#'       \item \code{"png"} -- or any other type save-able with \code{ggsave}
+#'       \item `"png"` -- or any other type save-able with `ggsave`
 #'     }
 #' }
 #'
@@ -92,7 +92,7 @@
 #' In cases where files are saved, and where `Plots` is used within a SpaDES module,
 #' the file(s) that is/are saved will be appended to the `outputs` slot of the
 #' `simList` of the module. This will, therefore, keep a record of figures saved
-#' \emph{within} the `simList`
+#' *within* the `simList`
 #'
 #' @examples
 #'
@@ -374,10 +374,10 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
 #'
 #' This will do all the various tests needed to determine whether
 #' plotting of one sort or another will occur. Testing any of the
-#' types as listed in \code{\link{Plots}} argument \code{types}. Only the
+#' types as listed in \code{\link{Plots}} argument `types`. Only the
 #' first 3 letters of the type are required.
 #'
-#' @param .plots Usually will be the \code{P(sim)$.plots} is used within
+#' @param .plots Usually will be the `P(sim)$.plots` is used within
 #'   a module.
 #'
 #' @export

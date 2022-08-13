@@ -1,6 +1,6 @@
-#' Save a whole \code{simList} object to disk
+#' Save a whole `simList` object to disk
 #'
-#' Saving a \code{simList} may not work using the standard approaches (e.g.,
+#' Saving a `simList` may not work using the standard approaches (e.g.,
 #' `save`, `saveRDS`, and `qs::qsave`). There are 2 primary reasons why this doesn't
 #' work as expected: the `activeBindings` that are in place within modules (these
 #' allow the `mod` and `Par` to exist), and file-backed rasters. Because of these,
@@ -11,34 +11,34 @@
 #' large `Raster*` objects. When using `fileBackend = 0` or `fileBackend = 1`, and
 #' when errors are noticed, please file a bug report on GitHub.
 #'
-#' @param sim Either a \code{simList} or a character string of the name
-#'        of a \code{simList} that can be found in \code{envir}. Using
+#' @param sim Either a `simList` or a character string of the name
+#'        of a `simList` that can be found in `envir`. Using
 #'        a character string will assign that object name to the saved
-#'        \code{simList}, so when it is recovered it will be given that
+#'        `simList`, so when it is recovered it will be given that
 #'        name.
-#' @param envir If \code{sim} is a character string, then this must be provided.
-#'        It is the environment where the object named \code{sim} can be found.
+#' @param envir If `sim` is a character string, then this must be provided.
+#'        It is the environment where the object named `sim` can be found.
 #'
-#' @param filename Character string with the path for saving \code{simList} to or
-#'   reading the `simList` from. Currently, only `.rds` and `.qs` filetypes are supported.
+#' @param filename Character string with the path for saving `simList` to or
+#'   reading the `simList` from. Currently, only `.rds` and `.qs` file types are supported.
 #'
-#' @param fileBackend Numeric. \code{0} means don't do anything with
+#' @param fileBackend Numeric. `0` means don't do anything with
 #'        file backed rasters. Leave their file intact as is, in its place.
-#'        \code{1} means save a copy of the file backed rasters in \code{fileBackedDir}.
-#'        \code{2} means move all data in file-backed rasters to memory. This
-#'        means that the objects will be part of the main \code{qs} file
-#'        of the \code{simList}. Default is \code{0}.
-#' @param filebackedDir Only used if \code{fileBackend} is 1.
-#'        \code{NULL}, the default, or Character string. If \code{NULL}, then then the
+#'        `1` means save a copy of the file backed rasters in `fileBackedDir`.
+#'        `2` means move all data in file-backed rasters to memory. This
+#'        means that the objects will be part of the main `qs` file
+#'        of the `simList`. Default is `0`.
+#' @param filebackedDir Only used if `fileBackend` is 1.
+#'        `NULL`, the default, or Character string. If `NULL`, then then the
 #'        files will be copied to the directory:
-#'        \code{file.path(dirname(filename), "rasters")}. A character string
+#'        `file.path(dirname(filename), "rasters")`. A character string
 #'        will be interpreted as a path to copy all rasters to.
-#' @param ... Passed to \code{save}, e.g., \code{compression}
+#' @param ... Passed to `save`, e.g., `compression`
 #'
 #' @return
-#' [saveSimList()]: A saved \code{.qs} file in \code{filename} location.
+#' [saveSimList()]: A saved `.qs` file in `filename` location.
 #'
-#' [zipSimList()]: A saved \code{.zip} file in \code{zipfile} location.
+#' [zipSimList()]: A saved `.zip` file in `zipfile` location.
 #'
 #' @details
 #' There is a family of 4 functions that are mutually useful for saving and
@@ -119,21 +119,21 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' Zip a `simList` and various files
 #'
 #' `zipSimList` will save the `simList` and file-backed `Raster*` objects, plus,
-#' optionally, files identified in \code{outputs(sim)} and \code{inputs(sim)}.
-#' This uses \code{Copy} under the hood, to not affect the original
-#' \code{simList}.
+#' optionally, files identified in `outputs(sim)` and `inputs(sim)`.
+#' This uses `Copy` under the hood, to not affect the original
+#' `simList`.
 #' **VERY experimental**.
 #'
 #' @param ... passed to \code{\link{saveSimList}}, including non-optional ones
-#'    such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}
+#'    such as `filename`. Also see `fileBackend` and `filebackedDir`
 #'    arguments in that function.
-#' @param zipfile A character string indicating the filename for the zip file. Passed to \code{zip}.
-#' @param outputs Logical. If \code{TRUE}, all files identified in
-#'    \code{outputs(sim)} will be included in the zip.
-#' @param inputs Logical. If \code{TRUE}, all files identified in
-#'    \code{inputs(sim)} will be included in the zip.
-#' @param cache Logical. Not yet implemented. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
-#'    zip archive. Defaults to \code{FALSE} as this could be large, and may include many
+#' @param zipfile A character string indicating the filename for the zip file. Passed to `zip`.
+#' @param outputs Logical. If `TRUE`, all files identified in
+#'    `outputs(sim)` will be included in the zip.
+#' @param inputs Logical. If `TRUE`, all files identified in
+#'    `inputs(sim)` will be included in the zip.
+#' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
+#'    zip archive. Defaults to `FALSE` as this could be large, and may include many
 #'    out of date elements. See Details.
 #' @export
 #' @md
@@ -176,14 +176,14 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'     ```
 #' 2. `filebackend = 2`: On-the-fly bringing to memory of all rasters
 #'
-#'     All rasters are brought to memory, and then saved into \code{sim.qs}
+#'     All rasters are brought to memory, and then saved into `sim.qs`
 #'
 #'     ```
 #'     saveSimList(sim, file = "sim.qs", fileBackend = 2)
 #'     simNew <- loadSimList(file = "sim.qs")
 #'     ```
 #'
-#' If \code{cache} is used, it is likely that it should be trimmed before
+#' If `cache` is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   dots <- list(...)
@@ -231,15 +231,15 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
   zip(zipfile = zipfile, files = unname(unlist(fns)))
 }
 
-#' Load a saved \code{simList} and ancillary files
+#' Load a saved `simList` and ancillary files
 #'
 #' Loading a `simList` from file can be problematic as there are non-standard
 #' objects that must be rebuilt. See description in [saveSimList()] for details.
 #'
 #' @param filename Character giving the name of a saved simulation file.
-#'   Currently, only filetypes `.qs` or `.rds` are supported.
+#'   Currently, only file types `.qs` or `.rds` are supported.
 #' @param paths A list of character vectors for all the `simList` paths. When
-#'   loading a \code{simList}, this will replace the paths of everything to
+#'   loading a `simList`, this will replace the paths of everything to
 #'   these new paths. Experimental still.
 #' @param otherFiles A character vector of (absolute) file names locating each of the
 #'   existing file-backed `Raster*` files that are the real paths for the possibly
@@ -378,12 +378,12 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 #'
 #' @export
 #' @param zipfile Filename of a zipped simList
-#' @param load Logical. If \code{TRUE}, the default, then the simList will
+#' @param load Logical. If `TRUE`, the default, then the simList will
 #'   also be loaded into R.
 #' @param ... passed to `unzip`
 #' @rdname loadSimList
 #' @details
-#' If \code{cache} is used, it is likely that it should be trimmed before
+#' If `cache` is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
 unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   zipfile <- normPath(zipfile)

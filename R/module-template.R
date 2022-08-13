@@ -1,7 +1,7 @@
 ################################################################################
 #' Open a file for editing
 #'
-#' RStudio's \code{file.edit} behaves differently than \code{utils::file.edit}.
+#' RStudio's `file.edit` behaves differently than `utils::file.edit`.
 #' The workaround is to have the user manually open the file if they are using RStudio.
 #'
 #' @param file  Character string giving the file path to open.
@@ -32,11 +32,11 @@
 #' Generate a skeleton for a new SpaDES module, a template for a
 #' documentation file, a citation file, a license file, a \file{README.txt} file,
 #' and a folder that contains unit tests information.
-#' The \code{newModuleDocumentation} will not generate the module file, but will
+#' The `newModuleDocumentation` will not generate the module file, but will
 #' create the other files.
 #'
-#' All files will be created within a subdirectory named \code{name} within the
-#' \code{path}:
+#' All files will be created within a subdirectory named `name` within the
+#' `path`:
 #'
 #' \preformatted{
 #'   <path>/
@@ -59,16 +59,16 @@
 #'
 #' @param ...   Additional arguments. Currently, only the following are supported:\cr\cr
 #' \describe{
-#'   \item{\code{children}}{Required when \code{type = "parent"}. A character vector
+#'   \item{`children`}{Required when `type = "parent"`. A character vector
 #'   specifying the names of child modules.}
-#'   \item{\code{open}}{Logical. Should the new module file be opened after creation?
-#'   Default \code{TRUE}.}
-#'   \item{\code{type}}{Character string specifying one of \code{"child"} (default),
-#'   or \code{"parent"}.}
-#'   \item{\code{unitTests}}{Logical. Should the new module include unit test files?
-#'   Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.}
-#'   \item{\code{useGitHub}}{Logical. Is module development happening on GitHub?
-#'   Default \code{TRUE}.}
+#'   \item{`open`}{Logical. Should the new module file be opened after creation?
+#'   Default `TRUE`.}
+#'   \item{`type`}{Character string specifying one of `"child"` (default),
+#'   or `"parent"`.}
+#'   \item{`unitTests`}{Logical. Should the new module include unit test files?
+#'   Default `TRUE`. Unit testing relies on the \pkg{testthat} package.}
+#'   \item{`useGitHub`}{Logical. Is module development happening on GitHub?
+#'   Default `TRUE`.}
 #' }
 #'
 #' @return Nothing is returned. The new module file is created at
@@ -76,10 +76,10 @@
 #' \file{LICENSE}, \file{README}, and \file{tests} directory.
 #'
 #' @note On Windows there is currently a bug in RStudio that prevents the editor
-#' from opening when \code{file.edit} is called.
+#' from opening when `file.edit` is called.
 #' Similarly, in RStudio on macOS, there is an issue opening files where they
 #' are opened in an overlaid window rather than a new tab.
-#' \code{file.edit} does work if the user types it at the command prompt.
+#' `file.edit` does work if the user types it at the command prompt.
 #' A message with the correct lines to copy and paste is provided.
 #'
 #' @author Alex Chubaty and Eliot McIntire
@@ -178,12 +178,12 @@ setMethod(
 #'              The default is the current working directory.
 #'
 #' @param open  Logical. Should the new module file be opened after creation?
-#'              Default \code{TRUE} in an interactive session.
+#'              Default `TRUE` in an interactive session.
 #'
-#' @param type  Character string specifying one of \code{"child"} (default),
-#'              or \code{"parent"}.
+#' @param type  Character string specifying one of `"child"` (default),
+#'              or `"parent"`.
 #'
-#' @param children   Required when \code{type = "parent"}. A character vector
+#' @param children   Required when `type = "parent"`. A character vector
 #'                   specifying the names of child modules.
 #'
 #' @author Eliot McIntire and Alex Chubaty
@@ -404,10 +404,10 @@ use_gha <- function(name, path) {
 #'              The default is the current working directory.
 #'
 #' @param open  Logical. Should the new module file be opened after creation?
-#'              Default \code{TRUE} in an interactive session.
+#'              Default `TRUE` in an interactive session.
 #'
 #' @param useGitHub Logical indicating whether GitHub will be used.
-#'                  If \code{TRUE} (default), creates suitable configuration files (e.g.,
+#'                  If `TRUE` (default), creates suitable configuration files (e.g.,
 #'                  \file{.gitignore}) and configures basic GitHub actions for module code checking.
 #'
 #' @author Eliot McIntire and Alex Chubaty
@@ -455,7 +455,7 @@ setMethod(
 #' Open all modules nested within a base directory
 #'
 #' This is just a convenience wrapper for opening several modules at once, recursively.
-#' A module is defined as any file that ends in \code{.R} or \code{.r} and has a
+#' A module is defined as any file that ends in `.R` or `.r` and has a
 #' directory name identical to its filename. Thus, this must be case sensitive.
 #'
 #' @param name  Character vector with names of modules to open. If missing, then
@@ -464,10 +464,10 @@ setMethod(
 #' @param path  Character string of length 1. The base directory within which
 #'              there are only module subdirectories.
 #'
-#' @return Nothing is returned. All file are open via \code{file.edit}.
+#' @return Nothing is returned. All file are open via `file.edit`.
 #'
 #' @note On Windows there is currently a bug in RStudio that prevents the editor
-#' from opening when \code{file.edit} is called. \code{file.edit} does work if the
+#' from opening when `file.edit` is called. `file.edit` does work if the
 #' user types it at the command prompt. A message with the correct lines to copy
 #' and paste is provided.
 #'
@@ -567,11 +567,11 @@ setMethod("openModules",
 #' @param to    The name of the copy.
 #'
 #' @param path  The path to a local module directory. Defaults to the path set by
-#'              the \code{spades.modulePath} option. See \code{\link{setPaths}}.
+#'              the `spades.modulePath` option. See \code{\link{setPaths}}.
 #'
-#' @param ...   Additional arguments to \code{file.copy}, e.g., \code{overwrite = TRUE}.
+#' @param ...   Additional arguments to `file.copy`, e.g., `overwrite = TRUE`.
 #'
-#' @return Invisible logical indicating success (\code{TRUE}) or failure (\code{FALSE}).
+#' @return Invisible logical indicating success (`TRUE`) or failure (`FALSE`).
 #'
 #' @author Alex Chubaty
 #' @export
@@ -654,11 +654,11 @@ setMethod("copyModule",
 #' @param name    Character string giving the module name.
 #' @param path    A file path to a directory containing the module subdirectory.
 #' @param version The module version.
-#' @param data    Logical. If \code{TRUE}, then the data subdirectory will be included in the zip.
-#'                Default is \code{FALSE}.
+#' @param data    Logical. If `TRUE`, then the data subdirectory will be included in the zip.
+#'                Default is `FALSE`.
 #' @param ...     Additional arguments to \code{\link{zip}}:
-#'                e.g., add \code{"-q"} using \code{flags="-q -r9X"}
-#'                (the default flags are \code{"-r9X"}).
+#'                e.g., add `"-q"` using `flags="-q -r9X"`
+#'                (the default flags are `"-r9X"`).
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export

@@ -110,7 +110,7 @@ function will be run during the \code{simInit} call. The
 developer should ensure that if the object is supplied
 by the module user as an argument in the \code{simInit}, then
 the \code{.inputObjects} should not be run, i.e., use an
-\code{(is.null(sim$xxx)))}.\cr
+\verb{(is.null(sim$xxx)))}.\cr
 \code{outputObjects} \tab A \code{data.frame} specifying the data objects output by
 the module, with columns identical to those in
 \code{inputObjects}. Like \code{inputObjects} above,

@@ -1,37 +1,37 @@
 ################################################################################
-#' Identify synonyms in a \code{simList}
+#' Identify synonyms in a `simList`
 #'
 #' This will create active bindings amongst the synonyms. To minimize copying,
 #' the first one that exists in the character vector will become the "canonical"
 #' object. All others named in the character vector will be activeBindings to
-#' that canonical one.  This synonym list will be assigned to the \code{envir},
-#' as an object named \code{objectSynonyms}. That object will have an attribute
-#' called, \code{bindings} indicating which one is the canonical one and which
+#' that canonical one.  This synonym list will be assigned to the `envir`,
+#' as an object named `objectSynonyms`. That object will have an attribute
+#' called, `bindings` indicating which one is the canonical one and which
 #' is/are the activeBindings. EXPERIMENTAL: If the objects are removed during a
-#' \code{spades} call by, say, a module, then at the end of the event, the
-#' \code{spades} call will replace the bindings. In other words, if a module
+#' `spades` call by, say, a module, then at the end of the event, the
+#' `spades` call will replace the bindings. In other words, if a module
 #' deletes the object, it will "come back". This may not always be desired.
 #'
 #' @param envir  An environment, which in the context of SpaDES.core is usually
-#'               a \code{simList} to find and/or place the \code{objectSynonyms}
+#'               a `simList` to find and/or place the `objectSynonyms`
 #'               object.
 #' @param synonyms A list of synonym character vectors, such as
-#' \code{list(c("age", "ageMap", "age2"), c("veg", "vegMap"))}
+#' `list(c("age", "ageMap", "age2"), c("veg", "vegMap"))`
 #'
 #' @details
 #' This is very experimental and only has minimal tests. Please report if this is
 #' not working, and under what circumstances (e.g., please submit a reproducible example
 #' to our issues tracker)
 #'
-#' This function will append any new \code{objectSynonym} to any pre-existing
-#' \code{objectSynonym} in the \code{envir}. Similarly, this function assumes
+#' This function will append any new `objectSynonym` to any pre-existing
+#' `objectSynonym` in the `envir`. Similarly, this function assumes
 #' transitivity, i.e., if age and ageMap are synonyms, and ageMap and timeSinceFire
 #' are synonyms, then age and timeSinceFire must be synonyms.
 #'
-#' @return Active bindings in the \code{envir} so that all synonyms point to the same
-#' canonical object, e.g., they would be at \code{envir[[synonym[[1]][1]]]} and
-#' \code{envir[[synonym[[1]][2]]]}, if a list of length one is passed into
-#' \code{synonyms}, with a character vector of length two. See examples.
+#' @return Active bindings in the `envir` so that all synonyms point to the same
+#' canonical object, e.g., they would be at `envir[[synonym[[1]][1]]]` and
+#' `envir[[synonym[[1]][2]]]`, if a list of length one is passed into
+#' `synonyms`, with a character vector of length two. See examples.
 #'
 #' @export
 #' @include simList-class.R

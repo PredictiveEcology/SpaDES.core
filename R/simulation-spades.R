@@ -3,22 +3,22 @@ utils::globalVariables(c(".", ".I", "whi"))
 ################################################################################
 #' Process a simulation event
 #'
-#' Internal function called from \code{spades}.
+#' Internal function called from `spades`.
 #'
 #' Calls the module corresponding to the event call, and executes the event.
 #'
 #' Here, we implement a simulation in a more modular fashion so it's easier to add
 #' submodules to the simulation. We use S4 classes and methods.
 #'
-#' @param sim Character string for the \code{simList} simulation object.
+#' @param sim Character string for the `simList` simulation object.
 #' @param useFuture Experimental use of future::future package. Not fully implemented.
 #'
 #' @inheritParams spades
-#' @return Returns the modified \code{simList} object.
+#' @return Returns the modified `simList` object.
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @author Alex Chubaty
 #' @export
@@ -329,13 +329,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #' submodules to the simulation. We use S4 classes and methods, and use `data.table`
 #' instead of `data.frame` to implement the event queue (because it is much faster).
 #'
-#' @param sim            A \code{simList} simulation object.
+#' @param sim            A `simList` simulation object.
 #'
 #' @param eventTime      A numeric specifying the time of the next event.
 #'
 #' @param moduleName     A character string specifying the module from which to
 #'                       call the event. If missing, it will use
-#'                       \code{currentModule(sim)}
+#'                       `currentModule(sim)`
 #'
 #' @param eventType      A character string specifying the type of event from
 #'                       within the module.
@@ -346,10 +346,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'                       grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
 #'                       similar).
 #'                       See \code{\link{priority}}.
-#' @param .skipChecks Logical. If \code{TRUE}, then internal checks that arguments match
+#' @param .skipChecks Logical. If `TRUE`, then internal checks that arguments match
 #'                    expected types are skipped. Should only be used if speed is critical.
 #'
-#' @return Returns the modified \code{simList} object.
+#' @return Returns the modified `simList` object.
 #'
 #' @include priority.R
 #' @export
@@ -360,7 +360,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #' \dontrun{
@@ -464,31 +464,31 @@ scheduleEvent <- function(sim,
 #'
 #' Adds a new event to the simulation's conditional event queue,
 #' updating the simulation object by creating or appending to
-#' \code{sim$._conditionalEvents}.
-#' \emph{This is very experimental. Use with caution.}
+#' `sim$._conditionalEvents`.
+#' *This is very experimental. Use with caution.*
 #'
 #' @inheritParams scheduleEvent
 #'
 #' @param minEventTime   A numeric specifying the time before which the event should not occur,
-#'         even if the condition is met. Defaults to \code{start(sim)}
+#'         even if the condition is met. Defaults to `start(sim)`
 #'
 #' @param maxEventTime   A numeric specifying the time after which the event should not occur,
-#'         even if the condition is met. Defaults to \code{end(sim)}
+#'         even if the condition is met. Defaults to `end(sim)`
 #'
-#' @param condition A string, call or expression that will be assessed for \code{TRUE}
+#' @param condition A string, call or expression that will be assessed for `TRUE`
 #'      after each event in the regular event queue.
-#'      It can access objects in the \code{simList} by using functions of \code{sim},
-#'      e.g., \code{"sim$age > 1"}
+#'      It can access objects in the `simList` by using functions of `sim`,
+#'      e.g., `"sim$age > 1"`
 #'
-#' @return Returns the modified \code{simList} object, i.e., \code{sim$._conditionalEvents}.
+#' @return Returns the modified `simList` object, i.e., `sim$._conditionalEvents`.
 #'
 #' This conditional event queue will be assessed at every single event in the normal event
-#' queue. If there are no conditional events, then \code{spades} will proceed as normal.
+#' queue. If there are no conditional events, then `spades` will proceed as normal.
 #' As conditional event conditions are found to be true, then it will trigger a call to
-#' \code{scheduleEvent(...)} with the current time passed to \code{eventTime} \emph{and}
+#' `scheduleEvent(...)` with the current time passed to `eventTime` *and*
 #' it will remove the conditional event from the conditional queue.
 #' If the user would like the triggered conditional event to occur as the very next event,
-#' then a possible strategy would be to set \code{eventPriority} of the conditional event
+#' then a possible strategy would be to set `eventPriority` of the conditional event
 #' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
 #' @include priority.R
@@ -500,7 +500,7 @@ scheduleEvent <- function(sim,
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #'   sim <- simInit(times = list(start = 0, end = 2))
@@ -625,156 +625,155 @@ scheduleConditionalEvent <- function(sim,
 #' submodules to the simulation. We use S4 classes and methods, and use `data.table`
 #' instead of `data.frame` to implement the event queue (because it is much faster).
 #'
-#' @param sim A \code{simList} simulation object, generally produced by \code{simInit}.
+#' @param sim A `simList` simulation object, generally produced by `simInit`.
 #'
-#' @param debug Optional tools for invoking debugging. Supplying a \code{list}
-#'              will invoke the more powerful \code{logging} package. See details.
-#'              Default is to use the value in \code{getOption("spades.debug")}.
+#' @param debug Optional tools for invoking debugging. Supplying a `list`
+#'              will invoke the more powerful `logging` package. See details.
+#'              Default is to use the value in `getOption("spades.debug")`.
 #'
-#' @param progress Logical (\code{TRUE} or \code{FALSE} show a graphical progress bar),
-#'                 character (\code{"graphical"}, \code{"text"}) or numeric indicating
+#' @param progress Logical (`TRUE` or `FALSE` show a graphical progress bar),
+#'                 character (`"graphical"`, `"text"`) or numeric indicating
 #'                 the number of update intervals to show in a graphical progress bar.
 #'
-#' @param cache Logical. If \code{TRUE}, then the \code{spades} call will be cached.
-#'              This means that if the call is made again with the same \code{simList},
-#'              then `spades`` will return the return value from the previous run
-#'              of that exact same \code{simList}. Default \code{FALSE}. See Details.
+#' @param cache Logical. If `TRUE`, then the `spades` call will be cached.
+#'              This means that if the call is made again with the same `simList`,
+#'              then `spades` will return the return value from the previous run
+#'              of that exact same `simList`. Default `FALSE`. See Details.
 #'              See also the vignette on caching for examples.
 #'
-#' @param .plotInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
+#' @param .plotInitialTime Numeric. Temporarily override the `.plotInitialTime`
 #'                                  parameter for all modules. See Details.
 #'
-#' @param .saveInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
+#' @param .saveInitialTime Numeric. Temporarily override the `.plotInitialTime`
 #'                                  parameter for all modules. See Details.
 #'
 #' @param .plots Character. Sets the parameter of this name in all modules.
 #'   See \code{\link{Plots}} for possible values. The parameter is intended to slowly
-#'   take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-#'   For backwards compatibility, if \code{.plotInitialTime} is not set
-#'   in this \code{spades} call, but this
-#'   \code{.plots} is used, two things will happen: setting this without \code{"screen"}
-#'   will turn off all plotting; setting this with \code{"screen"} will trigger
+#'   take over from `.plotInitialTime` as a mechanism to turn on or off plotting.
+#'   For backwards compatibility, if `.plotInitialTime` is not set in this `spades` call,
+#'   but this `.plots` is used, two things will happen: setting this without `"screen"`
+#'   will turn off all plotting; setting this with `"screen"` will trigger
 #'   plotting for any modules that use this parameter but will have no effect on
 #'   other modules. To get plotting, therefore, it may be necessary to also set
-#'   \code{.plotInitialTime = start(sim)}.
+#'   `.plotInitialTime = start(sim)`.
 #'
-#' @param notOlderThan Date or time. Passed to \code{reproducible::Cache} to update the cache.
-#'                     Default is \code{NULL}, meaning don't update the cache.
-#'                     If \code{Sys.time()} is provided, then it will force a recache,
+#' @param notOlderThan Date or time. Passed to `reproducible::Cache` to update the cache.
+#'                     Default is `NULL`, meaning don't update the cache.
+#'                     If `Sys.time()` is provided, then it will force a recache,
 #'                     i.e., remove old value and replace with new value.
-#'                     Ignored if \code{cache} is \code{FALSE}.
+#'                     Ignored if `cache` is `FALSE`.
 #' @param events A character vector or a named list of character vectors. If specified,
 #'   the simulations will only do the events indicated here. If a named list, the names
 #'   must correspond to the modules and the character vectors can be specific events within
-#'   each of the named modules. With the \code{list} form, all unspecified modules
-#'   will run \emph{all} their events, including internal spades modules, e.g., \code{save},
-#'   that get invoked with the \code{outputs} argument in  \code{simInit}. See example.
+#'   each of the named modules. With the `list` form, all unspecified modules
+#'   will run *all* their events, including internal spades modules, e.g., `save`,
+#'   that get invoked with the `outputs` argument in  `simInit`. See example.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
-#'            This will be included in the \code{Cache} call, so will be unique
-#'            and thus \code{spades} will not use a cached copy as long as
-#'            anything passed in \code{...} is unique, i.e., not cached previously.
+#'            This will be included in the `Cache` call, so will be unique
+#'            and thus `spades` will not use a cached copy as long as
+#'            anything passed in `...` is unique, i.e., not cached previously.
 #'
-#' @return Invisibly returns the modified \code{simList} object.
+#' @return Invisibly returns the modified `simList` object.
 #'
 #' @seealso \code{\link{SpaDES.core-package}},
 #' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
-#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
+#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html> which
 #' uses \code{\link[reproducible]{Cache}}.
 #'
 #'
 #' @details
 #' The is the workhorse function in the SpaDES package. It runs simulations by
-#' implementing the rules outlined in the \code{simList}.
+#' implementing the rules outlined in the `simList`.
 #'
 #' This function gives simple access to two sets of module parameters:
-#' \code{.plotInitialTime} and with \code{.plotInitialTime}. The primary use of
+#' `.plotInitialTime` and with `.plotInitialTime`. The primary use of
 #' these arguments is to temporarily turn off plotting and saving. "Temporary"
-#' means that the \code{simList} is not changed, so it can be used again with
+#' means that the `simList` is not changed, so it can be used again with
 #' the simList values reinstated. To turn off plotting and saving, use
-#' \code{.plotInitialTime = NA} or \code{.saveInitialTime = NA}. NOTE: if a
-#' module did not use \code{.plotInitialTime} or \code{.saveInitialTime}, then
+#' `.plotInitialTime = NA` or `.saveInitialTime = NA`. NOTE: if a
+#' module did not use `.plotInitialTime` or `.saveInitialTime`, then
 #' these arguments will not do anything.
 #'
 #' @section Caching with SpaDES:
 #'
 #' There are numerous ways in which Caching can be used within SpaDES. Please
 #' see the vignette
-#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
+#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html>
 #' for many examples. Briefly, functions, events, modules, entire spades calls or
-#' experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experiment})
+#' experiment calls (see <https://github.com/PredictiveEcology/SpaDES.experiment>)
 #' can be cached and mixtures of all of these will work. For functions, simply
-#' wrap the call with \code{Cache}, moving the original function name into
-#' the first argument of Cache. For events or modules, set the module \code{parameters},
-#' \code{.useCache}, e.g.,
-#' \code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
+#' wrap the call with `Cache`, moving the original function name into
+#' the first argument of Cache. For events or modules, set the module `parameters`,
+#' `.useCache`, e.g.,
+#' `simInit(..., parameters = list(myModule = list(.useCache = "init")))`.
 #' This can be set to an event name, which will cache that event, or a logical (e.g., \code{}),
-#' which will cache \emph{every} event in that module. Event and module caching
+#' which will cache *every* event in that module. Event and module caching
 #' makes most sense when the event or module only runs once, such as an initialization
 #' or data preparation event/module. Caching an entire simulation is actually just
-#' a function call to \code{simInitAndSpades}, for example. So, simply writing
-#' \code{Cache(simInitAndSpades, modules = ...)} will effectively cache a whole simulation.
+#' a function call to `simInitAndSpades`, for example. So, simply writing
+#' `Cache(simInitAndSpades, modules = ...)` will effectively cache a whole simulation.
 #' Finally for experiments, it is just like a function call:
-#' \code{Cache(simInitandExperiment, ...)}. The final way Caching can be done is in
-#' \code{experiment} or \code{spades}, by setting the \code{cache} argument.
+#' `Cache(simInitandExperiment, ...)`. The final way Caching can be done is in
+#' `experiment` or `spades`, by setting the `cache` argument.
 #'
-#' If \code{cache} is TRUE, this allows for a seamless way to "save" results
+#' If `cache` is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
-#' Instead, upon a call to \code{spades} in which the simList is identical,
+#' Instead, upon a call to `spades` in which the simList is identical,
 #' the function will simply return the result that would have come if it had
 #' been rerun. Use this with caution, as it will return exactly the result from
 #' a previous run, even if there is stochasticity internally.
 #' Caching is only based on the input simList.
 #' See also the vignette on caching for examples.
 #'
-#' @section \code{debug}:
+#' @section `debug`:
 #'
-#' The most powerful way to use debug is to invoke the \code{logging}
-#' R package. To invoke this, \code{debug} must be a list with up to 3
+#' The most powerful way to use debug is to invoke the `logging`
+#' R package. To invoke this, `debug` must be a list with up to 3
 #' named elements:
-#' \code{console}, \code{file}, and \code{debug}. Each of these list elements
-#' must be a list (including empty \code{list()} for defaults) with the
+#' `console`, `file`, and `debug`. Each of these list elements
+#' must be a list (including empty `list()` for defaults) with the
 #' sub-list elements here:
 #' \tabular{lll}{
-#'   \code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-#'   \code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
+#'   `console` \tab `level` \tab The `level`, see below, of information shown\cr
+#'   `file` \tab `append` \tab Logical. If `TRUE`, the default, then
 #'                                       log entries are appended to file, if it exists\cr
-#'               \tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
-#'               \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-#'   \code{debug} \tab See possible values below\cr
+#'               \tab `file` \tab A filename. Defaults to `log.txt`\cr
+#'               \tab `level` \tab The `level`, see below, of information shown\cr
+#'   `debug` \tab See possible values below\cr
 #'   }
 #'
-#' \code{level} can be a number from 0 to 100 or a character string matching one
-#' of the values in \code{logging::loglevels}. These are hierarchical levels of
+#' `level` can be a number from 0 to 100 or a character string matching one
+#' of the values in `logging::loglevels`. These are hierarchical levels of
 #' information passed to the console. Set a lower number for more information and a
-#' higher number for less information. Errors in code will be shown if \code{level}
-#' is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if
-#' \code{level} is set to \code{"WARN"} or \code{30} or above;
+#' higher number for less information. Errors in code will be shown if `level`
+#' is set to `"ERROR"` or `40` or above; warnings in code will be shown if
+#' `level` is set to `"WARN"` or `30` or above;
 #' normal messages in code will
-#' be shown if \code{level} is set to \code{"INFO"} or \code{20} or above. For
+#' be shown if `level` is set to `"INFO"` or `20` or above. For
 #' consistency with base R messaging, if default level is used, then normal
-#' messaging via \code{message} will be shown; this means that \code{suppressMessages}
-#' will work to suppress messaging only when level is set to \code{"INFO"} or \code{20}.
+#' messaging via `message` will be shown; this means that `suppressMessages`
+#' will work to suppress messaging only when level is set to `"INFO"` or `20`.
 #' Some functions in the SpaDES ecosystem may have information at the lower levels,
 #' but currently, there are few to none.
 #'
-#' \code{debug} is specified as a non-list argument to \code{spades} or as
-#' \code{list(debug = ...)}, then it can be a logical, a quoted call, a character vector
+#' `debug` is specified as a non-list argument to `spades` or as
+#' `list(debug = ...)`, then it can be a logical, a quoted call, a character vector
 #' or a numeric scalar (currently 1 or 2) or a list of any of these to get multiple
 #' outputs. This will be run at the start of every event. The following options for debug
 #' are available. Each of these can also be in a list to get multiple outputs:
 #'
 #' \tabular{ll}{
-#'   \code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
+#'   `TRUE` \tab `current(sim)` will be printed at the start of each event as
 #'                     it runs\cr
 #'   a function name (as character string) \tab If a function, then it will be run on the
 #'                                            simList, e.g., "time" will run
-#'                                            \code{time(sim)} at each event.\cr
+#'                                            `time(sim)` at each event.\cr
 #'   moduleName (as character string) \tab All calls to that module will be entered
 #'                                         interactively\cr
 #'   eventName (as character string) \tab All calls that have that event name (in any module)
 #'                                        will be entered interactively\cr
-#'   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+#'   `c(<moduleName>, <eventName>)`  \tab Only the event in that specified module
 #'                                             will be entered into. \cr
 #'   Any other R expression expressed as a character string or quoted call \tab
 #'                                 Will be evaluated with access to the simList as 'sim'.
@@ -785,21 +784,21 @@ scheduleConditionalEvent <- function(sim,
 #' }
 #'
 #' If not specified in the function call, the package
-#' option \code{spades.debug} is used.
+#' option `spades.debug` is used.
 #'
-#' If \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+#' If `options("spades.browserOnError" = TRUE)` (experimental still) if
 #' there is an error, it will attempt to open a browser
-#' in the event where the error occurred. You can edit, and then press \code{c} to continue
-#' or \code{Q} to quit, plus all other normal interactive browser tools.
-#' \code{c} will trigger a reparse and events will continue as scheduled, starting
+#' in the event where the error occurred. You can edit, and then press `c` to continue
+#' or `Q` to quit, plus all other normal interactive browser tools.
+#' `c` will trigger a reparse and events will continue as scheduled, starting
 #' with the one just edited. There may be some unexpected consequences if the
-#' \code{simList} objects had already been changed before the error occurred.
+#' `simList` objects had already been changed before the error occurred.
 #'
 #' @note The debug option is primarily intended to facilitate building simulation
 #' models by the user.
 #' Will print additional outputs informing the user of updates to the values of
-#' various \code{simList} slot components.
-#' See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details.
+#' various `simList` slot components.
+#' See <https://github.com/PredictiveEcology/SpaDES/wiki/Debugging> for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @importFrom data.table setDTthreads
@@ -807,7 +806,7 @@ scheduleConditionalEvent <- function(sim,
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #' \dontrun{
@@ -1888,10 +1887,10 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #' Alternative way to define events in SpaDES.core
 #'
 #' There are two ways to define what occurs during an event: defining a function
-#' called doEvent.\emph{moduleName}, where \emph{moduleName} is the actual module name. This
+#' called doEvent.*moduleName*, where *moduleName* is the actual module name. This
 #' approach is the original approach used in SpaDES.core, and it must have an
-#' explicit \code{switch} statement branching on \code{eventType}. The newer approach
-#' (still experimental) uses \code{defineEvent}. Instead of creating the
+#' explicit `switch` statement branching on `eventType`. The newer approach
+#' (still experimental) uses `defineEvent`. Instead of creating the
 #' function called, `doEvent.XXXX`, where XXXX is the module name, it creates one function
 #' for each event, each with the name `doEvent.XXXX.YYYY`, where `YYYY` is the event
 #' name. This may be a little bit cleaner, but both with still work.
@@ -1902,7 +1901,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'    used within a module, then it will try to find the module name.
 #' @param code An expression that defines the code to execute during the event. This will
 #'    be captured, and pasted into a new function (`doEvent.XXXX.YYYY`), where `XXXX` is the
-#'    \code{moduleName} and \code{YYYY} is the \code{eventName}, remaining unevaluated until
+#'    `moduleName` and `YYYY` is the `eventName`, remaining unevaluated until
 #'    that new function is called.
 #' @param envir An optional environment to specify where to put the resulting function.
 #'     The default will place a function called `doEvent.moduleName.eventName` in the

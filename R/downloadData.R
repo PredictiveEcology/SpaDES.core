@@ -2,12 +2,12 @@ utils::globalVariables(c("expectedFile", "result"))
 
 #' Extract a url from module metadata
 #'
-#' This will get the \code{sourceURL} for the object named.
+#' This will get the `sourceURL` for the object named.
 #'
 #' @param objectName A character string of the object name in the metadata.
-#' @param sim A \code{simList} object from which to extract the \code{sourceURL}
+#' @param sim A `simList` object from which to extract the `sourceURL`
 #' @param module An optional character string of the module name whose metadata is
-#'               to be used. If omitted, the function will use the \code{currentModule(sim)},
+#'               to be used. If omitted, the function will use the `currentModule(sim)`,
 #'               if defined.
 #'
 #' @return The url.
@@ -62,8 +62,8 @@ setMethod(
 #' Verify (and optionally write) checksums for data files in a module's
 #' \file{data/} subdirectory. The file \file{data/CHECKSUMS.txt} contains the
 #' expected checksums for each data file.
-#' Checksums are computed using \code{reproducible:::.digest}, which is simply a
-#' wrapper around \code{digest::digest}.
+#' Checksums are computed using `reproducible:::.digest`, which is simply a
+#' wrapper around `digest::digest`.
 #'
 #' Modules may require data that for various reasons cannot be distributed with
 #' the module source code. In these cases, the module developer should ensure
@@ -77,26 +77,26 @@ setMethod(
 #' one checksum value per file.
 #' To update your \file{CHECKSUMS.txt} files using the new algorithm:
 #' \enumerate{
-#'   \item specify your module (\code{moduleName <- "my_module"});
+#'   \item specify your module (`moduleName <- "my_module"`);
 #'   \item use a temp dir to ensure all modules get fresh copies of the data
-#'         (\code{tmpdir <- file.path(tempdir(), "SpaDES_modules")});
-#'   \item download your module's data to the temp dir (\code{downloadData(moduleName, tmpdir)});
+#'         (`tmpdir <- file.path(tempdir(), "SpaDES_modules")`);
+#'   \item download your module's data to the temp dir (`downloadData(moduleName, tmpdir)`);
 #'   \item initialize a dummy simulation to ensure any 'data prep' steps in the
-#'         \code{.inputObjects} section are run (\code{simInit(modules = moduleName)});
+#'         `.inputObjects` section are run (`simInit(modules = moduleName)`);
 #'   \item recalculate your checksums and overwrite the file
-#'         (\code{checksums(moduleName, tmpdir, write = TRUE)});
+#'         (`checksums(moduleName, tmpdir, write = TRUE)`);
 #'   \item copy the new checksums file to your working module directory
 #'         (the one not in the temp dir)
-#'         (\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+#'         (`file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
 #'                to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
-#'                overwrite = TRUE)}).
+#'                overwrite = TRUE)`).
 #' }
 #'
 #' @param module  Character string giving the name of the module.
 #'
 #' @param path    Character string giving the path to the module directory.
-#' @param ... Passed to \code{\link[reproducible]{Checksums}}, notably, \code{write},
-#'            \code{quickCheck},  \code{checksumFile} and \code{files}.
+#' @param ... Passed to \code{\link[reproducible]{Checksums}}, notably, `write`,
+#'            `quickCheck`,  `checksumFile` and `files`.
 #' @importFrom reproducible Checksums
 checksums <- function(module, path, ...) {
   path <- if (length(module)) {
@@ -144,53 +144,53 @@ remoteFileSize <- function(url) {
 #' directory, or if there is a checksum mismatch indicating that the file is not
 #' the correct one.
 #'
-#' \code{downloadData} requires a checksums file to work, as it will only download
+#' `downloadData` requires a checksums file to work, as it will only download
 #'  the files specified therein. Hence, module developers should make sure they
-#'  have manually downloaded all the necessary data and ran \code{checksums} to
+#'  have manually downloaded all the necessary data and ran `checksums` to
 #'  build a checksums file.
 #'
 #' There is an experimental attempt to use the \pkg{googledrive} package to download
 #' data from a shared (publicly or with individual users) file.
-#' To try this, put the Google Drive URL in \code{sourceURL} argument of
-#' \code{expectsInputs} in the module metadata, and put the filename once downloaded
-#' in the \code{objectName} argument.
+#' To try this, put the Google Drive URL in `sourceURL` argument of
+#' `expectsInputs` in the module metadata, and put the filename once downloaded
+#' in the `objectName` argument.
 #' If using RStudio Server, you may need to use "out of band" authentication by
-#' setting \code{options(httr_oob_default = TRUE)}.
-#' To avoid caching of Oauth credentials, set \code{options(httr_oauth_cache = TRUE)}.
+#' setting `options(httr_oob_default = TRUE)`.
+#' To avoid caching of Oauth credentials, set `options(httr_oauth_cache = TRUE)`.
 #'
 #' There is also an experimental option for the user to make a new \file{CHECKSUMS.txt}
-#' file if there is a \code{sourceURL} but no entry for that file.
+#' file if there is a `sourceURL` but no entry for that file.
 #' This is experimental and should be used with caution.
 #'
 #' @param module  Character string giving the name of the module.
 #'
 #' @param path    Character string giving the path to the module directory.
 #'
-#' @param quiet   Logical. This is passed to \code{download.file}. Default is FALSE.
+#' @param quiet   Logical. This is passed to `download.file`. Default is FALSE.
 #'
-#' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
-#'                   use \code{file.size} instead of \code{digest::digest}.
+#' @param quickCheck Logical. If `TRUE`, then the check with local data will only
+#'                   use `file.size` instead of `digest::digest`.
 #'                   This is faster, but potentially much less robust.
 #'
 #' @param overwrite Logical. Should local data files be overwritten in case they exist?
-#'                  Default is \code{FALSE}.
+#'                  Default is `FALSE`.
 #'
 #' @param files A character vector of length 1 or more if only a subset of files should be
 #'              checked in the \file{CHECKSUMS.txt} file.
 #'
-#' @param checked The result of a previous \code{checksums} call. This should only be used when
-#'         there is no possibility that the file has changed, i.e., if \code{downloadData} is
+#' @param checked The result of a previous `checksums` call. This should only be used when
+#'         there is no possibility that the file has changed, i.e., if `downloadData` is
 #'         called from inside another function.
 #'
 #' @param urls Character vector of urls from which to get the data. This is automatically
 #'             found from module metadata when this function invoked with
-#'            \code{SpaDES.core::downloadModule(..., data = TRUE)}. See also
+#'            `SpaDES.core::downloadModule(..., data = TRUE)`. See also
 #'            \code{\link{prepInputs}}.
 #'
 #' @param children The character vector of child modules (without path) to also
-#'                 run \code{downloadData} on
+#'                 run `downloadData` on
 #'
-#' @param ... Passed to \code{\link[reproducible]{preProcess}}, e.g., \code{purge}
+#' @param ... Passed to \code{\link[reproducible]{preProcess}}, e.g., `purge`
 #'
 #' @return Invisibly, a list of downloaded files.
 #'

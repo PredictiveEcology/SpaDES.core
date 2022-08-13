@@ -150,15 +150,15 @@ See more details below.
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
 \tabular{lll}{
-\bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
+\strong{What} \tab \strong{Details} \tab \strong{Argument(s) to use} \cr
 fills \code{simList} slots \tab places the arguments \code{times},
 \code{params}, \code{modules}, \code{paths} into equivalently named
 \code{simList} slots \tab \code{times},
 \code{params}, \code{modules}, \code{paths}\cr
 sources all module files \tab places all function definitions in the
 \code{simList}, specifically, into a sub-environment of the main
-\code{simList} environment: e.g., \code{sim$<moduleName>$function1}
-(see section on \bold{Scoping}) \tab \code{modules} \cr
+\code{simList} environment: e.g., \verb{sim$<moduleName>$function1}
+(see section on \strong{Scoping}) \tab \code{modules} \cr
 copies objects \tab from the global environment to the
 \code{simList} environment \tab \code{objects} \cr
 loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
@@ -187,8 +187,7 @@ it says \code{TRUE}. Here we can override that default with:
 \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
 Since this is a list of lists, one can override the module defaults for multiple
 parameters from multiple modules all at once, with say:
-\code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
-           caribouModule = list(N = 1000))}.
+\code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2), caribouModule = list(N = 1000))}.
 
 The \code{params} list can contain a list (named \code{.globals}) of named objects
 e.g., \code{.globals = list(climateURL = "https:\\\\something.com")} entry. Any and every
@@ -238,7 +237,7 @@ for successful initialization.
 
 
 The \code{simInit} function will attempt to find usage of \code{sim$xxx} or \code{sim[['xxx']]}
-on either side of the assignment (\code{<-}) operator.
+on either side of the assignment (\verb{<-}) operator.
 It will compare these to the module metadata, specifically \code{inputObjects} for cases where
 objects or "gotten" from the \code{simList} and \code{outputObjects} for cases where objects are
 assigned to the \code{simList.}

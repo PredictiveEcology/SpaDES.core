@@ -52,7 +52,7 @@ version 1.0.10
 * now `spades` messaging when e.g., `debug = 1` can correctly accommodate nested `spades` calls, i.e., a SpaDES module calling `spades` internally.
 * `newModule` now puts `SpaDES.core` dependency in the correct `reqdPkgs` instead of `version` metadata element
 * to further the transition to using `.plots` instead of `.plotInitialTime`, `Plots` will check whether `.plotInitialTime` is actually set in the module metadata first.
-  Only if it is there, will it evaluate its value. Currently, modules get default values for `.plotInitialTime` even if the module developer didn't include it in the module metadata. 
+  Only if it is there, will it evaluate its value. Currently, modules get default values for `.plotInitialTime` even if the module developer did not include it in the module metadata. 
 
 ## dependency changes
 * drop support for R 3.6 (#178)

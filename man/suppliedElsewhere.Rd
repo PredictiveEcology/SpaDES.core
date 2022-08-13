@@ -36,12 +36,12 @@ to proceed in getting and assigning its default value.
 }
 \details{
 \code{where} indicates which of three places to search, either \code{"sim"} i.e.,
-the \code{simList}, which would be equivalent to \code{is.null(sim\$objName)}, or
+the \code{simList}, which would be equivalent to \verb{is.null(sim\\$objName)}, or
 \code{"user"} which would be supplied by the user in the \code{simInit} function
 call via \code{outputs} or \code{inputs} (equivalent to
-\code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
-or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
-the present one \bold{will} create it as part of its outputs (i.e., as indicated by
+\verb{(!('defaultColor' \\\%in\\\% sim$.userSuppliedObjNames))}),
+or \code{"initEvent"}, which would test whether a module that gets loaded \strong{before}
+the present one \strong{will} create it as part of its outputs (i.e., as indicated by
 \code{createsOutputs} in that module's metadata). There is a caveat to this test,
 however; if that other event also has the object as an \code{expectsInput}, then
 it would fail this test, as it \emph{also} needs it as an input.

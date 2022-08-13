@@ -1,6 +1,6 @@
 #' Defaults values used in defineModule
 #'
-#' Where individual elements are missing in \code{defineModule},
+#' Where individual elements are missing in `defineModule`,
 #' these defaults will be used.
 #' @export
 #'
@@ -38,105 +38,105 @@ moduleDefaults <- list(
 #' @section Required metadata elements:
 #'
 #' \tabular{ll}{
-#'    \code{name} \tab Module name. Must match the filename (without the \code{.R} extension).
+#'    `name` \tab Module name. Must match the filename (without the `.R` extension).
 #'                     This is currently not parsed by SpaDES;
 #'                         it is for human readers only. \cr
-#'    \code{description} \tab Brief description of the module.
+#'    `description` \tab Brief description of the module.
 #'                            This is currently not parsed by SpaDES;
 #'                            it is for human readers only. \cr
-#'    \code{keywords} \tab Author-supplied keywords.
+#'    `keywords` \tab Author-supplied keywords.
 #'                         This is currently not parsed by SpaDES;
 #'                         it is for human readers only. \cr
-#'    \code{childModules} \tab If this contains any character vector, then it will
+#'    `childModules` \tab If this contains any character vector, then it will
 #'                             be treated as a parent module. If this is a parent module,
 #'                             then only this list entry will be read. For normal,
-#'                             i.e., 'child modules', this should be \code{character(0)} or
-#'                             \code{NA}.
+#'                             i.e., 'child modules', this should be `character(0)` or
+#'                             `NA`.
 #'                             If a character vector is provided, then these must be the
 #'                             names of the modules located in the same file path as this
-#'                             parent module that will be loaded during the \code{simInit}.\cr
-#'    \code{authors} \tab Module author information (as a vector of \code{\link{person}}
+#'                             parent module that will be loaded during the `simInit`.\cr
+#'    `authors` \tab Module author information (as a vector of \code{\link{person}}
 #'                        objects. This is currently not parsed by SpaDES;
 #'                        it is for human readers only.\cr
-#'    \code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
+#'    `version` \tab Module version number (will be coerced to \code{\link{numeric_version}}
 #'                        if a character or numeric are supplied).
 #'                        The module developer should update manually this with each change
-#'                        that is made to the module. See \url{https://semver.org/}
+#'                        that is made to the module. See <https://semver.org/>
 #'                        for a widely accepted standard for version numbering.\cr
-#'    \code{spatialExtent} \tab The spatial extent of the module supplied via
-#'                              \code{raster::extent}. This is currently unimplemented.
+#'    `spatialExtent` \tab The spatial extent of the module supplied via
+#'                              `raster::extent`. This is currently unimplemented.
 #'                              Once implemented, this should define what spatial region this
 #'                              module is scientifically reasonable to be used in.\cr
-#'    \code{timeframe} \tab Vector (length 2) of POSIXt dates specifying the temporal extent
+#'    `timeframe` \tab Vector (length 2) of POSIXt dates specifying the temporal extent
 #'                          of the module. Currently unimplemented.
 #'                          Once implemented, this should define what time frame this
 #'                          module is scientifically reasonable to be used for.\cr
-#'    \code{timeunit} \tab Time scale of the module (e.g., "day", "year"). If this is
-#'                         not specified, then \code{.timeunitDefault()} will be used.
+#'    `timeunit` \tab Time scale of the module (e.g., "day", "year"). If this is
+#'                         not specified, then `.timeunitDefault()` will be used.
 #'                         It indicates what '1' unit of time
-#'                         means for this module. \code{SpaDES} interprets this
-#'                         and if modules have different \code{timeunit} values
+#'                         means for this module. `SpaDES` interprets this
+#'                         and if modules have different `timeunit` values
 #'                         then it will correctly schedule each module, using the
 #'                         smallest (currently the default) timeunit as the
-#'                         'model' timeunit in the \code{spades} call.\cr
-#'    \code{citation} \tab List of character strings specifying module citation information.
-#'                         Alternatively, a list of filenames of \code{.bib} or similar files.
+#'                         'model' timeunit in the `spades` call.\cr
+#'    `citation` \tab List of character strings specifying module citation information.
+#'                         Alternatively, a list of filenames of `.bib` or similar files.
 #'                         This is currently not parsed by SpaDES;
 #'                         it is for human readers only.\cr
-#'    \code{documentation} \tab List of filenames referring to module documentation sources.
+#'    `documentation` \tab List of filenames referring to module documentation sources.
 #'                              This is currently not parsed by SpaDES;
 #'                              it is for human readers only.\cr\cr
-#'    \code{reqdPkgs} \tab List of R package names required by the module. These
-#'                         packages will be loaded when \code{simInit} is called.
+#'    `reqdPkgs` \tab List of R package names required by the module. These
+#'                         packages will be loaded when `simInit` is called.
 #'                         \code{\link[Require]{Require}} will be used internally
 #'                         to load if available, and install if not available.
 #'                         Because \code{\link[Require]{Require}} can also download from
 #'                         GitHub.com, these packages can specify package names stored
-#'                         on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
-#'    \code{parameters} \tab A data.frame specifying the parameters used in the module.
-#'                           Usually produced by \code{rbind}-ing the outputs of multiple
+#'                         on GitHub, e.g., `"PredictiveEcology/SpaDES.core@development"`. \cr
+#'    `parameters` \tab A data.frame specifying the parameters used in the module.
+#'                           Usually produced by `rbind`-ing the outputs of multiple
 #'                           \code{\link{defineParameter}} calls. These parameters indicate
 #'                           the default values that will be used unless a module user
-#'                           overrides them with the \code{params} argument in the
+#'                           overrides them with the `params` argument in the
 #'                           \code{\link{simInit}} call. The minimum and maximum are
-#'                           currently used by the \code{SpaDES.shiny::shine} function and the
-#'                           \code{POM} function, and they should indicate the range
+#'                           currently used by the `SpaDES.shiny::shine` function and the
+#'                           `POM` function, and they should indicate the range
 #'                           of values that are reasonable scientifically.\cr
-#'    \code{inputObjects} \tab A \code{data.frame} specifying the data objects expected as
+#'    `inputObjects` \tab A `data.frame` specifying the data objects expected as
 #'                             inputs to the module,
-#'                             with columns \code{objectName} (class \code{character}),
-#'                             \code{objectClass} (class \code{character}),
-#'                             \code{sourceURL} (class \code{character}), and \code{other}
+#'                             with columns `objectName` (class `character`),
+#'                             `objectClass` (class `character`),
+#'                             `sourceURL` (class `character`), and `other`
 #'                              (currently spades does nothing with this column).
 #'                             This data.frame identifies the objects that are expected,
 #'                             but does not do any loading of that object into the simList.
-#'                             The \code{sourceURL} gives the developer the opportunity
+#'                             The `sourceURL` gives the developer the opportunity
 #'                             to identify the source of a data file that can be used
 #'                             with the model. This URL will be
-#'                             used if the user calls \code{downloadData} (or
-#'                             \code{downloadModule(..., data = TRUE)}. If the raw data
+#'                             used if the user calls `downloadData` (or
+#'                             `downloadModule(..., data = TRUE)`. If the raw data
 #'                             must be modified, the developer can use create a
-#'                             function called \code{.inputObjects} in their module. That
-#'                             function will be run during the \code{simInit} call. The
+#'                             function called `.inputObjects` in their module. That
+#'                             function will be run during the `simInit` call. The
 #'                             developer should ensure that if the object is supplied
-#'                             by the module user as an argument in the \code{simInit}, then
-#'                             the \code{.inputObjects} should not be run, i.e., use an
-#'                             \code{(is.null(sim$xxx)))}.\cr
-#'    \code{outputObjects} \tab A \code{data.frame} specifying the data objects output by
+#'                             by the module user as an argument in the `simInit`, then
+#'                             the `.inputObjects` should not be run, i.e., use an
+#'                             `(is.null(sim$xxx)))`.\cr
+#'    `outputObjects` \tab A `data.frame` specifying the data objects output by
 #'                              the module, with columns identical to those in
-#'                              \code{inputObjects}. Like \code{inputObjects} above,
+#'                              `inputObjects`. Like `inputObjects` above,
 #'                              this only identifies the objects that this module will output
-#'                              into the \code{simList}.
+#'                              into the `simList`.
 #'                              The module developer must create the necessary functions
 #'                              that will cause these objects to be put into the
-#'                              \code{simList}.\cr
+#'                              `simList`.\cr
 #' }
 #'
 #' @inheritParams objs
 #'
 #' @param x A list with a number of named elements, referred to as the metadata. See details.
 #'
-#' @return Updated \code{simList} object.
+#' @return Updated `simList` object.
 #'
 #' @author Alex Chubaty
 #' @export
@@ -331,37 +331,37 @@ setMethod(
 ################################################################################
 #' Define a parameter used in a module
 #'
-#' Used to specify a parameter's name, value, and set a default. The \code{min} and
-#' \code{max} arguments are ignored by \code{simInit} or \code{spades}; they
+#' Used to specify a parameter's name, value, and set a default. The `min` and
+#' `max` arguments are ignored by `simInit` or `spades`; they
 #' are for human use only. To ensure that a user cannot set parameters outside of
 #' a range of values, the module developer should use assertions in their module
 #' code.
 #'
-#' @note Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
-#'       real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
+#' @note Be sure to use the correct NA type: logical (`NA`), integer (`NA_integer_`),
+#'       real (`NA_real_`), complex (`NA_complex_`), or character (`NA_character_`).
 #'       See \code{\link{NA}}.
 #'
 #' @param name      Character string giving the parameter name.
 #' @param class     Character string giving the parameter class.
 #' @param default   The default value to use when none is specified by the user.
 #'                  Non-standard evaluation is used for the expression.
-#' @param min       With \code{max}, used to define a suitable range of values.
+#' @param min       With `max`, used to define a suitable range of values.
 #'                  Non-standard evaluation is used for the expression.
-#'                  \emph{These are not tested by} \code{simInit} \emph{or}
-#'                  \code{spades}. These are primarily for human use, i.e., to
+#'                  *These are not tested by* `simInit` *or*
+#'                  `spades`. These are primarily for human use, i.e., to
 #'                  tell a module user what values the module expects.
-#' @param max       With \code{min}, used to define a suitable range of values.
+#' @param max       With `min`, used to define a suitable range of values.
 #'                  Non-standard evaluation is used for the expression.
-#'                  \emph{These are not tested by} \code{simInit} \emph{or}
-#'                  \code{spades}. These are primarily for human use, i.e., to
+#'                  *These are not tested by* `simInit` *or*
+#'                  `spades`. These are primarily for human use, i.e., to
 #'                  tell a module user what values the module expects.
 #' @param desc      Text string providing a brief description of the parameter.
 #'                  If there are extra spaces or carriage returns, these will be stripped,
-#'                  allowing for multi-line character strings without using \code{paste}
+#'                  allowing for multi-line character strings without using `paste`
 #'                  or multiple quotes.
-#' @param ...       A convenience that allows writing a long \code{desc} without
-#'                  having to use \code{paste}; any character strings after \code{desc}
-#'                  will be \code{paste}d together with \code{desc}.
+#' @param ...       A convenience that allows writing a long `desc` without
+#'                  having to use `paste`; any character strings after `desc`
+#'                  will be `paste`d together with `desc`.
 #'
 #' @return data.frame
 #'
@@ -390,7 +390,7 @@ setMethod(
 #' )
 #'
 #' \dontrun{
-#' # Create a new module, then access parameters using \code{P}
+#' # Create a new module, then access parameters using `P`
 #' tmpdir <- file.path(tempdir(), "test")
 #' checkPath(tmpdir, create = TRUE)
 #'
@@ -495,15 +495,15 @@ setMethod(
 #'
 #' @param desc         Text string providing a brief description of the input object.
 #'                  If there are extra spaces or carriage returns, these will be stripped,
-#'                  allowing for multi-line character strings without using \code{paste}
+#'                  allowing for multi-line character strings without using `paste`
 #'                  or multiple quotes.
 #'
 #' @param sourceURL    Character string to specify an URL to reach the input object,
-#'                     default is \code{NA}.
+#'                     default is `NA`.
 #'
 #' @param ...          Other specifications of the input object.
 #'
-#' @return A \code{data.frame} suitable to be passed to \code{inputObjects} in a
+#' @return A `data.frame` suitable to be passed to `inputObjects` in a
 #' module's metadata.
 #'
 #' @author Yong Luo
@@ -578,12 +578,12 @@ setMethod(
 #'
 #' @param desc         Text string providing a brief description of the output object.
 #'                  If there are extra spaces or carriage returns, these will be stripped,
-#'                  allowing for multi-line character strings without using \code{paste}
+#'                  allowing for multi-line character strings without using `paste`
 #'                  or multiple quotes.
 #'
 #' @param ...          Other specifications of the output object.
 #'
-#' @return A \code{data.frame} suitable to be passed to \code{outputObjects} in
+#' @return A `data.frame` suitable to be passed to `outputObjects` in
 #' a module's metadata.
 #'
 #' @author Yong Luo

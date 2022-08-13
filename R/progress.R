@@ -47,9 +47,9 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' Shows a progress bar that is scaled to simulation end time.
 #'
-#' The progress bar object is stored in a separate environment, #' \code{.pkgEnv}.
+#' The progress bar object is stored in a separate environment, #' `.pkgEnv`.
 #'
-#' @param sim A \code{simList} simulation object.
+#' @param sim A `simList` simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export

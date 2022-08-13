@@ -7,7 +7,7 @@
 \alias{rasterCreate.RasterLayer}
 \alias{rasterCreate.RasterStack}
 \alias{rasterCreate.Raster}
-\title{Simple wrapper to load any \code{Raster*} object
+\title{Simple wrapper to load any \verb{Raster*} object
 This wraps either \code{raster::raster}, \code{raster::stack},
 or \code{raster::brick}, allowing a single function to be used
 to create a new object of the same class as a template.}
@@ -25,14 +25,14 @@ rasterCreate(x, ...)
 \method{rasterCreate}{Raster}(x, ...)
 }
 \arguments{
-\item{x}{An object, notably a \code{Raster*} object. All others will simply
+\item{x}{An object, notably a \verb{Raster*} object. All others will simply
 be passed through with no effect.}
 
 \item{...}{Passed to \code{raster::raster}, \code{raster::stack},
 or \code{raster::brick}}
 }
 \description{
-Simple wrapper to load any \code{Raster*} object
+Simple wrapper to load any \verb{Raster*} object
 This wraps either \code{raster::raster}, \code{raster::stack},
 or \code{raster::brick}, allowing a single function to be used
 to create a new object of the same class as a template.
@@ -51,6 +51,6 @@ A new (empty) object of same class as the original.
 \item \code{rasterCreate(RasterStack)}: Uses \code{raster::stack}
 
 \item \code{rasterCreate(Raster)}: Uses \code{raster::raster} when one of the other,
-less commonly used \code{Raster*} classes, e.g., \code{RasterLayerSparse}
+less commonly used \verb{Raster*} classes, e.g., \code{RasterLayerSparse}
 
 }}

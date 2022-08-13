@@ -1,7 +1,7 @@
 ################################################################################
 #' SpaDES time units
 #'
-#' \code{SpaDES} modules commonly use approximate durations that divide with no
+#' `SpaDES` modules commonly use approximate durations that divide with no
 #' remainder among themselves.
 #' For example, models that simulate based on a "week" timestep, will likely
 #' want to fall in lock step with a second module that is a "year" timestep.
@@ -17,8 +17,8 @@
 #' When these units are not correct, a module developer can create their own
 #' time unit, and create a function to calculate the number of seconds
 #' in that unit using the "d" prefix (for duration), following the
-#' \code{lubridate} package standard:
-#' \code{ddecade <- function(x) lubridate::duration(dyear(10))}.
+#' `lubridate` package standard:
+#' `ddecade <- function(x) lubridate::duration(dyear(10))`.
 #' Then the module developer can use "decade" as the module's time unit.
 #'
 #' @param x numeric. Number of the desired units
@@ -136,30 +136,30 @@ attributes(monthsInSeconds)$unit <- "second"
 ################################################################################
 #' Convert time units
 #'
-#' Current pre-defined units are found within the \code{spadesTimes()} function.
+#' Current pre-defined units are found within the `spadesTimes()` function.
 #' The user can define a new unit.
 #' The unit name can be anything, but the function definition must be of the
-#' form \code{"dunitName"}, e.g., \code{dyear} or \code{dfortnight}.
-#' The unit name is the part without the \code{d} and the function name
-#' definition includes the \code{d}.
-#' This new function, e.g., \code{dfortnight <- function(x) lubridate::duration(dday(14))}
+#' form `"dunitName"`, e.g., `dyear` or `dfortnight`.
+#' The unit name is the part without the `d` and the function name
+#' definition includes the `d`.
+#' This new function, e.g., `dfortnight <- function(x) lubridate::duration(dday(14))`
 #' can be placed anywhere in the search path or in a module
-#' (you will need to declare \code{"lubridate"} in your \code{pkgDeps} in the metadata).
+#' (you will need to declare `"lubridate"` in your `pkgDeps` in the metadata).
 #'
-#' @param unit   Character. One of the time units used in \code{SpaDES} or user
+#' @param unit   Character. One of the time units used in `SpaDES` or user
 #'               defined time unit, given as the unit name only. See details.
 #' @param envir   An environment. This is where to look up the function definition for
 #'                the time unit. See details.
 #' @param skipChecks For speed, the internal checks for classes and missingness can be skipped.
-#'                   Default \code{FALSE}.
+#'                   Default `FALSE`.
 #'
-#' @details Because of R scoping, if \code{envir} is a simList environment, then
-#' this function will search there first, then up the current \code{search()} path.
+#' @details Because of R scoping, if `envir` is a simList environment, then
+#' this function will search there first, then up the current `search()` path.
 #' Thus, it will find a user defined or module defined unit before a SpaDES unit.
-#' This means that a user can override the \code{dyear} given in SpaDES, for example,
-#' which is 365.25 days, with \code{dyear <- function(x) lubridate::duration(dday(365))}.
+#' This means that a user can override the `dyear` given in SpaDES, for example,
+#' which is 365.25 days, with `dyear <- function(x) lubridate::duration(dday(365))`.
 #'
-#' @return A numeric vector of length 1, with \code{unit} attribute set to "seconds".
+#' @return A numeric vector of length 1, with `unit` attribute set to "seconds".
 #'
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
@@ -202,10 +202,10 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
 #'
 #' This function takes a numeric with a "unit" attribute and converts it to
 #' another numeric with a different time attribute.
-#' If the units passed to argument \code{units} are the same as
-#' \code{attr(time, "unit")}, then it simply returns input \code{time}.
+#' If the units passed to argument `units` are the same as
+#' `attr(time, "unit")`, then it simply returns input `time`.
 #'
-#' If \code{time} has no \code{unit} attribute, then it is assumed to be
+#' If `time` has no `unit` attribute, then it is assumed to be
 #' seconds.
 #'
 #' @param time   Numeric. With a unit attribute, indicating the time unit of the
@@ -280,9 +280,9 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
 ################################################################################
 #' Determine the largest timestep unit in a simulation
 #'
-#' @param sim   A \code{simList} simulation object.
+#' @param sim   A `simList` simulation object.
 #'
-#' @return The timeunit as a character string. This defaults to \code{NA} if
+#' @return The timeunit as a character string. This defaults to `NA` if
 #' none of the modules has explicit units.
 #'
 #' @export
@@ -322,7 +322,7 @@ setMethod(
 #' When modules have different timeunit, SpaDES automatically takes the smallest
 #' (e.g., "second") as the unit for a simulation.
 #'
-#' @param sim   A \code{simList} simulation object.
+#' @param sim   A `simList` simulation object.
 #'
 #' @return The timeunit as a character string. This defaults to "second" if
 #' none of the modules has explicit units.

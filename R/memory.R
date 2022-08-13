@@ -29,14 +29,14 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
   invisible(outputFile)
 }
 
-#' Estimate memory used with \code{system("ps")}
+#' Estimate memory used with `system("ps")`
 #'
-#' This will give a slightly different estimate than \code{pryr::mem_used},
-#' which uses \code{gc()} internally. The purpose of this function is
+#' This will give a slightly different estimate than `pryr::mem_used`,
+#' which uses `gc()` internally. The purpose of this function is
 #' to allow continuous monitoring, external to the R session.
 #' Normally, this is run in a different session.
 #' @param thisPid Numeric or integer, the PID of the process. If omitted, it will
-#'   be found with \code{Sys.getpid()}
+#'   be found with `Sys.getpid()`
 #' @export
 #' @rdname memoryUse
 memoryUseThisSession <- function(thisPid) {
@@ -86,17 +86,17 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #' Show memory use
 #'
 #' This will only work if the user has specified before running
-#' the \code{spades} call, set the interval, in seconds, that ps is
-#' run with \code{options("spades.memoryUseInterval" = 0.5)}, will assess
+#' the `spades` call, set the interval, in seconds, that ps is
+#' run with `options("spades.memoryUseInterval" = 0.5)`, will assess
 #' memory use every 0.5 seconds. The default
 #' is 0, meaning no interval, "off".
 #'
 #' @export
 #' @param sim A completed simList
 #' @param max Logical. If TRUE, then it the return value will be summarized by
-#'   module/event, showing the maximum memory used. If \code{FALSE}, then
+#'   module/event, showing the maximum memory used. If `FALSE`, then
 #'   the raw memory used during each event will be shown.
-#' @seealso The \code{vignette("iv-modules")}
+#' @seealso The `vignette("iv-modules")`
 memoryUse <- function(sim, max = TRUE) {
   compl <- Copy(completed(sim))
   mem <- Copy(sim@.xData$.memoryUse$obj)

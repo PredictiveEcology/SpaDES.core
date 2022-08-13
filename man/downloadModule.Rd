@@ -89,7 +89,7 @@ respective module folders (see \code{\link{zipModule}} for zip compression of mo
 if a value is set. This alleviates 403 errors caused by too-frequent downloads.
 Generate a GitHub personal access token with no additional permissions at
 \url{https://github.com/settings/tokens}, and add this key to \file{.Renviron}
-as \code{GITHUB_PAT=<your-github-pat-here>}.
+as \verb{GITHUB_PAT=<your-github-pat-here>}.
 
 The default is to overwrite any existing files in the case of a conflict.
 }

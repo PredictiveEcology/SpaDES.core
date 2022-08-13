@@ -31,17 +31,17 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' Restart an interrupted simulation
 #'
 #' This is very experimental and has not been thoroughly tested. Use with caution.
-#' This function will reparse a single module (currently) into the \code{simList}
+#' This function will reparse a single module (currently) into the `simList`
 #' where its source code should reside, and then optionally restart a simulation
 #' that stopped on an error, presumably after the developer has modified the
 #' source code of the module that caused the break.
 #' This will restart the simulation at the next event in the event queue
-#' (i.e., returned by \code{events(sim)}). Because of this, this function will
+#' (i.e., returned by `events(sim)`). Because of this, this function will
 #' not do anything if the event queue is empty.
 #'
 #' @details
 #' This will only parse the source code from the named module. It will not affect any
-#' objects that are in the \code{mod} or \code{sim}.
+#' objects that are in the `mod` or `sim`.
 #'
 #' The random number seed will be reset to the state it was at the start of the
 #' earliest event recovered, thereby returning to the exact stochastic simulation
@@ -49,24 +49,24 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @note
 #' This will only work reliably
-#' \emph{if the \code{simList} was not modified yet during the event which caused the error}.
-#' The \code{simList} will be in the state it was at the time of the error.
+#' *if the `simList` was not modified yet during the event which caused the error*.
+#' The `simList` will be in the state it was at the time of the error.
 #'
 #' @param sim A simList. If not supplied (the default), this will take the sim from
-#'    \code{SpaDES.core:::.pkgEnv$.sim}, i.e., the one that was interrupted
+#'    `SpaDES.core:::.pkgEnv$.sim`, i.e., the one that was interrupted
 #' @param module A character string length one naming the module that caused the error and
 #'   whose source code was fixed. This module will be reparsed and placed into the simList
-#' @param restart Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
-#'   restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
-#'   with the module code parsed into the \code{simList}
-#' @param numEvents Numeric. Default is Inf (i.e., all available). In the \code{simList}, if
-#'   \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
-#'   there will be a list in the \code{simList} called \code{.recoverableObjs}. These will be
+#' @param restart Logical. If `TRUE`, then the call to `spades` will be made, i.e.,
+#'   restarting the simulation. If `FALSE`, then it will return a new `simList`
+#'   with the module code parsed into the `simList`
+#' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
+#'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then
+#'   there will be a list in the `simList` called `.recoverableObjs`. These will be
 #'   replayed backwards in time to reproduce the initial state of the simList before
-#'   the event that is \code{numEvents} back from the first event in \code{events(sim)}.
-#' @param ... Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}
+#'   the event that is `numEvents` back from the first event in `events(sim)`.
+#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
 #' @return
-#' A simList as if \code{spades} had been called on a simList.
+#' A simList as if `spades` had been called on a simList.
 #'
 #' @export
 #' @examples
@@ -201,77 +201,77 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' Restart R programmatically
 #'
 #' This will attempt to restart the R session, reloading all packages, and
-#' saving and reloading the \code{simList}.
+#' saving and reloading the `simList`.
 #' Currently, this is not intended for general use: it has many specialized
-#' pieces for using inside a \code{spades} call.
+#' pieces for using inside a `spades` call.
 #' The main purpose for doing this is to clear memory leaks (possibly deep
-#' in R \url{https://github.com/r-lib/fastmap}) that are not fully diagnosed.
-#' \emph{This is still very experimental}.
+#' in R <https://github.com/r-lib/fastmap>) that are not fully diagnosed.
+#' *This is still very experimental*.
 #' This should only be used if there are RAM limitations being hit with long running simulations.
 #' It has been tested to work Linux within Rstudio and at a terminal R session.
-#' The way to initiate restarting of R is simply setting the \code{spades.restartRInterval} or
-#' setting the equivalent parameter in the \code{restartR} core module via:
-#' \code{simInit(..., params = list(.restartR = list(.restartRInterval = 1)), ...)}
+#' The way to initiate restarting of R is simply setting the `spades.restartRInterval` or
+#' setting the equivalent parameter in the `restartR` core module via:
+#' `simInit(..., params = list(.restartR = list(.restartRInterval = 1)), ...)`
 #' greater than 0, which is the default,
-#' e.g., \code{options("spades.restartRInterval" = 100)}.
+#' e.g., `options("spades.restartRInterval" = 100)`.
 #' This is only intended to restart a simulation in exactly the same place as it was
-#' (i.e., cannot change machines), and because of the restart, the assignment of the \code{spades}
-#' call will be either to \code{sim} or the user must make such an assignment manually,
-#' e.g., \code{sim <- SpaDES.core:::.pkgEnv$.sim}.
+#' (i.e., cannot change machines), and because of the restart, the assignment of the `spades`
+#' call will be either to `sim` or the user must make such an assignment manually,
+#' e.g., `sim <- SpaDES.core:::.pkgEnv$.sim`.
 #' This is stated in a message.
 #'
-#' @param sim Required. A \code{simList} to be retained through the restart
-#' @param reloadPkgs Logical. If \code{TRUE}, it will attempt to reload all the packages
-#'    as they were in previous session, in the same order. If \code{FALSE}, it will
-#'    load no packages beyond normal R startup. Default \code{TRUE}
+#' @param sim Required. A `simList` to be retained through the restart
+#' @param reloadPkgs Logical. If `TRUE`, it will attempt to reload all the packages
+#'    as they were in previous session, in the same order. If `FALSE`, it will
+#'    load no packages beyond normal R startup. Default `TRUE`
 #' @param .First A function to save to \file{~/.qs} which will
-#'    be loaded at restart from \file{~/.qs} and run. Default is \code{NULL},
-#'    meaning it will use the non-exported \code{SpaDES.core:::First}. If a
-#'    user wants to make a custom \code{First} file, it should built off that one.
-#' @param .RDataFile A filename for saving the \code{simList}.
-#'     Defaults to \code{getOption("spades.restartR.filename")}, and the directory will
-#'     be in \code{restartDir}. The simulation time will be mid-pended to this
-#'     name, as in: \code{basename(file), "_time",}
-#'     \code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}
+#'    be loaded at restart from \file{~/.qs} and run. Default is `NULL`,
+#'    meaning it will use the non-exported `SpaDES.core:::First`. If a
+#'    user wants to make a custom `First` file, it should built off that one.
+#' @param .RDataFile A filename for saving the `simList`.
+#'     Defaults to `getOption("spades.restartR.filename")`, and the directory will
+#'     be in `restartDir`. The simulation time will be mid-pended to this
+#'     name, as in: `basename(file), "_time",`
+#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`
 #'
 #' @param restartDir A character string indicating root directory to
-#'     save \code{simList} and other ancillary files during restart.
-#'     Defaults to \code{getOption("spades.restartR.restartDir", NULL)}.
-#'     If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
-#'     \code{modulePath(sim)}, \code{inputPath(sim)}, \code{cachePath(sim)},
-#'     taking the first one that is not inside the \code{tempdir()}, which will
+#'     save `simList` and other ancillary files during restart.
+#'     Defaults to `getOption("spades.restartR.restartDir", NULL)`.
+#'     If `NULL`, then it will try, in order, `outputPath(sim)`,
+#'     `modulePath(sim)`, `inputPath(sim)`, `cachePath(sim)`,
+#'     taking the first one that is not inside the `tempdir()`, which will
 #'     disappear during restart of R.
-#'     The actual directory for a given \code{spades} call that is restarting will be:
-#'     \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
+#'     The actual directory for a given `spades` call that is restarting will be:
+#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
 #'     The random string is to prevent parallel processes that started at the same clock
 #'     time from colliding.
 #'
 #' @details
 #' The process responds to several options. Though under most cases,
-#' the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
-#' the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
+#' the default behaviour should suffice. These are of 3 types: `restartRInterval`
+#' the arguments to `restartR` and the arguments to `saveSimList`, these latter two
 #' using a dot to separate the function name and its argument. The defaults for
-#' two key options are: \code{options("spades.restartR.restartDir" = NULL}, meaning
-#' use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
-#' and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
+#' two key options are: `options("spades.restartR.restartDir" = NULL`, meaning
+#' use `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`
+#' and `options("spades.saveSimList.fileBackend" = 0)`, which means don't do anything
 #' with raster-backed files.
 #' See specific functions for defaults and argument meanings.
-#' The only difference from the default function values is with \code{saveSimList} argument
-#' \code{fileBackend = FALSE} during \code{restartR} by default, because it is assumed that
+#' The only difference from the default function values is with `saveSimList` argument
+#' `fileBackend = FALSE` during `restartR` by default, because it is assumed that
 #' the file backends will still be intact after a restart, so no need to move them all to memory.
 #'
 #' @note
 #' Because of the restarting, the object name of the original assignment of the
-#' \code{spades} call can not be preserved. The \code{spades} call will be
-#' assigned to \code{sim} in the \code{.GlobalEnv}.
+#' `spades` call can not be preserved. The `spades` call will be
+#' assigned to `sim` in the `.GlobalEnv`.
 #'
-#' Because this function is focused on restarting during a \code{spades} call,
-#' it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.
+#' Because this function is focused on restarting during a `spades` call,
+#' it will remove all objects in the `.GlobalEnv`, emulating `q("no")`.
 #' If the user wants to keep those objects, then they should be saved to disk
-#' immediately before the \code{spades} call.
-#' This can then be recovered immediately after the return from the \code{spades} call.
+#' immediately before the `spades` call.
+#' This can then be recovered immediately after the return from the `spades` call.
 #'
-#' To keep the saved \code{simList}, use \code{options("spades.restartR.clearFiles" = TRUE)}.
+#' To keep the saved `simList`, use `options("spades.restartR.clearFiles" = TRUE)`.
 #' The default is to treat these files as temporary files and so will be removed.
 #'
 #' @export
