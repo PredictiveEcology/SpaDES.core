@@ -55,6 +55,7 @@ jobs:
             NLMR=?ignore
             PredictiveEcology/Require@development
             PredictiveEcology/reproducible@development
+            PredictiveEcology/SpaDES.tools@development
 
       - name: Install additional package dependencies
         run: |
