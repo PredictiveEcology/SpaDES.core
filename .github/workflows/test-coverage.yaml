@@ -30,14 +30,17 @@ jobs:
         with:
           extra-packages: |
             any::covr
+            fastshp=?ignore
             NLMR=?ignore
-            github::PredictiveEcology/Require@development
-            github::PredictiveEcology/reproducible@development
-            github::PredictiveEcology/quickPlot@development
-            github::PredictiveEcology/SpaDES.tools@development
+            PredictiveEcology/Require@development
+            PredictiveEcology/reproducible@development
+            PredictiveEcology/quickPlot@development
+            PredictiveEcology/SpaDES.tools@development
 
       - name: Install additional package dependencies
-        run: pak::pkg_install("achubaty/NLMR")
+        run: |
+          pak::pkg_install("achubaty/NLMR")
+          pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
 
       - name: Test coverage
