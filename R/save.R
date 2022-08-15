@@ -4,10 +4,10 @@ utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
-      firstSave <- min(outputs(sim)[, "saveTime"], na.rm = TRUE)
-      firstSaveWh <- which.min(outputs(sim)[, "saveTime"])
+      firstSave <- min(outputs(sim)[["saveTime"]], na.rm = TRUE)
+      firstSaveWh <- which.min(outputs(sim)[["saveTime"]])
       if ("eventPriority" %in% colnames(outputs(sim))) {
-        firstPriority <- outputs(sim)[firstSaveWh, "eventPriority"]
+        firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
       if (!exists("firstPriority", inherits = FALSE))
         firstPriority <- .last()
@@ -29,31 +29,31 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 ##############################################################
-#' Save objects using \code{.saveObjects} in \code{params} slot of \code{simInit}
+#' Save objects using `.saveObjects` in `params` slot of `simInit`
 #'
-#' In the \code{\link{simInit}} call, a parameter called \code{.saveObjects} can be provided in
+#' In the \code{\link{simInit}} call, a parameter called `.saveObjects` can be provided in
 #' each module.
 #' This must be a character string vector of all object names to save. These objects will
-#' then be saved whenever a call to \code{saveFiles} is made.
+#' then be saved whenever a call to `saveFiles` is made.
 #'
-#' The file names will be equal to the object name plus \code{time(sim)} is
+#' The file names will be equal to the object name plus `time(sim)` is
 #' appended at the end.
-#' The files are saved as \code{.rds} files, meaning, only one object gets
+#' The files are saved as `.rds` files, meaning, only one object gets
 #' saved per file.
 #'
 #'
 #' For objects saved using this function, the module developer must create save
-#' events that schedule a call to \code{saveFiles}.
+#' events that schedule a call to `saveFiles`.
 #'
 #' If this function is used outside of a module, it will save all files in the
 #' outputs(sim) that are scheduled to be saved at the current time in the simList.
 #'
-#' There are 3 ways to save objects using \code{SpaDES}.
+#' There are 3 ways to save objects using `SpaDES`.
 #'
 #' @noMd
 #' @section 1. Model-level saving:
 #'
-#' Using the \code{outputs} slot in the \code{\link{simInit}} call.
+#' Using the `outputs` slot in the \code{\link{simInit}} call.
 #' See example in \code{\link{simInit}}.
 #' This can be convenient because it gives overall control of many modules at a
 #' time, and it gets automatically scheduled during the
@@ -61,25 +61,25 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @section 2. Module-level saving:
 #'
-#' Using the \code{saveFiles} function inside a module.
-#' This must be accompanied by a \code{.saveObjects} list element in the
-#' \code{params} slot in the \code{\link{simList}}.
+#' Using the `saveFiles` function inside a module.
+#' This must be accompanied by a `.saveObjects` list element in the
+#' `params` slot in the \code{\link{simList}}.
 #' Usually a module developer will create this method for future users of
 #' their module.
 #'
 #' @section 3. Custom saving:
 #'
 #' A module developer can save any object at any time inside their module, using
-#' standard R functions for saving R objects (e.g., \code{save} or \code{saveRDS}).
+#' standard R functions for saving R objects (e.g., `save` or `saveRDS`).
 #' This is the least modular approach, as it will happen whether a module user
 #' wants it or not.
 #'
 #' @author Eliot McIntire
 #' @author Alex Chubaty
 #' @note It is not possible to schedule separate saving events for each object
-#' that is listed in the \code{.saveObjects}.
+#' that is listed in the `.saveObjects`.
 #'
-#' @param sim A \code{simList} simulation object.
+#' @param sim A `simList` simulation object.
 #'
 #' @importFrom data.table data.table
 #' @export
@@ -120,10 +120,11 @@ saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   # extract the current module name that called this function
   moduleName <- sim@current[["moduleName"]]
+
   if (length(moduleName) == 0) {
     moduleName <- "save"
     if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime, ])) {
-      outputs(sim)[outputs(sim)$saveTime == curTime, "saved"] <- NA
+      outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime] <- NA
     }
   }
 
@@ -138,15 +139,15 @@ saveFiles <- function(sim) {
     # from dplyr does not do as expected
     outputs(sim) <- data.table(outputs(sim)) %>%
       unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
-      data.frame()
+      data.frame(.)
   }
 
-  if (NROW(outputs(sim)[outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved), "saved"]) > 0) {
+  if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
-      if (exists(outputs(sim)[i, "objectName"], envir = sim@.xData)) {
-        args <- append(list(get(outputs(sim)[i, "objectName"], envir = sim@.xData),
-                            file = outputs(sim)[i, "file"]),
+      if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
+        args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
+                            file = outputs(sim)[["file"]][i]),
                        outputArgs(sim)[[i]])
         args <- args[!sapply(args, is.null)]
         args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
@@ -154,24 +155,27 @@ saveFiles <- function(sim) {
         }))])
 
         # The actual save line
-        do.call(outputs(sim)[i, "fun"], args = args,
-                envir = getNamespace(outputs(sim)[i, "package"]))
+        do.call(outputs(sim)[["fun"]][i], args = args,
+                envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        outputs(sim)[i, "saved"] <- TRUE
+        ## using @ works when outputs is a DT
+        outputs(sim)[["saved"]][i] <- TRUE
+        # sim@outputs[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[i, "saved"] <- FALSE
+        outputs(sim)[["saved"]][i] <- FALSE
+        # sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
 
   # Schedule an event for the next time in the saveTime column
-  if (any(is.na(outputs(sim)[outputs(sim)$saveTime > curTime, "saved"]))) {
+  if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
     isNA <- is.na(outputs(sim)$saved)
-    nextTime <- min(outputs(sim)[isNA, "saveTime"], na.rm = TRUE)
-    nextTimeWh <- which.min(outputs(sim)[isNA, "saveTime"])
+    nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
+    nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
     if ("eventPriority" %in% colnames(outputs(sim))) {
-      nextPriority <- outputs(sim)[isNA, "eventPriority"][nextTimeWh]
+      nextPriority <- outputs(sim)[["eventPriority"]][isNA][nextTimeWh]
     }
     if (!exists("nextPriority", inherits = FALSE))
       nextPriority <- .last()
@@ -188,12 +192,12 @@ saveFiles <- function(sim) {
 
 #' File extensions map
 #'
-#' A \code{data.frame} with information on how to load various types of files in R,
+#' A `data.frame` with information on how to load various types of files in R,
 #' containing the columns:
 #' \itemize{
-#'   \item \code{exts}: the file extension;
-#'   \item \code{fun}: the function to use for files with this file extension;
-#'   \item \code{package}: the package from which to load \code{fun}.
+#'   \item `exts`: the file extension;
+#'   \item `fun`: the function to use for files with this file extension;
+#'   \item `package`: the package from which to load `fun`.
 #' }
 #'
 #' @export
@@ -215,12 +219,12 @@ saveFiles <- function(sim) {
 #' Generate simulation file name
 #'
 #' Assists with saving and retrieving simulations
-#' (e.g., with \code{saveSimList} and \code{loadSimList}).
+#' (e.g., with `saveSimList` and `loadSimList`).
 #'
-#' @param name Object name (e.g., \code{"mySimOut"})
-#' @param path Directory location in where the file will be located (e.g., an \code{outputPath}).
-#' @param time Optional simulation time to use as filename suffix. Default \code{NULL}.
-#' @param ext  The file extension to use (default \code{"rds"}).
+#' @param name Object name (e.g., `"mySimOut"`)
+#' @param path Directory location in where the file will be located (e.g., an `outputPath`).
+#' @param time Optional simulation time to use as filename suffix. Default `NULL`.
+#' @param ext  The file extension to use (default `"rds"`).
 #'
 #' @export
 #' @importFrom reproducible normPath

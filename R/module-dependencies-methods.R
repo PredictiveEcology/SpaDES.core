@@ -10,21 +10,21 @@ selectMethod("show", "igraph")
 ################################################################################
 #' Build edge list for module dependency graph
 #'
-#' @param sim A \code{simList} object.
+#' @param sim A `simList` object.
 #'
 #' @param plot  Logical indicating whether the edgelist (and subsequent graph)
-#'              will be used for plotting. If \code{TRUE}, duplicated rows
+#'              will be used for plotting. If `TRUE`, duplicated rows
 #'              (i.e., multiple object dependencies between modules) are removed
 #'              so that only a single arrow is drawn connecting the modules.
-#'              Default is \code{FALSE}.
+#'              Default is `FALSE`.
 #'
-#' @return A \code{data.table} whose first two columns give a list of edges
+#' @return A `data.table` whose first two columns give a list of edges
 #'          and remaining columns the attributes of the dependency objects
 #'          (object name, class, etc.).
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table := data.table rbindlist setkey setorder
+#' @importFrom data.table := data.table rbindlist setkeyv setorder
 #' @include simList-class.R
 #' @rdname depsEdgeList
 #'
@@ -69,8 +69,8 @@ setMethod("depsEdgeList",
     return(invisible(NULL)) # return from the lapply
   })
 
-  setkey(sim.in, "objectName")
-  setkey(sim.out, "objectName")
+  setkeyv(sim.in, "objectName")
+  setkeyv(sim.out, "objectName")
 
   if ((nrow(sim.in)) && (nrow(sim.out))) {
     dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]
@@ -134,7 +134,7 @@ setMethod("depsGraph",
 #' Attempts to identify cycles in the dependency graph and remove edges representing
 #' object dependencies which are provided by other modules in the simulation.
 #'
-#' @param simEdgeList An edge list (\code{data.table}) produced by \code{\link{depsEdgeList}}.
+#' @param simEdgeList An edge list (`data.table`) produced by \code{\link{depsEdgeList}}.
 #'
 #' @return An updated edge list object.
 #'
@@ -223,7 +223,7 @@ setMethod(
 #' Uses \code{\link[igraph]{topo_sort}} to try to find a load order satisfying
 #' all module object dependencies.
 #'
-#' @param sim         A \code{simList} object.
+#' @param sim         A `simList` object.
 #'
 #' @param simGraph    An \code{\link{igraph}} object produced by \code{\link{depsGraph}}.
 #'

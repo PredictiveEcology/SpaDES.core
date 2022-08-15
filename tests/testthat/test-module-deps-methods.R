@@ -118,6 +118,8 @@ test_that("defineModule correctly handles different inputs", {
 })
 
 test_that("depsEdgeList and depsGraph work", {
+  skip_if_not_installed("NLMR")
+
   times <- list(start = 0.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),

@@ -1,4 +1,6 @@
 test_that("simList object initializes correctly (1)", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -170,17 +172,18 @@ test_that("simList object initializes correctly (1)", {
   expect_equal("second", attr(mySim@simtimes$current, "unit"))
 
   ### required packages
-  pkgs <- c("grid", "methods", "RandomFields", "raster", "RColorBrewer", "sp",
-            "SpaDES.tools", "SpaDES.core", "stats")
-  expect_equal(sort(packages(mySim)), sort(pkgs))
+  pkgs <- c("grid", "methods", "NLMR", "raster", "RColorBrewer", "sp",
+            "SpaDES.core", "SpaDES.tools", "stats")
+  expect_equal(sort(packages(mySim, clean = TRUE)), sort(pkgs))
 
   reqdPkgs <- lapply(modules, function(m) {
     mfile <- file.path(system.file("sampleModules", package = "SpaDES.core"), m, paste0(m, ".R"))
     packages(filename = mfile)
   }) %>%
     unlist() %>%
-    unique() %>%
-    sort()
+    sort() %>%
+    SpaDES.core:::.cleanPkgs() %>%
+    unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
   mdir <- getOption("spades.modulePath")
@@ -188,23 +191,23 @@ test_that("simList object initializes correctly (1)", {
   on.exit(options(spades.modulePath = mdir), add = TRUE)
   reqdPkgs <- lapply(modules, function(m) packages(module = m)) %>%
     unlist() %>%
-    unique() %>%
-    sort()
+    sort() %>%
+    SpaDES.core:::.cleanPkgs() %>%
+    unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
   rm(mySim)
 })
 
 test_that("simList object initializes correctly (2)", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
   ## test with outputs
-  ras <- raster::raster(nrows = 10, ncols = 10, xmn = -5, xmx = 5, ymn = -5, ymx = 5)
-  abundRasters <- list(SpaDES.tools::gaussMap(ras, scale = 100, var = 0.01))
+  abundRasters <- list(raster(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
 
   tmpdir <- tempdir()
   newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
@@ -222,6 +225,7 @@ test_that("simList object initializes correctly (2)", {
 
 test_that("simList test all signatures", {
   skip_on_cran()
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
 
@@ -391,6 +395,8 @@ test_that("test that module directory exists, but not files", {
 })
 
 test_that("inputObjects on module arg not sim", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit(smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)

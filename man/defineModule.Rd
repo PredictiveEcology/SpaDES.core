@@ -60,8 +60,9 @@ module is scientifically reasonable to be used in.\cr
 of the module. Currently unimplemented.
 Once implemented, this should define what time frame this
 module is scientifically reasonable to be used for.\cr
-\code{timeunit} \tab Time scale of the module (e.g., "day", "year"). This
-MUST be specified. It indicates what '1' unit of time
+\code{timeunit} \tab Time scale of the module (e.g., "day", "year"). If this is
+not specified, then \code{.timeunitDefault()} will be used.
+It indicates what '1' unit of time
 means for this module. \code{SpaDES} interprets this
 and if modules have different \code{timeunit} values
 then it will correctly schedule each module, using the
@@ -109,7 +110,7 @@ function will be run during the \code{simInit} call. The
 developer should ensure that if the object is supplied
 by the module user as an argument in the \code{simInit}, then
 the \code{.inputObjects} should not be run, i.e., use an
-\code{(is.null(sim$xxx)))}.\cr
+\verb{(is.null(sim$xxx)))}.\cr
 \code{outputObjects} \tab A \code{data.frame} specifying the data objects output by
 the module, with columns identical to those in
 \code{inputObjects}. Like \code{inputObjects} above,
@@ -132,7 +133,7 @@ that will cause these objects to be put into the
 
 }
 \seealso{
-moduleDefaults
+moduleDefaults \code{\link{defineEvent}}
 }
 \author{
 Alex Chubaty

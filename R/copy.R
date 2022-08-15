@@ -11,23 +11,23 @@ if (!isGeneric("Copy")) {
 #' it is not possible to simply copy an object with an assignment operator:
 #' the two objects will share the same objects. As one simList object changes
 #' so will the other. when this is not the desired behaviour, use this function.
-#' NOTE: use capital C, to limit confusion with \code{data.table::copy()}
+#' NOTE: use capital C, to limit confusion with `data.table::copy()`
 #' See \code{\link[reproducible]{Copy}}.
 #'
 #' @inheritParams reproducible::Copy
 #' @param objects  Whether the objects contained within the simList environment
-#'                 should be copied. Default \code{TRUE}, which may be slow.
-#' @param queues Logical. Should the events queues (\code{events},
-#'               \code{current}, \code{completed}) be deep copied via
-#'               \code{data.table::copy}
+#'                 should be copied. Default `TRUE`, which may be slow.
+#' @param queues Logical. Should the events queues (`events`,
+#'               `current`, `completed`) be deep copied via
+#'               `data.table::copy`
 #'
 #' @details
-#' \code{simList} objects can contain a lot of information, much of which could be
-#' in pass-by-reference objects (e.g., \code{data.table} class), and objects that are
-#' file-backed, such as some \code{Raster*}-class objects. For all the objects that
-#' are file-backed, it is likely \emph{very} important to give unique file-backed
+#' `simList` objects can contain a lot of information, much of which could be
+#' in pass-by-reference objects (e.g., `data.table` class), and objects that are
+#' file-backed, such as some `Raster*`-class objects. For all the objects that
+#' are file-backed, it is likely *very* important to give unique file-backed
 #' directories. This should be passed here, which gets passed on to the many methods
-#' of \code{Copy} in \code{reproducible}.
+#' of `Copy` in `reproducible`.
 #'
 #' @author Eliot McIntire
 #' @exportMethod Copy

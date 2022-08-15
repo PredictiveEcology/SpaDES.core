@@ -27,8 +27,8 @@ user wants to make a custom \code{First} file, it should built off that one.}
 \item{.RDataFile}{A filename for saving the \code{simList}.
 Defaults to \code{getOption("spades.restartR.filename")}, and the directory will
 be in \code{restartDir}. The simulation time will be mid-pended to this
-name, as in: \code{basename(file), "_time",}
-\code{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
+name, as in: \verb{basename(file), "_time",}
+\verb{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
 
 \item{restartDir}{A character string indicating root directory to
 save \code{simList} and other ancillary files during restart.
@@ -68,7 +68,7 @@ The process responds to several options. Though under most cases,
 the default behaviour should suffice. These are of 3 types: \code{restartRInterval}
 the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 using a dot to separate the function name and its argument. The defaults for
-two key options are: \code{options("spades.restartR.restartDir" = NULL}, meaning
+two key options are: \verb{options("spades.restartR.restartDir" = NULL}, meaning
 use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
 and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
 with raster-backed files.

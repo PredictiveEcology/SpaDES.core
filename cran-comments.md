@@ -1,32 +1,32 @@
 ## Maintenance release
 
-This is a maintenance release.
+This release fixes various issues with packages dependencies and CRAN check problems.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 20.04                 (GitHub), R 3.6.3
 * Ubuntu 20.04                 (GitHub), R 4.0.5
-* Windows                      (GitHub), R 3.6.3
+* Ubuntu 20.04                 (GitHub), R 4.1.3
 * Windows                      (GitHub), R 4.0.5
-* Windows                 (win-builder), R 4.0.5
+* Windows                      (GitHub), R 4.1.3
+* Windows                 (win-builder), R 4.1.3
 
 ### Current R versions
-* macOS 10.15.7 Catalina       (GitHub), R 4.1.2
-* macOS 11.6 Big Sur            (local), R 4.1.2
-* macOs (m1) Big Sur             (rhub), R 4.1.2
-* Ubuntu 20.04                 (GitHub), R 4.1.2
-* Ubuntu 20.04                  (local), R 4.1.2
-* Windows                      (GitHub), R 4.1.2
-* Windows                       (local), R 4.1.2
-* Windows                 (win-builder), R 4.1.2
+* macOS 11.6 Big Sur           (GitHub), R 4.2.1
+* macOS 11.6 Big Sur            (local), R 4.2.1
+* macOs (m1) Big Sur             (rhub), R 4.2.1
+* Ubuntu 20.04                 (GitHub), R 4.2.1
+* Ubuntu 20.04                  (local), R 4.2.1
+* Windows                      (GitHub), R 4.2.1
+* Windows                       (local), R 4.2.1
+* Windows                 (win-builder), R 4.2.1
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2022-01-17 r81508)
-* Ubuntu 20.04                  (local), R-devel (2022-01-17 r81511)
-* Windows                      (GitHub), R-devel (2022-01-17 r81511 ucrt)
-* Windows                 (win-builder), R-devel (2022-01-17 r81511)
+* Ubuntu 20.04                 (GitHub), R-devel (2022-08-11 r82713)
+* Ubuntu 20.04                  (local), R-devel (2022-08-11 r82713)
+* Windows                      (GitHub), R-devel (2022-08-11 r82713)
+* Windows                 (win-builder), R-devel (2022-08-11 r82713 ucrt)
 
 ## R CMD check results
 

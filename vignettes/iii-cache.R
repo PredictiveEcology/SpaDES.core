@@ -1,13 +1,15 @@
 ## ----setup, include = FALSE---------------------------------------------------
-RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
+hasSuggests <- all(
+  require("NLMR", quietly = TRUE),
+  require("SpaDES.tools", quietly = TRUE)
+)
 
-knitr::opts_chunk$set(eval = RFavailable)
+knitr::opts_chunk$set(eval = hasSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
 
 ## ----examples, echo=TRUE, message=FALSE---------------------------------------
-library(magrittr)
 library(raster)
 library(reproducible)
 library(SpaDES.core)
@@ -71,24 +73,40 @@ system.time({
 ## ----function-level, echo=TRUE------------------------------------------------
 ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
 system.time({
-  map <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim),
+  map <- Cache(NLMR::nlm_mpd,
+               ncol = ncol(ras),
+               nrow = nrow(ras),
+               resolution = unique(res(ras)),
+               roughness = 0.5,
+               rand_dev = 10,
+               rescale = FALSE,
+               verbose = FALSE,
+               cacheRepo = cachePath(mySim),
+               userTags = "nlm_mpd",
                notOlderThan = Sys.time())
 })
 
 # vastly faster the second time
 system.time({
-  mapCached <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim))
+  mapCached <- Cache(NLMR::nlm_mpd,
+                     ncol = ncol(ras),
+                     nrow = nrow(ras),
+                     resolution = unique(res(ras)),
+                     roughness = 0.5,
+                     rand_dev = 10,
+                     rescale = FALSE,
+                     verbose = FALSE,
+                     cacheRepo = cachePath(mySim),
+                     userTags = "nlm_mpd")
 })
 
 all.equal(map, mapCached) 
 
 ## ----manual-cache-------------------------------------------------------------
 cacheDB <- showCache(mySim)
-# examine only the functions that have been cached
-cacheDB[tagKey == "function"]
 
-# get the RasterLayer that was produced with the gaussMap function:
-map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "gaussMap"]$cacheId)
+## get the RasterLayer that was produced with the NLMR::nlm_mpd function:
+map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "nlm_mpd"]$cacheId)
 
 clearPlot()
 Plot(map)

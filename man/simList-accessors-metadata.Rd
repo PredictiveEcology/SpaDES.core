@@ -87,7 +87,7 @@ in a \code{simList} if not specified.
 }
 \examples{
 \dontrun{
-# To pre-install and pre-load all packages prior to \code{simInit}.
+# To pre-install and pre-load all packages prior to `simInit`.
 
 # set modulePath
 setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))

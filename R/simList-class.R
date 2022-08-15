@@ -1,6 +1,6 @@
-#' The \code{simList} class
+#' The `simList` class
 #'
-#' Contains the minimum components of a \code{SpaDES} simulation.
+#' Contains the minimum components of a `SpaDES` simulation.
 #' Various slot accessor methods (i.e., get and set functions) are provided
 #' (see 'Accessor Methods' below).
 #'
@@ -11,15 +11,15 @@
 #' \code{\link{data.frame}} to implement the event queue (because it is much
 #' more efficient).
 #'
-#' @note The \code{simList} class extends the \code{environment}, by adding
+#' @note The `simList` class extends the `environment`, by adding
 #' several slots that provide information about the metadata for a discrete
-#' event simulation. The environment slot, if accessed directly is \code{.xData}
+#' event simulation. The environment slot, if accessed directly is `.xData`
 #' and this is where input and output objects from modules are placed.
-#' The \code{\link{simList_}} class is similar, but it extends the \code{list}
+#' The \code{\link{simList_}} class is similar, but it extends the `list`
 #' class. All other slots are the same.
-#' Thus, \code{simList} is identical to \code{simList_}, except that the former
+#' Thus, `simList` is identical to `simList_`, except that the former
 #' uses an environment for objects and the latter uses a list.
-#' The class \code{simList_} is only used internally when saving/loading, because
+#' The class `simList_` is only used internally when saving/loading, because
 #' saving/loading a list behaves more reliably than saving/loading an environment.
 #'
 #' @slot modules    List of character names specifying which modules to load.
@@ -28,10 +28,10 @@
 #'                  parameters.
 #'
 #' @slot events     The list of scheduled events (i.e., event queue), which can
-#'                  be converted to a sorted \code{data.table} with \code{events(sim)}.
+#'                  be converted to a sorted `data.table` with `events(sim)`.
 #'                  See 'Event Lists' for more information.
 #'
-#' @slot current    The current event, as a \code{data.table}.
+#' @slot current    The current event, as a `data.table`.
 #'                  See 'Event Lists' for more information..
 #'
 #' @slot completed  An environment consisting of completed events, with
@@ -40,29 +40,29 @@
 #'                  was a list. This was changed because the list became
 #'                  slow as number of events increased.
 #'                  See 'Event Lists' for more information. It is kept
-#'                  as an environment of individual events for speed. The \code{completed}
-#'                  method converts it to a sorted \code{data.table}.
+#'                  as an environment of individual events for speed. The `completed`
+#'                  method converts it to a sorted `data.table`.
 #'
-#' @slot depends    A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
+#' @slot depends    A `.simDeps` list of \code{\link{.moduleDeps}} objects
 #'                  containing module object dependency information.
 #'
 #' @slot simtimes   List of numerical values describing the simulation start
 #'                  and end times; as well as the current simulation time.
 #'
-#' @slot inputs     a \code{data.frame} or \code{data.table} of files and
+#' @slot inputs     a `data.frame` or `data.table` of files and
 #'                  metadata
 #'
-#' @slot outputs    a \code{data.frame}  or \code{data.table} of files and
+#' @slot outputs    a `data.frame`  or `data.table` of files and
 #'                  metadata
 #'
-#' @slot paths      Named list of \code{modulePath}, \code{inputPath},
-#'                  and \code{outputPath} paths. Partial matching is performed.
+#' @slot paths      Named list of `modulePath`, `inputPath`,
+#'                  and `outputPath` paths. Partial matching is performed.
 #' @slot .xData     Environment referencing the objects used in the simulation.
 #'                  Several "shortcuts" to accessing objects referenced by this
 #'                  environment are provided, and can be used on the
-#'                  \code{simList} object directly instead of specifying the
-#'                  \code{.xData} slot: \code{$}, \code{[[}, \code{ls},
-#'                  \code{ls.str}, \code{objs}. See examples.
+#'                  `simList` object directly instead of specifying the
+#'                  `.xData` slot: `$`, `[[`, `ls`,
+#'                  `ls.str`, `objs`. See examples.
 #' @slot .envir     Deprecated. Please do not use any more.
 #'
 #' @section Accessor Methods:
@@ -87,15 +87,15 @@
 #' were executed.
 #' Each event is represented by a \code{\link{data.table}} row consisting of:
 #' \tabular{ll}{
-#'   \code{eventTime} \tab The time the event is to occur.\cr
-#'   \code{moduleName} \tab The module from which the event is taken.\cr
-#'   \code{eventType} \tab A character string for the programmer-defined event type.\cr
-#'   \code{eventPriority} \tab The priority given to the event. \cr
+#'   `eventTime` \tab The time the event is to occur.\cr
+#'   `moduleName` \tab The module from which the event is taken.\cr
+#'   `eventType` \tab A character string for the programmer-defined event type.\cr
+#'   `eventPriority` \tab The priority given to the event. \cr
 #' }
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @aliases simList
 #' @author Alex Chubaty and Eliot McIntire
@@ -126,10 +126,10 @@ setClass(
 )
 
 ### `initialize` generic is already defined in the methods package
-#' Generate a \code{simList} object
+#' Generate a `simList` object
 #'
 #' Given the name or the definition of a class, plus optionally data to be
-#' included in the object, \code{new} returns an object from that class.
+#' included in the object, `new` returns an object from that class.
 #'
 #' @export
 #' @include misc-methods.R
@@ -243,12 +243,12 @@ setAs(from = "simList", to = "simList_", def = function(from, to) {
 })
 
 ### `initialize` generic is already defined in the methods package
-#' Generate a \code{simList} object
+#' Generate a `simList` object
 #'
 #' Given the name or the definition of a class, plus optionally data to be
-#' included in the object, \code{new} returns an object from that class.
+#' included in the object, `new` returns an object from that class.
 #'
-#' @param .Object  A \code{simList} object.
+#' @param .Object  A `simList` object.
 #' @param ... Optional Values passed to any or all slot
 #'
 #' @export

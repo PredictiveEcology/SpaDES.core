@@ -1,4 +1,8 @@
 test_that("module templates work", {
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("knitr")
+  skip_if_not_installed("rmarkdown")
+
   testInitOut <- testInit(c("knitr", "rmarkdown"), smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
@@ -16,7 +20,7 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, "LICENSE")))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".R"))))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".Rmd"))))
-  expect_true(file.exists(file.path(mpath, "README.txt")))
+  expect_true(file.exists(file.path(mpath, "README.md")))
 
   expect_true(dir.exists(file.path(mpath, ".github")))
   expect_true(dir.exists(file.path(mpath, ".github", "workflows")))

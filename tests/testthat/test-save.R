@@ -1,19 +1,21 @@
 test_that("saving files (and memoryUse)", {
-  skip_if_not_installed("RandomFields")
   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+  skip_if_not_installed("future")
+  skip_if_not_installed("future.callr")
+  skip_if_not_installed("NLMR")
+  skip_on_covr() ## issue with memoryUseSetup
 
-  if (!requireNamespace("future", quietly = TRUE)) {
-    skip("future package required")
-  }
   testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
-                          c("data.table", "future.callr", "future"))
+                          libraries = c("data.table", "future.callr", "future"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
 
   origPlan <- future::plan()
-  if (is(origPlan, "sequential"))
+  if (is(origPlan, "sequential")) {
     pl <- suppressWarnings(future::plan("multisession", workers = 2)) ## suppressed for checks in Rstudio
+  }
+
   on.exit({
     future::plan(origPlan)
   }, add = TRUE)
@@ -25,7 +27,8 @@ test_that("saving files (and memoryUse)", {
       .plotInitialTime = NA, torus = TRUE, .saveObjects = "caribou",
       .saveInitialTime = 1, .saveInterval = 1
     ),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
 
   outputs <- data.frame(
     expand.grid(objectName = c("caribou", "landscape"),
@@ -160,7 +163,7 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", ""))
   unlink(tmpfile[5])
@@ -188,11 +191,21 @@ test_that("saveSimList does not work correctly", {
   mySim <- spades(mySim)
   mySim$landscape[] <- round(mySim$landscape[], 4) # after saving, these come back different, unless rounded
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
+
+  ## test using qs
   # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[2], fileBackend = 2)
   sim <- loadSimList(file = tmpfile[2], paths = paths(mySim))
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
+
+  ## test using rds
+  # removes the file-backing, loading it into R as an inMemory object
+  saveSimList(mySim, filename = extension(tmpfile[2], "rds"), fileBackend = 2)
+  sim <- loadSimList(file = extension(tmpfile[2], "rds"), paths = paths(mySim))
+  # on the saved/loaded one, it is there because it is not file-backed
+  expect_true(is.numeric(sim$landscape$DEM[]))
+  unlink(extension(tmpfile[2], "rds"))
 
   # Now put it back to disk for subsequent test
   unlink(c(tmpfile[1], extension(tmpfile[1], "gri"))) ## needed because of hardlink shenanigans
@@ -255,12 +268,11 @@ test_that("saveSimList does not work correctly", {
 
   # None of the original files exist
   expect_true(!all(file.exists(origFns)))
-
-
 })
 
 test_that("restart does not work correctly", {
   skip("restartR not possible in automated tests")
+  skip_if_not_installed("NLMR")
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
@@ -353,6 +365,7 @@ test_that("restart does not work correctly", {
 
 test_that("restart with logging", {
   skip("restartR with logging not possible in automated tests")
+  skip_if_not_installed("NLMR")
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")

@@ -1,5 +1,5 @@
 ################################################################################
-#' Named list of core \code{SpaDES} modules
+#' Named list of core `SpaDES` modules
 #'
 #' Internal function.
 #'
@@ -28,15 +28,15 @@
 ################################################################################
 #' Blank (template) event list
 #'
-#' Internal function called from \code{spades}, returning an empty event list.
+#' Internal function called from `spades`, returning an empty event list.
 #'
 #' Event lists are sorted (keyed) first by time, second by priority.
 #' Each event is represented by a \code{\link{data.table}} row consisting of:
 #' \tabular{ll}{
-#'   \code{eventTime} \tab The time the event is to occur.\cr
-#'   \code{moduleName} \tab The module from which the event is taken.\cr
-#'   \code{eventType} \tab A character string for the programmer-defined event type.\cr
-#'   \code{eventPriority} \tab The priority given to the event. \cr
+#'   `eventTime` \tab The time the event is to occur.\cr
+#'   `moduleName` \tab The module from which the event is taken.\cr
+#'   `eventType` \tab A character string for the programmer-defined event type.\cr
+#'   `eventPriority` \tab The priority given to the event. \cr
 #' }
 #'
 #' @param eventTime      The time the event is to occur.
@@ -140,7 +140,7 @@ setMethod(
 
 #' Find objects if passed as character strings
 #'
-#' Objects are passed into simList via \code{simInit} call or \code{objects(simList)}
+#' Objects are passed into simList via `simInit` call or `objects(simList)`
 #' assignment. This function is an internal helper to find those objects from their
 #' environments by searching the call stack.
 #'
@@ -166,20 +166,20 @@ setMethod(
 
 #' Modify package order in search path
 #'
-#' Intended for internal use only. It modifies the search path (i.e., \code{search()})
+#' Intended for internal use only. It modifies the search path (i.e., `search()`)
 #' such that the packages required by the current module are placed first in the
 #' search path. Note, several "core" packages are not touched; or more specifically,
 #' they will remain in the search path, but may move down if packages are rearranged.
 #' The current set of these core packages used by SpaDES can be found here:
-#' \code{SpaDES.core:::.corePackages}
+#' `SpaDES.core:::.corePackages`
 #'
 #' @param pkgs The packages that are to be placed at the beginning of the search path,
 #'
-#' @param removeOthers Logical. If \code{TRUE}, then only the packages in
-#'                     \code{c(pkgs, SpaDES.core:::.corePackages)}
+#' @param removeOthers Logical. If `TRUE`, then only the packages in
+#'                     `c(pkgs, SpaDES.core:::.corePackages)`
 #'                     will remain in the search path, i.e., all others will be removed.
 #'
-#' @param skipNamespacing Logical. If \code{FALSE}, then the running of an event in a module
+#' @param skipNamespacing Logical. If `FALSE`, then the running of an event in a module
 #'                        will not trigger a rearrangement of the search() path. This will
 #'                        generally speed up module simulations, but may create name
 #'                        conflicts between packages.
@@ -264,7 +264,7 @@ setMethod(
 #' All equal method for simLists
 #'
 #' This function removes a few attributes that are added internally
-#' by SpaDES.core and are not relevant to the \code{all.equal}. One
+#' by SpaDES.core and are not relevant to the `all.equal`. One
 #' key element removed is any time stamps, as these are guaranteed
 #' to be different.
 #'

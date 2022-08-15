@@ -24,29 +24,29 @@ clashingFnsSimple <- gsub(pattern = "\\\\>", clashingFnsSimple, replacement = ""
 allCleanMessage <- "module code appears clean"
 cantCodeCheckMessage <- ": line could not be checked "
 
-#' Find all references to \code{sim$}
+#' Find all references to `sim$`
 #'
 #' @param envToFindSim An environment where sim is defined. This is used when
 #'                     the element accessing the simList is actually a call, e.g.,
-#'                     \code{sim[[P(sim)$stackName]]}
+#'                     `sim[[P(sim)$stackName]]`
 #'
 #' @param moduleEnv The environment where the module functions are.
 #'
 #' @param type Either "get", "assign", or "globals". See details.
 #'
 #' @details
-#' \code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
-#' function code to a call, and then pass it to \code{.findElements}. It also does
-#' some cleaning for duplications, \code{NA} values, and cases where the element
-#' inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
-#' simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
+#' `.findElementsInEnv` is a wrapper around `.findElements`. It will convert
+#' function code to a call, and then pass it to `.findElements`. It also does
+#' some cleaning for duplications, `NA` values, and cases where the element
+#' inside a `sim[["xxx"]]` is a variable that should be evaluated, rather than
+#' simply taken verbatim (e.g., `sim[[P(sim)$stackName]])`.
 #'
-#' When \bold{\code{type = "get"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]]} on
+#' When **`type = "get"`**, the function scans for `sim$xxx` or `sim[["xxx"]]]` on
 #' the RHS of an assignment operator or when there is no assignment. When
-#' \bold{\code{type = "assign"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]} on the
-#' LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
+#' **`type = "assign"`**, the function scans for `sim$xxx` or `sim[["xxx"]]` on the
+#' LHS of an assignment operator. When **`type = "globals"`**, the function
 #' scans for all functions (i.e., "globals") being used. This is similar to
-#' \code{codetools::findGlobals}, but faster.
+#' `codetools::findGlobals`, but faster.
 #'
 #' @return
 #' A character string with all sim objects found
@@ -128,8 +128,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param x A call in which to search for sim
 #'
 #' @details
-#' \code{.findElement} will omit whatever it finds inside a \code{is.null}, when
-#' \code{type = "assign"}. Usually this is a test of existence of that object, in
+#' `.findElement` will omit whatever it finds inside a `is.null`, when
+#' `type = "assign"`. Usually this is a test of existence of that object, in
 #' order to assign to that object. It is only reading it to determine whether or
 #' not it should write to it.
 #'
@@ -245,7 +245,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' Runs a series of code checks during simInit
 #'
-#' This uses custom tools and some optional tools in \code{codetools}
+#' This uses custom tools and some optional tools in `codetools`
 #' package to check for function collisions with known,
 #' common function collisions (raster::stack, raster::scale).
 #' All outputs will be sent as messages.
@@ -581,8 +581,8 @@ cantCodeCheckMessage <- ": line could not be checked "
   c("is", "are")[1 + as.numeric(length(item) > 1)]
 }
 
-#' \code{.parsingSim} will pull out the various ways to use sim, e.g.,
-#' \code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
+#' `.parsingSim` will pull out the various ways to use sim, e.g.,
+#' `sim$xxx`, `sim[["xxx"]]`, `sim[[P(sim)$xxx]]`
 #'
 #' @keywords internal
 #' @rdname findElements

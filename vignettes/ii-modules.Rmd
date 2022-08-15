@@ -10,7 +10,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building `SpaDES` modules}
-  %\VignetteDepends{data.table, DiagrammeR, magrittr, RandomFields, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{data.table, DiagrammeR, magrittr, NLMR, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,9 +19,12 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
+knitr::opts_chunk$set(eval = TRUE)
 
-knitr::opts_chunk$set(eval = RFavailable)
+hasSuggests <- all(
+  require("NLMR", quietly = TRUE),
+  require("SpaDES.tools", quietly = TRUE)
+)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
@@ -144,44 +147,13 @@ Every module requires complete metadata, structured as a named list, and passed 
 &nbsp;                | the objects output by the module, with columns `objectName`, `objectClass`, `desc` and other specifications.
 &nbsp;                | Add an output object by using `createsOutput`.
 
-```{r module-metadata, eval=FALSE, echo=TRUE}
-## sample module metadata for the default `randomLandscapes` module
-## NOTE: long lines have been truncated
-defineModule(sim, list(
-  name = "randomLandscapes",
-  description = "Generate RasterStack of random maps representative of a forest landsc...",
-  keywords = c("random map", "random landscape"),
-  authors = c(person(c("Alex", "M"), "Chubaty",
-                     email = "alexander.chubaty@canada.ca",
-                     role = c("aut", "cre")),
-              person(c("Eliot", "J", "B"), "McIntire",
-                     email = "eliot.mcintire@canada.ca",
-                     role = c("aut", "cre"))),
-  version = numeric_version("0.2.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
-  timeframe = as.POSIXlt(c(NA, NA)),
-  timeunit = NA_real_,
-  citation = list(),
-  reqdPkgs = list("raster", "RColorBrewer", "SpaDES.tools"),
-  parameters = rbind(
-    defineParameter("stackName", "character", "randomLandscape", NA, NA, "..."),
-    defineParameter("nx", "numeric", 100L, NA, NA, "size of map (number ..."),
-    defineParameter("ny", "numeric", 100L, NA, NA, "size of map (number ..."),
-    defineParameter("inRAM", "logical", FALSE, NA, NA, "should the raster ..."),
-    defineParameter(".plotInitialTime", "numeric", 0, NA, NA, "time to ..."),
-    defineParameter(".plotInterval", "numeric", 1, NA, NA, "time interval ..."),
-    defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time ..."),
-    defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time ...")
-  ),
-  inputObjects = bindrows(
-    expectsInput(objectName = NA_character_, objectClass = NA_character_,
-                 desc = NA_character_, sourceURL = NA_character_, other = NA_character_)
-  ),
-  outputObjects = bindrows(
-    createsOutput(objectName = globals(sim)$stackName, objectClass = "RasterStack",
-                  desc = NA_character_, other = NA_character_)
-  )
-))
+```{r module-metadata, echo=FALSE, eval=TRUE, results="asis"}
+cat(c(
+  "```",
+  "## sample module metadata for the default `caribouMovement` module",
+  readLines(system.file("sampleModules", "caribouMovement", "caribouMovement.R", package = "SpaDES.core"))[10:45],
+  "```"
+  ), sep = "\n")
 ```
 
 #### Defining module parameters: `defineParameter()`
@@ -198,7 +170,7 @@ We suggest passing a list of all the parameters needed for a single module toget
 A module's metadata defines default values for module-specific parameters, and these defaults will be used unless overridden by the user.
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
-```{r passing-params, eval=RFavailable, echo=TRUE}
+```{r passing-params, eval=hasSuggests, echo=TRUE}
 library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
@@ -245,45 +217,13 @@ Each module may contain an arbitrary number of event types.
 Each of these event types are defined within the `doEvent.moduleName` call, and are wrapped in a simple `if`/`else` stanza that matches the called event type (NOTE: when several event types are defined, `switch`/`case` can faster than `if`/`else`).
 To keep the `doEvent.moduleName` code block as clear and readable as possible, keep the definitions of each event type minimal, using functions (defined outside of the block) for the details of what is happening for each event.
 
-```{r event-types, echo=TRUE, eval=FALSE}
-## sample event type definitions from the default `randomLandscapes` module
-doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
-  if (eventType == "init") {
-    # do stuff for this event
-    sim <- randomLandscapesInit(sim)
-
-    # schedule the next events
-    sim <- scheduleEvent(sim, params(sim)$randomLandscapes$.plotInitialTime,
-                         "randomLandscapes", "plot")
-    sim <- scheduleEvent(sim, params(sim)$randomLandscapes$.saveInitialTime,
-                         "randomLandscapes", "save")
-
-  } else if (eventType=="plot") {
-    # do stuff for this event
-    Plot(sim[[globals(sim)$stackName]])
-
-    # schedule the next event
-    sim <- scheduleEvent(sim, time(sim) +
-                           params(sim)$randomLandscapes$.plotInterval,
-                         "randomLandscapes", "plot")
-  } else if (eventType == "save") {
-    # do stuff for this event
-    saveFiles(sim)
-
-    # schedule the next event
-    sim <- scheduleEvent(sim, time(sim) +
-                           params(sim)$randomLandscapes$.saveInterval,
-                         "randomLandscapes", "save")
-
-  } else {
-    warning(paste("Undefined event type: \'",
-                  events(sim)[1, "eventType", with = FALSE],
-                  "\' in module \'",
-                  events(sim)[1, "moduleName", with = FALSE],
-                  "\'", sep = ""))
-  }
-  return(invisible(sim))
-}
+```{r event-types, echo=FALSE, eval=TRUE, results="asis"}
+cat(c(
+  "```",
+  "## sample event type definitions for the default `caribouMovement` module",
+  readLines(system.file("sampleModules", "caribouMovement", "caribouMovement.R", package = "SpaDES.core"))[61:116],
+  "```"
+  ), sep = "\n")
 ```
 
 ### Event functions
@@ -296,55 +236,16 @@ This mostly allows for function definitions to be simpler, *i.e.*, they just tak
 Accessing objects in the `envir` is similar to accessing items in a list, *i.e.*, `sim[["object"]]` or `sim$object` can be used, in addition to `get("object", envir=envir(sim))`. Likewise, simulation functions (*i.e.*, those defined in modules) are also accessed using the `$` accessor (*e.g.*, `sim$myFunction()`).
 
 Note that every module requires an `"init"` event type, which defines the initialization of the module; however, this `init` event need not do a whole lot (*i.e.*, it can be a stub).
-As such, the `modulenameInit()` function is required for initialization.
+As such, the `Init()` function is required for initialization.
 Modules may also include `"save"` and `"plot"` events, though these are optional.
 
-```{r event-functions, echo=TRUE, eval=FALSE}
-## sample event functions from the default `randomLandscapes` module
-library(raster)
-if (require(SpaDES.tools)) {
-  randomLandscapesInit <- function(sim) {
-    if (is.null(params(sim)$randomLandscapes$inRAM)) {
-      inMemory <- FALSE
-    } else {
-      inMemory <- params(sim)$randomLandscapes$inRAM
-    }
-    # Give dimensions of dummy raster
-    nx <- params(sim)$randomLandscapes$nx
-    ny <- params(sim)$randomLandscapes$ny
-    r <- raster(nrows = ny, ncols = nx, xmn = -nx/2, xmx = nx/2,
-                ymn = -ny/2, ymx = ny/2)
-    speedup <- max(1, nx/5e2)
-    # Make dummy maps for testing of models
-    DEM <- gaussMap(template, scale = 300, var = 0.03,
-                    speedup = speedup, inMemory = inMemory)
-    DEM[] <- round(getValues(DEM), 1) * 1000
-    forestAge <- gaussMap(template, scale = 10, var = 0.1,
-                          speedup = speedup, inMemory = inMemory)
-    forestAge[] <- round(getValues(forestAge), 1) * 20
-    percentPine <- gaussMap(template, scale = 50, var = 1,
-                            speedup = speedup, inMemory = inMemory)
-    percentPine[] <- round(getValues(percentPine), 1)
-  
-    # Scale them as needed
-    forestAge <- forestAge / maxValue(forestAge) * 100
-    percentPine <- percentPine / maxValue(percentPine) * 100
-  
-    # Make layers that are derived from other layers
-    habitatQuality <- (DEM + 10 + (forestAge + 2.5) * 10) / 100
-    habitatQuality <- habitatQuality / maxValue(habitatQuality)
-  
-    # Stack them into a single stack and assign to sim envir
-    mapStack <- stack(DEM, forestAge, habitatQuality, percentPine)
-    names(mapStack) <- c("DEM", "forestAge", "habitatQuality", "percentPine")
-    setColors(mapStack) <- list(DEM = brewer.pal(9, "YlOrBr"),
-                                forestAge = brewer.pal(9, "BuGn"),
-                                habitatQuality = brewer.pal(8, "Spectral"),
-                                percentPine = brewer.pal(9, "Greens"))
-    sim[[globals(sim)$stackName]] <- mapStack
-    return(invisible(sim))
-  }
-}
+```{r event-functions, echo=FALSE, eval=TRUE, results="asis"}
+cat(c(
+  "```",
+  "## sample Init event function from the default `caribouMovement` module",
+  readLines(system.file("sampleModules", "caribouMovement", "caribouMovement.R", package = "SpaDES.core"))[121:143],
+  "```"
+  ), sep = "\n")
 ```
 
 ### Event diagram
@@ -355,7 +256,7 @@ Simulation time is presented on the x-axis, starting at date `startDate`.
 Each module appears in a colour-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module.
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
-```{r sim-eventDiagram, eval=RFavailable, echo=FALSE, message=FALSE, warning=FALSE}
+```{r sim-eventDiagram, eval=hasSuggests, echo=FALSE, message=FALSE, warning=FALSE}
 library(magrittr)
 library(SpaDES.core)
 
@@ -385,9 +286,10 @@ dev.off()
 unlink(normalizePath(ftmp))
 ```
   
-```{r eventDiagram, echo=FALSE, eval=RFavailable, fig.height=10, fig.width=7}
+```{r eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7}
 # overview of the events in the simulation
-eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
+if (requireNamespace("DiagrammeR"))
+  eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 ```
 
 ## Module documentation (`moduleName.Rmd`)
@@ -407,7 +309,7 @@ Most citation management software can read and output `.bib` format.
 - `LICENSE.txt` describes how your module can be redistributed and used by others.
 For help selecting a license, see [choosealicense.com](https://choosealicense.com).
 
-- `README.txt` is used to briefly document module metadata and version change information.
+- `README.md` is used to briefly document module metadata and version change information.
 
 ## Data
 
@@ -481,7 +383,7 @@ Note that modules need not be inter-dependent on one another: module B may depen
 
 To view the dependencies for a simulation:
 
-```{r module-object-diagrams, eval=RFavailable, echo=TRUE, message=FALSE, fig.width=7}
+```{r module-object-diagrams, eval=hasSuggests, echo=TRUE, message=FALSE, fig.width=7}
 library(SpaDES.core)
 
 times <- list(start = 0.0, end = 20)
@@ -545,7 +447,7 @@ All objects in the global environment including the state of the random number g
 Checkpoint frequency and filename can be passed as parameters to the simulation object as illustrated below.
 By default, checkpointing is not used unless the `interval` parameter is provided; the simulation checkpoint file (if one exists) is loaded if the `file` parameter is specified.
 
-```{r checkpoints, echo=TRUE, eval=RFavailable, message=FALSE}
+```{r checkpoints, echo=TRUE, eval=hasSuggests, message=FALSE}
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 30)
 parameters <- list(
@@ -568,7 +470,7 @@ checkpointInterval(mySim)
 
 Schedule updates to the simulation progress bar.
 
-```{r progress, echo=TRUE, eval=RFavailable, message=FALSE}
+```{r progress, echo=TRUE, eval=hasSuggests, message=FALSE}
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 100.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -640,7 +542,7 @@ Therefore, a call to `outputs(mySim)` will indicate which objects have been save
 
 There is partial string matching of these names, so if the `fun` requires arguments to be passed to it, use `outputArgs()`, and it must be the same length as the `outputs()` `data.frame`.
 
-```{r load-save, echo=TRUE, eval=RFavailable, message=FALSE}
+```{r load-save, echo=TRUE, eval=hasSuggests, message=FALSE}
 # initialize a new simulation, setting the load and save parameters
 library(data.table)
 
@@ -877,6 +779,6 @@ Additionally, `zipModule()` can be used to build the `.zip` file corresponding t
 To submit your module for inclusion in our GitHub repository, login to GitHub with your account and initiate a pull request to the repository.
 See the [GitHub help documentation](https://docs.github.com/articles/creating-a-pull-request/) for more details.
 
-```{r cleanup, eval=RFavailable, echo=FALSE}
+```{r cleanup, eval=hasSuggests, echo=FALSE}
 unlink(outputDir, recursive = TRUE)
 ```

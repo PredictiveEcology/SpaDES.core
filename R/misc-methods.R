@@ -27,8 +27,8 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' @param y   a named list
 #'
 #' @return A named list, with elements sorted by name.
-#'          The values of matching elements in list \code{y}
-#'          replace the values in list \code{x}.
+#'          The values of matching elements in list `y`
+#'          replace the values in list `x`.
 #'
 #' @author Alex Chubaty
 #' @export
@@ -44,19 +44,18 @@ updateList <- function(x, y) {
   modifyList2(x = x, val = y)
 }
 
-
 ################################################################################
-#' Add a module to a \code{moduleList}
+#' Add a module to a `moduleList`
 #'
 #' Ordinary base lists and vectors do not retain their attributes when subsetted
 #' or appended. This function appends items to a list while preserving the
 #' attributes of items in the list (but not of the list itself).
 #'
-#' Similar to \code{updateList} but does not require named lists.
+#' Similar to `updateList` but does not require named lists.
 #'
-#' @param x,y  A \code{list} of items with optional attributes.
+#' @param x,y  A `list` of items with optional attributes.
 #'
-#' @return An updated \code{list} with attributes.
+#' @return An updated `list` with attributes.
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
@@ -99,7 +98,7 @@ setMethod("append_attr",
 #' @param len Length of strings to generate (default 8).
 #'            Will attempt to coerce to integer value.
 #'
-#' @param characterFirst Logical, if \code{TRUE}, then a letter will be the
+#' @param characterFirst Logical, if `TRUE`, then a letter will be the
 #'        first character of the string (useful if being used for object names).
 #'
 #' @return Character vector of random strings.
@@ -193,9 +192,9 @@ setMethod("rndstr",
 ################################################################################
 #' Filter objects by class
 #'
-#' Based on \url{https://stackoverflow.com/a/5158978/1380598}.
+#' Based on <https://stackoverflow.com/a/5158978/1380598>.
 #'
-#' @param x Character vector of object names to filter, possibly from \code{ls}.
+#' @param x Character vector of object names to filter, possibly from `ls`.
 #'
 #' @param include   Class(es) to include, as a character vector.
 #'
@@ -207,8 +206,8 @@ setMethod("rndstr",
 #' @return Vector of object names matching the class filter.
 #'
 #' @note \code{\link{inherits}} is used internally to check the object class,
-#' which can, in some cases, return results inconsistent with \code{is}.
-#' See \url{https://stackoverflow.com/a/27923346/1380598}.
+#' which can, in some cases, return results inconsistent with `is`.
+#' See <https://stackoverflow.com/a/27923346/1380598>.
 #' These (known) cases are checked manually and corrected.
 #'
 #' @export
@@ -387,34 +386,45 @@ setMethod(
 #' Get and set default working directories
 #'
 #' Wrapper functions to access the packages options for default working directories.
-#' Note: there is an active binding made to \code{Paths}, so a user can use
-#' \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
+#' Note: there is an active binding made to `Paths`, so a user can use
+#' `Paths$cachePath` for example instead of `getPaths()$cachePath`
 #'
 #' @param cachePath   The default local directory in which to cache simulation outputs.
-#'                    If not specified, defaults to \code{getOption("reproducible.cachePath")}.
+#'                    If not specified, defaults to `getOption("reproducible.cachePath")`.
 #'
 #' @param inputPath   The default local directory in which to look for simulation inputs
-#'                    If not specified, defaults to \code{getOption("spades.inputPath")}.
+#'                    If not specified, defaults to `getOption("spades.inputPath")`.
 #'
 #' @param modulePath  The default local directory where modules and data will be
 #'                    downloaded and stored.
-#'                    If not specified, defaults to \code{getOption("spades.modulePath")}.
+#'                    If not specified, defaults to `getOption("spades.modulePath")`.
 #'
 #' @param outputPath  The default local directory in which to save simulation outputs.
-#'                    If not specified, defaults to \code{getOption("spades.outputPath")}.
+#'                    If not specified, defaults to `getOption("spades.outputPath")`.
 #'
 #' @param rasterPath  The default local directory in which to save transient raster files.
-#'                    If not specified, defaults to \code{\link[raster:rasterOptions]{tmpDir}}.
-#'                    \emph{Important note:} this location may not be cleaned up automatically,
+#'                    If not specified, defaults to
+#'                    `file.path(getOption("spades.scratchPath"), "raster")`.
+#'                    *Important note:* this location may not be cleaned up automatically,
 #'                    so be sure to monitor this directory and remove unnecessary temp files
 #'                    that may contribute to excessive disk usage.
+#'                     *This option will be deprecated in a future release.*
+#'
+#' @param scratchPath The default local directory in which to save transient files.
+#'                    If not specified, defaults to `getOption("spades.scratchPath")`.
+#'
+#' @param terraPath  The default local directory in which to save transient terra files.
+#'                   If not specified, defaults to
+#'                   `file.path(getOption("spades.scratchPath"), "terra")`.
+#'                   *Important note:* this location may not be cleaned up automatically,
+#'                   so be sure to monitor this directory and remove unnecessary temp files
+#'                   that may contribute to excessive disk usage.
 #'
 #' @return Returns a named list of the user's default working directories.
-#' \code{setPaths} is invoked for the side effect of setting these directories.
+#' `setPaths` is invoked for the side effect of setting these directories.
 #'
 #' @author Alex Chubaty
 #' @keywords internal
-#' @importFrom raster tmpDir
 #' @name setPaths
 #' @rdname setPaths
 #' @export
@@ -422,16 +432,19 @@ setMethod(
 #' @examples
 #' \dontrun{
 #' getPaths()                       ## returns the current default working paths
-#' setPaths(cachePath = tempdir())  ## sets custom cachePath with other paths default
-#' setPaths(inputPath = tempdir())  ## sets custom inputPath with other paths default
-#' setPaths(modulePath = tempdir()) ## sets custom modulePath with other paths default
-#' setPaths(outputPath = tempdir()) ## sets custom outputPath with other paths default
+#'
+#' ## set individual custom paths
+#' setPaths(cachePath = file.path(tempdir(), "cache"))
+#' setPaths(inputPath = file.path(tempdir(), "inputs"))
+#' setPaths(modulePath = file.path(tempdir(), "modules"))
+#' setPaths(outputPath = file.path(tempdir(), "outputs"))
+#' setPaths(scratchPath = file.path(tempdir(), "scratch"))
 #'
 #' # NOTE: on loading and attaching SpaDES.core,
 #' # an active binding is made to "Paths"
 #'
 #' getPaths()
-#' Paths # same
+#' Paths ## same as getPaths() above
 #' setPaths(outputPath = tempdir())
 #' Paths # shows change
 #' }
@@ -444,11 +457,13 @@ setMethod(
   }
 
   list(
-    cachePath = .getOption("reproducible.cachePath"),
-    inputPath = getOption("spades.inputPath"),
-    modulePath = getOption("spades.modulePath"),
-    outputPath = getOption("spades.outputPath"),
-    rasterPath = tmpDir()
+    cachePath = .getOption("reproducible.cachePath"), # nolint
+    inputPath = getOption("spades.inputPath"), # nolint
+    modulePath = getOption("spades.modulePath"), # nolint
+    outputPath = getOption("spades.outputPath"), # nolint
+    rasterPath = file.path(getOption("spades.scratchPath"), "raster"), # nolint
+    scratchPath = getOption("spades.scratchPath"), # nolint
+    terraPath = file.path(getOption("spades.scratchPath"), "terra") # nolint
   )
 }
 
@@ -467,13 +482,16 @@ Paths <- .paths()
 #' @importFrom raster tmpDir
 #' @importFrom Require checkPath
 #' @param silent Logical. Should the messaging occur.
-setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, silent = FALSE) {
+setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
+                     terraPath, silent = FALSE) {
   defaults <- list(
     CP = FALSE,
     IP = FALSE,
     MP = FALSE,
     OP = FALSE,
-    RP = FALSE
+    RP = FALSE,
+    SP = FALSE,
+    TP = FALSE
   )
   if (missing(cachePath)) {
     cachePath <- .getOption("reproducible.cachePath") # nolint
@@ -491,19 +509,33 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     outputPath <- getOption("spades.outputPath") # nolint
     defaults$OP <- TRUE
   }
-  if (missing(rasterPath)) {
-    rasterPath <- tmpDir()
+  if (missing(rasterPath)) { ## TODO: deprecate
+    rasterPath <- file.path(getOption("spades.scratchPath"), "raster") # nolint
     defaults$RP <- TRUE
+  }
+  if (missing(scratchPath)) {
+    scratchPath <- getOption("spades.scratchPath") # nolint
+    defaults$SP <- TRUE
+  }
+  if (missing(terraPath)) {
+    terraPath <- file.path(getOption("spades.scratchPath"), "terra") # nolint
+    defaults$TP <- TRUE
   }
 
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
-  options(rasterTmpDir = rasterPath,
-          reproducible.cachePath = cachePath,
-          spades.inputPath = inputPath,
-          spades.modulePath = unlist(modulePath),
-          spades.outputPath = outputPath)
+  options(
+    rasterTmpDir = rasterPath,
+    reproducible.cachePath = cachePath,
+    spades.inputPath = inputPath,
+    spades.modulePath = unlist(modulePath),
+    spades.outputPath = outputPath,
+    spades.scratchPath = scratchPath
+  )
+  if (requireNamespace("terra", quietly = TRUE)) {
+    terra::terraOptions(tempdir = terraPath)
+  }
 
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
@@ -516,11 +548,11 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
       message(
         "Setting:\n",
         "  options(\n",
-        if (!defaults$RP) paste0("    rasterTmpDir = '", normPath(rasterPath), "'\n"),
         if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"),
         if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
         if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
         if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
+        if (!defaults$SP) paste0("    spades.scratchPath = '", normPath(scratchPath), "'\n"),
         "  )"
       )
     }
@@ -534,7 +566,9 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
         "    spades.inputPath = '", normPath(inputPath), "'\n",
         "    spades.outputPath = '", normPath(outputPath), "'\n",
         "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
-        "  )"
+        "    spades.scratchPath = '", normPath(scratchPath), "'\n",
+        "  )\n",
+        "  terra::terraOptions(tempdir = '", normPath(terraPath), "'"
       )
     }
   }
@@ -543,12 +577,12 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
   return(invisible(originalPaths))
 }
 
-#' Simple wrapper around \code{data.table::rbindlist}
+#' Simple wrapper around `data.table::rbindlist`
 #'
-#' This simply sets defaults to \code{fill = TRUE}, and
-#' \code{use.names = TRUE}
+#' This simply sets defaults to `fill = TRUE`, and
+#' `use.names = TRUE`
 #'
-#' @param ... 1 or more \code{data.frame}, \code{data.table}, or \code{list} objects
+#' @param ... 1 or more `data.frame`, `data.table`, or `list` objects
 #' @export
 bindrows <- function(...) {
   # Deal with things like "trailing commas"
@@ -575,28 +609,26 @@ moduleCodeFiles <- function(paths, modules) {
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
 }
 
-
-
 #' Test and update a parameter against same parameter in other modules
 #'
 #' This function is intended to be part of module code and will test whether
 #' the value of a parameter within the current module matches the value of the
 #' same parameter in other modules. This is a test for parameters that might expect
-#' to be part of a \code{params = list(.globals = list(someParam = "test"))} passed
-#' to the \code{simInit}
+#' to be part of a `params = list(.globals = list(someParam = "test"))` passed
+#' to the `simInit`
 #'
 #' @return
-#' If the value of the \code{paramToCheck} in the current module is either \code{NULL} or
-#' \code{"default"}, and there is only one other value across all modules named in \code{moduleToUse},
+#' If the value of the `paramToCheck` in the current module is either `NULL` or
+#' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
 #' then this will return a character string with the value of the single parameter value
 #' in the other module(s). It will return the current value if there are no other modules
 #' with the same parameter.
 #'
 #' It is considered a "fail" under several conditions:
 #' \enumerate{
-#'   \item current module has a value that is not \code{NULL} or \code{"default"} and another module
+#'   \item current module has a value that is not `NULL` or `"default"` and another module
 #'     has a different value;
-#'   \item there is more than one value for the \code{paramToCheck} in the other modules,
+#'   \item there is more than one value for the `paramToCheck` in the other modules,
 #'     so it is ambiguous which one to return.
 #' }
 #'
@@ -609,9 +641,9 @@ moduleCodeFiles <- function(paths, modules) {
 #' @param paramToCheck A character string, length one, of a parameter name to
 #'   check and compare between the current module and one or more or all others
 #' @param moduleToUse A character vector of module names to check against. This can be
-#'   \code{"all"} which will compare against all other modules.
-#' @param ifSetButDifferent A character string indicating whether to \code{"error"}
-#'   the default, or send a \code{"warning"}, \code{message} or just silently continue
+#'   `"all"` which will compare against all other modules.
+#' @param ifSetButDifferent A character string indicating whether to `"error"`
+#'   the default, or send a `"warning"`, `message` or just silently continue
 #'   (any other value).
 paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
                                 ifSetButDifferent = c("error", "warning", "message", "silent")) {

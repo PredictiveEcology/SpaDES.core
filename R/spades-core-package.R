@@ -1,15 +1,14 @@
-#
-#  SpaDES.core/R/SpaDES-core-package.R by Alex M Chubaty and Eliot J B McIntire
-#  Copyright (C) 2015-2021 Her Majesty the Queen in Right of Canada,
-#   as represented by the Minister of Natural Resources Canada
-#
+##  SpaDES.core/R/SpaDES-core-package.R by Alex M Chubaty and Eliot J B McIntire
+##  Copyright (C) 2015-2022 Her Majesty the Queen in Right of Canada,
+##   as represented by the Minister of Natural Resources Canada
+##
 
-#' Categorized overview of the \code{SpaDES.core} package
+#' Categorized overview of the `SpaDES.core` package
 #'
 #' @noMd
 #' @description
 #'
-#' \if{html}{\figure{SpaDES.png}{options: width=100 alt="SpaDES logo" align="right"}}
+#' \if{html}{\figure{SpaDES.png}{options: width=100 alt="SpaDES logo" style="float: right;"}}
 #' \if{latex}{\figure{SpaDES.png}{options: width=0.5in}}
 #'
 #' This package allows implementation a variety of simulation-type models,
@@ -26,14 +25,14 @@
 #' very minimally compared to the content of the events, which may often be
 #' milliseconds to many seconds each event.
 #'
-#' Bug reports: \url{https://github.com/PredictiveEcology/SpaDES.core/issues}
+#' Bug reports: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 #'
-#' Module repository: \url{https://github.com/PredictiveEcology/SpaDES-modules}
+#' Module repository: <https://github.com/PredictiveEcology/SpaDES-modules>
 #'
-#' Wiki: \url{https://github.com/PredictiveEcology/SpaDES/wiki}
+#' Wiki: <https://github.com/PredictiveEcology/SpaDES/wiki>
 #'
 #' ------------------------------------------------------------------------------------------
-#' @section 1 Spatial discrete event simulation (\code{SpaDES}):
+#' @section 1 Spatial discrete event simulation (`SpaDES`):
 #'
 #' A collection of top-level functions for doing spatial discrete event simulation.
 #'
@@ -44,9 +43,9 @@
 #'   \tabular{ll}{
 #'     \code{\link{simInit}} \tab Initialize a new simulation\cr
 #'     \code{\link{spades}} \tab Run a discrete event simulation\cr
-#'     \code{experiment} \tab In \code{SpaDES.experiment} package.
+#'     `experiment` \tab In `SpaDES.experiment` package.
 #'                                   Run multiple \code{\link{spades}} calls\cr
-#'     \code{experiment2} \tab In \code{SpaDES.experiment} package.
+#'     `experiment2` \tab In `SpaDES.experiment` package.
 #'                                   Run multiple \code{\link{spades}} calls\cr
 #'   }
 #' }
@@ -57,21 +56,21 @@
 #'   \tabular{ll}{
 #'     \code{\link{scheduleEvent}} \tab Schedule a simulation event\cr
 #'     \code{\link{scheduleConditionalEvent}} \tab Schedule a conditional simulation event\cr
-#'     \code{removeEvent} \tab Remove an event from the simulation queue (not yet implemented)\cr
+#'     `removeEvent` \tab Remove an event from the simulation queue (not yet implemented)\cr
 #'   }
 #' }
 #'
-#' @section 2 The \code{simList} object class:
+#' @section 2 The `simList` object class:
 #'
-#' The principle exported object class is the \code{simList}.
-#' All \code{SpaDES} simulations operate on this object class.
+#' The principle exported object class is the `simList`.
+#' All `SpaDES` simulations operate on this object class.
 #'
 #' \tabular{ll}{
 #'   \code{\link{simList}} \tab The 'simList' class\cr
 #' }
 #'
 #' ------------------------------------------------------------------------------------------
-#' @section 3 \code{simList} methods:
+#' @section 3 `simList` methods:
 #'
 #' Collections of commonly used functions to retrieve or set slots (and their elements)
 #' of a \code{\link{simList}} object are summarized further below.
@@ -92,7 +91,7 @@
 #'   }
 #' }
 #'
-#' \subsection{3.3 objects in the \code{simList}}{
+#' \subsection{3.3 objects in the `simList`}{
 #'   \tabular{ll}{
 #'      \code{\link{ls}}, \code{\link{objects}} \tab Names of objects referenced by the simulation environment.\cr
 #'      \code{\link{ls.str}} \tab List the structure of the simList objects.\cr
@@ -101,7 +100,7 @@
 #' }
 #'
 #' \subsection{3.4 Simulation paths}{
-#'   Accessor functions for the \code{paths} slot and its elements.
+#'   Accessor functions for the `paths` slot and its elements.
 #'   \tabular{ll}{
 #'      \code{\link{cachePath}} \tab Global simulation cache path.\cr
 #'      \code{\link{modulePath}} \tab Global simulation module path.\cr
@@ -113,7 +112,7 @@
 #' }
 #'
 #' \subsection{3.5 Simulation times}{
-#'   Accessor functions for the \code{simtimes} slot and its elements.
+#'   Accessor functions for the `simtimes` slot and its elements.
 #'
 #'   \tabular{ll}{
 #'      \code{\link{time}} \tab Current simulation time, in units of longest module.\cr
@@ -124,8 +123,8 @@
 #' }
 #'
 #' \subsection{3.6 Simulation event queues}{
-#'   Accessor functions for the \code{events} and \code{completed} slots.
-#'   By default, the event lists are shown when the \code{simList} object is printed,
+#'   Accessor functions for the `events` and `completed` slots.
+#'   By default, the event lists are shown when the `simList` object is printed,
 #'   thus most users will not require direct use of these methods.
 #'
 #'   \tabular{ll}{
@@ -137,7 +136,7 @@
 #' }
 #'
 #' \subsection{3.7 Modules, dependencies, packages}{
-#'   Accessor functions for the \code{depends}, \code{modules}, and \code{.loadOrder} slots.
+#'   Accessor functions for the `depends`, `modules`, and `.loadOrder` slots.
 #'   These are included for advanced users.
 #'
 #'   \tabular{ll}{
@@ -147,14 +146,14 @@
 #'   }
 #' }
 #'
-#' \subsection{3.8 \code{simList} environment}{
-#'   The \code{\link{simList}} has a slot called \code{.xData} which is an environment.
-#'   All objects in the \code{simList} are actually in this environment,
-#'   i.e., the \code{simList} is not a \code{list}.
+#' \subsection{3.8 `simList` environment}{
+#'   The \code{\link{simList}} has a slot called `.xData` which is an environment.
+#'   All objects in the `simList` are actually in this environment,
+#'   i.e., the `simList` is not a `list`.
 #'   In R, environments use pass-by-reference semantics, which means that copying
-#'   a \code{simList} object using normal R assignment operation (e.g., \code{sim2 <- sim1}),
-#'   will not copy the objects contained within the \code{.xData} slot.
-#'   The two objects (\code{sim1} and \code{sim2}) will share identical objects
+#'   a `simList` object using normal R assignment operation (e.g., `sim2 <- sim1`),
+#'   will not copy the objects contained within the `.xData` slot.
+#'   The two objects (`sim1` and `sim2`) will share identical objects
 #'   within that slot. Sometimes, this not desired, and a true copy is required.
 #'
 #'   \tabular{ll}{
@@ -166,15 +165,15 @@
 #' \subsection{3.9 Checkpointing}{
 #'   \tabular{lll}{
 #'      Accessor method \tab Module \tab Description\cr
-#'      \code{\link{checkpointFile}} \tab \code{checkpoint} \tab Name of the checkpoint file. (advanced)\cr
-#'      \code{\link{checkpointInterval}} \tab \code{checkpoint} \tab The simulation checkpoint interval. (advanced)\cr
+#'      \code{\link{checkpointFile}} \tab `checkpoint` \tab Name of the checkpoint file. (advanced)\cr
+#'      \code{\link{checkpointInterval}} \tab `checkpoint` \tab The simulation checkpoint interval. (advanced)\cr
 #'    }
 #'  }
 #'
 #' \subsection{3.10 Progress Bar}{
 #'   \tabular{lll}{
-#'      \code{\link{progressType}} \tab \code{.progress} \tab Type of graphical progress bar used. (advanced)\cr
-#'      \code{\link{progressInterval}} \tab \code{.progress} \tab Interval for the progress bar. (advanced)\cr
+#'      \code{\link{progressType}} \tab `.progress` \tab Type of graphical progress bar used. (advanced)\cr
+#'      \code{\link{progressInterval}} \tab `.progress` \tab Interval for the progress bar. (advanced)\cr
 #'   }
 #' }
 #'
@@ -182,10 +181,10 @@
 #' @section 4 Module operations:
 #'
 #' \subsection{4.1 Creating, distributing, and downloading modules}{
-#'   Modules are the basic unit of \code{SpaDES}.
+#'   Modules are the basic unit of `SpaDES`.
 #'   These are generally created and stored locally, or are downloaded from remote
 #'   repositories, including our
-#'   \href{https://github.com/PredictiveEcology/SpaDES-modules}{SpaDES-modules}
+#'   [SpaDES-modules](https://github.com/PredictiveEcology/SpaDES-modules)
 #'   repository on GitHub.
 #'
 #'   \tabular{ll}{
@@ -204,12 +203,12 @@
 #'   Each module requires several items to be defined.
 #'   These comprise the metadata for that module (including default parameter
 #'   specifications, inputs and outputs), and are currently written at the top of
-#'   the module's \code{.R} file.
+#'   the module's `.R` file.
 #'
 #'   \tabular{ll}{
 #'     \code{\link{defineModule}} \tab Define the module metadata\cr
 #'     \code{\link{defineParameter}} \tab Specify a parameter's name, value and set a default\cr
-#'     \code{\link{expectsInput}} \tab Specify an input object's name, class, description, \code{sourceURL} and other specifications\cr
+#'     \code{\link{expectsInput}} \tab Specify an input object's name, class, description, `sourceURL` and other specifications\cr
 #'     \code{\link{createsOutput}} \tab Specify an output object's name, class, description and other specifications\cr
 #'   }
 #'
@@ -231,20 +230,20 @@
 #'
 #'   \tabular{ll}{
 #'     \code{\link{depsEdgeList}} \tab Build edge list for module dependency graph\cr
-#'     \code{\link{depsGraph}} \tab Build a module dependency graph using \code{igraph}\cr
+#'     \code{\link{depsGraph}} \tab Build a module dependency graph using `igraph`\cr
 #'   }
 #' }
 #'
 #' ------------------------------------------------------------------------------------------
 #' @section 5 Module functions:
 #'
-#' \emph{A collection of functions that help with making modules can be found in
-#' the suggested \code{SpaDES.tools} package, and are summarized below.}
+#' *A collection of functions that help with making modules can be found in
+#' the suggested `SpaDES.tools` package, and are summarized below.*
 #'
 #' \subsection{5.1 Spatial spreading/distances methods}{
 #'   Spatial contagion is a key phenomenon for spatially explicit simulation models.
 #'   Contagion can be modelled using discrete approaches or continuous approaches.
-#'   Several \code{SpaDES.tools} functions assist with these:
+#'   Several `SpaDES.tools` functions assist with these:
 #'
 #'   \tabular{ll}{
 #'     \code{\link[SpaDES.tools]{adj}} \tab An optimized (i.e., faster) version of \code{\link[raster]{adjacent}}\cr
@@ -264,8 +263,8 @@
 #'
 #'   \tabular{ll}{
 #'     \code{\link[SpaDES.tools]{crw}} \tab Simple correlated random walk function\cr
-#'     \code{\link[SpaDES.tools]{heading}} \tab Determines the heading between \code{SpatialPoints*}\cr
-#'     \code{\link[quickPlot]{makeLines}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
+#'     \code{\link[SpaDES.tools]{heading}} \tab Determines the heading between `SpatialPoints*`\cr
+#'     \code{\link[quickPlot]{makeLines}} \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
 #'     \code{\link[SpaDES.tools:crw]{move}} \tab A meta function that can currently only take "crw"\cr
 #'     \code{\link[SpaDES.tools:specnumperpatch-probs]{specificNumPerPatch}} \tab Initiate a specific number of agents per patch\cr
 #'   }
@@ -273,7 +272,7 @@
 #'
 #' \subsection{5.3 GIS operations}{
 #'   In addition to the vast amount of GIS operations available in R (mostly from
-#'   contributed packages such as \code{sp}, \code{raster}, \code{maps}, \code{maptools}
+#'   contributed packages such as `sp`, `raster`, `maps`, `maptools`
 #'   and many others), we provide the following GIS-related functions:
 #'
 #'   \tabular{ll}{
@@ -291,13 +290,13 @@
 #'   }
 #' }
 #'
-#' \subsection{5.5 Colors in \code{Raster*} objects}{
+#' \subsection{5.5 Colors in `Raster*` objects}{
 #'   We likely will not want the default colours for every map.
-#'   Here are several helper functions to add to, set and get colors of \code{Raster*} objects:
+#'   Here are several helper functions to add to, set and get colors of `Raster*` objects:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[quickPlot:getSetColors]{setColors}} \tab Set colours for plotting \code{Raster*} objects\cr
-#'     \code{\link{getColors}} \tab Get colours in a \code{Raster*} objects\cr
+#'     \code{\link[quickPlot:getSetColors]{setColors}} \tab Set colours for plotting `Raster*` objects\cr
+#'     \code{\link{getColors}} \tab Get colours in a `Raster*` objects\cr
 #'     \code{\link{divergentColors}} \tab Create a colour palette with diverging colours around a middle\cr
 #'   }
 #' }
@@ -313,11 +312,11 @@
 #' }
 #'
 #' \subsection{5.7 Checking for the existence of objects}{
-#'   \code{SpaDES} modules will often require the existence of objects in the \code{simList}.
+#'   `SpaDES` modules will often require the existence of objects in the `simList`.
 #'   These are helpers for assessing this:
 #'
 #'   \tabular{ll}{
-#'     \code{\link{checkObject}} \tab Check for a existence of an object within a \code{simList} \cr
+#'     \code{\link{checkObject}} \tab Check for a existence of an object within a `simList` \cr
 #'     \code{\link[Require]{checkPath}} \tab Checks the specified filepath for formatting consistencies\cr
 #'   }
 #' }
@@ -329,7 +328,7 @@
 #'
 #'   \tabular{ll}{
 #'     \code{\link[SpaDES.tools:SELESagentLocation]{agentLocation}} \tab Agent location\cr
-#'     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
+#'     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a `SpatialPointsDataFrame`\cr
 #'     \code{\link[SpaDES.tools:SELESnumAgents]{numAgents}} \tab Number of agents\cr
 #'     \code{\link[SpaDES.tools:SELESprobInit]{probInit}} \tab Probability of initiating an agent or event\cr
 #'     \code{\link[SpaDES.tools:SELEStransitions]{transitions}} \tab Transition probability\cr
@@ -337,7 +336,7 @@
 #' }
 #'
 #' \subsection{5.9 Miscellaneous}{
-#'   Functions that may be useful within a \code{SpaDES} context:
+#'   Functions that may be useful within a `SpaDES` context:
 #'
 #'   \tabular{ll}{
 #'     \code{\link[SpaDES.tools]{inRange}} \tab Test whether a number lies within range [a,b]\cr
@@ -350,7 +349,7 @@
 #' ------------------------------------------------------------------------------------------
 #' @section 6 Caching simulations and simulation components:
 #'
-#' \emph{Simulation caching uses the \code{reproducible} package.}
+#' *Simulation caching uses the `reproducible` package.*
 #'
 #' Caching can be done in a variety of ways, most of which are up to the module developer.
 #' However, the one most common usage would be to cache a simulation run.
@@ -358,7 +357,7 @@
 #' goal is just to retrieve final results.
 #' This would be an alternative to manually saving the outputs.
 #'
-#' See example in \code{\link{spades}}, achieved by using \code{cache = TRUE} argument.
+#' See example in \code{\link{spades}}, achieved by using `cache = TRUE` argument.
 #'
 #' \tabular{ll}{
 #'   \code{\link[reproducible]{Cache}} \tab Caches a function, but often accessed as arg in \code{\link{spades}}\cr
@@ -417,90 +416,90 @@
 #' @section 9 Sample modules included in package:
 #'
 #' Several dummy modules are included for testing of functionality.
-#' These can be found with \code{file.path(find.package("SpaDES.core"), "sampleModules")}.
+#' These can be found with `file.path(find.package("SpaDES.core"), "sampleModules")`.
 #'
 #' \tabular{ll}{
-#'   \code{randomLandscapes} \tab Imports, updates, and plots several raster map layers\cr
-#'   \code{caribouMovement} \tab A simple agent-based (a.k.a., individual-based) model\cr
-#'   \code{fireSpread} \tab A simple model of a spatial spread process\cr
+#'   `randomLandscapes` \tab Imports, updates, and plots several raster map layers\cr
+#'   `caribouMovement` \tab A simple agent-based (a.k.a., individual-based) model\cr
+#'   `fireSpread` \tab A simple model of a spatial spread process\cr
 #' }
 #'
 #' ------------------------------------------------------------------------------------------
 #' @section 10 Package options:
 #'
-#' \code{SpaDES} packages use the following \code{\link{options}} to configure behaviour:
+#' `SpaDES` packages use the following \code{\link{options}} to configure behaviour:
 #'
 #' \itemize{
-#'   \item \code{spades.browserOnError}: If \code{TRUE}, the default, then any
-#'   error rerun the same event with \code{debugonce} called on it to allow editing
+#'   \item `spades.browserOnError`: If `TRUE`, the default, then any
+#'   error rerun the same event with `debugonce` called on it to allow editing
 #'   to be done. When that browser is continued (e.g., with 'c'), then it will save it
 #'   reparse it into the simList and rerun the edited version. This may allow a spades
 #'   call to be recovered on error, though in many cases that may not be the correct
 #'   behaviour. For example, if the simList gets updated inside that event in an iterative
 #'   manner, then each run through the event will cause that iteration to occur.
-#'   When this option is \code{TRUE}, then the event will be run at least 3 times: the
-#'   first time makes the error, the second time has \code{debugonce} and the third time
-#'   is after the error is addressed. \code{TRUE} is likely somewhat slower.
+#'   When this option is `TRUE`, then the event will be run at least 3 times: the
+#'   first time makes the error, the second time has `debugonce` and the third time
+#'   is after the error is addressed. `TRUE` is likely somewhat slower.
 #'
-#'   \item \code{reproducible.cachePath}: The default local directory in which to
+#'   \item `reproducible.cachePath`: The default local directory in which to
 #'   cache simulation outputs.
-#'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/cache}).
+#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).
 #'
-#'   \item \code{spades.inputPath}: The default local directory in which to
+#'   \item `spades.inputPath`: The default local directory in which to
 #'   look for simulation inputs.
-#'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/inputs}).
+#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`).
 #'
-#'   \item \code{spades.debug}: The default debugging value \code{debug}
-#'   argument in \code{spades()}. Default is \code{TRUE}.
+#'   \item `spades.debug`: The default debugging value `debug`
+#'   argument in `spades()`. Default is `TRUE`.
 #'
-#'   \item \code{spades.lowMemory}: If true, some functions will use more memory
-#'     efficient (but slower) algorithms. Default \code{FALSE}.
+#'   \item `spades.lowMemory`: If true, some functions will use more memory
+#'     efficient (but slower) algorithms. Default `FALSE`.
 #'
-#'   \item \code{spades.moduleCodeChecks}: Should the various code checks be run
-#'   during \code{simInit}. These are passed to codetools::checkUsage.
-#'   Default is given by the function, plus these :\code{list(suppressParamUnused = FALSE,
+#'   \item `spades.moduleCodeChecks`: Should the various code checks be run
+#'   during `simInit`. These are passed to codetools::checkUsage.
+#'   Default is given by the function, plus these :`list(suppressParamUnused = FALSE,
 #'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-#'   skipWith = TRUE)}.
+#'   skipWith = TRUE)`.
 #'
-#'   \item \code{spades.modulePath}: The default local directory where modules
+#'   \item `spades.modulePath`: The default local directory where modules
 #'     and data will be downloaded and stored.
-#'     Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/modules}).
+#'     Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/modules`).
 #'
-#'   \item \code{spades.moduleRepo}: The default GitHub repository to use when
-#'     downloading modules via \code{downloadModule}.
-#'     Default \code{"PredictiveEcology/SpaDES-modules"}.
+#'   \item `spades.moduleRepo`: The default GitHub repository to use when
+#'     downloading modules via `downloadModule`.
+#'     Default `"PredictiveEcology/SpaDES-modules"`.
 #'
-#'   \item \code{spades.nCompleted}: The maximum number of completed events to
-#'     retain in the \code{completed} event queue. Default \code{1000L}.
+#'   \item `spades.nCompleted`: The maximum number of completed events to
+#'     retain in the `completed` event queue. Default `1000L`.
 #'
-#'   \item \code{spades.outputPath}: The default local directory in which to
+#'   \item `spades.outputPath`: The default local directory in which to
 #'   save simulation outputs.
-#'   Default is a temporary directory (typically \code{/tmp/RtmpXXX/SpaDES/outputs}).
+#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/outputs`).
 #'
-#'   \item \code{spades.recoveryMode}: If this a numeric > 0 or TRUE, then the
+#'   \item `spades.recoveryMode`: If this a numeric > 0 or TRUE, then the
 #'   discrete event simulator will take a snapshot of the objects in the simList
-#'   that might change (based on metadata \code{outputObjects} for that module), prior to
+#'   that might change (based on metadata `outputObjects` for that module), prior to
 #'   initiating every event. This will allow the
-#'   user to be able to recover in case of an error or manual interruption (e.g., \code{Esc}).
+#'   user to be able to recover in case of an error or manual interruption (e.g., `Esc`).
 #'   If this is numeric, a copy of that number of "most
 #'   recent events" will be maintained so that the user can recover and restart
 #'   > 1 event in the past, i.e., redo some of the "completed" events. Default is
-#'   \code{TRUE}, i.e., it will keep the state of the \code{simList}
-#'   at the start of the current event. This can be recovered with \code{restartSpades}
-#'   and the differences can be seen in a hidden object in the stashed \code{simList.}
+#'   `TRUE`, i.e., it will keep the state of the `simList`
+#'   at the start of the current event. This can be recovered with `restartSpades`
+#'   and the differences can be seen in a hidden object in the stashed `simList.`
 #'   There is a message which describes how to find that.
 #'
-#'   \item \code{spades.switchPkgNamespaces}: Should the search path be modified
+#'   \item `spades.switchPkgNamespaces`: Should the search path be modified
 #'     to ensure a module's required packages are listed first?
-#'     Default \code{FALSE} to keep computational overhead down. If \code{TRUE},
+#'     Default `FALSE` to keep computational overhead down. If `TRUE`,
 #'     there should be no name conflicts among package objects,
 #'     but it is much slower, especially if the events are themselves fast.
 #'
-#'   \item \code{spades.tolerance}: The default tolerance value used for floating
-#'     point number comparisons. Default \code{.Machine$double.eps^0.5}.
+#'   \item `spades.tolerance`: The default tolerance value used for floating
+#'     point number comparisons. Default `.Machine$double.eps^0.5`.
 #'
-#'   \item \code{spades.useragent}: The default user agent to use for downloading
-#'     modules from GitHub.com. Default \code{"https://github.com/PredictiveEcology/SpaDES"}.
+#'   \item `spades.useragent`: The default user agent to use for downloading
+#'     modules from GitHub.com. Default `"https://github.com/PredictiveEcology/SpaDES"`.
 #' }
 #'
 #' @seealso \code{\link{spadesOptions}}

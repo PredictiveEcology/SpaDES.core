@@ -58,7 +58,7 @@ the number of update intervals to show in a graphical progress bar.}
 
 \item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
 This means that if the call is made again with the same \code{simList},
-then `spades`` will return the return value from the previous run
+then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
@@ -84,9 +84,8 @@ that get invoked with the \code{outputs} argument in  \code{simInit}. See exampl
 \item{.plots}{Character. Sets the parameter of this name in all modules.
 See \code{\link{Plots}} for possible values. The parameter is intended to slowly
 take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-For backwards compatibility, if \code{.plotInitialTime} is not set
-in this \code{spades} call, but this
-\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
+but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
 will turn off all plotting; setting this with \code{"screen"} will trigger
 plotting for any modules that use this parameter but will have no effect on
 other modules. To get plotting, therefore, it may be necessary to also set
@@ -206,7 +205,7 @@ moduleName (as character string) \tab All calls to that module will be entered
 interactively\cr
 eventName (as character string) \tab All calls that have that event name (in any module)
 will be entered interactively\cr
-\code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+\verb{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
 will be entered into. \cr
 Any other R expression expressed as a character string or quoted call \tab
 Will be evaluated with access to the simList as 'sim'.
@@ -214,7 +213,6 @@ If this is more than one character string, then all will
 be printed to the screen in their sequence. \cr
 A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
 information that users may find useful \cr
-
 }
 
 If not specified in the function call, the package

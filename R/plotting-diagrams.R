@@ -4,7 +4,7 @@ utils::globalVariables(c(".", "moduleName"))
 #' ganttStatus
 #'
 #' Internal function assign the "status" of each event to be passed to
-#' \code{DiagrammeR::mermaid} to make a Gantt chart representing the
+#' `DiagrammeR::mermaid` to make a Gantt chart representing the
 #' events in a completed simulation.
 #' 'init' events are set as "done"; 'plot' events as "critical"; and all others
 #' as "active".
@@ -42,17 +42,17 @@ setMethod("ganttStatus",
 ################################################################################
 #' sim2gantt
 #'
-#' Internal function to convert the completed events list of a \code{simList}
-#' object to a list of \code{data.frame}s suitable to pass to a call to
-#' \code{DiagrammeR::mermaid} to make a Gantt chart representing the
+#' Internal function to convert the completed events list of a `simList`
+#' object to a list of `data.frame`s suitable to pass to a call to
+#' `DiagrammeR::mermaid` to make a Gantt chart representing the
 #' events in a completed simulation.
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
 #' @param n    The number of most recently completed events to plot.
 #'
-#' @param startDate  A character representation of date in \code{YYYY-MM-DD} format.
+#' @param startDate  A character representation of date in `YYYY-MM-DD` format.
 #'
 #' @param width  Numeric. Passed to determine scale of vertical bars.
 #'
@@ -105,7 +105,7 @@ setMethod(
 #'
 #' Create a Gantt Chart representing the events in a completed simulation.
 #' This event diagram is constructed using the completed event list
-#' To change the number of events shown, provide an \code{n} argument.
+#' To change the number of events shown, provide an `n` argument.
 #'
 #' Simulation time is presented on the x-axis, starting at date 'startDate'.
 #' Each module appears in a color-coded row, within which each event for that
@@ -114,25 +114,25 @@ setMethod(
 #' the width of the bar associated with a particular module's event DOES NOT
 #' correspond to an event's "duration".
 #'
-#' Based on this StackOverflow answer: \url{https://stackoverflow.com/a/29999300/1380598}.
+#' Based on this StackOverflow answer: <https://stackoverflow.com/a/29999300/1380598>.
 #'
 #' @note
 #' A red vertical line corresponding to the current date may appear on the figure.
 #' This is useful for Gantt Charts generally but can be considered a 'bug' here.
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
 #' @param n    The number of most recently completed events to plot.
 #'
-#' @param startDate  A character representation of date in \code{YYYY-MM-DD} format.
+#' @param startDate  A character representation of date in `YYYY-MM-DD` format.
 #'
-#' @param ...  Additional arguments passed to \code{mermaid}.
-#'             Useful for specifying \code{height} and \code{width}.
+#' @param ...  Additional arguments passed to `mermaid`.
+#'             Useful for specifying `height` and `width`.
 #'
-#' @return Plots an event diagram as Gantt Chart, invisibly returning a \code{mermaid} object.
+#' @return Plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
 #'
-#' @seealso \code{DiagrammeR::mermaid}.
+#' @seealso `DiagrammeR::mermaid`.
 #'
 #' @include simList-accessors.R
 #' @export
@@ -215,18 +215,18 @@ setMethod(
 #'
 #' Create a sequence diagram illustrating the data object dependencies of a
 #' simulation. Offers a more detailed view of specific objects than does
-#' plotting the \code{depsEdgeList} directly with \code{\link{moduleDiagram}}.
+#' plotting the `depsEdgeList` directly with \code{\link{moduleDiagram}}.
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
-#' @param ...  Additional arguments passed to \code{DiagrammeR::mermaid}.
-#'             Useful for specifying \code{height} and \code{width}.
+#' @param ...  Additional arguments passed to `DiagrammeR::mermaid`.
+#'             Useful for specifying `height` and `width`.
 #'
 #' @return Plots a sequence diagram, invisibly returning a
-#'   \code{DiagrammeR::mermaid} object.
+#'   `DiagrammeR::mermaid` object.
 #'
-#' @seealso \code{DiagrammeR::mermaid}.
+#' @seealso `DiagrammeR::mermaid`.
 #'
 #' @include simList-accessors.R
 #' @export
@@ -270,20 +270,21 @@ setMethod(
 #'
 #' Create a network diagram illustrating the simplified module dependencies of a
 #' simulation. Offers a less detailed view of specific objects than does
-#' plotting the \code{depsEdgeList} directly with \code{\link{objectDiagram}}.
+#' plotting the `depsEdgeList` directly with \code{\link{objectDiagram}}.
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
-#' @param type  Character string, either \code{"rgl"} for \code{igraph::rglplot}
-#' or \code{"tk"} for \code{igraph::tkplot}. Default missing, which uses regular
-#' \code{plot}.
+#' @param type  Character string, either `"rgl"` for `igraph::rglplot`
+#' or `"tk"` for `igraph::tkplot`, `"Plot"` to use quickPlot::Plot
+#' or `"plot"` to use base::plot, the default.
 #'
 #' @param showParents Logical. If TRUE, then any children that are grouped into parent
 #'                    modules will be grouped together by colored blobs. Internally,
-#'                    this is calling \code{\link{moduleGraph}}. Default \code{FALSE}.
+#'                    this is calling \code{\link{moduleGraph}}. Default `FALSE`.
 #'
-#' @param ...  Additional arguments passed to plotting function specified by \code{type}.
+#'
+#' @param ...  Additional arguments passed to plotting function specified by `type`.
 #'
 #' @return Plots module dependency diagram.
 #'
@@ -320,7 +321,7 @@ setMethod(
 #' }
 #'
 # igraph is being imported in spades-package.R
-setGeneric("moduleDiagram", function(sim, type, showParents, ...) {
+setGeneric("moduleDiagram", function(sim, type, showParents = TRUE, ...) {
   standardGeneric("moduleDiagram")
 })
 
@@ -329,13 +330,16 @@ setGeneric("moduleDiagram", function(sim, type, showParents, ...) {
 setMethod(
   "moduleDiagram",
   signature = c(sim = "simList", type = "character", showParents = "logical"),
-  definition = function(sim, type, showParents, ...) {
+  definition = function(sim, type = "plot", showParents = TRUE,  ...) {
     if (type == "rgl") {
       rglplot(depsGraph(sim, TRUE), ...)
     } else if (type == "tk") {
       tkplot(depsGraph(sim, TRUE), ...)
     } else {
-      moduleDiagram(sim)
+      if (grep("plot", type, ignore.case = TRUE))
+        moduleDiagram(sim, showParents = showParents, plot = type, ... )
+      else
+        stop("type must be one of 'rgl', 'tk', 'Plot' or 'plot'")
     }
 })
 
@@ -343,7 +347,7 @@ setMethod(
 #' @rdname moduleDiagram
 setMethod(
   "moduleDiagram",
-  signature = c(sim = "simList", type = "missing"),
+  signature = c(sim = "simList"),
   definition = function(sim, ...) {
     modDia <- depsGraph(sim, TRUE)
     dots <- list(...)
@@ -417,16 +421,34 @@ setMethod(
         ylim2 <- if (!("ylim" %in% nDots)) c(-1.1, 1.1) else dots$ylim
         asp2 <-  if (!("asp" %in% nDots)) 0 else dots$asp
 
-        Plot(modDia, plotFn = "plot", axes = FALSE,
-             vertex.color = vcol,
-             vertex.size = vertexSize,
-             vertex.size2 = vertexSize2,
-             vertex.shape = vertexShape,
-             vertex.label.cex = vertexLabelCex,
-             vertex.label.family = vertexLabelFamily,
-             layout = layout2,
-             rescale = rescale2,
-             xlim = xlim2, ylim = ylim2, asp = asp2, ...)
+        notPlot <- isTRUE(dots$plot)
+        if (!isTRUE(notPlot)) {
+          plotTry <- try(Plot(modDia, plotFn = "plot", axes = FALSE,
+               vertex.color = vcol,
+               vertex.size = vertexSize,
+               vertex.size2 = vertexSize2,
+               vertex.shape = vertexShape,
+               vertex.label.cex = vertexLabelCex,
+               vertex.label.family = vertexLabelFamily,
+               layout = layout2,
+               rescale = rescale2,
+               xlim = xlim2, ylim = ylim2, asp = asp2, ...), silent = TRUE)
+          notPlot <- is(plotTry, "try-error")
+          if (notPlot)
+            message("Plot encountered an error; trying base::plot")
+        }
+        if (notPlot)
+          plot(modDia, axes = FALSE,
+               vertex.color = vcol,
+               vertex.size = vertexSize,
+               vertex.size2 = vertexSize2,
+               vertex.shape = vertexShape,
+               vertex.label.cex = vertexLabelCex,
+               vertex.label.family = vertexLabelFamily,
+               layout = layout2,
+               rescale = rescale2,
+               xlim = xlim2, ylim = ylim2, asp = asp2, ...)
+
       }
 
       if ("title" %in% nDots) {
@@ -448,9 +470,9 @@ setMethod(
 #'
 #' @inheritParams depsEdgeList
 #'
-#' @param ... Arguments passed to \code{Plot}
+#' @param ... Arguments passed to `Plot`
 #'
-#' @return A list with 2 elements, an \code{\link{igraph}} object and an \code{igraph}
+#' @return A list with 2 elements, an \code{\link{igraph}} object and an `igraph`
 #' communities object.
 #'
 #' @author Eliot McIntire

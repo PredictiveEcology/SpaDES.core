@@ -35,10 +35,10 @@ setMethod(
 #' @param envir Optional environment in which to store parsed code. This may be
 #'              useful if the same file is being parsed multiple times. This
 #'              function will check in that envir for the parsed file before
-#'              parsing again. If the \code{envir} is transient, then this will
+#'              parsing again. If the `envir` is transient, then this will
 #'              have no effect.
 #'
-#' @return \code{.parseModulePartial} extracts just the individual element
+#' @return `.parseModulePartial` extracts just the individual element
 #' requested from the module. This can be useful if parsing the whole module
 #' would cause an error.
 #'
@@ -51,7 +51,7 @@ setMethod(
 setGeneric(".parseModulePartial",
            function(sim, modules, filename, defineModuleElement, envir = NULL) {
              standardGeneric(".parseModulePartial")
-           })
+})
 
 #' @rdname parseModule
 setMethod(
@@ -81,7 +81,7 @@ setMethod(
         eval(out),
         error = function(x) {
           if (any(grepl("bind_rows", out))) { # historical artifact
-            if (!require("dplyr"))
+            if (!require("dplyr", quietly = TRUE))
               stop("To read module: '", gsub("\\.R", "", basename(filename)),
                    "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
             out <- eval(out)
@@ -93,7 +93,7 @@ setMethod(
       out <- NULL
     }
     return(out)
-  })
+})
 
 #' @rdname parseModule
 setMethod(
@@ -146,21 +146,21 @@ setMethod(
 #'
 #' Internal function, used during \code{\link{simInit}}.
 #'
-#' @param sim     A \code{simList} simulation object.
+#' @param sim     A `simList` simulation object.
 #'
 #' @param modules A list of modules with a logical attribute "parsed".
 #'
-#' @param userSuppliedObjNames Character string (or \code{NULL}, the default)
+#' @param userSuppliedObjNames Character string (or `NULL`, the default)
 #'                             indicating the names of objects that user has passed
 #'                             into simInit via objects or inputs.
 #'                             If all module inputObject dependencies are provided by user,
-#'                             then the \code{.inputObjects} code will be skipped.
+#'                             then the `.inputObjects` code will be skipped.
 #'
-#' @param notOlderThan Passed to \code{Cache} that may be used for .inputObjects function call.
+#' @param notOlderThan Passed to `Cache` that may be used for .inputObjects function call.
 #'
-#' @param ... All \code{simInit} parameters.
+#' @param ... All `simInit` parameters.
 #'
-#' @return A \code{simList} simulation object.
+#' @return A `simList` simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @importFrom reproducible Cache
@@ -268,7 +268,7 @@ setMethod(
 
           # evaluate the rest of the parsed file
           if (doesntUseNamespacing) {
-            message("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
+            stop("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
                     "It is now recommended to define functions that are not prefixed with the module name\n  ",
                     "and to no longer call the functions with sim$functionName.\n  ",
                     "Simply call functions in your module with their name: e.g.,\n  ",
@@ -530,6 +530,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
   simCopy <- Copy(sim, objects = FALSE)
+  simCopy$.mods <- Copy(sim$.mods)
   tmpEnvir$sim <- simCopy
 
   ll <- lapply(parsedModuleNoDefineModule,
@@ -554,7 +555,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   activeCode
 }
 
-#' Extract the user-defined \code{.inputObjects} function from a module
+#' Extract the user-defined `.inputObjects` function from a module
 #'
 #' @keywords internal
 #' @rdname getModuleInputObjects
@@ -569,7 +570,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
 #' Check is module uses module namespacing
 #'
-#' Older modules may not have their functions etc. namespaced in the \code{simList}.
+#' Older modules may not have their functions etc. namespaced in the `simList`.
 #'
 #' @keywords internal
 #' @rdname isNamespaced

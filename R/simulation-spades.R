@@ -3,26 +3,26 @@ utils::globalVariables(c(".", ".I", "whi"))
 ################################################################################
 #' Process a simulation event
 #'
-#' Internal function called from \code{spades}.
+#' Internal function called from `spades`.
 #'
 #' Calls the module corresponding to the event call, and executes the event.
 #'
 #' Here, we implement a simulation in a more modular fashion so it's easier to add
 #' submodules to the simulation. We use S4 classes and methods.
 #'
-#' @param sim Character string for the \code{simList} simulation object.
+#' @param sim Character string for the `simList` simulation object.
 #' @param useFuture Experimental use of future::future package. Not fully implemented.
 #'
 #' @inheritParams spades
-#' @return Returns the modified \code{simList} object.
+#' @return Returns the modified `simList` object.
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom data.table data.table rbindlist setkey fread
+#' @importFrom data.table data.table rbindlist fread
 #' @importFrom reproducible Cache messageDF
 #' @importFrom utils write.table
 #' @include helpers.R memory-leaks.R
@@ -36,7 +36,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   #if (missing(debug)) debug <- FALSE
   #if (!inherits(sim, "simList")) stop("sim must be a simList")
   #if (!is(sim, "simList")) stop("sim must be a simList")
-  if (class(sim) != "simList") { # faster than `is` and `inherits`
+  if (!inherits(sim, "simList")) {  ## July 2022: R 4.2 flags against using class()
     stop("doEvent can only accept a simList object")
   }
 
@@ -98,7 +98,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     }
   }
 
-
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <<- sim@current
@@ -113,15 +112,39 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
       fnEnv <- sim@.xData$.mods[[curModuleName]]
+
+      # This allows spades to run even if all the functions are in the .GlobalEnv;
+      #   while this is generally bad practice, and none of the tools in spades
+      #   enable this to happen, this allows a user can manually run individual functions
+      #   like `doEvent.XXX` and `scheduleEvent`, then run `spades(sim)` without failing
+      if (is.null(fnEnv)) {
+        if (!curModuleName %in% .coreModules())
+          fnEnv <- asNamespace("SpaDES.core")
+      }
+      fnEnvIsSpaDES.core <- identical(fnEnv, asNamespace("SpaDES.core"))
+
       # update current simulated time
       # Test replacement for speed
-      #slot(sim, "simtimes")[["current"]] <- cur[["eventTime"]]
       st <- slot(sim, "simtimes")
       st[["current"]] <- cur[["eventTime"]]
       slot(sim, "simtimes", check = FALSE) <- st
 
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", curModuleName, sep = ".")
+      # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
+      if (!is.null(fnEnv))
+        if (!exists(moduleCall, envir = fnEnv)) {
+          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur$eventType)
+          if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
+            fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
+            moduleCall <- moduleCallSeparateEventFns
+          } else {
+            if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+              moduleCall <- moduleCallSeparateEventFns
+            }
+
+          }
+        }
 
       # if debug is TRUE
       if (is.null(attr(sim, "needDebug"))) {
@@ -136,77 +159,81 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      if (curModuleName %in% sim@modules) {
-        if (curModuleName %in% core) {
-          sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
-        } else {
-          # for future caching of modules
-          cacheIt <- FALSE
-          eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-          a <- sim@params[[curModuleName]][[".useCache"]]
-          if (!is.null(a)) {
-            #.useCache is a parameter
-            if (!identical(FALSE, a)) {
-              #.useCache is not FALSE
-              if (!isTRUE(a)) {
-                #.useCache is not TRUE
-                if (cur[["eventType"]] %in% a) {
-                  cacheIt <- TRUE
-                } else if (is(a, "POSIXt")) {
-                  cacheIt <- TRUE
-                  notOlderThan <- a
-                }
-              } else {
+      moduleIsInSim <- curModuleName %in% sim@modules
+      if (!moduleIsInSim && !fnEnvIsSpaDES.core)
+        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
+      # if (curModuleName %in% sim@modules) {
+      if (curModuleName %in% core) {
+        sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
+      } else {
+        # for future caching of modules
+        cacheIt <- FALSE
+        eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
+        a <- sim@params[[curModuleName]][[".useCache"]]
+        if (!is.null(a)) {
+          #.useCache is a parameter
+          if (!identical(FALSE, a)) {
+            #.useCache is not FALSE
+            if (!isTRUE(a)) {
+              #.useCache is not TRUE
+              if (cur[["eventType"]] %in% a) {
                 cacheIt <- TRUE
+              } else if (is(a, "POSIXt")) {
+                cacheIt <- TRUE
+                notOlderThan <- a
               }
-            }
-          }
-
-          # browser(expr = exists("._doEvent_2"))
-          showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
-            isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
-              isTRUE(getOption("reproducible.showSimilar", FALSE))
             } else {
-              isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
-            }
-
-          # This is to create a namespaced module call
-          if (!.pkgEnv[["skipNamespacing"]])
-            .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
-                              removeOthers = FALSE)
-
-          skipEvent <- FALSE
-          if (!is.null(eventSeed)) {
-            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-              initialRandomSeed <- .Random.seed
-            set.seed(eventSeed) # will create .Random.seed
-          }
-
-          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
-          if (useFuture) {
-            # stop("using future for spades events is not yet fully implemented")
-            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                          curModName = cur[["moduleName"]])
-
-            if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
-              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
-                                     futureNeeds = futureNeeds)
-              skipEvent <- TRUE
+              cacheIt <- TRUE
             }
           }
+        }
 
-          if (!skipEvent) {
-            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                             showSimilar = showSimilar, .pkgEnv)
+        # browser(expr = exists("._doEvent_2"))
+        showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
+                           isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
+          isTRUE(getOption("reproducible.showSimilar", FALSE))
+        } else {
+          isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
+        }
+
+        # This is to create a namespaced module call
+        if (!.pkgEnv[["skipNamespacing"]])
+          .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
+                            removeOthers = FALSE)
+
+        skipEvent <- FALSE
+        if (!is.null(eventSeed)) {
+          if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
+            initialRandomSeed <- .Random.seed
+          set.seed(eventSeed) # will create .Random.seed
+        }
+
+        .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+        if (useFuture) {
+          # stop("using future for spades events is not yet fully implemented")
+          futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                        curModName = cur[["moduleName"]])
+
+          if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
+            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                                   showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                   futureNeeds = futureNeeds)
+            skipEvent <- TRUE
           }
+        }
 
-          if (!is.null(eventSeed)) {
-            if (exists("initialRandomSeed", inherits = FALSE))
-              .Random.seed <- initialRandomSeed
-          }
+        if (!skipEvent) {
+          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                           showSimilar = showSimilar, .pkgEnv)
+        }
 
-          # browser(expr = exists("._doEvent_3"))
+        if (!is.null(eventSeed)) {
+          if (exists("initialRandomSeed", inherits = FALSE))
+            .Random.seed <- initialRandomSeed
+        }
+
+        # browser(expr = exists("._doEvent_3"))
+        if (!fnEnvIsSpaDES.core) {
           if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
@@ -222,18 +249,17 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE)) {
             if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
                                       silent = TRUE, error = function(x) FALSE)
-                             ))
-            stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
-                 "sim$", curModuleName, ". ",
-                 "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
+            ))
+              stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+                   "sim$", curModuleName, ". ",
+                   "Please remove the section of code that does this in the event named: ",
+                   cur[["eventType"]])
           }
         }
-      } else {
-        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
       }
+        # }
 
-      # add to list of completed events
+        # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
@@ -303,13 +329,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #' submodules to the simulation. We use S4 classes and methods, and use `data.table`
 #' instead of `data.frame` to implement the event queue (because it is much faster).
 #'
-#' @param sim            A \code{simList} simulation object.
+#' @param sim            A `simList` simulation object.
 #'
 #' @param eventTime      A numeric specifying the time of the next event.
 #'
 #' @param moduleName     A character string specifying the module from which to
 #'                       call the event. If missing, it will use
-#'                       \code{currentModule(sim)}
+#'                       `currentModule(sim)`
 #'
 #' @param eventType      A character string specifying the type of event from
 #'                       within the module.
@@ -320,12 +346,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'                       grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
 #'                       similar).
 #'                       See \code{\link{priority}}.
-#' @param .skipChecks Logical. If \code{TRUE}, then internal checks that arguments match
+#' @param .skipChecks Logical. If `TRUE`, then internal checks that arguments match
 #'                    expected types are skipped. Should only be used if speed is critical.
 #'
-#' @return Returns the modified \code{simList} object.
+#' @return Returns the modified `simList` object.
 #'
-#' @importFrom data.table setkey
 #' @include priority.R
 #' @export
 #' @rdname scheduleEvent
@@ -335,7 +360,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #' \dontrun{
@@ -360,7 +385,9 @@ scheduleEvent <- function(sim,
   if (missing(moduleName)) moduleName <- currentModule(sim)
 
   if (!.skipChecks) {
-    if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+    if (!inherits(sim, "simList")) {
+      stop("sim must be a simList")  ## July 2022: R 4.2 flags against using class()
+    }
 
     if (!is.numeric(eventTime)) {
       if (is.na(eventTime)) {
@@ -409,7 +436,7 @@ scheduleEvent <- function(sim,
         if (eventTimeInSeconds > sim@events[[numEvents]][[1]]) {
           needSort <- FALSE
         } else if (eventTimeInSeconds == sim@events[[numEvents]][[1]] &&
-                   eventPriority >= sim@events[[numEvents]][[4]]){
+                   eventPriority >= sim@events[[numEvents]][[4]]) {
           needSort <- FALSE
         }
         if (needSort) {
@@ -437,33 +464,33 @@ scheduleEvent <- function(sim,
 #'
 #' Adds a new event to the simulation's conditional event queue,
 #' updating the simulation object by creating or appending to
-#' \code{sim$._conditionalEvents}. This is very experimental. Use with caution.
+#' `sim$._conditionalEvents`.
+#' *This is very experimental. Use with caution.*
 #'
 #' @inheritParams scheduleEvent
 #'
 #' @param minEventTime   A numeric specifying the time before which the event should not occur,
-#'         even if the condition is met. Defaults to \code{start(sim)}
+#'         even if the condition is met. Defaults to `start(sim)`
 #'
 #' @param maxEventTime   A numeric specifying the time after which the event should not occur,
-#'         even if the condition is met. Defaults to \code{end(sim)}
+#'         even if the condition is met. Defaults to `end(sim)`
 #'
-#' @param condition A string, call or expression that will be assessed for \code{TRUE}
+#' @param condition A string, call or expression that will be assessed for `TRUE`
 #'      after each event in the regular event queue.
-#'      It can access objects in the \code{simList} by using functions of \code{sim},
-#'      e.g., \code{"sim$age > 1"}
+#'      It can access objects in the `simList` by using functions of `sim`,
+#'      e.g., `"sim$age > 1"`
 #'
-#' @return Returns the modified \code{simList} object, i.e., \code{sim$._conditionalEvents}.
+#' @return Returns the modified `simList` object, i.e., `sim$._conditionalEvents`.
 #'
 #' This conditional event queue will be assessed at every single event in the normal event
-#' queue. If there are no conditional events, then \code{spades} will proceed as normal.
+#' queue. If there are no conditional events, then `spades` will proceed as normal.
 #' As conditional event conditions are found to be true, then it will trigger a call to
-#' \code{scheduleEvent(...)} with the current time passed to \code{eventTime} \emph{and}
+#' `scheduleEvent(...)` with the current time passed to `eventTime` *and*
 #' it will remove the conditional event from the conditional queue.
 #' If the user would like the triggered conditional event to occur as the very next event,
-#' then a possible strategy would be to set \code{eventPriority} of the conditional event
+#' then a possible strategy would be to set `eventPriority` of the conditional event
 #' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
-#' @importFrom data.table setkey
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
@@ -473,7 +500,7 @@ scheduleEvent <- function(sim,
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #'   sim <- simInit(times = list(start = 0, end = 2))
@@ -492,10 +519,12 @@ scheduleConditionalEvent <- function(sim,
                                      condition,
                                      moduleName,
                                      eventType,
-                                     eventPriority = .pkgEnv$.normalVal,
+                                     eventPriority = .normal(),
                                      minEventTime = start(sim),
                                      maxEventTime = end(sim)) {
-  if (class(sim) != "simList") stop("sim must be a simList") # faster than `is` and `inherits`
+  if (!inherits(sim, "simList")) {
+    stop("sim must be a simList") ## July 2022: R 4.2 flags against using class()
+  }
 
   if (!is.numeric(minEventTime)) {
     if (is.na(minEventTime)) {
@@ -566,7 +595,7 @@ scheduleConditionalEvent <- function(sim,
       if (minEventTimeInSeconds > sim$._conditionalEvents[[numEvents]]$minEventTime) {
         needSort <- FALSE
       } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &
-                 eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority){
+                 eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority) {
         needSort <- FALSE
       }
       if (needSort) {
@@ -596,156 +625,155 @@ scheduleConditionalEvent <- function(sim,
 #' submodules to the simulation. We use S4 classes and methods, and use `data.table`
 #' instead of `data.frame` to implement the event queue (because it is much faster).
 #'
-#' @param sim A \code{simList} simulation object, generally produced by \code{simInit}.
+#' @param sim A `simList` simulation object, generally produced by `simInit`.
 #'
-#' @param debug Optional tools for invoking debugging. Supplying a \code{list}
-#'              will invoke the more powerful \code{logging} package. See details.
-#'              Default is to use the value in \code{getOption("spades.debug")}.
+#' @param debug Optional tools for invoking debugging. Supplying a `list`
+#'              will invoke the more powerful `logging` package. See details.
+#'              Default is to use the value in `getOption("spades.debug")`.
 #'
-#' @param progress Logical (\code{TRUE} or \code{FALSE} show a graphical progress bar),
-#'                 character (\code{"graphical"}, \code{"text"}) or numeric indicating
+#' @param progress Logical (`TRUE` or `FALSE` show a graphical progress bar),
+#'                 character (`"graphical"`, `"text"`) or numeric indicating
 #'                 the number of update intervals to show in a graphical progress bar.
 #'
-#' @param cache Logical. If \code{TRUE}, then the \code{spades} call will be cached.
-#'              This means that if the call is made again with the same \code{simList},
-#'              then `spades`` will return the return value from the previous run
-#'              of that exact same \code{simList}. Default \code{FALSE}. See Details.
+#' @param cache Logical. If `TRUE`, then the `spades` call will be cached.
+#'              This means that if the call is made again with the same `simList`,
+#'              then `spades` will return the return value from the previous run
+#'              of that exact same `simList`. Default `FALSE`. See Details.
 #'              See also the vignette on caching for examples.
 #'
-#' @param .plotInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
+#' @param .plotInitialTime Numeric. Temporarily override the `.plotInitialTime`
 #'                                  parameter for all modules. See Details.
 #'
-#' @param .saveInitialTime Numeric. Temporarily override the \code{.plotInitialTime}
+#' @param .saveInitialTime Numeric. Temporarily override the `.plotInitialTime`
 #'                                  parameter for all modules. See Details.
 #'
 #' @param .plots Character. Sets the parameter of this name in all modules.
 #'   See \code{\link{Plots}} for possible values. The parameter is intended to slowly
-#'   take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-#'   For backwards compatibility, if \code{.plotInitialTime} is not set
-#'   in this \code{spades} call, but this
-#'   \code{.plots} is used, two things will happen: setting this without \code{"screen"}
-#'   will turn off all plotting; setting this with \code{"screen"} will trigger
+#'   take over from `.plotInitialTime` as a mechanism to turn on or off plotting.
+#'   For backwards compatibility, if `.plotInitialTime` is not set in this `spades` call,
+#'   but this `.plots` is used, two things will happen: setting this without `"screen"`
+#'   will turn off all plotting; setting this with `"screen"` will trigger
 #'   plotting for any modules that use this parameter but will have no effect on
 #'   other modules. To get plotting, therefore, it may be necessary to also set
-#'   \code{.plotInitialTime = start(sim)}.
+#'   `.plotInitialTime = start(sim)`.
 #'
-#' @param notOlderThan Date or time. Passed to \code{reproducible::Cache} to update the cache.
-#'                     Default is \code{NULL}, meaning don't update the cache.
-#'                     If \code{Sys.time()} is provided, then it will force a recache,
+#' @param notOlderThan Date or time. Passed to `reproducible::Cache` to update the cache.
+#'                     Default is `NULL`, meaning don't update the cache.
+#'                     If `Sys.time()` is provided, then it will force a recache,
 #'                     i.e., remove old value and replace with new value.
-#'                     Ignored if \code{cache} is \code{FALSE}.
+#'                     Ignored if `cache` is `FALSE`.
 #' @param events A character vector or a named list of character vectors. If specified,
 #'   the simulations will only do the events indicated here. If a named list, the names
 #'   must correspond to the modules and the character vectors can be specific events within
-#'   each of the named modules. With the \code{list} form, all unspecified modules
-#'   will run \emph{all} their events, including internal spades modules, e.g., \code{save},
-#'   that get invoked with the \code{outputs} argument in  \code{simInit}. See example.
+#'   each of the named modules. With the `list` form, all unspecified modules
+#'   will run *all* their events, including internal spades modules, e.g., `save`,
+#'   that get invoked with the `outputs` argument in  `simInit`. See example.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
-#'            This will be included in the \code{Cache} call, so will be unique
-#'            and thus \code{spades} will not use a cached copy as long as
-#'            anything passed in \code{...} is unique, i.e., not cached previously.
+#'            This will be included in the `Cache` call, so will be unique
+#'            and thus `spades` will not use a cached copy as long as
+#'            anything passed in `...` is unique, i.e., not cached previously.
 #'
-#' @return Invisibly returns the modified \code{simList} object.
+#' @return Invisibly returns the modified `simList` object.
 #'
 #' @seealso \code{\link{SpaDES.core-package}},
 #' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
-#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
+#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html> which
 #' uses \code{\link[reproducible]{Cache}}.
 #'
 #'
 #' @details
 #' The is the workhorse function in the SpaDES package. It runs simulations by
-#' implementing the rules outlined in the \code{simList}.
+#' implementing the rules outlined in the `simList`.
 #'
 #' This function gives simple access to two sets of module parameters:
-#' \code{.plotInitialTime} and with \code{.plotInitialTime}. The primary use of
+#' `.plotInitialTime` and with `.plotInitialTime`. The primary use of
 #' these arguments is to temporarily turn off plotting and saving. "Temporary"
-#' means that the \code{simList} is not changed, so it can be used again with
+#' means that the `simList` is not changed, so it can be used again with
 #' the simList values reinstated. To turn off plotting and saving, use
-#' \code{.plotInitialTime = NA} or \code{.saveInitialTime = NA}. NOTE: if a
-#' module did not use \code{.plotInitialTime} or \code{.saveInitialTime}, then
+#' `.plotInitialTime = NA` or `.saveInitialTime = NA`. NOTE: if a
+#' module did not use `.plotInitialTime` or `.saveInitialTime`, then
 #' these arguments will not do anything.
 #'
 #' @section Caching with SpaDES:
 #'
 #' There are numerous ways in which Caching can be used within SpaDES. Please
 #' see the vignette
-#' \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
+#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html>
 #' for many examples. Briefly, functions, events, modules, entire spades calls or
-#' experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experiment})
+#' experiment calls (see <https://github.com/PredictiveEcology/SpaDES.experiment>)
 #' can be cached and mixtures of all of these will work. For functions, simply
-#' wrap the call with \code{Cache}, moving the original function name into
-#' the first argument of Cache. For events or modules, set the module \code{parameters},
-#' \code{.useCache}, e.g.,
-#' \code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
+#' wrap the call with `Cache`, moving the original function name into
+#' the first argument of Cache. For events or modules, set the module `parameters`,
+#' `.useCache`, e.g.,
+#' `simInit(..., parameters = list(myModule = list(.useCache = "init")))`.
 #' This can be set to an event name, which will cache that event, or a logical (e.g., \code{}),
-#' which will cache \emph{every} event in that module. Event and module caching
+#' which will cache *every* event in that module. Event and module caching
 #' makes most sense when the event or module only runs once, such as an initialization
 #' or data preparation event/module. Caching an entire simulation is actually just
-#' a function call to \code{simInitAndSpades}, for example. So, simply writing
-#' \code{Cache(simInitAndSpades, modules = ...)} will effectively cache a whole simulation.
+#' a function call to `simInitAndSpades`, for example. So, simply writing
+#' `Cache(simInitAndSpades, modules = ...)` will effectively cache a whole simulation.
 #' Finally for experiments, it is just like a function call:
-#' \code{Cache(simInitandExperiment, ...)}. The final way Caching can be done is in
-#' \code{experiment} or \code{spades}, by setting the \code{cache} argument.
+#' `Cache(simInitandExperiment, ...)`. The final way Caching can be done is in
+#' `experiment` or `spades`, by setting the `cache` argument.
 #'
-#' If \code{cache} is TRUE, this allows for a seamless way to "save" results
+#' If `cache` is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
-#' Instead, upon a call to \code{spades} in which the simList is identical,
+#' Instead, upon a call to `spades` in which the simList is identical,
 #' the function will simply return the result that would have come if it had
 #' been rerun. Use this with caution, as it will return exactly the result from
 #' a previous run, even if there is stochasticity internally.
 #' Caching is only based on the input simList.
 #' See also the vignette on caching for examples.
 #'
-#' @section \code{debug}:
+#' @section `debug`:
 #'
-#' The most powerful way to use debug is to invoke the \code{logging}
-#' R package. To invoke this, \code{debug} must be a list with up to 3
+#' The most powerful way to use debug is to invoke the `logging`
+#' R package. To invoke this, `debug` must be a list with up to 3
 #' named elements:
-#' \code{console}, \code{file}, and \code{debug}. Each of these list elements
-#' must be a list (including empty \code{list()} for defaults) with the
+#' `console`, `file`, and `debug`. Each of these list elements
+#' must be a list (including empty `list()` for defaults) with the
 #' sub-list elements here:
 #' \tabular{lll}{
-#'   \code{console} \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-#'   \code{file} \tab \code{append} \tab Logical. If \code{TRUE}, the default, then
+#'   `console` \tab `level` \tab The `level`, see below, of information shown\cr
+#'   `file` \tab `append` \tab Logical. If `TRUE`, the default, then
 #'                                       log entries are appended to file, if it exists\cr
-#'               \tab \code{file} \tab A filename. Defaults to \code{log.txt}\cr
-#'               \tab \code{level} \tab The \code{level}, see below, of information shown\cr
-#'   \code{debug} \tab See possible values below\cr
+#'               \tab `file` \tab A filename. Defaults to `log.txt`\cr
+#'               \tab `level` \tab The `level`, see below, of information shown\cr
+#'   `debug` \tab See possible values below\cr
 #'   }
 #'
-#' \code{level} can be a number from 0 to 100 or a character string matching one
-#' of the values in \code{logging::loglevels}. These are hierarchical levels of
+#' `level` can be a number from 0 to 100 or a character string matching one
+#' of the values in `logging::loglevels`. These are hierarchical levels of
 #' information passed to the console. Set a lower number for more information and a
-#' higher number for less information. Errors in code will be shown if \code{level}
-#' is set to \code{"ERROR"} or \code{40} or above; warnings in code will be shown if
-#' \code{level} is set to \code{"WARN"} or \code{30} or above;
+#' higher number for less information. Errors in code will be shown if `level`
+#' is set to `"ERROR"` or `40` or above; warnings in code will be shown if
+#' `level` is set to `"WARN"` or `30` or above;
 #' normal messages in code will
-#' be shown if \code{level} is set to \code{"INFO"} or \code{20} or above. For
+#' be shown if `level` is set to `"INFO"` or `20` or above. For
 #' consistency with base R messaging, if default level is used, then normal
-#' messaging via \code{message} will be shown; this means that \code{suppressMessages}
-#' will work to suppress messaging only when level is set to \code{"INFO"} or \code{20}.
+#' messaging via `message` will be shown; this means that `suppressMessages`
+#' will work to suppress messaging only when level is set to `"INFO"` or `20`.
 #' Some functions in the SpaDES ecosystem may have information at the lower levels,
 #' but currently, there are few to none.
 #'
-#' \code{debug} is specified as a non-list argument to \code{spades} or as
-#' \code{list(debug = ...)}, then it can be a logical, a quoted call, a character vector
+#' `debug` is specified as a non-list argument to `spades` or as
+#' `list(debug = ...)`, then it can be a logical, a quoted call, a character vector
 #' or a numeric scalar (currently 1 or 2) or a list of any of these to get multiple
 #' outputs. This will be run at the start of every event. The following options for debug
 #' are available. Each of these can also be in a list to get multiple outputs:
 #'
 #' \tabular{ll}{
-#'   \code{TRUE} \tab \code{current(sim)} will be printed at the start of each event as
+#'   `TRUE` \tab `current(sim)` will be printed at the start of each event as
 #'                     it runs\cr
 #'   a function name (as character string) \tab If a function, then it will be run on the
 #'                                            simList, e.g., "time" will run
-#'                                            \code{time(sim)} at each event.\cr
+#'                                            `time(sim)` at each event.\cr
 #'   moduleName (as character string) \tab All calls to that module will be entered
 #'                                         interactively\cr
 #'   eventName (as character string) \tab All calls that have that event name (in any module)
 #'                                        will be entered interactively\cr
-#'   \code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+#'   `c(<moduleName>, <eventName>)`  \tab Only the event in that specified module
 #'                                             will be entered into. \cr
 #'   Any other R expression expressed as a character string or quoted call \tab
 #'                                 Will be evaluated with access to the simList as 'sim'.
@@ -753,35 +781,32 @@ scheduleConditionalEvent <- function(sim,
 #'                                be printed to the screen in their sequence. \cr
 #'   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
 #'                                           information that users may find useful \cr
-#'
 #' }
 #'
 #' If not specified in the function call, the package
-#' option \code{spades.debug} is used.
+#' option `spades.debug` is used.
 #'
-#' If \code{options("spades.browserOnError" = TRUE)} (experimental still) if
+#' If `options("spades.browserOnError" = TRUE)` (experimental still) if
 #' there is an error, it will attempt to open a browser
-#' in the event where the error occurred. You can edit, and then press \code{c} to continue
-#' or \code{Q} to quit, plus all other normal interactive browser tools.
-#' \code{c} will trigger a reparse and events will continue as scheduled, starting
+#' in the event where the error occurred. You can edit, and then press `c` to continue
+#' or `Q` to quit, plus all other normal interactive browser tools.
+#' `c` will trigger a reparse and events will continue as scheduled, starting
 #' with the one just edited. There may be some unexpected consequences if the
-#' \code{simList} objects had already been changed before the error occurred.
-#'
-#'
-#'
+#' `simList` objects had already been changed before the error occurred.
 #'
 #' @note The debug option is primarily intended to facilitate building simulation
 #' models by the user.
 #' Will print additional outputs informing the user of updates to the values of
-#' various \code{simList} slot components.
-#' See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details.
+#' various `simList` slot components.
+#' See <https://github.com/PredictiveEcology/SpaDES/wiki/Debugging> for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
+#' @importFrom data.table setDTthreads
 #' @export
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #' \dontrun{
@@ -855,7 +880,7 @@ setGeneric(
            .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
            events = NULL, .plots = NULL, ...) {
     standardGeneric("spades")
-  })
+})
 
 #' @rdname spades
 setMethod(
@@ -871,6 +896,9 @@ setMethod(
                         events,
                         .plots,
                         ...) {
+
+    opt <- options("encoding" = "UTF-8")
+    on.exit(options(opt), add = TRUE)
 
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
       modNam <- getOption("spades.covr")
@@ -900,7 +928,7 @@ setMethod(
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
       } else {
-        warning("debug cannot be a list unless logging package is installed: install.package('logging')\n",
+        warning("debug cannot be a list unless logging package is installed: install.packages('logging')\n",
                 "setting debug to non-list using unlist(debug)")
         debug <- unlist(debug)
 
@@ -912,7 +940,6 @@ setMethod(
     loadPkgs(pkgs)
 
     sim <- withCallingHandlers({
-
       recoverModeWrong <- getOption("spades.recoverMode")
       if (!is.null(recoverModeWrong))
         warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
@@ -962,8 +989,6 @@ setMethod(
         }
       }
 
-
-
       # This sets up checking for memory leaks
       if (is.null(sim@.xData[["._knownObjects"]])) {
         moduleNames <- unname(modules(sim))
@@ -983,7 +1008,8 @@ setMethod(
       # Memory Use
       # memory estimation of each event/sim
       if (getOption("spades.memoryUseInterval", 0) > 0) {
-        if (requireNamespace("future", quietly = TRUE)) {
+        if (requireNamespace("future", quietly = TRUE) &&
+            requireNamespace("future.callr", quietly = TRUE)) {
           originalPlan <- future::plan()
           sim <- memoryUseSetup(sim, originalPlan)
           on.exit({
@@ -1128,6 +1154,11 @@ setMethod(
         if (isTRUE(specialStart)) sim@simtimes[["current"]] <- sim@events[[1]][["eventTime"]]
       }
 
+      simDTthreads <- getOption("spades.DTthreads", 1L)
+      message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
+      origDTthreads <- setDTthreads(simDTthreads)
+      on.exit(setDTthreads(origDTthreads), add = TRUE)
+
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         if (recoverMode > 0) {
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
@@ -1184,25 +1215,34 @@ setMethod(
       .pkgEnv$.cleanEnd <- TRUE
       return(invisible(sim))
     },
-    warning = function(w) { if (requireNamespace("logging", quietly = TRUE)) {
-      logging::logwarn(paste0(collapse = " ", c(names(w), w)))
+    warning = function(w) {
+      if (requireNamespace("logging", quietly = TRUE)) {
+        logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
     },
-    error = function(e) { if (requireNamespace("logging", quietly = TRUE)) {
-      logging::logerror(e)
-    } else {
-      stop(e)
-    }},
+    error = function(e) {
+      if (requireNamespace("logging", quietly = TRUE)) {
+        logging::logerror(e)
+      } else {
+        fn <- get0("onError")
+        if (!is.null(fn))
+          fn(sim)
+        stop(e)
+      }
+    },
     message = function(m) {
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        message(loggingMessage(m$message))
+        if (startsWith(m$message, "\b")) {
+          message(gsub("\n$", "", m$message))
+        } else {
+          message(loggingMessage(m$message))
+        }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-      # tryCatch(rlang::cnd_muffle(m), error = function(e) NULL)
     }
     )
     return(invisible(sim))
@@ -1223,7 +1263,7 @@ setMethod(
                         events,
                         .plots,
                         ...) {
-    stopifnot(class(sim) == "simList")
+    stopifnot(inherits(sim, "simList")) ## July 2022: R 4.2 flags against using class()
 
     oldGetPaths <- getPaths()
     do.call(setPaths, append(list(silent = TRUE), sim@paths))
@@ -1273,19 +1313,21 @@ setMethod(
 
 #' @keywords internal
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
-  createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
-  if (cacheIt) { # means that a module or event is to be cached
-    fns <- ls(fnEnv, all.names = TRUE)
-    moduleSpecificObjects <-
-      c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
-        paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
-        na.omit(createsOutputs)) # objects outputted by module
-    #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
-    #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
-    moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
-    classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                         params = sim@params[[cur[["moduleName"]]]],
-                         modules = cur[["moduleName"]])
+  if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
+    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    if (cacheIt) { # means that a module or event is to be cached
+      fns <- ls(fnEnv, all.names = TRUE)
+      moduleSpecificObjects <-
+        c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
+          paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
+          na.omit(createsOutputs)) # objects outputted by module
+      #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
+      #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
+      moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
+      classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                           params = sim@params[[cur[["moduleName"]]]],
+                           modules = cur[["moduleName"]])
+    }
   }
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     expression(Cache(FUN = get(moduleCall, envir = fnEnv),
@@ -1310,11 +1352,13 @@ setMethod(
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
   # Test for memory leaks
-  if (getOption("spades.testMemoryLeaks", TRUE))
-    sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
-                                          modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
-                                          modName = cur[["moduleName"]],
-                                          knownObjects = sim@.xData$._knownObjects)
+  if (getOption("spades.testMemoryLeaks", TRUE)) {
+    if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))
+      sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
+                                            modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
+                                            modName = cur[["moduleName"]],
+                                            knownObjects = sim@.xData$._knownObjects)
+  }
 
   return(sim)
 }
@@ -1406,15 +1450,13 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
   }
 
-
   if (length(sim@events) > 0) {
-
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
     mess <- capture.output(type = "message",
                            rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
                              Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-                                  filebackedDir = tempdir2("._rmo"))
+                                  filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
                            } else {
                              list()
                            }), rmo$recoverableObjs)
@@ -1422,7 +1464,6 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     mess <- grep("Hardlinked version", mess, invert = TRUE)
     if (length(mess) > 0)
       lapply(mess, message)
-
   }
   endTime <- Sys.time()
   rmo$preEvents <- sim@events
@@ -1544,7 +1585,8 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
 }
 
 spadesDefaultFormatter <- function(record) {
-  text <- paste(record$timestamp, paste(record$levelname, record$logger, gsub("\n$", "", record$msg), sep=':'), sep = "")
+  text <- paste(record$timestamp, paste(record$levelname, record$logger,
+                                        gsub("\n$", "", record$msg), sep = ":"), sep = "")
 }
 
 #' @importFrom reproducible Filenames
@@ -1642,7 +1684,6 @@ getFutureNeeds <- function(deps, curModName) {
     out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
   }
   out
-
 }
 
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
@@ -1842,3 +1883,120 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 
   paste0(strftime(st, format = stForm2), mess)
 }
+
+
+#' Alternative way to define events in SpaDES.core
+#'
+#' There are two ways to define what occurs during an event: defining a function
+#' called doEvent.*moduleName*, where *moduleName* is the actual module name. This
+#' approach is the original approach used in SpaDES.core, and it must have an
+#' explicit `switch` statement branching on `eventType`. The newer approach
+#' (still experimental) uses `defineEvent`. Instead of creating the
+#' function called, `doEvent.XXXX`, where XXXX is the module name, it creates one function
+#' for each event, each with the name `doEvent.XXXX.YYYY`, where `YYYY` is the event
+#' name. This may be a little bit cleaner, but both with still work.
+#'
+#' @param sim A simList
+#' @param eventName Character string of the desired event name to define. Default is "init"
+#' @param moduleName Character string of the name of the module. If this function is
+#'    used within a module, then it will try to find the module name.
+#' @param code An expression that defines the code to execute during the event. This will
+#'    be captured, and pasted into a new function (`doEvent.XXXX.YYYY`), where `XXXX` is the
+#'    `moduleName` and `YYYY` is the `eventName`, remaining unevaluated until
+#'    that new function is called.
+#' @param envir An optional environment to specify where to put the resulting function.
+#'     The default will place a function called `doEvent.moduleName.eventName` in the
+#'     module function location, i.e., `sim$.mods[[moduleName]]`. However, if this
+#'     location does not exist, then it will place it in the `parent.frame()`, with a message.
+#'     Normally, especially, if used within SpaDES module code, this should be left missing.
+#' @export
+#' @seealso \code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
+#' @examples
+#' sim <- simInit()
+#'
+#' # these put the functions in the parent.frame() which is .GlobalEnv for an interactive user
+#' defineEvent(sim, "init", moduleName = "thisTestModule", code = {
+#'   sim <- Init(sim) # initialize
+#'   # Now schedule some different event for "current time", i.e., will
+#'   #   be put in the event queue to run *after* this current event is finished
+#'   sim <- scheduleEvent(sim, time(sim), "thisTestModule", "grow")
+#' }, envir = envir(sim))
+#'
+#' defineEvent(sim, "grow", moduleName = "thisTestModule", code = {
+#'   sim <- grow(sim) # grow
+#'   # Now schedule this same event for "current time plus 1", i.e., a "loop"
+#'   sim <- scheduleEvent(sim, time(sim) + 1, "thisTestModule", "grow") # for "time plus 1"
+#' })
+#'
+#' Init <- function(sim) {
+#'   sim$messageToWorld <- "Now the sim has an object in it that can be accessed"
+#'   sim$size <- 1 # initializes the size object --> this can be anything, Raster, list, whatever
+#'   message(sim$messageToWorld)
+#'   return(sim)   # returns all the things you added to sim as they are in the simList
+#' }
+#'
+#' grow <- function(sim) {
+#'   sim$size <- sim$size + 1 # increments the size
+#'   message(sim$size)
+#'   return(sim)
+#' }
+#'
+#' # schedule that first "init" event
+#' sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
+#' # Look at event queue
+#' events(sim) # shows the "init" we just added
+#' \dontrun{
+#'   # this is skipped when running in automated tests; it is fine in interactive use
+#'   out <- spades(sim)
+#' }
+#'
+defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
+  code <- substitute(code)
+  curMod <- currentModule(sim)
+  if (is.null(moduleName))
+    moduleName <- currentModule(sim)
+
+  useSimModsEnv <- FALSE
+  if (missing(envir)) {
+    if (is.null(moduleName)) {
+      if (length(curMod) > 0) {
+        useSimModsEnv <- TRUE
+      }
+    } else {
+      if (exists(moduleName, sim$.mods, inherits = FALSE))
+        useSimModsEnv <- TRUE
+    }
+    envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
+  }
+  fn <- paste0("
+    fn <- function(sim, eventTime, eventType, priority) {
+    ",
+         paste(format(substitute(code)), collapse = "\n")
+    ,"
+    return(sim)
+    }
+  ")
+
+  eventFnName <-  makeEventFn(moduleName, eventName)
+  parsedFn <- parse(text = fn)
+  if (!useSimModsEnv) {
+    if (is.null(sim@.xData[[eventFnElementEnvir()]])) {
+      sim@.xData[[eventFnElementEnvir()]] <- new.env(parent = asNamespace("SpaDES.core"))
+    }
+    sim@.xData[[eventFnElementEnvir()]][[eventFnName]] <- list(envir = envir,
+                                                          digest = .robustDigest(parsedFn))
+  }
+
+  assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
+         envir = envir)
+  theEvalEnvir <- environment(get(eventFnName, envir = envir))
+  rm(list = ls(theEvalEnvir), envir = theEvalEnvir)
+  return(invisible(sim))
+}
+
+makeEventFn <- function(curModuleName, eventType) {
+  paste("doEvent", curModuleName, eventType, sep = ".")
+}
+
+eventFnElement <- function() ".eventFnDigest"
+eventFnElementEnvir <- function() ".eventFnEnvir"

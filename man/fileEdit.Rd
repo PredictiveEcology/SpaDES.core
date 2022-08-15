@@ -14,9 +14,7 @@ Invoked for its side effect of opening a file for editing.
 }
 \description{
 RStudio's \code{file.edit} behaves differently than \code{utils::file.edit}.
-The workaround is to have the user manually open the file if they are using
-RStudio, as suggested in the RStudio support ticket at
-\url{https://support.rstudio.com/hc/en-us/community/posts/206011308-file-edit-vs-utils-file-edit}.
+The workaround is to have the user manually open the file if they are using RStudio.
 }
 \author{
 Alex Chubaty

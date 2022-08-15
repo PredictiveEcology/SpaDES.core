@@ -6,7 +6,7 @@ utils::globalVariables(c(
 ### `show` generic is already defined in the methods package
 #' Show an Object
 #'
-#' @param object  \code{simList}
+#' @param object  `simList`
 #'
 #' @author Alex Chubaty
 #' @export
@@ -102,9 +102,9 @@ setMethod(
 ################################################################################
 #' Simulation environment
 #'
-#' Accessor functions for the \code{.xData} slot, which is the default virtual
+#' Accessor functions for the `.xData` slot, which is the default virtual
 #' slot for an S4 class object that inherits from an S3 object (specifically,
-#' the \code{simList} inherits from \code{environment}) in a \code{simList} object.
+#' the `simList` inherits from `environment`) in a `simList` object.
 #' These are included for advanced users.
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.
@@ -113,7 +113,7 @@ setMethod(
 #'
 #' @param value The object to be stored at the slot.
 #'
-#' @return Returns or sets the value of the slot from the \code{simList} object.
+#' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.8 on simList environment.
 #'
@@ -156,22 +156,22 @@ setReplaceMethod("envir",
 ################################################################################
 #' Extract or replace an object from the simulation environment
 #'
-#' The \code{[[} and \code{$} operators provide "shortcuts" for accessing
+#' The `[[` and `$` operators provide "shortcuts" for accessing
 #' objects in the simulation environment.
-#' I.e., instead of using \code{envir(sim)$object} or \code{envir(sim)[["object"]]},
-#' one can simply use \code{sim$object} or \code{sim[["object"]]}.
+#' I.e., instead of using `envir(sim)$object` or `envir(sim)[["object"]]`,
+#' one can simply use `sim$object` or `sim[["object"]]`.
 #'
-#' \code{objs} can take \code{...} arguments passed to \code{ls},
-#' allowing, e.g. \code{all.names=TRUE}
-#' \code{objs<-} requires takes a named list of values to be assigned in
+#' `objs` can take `...` arguments passed to `ls`,
+#' allowing, e.g. `all.names=TRUE`
+#' `objs<-` requires takes a named list of values to be assigned in
 #' the simulation environment.
 #'
-#' @param sim      A \code{simList} object from which to extract element(s) or
+#' @param sim      A `simList` object from which to extract element(s) or
 #'                 in which to replace element(s).
-#' @param value objects to assign to the \code{simList}
-#' @param ... passed to \code{ls}
+#' @param value objects to assign to the `simList`
+#' @param ... passed to `ls`
 #'
-#' @return Returns or sets a list of objects in the \code{simList} environment.
+#' @return Returns or sets a list of objects in the `simList` environment.
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
@@ -234,8 +234,8 @@ setReplaceMethod(
 ################################################################################
 #' Simulation modules and dependencies
 #'
-#' Accessor functions for the \code{depends} and \code{modules} slots in a
-#' \code{simList} object.
+#' Accessor functions for the `depends` and `modules` slots in a
+#' `simList` object.
 #' These are included for advanced users.
 #' \tabular{ll}{
 #'    \code{\link{depends}} \tab List of simulation module dependencies. (advanced) \cr
@@ -251,7 +251,7 @@ setReplaceMethod(
 #'
 #' @param hidden Logical. If TRUE, show the default core modules.
 #'
-#' @return Returns or sets the value of the slot from the \code{simList} object.
+#' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.7 on Modules and dependencies.
@@ -335,15 +335,15 @@ setReplaceMethod("depends",
 })
 
 ################################################################################
-#' Namespacing within \code{SpaDES}
+#' Namespacing within `SpaDES`
 #'
-#' \code{.callingModuleName} returns the name of the module that is currently
-#' the active module calling functions like \code{scheduleEvent}.
-#' This will only return the module name if it is inside a \code{spades} call,
-#' i.e., it will return \code{NULL} if used in interactive mode.
-#' The related function \code{currentModule} is simply a rapid accessor for the
+#' `.callingModuleName` returns the name of the module that is currently
+#' the active module calling functions like `scheduleEvent`.
+#' This will only return the module name if it is inside a `spades` call,
+#' i.e., it will return `NULL` if used in interactive mode.
+#' The related function `currentModule` is simply a rapid accessor for the
 #' current module name. This latter will return the module that is in the current
-#' event queue, which will never be \code{NULL}.
+#' event queue, which will never be `NULL`.
 #'
 #' @inheritParams modules
 #'
@@ -402,8 +402,8 @@ setMethod(
 ################################################################################
 #' Get and set simulation parameters
 #'
-#' \code{params} and \code{P} access the parameter slot in the \code{simList}.
-#' \code{params} has a replace method, so can be used to update a parameter value.
+#' `params` and `P` access the parameter slot in the `simList`.
+#' `params` has a replace method, so can be used to update a parameter value.
 #'
 #' @inheritParams objs
 #'
@@ -413,12 +413,12 @@ setMethod(
 #'
 #' @param param Optional character string indicating which parameter to choose.
 #'
-#' @return Returns or sets the value of the slot from the \code{simList} object.
+#' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @note The differences between P, params and being explicit with passing arguments
 #' are mostly a question of speed and code compactness.
 #' The computationally fastest way to get a parameter is to specify moduleName and parameter name, as in:
-#' \code{P(sim, "paramName", "moduleName")} (replacing moduleName and paramName with your
+#' `P(sim, "paramName", "moduleName")` (replacing moduleName and paramName with your
 #' specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
 #' part for speed (e.g., 2-4x faster) is specifying the moduleName.
 #' Specifying the parameter name is <5% faster.
@@ -462,11 +462,11 @@ setReplaceMethod("params",
                    return(sim)
 })
 
-#' \code{P} is a concise way to access parameters within a module. It works more like
+#' `P` is a concise way to access parameters within a module. It works more like
 #' a namespaced function in the sense that the module from which it is called is the
 #' default place it will look for the parameter. To access a parameter from within
-#' a module, you can use \code{P(sim)$paramName} instead of
-#' \code{params(sim)$moduleName$paramName}
+#' a module, you can use `P(sim)$paramName` instead of
+#' `params(sim)$moduleName$paramName`
 #'
 #' @aliases simList-accessors-params
 #' @export
@@ -607,9 +607,9 @@ P.simList <- function(sim, param, module) {
 ################################################################################
 #' Get and set global simulation parameters
 #'
-#' \code{globals}, and the alias \code{G}, accesses or sets the "globals"
-#' in the \code{simList}. This currently is not an explicit slot in the \code{simList},
-#' but it is a \code{.globals} element in the \code{params} slot of the \code{simList}.
+#' `globals`, and the alias `G`, accesses or sets the "globals"
+#' in the `simList`. This currently is not an explicit slot in the `simList`,
+#' but it is a `.globals` element in the `params` slot of the `simList`.
 #'
 #' @inheritParams params
 #'
@@ -685,42 +685,45 @@ setReplaceMethod("G",
 
 ################################################################################
 #' @details
-#' \code{parameters} will extract only the metadata with the metadata defaults,
+#' `parameters` will extract only the metadata with the metadata defaults,
 #' NOT the current values that may be overwritten by a user. See examples.
 #' @inheritParams params
-#' @param asDF Logical. For \code{parameters}, if TRUE, this will produce a single
+#' @param asDF Logical. For `parameters`, if TRUE, this will produce a single
 #'                 data.frame of all model parameters. If FALSE, then it will return
 #'                 a data.frame with 1 row for each parameter within nested lists,
-#'                 with the same structure as \code{params}.
+#'                 with the same structure as `params`.
 #'
 #' @include simList-class.R
 #' @export
 #' @rdname params
 #' @examples
-#' modules <- list("randomLandscapes")
-#' paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-#' mySim <- simInit(modules = modules, paths = paths,
-#'                  params = list(.globals = list(stackName = "landscape")))
+#' if (require("NLMR", quietly = TRUE) &&
+#'     require("SpaDES.tools", quietly = TRUE)) {
+#'   modules <- list("randomLandscapes")
+#'   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'   mySim <- simInit(modules = modules, paths = paths,
+#'                    params = list(.globals = list(stackName = "landscape")))
 #'
-#' # update some parameters using assignment -- currently only params will work
-#' params(mySim)$randomLandscapes$nx <- 200
-#' params(mySim)$randomLandscapes$ny <- 200
+#'   # update some parameters using assignment -- currently only params will work
+#'   params(mySim)$randomLandscapes$nx <- 200
+#'   params(mySim)$randomLandscapes$ny <- 200
 #'
-#' parameters(mySim) # Does not contain these user overridden values
+#'   parameters(mySim) # Does not contain these user overridden values
 #'
-#' # These next 2 are same here because they are not within a module
-#' P(mySim)          # Does contain the user overridden values
-#' params(mySim)     # Does contain the user overridden values
+#'   # These next 2 are same here because they are not within a module
+#'   P(mySim)          # Does contain the user overridden values
+#'   params(mySim)     # Does contain the user overridden values
 #'
-#' # NOTE -- deleting a parameter will affect params and P, not parameters
-#' params(mySim)$randomLandscapes$nx <- NULL
-#' params(mySim)$randomLandscapes$ny <- NULL
+#'   # NOTE -- deleting a parameter will affect params and P, not parameters
+#'   params(mySim)$randomLandscapes$nx <- NULL
+#'   params(mySim)$randomLandscapes$ny <- NULL
 #'
-#' parameters(mySim) # Shows nx and ny
+#'   parameters(mySim) # Shows nx and ny
 #'
-#' # These next 2 are same here because they are not within a module
-#' P(mySim)          # nx and ny are Gone
-#' params(mySim)     # nx and ny are Gone
+#'   # These next 2 are same here because they are not within a module
+#'   P(mySim)          # nx and ny are Gone
+#'   params(mySim)     # nx and ny are Gone
+#' }
 setGeneric("parameters", function(sim, asDF = FALSE) {
   standardGeneric("parameters")
 })
@@ -833,10 +836,10 @@ setReplaceMethod("checkpointInterval",
 #' Second, at the \code{\link{spades}} call itself, which can be simpler. See examples.
 #'
 #' @details Progress Bar:
-#' Progress type can be one of  \code{"text"}, \code{"graphical"}, or \code{"shiny"}.
+#' Progress type can be one of  `"text"`, `"graphical"`, or `"shiny"`.
 #' Progress interval can be a numeric.
 #' These both can get set by passing a
-#' \code{.progress = list(type = "graphical", interval = 1)} into the \code{simInit} call.
+#' `.progress = list(type = "graphical", interval = 1)` into the `simInit` call.
 #' See examples.
 #'
 #' @inheritParams params
@@ -940,81 +943,81 @@ setReplaceMethod("progressType",
 ################################################################################
 #' Simulation inputs
 #'
-#' Accessor functions for the \code{inputs} slots in a \code{simList} object.
+#' Accessor functions for the `inputs` slots in a `simList` object.
 #'
 #' These functions are one of three mechanisms to add the information about which input files
-#' to load in a \code{spades} call.
+#' to load in a `spades` call.
 #' \enumerate{
-#'   \item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
-#'         See \code{?simInit}.
-#'   \item With the \code{outputs(simList)} function call.
-#'   \item By adding a function called \code{.inputObjects} inside a module, which will be executed
-#'         during the \code{simInit} call. This last way is the most "modular" way to create
+#'   \item As arguments to a `simInit` call. Specifically, `inputs` or `outputs`.
+#'         See `?simInit`.
+#'   \item With the `outputs(simList)` function call.
+#'   \item By adding a function called `.inputObjects` inside a module, which will be executed
+#'         during the `simInit` call. This last way is the most "modular" way to create
 #'         default data sets for your model.
 #' }
 #'
 #' See below for more details.
 #'
-#' @section inputs function or argument in \code{simInit}:
+#' @section inputs function or argument in `simInit`:
 #'
-#' \code{inputs} accepts a data.frame, with up to 7 columns.
+#' `inputs` accepts a data.frame, with up to 7 columns.
 #' Columns are:
 #'
 #' \tabular{ll}{
-#' \code{file} \tab required, a character string indicating the file path. There is no
+#' `file` \tab required, a character string indicating the file path. There is no
 #' default.\cr
 #'
-#' \code{objectName} \tab optional, character string indicating the name of the object
-#' that the loaded file will be assigned to in the \code{simList}. This object
-#' can therefore be accessed with \code{sim$xxx} in any module, where
-#' \code{objectName = "xxx"}. Defaults to the filename without file extension or
+#' `objectName` \tab optional, character string indicating the name of the object
+#' that the loaded file will be assigned to in the `simList`. This object
+#' can therefore be accessed with `sim$xxx` in any module, where
+#' `objectName = "xxx"`. Defaults to the filename without file extension or
 #' directory information.\cr
 #'
-#' \code{fun} \tab optional, a character string indicating the function to use to
-#' load that file. Defaults to the known extensions in \code{SpaDES} (found by
-#' examining \code{.fileExtensions()}). The \code{package} and \code{fun} can be
-#' jointly specified here as \code{"packageName::functionName"}, e.g.,
-#' \code{"raster::raster"}.\cr
+#' `fun` \tab optional, a character string indicating the function to use to
+#' load that file. Defaults to the known extensions in `SpaDES` (found by
+#' examining `.fileExtensions()`). The `package` and `fun` can be
+#' jointly specified here as `"packageName::functionName"`, e.g.,
+#' `"raster::raster"`.\cr
 #'
-#' \code{package} \tab optional character string indicating the package in
-#' which to find the \code{fun});\cr
+#' `package` \tab optional character string indicating the package in
+#' which to find the `fun`);\cr
 #'
-#' \code{loadTime} \tab optional numeric, indicating when in simulation time the file
-#' should be loaded. The default is the highest priority at \code{start(sim)},
+#' `loadTime` \tab optional numeric, indicating when in simulation time the file
+#' should be loaded. The default is the highest priority at `start(sim)`,
 #' i.e., at the very start. \cr
 #'
-#' \code{interval} \tab optional numeric, indicating at what interval should this same
+#' `interval` \tab optional numeric, indicating at what interval should this same
 #' exact file  be reloaded from disk, e.g,. 10 would mean every 10 time units. The
 #' default is NA or no interval, i.e, load the file only once as described in
-#' \code{loadTime} \cr
+#' `loadTime` \cr
 #'
-#' \code{arguments} \tab is a list of lists of named arguments, one list for each
-#' \code{fun}. For example, if \code{fun="raster"}, \code{arguments = list(native = TRUE)}
+#' `arguments` \tab is a list of lists of named arguments, one list for each
+#' `fun`. For example, if `fun="raster"`, `arguments = list(native = TRUE)`
 #' will pass the argument "native = TRUE" to raster.  If there is only one list,
 #' then it is assumed to apply to all files and will be recycled as per normal R
-#' rules of recycling for each \code{fun}.\cr
+#' rules of recycling for each `fun`.\cr
 #' }
 #'
-#' Currently, only \code{file} is required. All others will be filled with defaults
+#' Currently, only `file` is required. All others will be filled with defaults
 #' if not specified.
 #'
-#' See the modules vignette for more details (\code{browseVignettes("SpaDES.core")}).
+#' See the modules vignette for more details (`browseVignettes("SpaDES.core")`).
 #'
-#' @section \code{.inputObjects} function placed inside module:
+#' @section `.inputObjects` function placed inside module:
 #'
-#' Any code placed inside a function called \code{.inputObjects} will be run during
-#' \code{simInit()} for the purpose of creating any objects required by this module,
-#' i.e., objects  identified in the \code{inputObjects} element of \code{defineModule}.
+#' Any code placed inside a function called `.inputObjects` will be run during
+#' `simInit()` for the purpose of creating any objects required by this module,
+#' i.e., objects  identified in the `inputObjects` element of `defineModule`.
 #' This is useful if there is something required before simulation to produce the module
 #' object dependencies, including such things as downloading default datasets, e.g.,
-#' \code{downloadData('LCC2005', modulePath(sim))}.
-#' Nothing should be created here that does not create an named object in \code{inputObjects}.
+#' `downloadData('LCC2005', modulePath(sim))`.
+#' Nothing should be created here that does not create an named object in `inputObjects`.
 #' Any other initiation procedures should be put in the "init" eventType of the doEvent function.
 #' Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
 #' selectively skip unnecessary steps because the user has provided those inputObjects in the
-#' simInit call. e.g., the following code would look to see if the user had passed \code{defaultColor}
-#' into during \code{simInit}. If the user had done this, then this function would not override
-#' that value with 'red'. If the user has not passed in a value for \code{defaultColor}, then
+#' simInit call. e.g., the following code would look to see if the user had passed `defaultColor`
+#' into during `simInit`. If the user had done this, then this function would not override
+#' that value with 'red'. If the user has not passed in a value for `defaultColor`, then
 #' the module will get it here:
 #'
 #' \code{if (!('defaultColor' \%in\% sim$.userSuppliedObjNames)) \{
@@ -1025,8 +1028,8 @@ setReplaceMethod("progressType",
 #'
 #' @param value The object to be stored at the slot. See Details.
 #'
-#' @return Returns or sets the value(s) of the \code{input} or \code{output} slots
-#' in the \code{simList} object.
+#' @return Returns or sets the value(s) of the `input` or `output` slots
+#' in the `simList` object.
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.2 on loading and saving.
@@ -1109,22 +1112,22 @@ setReplaceMethod(
      # 2 things: 1. if relative, concatenate inputPath
      #           2. if absolute, don't use inputPath
    if (NROW(value) > 0) {
-     sim@inputs[is.na(sim@inputs$file), "file"] <- NA
+     sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
 
      # If a filename is provided, determine if it is absolute path, if so,
      # use that, if not, then append it to inputPath(sim)
      isAP <- isAbsolutePath(as.character(sim@inputs$file))
-     sim@inputs[!isAP & !is.na(sim@inputs$file), "file"] <-
+     sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
        file.path(inputPath(sim),
-                 sim@inputs$file[!isAP & !is.na(sim@inputs$file)])
+                 sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
 
      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
        stop(paste("input table can only have columns named",
                   paste(.fileTableInCols, collapse = ", ")))
      }
-     if (any(is.na(sim@inputs[, "loaded"]))) {
-       if (!all(is.na(sim@inputs[, "loadTime"]))) {
-         newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"]
+     if (any(is.na(sim@inputs[["loaded"]]))) {
+       if (!all(is.na(sim@inputs[["loadTime"]]))) {
+         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
          for (nT in newTime) {
@@ -1140,9 +1143,9 @@ setReplaceMethod(
          }
 
        } else {
-         sim@inputs[is.na(sim@inputs$loadTime), "loadTime"] <-
+         sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
            sim@simtimes[["current"]]
-         newTime <- sim@inputs[is.na(sim@inputs$loaded), "loadTime"] %>%
+         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
            min(., na.rm = TRUE)
          attributes(newTime)$unit <- "seconds"
          sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
@@ -1156,57 +1159,57 @@ setReplaceMethod(
 ################################################################################
 #' Simulation outputs
 #'
-#' Accessor functions for the \code{outputs} slots in a \code{simList} object.
+#' Accessor functions for the `outputs` slots in a `simList` object.
 #'
 #' These functions are one of three mechanisms to add information about which output files to save.
 #' \enumerate{
-#'   \item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
-#'         See \code{?simInit}.
-#'   \item With the \code{outputs(simList)} function call.
-#'   \item By adding a function called \code{.inputObjects} inside a module, which will be executed
-#'         during the \code{simInit} call. This last way is the most "modular" way to create
+#'   \item As arguments to a `simInit` call. Specifically, `inputs` or `outputs`.
+#'         See `?simInit`.
+#'   \item With the `outputs(simList)` function call.
+#'   \item By adding a function called `.inputObjects` inside a module, which will be executed
+#'         during the `simInit` call. This last way is the most "modular" way to create
 #'         default data sets for your model.
 #' }
 #'
 #' See below for more details.
 #'
-#' @section outputs function or argument in \code{simInit}:
+#' @section outputs function or argument in `simInit`:
 #'
-#' \code{outputs} accepts a data.frame similar to the \code{inputs} data.frame, but
+#' `outputs` accepts a data.frame similar to the `inputs` data.frame, but
 #' with up to 6 columns.
 #'
 #' \tabular{ll}{
-#' \code{objectName} \tab required, character string indicating the name of the object
-#' in the \code{simList} that will be saved to disk (without the \code{sim$} prefix).\cr
+#' `objectName` \tab required, character string indicating the name of the object
+#' in the `simList` that will be saved to disk (without the `sim$` prefix).\cr
 #'
-#' \code{file} \tab optional, a character string indicating the file path to save to.
-#' The default is to concatenate \code{objectName} with the model timeunit and
-#' \code{saveTime}, separated by underscore, '\code{_}'. So a default filename would be
-#' \code{"Fires_year1.rds"}.\cr
+#' `file` \tab optional, a character string indicating the file path to save to.
+#' The default is to concatenate `objectName` with the model timeunit and
+#' `saveTime`, separated by underscore, '`_`'. So a default filename would be
+#' `"Fires_year1.rds"`.\cr
 #'
-#' \code{fun} \tab optional, a character string indicating the function to use to
+#' `fun` \tab optional, a character string indicating the function to use to
 #' save that file. The default is \code{\link{saveRDS}} \cr
 #'
-#' \code{package} \tab optional character string indicating the package in
-#' which to find the \code{fun});\cr
+#' `package` \tab optional character string indicating the package in
+#' which to find the `fun`);\cr
 #'
-#' \code{saveTime} \tab optional numeric, indicating when in simulation time the file
-#' should be saved. The default is the lowest priority at \code{end(sim)},
+#' `saveTime` \tab optional numeric, indicating when in simulation time the file
+#' should be saved. The default is the lowest priority at `end(sim)`,
 #' i.e., at the very end. \cr
 #'
-#' \code{arguments} \tab is a list of lists of named arguments, one list for each
-#' \code{fun}. For example, if \code{fun = "write.csv"},
-#' \code{arguments = list(row.names = TRUE)} will pass the argument
-#' \code{row.names = TRUE} to \code{write.csv}  If there is only one list,
+#' `arguments` \tab is a list of lists of named arguments, one list for each
+#' `fun`. For example, if `fun = "write.csv"`,
+#' `arguments = list(row.names = TRUE)` will pass the argument
+#' `row.names = TRUE` to `write.csv`  If there is only one list,
 #' then it is assumed to apply to all files and will be recycled as per normal R
-#' rules of recycling for each \code{fun}.\cr
+#' rules of recycling for each `fun`.\cr
 #' }
 #'
-#' See the modules vignette for more details (\code{browseVignettes("SpaDES.core")}).
+#' See the modules vignette for more details (`browseVignettes("SpaDES.core")`).
 #'
 #' @note The automatic file type handling only adds the correct extension from a given
-#' \code{fun} and \code{package}. It does not do the inverse, from a given extension find the
-#' correct \code{fun} and \code{package}.
+#' `fun` and `package`. It does not do the inverse, from a given extension find the
+#' correct `fun` and `package`.
 #'
 #' @inheritParams inputs
 #'
@@ -1279,11 +1282,11 @@ setReplaceMethod(
 
        # coerce any factors to the correct class
        for (col in which(sapply(sim@outputs, is.factor))) {
-         sim@outputs[, col] <- as(sim@outputs[[col]], class(.fileTableOut()[[col]]))
+         sim@outputs[[col]] <- as(sim@outputs[[col]], class(.fileTableOut()[[col]]))
        }
 
        # if saveTime not provided, give it end(sim)
-       sim@outputs[is.na(sim@outputs$saveTime), "saveTime"] <-
+       sim@outputs[["saveTime"]][is.na(sim@outputs$saveTime)] <-
          end(sim, sim@simtimes[["timeunit"]])
        attributes(sim@outputs$saveTime)$unit <- sim@simtimes[["timeunit"]]
 
@@ -1292,7 +1295,7 @@ setReplaceMethod(
        #           2. if absolute, don't use outputPath
        #           3. concatenate time to file name in all cases
        # If no filename provided, use the object name
-       sim@outputs[is.na(sim@outputs$file), "file"] <-
+       sim@outputs[["file"]][is.na(sim@outputs$file)] <-
          paste0(sim@outputs$objectName[is.na(sim@outputs$file)])
        # If a filename is provided, determine if it is absolute path, if so,
        # use that, if not, then append it to outputPath(sim)
@@ -1300,13 +1303,13 @@ setReplaceMethod(
        if (any(!alreadyWithOutputPath)) {
          isAP <- isAbsolutePath(as.character(sim@outputs$file))
 
-         sim@outputs[!isAP[!alreadyWithOutputPath], "file"] <-
-           file.path(outputPath(sim), sim@outputs$file[!isAP])
+         sim@outputs[["file"]][!isAP[!alreadyWithOutputPath]] <-
+           file.path(outputPath(sim), sim@outputs[["file"]][!isAP])
        }
 
        # If there is no function provided, then use saveRDS, from package base
-       sim@outputs[is.na(sim@outputs$fun), "fun"] <- "saveRDS"
-       sim@outputs[is.na(sim@outputs$package), "package"] <- "base"
+       sim@outputs[["fun"]][is.na(sim@outputs$fun)] <- "saveRDS"
+       sim@outputs[["package"]][is.na(sim@outputs$package)] <- "base"
 
        # file extension stuff
        fileExts <- .saveFileExtensions()
@@ -1315,23 +1318,24 @@ setReplaceMethod(
        # grep allows for file extensions from 1 to 5 characters
        wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) &
          (nzchar(fe, keepNA = TRUE))
-       sim@outputs[wh, "file"] <- paste0(sim@outputs[wh, "file"], ".", fe[wh])
+       sim@outputs[["file"]][wh] <- paste0(sim@outputs[["file"]][wh], ".", fe[wh])
 
        # If the file name already has a time unit on it,
        # i.e., passed explicitly by user, then don't postpend again
-       txtTimeA <- paste0(attr(sim@outputs[, "saveTime"], "unit"))
+       txtTimeA <- paste0(attr(sim@outputs[["saveTime"]], "unit"))
        txtTimeB <- paddedFloatToChar(
-         sim@outputs[, "saveTime"],
+         sim@outputs[["saveTime"]],
          ceiling(log10(end(sim, sim@simtimes[["timeunit"]]) + 1))
        )
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !grepl(txtTimeA, sim@outputs$file)
-       sim@outputs[wh, "file"] <- paste0(
-         filePathSansExt(sim@outputs[wh, "file"]),
+       fns <- sim@outputs[["file"]][wh]
+       sim@outputs[["file"]][wh] <- paste0(
+         filePathSansExt(fns),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(fileExt(sim@outputs[wh, "file"]), keepNA = TRUE) ,
-                fileExt(sim@outputs[wh, "file"]),
+         ifelse(nzchar(fileExt(fns), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(fileExt(fns), keepNA = TRUE) ,
+                fileExt(fns),
                 "")
        )
      } else {
@@ -1347,7 +1351,7 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' \code{inputArgs} and \code{outputArgs} are ways to specify any arguments that are needed for
+#' `inputArgs` and `outputArgs` are ways to specify any arguments that are needed for
 #' file loading and file saving. This is still somewhat experimental.
 #'
 #' @inheritParams inputs
@@ -1440,25 +1444,27 @@ setReplaceMethod(
 ################################################################################
 #' Specify paths for modules, inputs, outputs, and temporary rasters
 #'
-#' Accessor functions for the \code{paths} slot in a \code{simList} object.
+#' Accessor functions for the `paths` slot in a `simList` object.
 #'
 #' These are ways to add or access the file paths used by \code{\link{spades}}.
-#' There are five file paths: \code{cachePath}, \code{modulePath},
-#' \code{inputPath}, \code{outputPath}, and \code{rasterPath}.
-#' Each has a function to get or set the value in a \code{simList} object.
+#' There are five file paths: `cachePath`, `modulePath`,
+#' `inputPath`, `outputPath`, and `rasterPath`.
+#' Each has a function to get or set the value in a `simList` object.
 #' If no paths are specified, the defaults are as follows:
 #'
 #' \itemize{
-#'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
-#'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
-#'   \item \code{modulePath}: \code{getOption("spades.inputPath")};
-#'   \item \code{outputPath}: \code{getOption("spades.outputPath")};
-#'   \item \code{rasterPath}: \code{raster::tmpDir()}
+#'   \item `cachePath`: `getOption("reproducible.cachePath")`;
+#'   \item `inputPath`: `getOption("spades.modulePath")`;
+#'   \item `modulePath`: `getOption("spades.inputPath")`;
+#'   \item `outputPath`: `getOption("spades.outputPath")`;
+#'   \item `rasterPath`: `file.path(getOption("spades.scratchPath"), "raster")`;
+#'   \item `scratchPath`: `getOption("spades.scratchPath")`;
+#'   \item `terraPath`: `file.path(getOption("spades.scratchPath"), "terra")`
 #' }
 #'
 #' @inheritParams params
 #'
-#' @return Returns or sets the value of the slot from the \code{simList} object.
+#' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.4 on Simulation Paths.
@@ -1498,10 +1504,10 @@ setReplaceMethod(
   "paths",
   signature = "simList",
   function(sim, value) {
-    N <- 4 # total number of named paths (cache, madule, input, output)
+    N <- 5 # total number of named paths (cache, module, input, output)
 
     # get named elements and their position in value list
-    wh <- pmatch(names(sim@paths), names(value)) # always length 4, NA if no name match, number if yes
+    wh <- pmatch(names(sim@paths), names(value)) # always length 5, NA if no name match, number if yes
     whValueNamed <- which(!is.na(pmatch(names(value), names(sim@paths)))) # length of names of value
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
@@ -1533,15 +1539,15 @@ setReplaceMethod(
       sim@paths[whichUnnamed][seq_len(sum(whValueUnnamed))] <- value[whValueUnnamed]
     }
 
-    # Don't need to create an archive in the paths directory, just have to create
-    #  the directory
+    ## Don't need to create an archive in the paths directory, just have to create the directory
     checkPath(sim@paths$cachePath, create = TRUE)
 
     validObject(sim)
     return(sim)
 })
 
-################################################################################
+# cachePath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1583,7 +1589,8 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+# inputPath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1625,7 +1632,9 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+
+# outputPath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1675,7 +1684,34 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+
+
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#'
+setGeneric("logPath", function(sim) {
+  standardGeneric("logPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("logPath",
+          signature = "simList",
+          definition = function(sim) {
+            lp <- file.path(sim@paths$outputPath, "log")
+            lp <- checkPath(lp, create = TRUE)
+            return(lp)
+})
+
+
+
+
+# modulePath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #' @param module The optional character string of the module(s) whose
 #'               paths are desired. If omitted, will return all modulePaths,
@@ -1723,7 +1759,52 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+
+# scratchPath ---------------------------------------------------------------------------------
+
+#' @inheritParams paths
+#'
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setGeneric("scratchPath", function(sim) {
+  standardGeneric("scratchPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("scratchPath",
+          signature = "simList",
+          definition = function(sim) {
+            sim@paths$scratchPath
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("scratchPath<-",
+           function(sim, value) {
+             standardGeneric("scratchPath<-")
+})
+
+#' @name scratchPath<-
+#' @aliases scratchPath<-,simList-method
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#' @export
+setReplaceMethod(
+  "scratchPath",
+  signature = "simList",
+  function(sim, value) {
+    sim@paths$scratchPath <- unname(unlist(value))
+    checkPath(sim@paths$scratchPath, create = TRUE)
+    validObject(sim)
+    return(sim)
+})
+
+# rasterPath ----------------------------------------------------------------------------------
+
 #' @inheritParams paths
 #'
 #' @include simList-class.R
@@ -1765,14 +1846,57 @@ setReplaceMethod(
     return(sim)
 })
 
+# terraPath ----------------------------------------------------------------------------------
+
+#' @inheritParams paths
+#'
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setGeneric("terraPath", function(sim) {
+  standardGeneric("terraPath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("terraPath",
+          signature = "simList",
+          definition = function(sim) {
+            sim@paths$terraPath
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+setGeneric("terraPath<-",
+           function(sim, value) {
+             standardGeneric("terraPath<-")
+})
+
+#' @name terraPath<-
+#' @aliases terraPath<-,simList-method
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#' @export
+setReplaceMethod(
+  "terraPath",
+  signature = "simList",
+  function(sim, value) {
+    sim@paths$terraPath <- unname(unlist(value))
+    checkPath(sim@paths$terraPath, create = TRUE)
+    validObject(sim)
+    return(sim)
+})
+
 #' @description
-#' \code{dataPath} will return \code{file.path(modulePath(sim), currentModule(sim), "data")}.
-#' \code{dataPath}, like \code{currentModule},is namespaced. This means that when
-#' it is used inside a module, then it will return \emph{that model-specific} information.
-#' For instance, if used inside a module called \code{"movingAgent"},
-#' then \code{currentModule(sim)}
-#' will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
-#' \code{file.path(modulePath(sim), "movingAgent", "data")}
+#' `dataPath` will return `file.path(modulePath(sim), currentModule(sim), "data")`.
+#' `dataPath`, like `currentModule`,is namespaced. This means that when
+#' it is used inside a module, then it will return *that model-specific* information.
+#' For instance, if used inside a module called `"movingAgent"`,
+#' then `currentModule(sim)`
+#' will return `"movingAgent"`, and `dataPath(sim)` will return
+#' `file.path(modulePath(sim), "movingAgent", "data")`
 #'
 #' @inheritParams paths
 #' @include simList-class.R
@@ -1793,13 +1917,13 @@ setMethod("dataPath",
 })
 
 ################################################################################
-#' Time usage in \code{SpaDES}
+#' Time usage in `SpaDES`
 #'
-#' Functions for the \code{simtimes} slot of a \code{simList} object
+#' Functions for the `simtimes` slot of a `simList` object
 #' and its elements. To maintain modularity, the behaviour of these functions depends
 #' on where they are used. In other words, different modules can have their own
-#' timeunit. \code{SpaDES} converts these to seconds when running a simulation, but
-#' shows the user time in the units of the model as shown with \code{timeunit(sim)}
+#' timeunit. `SpaDES` converts these to seconds when running a simulation, but
+#' shows the user time in the units of the model as shown with `timeunit(sim)`
 #'
 #' @note These have default behaviour that is based on the calling frame timeunit.
 #' When used inside a module, then the time is in the units of the module.
@@ -1810,17 +1934,17 @@ setMethod("dataPath",
 #' of the simulation:
 #'
 #' \tabular{ll}{
-#'    \code{time} \tab Current simulation time.\cr
-#'    \code{start} \tab Simulation start time.\cr
-#'    \code{end} \tab Simulation end time.\cr
-#'    \code{timeunit} \tab Simulation timeunit.\cr
-#'    \code{timeunits} \tab Module timeunits.\cr
-#'    \code{times} \tab List of all simulation times (current, start, end, timeunit).\cr
+#'    `time` \tab Current simulation time.\cr
+#'    `start` \tab Simulation start time.\cr
+#'    `end` \tab Simulation end time.\cr
+#'    `timeunit` \tab Simulation timeunit.\cr
+#'    `timeunits` \tab Module timeunits.\cr
+#'    `times` \tab List of all simulation times (current, start, end, timeunit).\cr
 #' }
 #'
-#' @param unit   Character. One of the time units used in \code{SpaDES}.
+#' @param unit   Character. One of the time units used in `SpaDES`.
 #'
-#' @param x A \code{simList}
+#' @param x A `simList`
 #'
 #' @param value  A time, given as a numeric, optionally with a unit attribute,
 #'               but this will be deduced from the model time units or module
@@ -1828,7 +1952,7 @@ setMethod("dataPath",
 #'
 #' @param ...    Additional parameters.
 #'
-#' @return Returns or sets the value of the slot from the \code{simList} object.
+#' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times;
 #'   \code{\link{elapsedTime}},
@@ -2069,43 +2193,44 @@ setReplaceMethod(
 #' @rdname namespacing
 .callingFrameTimeunit <- function(x) {
   if (is.null(x)) return(NULL)
-  #if (!is(x, "simList")) stop("x must be a .simList")
   mod <- x@current[["moduleName"]]
-  out <- if (length(mod) > 0) {
-    if (!is.null(x@.xData[[".timeunits"]])) {
-      x@.xData[[".timeunits"]][[mod]]
-    } else {
-      timeunits(x)[[mod]]
-    }
-
+  out <- x@simtimes[["timeunit"]] # default -- whole simList
+  if (!is.null(x@.xData[[".timeunits"]])) {
+    outPoss <- x@.xData[[".timeunits"]]
   } else {
-    x@simtimes[["timeunit"]]
+    outPoss <- timeunits(x)
   }
+  outPoss <- if (length(mod) > 0) {
+    outPoss[[mod]]
+  } else {
+    out
+  }
+  if (!is.null(outPoss)) out <- unlist(outPoss)
   return(out)
 }
 
 ################################################################################
-#' @details \code{timeunit} will extract the current units of the time used in a
-#' simulation (i.e., within a \code{spades} call).
-#' If it is set within a \code{simInit}, e.g.,
-#' \code{times=list(start=0, end=52, timeunit = "week")}, it will set the
+#' @details `timeunit` will extract the current units of the time used in a
+#' simulation (i.e., within a `spades` call).
+#' If it is set within a `simInit`, e.g.,
+#' `times=list(start=0, end=52, timeunit = "week")`, it will set the
 #' units for that simulation.
-#' By default, a \code{simInit} call will use the smallest unit contained within
+#' By default, a `simInit` call will use the smallest unit contained within
 #' the metadata for the modules being used. If there are parent modules, then the
 #' parent module timeunit will be used even if one of its children is a smaller timeunit.
-#' If all modules, including parents, are set to \code{NA}, \code{timeunit} defaults to seconds.
-#' If parents are set to \code{NA}, then the set of modules defined by that parent module
+#' If all modules, including parents, are set to `NA`, `timeunit` defaults to seconds.
+#' If parents are set to `NA`, then the set of modules defined by that parent module
 #' will be given the smallest units of the children.
 #'
 #' Currently, available units are "second", "hours", day", "week", "month", and
 #' "year" can be used in the metadata of a module.
 #'
 #' The user can also define a new unit. The unit name can be anything, but the
-#' function definition must be of the form \code{dunitName}, e.g., \code{dyear}
-#' or \code{dfortnight}.
-#' The unit name is the part without the \code{d} and the function name definition
-#' includes the \code{d}. This new function, e.g.,
-#' \code{dfortnight <- function(x) lubridate::duration(dday(14))}
+#' function definition must be of the form `dunitName`, e.g., `dyear`
+#' or `dfortnight`.
+#' The unit name is the part without the `d` and the function name definition
+#' includes the `d`. This new function, e.g.,
+#' `dfortnight <- function(x) lubridate::duration(dday(14))`
 #' can be placed anywhere in the search path or in a module.
 #'
 #' @aliases simList-accessors-times
@@ -2153,14 +2278,14 @@ setReplaceMethod(
 })
 
 ################################################################################
-#' @details \code{timeunits} will extract the current units of the time of all
+#' @details `timeunits` will extract the current units of the time of all
 #' modules used in a simulation.
-#' This is different from \code{timeunit} because it is not necessarily
-#' associated with a \code{spades} call.
+#' This is different from `timeunit` because it is not necessarily
+#' associated with a `spades` call.
 #'
 #' In many cases, the "simpler" use of each of these functions may be slower
-#' computationally. For instance, it is much faster to use \code{time(sim, "year")}
-#' than \code{time(sim)}. So as a module developer, it is advantageous to
+#' computationally. For instance, it is much faster to use `time(sim, "year")`
+#' than `time(sim)`. So as a module developer, it is advantageous to
 #' write out the longer one, minimizing the looking up that R must do.
 #'
 #' @aliases simList-accessors-times
@@ -2201,33 +2326,33 @@ setMethod(
 ################################################################################
 #' Simulation event lists
 #'
-#' Accessor functions for the \code{events} and \code{completed} slots of a
-#' \code{simList} object. These path functions will extract the values that were
-#' provided to the \code{simInit} function in the \code{path} argument.
+#' Accessor functions for the `events` and `completed` slots of a
+#' `simList` object. These path functions will extract the values that were
+#' provided to the `simInit` function in the `path` argument.
 #'
-#' By default, the event lists are shown when the \code{simList} object is printed,
+#' By default, the event lists are shown when the `simList` object is printed,
 #' thus most users will not require direct use of these methods.
 #' \tabular{ll}{
-#'    \code{events} \tab Scheduled simulation events (the event queue).\cr
-#'    \code{completed} \tab Completed simulation events.\cr
+#'    `events` \tab Scheduled simulation events (the event queue).\cr
+#'    `completed` \tab Completed simulation events.\cr
 #' }
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.
 #'
 #' @note Each event is represented by a \code{\link{data.table}} row consisting of:
 #'  \itemize{
-#'    \item \code{eventTime}: The time the event is to occur.
-#'    \item \code{moduleName}: The module from which the event is taken.
-#'    \item \code{eventType}: A character string for the programmer-defined event type.
+#'    \item `eventTime`: The time the event is to occur.
+#'    \item `moduleName`: The module from which the event is taken.
+#'    \item `eventType`: A character string for the programmer-defined event type.
 #'  }
 #'
 #' @inheritParams objs
 #'
-#' @param unit   Character. One of the time units used in \code{SpaDES}.
+#' @param unit   Character. One of the time units used in `SpaDES`.
 #'
 #' @param value The object to be stored at the slot.
 #'
-#' @return Returns or sets the value of the slot from the \code{simList} object.
+#' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.
 #'
@@ -2538,7 +2663,7 @@ setReplaceMethod(
 #' @param x   A named list containing the parameters used to construct a new
 #'            \code{\link{.moduleDeps}} object.
 #'
-#' @return A \code{simList} object.
+#' @return A `simList` object.
 #'
 #' @include simList-class.R
 #' @family functions to access elements of a 'simList' object
@@ -2568,21 +2693,32 @@ setMethod(
     return(sim)
 })
 
+#' strip GitHub repo info from vector of packages
+#'
+#' @keywords internal
+.cleanPkgs <- function(pkgs) {
+  pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
+  pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
+  pkgs <- sub("[[:space:]]*\\(>=.*", "", pkgs)
+
+  return(pkgs)
+}
+
 ################################################################################
 #' Get module or simulation package dependencies
 #'
-#' @param sim  A \code{simList} object.
+#' @param sim  A `simList` object.
 #'
 #' @param modules Character vector, specifying the name or
 #'             vector of names of module(s)
 #' @param paths Character vector, specifying the name or
 #'             vector of names of paths(s) for those modules. If path not specified,
 #'             it will be taken from getOption("spades.modulePath"), which is set
-#'             with \code{setPaths})
+#'             with `setPaths`)
 #' @param filenames Character vector specifying filenames of modules (i.e.
-#'                 combined path & module. If this is specified, then \code{modules} and
-#'                 \code{path} are ignored.
-#' @param clean Optional logical. If \code{TRUE}, it will scrub any references to
+#'                 combined path & module. If this is specified, then `modules` and
+#'                 `path` are ignored.
+#' @param clean Optional logical. If `TRUE`, it will scrub any references to
 #'              github repositories, e.g., "PredictiveEcology/reproducible" will be
 #'              returned as "reproducible"
 #'
@@ -2667,21 +2803,20 @@ setMethod(
       names(pkgs) <- modules
     }
     if (isTRUE(clean)) {
-      pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
-      pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
+      pkgs <- .cleanPkgs(pkgs)
     }
-    return(pkgs)
+    return(unique(pkgs))
 })
 
 ################################################################################
 #' Metadata accessors
 #'
 #' These accessors extract the metadata for a module (if specified) or all modules
-#' in a \code{simList} if not specified.
+#' in a `simList` if not specified.
 #'
 #' @inheritParams P
-#' @param path The path to the module., i.e., the \code{modulePath}.
-#'    Only relevant if \code{sim} not supplied.
+#' @param path The path to the module., i.e., the `modulePath`.
+#'    Only relevant if `sim` not supplied.
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
@@ -2818,9 +2953,9 @@ setMethod("outputObjectNames",
 ################################################################################
 #' @inheritParams P
 #' @param module Character vector of module name(s)
-#' @param modulePath That path where \code{module} can be found. If set already
-#'   using \code{setPaths}, it will use that. This will be ignored if \code{sim}
-#'   is supplied and is required if \code{sim} not supplied
+#' @param modulePath That path where `module` can be found. If set already
+#'   using `setPaths`, it will use that. This will be ignored if `sim`
+#'   is supplied and is required if `sim` not supplied
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
@@ -2828,7 +2963,7 @@ setMethod("outputObjectNames",
 #'
 #' @examples
 #' \dontrun{
-#' # To pre-install and pre-load all packages prior to \code{simInit}.
+#' # To pre-install and pre-load all packages prior to `simInit`.
 #'
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -2911,7 +3046,7 @@ setMethod("documentation",
 
 ################################################################################
 #' @param package For compatibility with \code{\link[utils]{citation}}. This can be
-#'                a \code{simList} or a character string for a package name.
+#'                a `simList` or a character string for a package name.
 #' @inheritParams P
 #' @inheritParams utils::citation
 #' @include simList-class.R
@@ -2959,8 +3094,8 @@ setMethod("citation",
 #' @rdname simList-accessors-times
 elapsedTime <- function(x, ...) UseMethod("elapsedTime")
 
-#' @param byEvent Logical. If \code{TRUE}, the elapsed time will be by module and event;
-#'                \code{FALSE} will report only by module. Default is \code{TRUE}.
+#' @param byEvent Logical. If `TRUE`, the elapsed time will be by module and event;
+#'                `FALSE` will report only by module. Default is `TRUE`.
 #'
 #' @inheritParams base::difftime
 #' @export

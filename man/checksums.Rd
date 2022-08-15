@@ -45,8 +45,6 @@ To update your \file{CHECKSUMS.txt} files using the new algorithm:
 (\code{checksums(moduleName, tmpdir, write = TRUE)});
 \item copy the new checksums file to your working module directory
 (the one not in the temp dir)
-(\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
-               to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
-               overwrite = TRUE)}).
+(\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'), to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'), overwrite = TRUE)}).
 }
 }

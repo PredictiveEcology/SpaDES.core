@@ -1,100 +1,115 @@
 ---
-title: "{{{name}}}"
-author: "{{{author}}}"
-date: "{{{date}}}"
+title: "{{{name}}} Manual"
+subtitle: "v.`r SpaDES.core::moduleMetadata(module = '{{{name}}}', path = '..')$version`"
+date: "Last updated: `r Sys.Date()`"
 output:
-  html_document:
+  bookdown::html_document2:
+    toc: true
+    toc_float: true
+    theme: sandstone
+    number_sections: false
+    df_print: paged
     keep_md: yes
 editor_options:
   chunk_output_type: console
+  bibliography: citations/references_{{{name}}}.bib
+citation-style: citations/ecology-letters.csl
+link-citations: true
+always_allow_html: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## TODO: use 'eval = TRUE'
+# {{{name}}} Module
+
+<!-- the following are text references used in captions for LaTeX compatibility -->
+(ref:{{{name2}}}) *{{{name}}}*
+
+```{r setup-{{{name2}}}, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
+
+## get citation style
+if (!file.exists("citations/ecology-letters.csl")) {
+  dir.create("citations", showWarnings = FALSE)
+  download.file("https://www.zotero.org/styles/ecology-letters", destfile = "citations/ecology-letters.csl")
+}
+
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  library(dplyr)
+}
+
+dir.create("figures", showWarnings = FALSE)
+
+download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.png",
+              destfile = "figures/markdownBadge.png",
+              mode = 'wb')
 ```
 
-# Overview
+[![made-with-Markdown](figures/markdownBadge.png)](http://commonmark.org)
 
-Provide an overview of what the module does / how to use the module.
+<!-- if knitting to pdf remember to add the pandoc_args: ["--extract-media", "."] option to yml in order to get the badge images -->
+
+#### Authors:
+
+`r paste(as.character(SpaDES.core::moduleMetadata(module = "{{{name}}}", path = '..')$authors), sep = ', ')`
+<!-- ideally separate authors with new lines, '\n' not working -->
+
+## Module Overview
+
+### Module summary
+
+Provide a brief summary of what the module does / how to use the module.
 
 Module documentation should be written so that others can use your module.
 This is a template for module documentation, and should be changed to reflect your module.
 
-## R Markdown
+### Module inputs and parameters
 
-R Markdown syntax allows R code, outputs, and figures to be rendered in the documentation.
+Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
+If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
+Table \@ref(tab:moduleInputs-{{{name2}}}) shows the full list of module inputs.
 
-For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
-
-# Usage
-
-```{r module_usage}
-library(SpaDES.core)
-
-setPaths(modulePath = file.path("{{{path}}}"))
-getPaths() # shows where the 4 relevant paths are
-
-times <- list(start = 0, end = 10)
-
-parameters <- list(
-  #.progress = list(type = "text", interval = 1), # for a progress bar
-  ## If there are further modules, each can have its own set of parameters:
-  #module1 = list(param1 = value1, param2 = value2),
-  #module2 = list(param1 = value1, param2 = value2)
-)
-modules <- list("{{{name}}}")
-objects <- list()
-inputs <- list()
-outputs <- list()
-
-mySim <- simInit(times = times, params = parameters, modules = modules,
-                 objects = objects)
-
-mySimOut <- spades(mySim)
+```{r moduleInputs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
+knitr::kable(df_inputs,
+             caption = "List of (ref:{{{name2}}}) input objects and their description.") %>%
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
-# Parameters
+Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams-{{{name2}}}))
 
-Provide a summary of user-visible parameters.
 
-```{r moduleParams, echo = FALSE, eval = TRUE}
+```{r moduleParams-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
-knitr::kable(df_params)
+knitr::kable(df_params, caption = "List of (ref:{{{name2}}}) parameters and their description.") %>%
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
-# Events
+### Events
 
 Describe what happens for each event type.
 
-## Plotting
+### Plotting
 
 Write what is plotted.
 
-## Saving
+### Saving
 
 Write what is saved.
 
-# Data dependencies
+### Module outputs
 
-## Input data
+Description of the module outputs (Table \@ref(tab:moduleOutputs-{{{name2}}})).
 
-How to obtain input data, and a description of the data required by the module.
-If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
-
-```{r moduleInputs, echo = FALSE, eval = TRUE}
-df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
-knitr::kable(df_inputs)
-```
-
-## Output data
-
-Description of the module outputs.
-
-```{r moduleOutputs, echo = FALSE, eval = TRUE}
+```{r moduleOutputs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
-knitr::kable(df_outputs)
+knitr::kable(df_outputs, caption = "List of (ref:{{{name2}}}) outputs and their description.") %>%
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
-# Links to other modules
+### Links to other modules
 
-Describe any anticipated linkages to other modules.
+Describe any anticipated linkages to other modules, such as modules that supply input data or do post-hoc analysis.
+
+### Getting help
+
+-   provide a way for people to obtain help (e.g., module repository issues page)

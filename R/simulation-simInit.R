@@ -3,186 +3,186 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' Initialize a new simulation
 #'
 #' Create a new simulation object, the "sim" object. This object is implemented
-#' using an \code{environment} where all objects and functions are placed.
-#' Since environments in \code{R} are pass by reference, "putting" objects in
+#' using an `environment` where all objects and functions are placed.
+#' Since environments in `R` are pass by reference, "putting" objects in
 #' the sim object does no actual copy.
-#' The \code{simList} also stores all parameters, and other important simulation
+#' The `simList` also stores all parameters, and other important simulation
 #' information, such as times, paths, modules, and module load order.
 #' See more details below.
 #'
-#' \subsection{Calling this \code{simInit} function does the following:}{
+#' \subsection{Calling this `simInit` function does the following:}{
 #'   \tabular{lll}{
-#'   \bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
-#'   fills \code{simList} slots \tab places the arguments \code{times},
-#'     \code{params}, \code{modules}, \code{paths} into equivalently named
-#'     \code{simList} slots \tab \code{times},
-#'     \code{params}, \code{modules}, \code{paths}\cr
+#'   **What** \tab **Details** \tab **Argument(s) to use** \cr
+#'   fills `simList` slots \tab places the arguments `times`,
+#'     `params`, `modules`, `paths` into equivalently named
+#'     `simList` slots \tab `times`,
+#'     `params`, `modules`, `paths`\cr
 #'   sources all module files \tab places all function definitions in the
-#'     \code{simList}, specifically, into a sub-environment of the main
-#'     \code{simList} environment: e.g., \code{sim$<moduleName>$function1}
-#'     (see section on \bold{Scoping}) \tab \code{modules} \cr
+#'     `simList`, specifically, into a sub-environment of the main
+#'     `simList` environment: e.g., `sim$<moduleName>$function1`
+#'     (see section on **Scoping**) \tab `modules` \cr
 #'   copies objects \tab from the global environment to the
-#'     \code{simList} environment \tab \code{objects} \cr
-#'   loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
+#'     `simList` environment \tab `objects` \cr
+#'   loads objects \tab from disk into the `simList` \tab `inputs` \cr
 #'   schedule object loading/copying \tab Objects can be loaded into the
-#'     \code{simList} at any time during a simulation  \tab \code{inputs} \cr
+#'     `simList` at any time during a simulation  \tab `inputs` \cr
 #'   schedule object saving \tab Objects can be saved to disk at any arbitrary
 #'     time during the simulation. If specified here, this will be in addition
 #'     to any saving due code inside a module (i.e., a module may manually
-#'     run \code{write.table(...)} \tab \code{outputs} \cr
+#'     run `write.table(...)` \tab `outputs` \cr
 #'   schedules "init" events \tab from all modules (see \code{\link{events}})
 #'        \tab automatic  \cr
 #'   assesses module dependencies \tab via the inputs and outputs identified in their
-#'     metadata. This gives the order of the \code{.inputObjects} and \code{init}
-#'     events. This can be overridden by \code{loadOrder}. \tab automatic \cr
+#'     metadata. This gives the order of the `.inputObjects` and `init`
+#'     events. This can be overridden by `loadOrder`. \tab automatic \cr
 #'   determines time unit \tab takes time units of modules
-#'       and how they fit together \tab \code{times} or automatic \cr
-#'   runs \code{.inputObjects} functions \tab from every module
-#'     \emph{in the module order as determined above} \tab automatic \cr
+#'       and how they fit together \tab `times` or automatic \cr
+#'   runs `.inputObjects` functions \tab from every module
+#'     *in the module order as determined above* \tab automatic \cr
 #'   }
 #' }
 #'
-#' \code{params} can only contain updates to any parameters that are defined in
-#' the metadata of modules. Take the example of a module named, \code{Fire}, which
-#' has a parameter named \code{.plotInitialTime}. In the metadata of that module,
-#' it says \code{TRUE}. Here we can override that default with:
-#' \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
+#' `params` can only contain updates to any parameters that are defined in
+#' the metadata of modules. Take the example of a module named, `Fire`, which
+#' has a parameter named `.plotInitialTime`. In the metadata of that module,
+#' it says `TRUE`. Here we can override that default with:
+#' `list(Fire=list(.plotInitialTime=NA))`, effectively turning off plotting.
 #' Since this is a list of lists, one can override the module defaults for multiple
 #' parameters from multiple modules all at once, with say:
-#' \code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
-#'            caribouModule = list(N = 1000))}.
+#' `list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
+#'            caribouModule = list(N = 1000))`.
 #'
-#' The \code{params} list can contain a list (named `.globals`) of named objects
+#' The `params` list can contain a list (named `.globals`) of named objects
 #' e.g., `.globals = list(climateURL = "https:\\something.com")` entry. Any and every
 #' module that has a parameter with that name (in this case `climateURL`) will be
 #' overridden with this value as passed.
 #'
-#' \code{params} can be used to set the seed for a specific event in a module. This
-#' is done using the normal \code{params} argument, specifying `.seed` as a list
+#' `params` can be used to set the seed for a specific event in a module. This
+#' is done using the normal `params` argument, specifying `.seed` as a list
 #' where the elements are a numeric for the seed and the name is the event. Since
 #' parameters must be specific to a module, this creates a module and event specific
-#' seed e.g., \code{params = list(moduleName = list(.seed = list(init = 123)))} will
-#' set the \code{init} event of module named \code{moduleName} to 123. The RN stream
-#' will be reset to its state prior to the \code{set.seed} call after the event.
+#' seed e.g., `params = list(moduleName = list(.seed = list(init = 123)))` will
+#' set the `init` event of module named `moduleName` to 123. The RN stream
+#' will be reset to its state prior to the `set.seed` call after the event.
 #'
 #' We implement a discrete event simulation in a more modular fashion so it is
 #' easier to add modules to the simulation. We use S4 classes and methods,
 #' and fast lists to manage the event queue.
 #'
-#' \code{paths} specifies the location of the module source files,
+#' `paths` specifies the location of the module source files,
 #' the data input files, and the saving output files. If no paths are specified
 #' the defaults are as follows:
 #'
 #' \itemize{
-#'   \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
+#'   \item `cachePath`: `getOption("reproducible.cachePath")`;
 #'
-#'   \item \code{inputPath}: \code{getOption("spades.modulePath")};
+#'   \item `inputPath`: `getOption("spades.modulePath")`;
 #'
-#'   \item \code{modulePath}: \code{getOption("spades.inputPath")};
+#'   \item `modulePath`: `getOption("spades.inputPath")`;
 #'
-#'   \item \code{inputPath}: \code{getOption("spades.outputPath")}.
+#'   \item `inputPath`: `getOption("spades.outputPath")`.
 #' }
 #'
 #' @section Parsing and Checking Code:
 #'
-#' The \code{simInit} function will attempt to find usage of \code{sim$xxx} or \code{sim[['xxx']]}
-#'  on either side of the assignment (\code{<-}) operator.
-#' It will compare these to the module metadata, specifically \code{inputObjects} for cases where
-#' objects or "gotten" from the \code{simList} and \code{outputObjects} for cases where objects are
-#' assigned to the \code{simList.}
+#' The `simInit` function will attempt to find usage of `sim$xxx` or `sim[['xxx']]`
+#'  on either side of the assignment (`<-`) operator.
+#' It will compare these to the module metadata, specifically `inputObjects` for cases where
+#' objects or "gotten" from the `simList` and `outputObjects` for cases where objects are
+#' assigned to the `simList.`
 #'
 #' It will also attempt to find potential, common function name conflicts with things like
-#' \code{scale} and \code{stack} (both in \pkg{base} and \pkg{raster}), and
-#' \code{Plot} (in \pkg{quickPlot} and some modules).
+#' `scale` and `stack` (both in \pkg{base} and \pkg{raster}), and
+#' `Plot` (in \pkg{quickPlot} and some modules).
 #'
-#' \emph{This code checking is young and may get false positives and false negatives,
-#' i.e., miss things}.
+#' *This code checking is young and may get false positives and false negatives,
+#' i.e., miss things*.
 #' It also takes computational time, which may be undesirable in operational code.
 #' To turn off checking (i.e., if there are too many false positives and negatives), set
-#' \code{options(spades.moduleCodeChecks = FALSE)}.
+#' `options(spades.moduleCodeChecks = FALSE)`.
 #'
 #' @section Caching:
 #'
-#' Using caching with \code{SpaDES} is vital when building re-usable and reproducible content.
+#' Using caching with `SpaDES` is vital when building re-usable and reproducible content.
 #' Please see the vignette dedicated to this topic.
 #'
 #' @note
-#' Since the objects in the \code{simList} are passed-by-reference, it is useful
-#' to create a copy of the initialized \code{simList} object prior to running
-#' the simulation (e.g., \code{mySimOut <- spades(Copy(mySim))}).
+#' Since the objects in the `simList` are passed-by-reference, it is useful
+#' to create a copy of the initialized `simList` object prior to running
+#' the simulation (e.g., `mySimOut <- spades(Copy(mySim))`).
 #' This ensures you retain access to the original objects, which would otherwise
 #' be overwritten/modified during the simulation.
 #'
 #' @note
-#' The user can opt to run a simpler \code{simInit} call without inputs, outputs, and times.
+#' The user can opt to run a simpler `simInit` call without inputs, outputs, and times.
 #' These can be added later with the accessor methods (See example).
-#' These are not required for initializing the simulation via \code{simInit}.
-#' All of \code{modules}, \code{paths}, \code{params}, and \code{objects} are needed
+#' These are not required for initializing the simulation via `simInit`.
+#' All of `modules`, `paths`, `params`, and `objects` are needed
 #' for successful initialization.
 #'
 #' @param times A named list of numeric simulation start and end times
-#'        (e.g., \code{times = list(start = 0.0, end = 10.0, timeunit = "year")}),
-#'        with the final optional element, \code{timeunit}, overriding the default
+#'        (e.g., `times = list(start = 0.0, end = 10.0, timeunit = "year")`),
+#'        with the final optional element, `timeunit`, overriding the default
 #'        time unit used in the simulation which is the "smallest time unit" across all
 #'        modules. See examples.
 #'
-#' @param params A list of lists of the form \code{list(moduleName=list(param1=value, param2=value))}.
+#' @param params A list of lists of the form `list(moduleName=list(param1=value, param2=value))`.
 #' See details.
 #'
 #' @param modules A named list of character strings specifying the names of modules to be loaded
 #' for the simulation.
 #' Note: the module name should correspond to the R source file from which the module is loaded.
 #' Example: a module named "caribou" will be sourced form the file \file{caribou.R},
-#' located at the specified \code{modulePath(simList)} (see below).
+#' located at the specified `modulePath(simList)` (see below).
 #'
 #' @param objects (optional) A vector of object names (naming objects
 #'                that are in the calling environment of
-#'                the \code{simInit}, which is often the
-#'                \code{.GlobalEnv} unless used programmatically.
+#'                the `simInit`, which is often the
+#'                `.GlobalEnv` unless used programmatically.
 #'                NOTE: this mechanism will
 #'                fail if object name is in a package dependency), or
 #'                a named list of data objects to be
-#'                passed into the \code{simList} (more reliable).
+#'                passed into the `simList` (more reliable).
 #'                These objects will be accessible
-#'                from the \code{simList} as a normal list, e.g,. \code{mySim$obj}.
+#'                from the `simList` as a normal list, e.g,. `mySim$obj`.
 #'
 #' @param paths  An optional named list with up to 4 named elements,
-#' \code{modulePath}, \code{inputPath}, \code{outputPath}, and \code{cachePath}.
-#' See details. NOTE: Experimental feature now allows for multiple \code{modulePath}s
+#' `modulePath`, `inputPath`, `outputPath`, and `cachePath`.
+#' See details. NOTE: Experimental feature now allows for multiple `modulePath`s
 #' to be specified in a character vector. The modules will be searched for sequentially
-#' in the first \code{modulePath}, then if it doesn't find it, in the second etc.
+#' in the first `modulePath`, then if it doesn't find it, in the second etc.
 #'
-#' @param inputs A \code{data.frame}. Can specify from 1 to 6
-#' columns with following column names: \code{objectName} (character, required),
-#' \code{file} (character), \code{fun} (character), \code{package} (character),
-#' \code{interval} (numeric), \code{loadTime} (numeric).
+#' @param inputs A `data.frame`. Can specify from 1 to 6
+#' columns with following column names: `objectName` (character, required),
+#' `file` (character), `fun` (character), `package` (character),
+#' `interval` (numeric), `loadTime` (numeric).
 #' See \code{\link{inputs}} and vignette("ii-modules") section about inputs.
 #'
-#' @param outputs A \code{data.frame}. Can specify from 1 to 5
-#' columns with following column names: \code{objectName} (character, required),
-#' \code{file} (character), \code{fun} (character), \code{package} (character),
-#' \code{saveTime} (numeric) and \code{eventPriority} (numeric). If
-#' \code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
-#' is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
+#' @param outputs A `data.frame`. Can specify from 1 to 5
+#' columns with following column names: `objectName` (character, required),
+#' `file` (character), `fun` (character), `package` (character),
+#' `saveTime` (numeric) and `eventPriority` (numeric). If
+#' `eventPriority` is not set, it defaults to `.last()`. If `eventPriority`
+#' is set to a low value, e.g., 0, 1, 2 and `saveTime` is `start(sim)`,
 #' it should give "initial conditions".
 #'
 #' See \code{\link{outputs}} and
-#' \code{vignette("ii-modules")} section about outputs.
+#' `vignette("ii-modules")` section about outputs.
 #'
 #' @param loadOrder  An optional character vector of module names specifying the order in
 #'                   which to load the modules. If not specified, the module
 #'                   load order will be determined automatically.
 #'
-#' @param notOlderThan A time, as in from \code{Sys.time()}. This is passed into
-#'                     the \code{Cache} function that wraps \code{.inputObjects}.
-#'                     If the module uses the \code{.useCache} parameter and it is
-#'                     set to \code{TRUE} or \code{".inputObjects"},
-#'                     then the \code{.inputObjects} will be cached.
-#'                     Setting \code{notOlderThan = Sys.time()} will cause the
-#'                     cached versions of \code{.inputObjects} to be refreshed,
+#' @param notOlderThan A time, as in from `Sys.time()`. This is passed into
+#'                     the `Cache` function that wraps `.inputObjects`.
+#'                     If the module uses the `.useCache` parameter and it is
+#'                     set to `TRUE` or `".inputObjects"`,
+#'                     then the `.inputObjects` will be cached.
+#'                     Setting `notOlderThan = Sys.time()` will cause the
+#'                     cached versions of `.inputObjects` to be refreshed,
 #'                     i.e., rerun.
 #'
-#' @return A \code{simList} simulation object, pre-initialized from values
+#' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
 #'
 #' @seealso \code{\link{spades}},
@@ -196,15 +196,15 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
+#' @importFrom data.table setDTthreads
 #' @importFrom reproducible basename2
-#' @importFrom utils compareVersion
 #' @importFrom Require Require trimVersionNumber modifyList2
 #' @importFrom utils compareVersion
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
 #'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from \url{https://nostarch.com/artofr.htm}
+#'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
 #' \dontrun{
@@ -343,6 +343,9 @@ setMethod(
                         loadOrder,
                         notOlderThan) {
 
+    opt <- options("encoding" = "UTF-8")
+    on.exit(options(opt), add = TRUE)
+
     paths <- lapply(paths, function(p)
       checkPath(p, create = TRUE)
     )
@@ -429,6 +432,11 @@ setMethod(
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
     loadPkgs(reqdPkgs)
+
+    simDTthreads <- getOption("spades.DTthreads", 1L)
+    message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
+    origDTthreads <- setDTthreads(simDTthreads)
+    on.exit(setDTthreads(origDTthreads), add = TRUE)
 
     allTimeUnits <- FALSE
 
@@ -525,6 +533,7 @@ setMethod(
       }
       if (!is.null(globalsUsed)) {
         globalsDF <- rbindlist(globalsDF)
+        setkeyv(globalsDF, c("global", "module"))
         message("The following .globals were used:")
         reproducible::messageDF(globalsDF)
       }
@@ -603,7 +612,8 @@ setMethod(
           mod <- getOption("spades.covr")
           tf <- tempfile();
           if (is.null(notOlderThan)) notOlderThan <- "NULL"
-          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "',m,'", notOlderThan = ',notOlderThan,')'))
+          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
+                                '", notOlderThan = ', notOlderThan,')'))
           # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
           # unlockBinding(mod, sim$.mods)
           if (length(objects))
@@ -958,16 +968,16 @@ setMethod(
     return(invisible(sim))
 })
 
-#' Call \code{simInit} and \code{spades} together
+#' Call `simInit` and `spades` together
 #'
 #' These functions are convenience wrappers that may allow for
 #' more efficient Caching.
-#' Passes all arguments to \code{simInit}, then passes the created \code{simList}
-#' to \code{spades}.
+#' Passes all arguments to `simInit`, then passes the created `simList`
+#' to `spades`.
 #'
 #' @param ... Arguments passed to simInit and spades
 #'
-#' @return Same as \code{\link{spades}} (a \code{simList}) or
+#' @return Same as \code{\link{spades}} (a `simList`) or
 #'
 #'
 #' @seealso \code{\link{simInit}}, \code{\link{spades}}
@@ -1015,8 +1025,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' @param modules List of module names
 #' @importFrom reproducible basename2
 #' @keywords internal
-#' @return list of \code{modules} will flat named list of all module names (children, parents etc.) and
-#'         \code{childModules} a non flat named list of only the childModule names.
+#' @return list of `modules` will flat named list of all module names (children, parents etc.) and
+#'         `childModules` a non flat named list of only the childModule names.
 .identifyChildModules <- function(sim, modules) {
   modulesToSearch <- modules
   if (any(duplicated(modules))) {
@@ -1076,10 +1086,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(parentNames)
 }
 
-#' Run module's \code{.inputObjects}
+#' Run module's `.inputObjects`
 #'
-#' Run \code{.inputObjects()} from each module file from each module, one at a time,
-#' and remove it from the \code{simList} so next module won't rerun it.
+#' Run `.inputObjects()` from each module file from each module, one at a time,
+#' and remove it from the `simList` so next module won't rerun it.
 #'
 #' @keywords internal
 #' @importFrom reproducible basename2
@@ -1130,6 +1140,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
+        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(".mods$", m))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1199,6 +1210,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(sim)
 }
 
+.timeunitDefault <- function() "year"
 .timesDefault <- function() list(start = 0, end = 10)
 .paramsDefault <- function() list()
 .modulesDefault <- function() list()
@@ -1208,6 +1220,17 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 .outputsDefault <- function() as.data.frame(NULL)
 .loadOrderDefault <- function() character(0)
 .notOlderThanDefault <- function() NULL
+
+#' `simInit` default values
+#' @export
+#' @rdname simInit
+simInitDefaults <- function() {
+
+  times <- append(.timesDefault(), list(timeunit = .timeunitDefault()))
+  simInitCall <- call("simInit", times = times)
+
+  .fillInSimInit(list(times = times), namesMatchCall = names(simInitCall))
+}
 
 .fillInSimInit <- function(li, namesMatchCall) {
 
@@ -1298,11 +1321,11 @@ findSmallestTU <- function(sim, mods, childModules) { # recursive function
     recurseLevel <- recurseLevel + 1 # if there were no time units at the first level of module, go into next level
   }
   if (!exists("tu", inherits = FALSE)) {
-    return(list("year")) # default
+    return(list(.timeunitDefault())) # default
   }
   minTU <- minTimeunit(as.list(unlist(tu)))
   if (isTRUE(is.na(minTU[[1]]))) {
-    minTU[[1]] <- "year"
+    minTU[[1]] <- .timeunitDefault()
   }
 
   # no timeunits or no modules at all
@@ -1343,24 +1366,8 @@ loadPkgs <- function(reqdPkgs) {
     if (getOption("spades.useRequire")) {
       Require(allPkgs, upgrade = FALSE)
     } else {
-      loadedPkgs <- search();
-      neededPkgs <- uniqueReqdPkgs %in% gsub(".*:", "", loadedPkgs)
-      names(neededPkgs) <- uniqueReqdPkgs
-      allPkgs <- unique(c(names(neededPkgs)[!neededPkgs], "SpaDES.core"))
-      message("options('spades.useRequire' = FALSE), so not checking minimum package version requirements")
-      # versionSpecs <- Require::getPkgVersions(allPkgs)
-      # if (any(versionSpecs$hasVersionSpec)) {
-      #   out11 <- lapply(which(versionSpecs$hasVersionSpec), function(iii) {
-      #     comp <- compareVersion(as.character(packageVersion(versionSpecs$Package[iii])),
-      #                            versionSpecs$versionSpec[iii])
-      #     if (comp < 0)
-      #       warning(versionSpecs$Package[iii], " needs to be updated to at least ",
-      #               versionSpecs$versionSpec[iii])
-      #   })
-      #
-      # }
       allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(trimVersionNumber(allPkgs), require, character.only = TRUE)
+      loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }
   }
 

@@ -23,7 +23,7 @@ test_that("local mod object", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter("testParA", "numeric", 1, NA, NA, "")
@@ -74,7 +74,7 @@ test_that("local mod object", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test2.Rmd"),
+      documentation = list("README.md", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter("testParB", "numeric", 2, NA, NA, ""),
@@ -251,9 +251,6 @@ test_that("local mod object", {
     expect_true(sum(grepl("There was an error", mess)) == len)
   })
 
-
-
-
   # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
   if (interactive()) {
     opt <- options("spades.recoveryMode" = TRUE)
@@ -261,13 +258,19 @@ test_that("local mod object", {
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
-    err <- try(ss <- spades(mySim8, debug = FALSE), silent = TRUE)
+    err <- try({
+      ss <- spades(mySim8, debug = FALSE)
+    }, silent = TRUE)
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
-    err <- capture_error(sim2 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+    err <- capture_error({
+      sim2 <- restartSpades(sim, debug = FALSE)
+    }) # is missing completed events
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
-    err <- capture_error(sim3 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+    err <- capture_error({
+      sim3 <- restartSpades(sim, debug = FALSE)
+    }) # is missing completed events
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
     sim@params$test2$testRestartSpades <- NULL
@@ -275,7 +278,6 @@ test_that("local mod object", {
     expect_true(NROW(completed(sim3)) == 7)
     options("spades.recoveryMode" = FALSE)
   }
-
 
   # Test converting these to packages
   if (interactive()) {
@@ -308,8 +310,8 @@ test_that("local mod object", {
         expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
         expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
       }
-      convertToPackage(module = "test", path = tmpdir)
-      convertToPackage(module = "test2", path = tmpdir)
+      convertToPackage(module = "test", path = tmpdir, buildDocuments = FALSE)
+      convertToPackage(module = "test2", path = tmpdir, buildDocuments = FALSE)
       for (tt in c("test", "test2")) {
         expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
         expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
@@ -353,6 +355,4 @@ test_that("local mod object", {
       pkgload::unload("test2")
     }
   }
-
-
 })

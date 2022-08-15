@@ -28,10 +28,9 @@ the module and is in the root directory of the module) will be moved to individu
 dot removed in its respective filename, but the function name is unaffected.
 
 Currently, \code{SpaDES.core} does not install the package under any circumstances.
-It will load it via
-\code{pkgdown::load_all}, and optionally (option("spades.moduleDocument" = TRUE))
-build documentation via \code{roxygen2::roxygenise}
-within the \code{simInit} call. This means that any modifications to source code
+It will load it via \code{pkgdown::load_all}, and optionally (\code{option("spades.moduleDocument" = TRUE)})
+build documentation via \code{roxygen2::roxygenise} within the \code{simInit} call.
+This means that any modifications to source code
 will be read in during the \code{simInit} call, as is the practice when a module
 is not a package.
 }
@@ -76,7 +75,7 @@ package from \code{.libPaths} and delete the \code{DESCRIPTION} file and
 
 The only function that will be exported by default is the \code{doEvent.xxx},
 where \code{xxx} is the module name. If any other module is to be exported, it must
-be explicitly exported with e.g., \code{@export}, and then building the \code{NAMESPACE}
+be explicitly exported with e.g., \verb{@export}, and then building the \code{NAMESPACE}
 file, e.g., via \code{devtools::document(moduleRootPath)}. NOTE: as long as all
 the functions are being used inside each other, and they all can be traced back
 to a call in \code{doEvent.xxx}, then there is no need to export anything else.
@@ -90,12 +89,12 @@ file) with this function will have
 several elements that a user may wish to change. Notably, all packages that were
 in \code{reqdPkgs} in the SpaDES module metadata will be in the \code{Imports}
 section of the \code{DESCRIPTION}. To accommodate the need to see these functions,
-a new R script, \code{imports.R} will be created with \code{@import} for each
+a new R script, \code{imports.R} will be created with \verb{@import} for each
 package in \code{reqdPkgs} of the module metadata. However, if a module already has used
-\code{@importFrom} for importing a function from a package, then the generic
-\code{@import} will be omitted for that (those) package(s).
+\verb{@importFrom} for importing a function from a package, then the generic
+\verb{@import} will be omitted for that (those) package(s).
 So, a user should likely follow standard R package
-best practices and use \code{@importFrom} to identify the specific functions that
+best practices and use \verb{@importFrom} to identify the specific functions that
 are required within external packages, thereby limiting function name collisions
 (and the warnings that come with them).
 

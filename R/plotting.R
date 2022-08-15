@@ -7,12 +7,12 @@ if (!isGeneric("Plot")) {
   })
 }
 
-#' Plot method for \code{simList} objects
+#' Plot method for `simList` objects
 #'
-#' Extends \code{quickPlot::Plot} for \code{simList} objects.
+#' Extends `quickPlot::Plot` for `simList` objects.
 #'
-#' See \code{quickPlot::Plot}.
-#' This method strips out stuff from a \code{simList} class object that would make it otherwise not
+#' See `quickPlot::Plot`.
+#' This method strips out stuff from a `simList` class object that would make it otherwise not
 #' reproducibly digestible between sessions, operating systems, or machines.
 #' This will likely still not allow identical digest results across R versions.
 #'
@@ -20,7 +20,7 @@ if (!isGeneric("Plot")) {
 #' @importMethodsFrom quickPlot Plot
 #' @inheritParams quickPlot::Plot
 #' @include simList-class.R
-#' @seealso \code{quickPlot::Plot}
+#' @seealso `quickPlot::Plot`
 #' @exportMethod Plot
 #' @rdname Plot
 #' @export
@@ -52,7 +52,7 @@ if (!isGeneric(".parseElems")) {
   })
 }
 
-#' \code{.parseElems} for \code{simList} class objects
+#' `.parseElems` for `simList` class objects
 #'
 #' See \code{\link[quickPlot:parseElems]{.parseElems}}.
 #'

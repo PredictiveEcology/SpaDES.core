@@ -8,7 +8,7 @@
 \alias{Paths}
 \title{Get and set default working directories}
 \format{
-An object of class \code{list} of length 5.
+An object of class \code{list} of length 7.
 }
 \usage{
 .paths()
@@ -23,6 +23,8 @@ setPaths(
   modulePath,
   outputPath,
   rasterPath,
+  scratchPath,
+  terraPath,
   silent = FALSE
 )
 }
@@ -41,7 +43,19 @@ If not specified, defaults to \code{getOption("spades.modulePath")}.}
 If not specified, defaults to \code{getOption("spades.outputPath")}.}
 
 \item{rasterPath}{The default local directory in which to save transient raster files.
-If not specified, defaults to \code{\link[raster:rasterOptions]{tmpDir}}.
+If not specified, defaults to
+\code{file.path(getOption("spades.scratchPath"), "raster")}.
+\emph{Important note:} this location may not be cleaned up automatically,
+so be sure to monitor this directory and remove unnecessary temp files
+that may contribute to excessive disk usage.
+\emph{This option will be deprecated in a future release.}}
+
+\item{scratchPath}{The default local directory in which to save transient files.
+If not specified, defaults to \code{getOption("spades.scratchPath")}.}
+
+\item{terraPath}{The default local directory in which to save transient terra files.
+If not specified, defaults to
+\code{file.path(getOption("spades.scratchPath"), "terra")}.
 \emph{Important note:} this location may not be cleaned up automatically,
 so be sure to monitor this directory and remove unnecessary temp files
 that may contribute to excessive disk usage.}
@@ -60,16 +74,19 @@ Note: there is an active binding made to \code{Paths}, so a user can use
 \examples{
 \dontrun{
 getPaths()                       ## returns the current default working paths
-setPaths(cachePath = tempdir())  ## sets custom cachePath with other paths default
-setPaths(inputPath = tempdir())  ## sets custom inputPath with other paths default
-setPaths(modulePath = tempdir()) ## sets custom modulePath with other paths default
-setPaths(outputPath = tempdir()) ## sets custom outputPath with other paths default
+
+## set individual custom paths
+setPaths(cachePath = file.path(tempdir(), "cache"))
+setPaths(inputPath = file.path(tempdir(), "inputs"))
+setPaths(modulePath = file.path(tempdir(), "modules"))
+setPaths(outputPath = file.path(tempdir(), "outputs"))
+setPaths(scratchPath = file.path(tempdir(), "scratch"))
 
 # NOTE: on loading and attaching SpaDES.core,
 # an active binding is made to "Paths"
 
 getPaths()
-Paths # same
+Paths ## same as getPaths() above
 setPaths(outputPath = tempdir())
 Paths # shows change
 }

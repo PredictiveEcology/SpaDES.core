@@ -11,7 +11,7 @@ deprecatedMsg <- function(fnName = as.character(match.call()[[1]]),
 
 #' Deprecated functions
 #'
-#' These functions have been moved to \code{SpaDES.experiment} package.
+#' These functions have been moved to `SpaDES.experiment` package.
 #'
 #' @export
 #' @param ... Unused.
@@ -53,7 +53,7 @@ simInitAndExperiment <- function(...) {
 #' @param quiet Logical flag. Should the final "packages loaded"
 #' message be suppressed?
 #'
-#' @return Specified packages are loaded and attached using \code{require()},
+#' @return Specified packages are loaded and attached using `require()`,
 #'         invisibly returning a logical vector of successes.
 #'
 #' @seealso \code{\link{require}}.
@@ -114,19 +114,18 @@ setMethod(
       loaded <- character(0)
     }
     return(invisible(loaded))
-  })
+})
 
 #' @rdname loadPackages
 setMethod("loadPackages",
           signature = "list",
           definition = function(packageList, install, quiet) {
             loadPackages(unlist(packageList), install, quiet)
-          })
+})
 
 #' @rdname loadPackages
 setMethod("loadPackages",
           signature = "NULL",
           definition = function(packageList, install, quiet) {
             return(invisible(character(0)))
-          })
-
+})
