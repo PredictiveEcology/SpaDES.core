@@ -297,6 +297,6 @@ unlink(normalizePath(ftmp))
 ## ----module-group-dl, eval=FALSE----------------------------------------------
 #  downloadModule("SpaDES_sampleModules")
 
-## ----cleanup, eval=TRUE, echo=FALSE-------------------------------------------
+## ----cleanup, eval=hasSuggests, echo=FALSE------------------------------------
 unlink(outputDir, recursive = TRUE)
 
