@@ -64,7 +64,8 @@ part for speed (e.g., 2-4x faster) is specifying the moduleName.
 Specifying the parameter name is <5\% faster.
 }
 \examples{
-if (require("NLMR") && require("SpaDES.tools")) {
+if (require("NLMR", quietly = TRUE) &&
+    require("SpaDES.tools", quietly = TRUE)) {
   modules <- list("randomLandscapes")
   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
   mySim <- simInit(modules = modules, paths = paths,

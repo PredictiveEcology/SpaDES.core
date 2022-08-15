@@ -57,7 +57,7 @@ opts <- options("spades.moduleCodeChecks" = FALSE,
 x <- moduleMetadata(sampleModules[3], path = path)
 
 ## using simList
-if (require("SpaDES.tools")) {
+if (require("SpaDES.tools", quietly = TRUE)) {
    mySim <- simInit(
       times = list(start = 2000.0, end = 2001.0, timeunit = "year"),
       params = list(

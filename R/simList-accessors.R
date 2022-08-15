@@ -697,7 +697,8 @@ setReplaceMethod("G",
 #' @export
 #' @rdname params
 #' @examples
-#' if (require("NLMR") && require("SpaDES.tools")) {
+#' if (require("NLMR", quietly = TRUE) &&
+#'     require("SpaDES.tools", quietly = TRUE)) {
 #'   modules <- list("randomLandscapes")
 #'   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'   mySim <- simInit(modules = modules, paths = paths,
