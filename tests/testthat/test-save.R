@@ -3,6 +3,7 @@ test_that("saving files (and memoryUse)", {
   skip_if_not_installed("future")
   skip_if_not_installed("future.callr")
   skip_if_not_installed("NLMR")
+  skip_on_covr() ## issue with memoryUseSetup
 
   testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
                           libraries = c("data.table", "future.callr", "future"))
