@@ -35,7 +35,7 @@ test_that("Plots function 1", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "year",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list("ggplot2"),
       parameters = rbind(
         defineParameter(".plotsToDisk", "character", ', lll, ', NA, NA, "lala"),
@@ -171,7 +171,7 @@ test_that("Plots function 2", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "year",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list("SpaDES.core (>= 3.0)", "SpaDES.core (>= 3.3)", "SpaDES.core (>= 1.0)"),
       parameters = rbind(
       ),

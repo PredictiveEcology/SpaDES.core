@@ -39,7 +39,7 @@ Nothing is returned. The new module file is created at
 }
 \description{
 Generate a skeleton for a new SpaDES module, a template for a
-documentation file, a citation file, a license file, a \file{README.txt} file,
+documentation file, a citation file, a license file, a \file{README.md} file,
 and a folder that contains unit tests information.
 The \code{newModuleDocumentation} will not generate the module file, but will
 create the other files.

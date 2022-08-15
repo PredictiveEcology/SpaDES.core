@@ -23,7 +23,7 @@ test_that("downloadModule downloads and unzips a single module", {
   }
   f <- f$value[[1]] %>% unlist() %>% as.character() %>% basename()
 
-  f_expected <- c("LICENSE", "README.txt", "citation.bib", "CHECKSUMS.txt",
+  f_expected <- c("LICENSE", "README.md", "citation.bib", "CHECKSUMS.txt",
                   "test.R", "test.Rmd")
 
   expect_gt(length(f), 0)

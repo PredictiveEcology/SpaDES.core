@@ -30,7 +30,7 @@
 #' Create new module from template
 #'
 #' Generate a skeleton for a new SpaDES module, a template for a
-#' documentation file, a citation file, a license file, a \file{README.txt} file,
+#' documentation file, a citation file, a license file, a \file{README.md} file,
 #' and a folder that contains unit tests information.
 #' The `newModuleDocumentation` will not generate the module file, but will
 #' create the other files.
@@ -308,7 +308,7 @@ setMethod(
     filenameRmd <- file.path(nestedPath, paste0(name, ".Rmd"))
     filenameCitation <- file.path(nestedPath, "citation.bib")
     filenameLICENSE <- file.path(nestedPath, "LICENSE")
-    filenameREADME <- file.path(nestedPath, "README.txt")
+    filenameREADME <- file.path(nestedPath, "README.md")
 
     moduleRmd <- list(
       author = Sys.getenv("USER"),

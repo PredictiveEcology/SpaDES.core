@@ -75,7 +75,7 @@ test_that("test objectSynonyms", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")

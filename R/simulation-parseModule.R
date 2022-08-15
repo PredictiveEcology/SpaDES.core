@@ -51,7 +51,7 @@ setMethod(
 setGeneric(".parseModulePartial",
            function(sim, modules, filename, defineModuleElement, envir = NULL) {
              standardGeneric(".parseModulePartial")
-           })
+})
 
 #' @rdname parseModule
 setMethod(
@@ -93,7 +93,7 @@ setMethod(
       out <- NULL
     }
     return(out)
-  })
+})
 
 #' @rdname parseModule
 setMethod(

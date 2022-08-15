@@ -20,7 +20,8 @@ version 1.0.11
 * The default temporary `rasterTmpDir` has changed to be a subdirectory of `scratchPath`.
   **`rasterPath` will be deprecated in a future release.**
 * New default temporary `terraTmpDir` set as a subdirectory of `scratchPath`.
-* Old way of naming module functions with full module name plus "Init" ('non namespaced') no longer works. Message now converted to `stop`. 
+* Old way of naming module functions with full module name plus "Init" ('non namespaced') no longer works. Message now converted to `stop`.
+* use `README.md` instead of `README.txt` in new modules.
 
 ## dependency changes
 * removed `RandomFields` dependency, as that package is no longer maintained;

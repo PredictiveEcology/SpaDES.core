@@ -292,7 +292,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
       ),
@@ -327,7 +327,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test2.Rmd"),
+      documentation = list("README.md", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
       ),

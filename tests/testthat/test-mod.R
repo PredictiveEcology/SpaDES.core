@@ -23,7 +23,7 @@ test_that("local mod object", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter("testParA", "numeric", 1, NA, NA, "")
@@ -74,7 +74,7 @@ test_that("local mod object", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test2.Rmd"),
+      documentation = list("README.md", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter("testParB", "numeric", 2, NA, NA, ""),
