@@ -1,7 +1,7 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.0.11
-==============
+version 1.1.0
+=============
 
 ## new features
 * messaging in a module can now handle "same line" messages --> simply use the standard `"\b"` in the message, and it will occur on same line as previous message
