@@ -29,7 +29,7 @@ defineModule(sim, list(
   citation = list(),
   documentation = list(),
   reqdPkgs = list(
-    "achubaty/NLMR", ## TODO: use ropensci/NLMR once they accept my PR#96
+    "ropensci/NLMR",
     "raster", "RColorBrewer",
     "PredictiveEcology/SpaDES.tools@development"
   ),
