@@ -1,10 +1,11 @@
 test_that("saving files (and memoryUse)", {
   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
   skip_if_not_installed("future")
+  skip_if_not_installed("future.callr")
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
-                          c("data.table", "future.callr", "future"))
+                          libraries = c("data.table", "future.callr", "future"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
