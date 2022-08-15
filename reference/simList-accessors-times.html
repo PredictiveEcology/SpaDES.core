@@ -254,34 +254,34 @@ of the simulation:</p>
 <span class="r-in"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpH5X4cu/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpH5X4cu/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpH5X4cu/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpH5X4cu/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpH5X4cu/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpSO7q6X/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpSO7q6X/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpSO7q6X/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpSO7q6X/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpSO7q6X/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:10:52       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:10:52 chckpn <span style="color: #00BB00;"> total elpsd: 0.0013 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:10:52 save   <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:10:52 prgrss <span style="color: #00BB00;"> total elpsd: 0.0063 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:10:52 load   <span style="color: #00BB00;"> total elpsd: 0.0084 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:24:18       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:24:18 chckpn <span style="color: #00BB00;"> total elpsd: 0.00088 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:24:18 save   <span style="color: #00BB00;"> total elpsd: 0.0025 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:24:18 prgrss <span style="color: #00BB00;"> total elpsd: 0.0041 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug15 21:24:18 load   <span style="color: #00BB00;"> total elpsd: 0.0055 secs | 0 load init 0</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    moduleName eventType      elapsedTime</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 0.002877474 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 0.002615929 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 0.002244473 secs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 0.002015591 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 0.002094030 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 0.001582146 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 0.001449347 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 0.001368284 secs</span>
 <span class="r-in"><span><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">s2</span>, units <span class="op">=</span> <span class="st">"mins"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    moduleName eventType       elapsedTime</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 4.795790e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 4.359881e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 3.740788e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 3.359318e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 3.490051e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 2.636909e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 2.415578e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 2.280474e-05 mins</span>
 </code></pre></div>
     </div>
   </div>
