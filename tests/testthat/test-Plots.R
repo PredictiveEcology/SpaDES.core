@@ -28,7 +28,7 @@ test_that("Plots function 1", {
       name = "test",
       description = "insert module description here",
       keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
       spatialExtent = raster::extent(rep(NA_real_, 4)),
@@ -38,8 +38,8 @@ test_that("Plots function 1", {
       documentation = list("README.txt", "test.Rmd"),
       reqdPkgs = list("ggplot2"),
       parameters = rbind(
-        defineParameter(".plotsToDisk", "character", ',lll,', NA, NA, "lala"),
-        defineParameter(".plotInitialTime", "numeric", ',.plotInitialTime,', NA, NA, "lala")
+        defineParameter(".plotsToDisk", "character", ', lll, ', NA, NA, "lala"),
+        defineParameter(".plotInitialTime", "numeric", ', .plotInitialTime, ', NA, NA, "lala")
       ),
       inputObjects = bindrows(
       ),
@@ -72,7 +72,9 @@ test_that("Plots function 1", {
       ', fill = TRUE)
       sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
                      times = list(start = 0, end = 10, timeunit = "year"))
-      mess <- capture_messages(simOut <- spades(sim, debug = TRUE))
+      mess <- capture_messages({
+        simOut <- spades(sim, debug = TRUE)
+      })
       files <- dir(file.path(outputPath(sim), "figures"), full.names = TRUE)
       expect_true(all(grepl(fn, files)))
       if (iii == 5) {
@@ -91,7 +93,6 @@ test_that("Plots function 1", {
 
       expect_true(NROW(outputs(simOut)) == length(out))
       unlink(files)
-
     }
   }
 
@@ -115,6 +116,8 @@ test_that("Plots function 1", {
 })
 
 test_that("testing .plotInitialTime & .plots", {
+  skip_if_not_installed("NLMR")
+
   if (interactive()) {
     testInitOut <- testInit()
     on.exit({

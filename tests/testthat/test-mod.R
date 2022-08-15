@@ -251,9 +251,6 @@ test_that("local mod object", {
     expect_true(sum(grepl("There was an error", mess)) == len)
   })
 
-
-
-
   # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
   if (interactive()) {
     opt <- options("spades.recoveryMode" = TRUE)
@@ -261,13 +258,19 @@ test_that("local mod object", {
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
-    err <- try(ss <- spades(mySim8, debug = FALSE), silent = TRUE)
+    err <- try({
+      ss <- spades(mySim8, debug = FALSE)
+    }, silent = TRUE)
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
-    err <- capture_error(sim2 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+    err <- capture_error({
+      sim2 <- restartSpades(sim, debug = FALSE)
+    }) # is missing completed events
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
-    err <- capture_error(sim3 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+    err <- capture_error({
+      sim3 <- restartSpades(sim, debug = FALSE)
+    }) # is missing completed events
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
     sim@params$test2$testRestartSpades <- NULL
@@ -275,7 +278,6 @@ test_that("local mod object", {
     expect_true(NROW(completed(sim3)) == 7)
     options("spades.recoveryMode" = FALSE)
   }
-
 
   # Test converting these to packages
   if (interactive()) {
@@ -353,6 +355,4 @@ test_that("local mod object", {
       pkgload::unload("test2")
     }
   }
-
-
 })

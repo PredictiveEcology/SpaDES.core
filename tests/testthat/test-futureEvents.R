@@ -1,4 +1,6 @@
 test_that("test spades.futureEvents", {
+  skip_if_not_installed("NLMR")
+
   if (interactive()) {
     skip_on_os("windows")
     testInitOut <- testInit(smcc = FALSE, libraries = "future",
@@ -14,14 +16,17 @@ test_that("test spades.futureEvents", {
       file.copy(f1, f2)
       ll <- readLines(f1)
       lin <- grep("Burn\\(sim\\)|Move\\(sim\\)|plotFun\\(sim\\)", ll)
-      newModCode <- c(ll[seq(lin-1)], "    system.time(for (i in 1:1e6) rnorm(10))",
-                      if(mod == "test") "sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, 'test', 'plot')",
-                      ll[lin:length(ll)])
+      newModCode <- c(
+        ll[seq(lin - 1)], "    system.time(for (i in 1:1e6) rnorm(10))",
+        if (mod == "test") "sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, 'test', 'plot')",
+        ll[lin:length(ll)]
+      )
       lin <- grep("expectsInput", newModCode)[1]
-      newModCode <- c(newModCode[seq(lin-1)],
-                      if(mod == "test") "    expectsInput(objectName = 'caribou', objectClass = 'raster', desc = NA, sourceURL = NA),",
-                      newModCode[(lin):length(newModCode)])
-
+      newModCode <- c(
+        newModCode[seq(lin - 1)],
+        if (mod == "test") "    expectsInput(objectName = 'caribou', objectClass = 'raster', desc = NA, sourceURL = NA),",
+        newModCode[(lin):length(newModCode)]
+      )
       writeLines(newModCode, con = f1)
     }
     on.exit({

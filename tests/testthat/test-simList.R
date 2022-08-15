@@ -1,4 +1,6 @@
 test_that("simList object initializes correctly (1)", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -198,6 +200,8 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit("raster")
   on.exit({
     testOnExit(testInitOut)
@@ -221,6 +225,7 @@ test_that("simList object initializes correctly (2)", {
 
 test_that("simList test all signatures", {
   skip_on_cran()
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
 
@@ -390,6 +395,8 @@ test_that("test that module directory exists, but not files", {
 })
 
 test_that("inputObjects on module arg not sim", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit(smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)

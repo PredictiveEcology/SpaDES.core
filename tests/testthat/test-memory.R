@@ -1,12 +1,9 @@
 test_that("testing memoryUse", {
+  skip_if_not(interactive()) ## still experimental
   # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+  skip_if_not_installed("future")
+  skip_if_not_installed("NLMR")
 
-  if (!interactive())
-    skip("This memoryUse is still very experimental")
-
-  if (!requireNamespace("future", quietly = TRUE)) {
-    skip("future package required")
-  }
   rm(list = ls())
   testInitOut <- testInit(c("raster", "future.callr", "future"),
                           opts = list("spades.moduleCodeChecks" = FALSE,

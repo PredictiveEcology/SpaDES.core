@@ -1,4 +1,6 @@
 test_that("timeunit works correctly", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)

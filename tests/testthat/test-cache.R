@@ -1,4 +1,6 @@
 test_that("test event-level cache & memory leaks", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit(smcc = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
   opts <- options("reproducible.cachePath" = tmpdir)
@@ -126,6 +128,7 @@ test_that("test event-level cache & memory leaks", {
 })
 
 test_that("test module-level cache", {
+  skip_if_not_installed("NLMR")
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
 
@@ -540,10 +543,11 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(sum(grepl("Running .inputObjects", mess11)) == 1)
   expect_true(!exists("newFun", envir = mySim$.mods$test))
   expect_true(sum(grepl("aaa <- 2", format(mySim$.mods$test$.inputObjects))) == 1)
-
 })
 
 test_that("test showSimilar", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit(smcc = FALSE, "raster")
   opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
@@ -568,8 +572,7 @@ test_that("test showSimilar", {
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou"),
-                         stringsAsFactors = FALSE)
+    outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
 
   out1 <- spades(Copy(mySim))#, showSimilar = TRUE)

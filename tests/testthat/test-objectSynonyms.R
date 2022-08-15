@@ -1,4 +1,6 @@
 test_that("test objectSynonyms", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
                                       spades.useRequire = FALSE#,
                                       #reproducible.useMemoise = FALSE
