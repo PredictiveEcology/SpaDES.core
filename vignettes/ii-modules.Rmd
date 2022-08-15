@@ -10,7 +10,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building `SpaDES` modules}
-  %\VignetteDepends{data.table, DiagrammeR, magrittr, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{data.table, DiagrammeR, magrittr, NLMR, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
