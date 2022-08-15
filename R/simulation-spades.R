@@ -1008,7 +1008,8 @@ setMethod(
       # Memory Use
       # memory estimation of each event/sim
       if (getOption("spades.memoryUseInterval", 0) > 0) {
-        if (requireNamespace("future", quietly = TRUE)) {
+        if (requireNamespace("future", quietly = TRUE) &&
+            requireNamespace("future.callr", quietly = TRUE)) {
           originalPlan <- future::plan()
           sim <- memoryUseSetup(sim, originalPlan)
           on.exit({
