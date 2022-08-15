@@ -70,6 +70,7 @@ test_that("downloadModule downloads and unzips a parent module", {
 
 test_that("downloadModule can overwrite existing modules", {
   skip_on_cran()
+  skip_if_not_installed("httr")
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
