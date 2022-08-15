@@ -114,19 +114,18 @@ setMethod(
       loaded <- character(0)
     }
     return(invisible(loaded))
-  })
+})
 
 #' @rdname loadPackages
 setMethod("loadPackages",
           signature = "list",
           definition = function(packageList, install, quiet) {
             loadPackages(unlist(packageList), install, quiet)
-          })
+})
 
 #' @rdname loadPackages
 setMethod("loadPackages",
           signature = "NULL",
           definition = function(packageList, install, quiet) {
             return(invisible(character(0)))
-          })
-
+})

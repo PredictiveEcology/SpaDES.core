@@ -1,5 +1,10 @@
 ## ----setup, include = FALSE---------------------------------------------------
-knitr::opts_chunk$set(eval = TRUE)
+hasSuggests <- all(
+  require("NLMR", quietly = TRUE),
+  require("SpaDES.tools", quietly = TRUE)
+)
+
+knitr::opts_chunk$set(eval = hasSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
