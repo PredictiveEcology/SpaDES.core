@@ -11,8 +11,10 @@ test_that("saving files (and memoryUse)", {
   }, add = TRUE)
 
   origPlan <- future::plan()
-  if (is(origPlan, "sequential"))
+  if (is(origPlan, "sequential")) {
     pl <- suppressWarnings(future::plan("multisession", workers = 2)) ## suppressed for checks in Rstudio
+  }
+
   on.exit({
     future::plan(origPlan)
   }, add = TRUE)
@@ -24,7 +26,8 @@ test_that("saving files (and memoryUse)", {
       .plotInitialTime = NA, torus = TRUE, .saveObjects = "caribou",
       .saveInitialTime = 1, .saveInterval = 1
     ),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
 
   outputs <- data.frame(
     expand.grid(objectName = c("caribou", "landscape"),
