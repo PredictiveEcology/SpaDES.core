@@ -52,7 +52,7 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' are in a simList or 2) as a short cut to simInit(inputs = filelist). Generally
 #' not to be used by a user.
 #'
-#' @seealso \code{\link{inputs}}
+#' @seealso [inputs()]
 #'
 #' @param sim      `simList` object.
 #'
@@ -299,7 +299,7 @@ setMethod("loadFiles",
 #'
 #' @return A raster object whose values are stored in memory.
 #'
-#' @seealso \code{\link{raster}}.
+#' @seealso [raster()].
 #'
 #' @name rasterToMemory
 #' @importFrom raster getValues raster setValues

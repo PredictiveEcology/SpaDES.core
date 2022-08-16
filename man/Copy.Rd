@@ -25,7 +25,7 @@ it is not possible to simply copy an object with an assignment operator:
 the two objects will share the same objects. As one simList object changes
 so will the other. when this is not the desired behaviour, use this function.
 NOTE: use capital C, to limit confusion with \code{data.table::copy()}
-See \code{\link[reproducible]{Copy}}.
+See \code{\link[reproducible:Copy]{reproducible::Copy()}}.
 }
 \details{
 \code{simList} objects can contain a lot of information, much of which could be
@@ -36,7 +36,7 @@ directories. This should be passed here, which gets passed on to the many method
 of \code{Copy} in \code{reproducible}.
 }
 \seealso{
-\code{\link[reproducible]{Copy}}
+\code{\link[reproducible:Copy]{reproducible::Copy()}}
 }
 \author{
 Eliot McIntire

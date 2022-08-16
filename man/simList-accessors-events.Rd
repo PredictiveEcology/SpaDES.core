@@ -87,7 +87,7 @@ thus most users will not require direct use of these methods.
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \note{
-Each event is represented by a \code{\link{data.table}} row consisting of:
+Each event is represented by a \code{\link[=data.table]{data.table()}} row consisting of:
 \itemize{
 \item \code{eventTime}: The time the event is to occur.
 \item \code{moduleName}: The module from which the event is taken.
@@ -95,7 +95,7 @@ Each event is represented by a \code{\link{data.table}} row consisting of:
 }
 }
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.6 on Simulation event queues.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

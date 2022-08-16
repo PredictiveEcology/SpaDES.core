@@ -41,12 +41,12 @@
 #'   third function for doing multiple spades runs:
 #'
 #'   \tabular{ll}{
-#'     \code{\link{simInit}} \tab Initialize a new simulation\cr
-#'     \code{\link{spades}} \tab Run a discrete event simulation\cr
+#'     [simInit()] \tab Initialize a new simulation\cr
+#'     [spades()] \tab Run a discrete event simulation\cr
 #'     `experiment` \tab In `SpaDES.experiment` package.
-#'                                   Run multiple \code{\link{spades}} calls\cr
+#'                                   Run multiple [spades()] calls\cr
 #'     `experiment2` \tab In `SpaDES.experiment` package.
-#'                                   Run multiple \code{\link{spades}} calls\cr
+#'                                   Run multiple [spades()] calls\cr
 #'   }
 #' }
 #'
@@ -54,8 +54,8 @@
 #'   Within a module, important simulation functions include:
 #'
 #'   \tabular{ll}{
-#'     \code{\link{scheduleEvent}} \tab Schedule a simulation event\cr
-#'     \code{\link{scheduleConditionalEvent}} \tab Schedule a conditional simulation event\cr
+#'     [scheduleEvent()] \tab Schedule a simulation event\cr
+#'     [scheduleConditionalEvent()] \tab Schedule a conditional simulation event\cr
 #'     `removeEvent` \tab Remove an event from the simulation queue (not yet implemented)\cr
 #'   }
 #' }
@@ -66,48 +66,48 @@
 #' All `SpaDES` simulations operate on this object class.
 #'
 #' \tabular{ll}{
-#'   \code{\link{simList}} \tab The 'simList' class\cr
+#'   [simList()] \tab The 'simList' class\cr
 #' }
 #'
 #' ------------------------------------------------------------------------------------------
 #' @section 3 `simList` methods:
 #'
 #' Collections of commonly used functions to retrieve or set slots (and their elements)
-#' of a \code{\link{simList}} object are summarized further below.
+#' of a [simList()] object are summarized further below.
 #'
 #' \subsection{3.1 Simulation parameters}{
 #'   \tabular{ll}{
-#'      \code{\link{globals}} \tab List of global simulation parameters.\cr
-#'      \code{\link{params}} \tab Nested list of all simulation parameter.\cr
-#'      \code{\link{P}} \tab Namespaced version of \code{\link{params}}
+#'      [globals()] \tab List of global simulation parameters.\cr
+#'      [params()] \tab Nested list of all simulation parameter.\cr
+#'      [P()] \tab Namespaced version of [params()]
 #'                         (i.e., do not have to specify module name).\cr
 #'   }
 #' }
 #'
 #' \subsection{3.2 loading from disk, saving to disk}{
 #'   \tabular{ll}{
-#'      \code{\link{inputs}} \tab List of loaded objects used in simulation. (advanced)\cr
-#'      \code{\link{outputs}} \tab List of objects to save during simulation. (advanced)\cr
+#'      [inputs()] \tab List of loaded objects used in simulation. (advanced)\cr
+#'      [outputs()] \tab List of objects to save during simulation. (advanced)\cr
 #'   }
 #' }
 #'
 #' \subsection{3.3 objects in the `simList`}{
 #'   \tabular{ll}{
-#'      \code{\link{ls}}, \code{\link{objects}} \tab Names of objects referenced by the simulation environment.\cr
-#'      \code{\link{ls.str}} \tab List the structure of the simList objects.\cr
-#'      \code{\link{objs}} \tab List of objects referenced by the simulation environment.\cr
+#'      [ls()], [objects()] \tab Names of objects referenced by the simulation environment.\cr
+#'      [ls.str()] \tab List the structure of the simList objects.\cr
+#'      [objs()] \tab List of objects referenced by the simulation environment.\cr
 #'   }
 #' }
 #'
 #' \subsection{3.4 Simulation paths}{
 #'   Accessor functions for the `paths` slot and its elements.
 #'   \tabular{ll}{
-#'      \code{\link{cachePath}} \tab Global simulation cache path.\cr
-#'      \code{\link{modulePath}} \tab Global simulation module path.\cr
-#'      \code{\link{inputPath}} \tab Global simulation input path.\cr
-#'      \code{\link{outputPath}} \tab Global simulation output path.\cr
-#'      \code{\link{rasterPath}} \tab Global simulation temporary raster path.\cr
-#'      \code{\link{paths}} \tab Global simulation paths (cache, modules, inputs, outputs, rasters).\cr
+#'      [cachePath()] \tab Global simulation cache path.\cr
+#'      [modulePath()] \tab Global simulation module path.\cr
+#'      [inputPath()] \tab Global simulation input path.\cr
+#'      [outputPath()] \tab Global simulation output path.\cr
+#'      [rasterPath()] \tab Global simulation temporary raster path.\cr
+#'      [paths()] \tab Global simulation paths (cache, modules, inputs, outputs, rasters).\cr
 #'   }
 #' }
 #'
@@ -115,10 +115,10 @@
 #'   Accessor functions for the `simtimes` slot and its elements.
 #'
 #'   \tabular{ll}{
-#'      \code{\link{time}} \tab Current simulation time, in units of longest module.\cr
-#'      \code{\link{start}} \tab Simulation start time, in units of longest module.\cr
-#'      \code{\link{end}} \tab Simulation end time, in units of longest module.\cr
-#'      \code{\link{times}} \tab List of all simulation times (current, start, end), in units of longest module..\cr
+#'      [time()] \tab Current simulation time, in units of longest module.\cr
+#'      [start()] \tab Simulation start time, in units of longest module.\cr
+#'      [end()] \tab Simulation end time, in units of longest module.\cr
+#'      [times()] \tab List of all simulation times (current, start, end), in units of longest module..\cr
 #'   }
 #' }
 #'
@@ -128,10 +128,10 @@
 #'   thus most users will not require direct use of these methods.
 #'
 #'   \tabular{ll}{
-#'      \code{\link{events}} \tab Scheduled simulation events (the event queue). (advanced)\cr
-#'      \code{\link{current}} \tab Currently executing event. (advanced)\cr
-#'      \code{\link{completed}} \tab Completed simulation events. (advanced)\cr
-#'      \code{\link{elapsedTime}} \tab The amount of clock time that modules & events use\cr
+#'      [events()] \tab Scheduled simulation events (the event queue). (advanced)\cr
+#'      [current()] \tab Currently executing event. (advanced)\cr
+#'      [completed()] \tab Completed simulation events. (advanced)\cr
+#'      [elapsedTime()] \tab The amount of clock time that modules & events use\cr
 #'   }
 #' }
 #'
@@ -140,14 +140,14 @@
 #'   These are included for advanced users.
 #'
 #'   \tabular{ll}{
-#'      \code{\link{depends}} \tab List of simulation module dependencies. (advanced)\cr
-#'      \code{\link{modules}} \tab List of simulation modules to be loaded. (advanced)\cr
-#'      \code{\link{packages}} \tab Vector of required R libraries of all modules. (advanced)\cr
+#'      [depends()] \tab List of simulation module dependencies. (advanced)\cr
+#'      [modules()] \tab List of simulation modules to be loaded. (advanced)\cr
+#'      [packages()] \tab Vector of required R libraries of all modules. (advanced)\cr
 #'   }
 #' }
 #'
 #' \subsection{3.8 `simList` environment}{
-#'   The \code{\link{simList}} has a slot called `.xData` which is an environment.
+#'   The [simList()] has a slot called `.xData` which is an environment.
 #'   All objects in the `simList` are actually in this environment,
 #'   i.e., the `simList` is not a `list`.
 #'   In R, environments use pass-by-reference semantics, which means that copying
@@ -157,23 +157,23 @@
 #'   within that slot. Sometimes, this not desired, and a true copy is required.
 #'
 #'   \tabular{ll}{
-#'      \code{\link{envir}} \tab Access the environment of the simList directly (advanced)\cr
-#'      \code{\link{copy}} \tab Deep copy of a simList. (advanced)\cr
+#'      [envir()] \tab Access the environment of the simList directly (advanced)\cr
+#'      [copy()] \tab Deep copy of a simList. (advanced)\cr
 #'   }
 #' }
 #'
 #' \subsection{3.9 Checkpointing}{
 #'   \tabular{lll}{
 #'      Accessor method \tab Module \tab Description\cr
-#'      \code{\link{checkpointFile}} \tab `checkpoint` \tab Name of the checkpoint file. (advanced)\cr
-#'      \code{\link{checkpointInterval}} \tab `checkpoint` \tab The simulation checkpoint interval. (advanced)\cr
+#'      [checkpointFile()] \tab `checkpoint` \tab Name of the checkpoint file. (advanced)\cr
+#'      [checkpointInterval()] \tab `checkpoint` \tab The simulation checkpoint interval. (advanced)\cr
 #'    }
 #'  }
 #'
 #' \subsection{3.10 Progress Bar}{
 #'   \tabular{lll}{
-#'      \code{\link{progressType}} \tab `.progress` \tab Type of graphical progress bar used. (advanced)\cr
-#'      \code{\link{progressInterval}} \tab `.progress` \tab Interval for the progress bar. (advanced)\cr
+#'      [progressType()] \tab `.progress` \tab Type of graphical progress bar used. (advanced)\cr
+#'      [progressInterval()] \tab `.progress` \tab Interval for the progress bar. (advanced)\cr
 #'   }
 #' }
 #'
@@ -188,14 +188,14 @@
 #'   repository on GitHub.
 #'
 #'   \tabular{ll}{
-#'     \code{\link{checksums}} \tab Verify (and optionally write) checksums for a module's data files.\cr
-#'     \code{\link{downloadModule}} \tab Open all modules nested within a base directory.\cr
-#'     \code{\link{getModuleVersion}} \tab Get the latest module version # from module repository.\cr
-#'     \code{\link{newModule}} \tab Create new module from template.\cr
-#'     \code{\link{newModuleDocumentation}} \tab Create empty documentation for a new module.\cr
-#'     \code{\link{openModules}} \tab Open all modules nested within a base directory.\cr
-#'     \code{\link{moduleMetadata}} \tab Shows the module metadata.\cr
-#'     \code{\link{zipModule}} \tab Zip a module and its associated files.\cr
+#'     [checksums()] \tab Verify (and optionally write) checksums for a module's data files.\cr
+#'     [downloadModule()] \tab Open all modules nested within a base directory.\cr
+#'     [getModuleVersion()] \tab Get the latest module version # from module repository.\cr
+#'     [newModule()] \tab Create new module from template.\cr
+#'     [newModuleDocumentation()] \tab Create empty documentation for a new module.\cr
+#'     [openModules()] \tab Open all modules nested within a base directory.\cr
+#'     [moduleMetadata()] \tab Shows the module metadata.\cr
+#'     [zipModule()] \tab Zip a module and its associated files.\cr
 #'   }
 #' }
 #'
@@ -206,20 +206,20 @@
 #'   the module's `.R` file.
 #'
 #'   \tabular{ll}{
-#'     \code{\link{defineModule}} \tab Define the module metadata\cr
-#'     \code{\link{defineParameter}} \tab Specify a parameter's name, value and set a default\cr
-#'     \code{\link{expectsInput}} \tab Specify an input object's name, class, description, `sourceURL` and other specifications\cr
-#'     \code{\link{createsOutput}} \tab Specify an output object's name, class, description and other specifications\cr
+#'     [defineModule()] \tab Define the module metadata\cr
+#'     [defineParameter()] \tab Specify a parameter's name, value and set a default\cr
+#'     [expectsInput()] \tab Specify an input object's name, class, description, `sourceURL` and other specifications\cr
+#'     [createsOutput()] \tab Specify an output object's name, class, description and other specifications\cr
 #'   }
 #'
 #'   There are also accessors for many of the metadata entries:
 #'   \tabular{ll}{
-#'     \code{\link{timeunit}} \tab Accesses metadata of same name\cr
-#'     \code{\link{citation}} \tab Accesses metadata of same name\cr
-#'     \code{\link{documentation}} \tab Accesses metadata of same name\cr
-#'     \code{\link{reqdPkgs}} \tab Accesses metadata of same name\cr
-#'     \code{\link{inputObjects}} \tab Accesses metadata of same name\cr
-#'     \code{\link{outputObjects}} \tab Accesses metadata of same name\cr
+#'     [timeunit()] \tab Accesses metadata of same name\cr
+#'     [citation()] \tab Accesses metadata of same name\cr
+#'     [documentation()] \tab Accesses metadata of same name\cr
+#'     [reqdPkgs()] \tab Accesses metadata of same name\cr
+#'     [inputObjects()] \tab Accesses metadata of same name\cr
+#'     [outputObjects()] \tab Accesses metadata of same name\cr
 #'   }
 #' }
 #'
@@ -229,8 +229,8 @@
 #'   information:
 #'
 #'   \tabular{ll}{
-#'     \code{\link{depsEdgeList}} \tab Build edge list for module dependency graph\cr
-#'     \code{\link{depsGraph}} \tab Build a module dependency graph using `igraph`\cr
+#'     [depsEdgeList()] \tab Build edge list for module dependency graph\cr
+#'     [depsGraph()] \tab Build a module dependency graph using `igraph`\cr
 #'   }
 #' }
 #'
@@ -246,15 +246,15 @@
 #'   Several `SpaDES.tools` functions assist with these:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools]{adj}} \tab An optimized (i.e., faster) version of \code{\link[raster]{adjacent}}\cr
-#'     \code{\link[SpaDES.tools]{cir}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*}} object\cr
-#'     \code{\link[SpaDES.tools:distanceFromEachPoint]{directionFromEachPoint}} \tab Fast calculation of direction and distance surfaces\cr
-#'     \code{\link[SpaDES.tools]{distanceFromEachPoint}} \tab Fast calculation of distance surfaces\cr
-#'     \code{\link[SpaDES.tools]{rings}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
-#'     \code{\link[SpaDES.tools]{spokes}} \tab Identify outward radiating spokes from initial points\cr
-#'     \code{\link[SpaDES.tools]{spread}} \tab Contagious cellular automata\cr
-#'     \code{\link[SpaDES.tools]{spread2}} \tab Contagious cellular automata, different algorithm, more robust\cr
-#'     \code{\link[SpaDES.tools]{wrap}} \tab Create a torus from a grid\cr
+#'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [raster::adjacent()]\cr
+#'     [SpaDES.tools::cir()] \tab Identify pixels in a circle around a [`SpatialPoints*()`][sp::SpatialPoints-class] object\cr
+#'     [`directionFromEachPoint()`][SpaDES.tools::distanceFromEachPoint] \tab Fast calculation of direction and distance surfaces\cr
+#'     [SpaDES.tools::distanceFromEachPoint()] \tab Fast calculation of distance surfaces\cr
+#'     [SpaDES.tools::rings()] \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
+#'     [SpaDES.tools::spokes()] \tab Identify outward radiating spokes from initial points\cr
+#'     [SpaDES.tools::spread()] \tab Contagious cellular automata\cr
+#'     [SpaDES.tools::spread2()] \tab Contagious cellular automata, different algorithm, more robust\cr
+#'     [SpaDES.tools::wrap()] \tab Create a torus from a grid\cr
 #'   }
 #' }
 #'
@@ -262,11 +262,11 @@
 #'   Agents have several methods and functions specific to them:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools]{crw}} \tab Simple correlated random walk function\cr
-#'     \code{\link[SpaDES.tools]{heading}} \tab Determines the heading between `SpatialPoints*`\cr
-#'     \code{\link[quickPlot]{makeLines}} \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
-#'     \code{\link[SpaDES.tools:crw]{move}} \tab A meta function that can currently only take "crw"\cr
-#'     \code{\link[SpaDES.tools:specnumperpatch-probs]{specificNumPerPatch}} \tab Initiate a specific number of agents per patch\cr
+#'     [SpaDES.tools::crw()] \tab Simple correlated random walk function\cr
+#'     [SpaDES.tools::heading()] \tab Determines the heading between `SpatialPoints*`\cr
+#'     [quickPlot::makeLines()] \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
+#'     [`move()`][SpaDES.tools::crw] \tab A meta function that can currently only take "crw"\cr
+#'     [`specificNumPerPatch()`][SpaDES.tools::specnumperpatch-probs] \tab Initiate a specific number of agents per patch\cr
 #'   }
 #' }
 #'
@@ -276,7 +276,7 @@
 #'   and many others), we provide the following GIS-related functions:
 #'
 #'   \tabular{ll}{
-#'     \code{\link{equalExtent}} \tab Assess whether a list of extents are all equal\cr
+#'     [equalExtent()] \tab Assess whether a list of extents are all equal\cr
 #'   }
 #' }
 #'
@@ -286,7 +286,7 @@
 #'   that share identical information.
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools]{rasterizeReduced}} \tab Convert reduced representation to full raster.\cr
+#'     [SpaDES.tools::rasterizeReduced()] \tab Convert reduced representation to full raster.\cr
 #'   }
 #' }
 #'
@@ -295,9 +295,9 @@
 #'   Here are several helper functions to add to, set and get colors of `Raster*` objects:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[quickPlot:getSetColors]{setColors}} \tab Set colours for plotting `Raster*` objects\cr
-#'     \code{\link{getColors}} \tab Get colours in a `Raster*` objects\cr
-#'     \code{\link{divergentColors}} \tab Create a colour palette with diverging colours around a middle\cr
+#'     [`setColors()`][quickPlot::getSetColors] \tab Set colours for plotting `Raster*` objects\cr
+#'     [getColors()] \tab Get colours in a `Raster*` objects\cr
+#'     [divergentColors()] \tab Create a colour palette with diverging colours around a middle\cr
 #'   }
 #' }
 #'
@@ -306,8 +306,8 @@
 #'   These dummy maps can later be replaced with actual data maps.
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools]{gaussMap}} \tab Creates a random map using Gaussian random fields\cr
-#'     \code{\link[SpaDES.tools]{randomPolygons}} \tab Creates a random polygon with specified number of classes\cr
+#'     [SpaDES.tools::gaussMap()] \tab Creates a random map using Gaussian random fields\cr
+#'     [SpaDES.tools::randomPolygons()] \tab Creates a random polygon with specified number of classes\cr
 #'   }
 #' }
 #'
@@ -316,8 +316,8 @@
 #'   These are helpers for assessing this:
 #'
 #'   \tabular{ll}{
-#'     \code{\link{checkObject}} \tab Check for a existence of an object within a `simList` \cr
-#'     \code{\link[Require]{checkPath}} \tab Checks the specified filepath for formatting consistencies\cr
+#'     [checkObject()] \tab Check for a existence of an object within a `simList` \cr
+#'     [Require::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
 #'   }
 #' }
 #'
@@ -327,11 +327,11 @@
 #'   You must know how to use SELES for these to be useful:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools:SELESagentLocation]{agentLocation}} \tab Agent location\cr
-#'     \code{\link[SpaDES.tools]{initiateAgents}} \tab Initiate agents into a `SpatialPointsDataFrame`\cr
-#'     \code{\link[SpaDES.tools:SELESnumAgents]{numAgents}} \tab Number of agents\cr
-#'     \code{\link[SpaDES.tools:SELESprobInit]{probInit}} \tab Probability of initiating an agent or event\cr
-#'     \code{\link[SpaDES.tools:SELEStransitions]{transitions}} \tab Transition probability\cr
+#'     [`agentLocation()`][SpaDES.tools::SELESagentLocation] \tab Agent location\cr
+#'     [SpaDES.tools::initiateAgents()] \tab Initiate agents into a `SpatialPointsDataFrame`\cr
+#'     [`numAgents()`][SpaDES.tools::SELESnumAgents] \tab Number of agents\cr
+#'     [`probInit()`][SpaDES.tools::SELESprobInit] \tab Probability of initiating an agent or event\cr
+#'     [`transitions()`][SpaDES.tools::SELEStransitions] \tab Transition probability\cr
 #'   }
 #' }
 #'
@@ -339,10 +339,10 @@
 #'   Functions that may be useful within a `SpaDES` context:
 #'
 #'   \tabular{ll}{
-#'     \code{\link[SpaDES.tools]{inRange}} \tab Test whether a number lies within range [a,b]\cr
-#'     \code{\link{layerNames}} \tab Get layer names for numerous object classes\cr
-#'     \code{\link{numLayers}} \tab Return number of layers\cr
-#'     \code{\link{paddedFloatToChar}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
+#'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range [a,b]\cr
+#'     [layerNames()] \tab Get layer names for numerous object classes\cr
+#'     [numLayers()] \tab Return number of layers\cr
+#'     [paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
 #'   }
 #' }
 #'
@@ -357,13 +357,13 @@
 #' goal is just to retrieve final results.
 #' This would be an alternative to manually saving the outputs.
 #'
-#' See example in \code{\link{spades}}, achieved by using `cache = TRUE` argument.
+#' See example in [spades()], achieved by using `cache = TRUE` argument.
 #'
 #' \tabular{ll}{
-#'   \code{\link[reproducible]{Cache}} \tab Caches a function, but often accessed as arg in \code{\link{spades}}\cr
-#'   \code{\link[reproducible:cache-tools]{showCache}} \tab Shows information about the objects in the cache\cr
-#'   \code{\link[reproducible:cache-tools]{clearCache}} \tab Removes objects from the cache\cr
-#'   \code{\link[reproducible:cache-tools]{keepCache}} \tab Keeps only the objects described\cr
+#'   [reproducible::Cache()] \tab Caches a function, but often accessed as arg in [spades()]\cr
+#'   [`showCache()`][reproducible::cache-tools] \tab Shows information about the objects in the cache\cr
+#'   [`clearCache()`][reproducible::cache-tools] \tab Removes objects from the cache\cr
+#'   [`keepCache()`][reproducible::cache-tools] \tab Keeps only the objects described\cr
 #' }
 #'
 #' A module developer can build caching into their module by creating cached versions of their
@@ -379,25 +379,25 @@
 #'
 #' Commonly used:
 #' \tabular{ll}{
-#'   \code{\link{Plot}} \tab The workhorse plotting function\cr
+#'   [Plot()] \tab The workhorse plotting function\cr
 #' }
 #'
 #' Simulation diagrams:
 #' \tabular{ll}{
-#'   \code{\link{eventDiagram}} \tab Gantt chart representing the events in a completed simulation.\cr
-#'   \code{\link{moduleDiagram}} \tab Network diagram of simplified module (object) dependencies.\cr
-#'   \code{\link{objectDiagram}} \tab Sequence diagram of detailed object dependencies.\cr
+#'   [eventDiagram()] \tab Gantt chart representing the events in a completed simulation.\cr
+#'   [moduleDiagram()] \tab Network diagram of simplified module (object) dependencies.\cr
+#'   [objectDiagram()] \tab Sequence diagram of detailed object dependencies.\cr
 #' }
 #'
 #' Other useful plotting functions:
 #' \tabular{ll}{
-#'   \code{\link{clearPlot}} \tab Helpful for resolving many errors\cr
-#'   \code{\link{clickValues}} \tab Extract values from a raster object at the mouse click location(s)\cr
-#'   \code{\link{clickExtent}} \tab Zoom into a raster or polygon map that was plotted with \code{\link{Plot}}\cr
-#'   \code{\link{clickCoordinates}} \tab Get the coordinates, in map units, under mouse click\cr
-#'   \code{\link{dev}} \tab Specify which device to plot on, making a non-RStudio one as default\cr
-#'   \code{\link{newPlot}} \tab Open a new default plotting device\cr
-#'   \code{\link{rePlot}} \tab Replots all elements of device for refreshing or moving plot\cr
+#'   [clearPlot()] \tab Helpful for resolving many errors\cr
+#'   [clickValues()] \tab Extract values from a raster object at the mouse click location(s)\cr
+#'   [clickExtent()] \tab Zoom into a raster or polygon map that was plotted with [Plot()]\cr
+#'   [clickCoordinates()] \tab Get the coordinates, in map units, under mouse click\cr
+#'   [dev()] \tab Specify which device to plot on, making a non-RStudio one as default\cr
+#'   [newPlot()] \tab Open a new default plotting device\cr
+#'   [rePlot()] \tab Replots all elements of device for refreshing or moving plot\cr
 #' }
 #'
 #' ------------------------------------------------------------------------------------------
@@ -407,9 +407,9 @@
 #' loading and saving of files for simulation purposes:
 #'
 #' \tabular{ll}{
-#'   \code{\link{loadFiles}} \tab Load simulation objects according to a filelist\cr
-#'   \code{\link{rasterToMemory}} \tab Read a raster from file to RAM\cr
-#'   \code{\link{saveFiles}} \tab Save simulation objects according to outputs and params\cr
+#'   [loadFiles()] \tab Load simulation objects according to a filelist\cr
+#'   [rasterToMemory()] \tab Read a raster from file to RAM\cr
+#'   [saveFiles()] \tab Save simulation objects according to outputs and params\cr
 #' }
 #'
 #' ------------------------------------------------------------------------------------------
@@ -427,7 +427,7 @@
 #' ------------------------------------------------------------------------------------------
 #' @section 10 Package options:
 #'
-#' `SpaDES` packages use the following \code{\link{options}} to configure behaviour:
+#' `SpaDES` packages use the following [options()] to configure behaviour:
 #'
 #' \itemize{
 #'   \item `spades.browserOnError`: If `TRUE`, the default, then any
@@ -502,7 +502,7 @@
 #'     modules from GitHub.com. Default `"https://github.com/PredictiveEcology/SpaDES"`.
 #' }
 #'
-#' @seealso \code{\link{spadesOptions}}
+#' @seealso [spadesOptions()]
 #'
 #' @import igraph
 #' @import methods

@@ -34,7 +34,7 @@ just a pass through, so this can be safely used on large complex objects,
 recursively, e.g., a \code{simList}.
 }
 \seealso{
-\code{\link{raster}}.
+\code{\link[=raster]{raster()}}.
 }
 \author{
 Eliot McIntire and Alex Chubaty

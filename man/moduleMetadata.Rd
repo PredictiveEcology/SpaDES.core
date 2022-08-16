@@ -42,7 +42,7 @@ about.}
 }
 \value{
 A list of module metadata, matching the structure in
-\code{\link{defineModule}}.
+\code{\link[=defineModule]{defineModule()}}.
 }
 \description{
 Parse and extract module metadata
@@ -73,7 +73,7 @@ if (require("SpaDES.tools", quietly = TRUE)) {
 options(opts)
 }
 \seealso{
-\code{\link{defineModule}}
+\code{\link[=defineModule]{defineModule()}}
 }
 \author{
 Alex Chubaty

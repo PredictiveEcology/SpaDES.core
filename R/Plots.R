@@ -374,7 +374,7 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
 #'
 #' This will do all the various tests needed to determine whether
 #' plotting of one sort or another will occur. Testing any of the
-#' types as listed in \code{\link{Plots}} argument `types`. Only the
+#' types as listed in [Plots()] argument `types`. Only the
 #' first 3 letters of the type are required.
 #'
 #' @param .plots Usually will be the `P(sim)$.plots` is used within

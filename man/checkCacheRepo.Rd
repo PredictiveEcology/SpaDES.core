@@ -12,8 +12,8 @@
 \item{create}{Logical. If TRUE, then it will create the path for cache.}
 }
 \description{
-See \code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}.
+See \link[reproducible:checkCacheRepo]{reproducible::.checkCacheRepo}.
 }
 \seealso{
-\code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}
+\link[reproducible:checkCacheRepo]{reproducible::.checkCacheRepo}
 }

@@ -25,7 +25,7 @@ removeClass("person4")
 #' @author Alex Chubaty
 #' @keywords internal
 #' @rdname inputObjectsDF
-#' @seealso \code{\link{defineModule}}
+#' @seealso [defineModule()]
 setGeneric("._inputObjectsDF", function(x) {
   standardGeneric("._inputObjectsDF")
 })
@@ -68,7 +68,7 @@ setMethod("._outputObjectsDF",
 #'
 #' @slot keywords       Character vector containing a module's keywords.
 #'
-#' @slot authors        The author(s) of the module as a \code{\link{person}} object.
+#' @slot authors        The author(s) of the module as a [person()] object.
 #'
 #' @slot childModules   A character vector of child module names.
 #'                      Modules listed here will be loaded with this module.
@@ -77,10 +77,10 @@ setMethod("._outputObjectsDF",
 #'                      Semantic versioning is assumed <https://semver.org/>.
 #'
 #' @slot spatialExtent  Specifies the module's spatial extent as an
-#'                      \code{\link{Extent}} object. Default is `NA`.
+#'                      [Extent()] object. Default is `NA`.
 #'
 #' @slot timeframe      Specifies the valid timeframe for which the module was
-#'                      designed to simulate. Must be a \code{\link{POSIXt}}
+#'                      designed to simulate. Must be a [POSIXt()]
 #'                      object of length 2, specifying the start and end times
 #'                      (e.g., `as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))`).
 #'                      Can be specified as `NA` using `as.POSIXlt(c(NA, NA))`.
@@ -103,7 +103,7 @@ setMethod("._outputObjectsDF",
 #'                      of type `character`, `character`, and
 #'                      `ANY`, respectively. Default values may be
 #'                      overridden by the user by passing a list of parameters
-#'                      to \code{\link{simInit}}.
+#'                      to [simInit()].
 #'
 #' @slot inputObjects   A `data.frame` specifying the object dependencies of
 #'                      the module, with columns `objectName`,
@@ -120,7 +120,7 @@ setMethod("._outputObjectsDF",
 #' @importFrom raster extent
 #' @keywords internal
 #'
-#' @seealso `.simDeps`, \code{\link{spadesClasses}}
+#' @seealso `.simDeps`, [spadesClasses()]
 #'
 #' @author Alex Chubaty
 #'
@@ -201,9 +201,9 @@ setClass(
 #'
 #' Defines all simulation dependencies for all modules within a SpaDES simulation.
 #'
-#' @slot dependencies   List of \code{\link{.moduleDeps}} dependency objects.
+#' @slot dependencies   List of [.moduleDeps()] dependency objects.
 #'
-#' @seealso \code{\link{.moduleDeps}}, \code{\link{spadesClasses}}
+#' @seealso [.moduleDeps()], [spadesClasses()]
 #'
 #' @aliases .simDeps
 #' @keywords internal

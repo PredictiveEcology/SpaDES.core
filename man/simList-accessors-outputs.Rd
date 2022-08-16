@@ -70,7 +70,7 @@ The default is to concatenate \code{objectName} with the model timeunit and
 \code{"Fires_year1.rds"}.\cr
 
 \code{fun} \tab optional, a character string indicating the function to use to
-save that file. The default is \code{\link{saveRDS}} \cr
+save that file. The default is \code{\link[=saveRDS]{saveRDS()}} \cr
 
 \code{package} \tab optional character string indicating the package in
 which to find the \code{fun});\cr

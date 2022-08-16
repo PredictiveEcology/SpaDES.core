@@ -44,10 +44,10 @@ i.e., 'child modules', this should be \code{character(0)} or
 If a character vector is provided, then these must be the
 names of the modules located in the same file path as this
 parent module that will be loaded during the \code{simInit}.\cr
-\code{authors} \tab Module author information (as a vector of \code{\link{person}}
+\code{authors} \tab Module author information (as a vector of \code{\link[=person]{person()}}
 objects. This is currently not parsed by SpaDES;
 it is for human readers only.\cr
-\code{version} \tab Module version number (will be coerced to \code{\link{numeric_version}}
+\code{version} \tab Module version number (will be coerced to \code{\link[=numeric_version]{numeric_version()}}
 if a character or numeric are supplied).
 The module developer should update manually this with each change
 that is made to the module. See \url{https://semver.org/}
@@ -77,17 +77,17 @@ This is currently not parsed by SpaDES;
 it is for human readers only.\cr\cr
 \code{reqdPkgs} \tab List of R package names required by the module. These
 packages will be loaded when \code{simInit} is called.
-\code{\link[Require]{Require}} will be used internally
+\code{\link[Require:Require]{Require::Require()}} will be used internally
 to load if available, and install if not available.
-Because \code{\link[Require]{Require}} can also download from
+Because \code{\link[Require:Require]{Require::Require()}} can also download from
 GitHub.com, these packages can specify package names stored
 on GitHub, e.g., \code{"PredictiveEcology/SpaDES.core@development"}. \cr
 \code{parameters} \tab A data.frame specifying the parameters used in the module.
 Usually produced by \code{rbind}-ing the outputs of multiple
-\code{\link{defineParameter}} calls. These parameters indicate
+\code{\link[=defineParameter]{defineParameter()}} calls. These parameters indicate
 the default values that will be used unless a module user
 overrides them with the \code{params} argument in the
-\code{\link{simInit}} call. The minimum and maximum are
+\code{\link[=simInit]{simInit()}} call. The minimum and maximum are
 currently used by the \code{SpaDES.shiny::shine} function and the
 \code{POM} function, and they should indicate the range
 of values that are reasonable scientifically.\cr
@@ -133,7 +133,7 @@ that will cause these objects to be put into the
 
 }
 \seealso{
-moduleDefaults \code{\link{defineEvent}}
+moduleDefaults \code{\link[=defineEvent]{defineEvent()}}
 }
 \author{
 Alex Chubaty

@@ -115,7 +115,7 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.8 on simList environment.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.8 on simList environment.
 #'
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
@@ -174,7 +174,7 @@ setReplaceMethod("envir",
 #' @return Returns or sets a list of objects in the `simList` environment.
 #'
 #' @family functions to access elements of a 'simList' object
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -238,9 +238,9 @@ setReplaceMethod(
 #' `simList` object.
 #' These are included for advanced users.
 #' \tabular{ll}{
-#'    \code{\link{depends}} \tab List of simulation module dependencies. (advanced) \cr
-#'    \code{\link{modules}} \tab List of simulation modules to be loaded. (advanced) \cr
-#'    \code{\link{inputs}} \tab List of loaded objects used in simulation. (advanced) \cr
+#'    [depends()] \tab List of simulation module dependencies. (advanced) \cr
+#'    [modules()] \tab List of simulation modules to be loaded. (advanced) \cr
+#'    [inputs()] \tab List of loaded objects used in simulation. (advanced) \cr
 #' }
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.
@@ -254,7 +254,7 @@ setReplaceMethod(
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @family functions to access elements of a 'simList' object
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.7 on Modules and dependencies.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @aliases simList-accessors-modules
 #' @author Alex Chubaty
@@ -424,7 +424,7 @@ setMethod(
 #' Specifying the parameter name is <5% faster.
 #'
 #' @family functions to access elements of a 'simList' object
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @aliases parameters
 #' @aliases simList-accessors-params
@@ -614,7 +614,7 @@ P.simList <- function(sim, param, module) {
 #' @inheritParams params
 #'
 #' @family functions to access elements of a 'simList' object
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -832,8 +832,8 @@ setReplaceMethod("checkpointInterval",
 #' Get and set simulation progress bar details
 #'
 #' The progress bar can be set in two ways in SpaDES. First, by setting values
-#' in the .progress list element in the params list element passed to \code{\link{simInit}}.
-#' Second, at the \code{\link{spades}} call itself, which can be simpler. See examples.
+#' in the .progress list element in the params list element passed to [simInit()].
+#' Second, at the [spades()] call itself, which can be simpler. See examples.
 #'
 #' @details Progress Bar:
 #' Progress type can be one of  `"text"`, `"graphical"`, or `"shiny"`.
@@ -1032,7 +1032,7 @@ setReplaceMethod("progressType",
 #' in the `simList` object.
 #'
 #' @family functions to access elements of a 'simList' object
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.2 on loading and saving.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
@@ -1188,7 +1188,7 @@ setReplaceMethod(
 #' `"Fires_year1.rds"`.\cr
 #'
 #' `fun` \tab optional, a character string indicating the function to use to
-#' save that file. The default is \code{\link{saveRDS}} \cr
+#' save that file. The default is [saveRDS()] \cr
 #'
 #' `package` \tab optional character string indicating the package in
 #' which to find the `fun`);\cr
@@ -1446,7 +1446,7 @@ setReplaceMethod(
 #'
 #' Accessor functions for the `paths` slot in a `simList` object.
 #'
-#' These are ways to add or access the file paths used by \code{\link{spades}}.
+#' These are ways to add or access the file paths used by [spades()].
 #' There are five file paths: `cachePath`, `modulePath`,
 #' `inputPath`, `outputPath`, and `rasterPath`.
 #' Each has a function to get or set the value in a `simList` object.
@@ -1467,7 +1467,7 @@ setReplaceMethod(
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @family functions to access elements of a 'simList' object
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.4 on Simulation Paths.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
 #' @importFrom stats na.omit
@@ -1954,8 +1954,8 @@ setMethod("dataPath",
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.5 on Simulation times;
-#'   \code{\link{elapsedTime}},
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.5 on Simulation times;
+#'   [elapsedTime()],
 #'
 #' @aliases simList-accessors-times
 #' @author Alex Chubaty and Eliot McIntire
@@ -2339,7 +2339,7 @@ setMethod(
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.
 #'
-#' @note Each event is represented by a \code{\link{data.table}} row consisting of:
+#' @note Each event is represented by a [data.table()] row consisting of:
 #'  \itemize{
 #'    \item `eventTime`: The time the event is to occur.
 #'    \item `moduleName`: The module from which the event is taken.
@@ -2354,7 +2354,7 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso \code{\link{SpaDES.core-package}}, specifically the section 1.2.6 on Simulation event queues.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.6 on Simulation event queues.
 #'
 #' @aliases simList-accessors-events
 #' @export
@@ -2656,12 +2656,12 @@ setReplaceMethod(
 #' Add simulation dependencies
 #'
 #' Internal function.
-#' Adds a \code{\link{.moduleDeps}} object to the simulation dependency list.
+#' Adds a [.moduleDeps()] object to the simulation dependency list.
 #'
 #' @inheritParams objs
 #'
 #' @param x   A named list containing the parameters used to construct a new
-#'            \code{\link{.moduleDeps}} object.
+#'            [.moduleDeps()] object.
 #'
 #' @return A `simList` object.
 #'
@@ -3045,7 +3045,7 @@ setMethod("documentation",
 })
 
 ################################################################################
-#' @param package For compatibility with \code{\link[utils]{citation}}. This can be
+#' @param package For compatibility with [utils::citation()]. This can be
 #'                a `simList` or a character string for a package name.
 #' @inheritParams P
 #' @inheritParams utils::citation

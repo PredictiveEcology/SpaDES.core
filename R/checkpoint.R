@@ -21,7 +21,7 @@
 #'
 #' @return Returns the modified `simList` object.
 #'
-#' @seealso \code{\link{.Random.seed}}.
+#' @seealso [.Random.seed()].
 #'
 #' @author Alex Chubaty
 #'

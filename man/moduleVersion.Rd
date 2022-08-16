@@ -55,7 +55,7 @@ if (require("SpaDES.tools", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link{moduleMetadata}}
+\code{\link[=moduleMetadata]{moduleMetadata()}}
 }
 \author{
 Alex Chubaty

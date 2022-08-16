@@ -16,8 +16,8 @@ Various slot accessor methods (i.e., get and set functions) are provided
 Based on code from chapter 7.8.3 of Matloff (2011): "Discrete event simulation".
 Here, we implement a discrete event simulation in a more modular fashion so
 it's easier to add simulation components (i.e., "simulation modules").
-We use S4 classes and methods, and use \code{\link{data.table}} instead of
-\code{\link{data.frame}} to implement the event queue (because it is much
+We use S4 classes and methods, and use \code{\link[=data.table]{data.table()}} instead of
+\code{\link[=data.frame]{data.frame()}} to implement the event queue (because it is much
 more efficient).
 }
 \section{Slots}{
@@ -44,7 +44,7 @@ See 'Event Lists' for more information. It is kept
 as an environment of individual events for speed. The \code{completed}
 method converts it to a sorted \code{data.table}.}
 
-\item{\code{depends}}{A \code{.simDeps} list of \code{\link{.moduleDeps}} objects
+\item{\code{depends}}{A \code{.simDeps} list of \code{\link[=.moduleDeps]{.moduleDeps()}} objects
 containing module object dependency information.}
 
 \item{\code{simtimes}}{List of numerical values describing the simulation start
@@ -74,7 +74,7 @@ The \code{simList} class extends the \code{environment}, by adding
 several slots that provide information about the metadata for a discrete
 event simulation. The environment slot, if accessed directly is \code{.xData}
 and this is where input and output objects from modules are placed.
-The \code{\link{simList_}} class is similar, but it extends the \code{list}
+The \code{\link[=simList_]{simList_()}} class is similar, but it extends the \code{list}
 class. All other slots are the same.
 Thus, \code{simList} is identical to \code{simList_}, except that the former
 uses an environment for objects and the latter uses a list.
@@ -87,14 +87,14 @@ saving/loading a list behaves more reliably than saving/loading an environment.
 Several slot (and sub-slot) accessor methods are provided for use, and
 categorized into separate help pages:
 \tabular{ll}{
-\code{\link{simList-accessors-envir}} \tab Simulation environment. \cr
-\code{\link{simList-accessors-events}} \tab Scheduled and completed events. \cr
-\code{\link{simList-accessors-inout}} \tab Passing data in to / out of simulations. \cr
-\code{\link{simList-accessors-modules}} \tab Modules loaded and used; module dependencies. \cr
-\code{\link{simList-accessors-objects}} \tab Accessing objects used in the simulation. \cr
-\code{\link{simList-accessors-params}} \tab Global and module-specific parameters. \cr
-\code{\link{simList-accessors-paths}} \tab File paths for modules, inputs, and outputs. \cr
-\code{\link{simList-accessors-times}} \tab Simulation times. \cr
+\code{\link[=simList-accessors-envir]{simList-accessors-envir()}} \tab Simulation environment. \cr
+\code{\link[=simList-accessors-events]{simList-accessors-events()}} \tab Scheduled and completed events. \cr
+\code{\link[=simList-accessors-inout]{simList-accessors-inout()}} \tab Passing data in to / out of simulations. \cr
+\code{\link[=simList-accessors-modules]{simList-accessors-modules()}} \tab Modules loaded and used; module dependencies. \cr
+\code{\link[=simList-accessors-objects]{simList-accessors-objects()}} \tab Accessing objects used in the simulation. \cr
+\code{\link[=simList-accessors-params]{simList-accessors-params()}} \tab Global and module-specific parameters. \cr
+\code{\link[=simList-accessors-paths]{simList-accessors-paths()}} \tab File paths for modules, inputs, and outputs. \cr
+\code{\link[=simList-accessors-times]{simList-accessors-times()}} \tab Simulation times. \cr
 }
 }
 
@@ -104,7 +104,7 @@ categorized into separate help pages:
 The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
 The completed event list is an ordered list in the exact order that the events
 were executed.
-Each event is represented by a \code{\link{data.table}} row consisting of:
+Each event is represented by a \code{\link[=data.table]{data.table()}} row consisting of:
 \tabular{ll}{
 \code{eventTime} \tab The time the event is to occur.\cr
 \code{moduleName} \tab The module from which the event is taken.\cr

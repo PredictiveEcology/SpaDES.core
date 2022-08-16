@@ -54,7 +54,7 @@ if (!isGeneric(".parseElems")) {
 
 #' `.parseElems` for `simList` class objects
 #'
-#' See \code{\link[quickPlot:parseElems]{.parseElems}}.
+#' See [quickPlot::.parseElems].
 #'
 #' @inheritParams quickPlot::.parseElems
 #'
@@ -64,7 +64,7 @@ if (!isGeneric(".parseElems")) {
 #' @importMethodsFrom quickPlot .parseElems
 #' @include simList-class.R
 #' @rdname parseElems
-#' @seealso \code{\link[quickPlot:parseElems]{.parseElems}}
+#' @seealso [quickPlot::.parseElems]
 setMethod(
   ".parseElems",
   signature = "simList",

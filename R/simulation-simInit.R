@@ -30,7 +30,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'     time during the simulation. If specified here, this will be in addition
 #'     to any saving due code inside a module (i.e., a module may manually
 #'     run `write.table(...)` \tab `outputs` \cr
-#'   schedules "init" events \tab from all modules (see \code{\link{events}})
+#'   schedules "init" events \tab from all modules (see [events()])
 #'        \tab automatic  \cr
 #'   assesses module dependencies \tab via the inputs and outputs identified in their
 #'     metadata. This gives the order of the `.inputObjects` and `init`
@@ -156,7 +156,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' columns with following column names: `objectName` (character, required),
 #' `file` (character), `fun` (character), `package` (character),
 #' `interval` (numeric), `loadTime` (numeric).
-#' See \code{\link{inputs}} and vignette("ii-modules") section about inputs.
+#' See [inputs()] and vignette("ii-modules") section about inputs.
 #'
 #' @param outputs A `data.frame`. Can specify from 1 to 5
 #' columns with following column names: `objectName` (character, required),
@@ -166,7 +166,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' is set to a low value, e.g., 0, 1, 2 and `saveTime` is `start(sim)`,
 #' it should give "initial conditions".
 #'
-#' See \code{\link{outputs}} and
+#' See [outputs()] and
 #' `vignette("ii-modules")` section about outputs.
 #'
 #' @param loadOrder  An optional character vector of module names specifying the order in
@@ -185,9 +185,9 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
 #'
-#' @seealso \code{\link{spades}},
-#' \code{\link{times}}, \code{\link{params}}, \code{\link{objs}}, \code{\link{paths}},
-#' \code{\link{modules}}, \code{\link{inputs}}, \code{\link{outputs}}
+#' @seealso [spades()],
+#' [times()], [params()], [objs()], [paths()],
+#' [modules()], [inputs()], [outputs()]
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
@@ -977,10 +977,10 @@ setMethod(
 #'
 #' @param ... Arguments passed to simInit and spades
 #'
-#' @return Same as \code{\link{spades}} (a `simList`) or
+#' @return Same as [spades()] (a `simList`) or
 #'
 #'
-#' @seealso \code{\link{simInit}}, \code{\link{spades}}
+#' @seealso [simInit()], [spades()]
 #'
 #' @export
 #' @inheritParams simInit

@@ -11,7 +11,7 @@ checksums(module, path, ...)
 
 \item{path}{Character string giving the path to the module directory.}
 
-\item{...}{Passed to \code{\link[reproducible]{Checksums}}, notably, \code{write},
+\item{...}{Passed to \code{\link[reproducible:Checksums]{reproducible::Checksums()}}, notably, \code{write},
 \code{quickCheck},  \code{checksumFile} and \code{files}.}
 }
 \description{

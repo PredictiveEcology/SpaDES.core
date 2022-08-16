@@ -13,6 +13,6 @@ a module.}
 \description{
 This will do all the various tests needed to determine whether
 plotting of one sort or another will occur. Testing any of the
-types as listed in \code{\link{Plots}} argument \code{types}. Only the
+types as listed in \code{\link[=Plots]{Plots()}} argument \code{types}. Only the
 first 3 letters of the type are required.
 }

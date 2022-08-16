@@ -30,7 +30,7 @@ Lower number means higher priority. As a best practice, it is
 recommended that decimal values are conceptual
 grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
 similar).
-See \code{\link{priority}}.}
+See \code{\link[=priority]{priority()}}.}
 
 \item{.skipChecks}{Logical. If \code{TRUE}, then internal checks that arguments match
 expected types are skipped. Should only be used if speed is critical.}
@@ -64,7 +64,7 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{priority}}, \code{\link{scheduleConditionalEvent}}
+\code{\link[=priority]{priority()}}, \code{\link[=scheduleConditionalEvent]{scheduleConditionalEvent()}}
 }
 \author{
 Alex Chubaty

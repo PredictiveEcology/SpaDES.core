@@ -42,13 +42,13 @@ This is intended to be used within the \code{Cache} function, but can be used to
 a \code{simList} would look like once it is converted to a repeatably digestible object.
 }
 \details{
-See \code{\link[reproducible]{robustDigest}}.
+See \code{\link[reproducible:robustDigest]{reproducible::.robustDigest()}}.
 This method strips out stuff from a \code{simList} class object that would make it otherwise not
 reproducibly digestible between sessions, operating systems, or machines.
 This will likely still not allow identical digest results across R versions.
 }
 \seealso{
-\code{\link[reproducible]{robustDigest}}
+\code{\link[reproducible:robustDigest]{reproducible::.robustDigest()}}
 }
 \author{
 Eliot McIntire

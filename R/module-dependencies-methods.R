@@ -93,7 +93,7 @@ setMethod("depsEdgeList",
 #'
 #' @inheritParams depsEdgeList
 #'
-#' @return An \code{\link{igraph}} object.
+#' @return An [igraph()] object.
 #'
 #' @author Alex Chubaty
 #' @export
@@ -134,7 +134,7 @@ setMethod("depsGraph",
 #' Attempts to identify cycles in the dependency graph and remove edges representing
 #' object dependencies which are provided by other modules in the simulation.
 #'
-#' @param simEdgeList An edge list (`data.table`) produced by \code{\link{depsEdgeList}}.
+#' @param simEdgeList An edge list (`data.table`) produced by [depsEdgeList()].
 #'
 #' @return An updated edge list object.
 #'
@@ -220,12 +220,12 @@ setMethod(
 #' can be resolved, checking objects in the global environment, and finally,
 #' attempts to determine the load order for modules in the simulation.
 #'
-#' Uses \code{\link[igraph]{topo_sort}} to try to find a load order satisfying
+#' Uses [igraph::topo_sort()] to try to find a load order satisfying
 #' all module object dependencies.
 #'
 #' @param sim         A `simList` object.
 #'
-#' @param simGraph    An \code{\link{igraph}} object produced by \code{\link{depsGraph}}.
+#' @param simGraph    An [igraph()] object produced by [depsGraph()].
 #'
 #' @return Character vector of module names, sorted in correct load order.
 #'

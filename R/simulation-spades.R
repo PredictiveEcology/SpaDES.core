@@ -345,7 +345,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'                       recommended that decimal values are conceptual
 #'                       grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
 #'                       similar).
-#'                       See \code{\link{priority}}.
+#'                       See [priority()].
 #' @param .skipChecks Logical. If `TRUE`, then internal checks that arguments match
 #'                    expected types are skipped. Should only be used if speed is critical.
 #'
@@ -354,7 +354,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #' @include priority.R
 #' @export
 #' @rdname scheduleEvent
-#' @seealso \code{\link{priority}}, \code{\link{scheduleConditionalEvent}}
+#' @seealso [priority()], [scheduleConditionalEvent()]
 #'
 #' @author Alex Chubaty
 #'
@@ -494,7 +494,7 @@ scheduleEvent <- function(sim,
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
-#' @seealso \code{\link{scheduleEvent}}, \code{\link{conditionalEvents}}
+#' @seealso [scheduleEvent()], [conditionalEvents()]
 #'
 #' @author Eliot McIntire
 #'
@@ -648,7 +648,7 @@ scheduleConditionalEvent <- function(sim,
 #'                                  parameter for all modules. See Details.
 #'
 #' @param .plots Character. Sets the parameter of this name in all modules.
-#'   See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+#'   See [Plots()] for possible values. The parameter is intended to slowly
 #'   take over from `.plotInitialTime` as a mechanism to turn on or off plotting.
 #'   For backwards compatibility, if `.plotInitialTime` is not set in this `spades` call,
 #'   but this `.plots` is used, two things will happen: setting this without `"screen"`
@@ -676,10 +676,10 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' @return Invisibly returns the modified `simList` object.
 #'
-#' @seealso \code{\link{SpaDES.core-package}},
-#' \code{\link{simInit}}, and the caching vignette (very important for reproducibility):
+#' @seealso [SpaDES.core-package()],
+#' [simInit()], and the caching vignette (very important for reproducibility):
 #' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html> which
-#' uses \code{\link[reproducible]{Cache}}.
+#' uses [reproducible::Cache()].
 #'
 #'
 #' @details
@@ -1910,7 +1910,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'     location does not exist, then it will place it in the `parent.frame()`, with a message.
 #'     Normally, especially, if used within SpaDES module code, this should be left missing.
 #' @export
-#' @seealso \code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
+#' @seealso [defineModule()], [simInit()], [scheduleEvent()]
 #' @examples
 #' sim <- simInit()
 #'
