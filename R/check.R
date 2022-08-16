@@ -5,7 +5,7 @@
 #' Check that a named object exists in the provide `simList` environment slot,
 #' and optionally has desired attributes.
 #'
-#' @param sim     A \code{\link{simList}} object.
+#' @param sim     A [simList()] object.
 #'
 #' @param name    A character string specifying the name of an object to be checked.
 #'
@@ -19,7 +19,7 @@
 #'
 #' @return Invisibly return `TRUE` indicating object exists; `FALSE` if not.
 #'
-#' @seealso \code{\link{library}}.
+#' @seealso [library()].
 #'
 #' @importFrom quickPlot .objectNames
 #' @include simList-class.R

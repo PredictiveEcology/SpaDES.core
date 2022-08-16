@@ -40,7 +40,7 @@ allowing, e.g. \code{all.names=TRUE}
 the simulation environment.
 }
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation Parameters.
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation Parameters.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

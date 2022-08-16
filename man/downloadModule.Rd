@@ -82,7 +82,7 @@ Download a .zip file of the module and extract (unzip) it to a user-specified lo
 Currently only works with GitHub repositories where modules are located in
 a \code{modules} directory in the root tree on the \code{master} branch.
 Module .zip files' names should contain the version number and be inside their
-respective module folders (see \code{\link{zipModule}} for zip compression of modules).
+respective module folders (see \code{\link[=zipModule]{zipModule()}} for zip compression of modules).
 }
 \note{
 \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
@@ -94,7 +94,7 @@ as \verb{GITHUB_PAT=<your-github-pat-here>}.
 The default is to overwrite any existing files in the case of a conflict.
 }
 \seealso{
-\code{\link{zipModule}} for creating module .zip folders.
+\code{\link[=zipModule]{zipModule()}} for creating module .zip folders.
 }
 \author{
 Alex Chubaty

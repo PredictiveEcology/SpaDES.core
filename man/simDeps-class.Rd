@@ -11,11 +11,11 @@ Defines all simulation dependencies for all modules within a SpaDES simulation.
 \section{Slots}{
 
 \describe{
-\item{\code{dependencies}}{List of \code{\link{.moduleDeps}} dependency objects.}
+\item{\code{dependencies}}{List of \code{\link[=.moduleDeps]{.moduleDeps()}} dependency objects.}
 }}
 
 \seealso{
-\code{\link{.moduleDeps}}, \code{\link{spadesClasses}}
+\code{\link[=.moduleDeps]{.moduleDeps()}}, \code{\link[=spadesClasses]{spadesClasses()}}
 }
 \author{
 Alex Chubaty

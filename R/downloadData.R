@@ -95,7 +95,7 @@ setMethod(
 #' @param module  Character string giving the name of the module.
 #'
 #' @param path    Character string giving the path to the module directory.
-#' @param ... Passed to \code{\link[reproducible]{Checksums}}, notably, `write`,
+#' @param ... Passed to [reproducible::Checksums()], notably, `write`,
 #'            `quickCheck`,  `checksumFile` and `files`.
 #' @importFrom reproducible Checksums
 checksums <- function(module, path, ...) {
@@ -185,16 +185,16 @@ remoteFileSize <- function(url) {
 #' @param urls Character vector of urls from which to get the data. This is automatically
 #'             found from module metadata when this function invoked with
 #'            `SpaDES.core::downloadModule(..., data = TRUE)`. See also
-#'            \code{\link{prepInputs}}.
+#'            [prepInputs()].
 #'
 #' @param children The character vector of child modules (without path) to also
 #'                 run `downloadData` on
 #'
-#' @param ... Passed to \code{\link[reproducible]{preProcess}}, e.g., `purge`
+#' @param ... Passed to [reproducible::preProcess()], e.g., `purge`
 #'
 #' @return Invisibly, a list of downloaded files.
 #'
-#' @seealso \code{\link{prepInputs}}, \code{\link{checksums}}, and \code{\link{downloadModule}}
+#' @seealso [prepInputs()], [checksums()], and [downloadModule()]
 #' for downloading modules and building a checksums file.
 #'
 #' @author Alex Chubaty & Eliot McIntire

@@ -23,7 +23,7 @@ checkObject(sim, name, object, layer, ...)
 \S4method{checkObject}{missing,ANY,missing,ANY}(sim, name, object, layer, ...)
 }
 \arguments{
-\item{sim}{A \code{\link{simList}} object.}
+\item{sim}{A \code{\link[=simList]{simList()}} object.}
 
 \item{name}{A character string specifying the name of an object to be checked.}
 
@@ -43,7 +43,7 @@ Check that a named object exists in the provide \code{simList} environment slot,
 and optionally has desired attributes.
 }
 \seealso{
-\code{\link{library}}.
+\code{\link[=library]{library()}}.
 }
 \author{
 Alex Chubaty and Eliot McIntire

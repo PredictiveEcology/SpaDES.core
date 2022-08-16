@@ -567,7 +567,7 @@ setMethod("openModules",
 #' @param to    The name of the copy.
 #'
 #' @param path  The path to a local module directory. Defaults to the path set by
-#'              the `spades.modulePath` option. See \code{\link{setPaths}}.
+#'              the `spades.modulePath` option. See [setPaths()].
 #'
 #' @param ...   Additional arguments to `file.copy`, e.g., `overwrite = TRUE`.
 #'
@@ -656,7 +656,7 @@ setMethod("copyModule",
 #' @param version The module version.
 #' @param data    Logical. If `TRUE`, then the data subdirectory will be included in the zip.
 #'                Default is `FALSE`.
-#' @param ...     Additional arguments to \code{\link{zip}}:
+#' @param ...     Additional arguments to [zip()]:
 #'                e.g., add `"-q"` using `flags="-q -r9X"`
 #'                (the default flags are `"-r9X"`).
 #'

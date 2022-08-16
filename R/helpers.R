@@ -31,7 +31,7 @@
 #' Internal function called from `spades`, returning an empty event list.
 #'
 #' Event lists are sorted (keyed) first by time, second by priority.
-#' Each event is represented by a \code{\link{data.table}} row consisting of:
+#' Each event is represented by a [data.table()] row consisting of:
 #' \tabular{ll}{
 #'   `eventTime` \tab The time the event is to occur.\cr
 #'   `moduleName` \tab The module from which the event is taken.\cr
@@ -271,7 +271,7 @@ setMethod(
 #' @inheritParams base::all.equal
 #' @export
 #' @return
-#' See \code{\link[base]{all.equal}}
+#' See [base::all.equal()]
 all.equal.simList <- function(target, current, ...) {
   attr(target, ".Cache")$newCache <- NULL
   attr(current, ".Cache")$newCache <- NULL

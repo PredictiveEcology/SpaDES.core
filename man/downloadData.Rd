@@ -82,12 +82,12 @@ called from inside another function.}
 \item{urls}{Character vector of urls from which to get the data. This is automatically
 found from module metadata when this function invoked with
 \code{SpaDES.core::downloadModule(..., data = TRUE)}. See also
-\code{\link{prepInputs}}.}
+\code{\link[=prepInputs]{prepInputs()}}.}
 
 \item{children}{The character vector of child modules (without path) to also
 run \code{downloadData} on}
 
-\item{...}{Passed to \code{\link[reproducible]{preProcess}}, e.g., \code{purge}}
+\item{...}{Passed to \code{\link[reproducible:preProcess]{reproducible::preProcess()}}, e.g., \code{purge}}
 }
 \value{
 Invisibly, a list of downloaded files.
@@ -129,7 +129,7 @@ downloadData("thisModule", "there", files = "theFilename.zip")
 
 }
 \seealso{
-\code{\link{prepInputs}}, \code{\link{checksums}}, and \code{\link{downloadModule}}
+\code{\link[=prepInputs]{prepInputs()}}, \code{\link[=checksums]{checksums()}}, and \code{\link[=downloadModule]{downloadModule()}}
 for downloading modules and building a checksums file.
 }
 \author{

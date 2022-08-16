@@ -26,7 +26,7 @@ A \code{data.frame} object.
 Internal function.
 }
 \seealso{
-\code{\link{defineModule}}
+\code{\link[=defineModule]{defineModule()}}
 }
 \author{
 Alex Chubaty

@@ -124,7 +124,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' `simList`.
 #' **VERY experimental**.
 #'
-#' @param ... passed to \code{\link{saveSimList}}, including non-optional ones
+#' @param ... passed to [saveSimList()], including non-optional ones
 #'    such as `filename`. Also see `fileBackend` and `filebackedDir`
 #'    arguments in that function.
 #' @param zipfile A character string indicating the filename for the zip file. Passed to `zip`.

@@ -30,7 +30,7 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'
 #' @author Alex Chubaty
 #'
-#' @seealso \code{\link{zipModule}} for creating module \file{.zip} folders.
+#' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
 # igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
@@ -240,7 +240,7 @@ setMethod(
 #' Currently only works with GitHub repositories where modules are located in
 #' a `modules` directory in the root tree on the `master` branch.
 #' Module .zip files' names should contain the version number and be inside their
-#' respective module folders (see \code{\link{zipModule}} for zip compression of modules).
+#' respective module folders (see [zipModule()] for zip compression of modules).
 #'
 #' @note `downloadModule` uses the `GITHUB_PAT` environment variable
 #' if a value is set. This alleviates 403 errors caused by too-frequent downloads.
@@ -250,7 +250,7 @@ setMethod(
 #'
 #' @note The default is to overwrite any existing files in the case of a conflict.
 #'
-#' @seealso \code{\link{zipModule}} for creating module .zip folders.
+#' @seealso [zipModule()] for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
 #'

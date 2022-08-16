@@ -55,10 +55,10 @@ moduleDefaults <- list(
 #'                             If a character vector is provided, then these must be the
 #'                             names of the modules located in the same file path as this
 #'                             parent module that will be loaded during the `simInit`.\cr
-#'    `authors` \tab Module author information (as a vector of \code{\link{person}}
+#'    `authors` \tab Module author information (as a vector of [person()]
 #'                        objects. This is currently not parsed by SpaDES;
 #'                        it is for human readers only.\cr
-#'    `version` \tab Module version number (will be coerced to \code{\link{numeric_version}}
+#'    `version` \tab Module version number (will be coerced to [numeric_version()]
 #'                        if a character or numeric are supplied).
 #'                        The module developer should update manually this with each change
 #'                        that is made to the module. See <https://semver.org/>
@@ -88,17 +88,17 @@ moduleDefaults <- list(
 #'                              it is for human readers only.\cr\cr
 #'    `reqdPkgs` \tab List of R package names required by the module. These
 #'                         packages will be loaded when `simInit` is called.
-#'                         \code{\link[Require]{Require}} will be used internally
+#'                         [Require::Require()] will be used internally
 #'                         to load if available, and install if not available.
-#'                         Because \code{\link[Require]{Require}} can also download from
+#'                         Because [Require::Require()] can also download from
 #'                         GitHub.com, these packages can specify package names stored
 #'                         on GitHub, e.g., `"PredictiveEcology/SpaDES.core@development"`. \cr
 #'    `parameters` \tab A data.frame specifying the parameters used in the module.
 #'                           Usually produced by `rbind`-ing the outputs of multiple
-#'                           \code{\link{defineParameter}} calls. These parameters indicate
+#'                           [defineParameter()] calls. These parameters indicate
 #'                           the default values that will be used unless a module user
 #'                           overrides them with the `params` argument in the
-#'                           \code{\link{simInit}} call. The minimum and maximum are
+#'                           [simInit()] call. The minimum and maximum are
 #'                           currently used by the `SpaDES.shiny::shine` function and the
 #'                           `POM` function, and they should indicate the range
 #'                           of values that are reasonable scientifically.\cr
@@ -144,7 +144,7 @@ moduleDefaults <- list(
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
-#' @seealso moduleDefaults \code{\link{defineEvent}}
+#' @seealso moduleDefaults [defineEvent()]
 #'
 #' @examples
 #' \dontrun{
@@ -339,7 +339,7 @@ setMethod(
 #'
 #' @note Be sure to use the correct NA type: logical (`NA`), integer (`NA_integer_`),
 #'       real (`NA_real_`), complex (`NA_complex_`), or character (`NA_character_`).
-#'       See \code{\link{NA}}.
+#'       See [NA()].
 #'
 #' @param name      Character string giving the parameter name.
 #' @param class     Character string giving the parameter class.
@@ -369,7 +369,7 @@ setMethod(
 #' @export
 #' @rdname defineParameter
 #'
-#' @seealso \code{\link{P}}, \code{\link{params}} for accessing these parameters in
+#' @seealso [P()], [params()] for accessing these parameters in
 #'          a module.
 #' @examples
 #' parameters = rbind(

@@ -17,7 +17,7 @@ Descriptor object for specifying SpaDES module dependencies.
 
 \item{\code{keywords}}{Character vector containing a module's keywords.}
 
-\item{\code{authors}}{The author(s) of the module as a \code{\link{person}} object.}
+\item{\code{authors}}{The author(s) of the module as a \code{\link[=person]{person()}} object.}
 
 \item{\code{childModules}}{A character vector of child module names.
 Modules listed here will be loaded with this module.}
@@ -26,10 +26,10 @@ Modules listed here will be loaded with this module.}
 Semantic versioning is assumed \url{https://semver.org/}.}
 
 \item{\code{spatialExtent}}{Specifies the module's spatial extent as an
-\code{\link{Extent}} object. Default is \code{NA}.}
+\code{\link[=Extent]{Extent()}} object. Default is \code{NA}.}
 
 \item{\code{timeframe}}{Specifies the valid timeframe for which the module was
-designed to simulate. Must be a \code{\link{POSIXt}}
+designed to simulate. Must be a \code{\link[=POSIXt]{POSIXt()}}
 object of length 2, specifying the start and end times
 (e.g., \code{as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))}).
 Can be specified as \code{NA} using \code{as.POSIXlt(c(NA, NA))}.}
@@ -52,7 +52,7 @@ of the module, with columns \code{paramName},
 of type \code{character}, \code{character}, and
 \code{ANY}, respectively. Default values may be
 overridden by the user by passing a list of parameters
-to \code{\link{simInit}}.}
+to \code{\link[=simInit]{simInit()}}.}
 
 \item{\code{inputObjects}}{A \code{data.frame} specifying the object dependencies of
 the module, with columns \code{objectName},
@@ -66,7 +66,7 @@ module, following the format of \code{inputObjects}.}
 }}
 
 \seealso{
-\code{.simDeps}, \code{\link{spadesClasses}}
+\code{.simDeps}, \code{\link[=spadesClasses]{spadesClasses()}}
 }
 \author{
 Alex Chubaty

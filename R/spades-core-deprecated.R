@@ -42,7 +42,7 @@ simInitAndExperiment <- function(...) {
 ################################################################################
 #' Load packages.
 #'
-#' Deprecated. Please use \code{\link[Require]{Require}}
+#' Deprecated. Please use [Require::Require()]
 #'
 #' @param packageList A list of character strings specifying
 #' the names of packages to be loaded.
@@ -56,7 +56,7 @@ simInitAndExperiment <- function(...) {
 #' @return Specified packages are loaded and attached using `require()`,
 #'         invisibly returning a logical vector of successes.
 #'
-#' @seealso \code{\link{require}}.
+#' @seealso [require()].
 #'
 #' @export
 #' @rdname loadPackages

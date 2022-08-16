@@ -31,7 +31,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 ##############################################################
 #' Save objects using `.saveObjects` in `params` slot of `simInit`
 #'
-#' In the \code{\link{simInit}} call, a parameter called `.saveObjects` can be provided in
+#' In the [simInit()] call, a parameter called `.saveObjects` can be provided in
 #' each module.
 #' This must be a character string vector of all object names to save. These objects will
 #' then be saved whenever a call to `saveFiles` is made.
@@ -53,17 +53,17 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @noMd
 #' @section 1. Model-level saving:
 #'
-#' Using the `outputs` slot in the \code{\link{simInit}} call.
-#' See example in \code{\link{simInit}}.
+#' Using the `outputs` slot in the [simInit()] call.
+#' See example in [simInit()].
 #' This can be convenient because it gives overall control of many modules at a
 #' time, and it gets automatically scheduled during the
-#' \code{\link{simInit}} call.
+#' [simInit()] call.
 #'
 #' @section 2. Module-level saving:
 #'
 #' Using the `saveFiles` function inside a module.
 #' This must be accompanied by a `.saveObjects` list element in the
-#' `params` slot in the \code{\link{simList}}.
+#' `params` slot in the [simList()].
 #' Usually a module developer will create this method for future users of
 #' their module.
 #'

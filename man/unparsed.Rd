@@ -16,7 +16,7 @@
 The ids of the unparsed list elements.
 }
 \description{
-Internal function, used during \code{\link{simInit}}.
+Internal function, used during \code{\link[=simInit]{simInit()}}.
 }
 \author{
 Alex Chubaty

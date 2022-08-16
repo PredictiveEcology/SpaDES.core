@@ -36,7 +36,7 @@ will be interpreted as a path to copy all rasters to.}
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can be found.}
 
-\item{...}{passed to \code{\link{saveSimList}}, including non-optional ones
+\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones
 such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}
 arguments in that function.}
 

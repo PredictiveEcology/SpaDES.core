@@ -10,13 +10,13 @@
 #'   about.
 #'
 #' @return A list of module metadata, matching the structure in
-#'         \code{\link{defineModule}}.
+#'         [defineModule()].
 #'
 #' @author Alex Chubaty
 #' @export
 #' @include simulation-simInit.R
 #' @rdname moduleMetadata
-#' @seealso \code{\link{defineModule}}
+#' @seealso [defineModule()]
 #'
 #' @example inst/examples/example_moduleMetadata.R
 #'
@@ -147,7 +147,7 @@ setMethod(
 #' @export
 #' @include simulation-simInit.R
 #' @rdname moduleVersion
-#' @seealso \code{\link{moduleMetadata}}
+#' @seealso [moduleMetadata()]
 #'
 #' @example inst/examples/example_moduleVersion.R
 #'
@@ -214,7 +214,7 @@ setMethod(
 #' @author Alex Chubaty
 #' @export
 #' @rdname moduleParamsInputsOuputs
-#' @seealso \code{\link{moduleMetadata}}
+#' @seealso [moduleMetadata()]
 #'
 #' @example inst/examples/example_moduleParamsInputsOuputs.R
 #'

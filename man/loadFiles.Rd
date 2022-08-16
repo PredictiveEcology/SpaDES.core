@@ -83,7 +83,7 @@ sim2 <- spades(sim2) # loads the percentPine map 2 more times, once at 10, once 
 }
 }
 \seealso{
-\code{\link{inputs}}
+\code{\link[=inputs]{inputs()}}
 }
 \author{
 Eliot McIntire and Alex Chubaty

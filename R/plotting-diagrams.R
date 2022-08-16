@@ -215,7 +215,7 @@ setMethod(
 #'
 #' Create a sequence diagram illustrating the data object dependencies of a
 #' simulation. Offers a more detailed view of specific objects than does
-#' plotting the `depsEdgeList` directly with \code{\link{moduleDiagram}}.
+#' plotting the `depsEdgeList` directly with [moduleDiagram()].
 #'
 #' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
@@ -270,7 +270,7 @@ setMethod(
 #'
 #' Create a network diagram illustrating the simplified module dependencies of a
 #' simulation. Offers a less detailed view of specific objects than does
-#' plotting the `depsEdgeList` directly with \code{\link{objectDiagram}}.
+#' plotting the `depsEdgeList` directly with [objectDiagram()].
 #'
 #' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
@@ -281,14 +281,14 @@ setMethod(
 #'
 #' @param showParents Logical. If TRUE, then any children that are grouped into parent
 #'                    modules will be grouped together by colored blobs. Internally,
-#'                    this is calling \code{\link{moduleGraph}}. Default `FALSE`.
+#'                    this is calling [moduleGraph()]. Default `FALSE`.
 #'
 #'
 #' @param ...  Additional arguments passed to plotting function specified by `type`.
 #'
 #' @return Plots module dependency diagram.
 #'
-#' @seealso \code{\link{igraph}}, \code{\link{moduleGraph}} for a version that accounts for
+#' @seealso [igraph()], [moduleGraph()] for a version that accounts for
 #' parent and children module structure.
 #'
 #' @include simList-accessors.R
@@ -472,7 +472,7 @@ setMethod(
 #'
 #' @param ... Arguments passed to `Plot`
 #'
-#' @return A list with 2 elements, an \code{\link{igraph}} object and an `igraph`
+#' @return A list with 2 elements, an [igraph()] object and an `igraph`
 #' communities object.
 #'
 #' @author Eliot McIntire

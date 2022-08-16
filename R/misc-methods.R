@@ -20,8 +20,8 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
-#' Being deprecated. Use \code{\link[utils]{modifyList}} (which can not handle NULL) or
-#' \code{\link[Require]{modifyList2}} for case with >2 lists and can handle NULL lists.
+#' Being deprecated. Use [utils::modifyList()] (which can not handle NULL) or
+#' [Require::modifyList2()] for case with >2 lists and can handle NULL lists.
 #'
 #' @param x   a named list
 #' @param y   a named list
@@ -205,7 +205,7 @@ setMethod("rndstr",
 #'
 #' @return Vector of object names matching the class filter.
 #'
-#' @note \code{\link{inherits}} is used internally to check the object class,
+#' @note [inherits()] is used internally to check the object class,
 #' which can, in some cases, return results inconsistent with `is`.
 #' See <https://stackoverflow.com/a/27923346/1380598>.
 #' These (known) cases are checked manually and corrected.

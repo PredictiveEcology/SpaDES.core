@@ -3,7 +3,7 @@ utils::globalVariables(".")
 ################################################################################
 #' Determine which modules in a list are unparsed
 #'
-#' Internal function, used during \code{\link{simInit}}.
+#' Internal function, used during [simInit()].
 #'
 #' @param modules A character vector specifying the modules to parse.
 #'
@@ -144,7 +144,7 @@ setMethod(
 
 #' Parse and initialize a module
 #'
-#' Internal function, used during \code{\link{simInit}}.
+#' Internal function, used during [simInit()].
 #'
 #' @param sim     A `simList` simulation object.
 #'

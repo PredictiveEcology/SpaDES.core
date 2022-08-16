@@ -10,15 +10,15 @@ are therefore intended for internal use only.
 \section{Simulation classes}{
 
 \tabular{ll}{
-\code{\link{simList}} \tab The 'simList' class\cr
-\code{\link{.moduleDeps}} \tab Descriptor object for specifying \code{SpaDES} module dependencies\cr
-\code{\link{.simDeps}} \tab Defines all simulation dependencies for all modules within a \code{SpaDES} simulation\cr
+\code{\link[=simList]{simList()}} \tab The 'simList' class\cr
+\code{\link[=.moduleDeps]{.moduleDeps()}} \tab Descriptor object for specifying \code{SpaDES} module dependencies\cr
+\code{\link[=.simDeps]{.simDeps()}} \tab Defines all simulation dependencies for all modules within a \code{SpaDES} simulation\cr
 --------------------------- \tab ------------------------------------------------------------------------------------------ \cr
 }
 }
 
 \seealso{
-\code{\link{simInit}}
+\code{\link[=simInit]{simInit()}}
 }
 \author{
 Eliot McIntire and Alex Chubaty

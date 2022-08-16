@@ -5,13 +5,13 @@
 #'
 #' @section Simulation classes:
 #' \tabular{ll}{
-#'   \code{\link{simList}} \tab The 'simList' class\cr
-#'   \code{\link{.moduleDeps}} \tab Descriptor object for specifying `SpaDES` module dependencies\cr
-#'   \code{\link{.simDeps}} \tab Defines all simulation dependencies for all modules within a `SpaDES` simulation\cr
+#'   [simList()] \tab The 'simList' class\cr
+#'   [.moduleDeps()] \tab Descriptor object for specifying `SpaDES` module dependencies\cr
+#'   [.simDeps()] \tab Defines all simulation dependencies for all modules within a `SpaDES` simulation\cr
 #'   --------------------------- \tab ------------------------------------------------------------------------------------------ \cr
 #' }
 #'
-#' @seealso \code{\link{simInit}}
+#' @seealso [simInit()]
 #' @name spadesClasses
 #' @rdname spades-classes
 #' @author Eliot McIntire and Alex Chubaty

@@ -13,10 +13,10 @@
 Takes a snapshot of \code{simList} objects.
 }
 \details{
-See \code{\link[reproducible:preDigestByClass]{.preDigestByClass}}.
+See \link[reproducible:preDigestByClass]{reproducible::.preDigestByClass}.
 }
 \seealso{
-\code{\link[reproducible:preDigestByClass]{.preDigestByClass}}
+\link[reproducible:preDigestByClass]{reproducible::.preDigestByClass}
 }
 \author{
 Eliot McIntire

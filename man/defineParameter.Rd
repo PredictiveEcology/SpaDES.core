@@ -57,7 +57,7 @@ code.
 \note{
 Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
 real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).
-See \code{\link{NA}}.
+See \code{\link[=NA]{NA()}}.
 }
 \examples{
 parameters = rbind(
@@ -100,7 +100,7 @@ P(mySim, "testModule")$.useCache
 
 }
 \seealso{
-\code{\link{P}}, \code{\link{params}} for accessing these parameters in
+\code{\link[=P]{P()}}, \code{\link[=params]{params()}} for accessing these parameters in
 a module.
 }
 \author{

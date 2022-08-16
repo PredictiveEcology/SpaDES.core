@@ -19,8 +19,8 @@
 recovery from memoised copy}
 }
 \description{
-See \code{\link[reproducible:cacheMessage]{.cacheMessage}}.
+See \link[reproducible:cacheMessage]{reproducible::.cacheMessage}.
 }
 \seealso{
-\code{\link[reproducible:cacheMessage]{.cacheMessage}}
+\link[reproducible:cacheMessage]{reproducible::.cacheMessage}
 }

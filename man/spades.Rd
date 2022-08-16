@@ -82,7 +82,7 @@ will run \emph{all} their events, including internal spades modules, e.g., \code
 that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+See \code{\link[=Plots]{Plots()}} for possible values. The parameter is intended to slowly
 take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
 For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
 but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
@@ -300,10 +300,10 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{SpaDES.core-package}},
-\code{\link{simInit}}, and the caching vignette (very important for reproducibility):
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}},
+\code{\link[=simInit]{simInit()}}, and the caching vignette (very important for reproducibility):
 \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
-uses \code{\link[reproducible]{Cache}}.
+uses \code{\link[reproducible:Cache]{reproducible::Cache()}}.
 }
 \author{
 Alex Chubaty and Eliot McIntire

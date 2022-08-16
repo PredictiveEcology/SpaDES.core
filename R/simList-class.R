@@ -7,15 +7,15 @@
 #' Based on code from chapter 7.8.3 of Matloff (2011): "Discrete event simulation".
 #' Here, we implement a discrete event simulation in a more modular fashion so
 #' it's easier to add simulation components (i.e., "simulation modules").
-#' We use S4 classes and methods, and use \code{\link{data.table}} instead of
-#' \code{\link{data.frame}} to implement the event queue (because it is much
+#' We use S4 classes and methods, and use [data.table()] instead of
+#' [data.frame()] to implement the event queue (because it is much
 #' more efficient).
 #'
 #' @note The `simList` class extends the `environment`, by adding
 #' several slots that provide information about the metadata for a discrete
 #' event simulation. The environment slot, if accessed directly is `.xData`
 #' and this is where input and output objects from modules are placed.
-#' The \code{\link{simList_}} class is similar, but it extends the `list`
+#' The [simList_()] class is similar, but it extends the `list`
 #' class. All other slots are the same.
 #' Thus, `simList` is identical to `simList_`, except that the former
 #' uses an environment for objects and the latter uses a list.
@@ -43,7 +43,7 @@
 #'                  as an environment of individual events for speed. The `completed`
 #'                  method converts it to a sorted `data.table`.
 #'
-#' @slot depends    A `.simDeps` list of \code{\link{.moduleDeps}} objects
+#' @slot depends    A `.simDeps` list of [.moduleDeps()] objects
 #'                  containing module object dependency information.
 #'
 #' @slot simtimes   List of numerical values describing the simulation start
@@ -70,14 +70,14 @@
 #' Several slot (and sub-slot) accessor methods are provided for use, and
 #' categorized into separate help pages:
 #' \tabular{ll}{
-#'   \code{\link{simList-accessors-envir}} \tab Simulation environment. \cr
-#'   \code{\link{simList-accessors-events}} \tab Scheduled and completed events. \cr
-#'   \code{\link{simList-accessors-inout}} \tab Passing data in to / out of simulations. \cr
-#'   \code{\link{simList-accessors-modules}} \tab Modules loaded and used; module dependencies. \cr
-#'   \code{\link{simList-accessors-objects}} \tab Accessing objects used in the simulation. \cr
-#'   \code{\link{simList-accessors-params}} \tab Global and module-specific parameters. \cr
-#'   \code{\link{simList-accessors-paths}} \tab File paths for modules, inputs, and outputs. \cr
-#'   \code{\link{simList-accessors-times}} \tab Simulation times. \cr
+#'   [simList-accessors-envir()] \tab Simulation environment. \cr
+#'   [simList-accessors-events()] \tab Scheduled and completed events. \cr
+#'   [simList-accessors-inout()] \tab Passing data in to / out of simulations. \cr
+#'   [simList-accessors-modules()] \tab Modules loaded and used; module dependencies. \cr
+#'   [simList-accessors-objects()] \tab Accessing objects used in the simulation. \cr
+#'   [simList-accessors-params()] \tab Global and module-specific parameters. \cr
+#'   [simList-accessors-paths()] \tab File paths for modules, inputs, and outputs. \cr
+#'   [simList-accessors-times()] \tab Simulation times. \cr
 #' }
 #'
 #' @section Event Lists:
@@ -85,7 +85,7 @@
 #' The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
 #' The completed event list is an ordered list in the exact order that the events
 #' were executed.
-#' Each event is represented by a \code{\link{data.table}} row consisting of:
+#' Each event is represented by a [data.table()] row consisting of:
 #' \tabular{ll}{
 #'   `eventTime` \tab The time the event is to occur.\cr
 #'   `moduleName` \tab The module from which the event is taken.\cr

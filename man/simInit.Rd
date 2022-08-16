@@ -108,7 +108,7 @@ in the first \code{modulePath}, then if it doesn't find it, in the second etc.}
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
 \code{interval} (numeric), \code{loadTime} (numeric).
-See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
+See \code{\link[=inputs]{inputs()}} and vignette("ii-modules") section about inputs.}
 
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
@@ -118,7 +118,7 @@ columns with following column names: \code{objectName} (character, required),
 is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
 it should give "initial conditions".
 
-See \code{\link{outputs}} and
+See \code{\link[=outputs]{outputs()}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional character vector of module names specifying the order in
@@ -168,7 +168,7 @@ schedule object saving \tab Objects can be saved to disk at any arbitrary
 time during the simulation. If specified here, this will be in addition
 to any saving due code inside a module (i.e., a module may manually
 run \code{write.table(...)} \tab \code{outputs} \cr
-schedules "init" events \tab from all modules (see \code{\link{events}})
+schedules "init" events \tab from all modules (see \code{\link[=events]{events()}})
 \tab automatic  \cr
 assesses module dependencies \tab via the inputs and outputs identified in their
 metadata. This gives the order of the \code{.inputObjects} and \code{init}
@@ -374,9 +374,9 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{spades}},
-\code{\link{times}}, \code{\link{params}}, \code{\link{objs}}, \code{\link{paths}},
-\code{\link{modules}}, \code{\link{inputs}}, \code{\link{outputs}}
+\code{\link[=spades]{spades()}},
+\code{\link[=times]{times()}}, \code{\link[=params]{params()}}, \code{\link[=objs]{objs()}}, \code{\link[=paths]{paths()}},
+\code{\link[=modules]{modules()}}, \code{\link[=inputs]{inputs()}}, \code{\link[=outputs]{outputs()}}
 }
 \author{
 Alex Chubaty and Eliot McIntire

@@ -24,7 +24,7 @@ Default is \code{FALSE}.}
 \item{...}{Arguments passed to \code{Plot}}
 }
 \value{
-A list with 2 elements, an \code{\link{igraph}} object and an \code{igraph}
+A list with 2 elements, an \code{\link[=igraph]{igraph()}} object and an \code{igraph}
 communities object.
 }
 \description{
