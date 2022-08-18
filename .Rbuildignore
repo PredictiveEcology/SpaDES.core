@@ -16,5 +16,4 @@ vignettes/.*\.log$
 ^revdep$
 ^\.github$
 ^codecov\.yml$
-^CRAN-RELEASE$
 ^CRAN-SUBMISSION$
