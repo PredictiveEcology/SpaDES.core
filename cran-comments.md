@@ -26,15 +26,33 @@ See `NEWS.md` for a full list of changes.
 * Ubuntu 20.04                 (GitHub), R-devel (2022-08-11 r82713)
 * Ubuntu 20.04                  (local), R-devel (2022-08-11 r82713)
 * Windows                      (GitHub), R-devel (2022-08-14 r82716 ucrt)
-* Windows                 (win-builder), R-devel (2022-08-14 r82716 ucrt)
+* Windows                 (win-builder), R-devel (2022-08-17 r82724 ucrt)
 
 ## R CMD check results
 
-There are no ERRORs nor WARNINGs.
+There are no errors, or warnings in any of the above.
 
-There was 1 NOTEs:
+There are some NOTEs:
 
-1. Some words were flagged as possibly misspelled, but they are false positives:
+The `NLMR` packages in Suggests are optionally installed from our R-universe repository
+(until the maintainers of that package are able to get it back on CRAN).
+Instructions for installation are provided in the README, DESCRIPTION, and via a message to the user.
+We believe this should satisfy the CRAN policy requirement regarding additional dependencies.
+
+        Suggests or Enhances not in mainstream repositories:
+          NLMR
+        Availability using Additional_repositories specification:
+          NLMR         yes   https://predictiveecology.r-universe.dev/
+
+Related to the above note:
+
+        The Description field contains
+          "https://PredictiveEcology.r-universe.dev")'.
+        Please enclose URLs in angle brackets (<...>).
+
+This URL is included as part of the command used to install these additional packages.
+
+Additionally, some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
           workflow (6:58)
