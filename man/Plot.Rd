@@ -44,7 +44,7 @@ added to the current device, adding or rearranging the plot layout
 as necessary. Default is \code{FALSE}. This currently works best if
 there is only one object being plotted in a given \code{Plot} call. However,
 it is possible to pass a list of logicals to this, matching the
-length of the ... objects. Use \code{clearPlot} to clear the whole
+length of the \code{...} objects. Use \code{clearPlot} to clear the whole
 plotting device. NOTE if \code{TRUE}: \emph{Everything that was there,
 including the legend and the end points of the colour palette, will
 be removed and re-initiated}.}
@@ -52,9 +52,9 @@ be removed and re-initiated}.}
 \item{addTo}{Character vector, with same length as \code{...}.
 This is for overplotting, when the overplot is not to occur on
 the plot with the same name, such as plotting a
-\code{SpatialPoints*} object on a \code{RasterLayer}.}
+\verb{SpatialPoints*} object on a \code{RasterLayer}.}
 
-\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot:grid-functions]{gpar}},
+\item{gp}{A \code{gpar} object, created by \code{\link[quickPlot:gpar]{gpar()}},
 to change plotting parameters (see \pkg{grid} package).}
 
 \item{gpText}{A \code{gpar} object for the title text.
@@ -97,7 +97,7 @@ the data bounds contained within the \code{grobToPlot}.}
 \item{legendText}{Character vector of legend value labels.
 Defaults to \code{NULL}, which results in a pretty numeric
 representation.
-If \code{Raster*} has a Raster Attribute Table (\code{rat};
+If \verb{Raster*} has a Raster Attribute Table (\code{rat};
 see \pkg{raster} package), this will be used by default.
 Currently, only a single vector is accepted.
 The length of this must match the length of the legend, so
