@@ -98,7 +98,7 @@
 
 
 <dt><code>authors</code></dt>
-<dd><p>The author(s) of the module as a <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">person</a></code> object.</p></dd>
+<dd><p>The author(s) of the module as a <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">person()</a></code> object.</p></dd>
 
 
 <dt><code>childModules</code></dt>
@@ -113,12 +113,12 @@ Semantic versioning is assumed <a href="https://semver.org/" class="external-lin
 
 <dt><code>spatialExtent</code></dt>
 <dd><p>Specifies the module's spatial extent as an
-<code>Extent</code> object. Default is <code>NA</code>.</p></dd>
+<code>Extent()</code> object. Default is <code>NA</code>.</p></dd>
 
 
 <dt><code>timeframe</code></dt>
 <dd><p>Specifies the valid timeframe for which the module was
-designed to simulate. Must be a <code><a href="https://rdrr.io/r/base/DateTimeClasses.html" class="external-link">POSIXt</a></code>
+designed to simulate. Must be a <code><a href="https://rdrr.io/r/base/DateTimeClasses.html" class="external-link">POSIXt()</a></code>
 object of length 2, specifying the start and end times
 (e.g., <code>as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))</code>).
 Can be specified as <code>NA</code> using <code>as.POSIXlt(c(NA, NA))</code>.</p></dd>
@@ -151,7 +151,7 @@ of the module, with columns <code>paramName</code>,
 of type <code>character</code>, <code>character</code>, and
 <code>ANY</code>, respectively. Default values may be
 overridden by the user by passing a list of parameters
-to <code><a href="simInit.html">simInit</a></code>.</p></dd>
+to <code><a href="simInit.html">simInit()</a></code>.</p></dd>
 
 
 <dt><code>inputObjects</code></dt>
@@ -171,7 +171,7 @@ module, following the format of <code>inputObjects</code>.</p></dd>
 </dl></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code>.simDeps</code>, <code><a href="spades-classes.html">spadesClasses</a></code></p></div>
+    <div class="dont-index"><p><code>.simDeps</code>, <code><a href="spades-classes.html">spadesClasses()</a></code></p></div>
     </div>
     <div id="author">
     <h2>Author</h2>

@@ -192,7 +192,7 @@
 <li>
 <code>restartSpades</code> was losing the previous completed events list. This has been fixed; it is now kept after <code>restartSpades</code>
 </li>
-<li>Plots - fixed issues with plot layer names and plot overlaying when passing <code>data</code> only (e.g. <code><a href="http://quickplot.predictiveecology.org//reference/Plot.html" class="external-link">quickPlot::Plot</a></code>-like behaviour)</li>
+<li>Plots - fixed issues with plot layer names and plot overlaying when passing <code>data</code> only (e.g. <code><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">quickPlot::Plot</a></code>-like behaviour)</li>
 <li>
 <code>simInitAndSpades</code> now has <code>.plots</code> arg to match <code>spades</code>
 </li>
@@ -575,7 +575,7 @@
 <li>
 <p>introduction of code checking for modules, currently turned on or off by an option <code>spades.moduleCodeChecks</code>, which is <code>TRUE</code> by default. Code checking includes various types:</p>
 <ul><li>use <code>codetools</code> to check for various code problems</li>
-<li>detects conflicts with known common functions (<code>raster::level</code>, <code><a href="https://rdrr.io/r/base/scale.html" class="external-link">raster::scale</a></code>, <code><a href="http://quickplot.predictiveecology.org//reference/Plot.html" class="external-link">quickPlot::Plot</a></code>)</li>
+<li>detects conflicts with known common functions (<code>raster::level</code>, <code><a href="https://rdrr.io/r/base/scale.html" class="external-link">raster::scale</a></code>, <code><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">quickPlot::Plot</a></code>)</li>
 <li>use <code>checkCodeEnv</code> on every function inside a module</li>
 <li>checking for <code>sim$xxx</code> occurrences in modules, comparing to <code>outputObjects</code> in metadata if used in assignment (i.e., left hand side of assign operator), or comparing to <code>inputObjects</code> if used on the right hand side</li>
 <li>check that all objects declared in <code>inputObjects</code> have default values assigned in the <code>.inputObjects</code> function</li>

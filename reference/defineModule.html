@@ -126,9 +126,9 @@ i.e., 'child modules', this should be <code>character(0)</code> or
 <code>NA</code>.
 If a character vector is provided, then these must be the
 names of the modules located in the same file path as this
-parent module that will be loaded during the <code>simInit</code>.</td></tr><tr><td><code>authors</code></td><td>Module author information (as a vector of <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">person</a></code>
+parent module that will be loaded during the <code>simInit</code>.</td></tr><tr><td><code>authors</code></td><td>Module author information (as a vector of <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">person()</a></code>
 objects. This is currently not parsed by SpaDES;
-it is for human readers only.</td></tr><tr><td><code>version</code></td><td>Module version number (will be coerced to <code><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">numeric_version</a></code>
+it is for human readers only.</td></tr><tr><td><code>version</code></td><td>Module version number (will be coerced to <code><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">numeric_version()</a></code>
 if a character or numeric are supplied).
 The module developer should update manually this with each change
 that is made to the module. See <a href="https://semver.org/" class="external-link">https://semver.org/</a>
@@ -152,16 +152,16 @@ it is for human readers only.</td></tr><tr><td><code>documentation</code></td><t
 This is currently not parsed by SpaDES;
 it is for human readers only.</td></tr><tr><td></td><td><code>reqdPkgs</code></td></tr><tr><td>List of R package names required by the module. These
 packages will be loaded when <code>simInit</code> is called.
-<code><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require</a></code> will be used internally
+<code><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require::Require()</a></code> will be used internally
 to load if available, and install if not available.
-Because <code><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require</a></code> can also download from
+Because <code><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require::Require()</a></code> can also download from
 GitHub.com, these packages can specify package names stored
 on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr><tr><td>A data.frame specifying the parameters used in the module.
 Usually produced by <code>rbind</code>-ing the outputs of multiple
-<code><a href="defineParameter.html">defineParameter</a></code> calls. These parameters indicate
+<code><a href="defineParameter.html">defineParameter()</a></code> calls. These parameters indicate
 the default values that will be used unless a module user
 overrides them with the <code>params</code> argument in the
-<code><a href="simInit.html">simInit</a></code> call. The minimum and maximum are
+<code><a href="simInit.html">simInit()</a></code> call. The minimum and maximum are
 currently used by the <code>SpaDES.shiny::shine</code> function and the
 <code>POM</code> function, and they should indicate the range
 of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr><tr><td>A <code>data.frame</code> specifying the data objects expected as
@@ -193,7 +193,7 @@ that will cause these objects to be put into the
 <code>simList</code>.</td><td></td></tr></table></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>moduleDefaults <code><a href="defineEvent.html">defineEvent</a></code></p></div>
+    <div class="dont-index"><p>moduleDefaults <code><a href="defineEvent.html">defineEvent()</a></code></p></div>
     </div>
     <div id="author">
     <h2>Author</h2>
