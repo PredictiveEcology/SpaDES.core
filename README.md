@@ -2,7 +2,6 @@
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/SpaDES.core)](https://cran.r-project.org/package=SpaDES.core)
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/SpaDES.core)](https://cran.r-project.org/package=SpaDES.core)
 [![R build status](https://github.com/PredictiveEcology/SpaDES.core/workflows/R-CMD-check/badge.svg)](https://github.com/PredictiveEcology/SpaDES.core/actions)
-[![Gitter](https://badges.gitter.im/PredictiveEcology/spades-core.svg)](https://gitter.im/PredictiveEcology/spades-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 <!-- badges: end -->
 
 <img align="right" width="80" pad="20" src="https://github.com/PredictiveEcology/SpaDES/raw/master/man/figures/SpaDES.png">
