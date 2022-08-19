@@ -5,7 +5,7 @@
 [![Gitter](https://badges.gitter.im/PredictiveEcology/spades-core.svg)](https://gitter.im/PredictiveEcology/spades-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 <!-- badges: end -->
 
-<img align="right" width="80" vspace="10" hspace="10" src="https://github.com/PredictiveEcology/SpaDES/raw/master/docs/images/SpaDES.png">
+<img align="right" width="80" pad="20" src="https://github.com/PredictiveEcology/SpaDES/raw/master/man/figures/SpaDES.png">
 
 # SpaDES.core
 
