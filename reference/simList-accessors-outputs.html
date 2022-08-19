@@ -169,37 +169,37 @@ rules of recycling for each <code>fun</code>.</td></tr></table><p>See the module
 <span class="r-in"><span>               paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>outputPath <span class="op">=</span> <span class="va">tmpdir</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd5hsL6/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd5hsL6/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd5hsL6/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd5hsL6/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpAzfvD1/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpAzfvD1/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpAzfvD1/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpAzfvD1/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpAzfvD1/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpAzfvD1/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span><span class="fu">outputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># To see what will be saved, when, what filename</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   objectName                                       file     fun package</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    tempObj /tmp/Rtmpd5hsL6/outputs/tempObj_year10.rds saveRDS    base</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    tempObj /tmp/RtmpAzfvD1/outputs/tempObj_year10.rds saveRDS    base</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   saveTime saved arguments</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       10    NA        NA</span>
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 chckpn <span style="color: #00BB00;"> total elpsd: 0.00079 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0021 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 prgrss <span style="color: #00BB00;"> total elpsd: 0.0037 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 load   <span style="color: #00BB00;"> total elpsd: 0.0051 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0065 secs | 10 save spades 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 chckpn <span style="color: #00BB00;"> total elpsd: 0.00096 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0026 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 prgrss <span style="color: #00BB00;"> total elpsd: 0.0044 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 load   <span style="color: #00BB00;"> total elpsd: 0.0059 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0073 secs | 10 save spades 10</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span><span class="fu">outputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># To see that it was saved, when, what filename</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   objectName                                       file     fun package</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    tempObj /tmp/Rtmpd5hsL6/outputs/tempObj_year10.rds saveRDS    base</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    tempObj /tmp/RtmpAzfvD1/outputs/tempObj_year10.rds saveRDS    base</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   saveTime saved arguments</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       10  TRUE        NA</span>
 <span class="r-in"><span></span></span>
@@ -207,51 +207,51 @@ rules of recycling for each <code>fun</code>.</td></tr></table><p>See the module
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tempObj"</span><span class="op">)</span>, paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>outputPath <span class="op">=</span> <span class="va">tmpdir</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd5hsL6/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd5hsL6/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd5hsL6/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd5hsL6/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpAzfvD1/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpAzfvD1/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpAzfvD1/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpAzfvD1/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpAzfvD1/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpAzfvD1/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span><span class="fu">outputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>objectName <span class="op">=</span> <span class="st">"tempObj"</span>, saveTime <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 chckpn <span style="color: #00BB00;"> total elpsd: 9e-04 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0023 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 prgrss <span style="color: #00BB00;"> total elpsd: 0.0037 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 load   <span style="color: #00BB00;"> total elpsd: 0.005 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0062 secs | 1 save spades 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.01 secs | 2 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.015 secs | 3 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.019 secs | 4 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.023 secs | 5 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.027 secs | 6 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.031 secs | 7 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.035 secs | 8 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.039 secs | 9 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.043 secs | 10 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 chckpn <span style="color: #00BB00;"> total elpsd: 0.00097 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0026 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 prgrss <span style="color: #00BB00;"> total elpsd: 0.0043 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 load   <span style="color: #00BB00;"> total elpsd: 0.0058 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0073 secs | 1 save spades 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.012 secs | 2 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.017 secs | 3 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.022 secs | 4 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.026 secs | 5 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.031 secs | 6 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.036 secs | 7 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.04 secs | 8 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.045 secs | 9 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.05 secs | 10 save later 10</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span><span class="fu">outputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># To see that it was saved, when, what filename.</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    objectName saveTime                                       file     fun</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     tempObj        1 /tmp/Rtmpd5hsL6/outputs/tempObj_year01.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     tempObj        2 /tmp/Rtmpd5hsL6/outputs/tempObj_year02.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     tempObj        3 /tmp/Rtmpd5hsL6/outputs/tempObj_year03.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     tempObj        4 /tmp/Rtmpd5hsL6/outputs/tempObj_year04.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     tempObj        5 /tmp/Rtmpd5hsL6/outputs/tempObj_year05.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     tempObj        6 /tmp/Rtmpd5hsL6/outputs/tempObj_year06.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     tempObj        7 /tmp/Rtmpd5hsL6/outputs/tempObj_year07.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     tempObj        8 /tmp/Rtmpd5hsL6/outputs/tempObj_year08.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9     tempObj        9 /tmp/Rtmpd5hsL6/outputs/tempObj_year09.rds saveRDS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10    tempObj       10 /tmp/Rtmpd5hsL6/outputs/tempObj_year10.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     tempObj        1 /tmp/RtmpAzfvD1/outputs/tempObj_year01.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     tempObj        2 /tmp/RtmpAzfvD1/outputs/tempObj_year02.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     tempObj        3 /tmp/RtmpAzfvD1/outputs/tempObj_year03.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     tempObj        4 /tmp/RtmpAzfvD1/outputs/tempObj_year04.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     tempObj        5 /tmp/RtmpAzfvD1/outputs/tempObj_year05.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     tempObj        6 /tmp/RtmpAzfvD1/outputs/tempObj_year06.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     tempObj        7 /tmp/RtmpAzfvD1/outputs/tempObj_year07.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     tempObj        8 /tmp/RtmpAzfvD1/outputs/tempObj_year08.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     tempObj        9 /tmp/RtmpAzfvD1/outputs/tempObj_year09.rds saveRDS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    tempObj       10 /tmp/RtmpAzfvD1/outputs/tempObj_year10.rds saveRDS</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    package saved arguments</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     base  TRUE        NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     base  TRUE        NA</span>
@@ -271,18 +271,18 @@ rules of recycling for each <code>fun</code>.</td></tr></table><p>See the module
 <span class="r-in"><span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>outputPath <span class="op">=</span> <span class="va">tmpdir</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd5hsL6/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd5hsL6/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd5hsL6/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd5hsL6/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpAzfvD1/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpAzfvD1/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpAzfvD1/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpAzfvD1/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpAzfvD1/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpAzfvD1/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span><span class="fu">outputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>     objectName <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"tempObj"</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"tempObj2"</span>, <span class="fl">3</span><span class="op">)</span>, <span class="st">"df1"</span><span class="op">)</span>,</span></span>
@@ -294,17 +294,17 @@ rules of recycling for each <code>fun</code>.</td></tr></table><p>See the module
 <span class="r-in"><span><span class="co">#   argument for 6th row in data.frame (corresponding to the write.csv function)</span></span></span>
 <span class="r-in"><span><span class="fu">outputArgs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[[</span><span class="fl">6</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 chckpn <span style="color: #00BB00;"> total elpsd: 9e-04 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0022 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 prgrss <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 load   <span style="color: #00BB00;"> total elpsd: 0.0051 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0064 secs | 1 save spades 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.011 secs | 2 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.015 secs | 4 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.019 secs | 6 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.023 secs | 7 save later 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.027 secs | 10 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 chckpn <span style="color: #00BB00;"> total elpsd: 0.00099 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0027 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 prgrss <span style="color: #00BB00;"> total elpsd: 0.0045 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 load   <span style="color: #00BB00;"> total elpsd: 0.006 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0074 secs | 1 save spades 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.013 secs | 2 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.018 secs | 4 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.023 secs | 6 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.027 secs | 7 save later 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.032 secs | 10 save later 10</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -317,12 +317,12 @@ rules of recycling for each <code>fun</code>.</td></tr></table><p>See the module
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5   tempObj2        7   saveRDS    base</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6        df1       10 write.csv   utils</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          file saved arguments</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  /tmp/Rtmpd5hsL6/outputs/tempObj_year01.rds  TRUE        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  /tmp/Rtmpd5hsL6/outputs/tempObj_year04.rds  TRUE        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 /tmp/Rtmpd5hsL6/outputs/tempObj2_year02.rds  TRUE        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 /tmp/Rtmpd5hsL6/outputs/tempObj2_year06.rds  TRUE        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 /tmp/Rtmpd5hsL6/outputs/tempObj2_year07.rds  TRUE        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      /tmp/Rtmpd5hsL6/outputs/df1_year10.csv  TRUE     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  /tmp/RtmpAzfvD1/outputs/tempObj_year01.rds  TRUE        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  /tmp/RtmpAzfvD1/outputs/tempObj_year04.rds  TRUE        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 /tmp/RtmpAzfvD1/outputs/tempObj2_year02.rds  TRUE        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 /tmp/RtmpAzfvD1/outputs/tempObj2_year06.rds  TRUE        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 /tmp/RtmpAzfvD1/outputs/tempObj2_year07.rds  TRUE        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      /tmp/RtmpAzfvD1/outputs/df1_year10.csv  TRUE     FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># read one back in just to test it all worked as planned</span></span></span>
 <span class="r-in"><span><span class="va">newObj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">tmpdir</span>, pattern <span class="op">=</span> <span class="st">"year10.csv"</span>, full.name <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -370,25 +370,25 @@ rules of recycling for each <code>fun</code>.</td></tr></table><p>See the module
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd5hsL6/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd5hsL6/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd5hsL6/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd5hsL6/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd5hsL6/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpAzfvD1/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpAzfvD1/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpAzfvD1/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpAzfvD1/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpAzfvD1/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpd5hsL6/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpAzfvD1/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 chckpn <span style="color: #00BB00;"> total elpsd: 0.00069 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0019 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 prgrss <span style="color: #00BB00;"> total elpsd: 0.0034 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 load   <span style="color: #00BB00;"> total elpsd: 0.0048 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 15:09:49 save   <span style="color: #00BB00;"> total elpsd: 0.0062 secs | 10 save spades 10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 chckpn <span style="color: #00BB00;"> total elpsd: 0.00093 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0025 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 prgrss <span style="color: #00BB00;"> total elpsd: 0.0042 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 load   <span style="color: #00BB00;"> total elpsd: 0.0057 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aug19 19:59:30 save   <span style="color: #00BB00;"> total elpsd: 0.0071 secs | 10 save spades 10</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
