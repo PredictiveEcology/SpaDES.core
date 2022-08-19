@@ -99,7 +99,7 @@
       <h1 data-toc-skip>03 Caching <code>SpaDES</code> simulations</h1>
                         <h4 data-toc-skip class="author">Eliot J. B. McIntire</h4>
             
-            <h4 data-toc-skip class="date">August 18 2022</h4>
+            <h4 data-toc-skip class="date">August 19 2022</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/vignettes/iii-cache.Rmd" class="external-link"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -143,28 +143,28 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">outSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span>, notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug18 18:50:25       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 chckpn <span style="color: #00BB00;"> total elpsd: 0.0031 secs | 0 checkpoint init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 save   <span style="color: #00BB00;"> total elpsd: 0.0055 secs | 0 save init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 prgrss <span style="color: #00BB00;"> total elpsd: 0.0074 secs | 0 progress init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 load   <span style="color: #00BB00;"> total elpsd: 0.0093 secs | 0 load init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 rndmLn <span style="color: #00BB00;"> total elpsd: 0.011 secs | 0 randomLandscapes init</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.24 secs | 0 fireSpread init 1</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.25 secs | 1 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.32 secs | 1 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.33 secs | 2 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.36 secs | 2 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.36 secs | 3 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.38 secs | 3 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.39 secs | 4 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.41 secs | 4 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.41 secs | 5 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:25 frSprd <span style="color: #00BB00;"> total elpsd: 0.43 secs | 5 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:18       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:18 chckpn <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 0 checkpoint init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:18 save   <span style="color: #00BB00;"> total elpsd: 0.0059 secs | 0 save init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:18 prgrss <span style="color: #00BB00;"> total elpsd: 0.0078 secs | 0 progress init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:18 load   <span style="color: #00BB00;"> total elpsd: 0.0095 secs | 0 load init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:18 rndmLn <span style="color: #00BB00;"> total elpsd: 0.011 secs | 0 randomLandscapes init</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.25 secs | 0 fireSpread init 1</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.27 secs | 1 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.34 secs | 1 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.34 secs | 2 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.37 secs | 2 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.37 secs | 3 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.4 secs | 3 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.4 secs | 4 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.43 secs | 4 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.43 secs | 5 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:19 frSprd <span style="color: #00BB00;"> total elpsd: 0.45 secs | 5 fireSpread stats 5</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.631   0.040   0.675</span></span></code></pre>
+<span><span class="co">##   0.651   0.048   0.705</span></span></code></pre>
 <p>Note that if there were any visualizations (here we turned them off with <code>.plotInitialTime = NA</code> above) they will happen the first time through, but not the cached times.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># vastly faster 2nd time</span></span>
@@ -174,7 +174,7 @@
 <pre><code><span><span class="co">## <span style="color: #0000BB;">  ...(Object to retrieve (5dbbbedd5420e39b.rds))</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #0000BB;">     loaded cached result from previous spades call</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.305   0.000   0.307</span></span></code></pre>
+<span><span class="co">##   0.339   0.004   0.346</span></span></code></pre>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">outSim</span>, <span class="va">outSimCached</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
@@ -191,59 +191,59 @@
 <span>  <span class="va">randomSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug18 18:50:27       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:20 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.517   0.008   0.527</span></span></code></pre>
+<span><span class="co">##   0.567   0.000   0.569</span></span></code></pre>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># vastly faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug18 18:50:27       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:27 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (ce93a84a7dde15e5.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (ce93a84a7dde15e5.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:21 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.412   0.004   0.417</span></span></code></pre>
+<span><span class="co">##   0.445   0.004   0.451</span></span></code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are identical, not <code>fireSpread</code>.</p>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span><span class="op">)</span></span>
@@ -277,61 +277,61 @@
 <span>  <span class="va">randomSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug18 18:50:28       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:28 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.404   0.000   0.426</span></span></code></pre>
+<span><span class="co">##   0.425   0.000   0.450</span></span></code></pre>
 <div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># vastly faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug18 18:50:29       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (ce93a84a7dde15e5.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #0000BB;">  ...(Object to retrieve (830aada858ef3b87.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #0000BB;">     loaded cached copy of init event in fireSpread module.   </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug18 18:50:29 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (ce93a84a7dde15e5.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #0000BB;">  ...(Object to retrieve (5f3aff0af5d6ee3e.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #0000BB;">     loaded cached copy of init event in fireSpread module.   </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:22 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Aug19 15:10:23 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.174   0.004   0.180</span></span></code></pre>
+<span><span class="co">##   0.189   0.003   0.198</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="function-level-caching">Function-level caching<a class="anchor" aria-label="anchor" href="#function-level-caching"></a>
@@ -354,7 +354,7 @@
 <span>               notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.729   0.012   0.741</span></span></code></pre>
+<span><span class="co">##   0.686   0.037   0.729</span></span></code></pre>
 <div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># vastly faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
@@ -370,7 +370,7 @@
 <span>                     userTags <span class="op">=</span> <span class="st">"nlm_mpd"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.076   0.000   0.077</span></span></code></pre>
+<span><span class="co">##   0.064   0.000   0.072</span></span></code></pre>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">map</span>, <span class="va">mapCached</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
