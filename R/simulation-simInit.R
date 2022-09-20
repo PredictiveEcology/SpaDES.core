@@ -368,9 +368,9 @@ setMethod(
     sim <- new("simList")
 
     if (length(simPrev) > 0) {
-      sim$._simPrevs <- append(sys.frames()[tail(simPrev, 1)], sim$._simPrev)
+      sim[["._simPrevs"]] <- append(sys.frames()[tail(simPrev, 1)], sim[["._simPrevs"]])
     } else {
-      sim$._simPrevs <- list()
+      sim[["._simPrevs"]] <- list()
     }
 
     # Make a temporary place to store parsed module files
