@@ -18,6 +18,8 @@
 \alias{citation}
 \alias{citation,simList-method}
 \alias{citation,character-method}
+\alias{sessInfo}
+\alias{sessInfo,simList-method}
 \title{Metadata accessors}
 \usage{
 inputObjects(sim, module, path)
@@ -51,6 +53,10 @@ citation(package, lib.loc = NULL, auto = NULL, module = character())
 \S4method{citation}{simList}(package, lib.loc = NULL, auto = NULL, module = character())
 
 \S4method{citation}{character}(package, lib.loc = NULL, auto = NULL, module = character())
+
+sessInfo(sim)
+
+\S4method{sessInfo}{simList}(sim)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

@@ -199,7 +199,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @importFrom data.table setDTthreads
 #' @importFrom reproducible basename2
 #' @importFrom Require Require trimVersionNumber modifyList2
-#' @importFrom utils compareVersion
+#' @importFrom utils compareVersion sessionInfo
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -372,6 +372,12 @@ setMethod(
     } else {
       sim[["._simPrevs"]] <- list()
     }
+
+    # add project/session info -- use list to allow subsequent addition (e.g., git, spatial libs)
+    sim@.xData[["._sessionInfo"]] <- list(
+      sessionInfo = utils::sessionInfo(),
+      timestamp = Sys.time()
+    )
 
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
