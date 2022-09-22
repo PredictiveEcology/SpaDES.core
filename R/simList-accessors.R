@@ -3088,6 +3088,29 @@ setMethod("citation",
 })
 
 ################################################################################
+#' @param package For compatibility with [utils::citation()]. This can be
+#'                a `simList` or a character string for a package name.
+#' @inheritParams P
+#' @inheritParams utils::citation
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+#' @aliases simList-accessors-metadata
+setGeneric("sessInfo", function(sim) {
+  standardGeneric("sessInfo")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("sessInfo",
+          signature = "simList",
+          definition = function(sim) {
+            return(sim@.xData[["._sessionInfo"]])
+})
+
+################################################################################
 #' @export
 #' @include simList-class.R
 #' @include times.R
@@ -3133,6 +3156,5 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   }
   return(ret[])
 }
-
 
 .knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")
