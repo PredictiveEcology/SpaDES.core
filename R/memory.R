@@ -46,7 +46,7 @@ memoryUseThisSession <- function(thisPid) {
   if (missing(thisPid)) thisPid <- Sys.getpid()
   needTasklist <- isWindows()
   if (nzchar(ps) && !needTasklist) {
-    aa <- try(suppressWarnings(system(paste("ps -eo rss,pid | grep", thisPid), intern = TRUE)), silent = TRUE)
+    aa <- try(suppressWarnings(system(paste(ps, "-eo rss,pid | grep", thisPid), intern = TRUE)), silent = TRUE)
     needTasklist <- !is.null(attr(aa, "status"))
     if (!needTasklist)
       aa2 <- try(strsplit(aa, split = " +")[[1]][1], silent = TRUE)
