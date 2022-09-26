@@ -90,8 +90,9 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #' This will only work if the user has specified before running
 #' the `spades` call, set the interval, in seconds, that ps is
 #' run with `options("spades.memoryUseInterval" = 0.5)`, will assess
-#' memory use every 0.5 seconds. The default
-#' is 0, meaning no interval, "off".
+#' memory use every 0.5 seconds. The default is `0`, meaning no interval, "off".
+#'
+#' @note The suggested `future` and `future.callr` packages must be available.
 #'
 #' @export
 #' @param sim A completed simList
