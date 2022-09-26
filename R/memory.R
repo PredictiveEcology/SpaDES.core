@@ -178,7 +178,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       message("\bDone!")
 
   } else {
-    message(futureMessage)
+    stop(futureMessage)
   }
 
   return(sim)

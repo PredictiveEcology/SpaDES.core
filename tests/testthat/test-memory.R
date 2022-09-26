@@ -2,13 +2,14 @@ test_that("testing memoryUse", {
   skip_if_not(interactive()) ## still experimental
   # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
   skip_if_not_installed("future")
+  skip_if_not_installed("future.callr")
   skip_if_not_installed("NLMR")
 
   rm(list = ls())
   testInitOut <- testInit(c("raster", "future.callr", "future"),
-                          opts = list("spades.moduleCodeChecks" = FALSE,
-                                      "spades.memoryUseInterval" = 0.2,
-                                      "spades.futurePlan" = "callr"))
+                          opts = list(spades.moduleCodeChecks = FALSE,
+                                      spades.memoryUseInterval = 0.2,
+                                      spades.futurePlan = "callr"))
   oldPlan <- future::plan()
   on.exit({
     testOnExit(testInitOut)
