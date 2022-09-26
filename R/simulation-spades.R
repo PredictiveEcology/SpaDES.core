@@ -1016,7 +1016,7 @@ setMethod(
             sim <- memoryUseOnExit(sim, originalPlan)
           }, add = TRUE)
         } else {
-          message(futureMessage)
+          stop(futureMessage)
         }
       }
 

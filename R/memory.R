@@ -207,7 +207,7 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
       message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
     }
   } else {
-    message(futureMessage)
+    stop(futureMessage)
   }
   return(sim)
 }
