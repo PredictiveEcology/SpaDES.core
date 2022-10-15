@@ -14,7 +14,7 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
   if (interval > 0) {
     op <- options(digits.secs = 5)
     stopFilename <- stopFilename(outputFile)
-    while(numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
+    while (numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
       Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
       a <- memoryUseThisSession(thisPid)
       data.table::fwrite(list(memory = a, time = Sys.time()),
@@ -35,8 +35,10 @@ ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.me
 #' which uses `gc()` internally. The purpose of this function is
 #' to allow continuous monitoring, external to the R session.
 #' Normally, this is run in a different session.
+#'
 #' @param thisPid Numeric or integer, the PID of the process. If omitted, it will
 #'   be found with `Sys.getpid()`
+#'
 #' @export
 #' @rdname memoryUse
 memoryUseThisSession <- function(thisPid) {
@@ -44,7 +46,7 @@ memoryUseThisSession <- function(thisPid) {
   if (missing(thisPid)) thisPid <- Sys.getpid()
   needTasklist <- isWindows()
   if (nzchar(ps) && !needTasklist) {
-    aa <- try(suppressWarnings(system(paste("ps -eo rss,pid | grep", thisPid), intern = TRUE)), silent = TRUE)
+    aa <- try(suppressWarnings(system(paste(ps, "-eo rss,pid | grep", thisPid), intern = TRUE)), silent = TRUE)
     needTasklist <- !is.null(attr(aa, "status"))
     if (!needTasklist)
       aa2 <- try(strsplit(aa, split = " +")[[1]][1], silent = TRUE)
@@ -88,8 +90,9 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #' This will only work if the user has specified before running
 #' the `spades` call, set the interval, in seconds, that ps is
 #' run with `options("spades.memoryUseInterval" = 0.5)`, will assess
-#' memory use every 0.5 seconds. The default
-#' is 0, meaning no interval, "off".
+#' memory use every 0.5 seconds. The default is `0`, meaning no interval, "off".
+#'
+#' @note The suggested `future` and `future.callr` packages must be available.
 #'
 #' @export
 #' @param sim A completed simList
@@ -103,7 +106,6 @@ memoryUse <- function(sim, max = TRUE) {
   if (is.null(mem)) {
     message("There are no data in the sim@.xData$.memoryUse$obj ... try running spades again?")
   } else {
-
     # make sure same tz
     if (any(grepl("^time$", names(mem))))
       setnames(mem, old = "time", new = "clockTime")
@@ -176,7 +178,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       message("\bDone!")
 
   } else {
-    message(futureMessage)
+    stop(futureMessage)
   }
 
   return(sim)
@@ -205,7 +207,7 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
       message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
     }
   } else {
-    message(futureMessage)
+    stop(futureMessage)
   }
   return(sim)
 }
