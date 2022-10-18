@@ -17,21 +17,23 @@ name: Render module Rmd
 
 jobs:
   render:
+    if: "!contains(github.event.commits[0].message, '[skip-ci]')"
     name: Render module Rmd
     runs-on: ubuntu-20.04
 
     env:
-      RSPM: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-pandoc@v2
+      
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
 
-      - uses: r-lib/actions/setup-pandoc@v1
-
-      - name: Install GDAL and other dependencies
+      - name: Install additional system dependencies
         run: |
           sudo apt-get install -y \
             libcurl4-openssl-dev \
@@ -45,16 +47,18 @@ jobs:
             libxml2-dev \
             python3-gdal
 
-      - name: Install remotes, knitr, rmarkdown
+      - name: Install remotes, knitr, rmarkdown, bookdown
         run: |
           install.packages("remotes")
           remotes::install_cran("rmarkdown")
           remotes::install_cran("knitr")
+          remotes::install_cran("bookdown")
         shell: Rscript {0}
 
-      - name: Install SpaDES
+      - name: Install SpaDES packages
         run: |
           install.packages("SpaDES", dependencies = TRUE)
+          remotes::install_github("PredictiveEcology/SpaDES.docs@development")
         shell: Rscript {0}
 
       - name: Install module package dependencies
