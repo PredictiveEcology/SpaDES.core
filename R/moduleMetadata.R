@@ -36,11 +36,15 @@ setMethod(
   signature = c(sim = "missing", module = "character", path = "character"),
   definition = function(module, path, defineModuleListItems) {
     filename <- paste(path, "/", module, "/", module, ".R", sep = "")
-    if (!file.exists(filename)) {
+    if (!any(file.exists(filename))) {
       stop(paste(filename, "does not exist. This was created by putting",
-                 "modulePath with the module name as a folder and filename. ",
-                 "Please correct the modulePath or module name in",
-                 "the simInit() call."))
+                 "modulePath with the module name as a folder and filename.",
+                 "Please correct the modulePath or module name in the simInit() call."))
+    } else {
+      ## check which of the module paths the file exists in -- use that file and path below
+      id <- which(file.exists(filename))
+      filename <- filename[id]
+      path <- path[id]
     }
 
     ## store metadata as list

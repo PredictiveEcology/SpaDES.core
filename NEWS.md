@@ -1,5 +1,11 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
+version 1.1.0.9000
+=============
+
+## new features
+* `moduleMetadata` now handles multiple module paths
+
 version 1.1.0
 =============
 
@@ -490,7 +496,7 @@ version 0.1.1
     - the core DES is now built around lists, rather than `data.table` objects. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
     - `.parseModule` and `.parseModuePartial` now put their parsed content into a temporary environment (`sim@.envir$.parsedFiles$<Full Filename>)` during the `simInit`, which gets re-used. Previously, files were parsed multiple times in a given `simInit` call. Several functions now have `envir` argument to pass this through (including `moduleVersion`, `packages`, `checkParams`)
 
-* parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the sim object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., `startSimPlus1 <- start(sim) + 1` can be defined in the module and used in `defineModule`
+* parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the `sim` object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., `startSimPlus1 <- start(sim) + 1` can be defined in the module and used in `defineModule`
 * remove `grDevices` from Imports as it was not used (#1)
 * remove `chron` and `CircStats` dependencies
 * remove functions `dwrpnorm2` and move to package `SpaDES.tools`
