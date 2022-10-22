@@ -109,41 +109,32 @@ Init <- function(sim) {
   ## NOTE: nlm_mpd drops row + columns along outer edge so new raster won't always match nx & ny
 
   # DEM <- gaussMap(template, scale = 10, var = 0.03, speedup = speedup, inMemory = inMemory)
-  DEM <- NLMR::nlm_mpd(
-    ncol = ncol(template),
-    nrow = nrow(template),
-    resolution = unique(res(template)),
-    roughness = 0.3,
-    rand_dev = 10,
-    rescale = TRUE,
-    verbose = FALSE
-  )
+  DEM <- neutralLandscapeMap(template,
+                             roughness = 0.3,
+                             rand_dev = 10,
+                             rescale = TRUE,
+                             verbose = FALSE)
+
   DEM[] <- round(getValues(DEM), 1) * 300
   # plot(DEM)
 
   # forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
-  forestAge <- NLMR::nlm_mpd(
-    ncol = ncol(template),
-    nrow = nrow(template),
-    resolution = unique(res(template)),
-    roughness = 0.7,
-    rand_dev = 10,
-    rescale = FALSE,
-    verbose = FALSE
-  )
+  forestAge <- neutralLandscapeMap(template,
+                                   roughness = 0.7,
+                                   rand_dev = 10,
+                                   rescale = FALSE,
+                                   verbose = FALSE)
+
   forestAge[] <- round(getValues(forestAge), 1) * 10
   # plot(forestAge)
 
   # percentPine <- gaussMap(template, scale = 10, var = 1, speedup = speedup, inMemory = inMemory)
-  percentPine <- NLMR::nlm_mpd(
-    ncol = ncol(template),
-    nrow = nrow(template),
-    resolution = unique(res(template)),
-    roughness = 0.5,
-    rand_dev = 10,
-    rescale = TRUE,
-    verbose = FALSE
-  )
+  percentPine <- neutralLandscapeMap(template,
+                                     roughness = 0.5,
+                                     rand_dev = 10,
+                                     rescale = TRUE,
+                                     verbose = FALSE)
+
   percentPine[] <- round(getValues(percentPine), 1)
   # plot(percentPine)
 

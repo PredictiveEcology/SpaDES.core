@@ -70,7 +70,7 @@ Suggests:
     roxygen2,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 0.2.0),
+    SpaDES.tools (>= 1.0.0.9000),
     tcltk,
     terra,
     testthat (>= 1.0.2)
