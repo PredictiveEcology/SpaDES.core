@@ -29,9 +29,9 @@ defineModule(sim, list(
   citation = list(),
   documentation = list(),
   reqdPkgs = list(
-    "ropensci/NLMR",
+    "ropensci/NLMR (>= 1.1.1)",
     "raster", "RColorBrewer",
-    "PredictiveEcology/SpaDES.tools@development"
+    "PredictiveEcology/SpaDES.tools@development (>= 1.0.0.9001)"
   ),
   parameters = rbind(
     defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
@@ -106,44 +106,30 @@ Init <- function(sim) {
                      ymn = -ny / 2, ymx = ny / 2)
 
   ## Make dummy maps for testing of models
-  ## NOTE: nlm_mpd drops row + columns along outer edge so new raster won't always match nx & ny
+  DEM <- neutralLandscapeMap(template,
+                             roughness = 0.3,
+                             rand_dev = 10,
+                             rescale = TRUE,
+                             verbose = FALSE)
 
-  # DEM <- gaussMap(template, scale = 10, var = 0.03, speedup = speedup, inMemory = inMemory)
-  DEM <- NLMR::nlm_mpd(
-    ncol = ncol(template),
-    nrow = nrow(template),
-    resolution = unique(res(template)),
-    roughness = 0.3,
-    rand_dev = 10,
-    rescale = TRUE,
-    verbose = FALSE
-  )
   DEM[] <- round(getValues(DEM), 1) * 300
   # plot(DEM)
 
-  # forestAge <- gaussMap(template, scale = 10, var = 0.1, speedup = speedup, inMemory = inMemory)
-  forestAge <- NLMR::nlm_mpd(
-    ncol = ncol(template),
-    nrow = nrow(template),
-    resolution = unique(res(template)),
-    roughness = 0.7,
-    rand_dev = 10,
-    rescale = FALSE,
-    verbose = FALSE
-  )
+  forestAge <- neutralLandscapeMap(template,
+                                   roughness = 0.7,
+                                   rand_dev = 10,
+                                   rescale = FALSE,
+                                   verbose = FALSE)
+
   forestAge[] <- round(getValues(forestAge), 1) * 10
   # plot(forestAge)
 
-  # percentPine <- gaussMap(template, scale = 10, var = 1, speedup = speedup, inMemory = inMemory)
-  percentPine <- NLMR::nlm_mpd(
-    ncol = ncol(template),
-    nrow = nrow(template),
-    resolution = unique(res(template)),
-    roughness = 0.5,
-    rand_dev = 10,
-    rescale = TRUE,
-    verbose = FALSE
-  )
+  percentPine <- neutralLandscapeMap(template,
+                                     roughness = 0.5,
+                                     rand_dev = 10,
+                                     rescale = TRUE,
+                                     verbose = FALSE)
+
   percentPine[] <- round(getValues(percentPine), 1)
   # plot(percentPine)
 
