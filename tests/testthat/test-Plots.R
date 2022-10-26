@@ -231,3 +231,16 @@ test_that("Plots function 3 - use as Plot", {
     Plot(stk2) # should show first row on left plot only as lower -- 0.25
   }
 })
+
+test_that("Plots test .guessPkgFun", {
+  testInitOut <- testInit("raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
+  test <- sapply(pkgFun, function(x) {
+    exists(sub(".*:", "", x), where = paste0("package:", sub(":.*", "", x)), mode = "function")
+  })
+  expect_true(all(test))
+})

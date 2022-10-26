@@ -319,10 +319,12 @@ Plots <- function(data, fn, filename,
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
         if (!is(plotted, "try-error")) {
-          if (exists("sim", inherits = FALSE))
+          if (exists("sim", inherits = FALSE)) {
+            pkgAndFn <- .guessPkgFun(bsf)
             sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
                                          objectName = filePathSansExt(basename(theFilename)),
-                                         file = theFilename, fun = "unknown", args = NA,  ...)
+                                         file = theFilename, fun = pkgAndFn, args = NA,  ...)
+          }
           message("Saved figure to: ", theFilename)
         }
 
@@ -394,3 +396,14 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 
 filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
+
+#' Guess package of a function
+#'
+#' @param bsf character. A function name
+#'
+#' @return character. The package and function name as "pkg::bsf"
+
+.guessPkgFun <- function(bsf) {
+  pkgName <- eval(parse(text = paste0("environmentName(environment(", bsf, "))")))
+  return(paste0(pkgName, "::", bsf))
+}
