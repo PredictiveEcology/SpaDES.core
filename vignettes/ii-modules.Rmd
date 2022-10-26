@@ -257,7 +257,6 @@ Each module appears in a colour-coded row, within which each event for that modu
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
 ```{r sim-eventDiagram, eval=hasSuggests, echo=FALSE, message=FALSE, warning=FALSE}
-library(magrittr)
 library(SpaDES.core)
 
 parameters <- list(
@@ -274,14 +273,13 @@ parameters <- list(
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
-mySim <- simInit(
+mySim <- simInitAndSpades(
   times = list(start = 0.0, end = 2.0, timeunit = "year"),
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-  ) %>% 
-  spades()
+)
 dev.off()
 unlink(normalizePath(ftmp))
 ```
