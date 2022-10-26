@@ -361,7 +361,6 @@ Plots <- function(data, fn, filename,
   return(invisible(NULL))
 }
 
-
 outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
   outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
                                      saved = TRUE, arguments = I(args)),
@@ -370,12 +369,13 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
     outputs[["arguments"]] <- I(outputs[["arguments"]])
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
-#' Test whether there should be any plotting from .plot parameter
+
+#' Test whether there should be any plotting from `.plot` parameter
 #'
 #' This will do all the various tests needed to determine whether
-#' plotting of one sort or another will occur. Testing any of the
-#' types as listed in [Plots()] argument `types`. Only the
-#' first 3 letters of the type are required.
+#' plotting of one sort or another will occur.
+#' Testing any of the types as listed in [Plots()] argument `types`.
+#' Only the first 3 letters of the type are required.
 #'
 #' @param .plots Usually will be the `P(sim)$.plots` is used within
 #'   a module.
