@@ -1684,8 +1684,6 @@ setReplaceMethod(
     return(sim)
 })
 
-
-
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1706,9 +1704,6 @@ setMethod("logPath",
             lp <- checkPath(lp, create = TRUE)
             return(lp)
 })
-
-
-
 
 # modulePath ----------------------------------------------------------------------------------
 
