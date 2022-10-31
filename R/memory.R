@@ -11,7 +11,6 @@ ongoingMemoryThisPid <- function(seconds = 1000,
     outputFile <- outputFilename(thisPid)
   }
   suppressWarnings(file.remove(outputFile))
-  checkPath(dirname(outputFile), create = TRUE)
   if (interval > 0) {
     op <- options(digits.secs = 5)
     stopFilename <- stopFilename(outputFile)
@@ -157,6 +156,9 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
     st <- format(Sys.time(), format = "%Y-%m-%d_%H-%M-%S")
     sim@.xData$.memoryUse$filename <-
       file.path(logPath(sim), paste0("_memoryUse_", st, "_", Sys.getpid(), ".csv"))
+
+    checkPath(dirname(sim@.xData$.memoryUse$filename), create = TRUE)
+
     sim@.xData$.memoryUse$futureObj <-
       futureOngoingMemoryThisPid(seconds = Inf,
                                  interval = getOption("spades.memoryUseInterval", 0.2),
