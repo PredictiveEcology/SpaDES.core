@@ -1,16 +1,17 @@
 utils::globalVariables(c("memory", "maxMemory"))
 
 #' @importFrom reproducible tempfile2
-ongoingMemoryThisPid <- function(seconds = 1000, interval = getOption("spades.memoryUseInterval", 0.5),
-                                 thisPid, outputFile) {
-  numTimes = 1
+ongoingMemoryThisPid <- function(seconds = 1000,
+                                 interval = getOption("spades.memoryUseInterval", 0.5),
+                                 thisPid,
+                                 outputFile) {
+  numTimes <- 1
   if (missing(thisPid)) thisPid <- Sys.getpid()
   if (missing(outputFile)) {
     outputFile <- outputFilename(thisPid)
-    # outputFile <-
   }
-  #cat("memory,  time", "\n", file = outputFile, append = FALSE)
   suppressWarnings(file.remove(outputFile))
+  checkPath(dirname(outputFile), create = TRUE)
   if (interval > 0) {
     op <- options(digits.secs = 5)
     stopFilename <- stopFilename(outputFile)
@@ -70,14 +71,15 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
   if (is.null(outputFile))
     outputFile <- outputFilename(thisPid)
   message("Writing memory to ", outputFile)
-  a <- future::future(
+  a <- future::future({
     getFromNamespace("ongoingMemoryThisPid", "SpaDES.core")(seconds = seconds,
                                                             interval = interval,
                                                             thisPid = thisPid,
-                                                            outputFile = outputFile),
-    globals = list(memoryUseThisSession = memoryUseThisSession,
-                   outputFile = outputFile, thisPid = thisPid,
-                   seconds = seconds, interval = interval))
+                                                            outputFile = outputFile)
+  }, globals = list(memoryUseThisSession = memoryUseThisSession,
+                    outputFile = outputFile, thisPid = thisPid,
+                    seconds = seconds, interval = interval)
+  )
   return(a)
 }
 
@@ -154,7 +156,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
 
     st <- format(Sys.time(), format = "%Y-%m-%d_%H-%M-%S")
     sim@.xData$.memoryUse$filename <-
-      file.path(logPath(sim), paste0("_memoryUse_", st, "_", Sys.getpid(),".csv"))
+      file.path(logPath(sim), paste0("_memoryUse_", st, "_", Sys.getpid(), ".csv"))
     sim@.xData$.memoryUse$futureObj <-
       futureOngoingMemoryThisPid(seconds = Inf,
                                  interval = getOption("spades.memoryUseInterval", 0.2),
