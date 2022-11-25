@@ -480,7 +480,7 @@ Paths <- .paths()
 #' @export
 #' @rdname setPaths
 #' @importFrom raster tmpDir
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @param silent Logical. Should the messaging occur.
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
                      terraPath, silent = FALSE) {

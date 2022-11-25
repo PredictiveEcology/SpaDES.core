@@ -200,7 +200,7 @@ remoteFileSize <- function(url) {
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @importFrom reproducible compareNA
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples

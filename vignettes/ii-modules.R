@@ -73,7 +73,6 @@ cat(c(
   ), sep = "\n")
 
 ## ----sim-eventDiagram, eval=hasSuggests, echo=FALSE, message=FALSE, warning=FALSE----
-library(magrittr)
 library(SpaDES.core)
 
 parameters <- list(
@@ -90,14 +89,13 @@ parameters <- list(
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
-mySim <- simInit(
+mySim <- simInitAndSpades(
   times = list(start = 0.0, end = 2.0, timeunit = "year"),
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-  ) %>% 
-  spades()
+)
 dev.off()
 unlink(normalizePath(ftmp))
 

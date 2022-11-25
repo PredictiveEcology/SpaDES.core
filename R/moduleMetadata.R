@@ -48,7 +48,6 @@ setMethod(
     }
 
     ## store metadata as list
-
     metadata <- lapply(defineModuleListItems, function(xx) {
       pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
                                  defineModuleElement = xx)
