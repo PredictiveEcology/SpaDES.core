@@ -890,7 +890,7 @@ if (!isGeneric("clearCache")) {
 #'
 #' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
 #' @param drv an object that inherits from `DBIDriver`, or an existing
-#'     `DBIConnection` object (in order to clone an existing connection).
+#'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #'
 #' @export

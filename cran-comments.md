@@ -1,6 +1,6 @@
-## Maintenance release
+## Release information
 
-This release fixes various issues with packages dependencies and CRAN check problems.
+This is a resubmission to restore the package to CRAN following archival due to removal of dependency package `Require`, which has now been restored to CRAN.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
@@ -13,20 +13,20 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.1.3
 
 ### Current R versions
-* macOS 11.6 Big Sur           (GitHub), R 4.2.1
-* macOS 11.6 Big Sur            (local), R 4.2.1
-* macOs (m1) Big Sur             (rhub), R 4.2.1
-* Ubuntu 20.04                 (GitHub), R 4.2.1
-* Ubuntu 20.04                  (local), R 4.2.1
-* Windows                      (GitHub), R 4.2.1
-* Windows                       (local), R 4.2.1
-* Windows                 (win-builder), R 4.2.1
+* macOS 11.7 Big Sur           (GitHub), R 4.2.2
+* macOS 11.7 Big Sur            (local), R 4.2.2
+* macOs (m1) Big Sur             (rhub), R 4.2.2
+* Ubuntu 20.04                 (GitHub), R 4.2.2
+* Ubuntu 20.04                  (local), R 4.2.2
+* Windows                      (GitHub), R 4.2.2
+* Windows                       (local), R 4.2.2
+* Windows                 (win-builder), R 4.2.2
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2022-08-11 r82713)
-* Ubuntu 20.04                  (local), R-devel (2022-08-11 r82713)
-* Windows                      (GitHub), R-devel (2022-08-14 r82716 ucrt)
-* Windows                 (win-builder), R-devel (2022-08-17 r82724 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2022-11-24 r83383)
+* Ubuntu 20.04                  (local), R-devel (2022-11-24 r83383)
+* Windows                      (GitHub), R-devel (2022-10-11 r83083 ucrt)
+* Windows                 (win-builder), R-devel (2022-10-11 r83083 ucrt)
 
 ## R CMD check results
 
@@ -60,7 +60,4 @@ Additionally, some words were flagged as possibly misspelled, but they are false
 
 ## Downstream dependencies
 
-We checked 3 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
-
- * We saw 0 new problems
- * We failed to check 0 packages
+Currently none, but we are working to resubmit our other packages that depend on this one, and they are passing.
