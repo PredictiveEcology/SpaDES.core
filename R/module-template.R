@@ -231,11 +231,11 @@ setMethod(
     } else {
       SpaDES.core.pkgName <- "SpaDES.core"
     }
-    SpaDES.core.Fullname <- paste0(SpaDES.core.pkgName, " (>=",SpaDES.core.version,")")
+    SpaDES.core.Fullname <- paste0(SpaDES.core.pkgName, " (>= ", SpaDES.core.version, ")")
 
     modulePartialMeta <- list(
-      reqdPkgs = deparse(c(SpaDES.core.Fullname,
-                                moduleDefaults[["reqdPkgs"]]))
+      reqdPkgs = deparse1(append(list(SpaDES.core.Fullname), moduleDefaults[["reqdPkgs"]]),
+                          collapse = "")
     )
     modulePartialMetaTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
                                                      "modulePartialMeta.R.template"))

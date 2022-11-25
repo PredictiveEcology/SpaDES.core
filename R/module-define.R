@@ -18,14 +18,14 @@ moduleDefaults <- list(
     if (!is(pers, "person"))
       pers <- tryCatch(eval(parse(text = pers)), error = function(e) pers)
     pers
-    },
+  },
   childModules = character(0),
   version = "0.0.0.9000", ## numeric_versions don't deparse well
   extent = quote(raster::extent(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
-  reqdPkgs = list("ggplot2")
+  reqdPkgs = list("ggplot2", "raster")
 )
 
 ################################################################################
