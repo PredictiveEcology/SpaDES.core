@@ -641,7 +641,6 @@ setMethod(
         names(m) <- mFullPath
         modulesLoaded <- append(modulesLoaded, m)
 
-
         ### add NAs to any of the dotParams that are not specified by user
         # ensure the modules sublist exists by creating a tmp value in it
         if (is.null(sim@params[[m]])) {
@@ -1020,7 +1019,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   objsSpades <- append(alist(sim = sim), objsAll[spadesFormals])
   sim <- do.call(spades, objsSpades)
 }
-
 
 #' Identify Child Modules from a recursive list
 #'
