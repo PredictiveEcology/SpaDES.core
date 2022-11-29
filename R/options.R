@@ -157,6 +157,7 @@ spadesOptions <- function() {
     spades.moduleDocument = NULL,
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir(), "outputs"),
+    spades.qsThreads = 1L,
     spades.recoveryMode = 1,
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,
