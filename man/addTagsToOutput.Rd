@@ -7,7 +7,7 @@
 \S4method{.addTagsToOutput}{simList}(object, outputObjects, FUN, preDigestByClass)
 }
 \arguments{
-\item{object}{Any R object.}
+\item{object}{Any R object returned from a function}
 
 \item{outputObjects}{Optional character vector indicating which objects to
 return. This is only relevant for list, environment (or similar) objects}
@@ -17,10 +17,10 @@ return. This is only relevant for list, environment (or similar) objects}
 \item{preDigestByClass}{A list, usually from \code{.preDigestByClass}}
 }
 \description{
-See \link[reproducible:addTagsToOutput]{reproducible::.addTagsToOutput}.
+See \link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}.
 }
 \seealso{
-\link[reproducible:addTagsToOutput]{reproducible::.addTagsToOutput}
+\link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}
 }
 \author{
 Eliot McIntire

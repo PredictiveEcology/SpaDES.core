@@ -25,7 +25,7 @@ When this function is subsequently called again, only these changed objects
 will be returned. All other \code{simList} objects will remain unchanged.
 }
 \seealso{
-\link[reproducible:addChangedAttr]{reproducible::.addChangedAttr}.
+\link[reproducible:exportedMethods]{reproducible::.addChangedAttr}.
 
-\link[reproducible:addChangedAttr]{reproducible::.addChangedAttr}
+\link[reproducible:exportedMethods]{reproducible::.addChangedAttr}
 }
