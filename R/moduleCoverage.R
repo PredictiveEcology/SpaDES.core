@@ -30,7 +30,7 @@
 #' @author Yong Luo
 #' @export
 #' @importFrom data.table data.table
-#' @importFrom reproducible file.move
+#' @importFrom reproducible .file.move
 #' @include simList-class.R
 #' @rdname moduleCoverage
 #'
@@ -69,8 +69,8 @@ moduleCoverage <- function(mod, modulePath = "..") {
     b <- parse(file = modFileNam)
     defModLine <- grep("defineModule", b)
     tf <- tempfile(fileext = ".R")
-    file.move(modFileNam, tf)
-    on.exit(file.move(tf, modFileNam, overwrite = TRUE), add = TRUE)
+    .file.move(modFileNam, tf)
+    on.exit(.file.move(tf, modFileNam, overwrite = TRUE), add = TRUE)
     cat(do.call(c, lapply(b[-defModLine], function(x) format(x))),
         file = tmpFile, sep = "\n")
     cat(do.call(c, lapply(b[defModLine], function(x) format(x))),
