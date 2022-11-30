@@ -15,7 +15,7 @@
     following two, for numerical comparison:}
 }
 \value{
-See \code{\link[base]{all.equal}}
+See \code{\link[base:all.equal]{base::all.equal()}}
 }
 \description{
 This function removes a few attributes that are added internally

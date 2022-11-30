@@ -61,7 +61,7 @@ in the first \code{modulePath}, then if it doesn't find it, in the second etc.}
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
 \code{interval} (numeric), \code{loadTime} (numeric).
-See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
+See \code{\link[=inputs]{inputs()}} and vignette("ii-modules") section about inputs.}
 
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
@@ -71,7 +71,7 @@ columns with following column names: \code{objectName} (character, required),
 is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
 it should give "initial conditions".
 
-See \code{\link{outputs}} and
+See \code{\link[=outputs]{outputs()}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional character vector of module names specifying the order in
@@ -97,16 +97,15 @@ the number of update intervals to show in a graphical progress bar.}
 
 \item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
 This means that if the call is made again with the same \code{simList},
-then `spades`` will return the return value from the previous run
+then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+See \code{\link[=Plots]{Plots()}} for possible values. The parameter is intended to slowly
 take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-For backwards compatibility, if \code{.plotInitialTime} is not set
-in this \code{spades} call, but this
-\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
+but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
 will turn off all plotting; setting this with \code{"screen"} will trigger
 plotting for any modules that use this parameter but will have no effect on
 other modules. To get plotting, therefore, it may be necessary to also set
@@ -128,7 +127,7 @@ that get invoked with the \code{outputs} argument in  \code{simInit}. See exampl
 \item{...}{Arguments passed to simInit and spades}
 }
 \value{
-Same as \code{\link{spades}} (a \code{simList}) or
+Same as \code{\link[=spades]{spades()}} (a \code{simList}) or
 }
 \description{
 These functions are convenience wrappers that may allow for
@@ -137,5 +136,5 @@ Passes all arguments to \code{simInit}, then passes the created \code{simList}
 to \code{spades}.
 }
 \seealso{
-\code{\link{simInit}}, \code{\link{spades}}
+\code{\link[=simInit]{simInit()}}, \code{\link[=spades]{spades()}}
 }

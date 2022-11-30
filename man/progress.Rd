@@ -35,8 +35,8 @@ in which to replace element(s).}
 }
 \description{
 The progress bar can be set in two ways in SpaDES. First, by setting values
-in the .progress list element in the params list element passed to \code{\link{simInit}}.
-Second, at the \code{\link{spades}} call itself, which can be simpler. See examples.
+in the .progress list element in the params list element passed to \code{\link[=simInit]{simInit()}}.
+Second, at the \code{\link[=spades]{spades()}} call itself, which can be simpler. See examples.
 }
 \details{
 Progress Bar:

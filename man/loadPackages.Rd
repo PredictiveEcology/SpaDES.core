@@ -30,7 +30,7 @@ Specified packages are loaded and attached using \code{require()},
 invisibly returning a logical vector of successes.
 }
 \description{
-Deprecated. Please use \code{\link[Require]{Require}}
+Deprecated. Please use \code{\link[Require:Require]{Require::Require()}}
 }
 \examples{
 \dontrun{
@@ -41,7 +41,7 @@ Deprecated. Please use \code{\link[Require]{Require}}
 
 }
 \seealso{
-\code{\link{require}}.
+\code{\link[=require]{require()}}.
 }
 \author{
 Alex Chubaty

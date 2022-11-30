@@ -4,7 +4,7 @@ utils::globalVariables(c(".", "moduleName"))
 #' ganttStatus
 #'
 #' Internal function assign the "status" of each event to be passed to
-#' \code{DiagrammeR::mermaid} to make a Gantt chart representing the
+#' `DiagrammeR::mermaid` to make a Gantt chart representing the
 #' events in a completed simulation.
 #' 'init' events are set as "done"; 'plot' events as "critical"; and all others
 #' as "active".
@@ -42,17 +42,17 @@ setMethod("ganttStatus",
 ################################################################################
 #' sim2gantt
 #'
-#' Internal function to convert the completed events list of a \code{simList}
-#' object to a list of \code{data.frame}s suitable to pass to a call to
-#' \code{DiagrammeR::mermaid} to make a Gantt chart representing the
+#' Internal function to convert the completed events list of a `simList`
+#' object to a list of `data.frame`s suitable to pass to a call to
+#' `DiagrammeR::mermaid` to make a Gantt chart representing the
 #' events in a completed simulation.
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
 #' @param n    The number of most recently completed events to plot.
 #'
-#' @param startDate  A character representation of date in \code{YYYY-MM-DD} format.
+#' @param startDate  A character representation of date in `YYYY-MM-DD` format.
 #'
 #' @param width  Numeric. Passed to determine scale of vertical bars.
 #'
@@ -105,7 +105,7 @@ setMethod(
 #'
 #' Create a Gantt Chart representing the events in a completed simulation.
 #' This event diagram is constructed using the completed event list
-#' To change the number of events shown, provide an \code{n} argument.
+#' To change the number of events shown, provide an `n` argument.
 #'
 #' Simulation time is presented on the x-axis, starting at date 'startDate'.
 #' Each module appears in a color-coded row, within which each event for that
@@ -114,25 +114,25 @@ setMethod(
 #' the width of the bar associated with a particular module's event DOES NOT
 #' correspond to an event's "duration".
 #'
-#' Based on this StackOverflow answer: \url{https://stackoverflow.com/a/29999300/1380598}.
+#' Based on this StackOverflow answer: <https://stackoverflow.com/a/29999300/1380598>.
 #'
 #' @note
 #' A red vertical line corresponding to the current date may appear on the figure.
 #' This is useful for Gantt Charts generally but can be considered a 'bug' here.
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
 #' @param n    The number of most recently completed events to plot.
 #'
-#' @param startDate  A character representation of date in \code{YYYY-MM-DD} format.
+#' @param startDate  A character representation of date in `YYYY-MM-DD` format.
 #'
-#' @param ...  Additional arguments passed to \code{mermaid}.
-#'             Useful for specifying \code{height} and \code{width}.
+#' @param ...  Additional arguments passed to `mermaid`.
+#'             Useful for specifying `height` and `width`.
 #'
-#' @return Plots an event diagram as Gantt Chart, invisibly returning a \code{mermaid} object.
+#' @return Plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
 #'
-#' @seealso \code{DiagrammeR::mermaid}.
+#' @seealso `DiagrammeR::mermaid`.
 #'
 #' @include simList-accessors.R
 #' @export
@@ -215,18 +215,18 @@ setMethod(
 #'
 #' Create a sequence diagram illustrating the data object dependencies of a
 #' simulation. Offers a more detailed view of specific objects than does
-#' plotting the \code{depsEdgeList} directly with \code{\link{moduleDiagram}}.
+#' plotting the `depsEdgeList` directly with [moduleDiagram()].
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
-#' @param ...  Additional arguments passed to \code{DiagrammeR::mermaid}.
-#'             Useful for specifying \code{height} and \code{width}.
+#' @param ...  Additional arguments passed to `DiagrammeR::mermaid`.
+#'             Useful for specifying `height` and `width`.
 #'
 #' @return Plots a sequence diagram, invisibly returning a
-#'   \code{DiagrammeR::mermaid} object.
+#'   `DiagrammeR::mermaid` object.
 #'
-#' @seealso \code{DiagrammeR::mermaid}.
+#' @seealso `DiagrammeR::mermaid`.
 #'
 #' @include simList-accessors.R
 #' @export
@@ -270,25 +270,25 @@ setMethod(
 #'
 #' Create a network diagram illustrating the simplified module dependencies of a
 #' simulation. Offers a less detailed view of specific objects than does
-#' plotting the \code{depsEdgeList} directly with \code{\link{objectDiagram}}.
+#' plotting the `depsEdgeList` directly with [objectDiagram()].
 #'
-#' @param sim  A \code{simList} object (typically corresponding to a
+#' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
-#' @param type  Character string, either \code{"rgl"} for \code{igraph::rglplot}
-#' or \code{"tk"} for \code{igraph::tkplot}, \code{"Plot"} to use quickPlot::Plot
-#' or \code{"plot"} to use base::plot, the default.
+#' @param type  Character string, either `"rgl"` for `igraph::rglplot`
+#' or `"tk"` for `igraph::tkplot`, `"Plot"` to use quickPlot::Plot
+#' or `"plot"` to use base::plot, the default.
 #'
 #' @param showParents Logical. If TRUE, then any children that are grouped into parent
 #'                    modules will be grouped together by colored blobs. Internally,
-#'                    this is calling \code{\link{moduleGraph}}. Default \code{FALSE}.
+#'                    this is calling [moduleGraph()]. Default `FALSE`.
 #'
 #'
-#' @param ...  Additional arguments passed to plotting function specified by \code{type}.
+#' @param ...  Additional arguments passed to plotting function specified by `type`.
 #'
 #' @return Plots module dependency diagram.
 #'
-#' @seealso \code{\link{igraph}}, \code{\link{moduleGraph}} for a version that accounts for
+#' @seealso [igraph()], [moduleGraph()] for a version that accounts for
 #' parent and children module structure.
 #'
 #' @include simList-accessors.R
@@ -470,9 +470,9 @@ setMethod(
 #'
 #' @inheritParams depsEdgeList
 #'
-#' @param ... Arguments passed to \code{Plot}
+#' @param ... Arguments passed to `Plot`
 #'
-#' @return A list with 2 elements, an \code{\link{igraph}} object and an \code{igraph}
+#' @return A list with 2 elements, an [igraph()] object and an `igraph`
 #' communities object.
 #'
 #' @author Eliot McIntire

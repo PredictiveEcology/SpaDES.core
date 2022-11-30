@@ -46,18 +46,18 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 }
 
 ###############################################################################
-#' Load simulation objects according to \code{filelist}
+#' Load simulation objects according to `filelist`
 #'
 #' This function has two roles: 1) to proceed with the loading of files that
 #' are in a simList or 2) as a short cut to simInit(inputs = filelist). Generally
 #' not to be used by a user.
 #'
-#' @seealso \code{\link{inputs}}
+#' @seealso [inputs()]
 #'
-#' @param sim      \code{simList} object.
+#' @param sim      `simList` object.
 #'
-#' @param filelist \code{list} or \code{data.frame} to call \code{loadFiles} directly from the
-#'                  \code{filelist} as described in Details
+#' @param filelist `list` or `data.frame` to call `loadFiles` directly from the
+#'                  `filelist` as described in Details
 #'
 #' @param ...      Additional arguments.
 #'
@@ -287,19 +287,19 @@ setMethod("loadFiles",
 #######################################################
 #' Read raster to memory
 #'
-#' Wrapper to the \code{raster} function, that creates the raster object in
+#' Wrapper to the `raster` function, that creates the raster object in
 #' memory, even if it was read in from file. There is the default method which is
 #' just a pass through, so this can be safely used on large complex objects,
-#' recursively, e.g., a \code{simList}.
+#' recursively, e.g., a `simList`.
 #'
 #' @param x An object passed directly to the function raster (e.g., character string of a filename).
 #'
-#' @param ... Additional arguments to \code{raster::raster}, \code{raster::stack},
-#' or \code{raster::brick}.
+#' @param ... Additional arguments to `raster::raster`, `raster::stack`,
+#' or `raster::brick`.
 #'
 #' @return A raster object whose values are stored in memory.
 #'
-#' @seealso \code{\link{raster}}.
+#' @seealso [raster()].
 #'
 #' @name rasterToMemory
 #' @importFrom raster getValues raster setValues
@@ -351,16 +351,16 @@ setMethod("rasterToMemory",
 })
 
 
-#' Simple wrapper to load any \code{Raster*} object
-#' This wraps either \code{raster::raster}, \code{raster::stack},
-#' or \code{raster::brick}, allowing a single function to be used
+#' Simple wrapper to load any `Raster*` object
+#' This wraps either `raster::raster`, `raster::stack`,
+#' or `raster::brick`, allowing a single function to be used
 #' to create a new object of the same class as a template.
 #'
 #' @export
-#' @param x An object, notably a \code{Raster*} object. All others will simply
+#' @param x An object, notably a `Raster*` object. All others will simply
 #'   be passed through with no effect.
-#' @param ... Passed to \code{raster::raster}, \code{raster::stack},
-#' or \code{raster::brick}
+#' @param ... Passed to `raster::raster`, `raster::stack`,
+#' or `raster::brick`
 #'
 #' @details
 #' A new (empty) object of same class as the original.
@@ -374,23 +374,23 @@ rasterCreate.default <- function(x, ...) {
   x
 }
 
-#' @describeIn rasterCreate Uses \code{raster::brick}
+#' @describeIn rasterCreate Uses `raster::brick`
 rasterCreate.RasterBrick <- function(x, ...) {
   raster::brick(x, ...)
 }
 
-#' @describeIn rasterCreate Uses \code{raster::raster}
+#' @describeIn rasterCreate Uses `raster::raster`
 rasterCreate.RasterLayer <- function(x, ...) {
   raster::raster(x, ...)
 }
 
-#' @describeIn rasterCreate Uses \code{raster::stack}
+#' @describeIn rasterCreate Uses `raster::stack`
 rasterCreate.RasterStack <- function(x, ...) {
   raster::stack(x, ...)
 }
 
-#' @describeIn rasterCreate Uses \code{raster::raster} when one of the other,
-#'   less commonly used \code{Raster*} classes, e.g., \code{RasterLayerSparse}
+#' @describeIn rasterCreate Uses `raster::raster` when one of the other,
+#'   less commonly used `Raster*` classes, e.g., `RasterLayerSparse`
 rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
 }

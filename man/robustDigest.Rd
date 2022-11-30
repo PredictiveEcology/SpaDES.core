@@ -31,7 +31,7 @@ Default is \code{getOption("reproducible.length")}, which is set to \code{Inf}.}
 
 \item{quick}{Logical or character. If \code{TRUE},
 no disk-based information will be assessed, i.e., only
-memory content. See Details section about \code{quick} in \code{\link[reproducible]{Cache}}.}
+memory content. See Details section about \code{quick} in \code{\link[reproducible:Cache]{Cache()}}.}
 
 \item{classOptions}{Optional list. This will pass into \code{.robustDigest} for
 specific classes. Should be options that the \code{.robustDigest} knows what
@@ -42,13 +42,13 @@ This is intended to be used within the \code{Cache} function, but can be used to
 a \code{simList} would look like once it is converted to a repeatably digestible object.
 }
 \details{
-See \code{\link[reproducible]{robustDigest}}.
+See \code{\link[reproducible:robustDigest]{reproducible::.robustDigest()}}.
 This method strips out stuff from a \code{simList} class object that would make it otherwise not
 reproducibly digestible between sessions, operating systems, or machines.
 This will likely still not allow identical digest results across R versions.
 }
 \seealso{
-\code{\link[reproducible]{robustDigest}}
+\code{\link[reproducible:robustDigest]{reproducible::.robustDigest()}}
 }
 \author{
 Eliot McIntire

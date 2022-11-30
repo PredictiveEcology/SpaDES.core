@@ -7,13 +7,13 @@
 \S4method{.checkCacheRepo}{list}(object, create = FALSE)
 }
 \arguments{
-\item{object}{An R object}
+\item{object}{Any R object returned from a function}
 
 \item{create}{Logical. If TRUE, then it will create the path for cache.}
 }
 \description{
-See \code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}.
+See \link[reproducible:exportedMethods]{reproducible::.checkCacheRepo}.
 }
 \seealso{
-\code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}
+\link[reproducible:exportedMethods]{reproducible::.checkCacheRepo}
 }

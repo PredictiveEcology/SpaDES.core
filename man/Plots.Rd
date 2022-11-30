@@ -12,7 +12,7 @@ Plots(
   path = quote(file.path(outputPath(sim), "figures")),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ggsaveArgs = list(),
-  usePlot = TRUE,
+  usePlot = getOption("spades.PlotsUsePlot", FALSE),
   deviceArgs = list(),
   ...
 )
@@ -22,7 +22,7 @@ Plots(
 the first argument to \code{Plot} function, and should contain all the data
 required for the inner plotting. If passing a \code{RasterLayer},
 it may be a good idea to set \code{names(RasterLayer)} so that
-multiple layers can be plotted without overlapping eachother. When a custom \code{fn}
+multiple layers can be plotted without overlapping each other. When a custom \code{fn}
 is used and all arguments for \code{fn} are supplied and named, then this can be omitted.
 See examples.}
 
@@ -64,7 +64,7 @@ Specifically, the two common formats would be to \code{"screen"} or to disk as a
 such as \code{"png"}.
 \emph{THIS CURRENTLY HAS BEEN TESTED WITH \code{ggplot2}, \code{RasterLayer}, and
 \code{tmap} objects.}
-The default (or change with e.g., \code{fn = "print", usePlot = FALSE}) uses
+The default (or change with e.g., \verb{fn = "print", usePlot = FALSE}) uses
 \code{Plot} internally, so individual plots may be rearranged. When saved to
 disk (e.g., via \code{type = 'png'}), then \code{Plot} will not be used and the single object
 that is the result of this \code{Plots} call will be saved to disk.

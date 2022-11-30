@@ -18,7 +18,7 @@ copyModule(from, to, path, ...)
 \item{to}{The name of the copy.}
 
 \item{path}{The path to a local module directory. Defaults to the path set by
-the \code{spades.modulePath} option. See \code{\link{setPaths}}.}
+the \code{spades.modulePath} option. See \code{\link[=setPaths]{setPaths()}}.}
 
 \item{...}{Additional arguments to \code{file.copy}, e.g., \code{overwrite = TRUE}.}
 }

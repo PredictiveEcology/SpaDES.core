@@ -6,29 +6,29 @@
 #' by scheduling checkpoint events.
 #'
 #' RNG save code adapted from:
-#' \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
-#' and \url{https://stackoverflow.com/q/13997444/1380598}
+#' <http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/>
+#' and <https://stackoverflow.com/q/13997444/1380598>
 #'
-#' @param sim           A \code{simList} simulation object.
+#' @param sim           A `simList` simulation object.
 #'
 #' @param eventTime    A numeric specifying the time of the next event.
 #'
 #' @param eventType      A character string specifying the type of event: one of
-#'                       either \code{"init"}, \code{"load"}, or \code{"save"}.
+#'                       either `"init"`, `"load"`, or `"save"`.
 #'
 #' @param debug         Optional logical flag determines whether sim debug info
-#'                      will be printed (default \code{debug = FALSE}).
+#'                      will be printed (default `debug = FALSE`).
 #'
-#' @return Returns the modified \code{simList} object.
+#' @return Returns the modified `simList` object.
 #'
-#' @seealso \code{\link{.Random.seed}}.
+#' @seealso [.Random.seed()].
 #'
 #' @author Alex Chubaty
 #'
 #' @include environment.R
 #' @include priority.R
 #' @importFrom quickPlot .objectNames
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @export
 #' @rdname checkpoint
 #'

@@ -11,7 +11,7 @@ unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 }
 \arguments{
 \item{filename}{Character giving the name of a saved simulation file.
-Currently, only filetypes \code{.qs} or \code{.rds} are supported.}
+Currently, only file types \code{.qs} or \code{.rds} are supported.}
 
 \item{paths}{A list of character vectors for all the \code{simList} paths. When
 loading a \code{simList}, this will replace the paths of everything to

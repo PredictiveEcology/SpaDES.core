@@ -9,7 +9,7 @@ scheduleConditionalEvent(
   condition,
   moduleName,
   eventType,
-  eventPriority = .pkgEnv$.normalVal,
+  eventPriority = .normal(),
   minEventTime = start(sim),
   maxEventTime = end(sim)
 )
@@ -34,7 +34,7 @@ Lower number means higher priority. As a best practice, it is
 recommended that decimal values are conceptual
 grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
 similar).
-See \code{\link{priority}}.}
+See \code{\link[=priority]{priority()}}.}
 
 \item{minEventTime}{A numeric specifying the time before which the event should not occur,
 even if the condition is met. Defaults to \code{start(sim)}}
@@ -57,7 +57,8 @@ to very low or even negative to ensure it gets inserted at the top of the event 
 \description{
 Adds a new event to the simulation's conditional event queue,
 updating the simulation object by creating or appending to
-\code{sim$._conditionalEvents}. This is very experimental. Use with caution.
+\code{sim$._conditionalEvents}.
+\emph{This is very experimental. Use with caution.}
 }
 \examples{
   sim <- simInit(times = list(start = 0, end = 2))
@@ -79,7 +80,7 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{scheduleEvent}}, \code{\link{conditionalEvents}}
+\code{\link[=scheduleEvent]{scheduleEvent()}}, \code{\link[=conditionalEvents]{conditionalEvents()}}
 }
 \author{
 Eliot McIntire

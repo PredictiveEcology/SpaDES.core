@@ -1,40 +1,58 @@
-## Maintenance release
+## Release information
 
-This is a maintenance release.
+This is a resubmission to restore the package to CRAN following archival due to removal of dependency package `Require`, which has now been restored to CRAN.
 See `NEWS.md` for a full list of changes.
 
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 20.04                 (GitHub), R 3.6.3
 * Ubuntu 20.04                 (GitHub), R 4.0.5
-* Windows                      (GitHub), R 3.6.3
+* Ubuntu 20.04                 (GitHub), R 4.1.3
 * Windows                      (GitHub), R 4.0.5
-* Windows                 (win-builder), R 4.0.5
+* Windows                      (GitHub), R 4.1.3
+* Windows                 (win-builder), R 4.1.3
 
 ### Current R versions
-* macOS 10.15.7 Catalina       (GitHub), R 4.1.2
-* macOS 11.6 Big Sur            (local), R 4.1.2
-* macOs (m1) Big Sur             (rhub), R 4.1.2
-* Ubuntu 20.04                 (GitHub), R 4.1.2
-* Ubuntu 20.04                  (local), R 4.1.2
-* Windows                      (GitHub), R 4.1.2
-* Windows                       (local), R 4.1.2
-* Windows                 (win-builder), R 4.1.2
+* macOS 11.7 Big Sur           (GitHub), R 4.2.2
+* macOS 11.7 Big Sur            (local), R 4.2.2
+* macOs (m1) Big Sur             (rhub), R 4.2.2
+* Ubuntu 20.04                 (GitHub), R 4.2.2
+* Ubuntu 20.04                  (local), R 4.2.2
+* Windows                      (GitHub), R 4.2.2
+* Windows                       (local), R 4.2.2
+* Windows                 (win-builder), R 4.2.2
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2022-01-17 r81508)
-* Ubuntu 20.04                  (local), R-devel (2022-01-17 r81511)
-* Windows                      (GitHub), R-devel (2022-01-17 r81511 ucrt)
-* Windows                 (win-builder), R-devel (2022-01-17 r81511)
+* Ubuntu 20.04                 (GitHub), R-devel (2022-11-24 r83383)
+* Ubuntu 20.04                  (local), R-devel (2022-11-24 r83383)
+* Windows                      (GitHub), R-devel (2022-10-11 r83083 ucrt)
+* Windows                 (win-builder), R-devel (2022-10-11 r83083 ucrt)
 
 ## R CMD check results
 
-There are no ERRORs nor WARNINGs.
+There are no errors, or warnings in any of the above.
 
-There was 1 NOTEs:
+There are some NOTEs:
 
-1. Some words were flagged as possibly misspelled, but they are false positives:
+The `NLMR` packages in Suggests are optionally installed from our R-universe repository
+(until the maintainers of that package are able to get it back on CRAN).
+Instructions for installation are provided in the README, DESCRIPTION, and via a message to the user.
+We believe this should satisfy the CRAN policy requirement regarding additional dependencies.
+
+        Suggests or Enhances not in mainstream repositories:
+          NLMR
+        Availability using Additional_repositories specification:
+          NLMR         yes   https://predictiveecology.r-universe.dev/
+
+Related to the above note:
+
+        The Description field contains
+          "https://PredictiveEcology.r-universe.dev")'.
+        Please enclose URLs in angle brackets (<...>).
+
+This URL is included as part of the command used to install these additional packages.
+
+Additionally, some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
           workflow (6:58)
@@ -42,7 +60,4 @@ There was 1 NOTEs:
 
 ## Downstream dependencies
 
-We checked 3 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
-
- * We saw 0 new problems
- * We failed to check 0 packages
+Currently none, but we are working to resubmit our other packages that depend on this one, and they are passing.

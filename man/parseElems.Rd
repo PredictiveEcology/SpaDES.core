@@ -14,8 +14,8 @@
 \item{envir}{An environment}
 }
 \description{
-See \code{\link[quickPlot:parseElems]{.parseElems}}.
+See \link[quickPlot:parseElems]{quickPlot::.parseElems}.
 }
 \seealso{
-\code{\link[quickPlot:parseElems]{.parseElems}}
+\link[quickPlot:parseElems]{quickPlot::.parseElems}
 }

@@ -28,7 +28,7 @@ zipModule(name, path, version, data = FALSE, ...)
 \item{data}{Logical. If \code{TRUE}, then the data subdirectory will be included in the zip.
 Default is \code{FALSE}.}
 
-\item{...}{Additional arguments to \code{\link{zip}}:
+\item{...}{Additional arguments to \code{\link[=zip]{zip()}}:
 e.g., add \code{"-q"} using \code{flags="-q -r9X"}
 (the default flags are \code{"-r9X"}).}
 }

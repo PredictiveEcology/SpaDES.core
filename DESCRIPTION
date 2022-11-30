@@ -9,17 +9,19 @@ Description: Provides the core framework for a discrete event system (DES) to
     reusable modules, tools for developing arbitrary automated workflows,
     automated interweaving of modules of different temporal resolution,
     and tools for visualizing and understanding the DES project.
+    The suggested package 'NLMR' can be installed with 
+    'install.packages("NLMR", repos = "https://PredictiveEcology.r-universe.dev")'.
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2022-06-03
-Version: 1.0.10.9015
+Date: 2022-11-25
+Version: 1.1.0.9005
 Authors@R: c(
-    person("Alex M", "Chubaty", email = "ahubaty@for-cast.ca",
+    person("Alex M", "Chubaty", email = "achubaty@for-cast.ca",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
-    person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
+    person("Eliot J B", "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
            role = c("aut"), comment = c(ORCID = "0000-0002-6914-8316")),
-    person("Yong", "Luo", email = "yluo1@lakeheadu.ca",
+    person("Yong", "Luo", email = "Yong.Luo@gov.bc.ca",
            role = c("ctb")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
            role = c("ctb")),
@@ -32,7 +34,7 @@ Authors@R: c(
 Depends:
     R (>= 4.0),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.8.9043)
+    reproducible (>= 1.2.9)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -59,19 +61,25 @@ Suggests:
     knitr,
     logging,
     magrittr,
+    NLMR (>= 1.1.1),
     pkgload,
     png,
-    RandomFields (>= 3.3.4),
     RColorBrewer (>= 1.1-2),
     rgdal,
     rmarkdown,
     roxygen2,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 0.2.0),
+    SpaDES.tools (>= 1.0.0.9001),
     tcltk,
     terra,
     testthat (>= 1.0.2)
+Remotes:
+    ropensci/NLMR,
+    PredictiveEcology/Require@development,
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.tools@development
+Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
@@ -125,4 +133,4 @@ Collate:
     'suppliedElsewhere.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.2

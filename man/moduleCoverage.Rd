@@ -19,7 +19,7 @@ The \code{moduleCoverage} object contains the percent value of unit test coverag
 for the module.
 The \code{functionCoverage} object contains percentage values for unit test
 coverage for each function defined in the module.
-Please use \code{\link[covr]{report}} to view the coverage information.
+Please use \code{\link[covr:report]{covr::report()}} to view the coverage information.
 Two data.tables give the information of all the tested and untested functions
 in the module.
 }
@@ -30,7 +30,7 @@ Calculate the test coverage by unit tests for the module and its functions.
 When running this function, the test files must be strictly placed in
 the \file{tests/testthat/} directory under module path.
 To automatically generate this folder, please set \code{unitTests = TRUE}
-when creating a new module using \code{\link{newModule}}.
+when creating a new module using \code{\link[=newModule]{newModule()}}.
 To accurately test your module, the test filename must follow the format
 \code{test-functionName.R}.
 }
@@ -48,7 +48,7 @@ To accurately test your module, the test filename must follow the format
 }
 }
 \seealso{
-\code{\link{newModule}}.
+\code{\link[=newModule]{newModule()}}.
 }
 \author{
 Yong Luo

@@ -18,6 +18,8 @@
 \alias{citation}
 \alias{citation,simList-method}
 \alias{citation,character-method}
+\alias{sessInfo}
+\alias{sessInfo,simList-method}
 \title{Metadata accessors}
 \usage{
 inputObjects(sim, module, path)
@@ -51,6 +53,10 @@ citation(package, lib.loc = NULL, auto = NULL, module = character())
 \S4method{citation}{simList}(package, lib.loc = NULL, auto = NULL, module = character())
 
 \S4method{citation}{character}(package, lib.loc = NULL, auto = NULL, module = character())
+
+sessInfo(sim)
+
+\S4method{sessInfo}{simList}(sim)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -65,7 +71,7 @@ Only relevant if \code{sim} not supplied.}
 using \code{setPaths}, it will use that. This will be ignored if \code{sim}
 is supplied and is required if \code{sim} not supplied}
 
-\item{package}{For compatibility with \code{\link[utils]{citation}}. This can be
+\item{package}{For compatibility with \code{\link[utils:citation]{utils::citation()}}. This can be
 a \code{simList} or a character string for a package name.}
 
 \item{lib.loc}{a character vector with path names of \R libraries, or
@@ -87,7 +93,7 @@ in a \code{simList} if not specified.
 }
 \examples{
 \dontrun{
-# To pre-install and pre-load all packages prior to \code{simInit}.
+# To pre-install and pre-load all packages prior to `simInit`.
 
 # set modulePath
 setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))

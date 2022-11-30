@@ -1,11 +1,11 @@
 ###############################################################################
-#' Check for existence of object(s) referenced by a \code{objects} slot of a
-#' \code{simList} object
+#' Check for existence of object(s) referenced by a `objects` slot of a
+#' `simList` object
 #'
-#' Check that a named object exists in the provide \code{simList} environment slot,
+#' Check that a named object exists in the provide `simList` environment slot,
 #' and optionally has desired attributes.
 #'
-#' @param sim     A \code{\link{simList}} object.
+#' @param sim     A [simList()] object.
 #'
 #' @param name    A character string specifying the name of an object to be checked.
 #'
@@ -13,13 +13,13 @@
 #'                  because it will fail if the object does not exist.
 #'
 #' @param layer   Character string, specifying a layer name in a Raster, if the
-#'                \code{name} is a \code{Raster*} object.
+#'                `name` is a `Raster*` object.
 #'
 #' @param ...    Additional arguments. Not implemented.
 #'
-#' @return Invisibly return \code{TRUE} indicating object exists; \code{FALSE} if not.
+#' @return Invisibly return `TRUE` indicating object exists; `FALSE` if not.
 #'
-#' @seealso \code{\link{library}}.
+#' @seealso [library()].
 #'
 #' @importFrom quickPlot .objectNames
 #' @include simList-class.R
@@ -127,7 +127,7 @@ setMethod(
 #'
 #' @param ...    Additional arguments. Not implemented.
 #'
-#' @return  Invisibly return \code{TRUE} indicating object exists; \code{FALSE} if not.
+#' @return  Invisibly return `TRUE` indicating object exists; `FALSE` if not.
 #'          Sensible messages are be produced identifying missing parameters.
 #'
 #' @include simList-class.R

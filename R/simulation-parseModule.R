@@ -3,7 +3,7 @@ utils::globalVariables(".")
 ################################################################################
 #' Determine which modules in a list are unparsed
 #'
-#' Internal function, used during \code{\link{simInit}}.
+#' Internal function, used during [simInit()].
 #'
 #' @param modules A character vector specifying the modules to parse.
 #'
@@ -35,10 +35,10 @@ setMethod(
 #' @param envir Optional environment in which to store parsed code. This may be
 #'              useful if the same file is being parsed multiple times. This
 #'              function will check in that envir for the parsed file before
-#'              parsing again. If the \code{envir} is transient, then this will
+#'              parsing again. If the `envir` is transient, then this will
 #'              have no effect.
 #'
-#' @return \code{.parseModulePartial} extracts just the individual element
+#' @return `.parseModulePartial` extracts just the individual element
 #' requested from the module. This can be useful if parsing the whole module
 #' would cause an error.
 #'
@@ -51,7 +51,7 @@ setMethod(
 setGeneric(".parseModulePartial",
            function(sim, modules, filename, defineModuleElement, envir = NULL) {
              standardGeneric(".parseModulePartial")
-           })
+})
 
 #' @rdname parseModule
 setMethod(
@@ -81,7 +81,7 @@ setMethod(
         eval(out),
         error = function(x) {
           if (any(grepl("bind_rows", out))) { # historical artifact
-            if (!require("dplyr"))
+            if (!require("dplyr", quietly = TRUE))
               stop("To read module: '", gsub("\\.R", "", basename(filename)),
                    "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
             out <- eval(out)
@@ -93,7 +93,7 @@ setMethod(
       out <- NULL
     }
     return(out)
-  })
+})
 
 #' @rdname parseModule
 setMethod(
@@ -144,23 +144,23 @@ setMethod(
 
 #' Parse and initialize a module
 #'
-#' Internal function, used during \code{\link{simInit}}.
+#' Internal function, used during [simInit()].
 #'
-#' @param sim     A \code{simList} simulation object.
+#' @param sim     A `simList` simulation object.
 #'
 #' @param modules A list of modules with a logical attribute "parsed".
 #'
-#' @param userSuppliedObjNames Character string (or \code{NULL}, the default)
+#' @param userSuppliedObjNames Character string (or `NULL`, the default)
 #'                             indicating the names of objects that user has passed
 #'                             into simInit via objects or inputs.
 #'                             If all module inputObject dependencies are provided by user,
-#'                             then the \code{.inputObjects} code will be skipped.
+#'                             then the `.inputObjects` code will be skipped.
 #'
-#' @param notOlderThan Passed to \code{Cache} that may be used for .inputObjects function call.
+#' @param notOlderThan Passed to `Cache` that may be used for .inputObjects function call.
 #'
-#' @param ... All \code{simInit} parameters.
+#' @param ... All `simInit` parameters.
 #'
-#' @return A \code{simList} simulation object.
+#' @return A `simList` simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @importFrom reproducible Cache
@@ -555,7 +555,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   activeCode
 }
 
-#' Extract the user-defined \code{.inputObjects} function from a module
+#' Extract the user-defined `.inputObjects` function from a module
 #'
 #' @keywords internal
 #' @rdname getModuleInputObjects
@@ -570,7 +570,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
 #' Check is module uses module namespacing
 #'
-#' Older modules may not have their functions etc. namespaced in the \code{simList}.
+#' Older modules may not have their functions etc. namespaced in the `simList`.
 #'
 #' @keywords internal
 #' @rdname isNamespaced

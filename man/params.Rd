@@ -64,33 +64,36 @@ part for speed (e.g., 2-4x faster) is specifying the moduleName.
 Specifying the parameter name is <5\% faster.
 }
 \examples{
-modules <- list("randomLandscapes")
-paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-mySim <- simInit(modules = modules, paths = paths,
-                 params = list(.globals = list(stackName = "landscape")))
+if (require("NLMR", quietly = TRUE) &&
+    require("SpaDES.tools", quietly = TRUE)) {
+  modules <- list("randomLandscapes")
+  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  mySim <- simInit(modules = modules, paths = paths,
+                   params = list(.globals = list(stackName = "landscape")))
 
-# update some parameters using assignment -- currently only params will work
-params(mySim)$randomLandscapes$nx <- 200
-params(mySim)$randomLandscapes$ny <- 200
+  # update some parameters using assignment -- currently only params will work
+  params(mySim)$randomLandscapes$nx <- 200
+  params(mySim)$randomLandscapes$ny <- 200
 
-parameters(mySim) # Does not contain these user overridden values
+  parameters(mySim) # Does not contain these user overridden values
 
-# These next 2 are same here because they are not within a module
-P(mySim)          # Does contain the user overridden values
-params(mySim)     # Does contain the user overridden values
+  # These next 2 are same here because they are not within a module
+  P(mySim)          # Does contain the user overridden values
+  params(mySim)     # Does contain the user overridden values
 
-# NOTE -- deleting a parameter will affect params and P, not parameters
-params(mySim)$randomLandscapes$nx <- NULL
-params(mySim)$randomLandscapes$ny <- NULL
+  # NOTE -- deleting a parameter will affect params and P, not parameters
+  params(mySim)$randomLandscapes$nx <- NULL
+  params(mySim)$randomLandscapes$ny <- NULL
 
-parameters(mySim) # Shows nx and ny
+  parameters(mySim) # Shows nx and ny
 
-# These next 2 are same here because they are not within a module
-P(mySim)          # nx and ny are Gone
-params(mySim)     # nx and ny are Gone
+  # These next 2 are same here because they are not within a module
+  P(mySim)          # nx and ny are Gone
+  params(mySim)     # nx and ny are Gone
+}
 }
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.1 on Simulation parameters.
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation parameters.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

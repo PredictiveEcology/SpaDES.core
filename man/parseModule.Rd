@@ -66,7 +66,7 @@ would cause an error.
 A \code{simList} simulation object.
 }
 \description{
-Internal function, used during \code{\link{simInit}}.
+Internal function, used during \code{\link[=simInit]{simInit()}}.
 }
 \author{
 Eliot McIntire

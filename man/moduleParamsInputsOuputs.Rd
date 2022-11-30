@@ -52,7 +52,7 @@ knitr::kable(o)
 #' }
 }
 \seealso{
-\code{\link{moduleMetadata}}
+\code{\link[=moduleMetadata]{moduleMetadata()}}
 }
 \author{
 Alex Chubaty

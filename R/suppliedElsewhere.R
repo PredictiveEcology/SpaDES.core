@@ -3,38 +3,38 @@ utils::globalVariables(c("objName", "V1"))
 
 #' Assess whether an object has or will be supplied from elsewhere
 #'
-#' When loading objects into a \code{simList}, especially during the
-#' \code{simInit} call, and inside the \code{.inputObjects} functions of modules,
+#' When loading objects into a `simList`, especially during the
+#' `simInit` call, and inside the `.inputObjects` functions of modules,
 #' it is often useful to know if an object in question will or has been
-#' by the user via the \code{inputs} or \code{objects} arguments, or by another
-#' module's \code{.inputObjects} while preparing its expected inputs (via
-#' \code{expectsInputs} in metadata), or if it will be supplied by another
-#' module during its \code{"init"} event. In all these cases, it may not
-#' be necessary for a given module to load any default value for its \code{expectsInputs}.
+#' by the user via the `inputs` or `objects` arguments, or by another
+#' module's `.inputObjects` while preparing its expected inputs (via
+#' `expectsInputs` in metadata), or if it will be supplied by another
+#' module during its `"init"` event. In all these cases, it may not
+#' be necessary for a given module to load any default value for its `expectsInputs`.
 #' This function can be used as a check to determine whether the module needs
 #' to proceed in getting and assigning its default value.
 #'
 #' @param object Character vector
-#' @param sim A \code{simList} in which to evaluated whether the object is supplied elsewhere
+#' @param sim A `simList` in which to evaluated whether the object is supplied elsewhere
 #' @param where Character vector with one to three of "sim", "user", or "initEvent".
 #'        Default is all three. Partial matching is used. See details.
-#' @param returnWhere Logical, default \code{FALSE}, whether the vector of length
+#' @param returnWhere Logical, default `FALSE`, whether the vector of length
 #'   3 logical should be returned, or a logical of length one
 #' @export
 #'
 #' @details
 #'
-#' \code{where} indicates which of three places to search, either \code{"sim"} i.e.,
-#' the \code{simList}, which would be equivalent to \code{is.null(sim\$objName)}, or
-#' \code{"user"} which would be supplied by the user in the \code{simInit} function
-#' call via \code{outputs} or \code{inputs} (equivalent to
-#' \code{(!('defaultColor' \%in\% sim$.userSuppliedObjNames))}),
-#' or \code{"initEvent"}, which would test whether a module that gets loaded \bold{before}
-#' the present one \bold{will} create it as part of its outputs (i.e., as indicated by
-#' \code{createsOutputs} in that module's metadata). There is a caveat to this test,
-#' however; if that other event also has the object as an \code{expectsInput}, then
-#' it would fail this test, as it \emph{also} needs it as an input.
-#' This final one (\code{"initEvent"})
+#' `where` indicates which of three places to search, either `"sim"` i.e.,
+#' the `simList`, which would be equivalent to `is.null(sim\$objName)`, or
+#' `"user"` which would be supplied by the user in the `simInit` function
+#' call via `outputs` or `inputs` (equivalent to
+#' `(!('defaultColor' \%in\% sim$.userSuppliedObjNames))`),
+#' or `"initEvent"`, which would test whether a module that gets loaded **before**
+#' the present one **will** create it as part of its outputs (i.e., as indicated by
+#' `createsOutputs` in that module's metadata). There is a caveat to this test,
+#' however; if that other event also has the object as an `expectsInput`, then
+#' it would fail this test, as it *also* needs it as an input.
+#' This final one (`"initEvent"`)
 #' does not explicitly test that the object will be created in the "init" event, only that
 #' it is in the outputs of that module, and that it is a module that is loaded prior to
 #' this one.

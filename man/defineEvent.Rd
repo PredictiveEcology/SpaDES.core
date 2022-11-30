@@ -76,5 +76,5 @@ events(sim) # shows the "init" we just added
 
 }
 \seealso{
-\code{\link{defineModule}}, \code{\link{simInit}}, \code{\link{scheduleEvent}}
+\code{\link[=defineModule]{defineModule()}}, \code{\link[=simInit]{simInit()}}, \code{\link[=scheduleEvent]{scheduleEvent()}}
 }

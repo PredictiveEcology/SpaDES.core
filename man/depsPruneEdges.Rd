@@ -10,7 +10,7 @@
 \S4method{.depsPruneEdges}{data.table}(simEdgeList)
 }
 \arguments{
-\item{simEdgeList}{An edge list (\code{data.table}) produced by \code{\link{depsEdgeList}}.}
+\item{simEdgeList}{An edge list (\code{data.table}) produced by \code{\link[=depsEdgeList]{depsEdgeList()}}.}
 }
 \value{
 An updated edge list object.

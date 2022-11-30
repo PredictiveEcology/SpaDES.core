@@ -13,19 +13,19 @@ setOldClass("person", S4Class = "person4")
 selectMethod("show", "person")
 removeClass("person4")
 
-#' Create an empty \code{data.frame} object for use with \code{inputObjects} or
-#' \code{outputObjects}
+#' Create an empty `data.frame` object for use with `inputObjects` or
+#' `outputObjects`
 #'
 #' Internal function.
 #'
 #' @param x Not used. Should be missing.
 #'
-#' @return A \code{data.frame} object.
+#' @return A `data.frame` object.
 #'
 #' @author Alex Chubaty
 #' @keywords internal
 #' @rdname inputObjectsDF
-#' @seealso \code{\link{defineModule}}
+#' @seealso [defineModule()]
 setGeneric("._inputObjectsDF", function(x) {
   standardGeneric("._inputObjectsDF")
 })
@@ -58,7 +58,7 @@ setMethod("._outputObjectsDF",
 })
 
 ################################################################################
-#' The \code{.moduleDeps} class
+#' The `.moduleDeps` class
 #'
 #' Descriptor object for specifying SpaDES module dependencies.
 #'
@@ -68,59 +68,59 @@ setMethod("._outputObjectsDF",
 #'
 #' @slot keywords       Character vector containing a module's keywords.
 #'
-#' @slot authors        The author(s) of the module as a \code{\link{person}} object.
+#' @slot authors        The author(s) of the module as a [person()] object.
 #'
 #' @slot childModules   A character vector of child module names.
 #'                      Modules listed here will be loaded with this module.
 #'
-#' @slot version        The module version as a \code{numeric_version}.
-#'                      Semantic versioning is assumed \url{https://semver.org/}.
+#' @slot version        The module version as a `numeric_version`.
+#'                      Semantic versioning is assumed <https://semver.org/>.
 #'
 #' @slot spatialExtent  Specifies the module's spatial extent as an
-#'                      \code{\link{Extent}} object. Default is \code{NA}.
+#'                      [Extent()] object. Default is `NA`.
 #'
 #' @slot timeframe      Specifies the valid timeframe for which the module was
-#'                      designed to simulate. Must be a \code{\link{POSIXt}}
+#'                      designed to simulate. Must be a [POSIXt()]
 #'                      object of length 2, specifying the start and end times
-#'                      (e.g., \code{as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))}).
-#'                      Can be specified as \code{NA} using \code{as.POSIXlt(c(NA, NA))}.
+#'                      (e.g., `as.POSIXlt(c("1990-01-01 00:00:00", "2100-12-31 11:59:59"))`).
+#'                      Can be specified as `NA` using `as.POSIXlt(c(NA, NA))`.
 #'
 #' @slot timeunit       Describes the time (in seconds) corresponding to 1.0
-#'                      simulation time units. Default is \code{NA}.
+#'                      simulation time units. Default is `NA`.
 #'
 #' @slot citation       A list of citations for the module, each as character strings.
-#'                      Alternatively, list of filenames of \code{.bib} or similar files.
-#'                      Defaults to \code{NA_character_}.
+#'                      Alternatively, list of filenames of `.bib` or similar files.
+#'                      Defaults to `NA_character_`.
 #'
 #' @slot documentation  List of filenames referring to module documentation sources.
 #'
 #' @slot reqdPkgs       Character vector of R package names to be loaded.
-#'                      Defaults to \code{NA_character_}.
+#'                      Defaults to `NA_character_`.
 #'
-#' @slot parameters     A \code{data.frame} specifying the object dependencies
-#'                      of the module, with columns \code{paramName},
-#'                      \code{paramClass}, and \code{default}, whose values are
-#'                      of type \code{character}, \code{character}, and
-#'                      \code{ANY}, respectively. Default values may be
+#' @slot parameters     A `data.frame` specifying the object dependencies
+#'                      of the module, with columns `paramName`,
+#'                      `paramClass`, and `default`, whose values are
+#'                      of type `character`, `character`, and
+#'                      `ANY`, respectively. Default values may be
 #'                      overridden by the user by passing a list of parameters
-#'                      to \code{\link{simInit}}.
+#'                      to [simInit()].
 #'
-#' @slot inputObjects   A \code{data.frame} specifying the object dependencies of
-#'                      the module, with columns \code{objectName},
-#'                      \code{objectClass}, and \code{other}.
+#' @slot inputObjects   A `data.frame` specifying the object dependencies of
+#'                      the module, with columns `objectName`,
+#'                      `objectClass`, and `other`.
 #'                      For objects that are used within the module as both an
 #'                      input and an output, add the object to each of these
-#'                      \code{data.frame}s.
+#'                      `data.frame`s.
 #'
-#' @slot outputObjects  A \code{data.frame} specifying the objects output by the
-#'                      module, following the format of \code{inputObjects}.
+#' @slot outputObjects  A `data.frame` specifying the objects output by the
+#'                      module, following the format of `inputObjects`.
 #'
 #' @aliases .moduleDeps
 #' @rdname moduleDeps-class
 #' @importFrom raster extent
 #' @keywords internal
 #'
-#' @seealso \code{.simDeps}, \code{\link{spadesClasses}}
+#' @seealso `.simDeps`, [spadesClasses()]
 #'
 #' @author Alex Chubaty
 #'
@@ -197,13 +197,13 @@ setClass(
     }
 })
 
-#' The \code{.simDeps} class
+#' The `.simDeps` class
 #'
 #' Defines all simulation dependencies for all modules within a SpaDES simulation.
 #'
-#' @slot dependencies   List of \code{\link{.moduleDeps}} dependency objects.
+#' @slot dependencies   List of [.moduleDeps()] dependency objects.
 #'
-#' @seealso \code{\link{.moduleDeps}}, \code{\link{spadesClasses}}
+#' @seealso [.moduleDeps()], [spadesClasses()]
 #'
 #' @aliases .simDeps
 #' @keywords internal

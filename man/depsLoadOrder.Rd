@@ -12,7 +12,7 @@
 \arguments{
 \item{sim}{A \code{simList} object.}
 
-\item{simGraph}{An \code{\link{igraph}} object produced by \code{\link{depsGraph}}.}
+\item{simGraph}{An \code{\link[=igraph]{igraph()}} object produced by \code{\link[=depsGraph]{depsGraph()}}.}
 }
 \value{
 Character vector of module names, sorted in correct load order.
@@ -24,7 +24,7 @@ can be resolved, checking objects in the global environment, and finally,
 attempts to determine the load order for modules in the simulation.
 }
 \details{
-Uses \code{\link[igraph]{topo_sort}} to try to find a load order satisfying
+Uses \code{\link[igraph:topo_sort]{igraph::topo_sort()}} to try to find a load order satisfying
 all module object dependencies.
 }
 \author{

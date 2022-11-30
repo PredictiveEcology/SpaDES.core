@@ -11,7 +11,7 @@ checksums(module, path, ...)
 
 \item{path}{Character string giving the path to the module directory.}
 
-\item{...}{Passed to \code{\link[reproducible]{Checksums}}, notably, \code{write},
+\item{...}{Passed to \code{\link[reproducible:Checksums]{reproducible::Checksums()}}, notably, \code{write},
 \code{quickCheck},  \code{checksumFile} and \code{files}.}
 }
 \description{
@@ -45,8 +45,6 @@ To update your \file{CHECKSUMS.txt} files using the new algorithm:
 (\code{checksums(moduleName, tmpdir, write = TRUE)});
 \item copy the new checksums file to your working module directory
 (the one not in the temp dir)
-(\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
-               to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
-               overwrite = TRUE)}).
+(\code{file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'), to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'), overwrite = TRUE)}).
 }
 }

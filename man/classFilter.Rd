@@ -35,7 +35,7 @@ Vector of object names matching the class filter.
 Based on \url{https://stackoverflow.com/a/5158978/1380598}.
 }
 \note{
-\code{\link{inherits}} is used internally to check the object class,
+\code{\link[=inherits]{inherits()}} is used internally to check the object class,
 which can, in some cases, return results inconsistent with \code{is}.
 See \url{https://stackoverflow.com/a/27923346/1380598}.
 These (known) cases are checked manually and corrected.

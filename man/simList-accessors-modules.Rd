@@ -44,16 +44,16 @@ Accessor functions for the \code{depends} and \code{modules} slots in a
 \code{simList} object.
 These are included for advanced users.
 \tabular{ll}{
-\code{\link{depends}} \tab List of simulation module dependencies. (advanced) \cr
-\code{\link{modules}} \tab List of simulation modules to be loaded. (advanced) \cr
-\code{\link{inputs}} \tab List of loaded objects used in simulation. (advanced) \cr
+\code{\link[=depends]{depends()}} \tab List of simulation module dependencies. (advanced) \cr
+\code{\link[=modules]{modules()}} \tab List of simulation modules to be loaded. (advanced) \cr
+\code{\link[=inputs]{inputs()}} \tab List of loaded objects used in simulation. (advanced) \cr
 }
 }
 \details{
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.7 on Modules and dependencies.
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.7 on Modules and dependencies.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
