@@ -1278,23 +1278,34 @@ setMethod(
 
     if (cache) {
       return(
-        do.call(quote = TRUE, Cache,
-                args = append(
-                  list(
-                    spades,
-                    sim = sim,
-                    debug = debug,
-                    progress = progress,
-                    .plotInitialTime = .plotInitialTime,
-                    .saveInitialTime = .saveInitialTime,
-                    omitArgs = omitArgs,
-                    notOlderThan = notOlderThan,
-                    events = events,
-                    .plots = .plots
-                  ),
-                  dots
-               )
-        )
+        Cache(spades(sim = sim,
+                     debug = debug,
+                     progress = progress,
+                     .plotInitialTime = .plotInitialTime,
+                     .saveInitialTime = .saveInitialTime,
+                     omitArgs = omitArgs,
+                     notOlderThan = notOlderThan,
+                     events = events,
+                     .plots = .plots,
+                     ...
+        ))
+        # do.call(quote = TRUE, Cache,
+        #         args = append(
+        #           list(
+        #             spades,
+        #             sim = sim,
+        #             debug = debug,
+        #             progress = progress,
+        #             .plotInitialTime = .plotInitialTime,
+        #             .saveInitialTime = .saveInitialTime,
+        #             omitArgs = omitArgs,
+        #             notOlderThan = notOlderThan,
+        #             events = events,
+        #             .plots = .plots
+        #           ),
+        #           dots
+        #        )
+        # )
       )
     } else {
       return(

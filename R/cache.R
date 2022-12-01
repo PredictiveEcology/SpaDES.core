@@ -189,7 +189,11 @@ setMethod(
       })
     }
 
-    obj[nonDotList] <- lapply(nonDotList, function(x) .robustDigest(slot(object, x), algo = algo))
+    # outputs --> should not be treated like inputs; if they change, it is OK, so just outputs as a data.frame,
+    #   not files
+    nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
+    obj[nonDotListNoOutputs] <- lapply(nonDotListNoOutputs, function(x) .robustDigest(slot(object, x), algo = algo))
+    obj["outputs"] <- .robustDigest(object@outputs, quick = TRUE)
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
@@ -472,7 +476,7 @@ if (!isGeneric(".prepareOutput")) {
 setMethod(
   ".prepareOutput",
   signature = "simList",
-  definition = function(object, cacheRepo, ...) {
+  definition = function(object, cachePath, ...) {
     tmpl <- list(...)
     # browser(expr = exists("._prepareOutput_5"))
     tmpl <- .findSimList(tmpl)

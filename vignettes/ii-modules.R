@@ -101,8 +101,8 @@ unlink(normalizePath(ftmp))
 
 ## ----eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7----
 # overview of the events in the simulation
-if (requireNamespace("DiagrammeR"))
-  eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
+if (!requireNamespace("DiagrammeR", quietly = TRUE)) Require::Install("DiagrammeR")
+eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
 ## ----checksums, eval=FALSE----------------------------------------------------
 #  ## 1. specify your module here
