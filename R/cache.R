@@ -348,19 +348,19 @@ setMethod(
 
     if (any(whSimList)) {
       # just take the first simList, if there are >1
-      cacheRepo <- object[whSimList][[1]]@paths$cachePath
+      cachePath <- object[whSimList][[1]]@paths$cachePath
     } else {
       doEventFrameNum <- .grepSysCalls(sys.calls(), "(^doEvent)|(^.parseModule)")[2]
 
       if (!is.na(doEventFrameNum)) {
         sim <- get("sim", envir = sys.frame(doEventFrameNum))
-        cacheRepo <- sim@paths$cachePath
+        cachePath <- sim@paths$cachePath
       } else {
-        cacheRepo <- .getOption("reproducible.cachePath")
-        #checkPath(cacheRepo, create = TRUE) #SpaDES dependency
+        cachePath <- .getOption("reproducible.cachePath")
+        #checkPath(cachePath, create = TRUE) #SpaDES dependency
       }
     }
-    checkPath(path = cacheRepo, create = create)
+    checkPath(path = cachePath, create = create)
 })
 
 if (!isGeneric(".addChangedAttr")) {

@@ -1351,7 +1351,7 @@ setMethod(
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
                 showSimilar = showSimilar,
-                     cacheRepo = sim@paths[["cachePath"]]))
+                     cachePath = sim@paths[["cachePath"]]))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,

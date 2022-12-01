@@ -44,9 +44,9 @@ Some of the details of the `simList`-specific features of this `Cache` function 
 
 - The function converts all elements that have an environment as part of their attributes into a format that has no unique environment attribute, using `format` if a function, and `as.list` in the case of the `simList` environment.
 
-- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cacheRepo` be specified.
-If called from inside a SpaDES module, `Cache` will use the `cacheRepo` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
-Similarly, if no `cacheRepo` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
+- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cachePath` be specified.
+If called from inside a SpaDES module, `Cache` will use the `cachePath` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
+Similarly, if no `cachePath` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
 To persist between sessions, use `SpaDES::setPaths()` every session.
 
 In a `SpaDES` context, there are several levels of caching that can be used as part of a reproducible workflow.
@@ -172,7 +172,7 @@ system.time({
                rand_dev = 10,
                rescale = FALSE,
                verbose = FALSE,
-               cacheRepo = cachePath(mySim),
+               cachePath = cachePath(mySim),
                userTags = "nlm_mpd",
                notOlderThan = Sys.time())
 })
@@ -187,7 +187,7 @@ system.time({
                      rand_dev = 10,
                      rescale = FALSE,
                      verbose = FALSE,
-                     cacheRepo = cachePath(mySim),
+                     cachePath = cachePath(mySim),
                      userTags = "nlm_mpd")
 })
 

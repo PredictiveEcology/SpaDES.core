@@ -81,7 +81,7 @@ system.time({
                rand_dev = 10,
                rescale = FALSE,
                verbose = FALSE,
-               cacheRepo = cachePath(mySim),
+               cachePath = cachePath(mySim),
                userTags = "nlm_mpd",
                notOlderThan = Sys.time())
 })
@@ -96,7 +96,7 @@ system.time({
                      rand_dev = 10,
                      rescale = FALSE,
                      verbose = FALSE,
-                     cacheRepo = cachePath(mySim),
+                     cachePath = cachePath(mySim),
                      userTags = "nlm_mpd")
 })
 

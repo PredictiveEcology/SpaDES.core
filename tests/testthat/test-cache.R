@@ -275,7 +275,7 @@ test_that("test .robustDigest for simLists", {
     mess1 <- capture_messages(do.call(simInit, args))
     msgGrep <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                     "There is no similar item in the cacheRepo", sep = "|")
+                     "There is no similar item in the cachePath", sep = "|")
     expect_true(all(grepl(msgGrep, mess1)))
 
     msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -293,7 +293,7 @@ test_that("test .robustDigest for simLists", {
 
     msgGrep <- paste("Running .input", "module code", "so not checking minimum package",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                     "There is no similar item in the cacheRepo", sep = "|")
+                     "There is no similar item in the cachePath", sep = "|")
     mess1 <- capture_messages(do.call(simInit, args))
     expect_true(all(grepl(msgGrep, mess1)))
 

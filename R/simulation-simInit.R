@@ -1189,7 +1189,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
-                       cacheRepo = sim@paths$cachePath,
+                       cachePath = sim@paths$cachePath,
                        classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                                             params = sim@params[[mBase]],
                                             modules = mBase),
