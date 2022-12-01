@@ -1330,7 +1330,6 @@ setMethod(
                            modules = cur[["moduleName"]])
     }
   }
-  browser()
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     expression(Cache(FUN = get(moduleCall, envir = fnEnv), useCloud = TRUE,
                 sim = sim,
