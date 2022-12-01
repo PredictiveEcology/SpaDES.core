@@ -1331,7 +1331,8 @@ setMethod(
     }
   }
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
-    expression(Cache(FUN = get(moduleCall, envir = fnEnv), useCloud = TRUE,
+    modCall <- get(moduleCall, envir = fnEnv)
+    expression(Cache(FUN = modCall,
                 sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,
