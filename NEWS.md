@@ -6,6 +6,12 @@ version 1.1.0.9000
 ## new features
 * `moduleMetadata` now handles multiple module paths
 
+## dependency changes
+* none
+
+## bug fixes
+* `setPaths()` ensures that paths exist before setting them
+
 version 1.1.0
 =============
 
