@@ -275,15 +275,14 @@ test_that("test .robustDigest for simLists", {
     mess1 <- capture_messages(do.call(simInit, args))
     msgGrep <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
+                     "Loading required package[:]",
                      "There is no similar item in the cachePath", sep = "|")
     expect_true(all(grepl(msgGrep, mess1)))
 
     msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
-    #a <- capture.output(
     expect_message(do.call(simInit, args), regexp = msgGrep)
-    #)
 
-    # make change to .inputObjects code -- should rerun .inputObjects
+    ## make change to .inputObjects code -- should rerun .inputObjects
     xxx <- readLines(fileName)
     startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
     editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
@@ -297,7 +296,7 @@ test_that("test .robustDigest for simLists", {
     mess1 <- capture_messages(do.call(simInit, args))
     expect_true(all(grepl(msgGrep, mess1)))
 
-    # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
+    ## make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
     xxx <- readLines(fileName)
     startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
     editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
@@ -505,8 +504,6 @@ test_that("Cache sim objs via .Cache attr", {
   })
   expect_true(sum(grepl("loaded cached copy of .inputObjects", mess10)) == 1)
   expect_true(exists("newFun", envir = mySim$.mods$test))
-
-
 
   # Test 2 in the "capture failed Cache"...
   # This should not recover the cache because it has a new .inputObjects function

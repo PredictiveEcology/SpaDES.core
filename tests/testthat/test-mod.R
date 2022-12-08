@@ -195,12 +195,12 @@ test_that("local mod object", {
 
   # Cached copy
   expect_true(any(grepl("loaded cached", mess)))
-  expect_true(out4$.mods$test$.objects$a == 2)
-  expect_true(out4$.mods$test2$.objects$a == 1)
-  expect_true(out4$.mods$test2$.objects$b == 2)
+  expect_true(out4$.mods$test$.objects$a == 2) ## TODO: fails (gets NULL)
+  expect_true(out4$.mods$test2$.objects$a == 1) ## TODO: fails (gets NULL)
+  expect_true(out4$.mods$test2$.objects$b == 2) ## TODO: fails (gets NULL)
   expect_true(is.null(out4$.mods$test2$.objects$x))
   expect_true(!is.null(out4$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out4$.mods$test2$.objects$y == "This module is test2")
+  expect_true(out4$.mods$test2$.objects$y == "This module is test2") ## TODO: fails (gets 'This module')
 
   # Test P replace method
   mySim3 <- simInit(times = list(start = 0, end = 0),
