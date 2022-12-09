@@ -6,31 +6,31 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 
 #' Find the latest module version from a SpaDES module repository
 #'
-#' Modified from \url{https://stackoverflow.com/a/25485782/1380598}.
+#' Modified from <https://stackoverflow.com/a/25485782/1380598>.
 #'
 #' @param name  Character string giving the module name.
 #'
-#' @param repo  GitHub repository name, specified as \code{"username/repo"}.
-#'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
-#'              specified by the global option \code{spades.moduleRepo}.
-#'              Only \code{master} branches can be used at this point.
+#' @param repo  GitHub repository name, specified as `"username/repo"`.
+#'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
+#'              specified by the global option `spades.moduleRepo`.
+#'              Only `master` branches can be used at this point.
 #'
 #' @export
 #' @rdname getModuleVersion
 #'
 #' @details
-#' \code{getModuleVersion} extracts a module's most recent version by
+#' `getModuleVersion` extracts a module's most recent version by
 #' looking at the module \file{.zip} files contained in the module directory.
 #' It takes the most recent version, based on the name of the zip file.
 #'
 #' See the modules vignette for details of module directory structure
-#' (\url{https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename}),
+#' (<https://spades-core.predictiveecology.org/articles/ii-modules.html#module-directory-structure-modulename>),
 #' and see our SpaDES-modules repo for details of module repository structure
-#' (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
+#' (<https://github.com/PredictiveEcology/SpaDES-modules>).
 #'
 #' @author Alex Chubaty
 #'
-#' @seealso \code{\link{zipModule}} for creating module \file{.zip} folders.
+#' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
 # igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
@@ -73,13 +73,13 @@ setMethod("getModuleVersion",
 ################################################################################
 #' Check for the existence of a remote module
 #'
-#' Looks in the remote \code{repo} for a module named \code{name}.
+#' Looks in the remote `repo` for a module named `name`.
 #'
 #' @param name  Character string giving the module name.
 #'
 #' @param repo  GitHub repository name.
-#'              Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
-#'              specified by the global option \code{spades.moduleRepo}.
+#'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
+#'              specified by the global option `spades.moduleRepo`.
 #'
 #' @export
 #' @rdname checkModule
@@ -153,7 +153,7 @@ setMethod("checkModule",
 ################################################################################
 #' Check for the existence of a module locally
 #'
-#' Looks the module path for a module named \code{name}, and checks for existence
+#' Looks the module path for a module named `name`, and checks for existence
 #' of all essential module files listed below.
 #'
 #' \itemize{
@@ -164,7 +164,7 @@ setMethod("checkModule",
 #' @param name  Character string giving the module name.
 #'
 #' @param path  Local path to modules directory.
-#'              Default is specified by the global option \code{spades.modulePath}.
+#'              Default is specified by the global option `spades.modulePath`.
 #'
 #' @param version Character specifying the desired module version.
 #'
@@ -238,43 +238,43 @@ setMethod(
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
 #'
 #' Currently only works with GitHub repositories where modules are located in
-#' a \code{modules} directory in the root tree on the \code{master} branch.
+#' a `modules` directory in the root tree on the `master` branch.
 #' Module .zip files' names should contain the version number and be inside their
-#' respective module folders (see \code{\link{zipModule}} for zip compression of modules).
+#' respective module folders (see [zipModule()] for zip compression of modules).
 #'
-#' @note \code{downloadModule} uses the \code{GITHUB_PAT} environment variable
+#' @note `downloadModule` uses the `GITHUB_PAT` environment variable
 #' if a value is set. This alleviates 403 errors caused by too-frequent downloads.
 #' Generate a GitHub personal access token with no additional permissions at
-#' \url{https://github.com/settings/tokens}, and add this key to \file{.Renviron}
-#' as \code{GITHUB_PAT=<your-github-pat-here>}.
+#' <https://github.com/settings/tokens>, and add this key to \file{.Renviron}
+#' as `GITHUB_PAT=<your-github-pat-here>`.
 #'
 #' @note The default is to overwrite any existing files in the case of a conflict.
 #'
-#' @seealso \code{\link{zipModule}} for creating module .zip folders.
+#' @seealso [zipModule()] for creating module .zip folders.
 #'
 #' @inheritParams getModuleVersion
 #'
 #' @param path    Character string giving the location in which to save the
 #'                downloaded module.
 #'
-#' @param version The module version to download. (If not specified, or \code{NA},
+#' @param version The module version to download. (If not specified, or `NA`,
 #'                the most recent version will be retrieved.)
 #'
-#' @param data    Logical. If \code{TRUE}, then the data that is identified in the
-#'                module metadata will be downloaded, if possible. Default \code{FALSE}.
+#' @param data    Logical. If `TRUE`, then the data that is identified in the
+#'                module metadata will be downloaded, if possible. Default `FALSE`.
 #'
-#' @param quiet   Logical. This is passed to \code{download.file} (default \code{FALSE}).
+#' @param quiet   Logical. This is passed to `download.file` (default `FALSE`).
 #'
-#' @param quickCheck Logical. If \code{TRUE}, then the check with local data will only
-#'                   use \code{file.size} instead of \code{digest::digest}.
+#' @param quickCheck Logical. If `TRUE`, then the check with local data will only
+#'                   use `file.size` instead of `digest::digest`.
 #'                   This is faster, but potentially much less robust.
 #'
 #' @param overwrite Logical. Should local module files be overwritten in case they exist?
-#'                  Default \code{FALSE}.
+#'                  Default `FALSE`.
 #'
 #' @return A list of length 2. The first element is a character vector containing
 #'    a character vector of extracted files for the module. The second element is
-#'    a \code{tbl} with details about the data that is relevant for the function,
+#'    a `tbl` with details about the data that is relevant for the function,
 #'    including whether it was downloaded or not, and whether it was renamed
 #'    (because there was a local copy that had the wrong file name).
 #'
@@ -290,7 +290,7 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
 })
 
 #' @rdname downloadModule
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @importFrom utils unzip zip
 #' @importFrom data.table setDF rbindlist
 setMethod(

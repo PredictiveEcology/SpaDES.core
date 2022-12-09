@@ -1,5 +1,5 @@
 test_that("test objectSynonyms", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
                                       spades.useRequire = FALSE#,
@@ -75,7 +75,7 @@ test_that("test objectSynonyms", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")
@@ -168,5 +168,4 @@ test_that("test objectSynonyms", {
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
-
-  })
+})

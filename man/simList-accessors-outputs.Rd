@@ -62,15 +62,15 @@ with up to 6 columns.
 
 \tabular{ll}{
 \code{objectName} \tab required, character string indicating the name of the object
-in the \code{simList} that will be saved to disk (without the \code{sim$} prefix).\cr
+in the \code{simList} that will be saved to disk (without the \verb{sim$} prefix).\cr
 
 \code{file} \tab optional, a character string indicating the file path to save to.
 The default is to concatenate \code{objectName} with the model timeunit and
-\code{saveTime}, separated by underscore, '\code{_}'. So a default filename would be
+\code{saveTime}, separated by underscore, '\verb{_}'. So a default filename would be
 \code{"Fires_year1.rds"}.\cr
 
 \code{fun} \tab optional, a character string indicating the function to use to
-save that file. The default is \code{\link{saveRDS}} \cr
+save that file. The default is \code{\link[=saveRDS]{saveRDS()}} \cr
 
 \code{package} \tab optional character string indicating the package in
 which to find the \code{fun});\cr

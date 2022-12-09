@@ -1,19 +1,21 @@
 test_that("saving files (and memoryUse)", {
-  skip_if_not_installed("RandomFields")
   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+  skip_if_not_installed("future")
+  skip_if_not_installed("future.callr")
+  skip_if_not_installed("NLMR")
+  skip_on_covr() ## issue with memoryUseSetup
 
-  if (!requireNamespace("future", quietly = TRUE)) {
-    skip("future package required")
-  }
   testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
-                          c("data.table", "future.callr", "future"))
+                          libraries = c("data.table", "future.callr", "future"))
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
 
   origPlan <- future::plan()
-  if (is(origPlan, "sequential"))
+  if (is(origPlan, "sequential")) {
     pl <- suppressWarnings(future::plan("multisession", workers = 2)) ## suppressed for checks in Rstudio
+  }
+
   on.exit({
     future::plan(origPlan)
   }, add = TRUE)
@@ -25,7 +27,8 @@ test_that("saving files (and memoryUse)", {
       .plotInitialTime = NA, torus = TRUE, .saveObjects = "caribou",
       .saveInitialTime = 1, .saveInterval = 1
     ),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
 
   outputs <- data.frame(
     expand.grid(objectName = c("caribou", "landscape"),
@@ -160,7 +163,7 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", ""))
   unlink(tmpfile[5])
@@ -269,6 +272,7 @@ test_that("saveSimList does not work correctly", {
 
 test_that("restart does not work correctly", {
   skip("restartR not possible in automated tests")
+  skip_if_not_installed("NLMR")
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
@@ -361,6 +365,7 @@ test_that("restart does not work correctly", {
 
 test_that("restart with logging", {
   skip("restartR with logging not possible in automated tests")
+  skip_if_not_installed("NLMR")
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")

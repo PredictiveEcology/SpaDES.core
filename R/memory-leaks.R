@@ -11,7 +11,7 @@ testObjectForLeak <- function(objs, envir, class, type, customMessage) {
         } else {
           os2 <- sum(unlist(objSize2(x)))
         }
-        if (os2 > os1 * 50) {
+        if (os2 > os1 * 50) { # was 50; probably should be
           memoryLeakWarning(class, type, nam, customMessage = customMessage)
         }
       }
@@ -37,6 +37,7 @@ testMemoryLeaks <- function(simEnv, modEnv, modName, knownObjects) {
   if (length(unlist(untested))) {
     out <- testObjectForLeak(untested$simObjects, simEnv, "formula", "simList",
                              customMessage = "It is suggested to put it in the simList as a character string, then eval it when needed")
+    # browser()
     out <- testObjectForLeak(untested$simObjects, simEnv, "function", "simList",
                              customMessage = "It is suggested to add it as a normal function in the module, not a nested function.")
     out <- testObjectForLeak(untested$modObjects, modEnv, "formula", "mod",

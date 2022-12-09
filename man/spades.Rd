@@ -58,7 +58,7 @@ the number of update intervals to show in a graphical progress bar.}
 
 \item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
 This means that if the call is made again with the same \code{simList},
-then `spades`` will return the return value from the previous run
+then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
@@ -82,11 +82,10 @@ will run \emph{all} their events, including internal spades modules, e.g., \code
 that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link{Plots}} for possible values. The parameter is intended to slowly
+See \code{\link[=Plots]{Plots()}} for possible values. The parameter is intended to slowly
 take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-For backwards compatibility, if \code{.plotInitialTime} is not set
-in this \code{spades} call, but this
-\code{.plots} is used, two things will happen: setting this without \code{"screen"}
+For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
+but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
 will turn off all plotting; setting this with \code{"screen"} will trigger
 plotting for any modules that use this parameter but will have no effect on
 other modules. To get plotting, therefore, it may be necessary to also set
@@ -206,7 +205,7 @@ moduleName (as character string) \tab All calls to that module will be entered
 interactively\cr
 eventName (as character string) \tab All calls that have that event name (in any module)
 will be entered interactively\cr
-\code{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
+\verb{c(<moduleName>, <eventName>)}  \tab Only the event in that specified module
 will be entered into. \cr
 Any other R expression expressed as a character string or quoted call \tab
 Will be evaluated with access to the simList as 'sim'.
@@ -301,10 +300,10 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{SpaDES.core-package}},
-\code{\link{simInit}}, and the caching vignette (very important for reproducibility):
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}},
+\code{\link[=simInit]{simInit()}}, and the caching vignette (very important for reproducibility):
 \url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
-uses \code{\link[reproducible]{Cache}}.
+uses \code{\link[reproducible:Cache]{reproducible::Cache()}}.
 }
 \author{
 Alex Chubaty and Eliot McIntire

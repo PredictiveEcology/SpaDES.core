@@ -1,4 +1,6 @@
 test_that("paths file does not work correctly", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit(setPaths = FALSE)
 
   on.exit({

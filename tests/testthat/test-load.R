@@ -1,5 +1,5 @@
 test_that("test-load.R: loading inputs does not work correctly", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
   on.exit({
@@ -113,7 +113,7 @@ test_that("test-load.R: loading inputs does not work correctly", {
 })
 
 test_that("test-load.R: passing arguments to filelist in simInit does not work correctly", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
   on.exit({
@@ -203,7 +203,7 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
 })
 
 test_that("test-load.R: passing objects to simInit does not work correctly", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
   on.exit({

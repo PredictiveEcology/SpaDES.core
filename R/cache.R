@@ -7,13 +7,13 @@ if (!isGeneric(".robustDigest")) {
   )
 }
 
-#' \code{.robustDigest} for \code{simList} objects
+#' `.robustDigest` for `simList` objects
 #'
-#' This is intended to be used within the \code{Cache} function, but can be used to evaluate what
-#' a \code{simList} would look like once it is converted to a repeatably digestible object.
+#' This is intended to be used within the `Cache` function, but can be used to evaluate what
+#' a `simList` would look like once it is converted to a repeatably digestible object.
 #'
-#' See \code{\link[reproducible]{robustDigest}}.
-#' This method strips out stuff from a \code{simList} class object that would make it otherwise not
+#' See [reproducible::.robustDigest()].
+#' This method strips out stuff from a `simList` class object that would make it otherwise not
 #' reproducibly digestible between sessions, operating systems, or machines.
 #' This will likely still not allow identical digest results across R versions.
 #'
@@ -22,13 +22,12 @@ if (!isGeneric(".robustDigest")) {
 #' @aliases Cache
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
-#' @importFrom fastdigest fastdigest
 #' @importFrom Require modifyList2
 #' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
 #' @rdname robustDigest
-#' @seealso \code{\link[reproducible]{robustDigest}}
+#' @seealso [reproducible::.robustDigest()]
 setMethod(
   ".robustDigest",
   signature = "simList",
@@ -190,7 +189,11 @@ setMethod(
       })
     }
 
-    obj[nonDotList] <- lapply(nonDotList, function(x) fastdigest(slot(object, x)))
+    # outputs --> should not be treated like inputs; if they change, it is OK, so just outputs as a data.frame,
+    #   not files
+    nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
+    obj[nonDotListNoOutputs] <- lapply(nonDotListNoOutputs, function(x) .robustDigest(slot(object, x), algo = algo))
+    obj["outputs"] <- .robustDigest(object@outputs, quick = TRUE)
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
@@ -209,10 +212,10 @@ if (!isGeneric(".tagsByClass")) {
   })
 }
 
-#' \code{.tagsByClass} for \code{simList} objects
+#' `.tagsByClass` for `simList` objects
 #'
-#' See \code{\link[reproducible:tagsByClass]{.tagsByClass}}. Adds current \code{moduleName},
-#' \code{eventType}, \code{eventTime}, and \code{function:spades} as \code{userTags}.
+#' See [reproducible::.tagsByClass]. Adds current `moduleName`,
+#' `eventType`, `eventTime`, and `function:spades` as `userTags`.
 #'
 #' @inheritParams reproducible::.tagsByClass
 #'
@@ -222,7 +225,7 @@ if (!isGeneric(".tagsByClass")) {
 #' @importFrom reproducible .grepSysCalls
 #' @importMethodsFrom reproducible .tagsByClass
 #' @include simList-class.R
-#' @seealso \code{\link[reproducible:tagsByClass]{.tagsByClass}}
+#' @seealso [reproducible::.tagsByClass]
 #' @rdname tagsByClass
 setMethod(
   ".tagsByClass",
@@ -260,9 +263,9 @@ if (!isGeneric(".cacheMessage")) {
   })
 }
 
-#' \code{.cacheMessage} for \code{simList} objects
+#' `.cacheMessage` for `simList` objects
 #'
-#' See \code{\link[reproducible:cacheMessage]{.cacheMessage}}.
+#' See [reproducible::.cacheMessage].
 #'
 #' @exportMethod .cacheMessage
 #' @importFrom crayon blue
@@ -271,7 +274,7 @@ if (!isGeneric(".cacheMessage")) {
 #' @inheritParams reproducible::.cacheMessage
 #' @include simList-class.R
 #' @rdname cacheMessage
-#' @seealso \code{\link[reproducible:cacheMessage]{.cacheMessage}}
+#' @seealso [reproducible::.cacheMessage]
 setMethod(
   ".cacheMessage",
   signature = "simList",
@@ -323,9 +326,9 @@ if (!isGeneric(".checkCacheRepo")) {
   })
 }
 
-#' \code{.checkCacheRepo} for \code{simList} objects
+#' `.checkCacheRepo` for `simList` objects
 #'
-#' See \code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}.
+#' See [reproducible::.checkCacheRepo].
 #'
 #' @inheritParams reproducible::.checkCacheRepo
 #'
@@ -335,7 +338,7 @@ if (!isGeneric(".checkCacheRepo")) {
 #' @importMethodsFrom reproducible .checkCacheRepo
 #' @include simList-class.R
 #' @rdname checkCacheRepo
-#' @seealso \code{\link[reproducible:checkCacheRepo]{.checkCacheRepo}}
+#' @seealso [reproducible::.checkCacheRepo]
 setMethod(
   ".checkCacheRepo",
   signature = "list",
@@ -345,19 +348,19 @@ setMethod(
 
     if (any(whSimList)) {
       # just take the first simList, if there are >1
-      cacheRepo <- object[whSimList][[1]]@paths$cachePath
+      cachePath <- object[whSimList][[1]]@paths$cachePath
     } else {
       doEventFrameNum <- .grepSysCalls(sys.calls(), "(^doEvent)|(^.parseModule)")[2]
 
       if (!is.na(doEventFrameNum)) {
         sim <- get("sim", envir = sys.frame(doEventFrameNum))
-        cacheRepo <- sim@paths$cachePath
+        cachePath <- sim@paths$cachePath
       } else {
-        cacheRepo <- .getOption("reproducible.cachePath")
-        #checkPath(cacheRepo, create = TRUE) #SpaDES dependency
+        cachePath <- .getOption("reproducible.cachePath")
+        #checkPath(cachePath, create = TRUE) #SpaDES dependency
       }
     }
-    checkPath(path = cacheRepo, create = create)
+    checkPath(path = cachePath, create = create)
 })
 
 if (!isGeneric(".addChangedAttr")) {
@@ -366,17 +369,17 @@ if (!isGeneric(".addChangedAttr")) {
   })
 }
 
-#' \code{.addChangedAttr} for \code{simList} objects
+#' `.addChangedAttr` for `simList` objects
 #'
-#' This will evaluate which elements in the \code{simList} object changed following
+#' This will evaluate which elements in the `simList` object changed following
 #' this Cached function call. It will add a named character string as an
-#' attribute \code{attr(x, ".Cache")$changed}, indicating which ones changed.
+#' attribute `attr(x, ".Cache")$changed`, indicating which ones changed.
 #' When this function is subsequently called again, only these changed objects
-#' will be returned. All other \code{simList} objects will remain unchanged.
+#' will be returned. All other `simList` objects will remain unchanged.
 #'
 #' @inheritParams reproducible::.addChangedAttr
 #'
-#' @seealso \code{\link[reproducible:addChangedAttr]{.addChangedAttr}}.
+#' @seealso [reproducible::.addChangedAttr].
 #'
 #' @export
 #' @exportMethod .addChangedAttr
@@ -384,7 +387,7 @@ if (!isGeneric(".addChangedAttr")) {
 #' @importMethodsFrom reproducible .addChangedAttr
 #' @include simList-class.R
 #' @rdname addChangedAttr
-#' @seealso \code{\link[reproducible:addChangedAttr]{.addChangedAttr}}
+#' @seealso [reproducible::.addChangedAttr]
 setMethod(
   ".addChangedAttr",
   signature = "simList",
@@ -424,8 +427,8 @@ setMethod(
         newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
         newObjs <- newObjs[!startsWith(newObjs, "._")]
         existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
-        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], fastdigest::fastdigest)
+        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
+        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
         changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
         changed <- c(newObjs, changedObjs)
       } else {
@@ -456,9 +459,9 @@ if (!isGeneric(".prepareOutput")) {
   })
 }
 
-#' \code{.prepareOutput} for \code{simList} objects
+#' `.prepareOutput` for `simList` objects
 #'
-#' See \code{\link[reproducible:prepareOutput]{.prepareOutput}}.
+#' See [reproducible::.prepareOutput].
 #'
 #' @inheritParams reproducible::.prepareOutput
 #'
@@ -469,11 +472,11 @@ if (!isGeneric(".prepareOutput")) {
 #' @importFrom reproducible .prepareOutput
 #' @importMethodsFrom reproducible .prepareOutput
 #' @rdname prepareOutput
-#' @seealso \code{\link[reproducible:prepareOutput]{.prepareOutput}}
+#' @seealso [reproducible::.prepareOutput]
 setMethod(
   ".prepareOutput",
   signature = "simList",
-  definition = function(object, cacheRepo, ...) {
+  definition = function(object, cachePath, ...) {
     tmpl <- list(...)
     # browser(expr = exists("._prepareOutput_5"))
     tmpl <- .findSimList(tmpl)
@@ -660,11 +663,11 @@ setMethod(
     }
 })
 
-#' Pre-digesting method for \code{simList}
+#' Pre-digesting method for `simList`
 #'
-#' Takes a snapshot of \code{simList} objects.
+#' Takes a snapshot of `simList` objects.
 #'
-#' See \code{\link[reproducible:preDigestByClass]{.preDigestByClass}}.
+#' See [reproducible::.preDigestByClass].
 #'
 #' @inheritParams reproducible::.preDigestByClass
 #'
@@ -675,7 +678,7 @@ setMethod(
 #' @importMethodsFrom reproducible .preDigestByClass
 #' @include simList-class.R
 #' @rdname preDigestByClass
-#' @seealso \code{\link[reproducible:preDigestByClass]{.preDigestByClass}}
+#' @seealso [reproducible::.preDigestByClass]
 setMethod(
   ".preDigestByClass",
   signature = "simList",
@@ -690,9 +693,9 @@ if (!isGeneric(".addTagsToOutput")) {
   })
 }
 
-#' \code{.addTagsToOutput} for \code{simList} objects
+#' `.addTagsToOutput` for `simList` objects
 #'
-#' See \code{\link[reproducible:addTagsToOutput]{.addTagsToOutput}}.
+#' See [reproducible::.addTagsToOutput].
 #'
 #' @inheritParams reproducible::.addTagsToOutput
 #'
@@ -704,7 +707,7 @@ if (!isGeneric(".addTagsToOutput")) {
 #' @importMethodsFrom reproducible .addTagsToOutput
 #' @include simList-class.R
 #' @rdname addTagsToOutput
-#' @seealso \code{\link[reproducible:addTagsToOutput]{.addTagsToOutput}}
+#' @seealso [reproducible::.addTagsToOutput]
 setMethod(
   ".addTagsToOutput",
   signature = "simList",
@@ -754,12 +757,12 @@ setMethod(
 })
 
 
-#' Find \code{simList} in a nested list
+#' Find `simList` in a nested list
 #'
-#' This is recursive, so it will find the all \code{simList}s even if they are deeply nested.
+#' This is recursive, so it will find the all `simList`s even if they are deeply nested.
 #'
 #' @param x any object, used here only when it is a list with at least one
-#'        \code{simList} in it
+#'        `simList` in it
 #'
 #' @rdname findSimList
 .findSimList <- function(x) {
@@ -782,13 +785,14 @@ if (!exists("objSize")) {
   objSize <- function(x, quick, enclosingEnvs, .prevEnvs, ...) UseMethod("objSize")
 }
 
-#' Object size for \code{simList}
+#' Object size for `simList`
 #'
-#' Recursively, runs \code{\link[reproducible]{objSize}} on the \code{simList} environment,
+#' Recursively, runs [reproducible::objSize()] on the `simList` environment,
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
-#' environments) plus, it adds all other "normal" elements of the \code{simList}, e.g.,
-#' \code{objSize(completed(sim))}. The output is structured into 2 elemenst: the sim environment
-#' and all its objects, and the other slots in the simList (e.g., events, completed, modules, etc.).
+#' environments) plus, it adds all other "normal" elements of the `simList`, e.g.,
+#' `objSize(completed(sim))`.
+#' The output is structured into 2 elements: the sim environment and all its objects,
+#' and the other slots in the `simList` (e.g., events, completed, modules, etc.).
 #' The returned object also has an attribute, "total", which shows the total size.
 #'
 #' @importFrom reproducible objSize
@@ -817,21 +821,21 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   return(total)
 }
 
-#' Make \code{simList} correctly work with \code{memoise}
+#' Make `simList` correctly work with `memoise`
 #'
-#' Because of the environment slot, \code{simList} objects don't correctly
-#' memoise a \code{simList}.
-#' This method for \code{simList} converts the object to a \code{simList_} first.
+#' Because of the environment slot, `simList` objects don't correctly
+#' memoise a `simList`.
+#' This method for `simList` converts the object to a `simList_` first.
 #'
 #' @inheritParams reproducible::makeMemoisable
 #'
-#' @return A \code{simList_} object or a \code{simList}, in the case
-#' of \code{unmakeMemoisable}.
+#' @return A `simList_` object or a `simList`, in the case
+#' of `unmakeMemoisable`.
 #'
 #' @importFrom reproducible makeMemoisable
 #' @include simList-class.R
 #' @rdname makeMemoisable
-#' @seealso \code{\link[reproducible]{makeMemoisable}}
+#' @seealso [reproducible::makeMemoisable()]
 #' @export
 makeMemoisable.simList <- function(x) {
   as(x, "simList_")
@@ -883,13 +887,13 @@ if (!isGeneric("clearCache")) {
   )
 }
 
-#' \code{clearCache} for \code{simList} objects
+#' `clearCache` for `simList` objects
 #'
-#' This will take the \code{cachePath(object)} and pass
+#' This will take the `cachePath(object)` and pass
 #'
-#' @param conn A \code{DBIConnection} object, as returned by \code{dbConnect()}.
-#' @param drv an object that inherits from \code{DBIDriver}, or an existing
-#'     \code{DBIConnection} object (in order to clone an existing connection).
+#' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
+#' @param drv an object that inherits from `DBIDriver`, or an existing
+#'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #'
 #' @export
@@ -917,9 +921,9 @@ if (!isGeneric("showCache")) {
   })
 }
 
-#' \code{showCache} for \code{simList} objects
+#' `showCache` for `simList` objects
 #'
-#' This will take the \code{cachePath(object)} and pass
+#' This will take the `cachePath(object)` and pass
 #' @export
 #'
 #' @importFrom reproducible showCache
@@ -940,9 +944,9 @@ if (!isGeneric("keepCache")) {
   })
 }
 
-#' \code{keepCache} for \code{simList} objects
+#' `keepCache` for `simList` objects
 #'
-#' This will take the \code{cachePath(object)} and pass
+#' This will take the `cachePath(object)` and pass
 #' @export
 #'
 #' @importFrom reproducible keepCache

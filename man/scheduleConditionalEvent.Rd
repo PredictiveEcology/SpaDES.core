@@ -34,7 +34,7 @@ Lower number means higher priority. As a best practice, it is
 recommended that decimal values are conceptual
 grouped by their integer values (e.g., 4.0, 4.25, 4.5 are conceptually
 similar).
-See \code{\link{priority}}.}
+See \code{\link[=priority]{priority()}}.}
 
 \item{minEventTime}{A numeric specifying the time before which the event should not occur,
 even if the condition is met. Defaults to \code{start(sim)}}
@@ -80,7 +80,7 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{scheduleEvent}}, \code{\link{conditionalEvents}}
+\code{\link[=scheduleEvent]{scheduleEvent()}}, \code{\link[=conditionalEvents]{conditionalEvents()}}
 }
 \author{
 Eliot McIntire

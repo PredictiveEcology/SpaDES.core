@@ -1,4 +1,6 @@
 test_that("timeunit works correctly", {
+  skip_if_not_installed("NLMR")
+
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -253,7 +255,7 @@ test_that("timeunits with child and parent modules work correctly", {
   msgGrep <- paste("Setting:", "Paths set to:", "Running .input",
                    "child6: module code: b is declared",
                    "child6: outputObjects: dp, cm are assigned",
-                   "There is no similar item in the cacheRepo",
+                   "There is no similar item in the cachePath",
                    "child6: using dataPath",
                    sep = "|")
   expect_silent(expect_message({

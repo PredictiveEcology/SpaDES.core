@@ -22,7 +22,7 @@ or \code{"plot"} to use base::plot, the default.}
 
 \item{showParents}{Logical. If TRUE, then any children that are grouped into parent
 modules will be grouped together by colored blobs. Internally,
-this is calling \code{\link{moduleGraph}}. Default \code{FALSE}.}
+this is calling \code{\link[=moduleGraph]{moduleGraph()}}. Default \code{FALSE}.}
 
 \item{...}{Additional arguments passed to plotting function specified by \code{type}.}
 }
@@ -32,7 +32,7 @@ Plots module dependency diagram.
 \description{
 Create a network diagram illustrating the simplified module dependencies of a
 simulation. Offers a less detailed view of specific objects than does
-plotting the \code{depsEdgeList} directly with \code{\link{objectDiagram}}.
+plotting the \code{depsEdgeList} directly with \code{\link[=objectDiagram]{objectDiagram()}}.
 }
 \examples{
 \dontrun{
@@ -60,7 +60,7 @@ plot(ig)
 
 }
 \seealso{
-\code{\link{igraph}}, \code{\link{moduleGraph}} for a version that accounts for
+\code{\link[=igraph]{igraph()}}, \code{\link[=moduleGraph]{moduleGraph()}} for a version that accounts for
 parent and children module structure.
 }
 \author{

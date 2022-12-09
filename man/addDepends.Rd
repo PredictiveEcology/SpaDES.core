@@ -14,14 +14,14 @@
 in which to replace element(s).}
 
 \item{x}{A named list containing the parameters used to construct a new
-\code{\link{.moduleDeps}} object.}
+\code{\link[=.moduleDeps]{.moduleDeps()}} object.}
 }
 \value{
 A \code{simList} object.
 }
 \description{
 Internal function.
-Adds a \code{\link{.moduleDeps}} object to the simulation dependency list.
+Adds a \code{\link[=.moduleDeps]{.moduleDeps()}} object to the simulation dependency list.
 }
 \seealso{
 Other functions to access elements of a 'simList' object: 

@@ -1,7 +1,7 @@
 if (interactive()) library(testthat)
 
 test_that("simulation runs with simInit and spades", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
   on.exit({
@@ -44,7 +44,7 @@ test_that("simulation runs with simInit and spades", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "year",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
       ),

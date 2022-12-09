@@ -18,7 +18,7 @@ a character string will assign that object name to the saved
 name.}
 
 \item{filename}{Character string with the path for saving \code{simList} to or
-reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs} filetypes are supported.}
+reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs} file types are supported.}
 
 \item{fileBackend}{Numeric. \code{0} means don't do anything with
 file backed rasters. Leave their file intact as is, in its place.
@@ -36,7 +36,7 @@ will be interpreted as a path to copy all rasters to.}
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can be found.}
 
-\item{...}{passed to \code{\link{saveSimList}}, including non-optional ones
+\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones
 such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}
 arguments in that function.}
 

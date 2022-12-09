@@ -35,7 +35,7 @@ These are included for advanced users.
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.8 on simList environment.
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.8 on simList environment.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

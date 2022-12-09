@@ -1,5 +1,6 @@
 test_that("downloadData downloads and unzips module data", {
   skip_on_cran()
+  skip_if_not_installed("googledrive")
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")

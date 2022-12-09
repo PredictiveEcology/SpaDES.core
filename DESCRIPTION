@@ -12,14 +12,14 @@ Description: Provides the core framework for a discrete event system (DES) to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2022-07-08
-Version: 1.0.10.9018
+Date: 2022-12-08
+Version: 1.1.0.9016
 Authors@R: c(
     person("Alex M", "Chubaty", email = "achubaty@for-cast.ca",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
-    person("Eliot J B", "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
+    person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
            role = c("aut"), comment = c(ORCID = "0000-0002-6914-8316")),
-    person("Yong", "Luo", email = "Yong.Luo@gov.bc.ca",
+        person("Yong", "Luo", email = "Yong.Luo@gov.bc.ca",
            role = c("ctb")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
            role = c("ctb")),
@@ -32,17 +32,16 @@ Authors@R: c(
 Depends:
     R (>= 4.0),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.8.9043)
+    reproducible (>= 1.2.14)
 Imports:
     crayon,
     data.table (>= 1.11.0),
-    fastdigest,
     igraph (>= 1.0.1),
     lobstr,
     methods,
     qs (>= 0.21.1),
     raster (>= 2.5-8),
-    Require (>= 0.0.7),
+    Require (>= 0.2.5),
     stats,
     utils,
     whisker
@@ -59,6 +58,7 @@ Suggests:
     knitr,
     logging,
     magrittr,
+    NLMR (>= 1.1.1),
     pkgload,
     png,
     RandomFields (>= 3.3.4),
@@ -68,10 +68,16 @@ Suggests:
     roxygen2,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 0.2.0),
+    SpaDES.tools (>= 1.0.0.9001),
     tcltk,
     terra,
     testthat (>= 1.0.2)
+Remotes:
+    ropensci/NLMR,
+    PredictiveEcology/Require@development,
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.tools@development
+Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
@@ -125,4 +131,4 @@ Collate:
     'suppliedElsewhere.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.2

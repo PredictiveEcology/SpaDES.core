@@ -108,7 +108,7 @@ in the first \code{modulePath}, then if it doesn't find it, in the second etc.}
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
 \code{interval} (numeric), \code{loadTime} (numeric).
-See \code{\link{inputs}} and vignette("ii-modules") section about inputs.}
+See \code{\link[=inputs]{inputs()}} and vignette("ii-modules") section about inputs.}
 
 \item{outputs}{A \code{data.frame}. Can specify from 1 to 5
 columns with following column names: \code{objectName} (character, required),
@@ -118,7 +118,7 @@ columns with following column names: \code{objectName} (character, required),
 is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
 it should give "initial conditions".
 
-See \code{\link{outputs}} and
+See \code{\link[=outputs]{outputs()}} and
 \code{vignette("ii-modules")} section about outputs.}
 
 \item{loadOrder}{An optional character vector of module names specifying the order in
@@ -150,15 +150,15 @@ See more details below.
 \details{
 \subsection{Calling this \code{simInit} function does the following:}{
 \tabular{lll}{
-\bold{What} \tab \bold{Details} \tab \bold{Argument(s) to use} \cr
+\strong{What} \tab \strong{Details} \tab \strong{Argument(s) to use} \cr
 fills \code{simList} slots \tab places the arguments \code{times},
 \code{params}, \code{modules}, \code{paths} into equivalently named
 \code{simList} slots \tab \code{times},
 \code{params}, \code{modules}, \code{paths}\cr
 sources all module files \tab places all function definitions in the
 \code{simList}, specifically, into a sub-environment of the main
-\code{simList} environment: e.g., \code{sim$<moduleName>$function1}
-(see section on \bold{Scoping}) \tab \code{modules} \cr
+\code{simList} environment: e.g., \verb{sim$<moduleName>$function1}
+(see section on \strong{Scoping}) \tab \code{modules} \cr
 copies objects \tab from the global environment to the
 \code{simList} environment \tab \code{objects} \cr
 loads objects \tab from disk into the \code{simList} \tab \code{inputs} \cr
@@ -168,7 +168,7 @@ schedule object saving \tab Objects can be saved to disk at any arbitrary
 time during the simulation. If specified here, this will be in addition
 to any saving due code inside a module (i.e., a module may manually
 run \code{write.table(...)} \tab \code{outputs} \cr
-schedules "init" events \tab from all modules (see \code{\link{events}})
+schedules "init" events \tab from all modules (see \code{\link[=events]{events()}})
 \tab automatic  \cr
 assesses module dependencies \tab via the inputs and outputs identified in their
 metadata. This gives the order of the \code{.inputObjects} and \code{init}
@@ -187,8 +187,7 @@ it says \code{TRUE}. Here we can override that default with:
 \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
 Since this is a list of lists, one can override the module defaults for multiple
 parameters from multiple modules all at once, with say:
-\code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2),
-           caribouModule = list(N = 1000))}.
+\code{list(Fire = list(.plotInitialTime = NA, .plotInterval = 2), caribouModule = list(N = 1000))}.
 
 The \code{params} list can contain a list (named \code{.globals}) of named objects
 e.g., \code{.globals = list(climateURL = "https:\\\\something.com")} entry. Any and every
@@ -238,7 +237,7 @@ for successful initialization.
 
 
 The \code{simInit} function will attempt to find usage of \code{sim$xxx} or \code{sim[['xxx']]}
-on either side of the assignment (\code{<-}) operator.
+on either side of the assignment (\verb{<-}) operator.
 It will compare these to the module metadata, specifically \code{inputObjects} for cases where
 objects or "gotten" from the \code{simList} and \code{outputObjects} for cases where objects are
 assigned to the \code{simList.}
@@ -375,9 +374,9 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link{spades}},
-\code{\link{times}}, \code{\link{params}}, \code{\link{objs}}, \code{\link{paths}},
-\code{\link{modules}}, \code{\link{inputs}}, \code{\link{outputs}}
+\code{\link[=spades]{spades()}},
+\code{\link[=times]{times()}}, \code{\link[=params]{params()}}, \code{\link[=objs]{objs()}}, \code{\link[=paths]{paths()}},
+\code{\link[=modules]{modules()}}, \code{\link[=inputs]{inputs()}}, \code{\link[=outputs]{outputs()}}
 }
 \author{
 Alex Chubaty and Eliot McIntire

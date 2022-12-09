@@ -23,7 +23,7 @@ test_that("local mod object", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test.Rmd"),
+      documentation = list("README.md", "test.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter("testParA", "numeric", 1, NA, NA, "")
@@ -74,7 +74,7 @@ test_that("local mod object", {
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
-      documentation = list("README.txt", "test2.Rmd"),
+      documentation = list("README.md", "test2.Rmd"),
       reqdPkgs = list(),
       parameters = rbind(
         defineParameter("testParB", "numeric", 2, NA, NA, ""),
@@ -195,12 +195,12 @@ test_that("local mod object", {
 
   # Cached copy
   expect_true(any(grepl("loaded cached", mess)))
-  expect_true(out4$.mods$test$.objects$a == 2)
-  expect_true(out4$.mods$test2$.objects$a == 1)
-  expect_true(out4$.mods$test2$.objects$b == 2)
+  expect_true(out4$.mods$test$.objects$a == 2) ## TODO: fails (gets NULL)
+  expect_true(out4$.mods$test2$.objects$a == 1) ## TODO: fails (gets NULL)
+  expect_true(out4$.mods$test2$.objects$b == 2) ## TODO: fails (gets NULL)
   expect_true(is.null(out4$.mods$test2$.objects$x))
   expect_true(!is.null(out4$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out4$.mods$test2$.objects$y == "This module is test2")
+  expect_true(out4$.mods$test2$.objects$y == "This module is test2") ## TODO: fails (gets 'This module')
 
   # Test P replace method
   mySim3 <- simInit(times = list(start = 0, end = 0),
@@ -251,9 +251,6 @@ test_that("local mod object", {
     expect_true(sum(grepl("There was an error", mess)) == len)
   })
 
-
-
-
   # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
   if (interactive()) {
     opt <- options("spades.recoveryMode" = TRUE)
@@ -261,13 +258,19 @@ test_that("local mod object", {
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
-    err <- try(ss <- spades(mySim8, debug = FALSE), silent = TRUE)
+    err <- try({
+      ss <- spades(mySim8, debug = FALSE)
+    }, silent = TRUE)
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
-    err <- capture_error(sim2 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+    err <- capture_error({
+      sim2 <- restartSpades(sim, debug = FALSE)
+    }) # is missing completed events
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
-    err <- capture_error(sim3 <- restartSpades(sim, debug = FALSE)) # is missing completed events
+    err <- capture_error({
+      sim3 <- restartSpades(sim, debug = FALSE)
+    }) # is missing completed events
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
     sim@params$test2$testRestartSpades <- NULL
@@ -275,7 +278,6 @@ test_that("local mod object", {
     expect_true(NROW(completed(sim3)) == 7)
     options("spades.recoveryMode" = FALSE)
   }
-
 
   # Test converting these to packages
   if (interactive()) {
@@ -353,6 +355,4 @@ test_that("local mod object", {
       pkgload::unload("test2")
     }
   }
-
-
 })

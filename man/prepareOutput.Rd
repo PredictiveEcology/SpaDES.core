@@ -4,19 +4,19 @@
 \alias{.prepareOutput,simList-method}
 \title{\code{.prepareOutput} for \code{simList} objects}
 \usage{
-\S4method{.prepareOutput}{simList}(object, cacheRepo, ...)
+\S4method{.prepareOutput}{simList}(object, cachePath, ...)
 }
 \arguments{
-\item{object}{Any R object}
+\item{object}{Any R object returned from a function}
 
-\item{cacheRepo}{A repository used for storing cached objects.
+\item{cachePath}{A repository used for storing cached objects.
 This is optional if \code{Cache} is used inside a SpaDES module.}
 
-\item{...}{Arguments passed to \code{FUN}}
+\item{...}{Anything passed to methods.}
 }
 \description{
-See \code{\link[reproducible:prepareOutput]{.prepareOutput}}.
+See \link[reproducible:exportedMethods]{reproducible::.prepareOutput}.
 }
 \seealso{
-\code{\link[reproducible:prepareOutput]{.prepareOutput}}
+\link[reproducible:exportedMethods]{reproducible::.prepareOutput}
 }

@@ -34,7 +34,7 @@ and see our SpaDES-modules repo for details of module repository structure
 (\url{https://github.com/PredictiveEcology/SpaDES-modules}).
 }
 \seealso{
-\code{\link{zipModule}} for creating module \file{.zip} folders.
+\code{\link[=zipModule]{zipModule()}} for creating module \file{.zip} folders.
 }
 \author{
 Alex Chubaty

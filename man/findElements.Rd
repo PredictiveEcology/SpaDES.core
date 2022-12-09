@@ -4,7 +4,7 @@
 \alias{.findElementsInEnv}
 \alias{.findElement}
 \alias{.parsingSim}
-\title{Find all references to \code{sim$}}
+\title{Find all references to \verb{sim$}}
 \usage{
 .findElementsInEnv(
   envToFindSim = parent.frame(),
@@ -31,7 +31,7 @@ the element accessing the simList is actually a call, e.g.,
 A character string with all sim objects found
 }
 \description{
-Find all references to \code{sim$}
+Find all references to \verb{sim$}
 
 \code{.parsingSim} will pull out the various ways to use sim, e.g.,
 \code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
@@ -41,12 +41,12 @@ Find all references to \code{sim$}
 function code to a call, and then pass it to \code{.findElements}. It also does
 some cleaning for duplications, \code{NA} values, and cases where the element
 inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
-simply taken verbatim (e.g., \code{sim[[P(sim)$stackName]])}.
+simply taken verbatim (e.g., \verb{sim[[P(sim)$stackName]])}.
 
-When \bold{\code{type = "get"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]]} on
+When \strong{\code{type = "get"}}, the function scans for \code{sim$xxx} or \verb{sim[["xxx"]]]} on
 the RHS of an assignment operator or when there is no assignment. When
-\bold{\code{type = "assign"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]} on the
-LHS of an assignment operator. When \bold{\code{type = "globals"}}, the function
+\strong{\code{type = "assign"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]} on the
+LHS of an assignment operator. When \strong{\code{type = "globals"}}, the function
 scans for all functions (i.e., "globals") being used. This is similar to
 \code{codetools::findGlobals}, but faster.
 

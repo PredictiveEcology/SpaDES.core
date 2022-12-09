@@ -11,7 +11,7 @@
 )
 }
 \arguments{
-\item{object}{Any R object.}
+\item{object}{Any R object returned from a function}
 
 \item{functionName}{A character string indicating the function name}
 
@@ -19,8 +19,8 @@
 recovery from memoised copy}
 }
 \description{
-See \code{\link[reproducible:cacheMessage]{.cacheMessage}}.
+See \link[reproducible:exportedMethods]{reproducible::.cacheMessage}.
 }
 \seealso{
-\code{\link[reproducible:cacheMessage]{.cacheMessage}}
+\link[reproducible:exportedMethods]{reproducible::.cacheMessage}
 }

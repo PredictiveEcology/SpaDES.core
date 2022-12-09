@@ -1,13 +1,13 @@
 #' Create new SpaDES project
 #'
 #' Initialize a project with subdirectories \file{cache/}, \file{modules/},
-#' \file{inputs/}, \file{outputs/}, and \code{setPaths} accordingly.
+#' \file{inputs/}, \file{outputs/}, and `setPaths` accordingly.
 #' If invoked from Rstudio, will also create a new Rstudio project file.
 #'
 #' @param name project name (name of project directory)
 #' @param path path to directory in which to create the project directory
 #' @param open  Logical. Should the new project file be opened after creation?
-#'              Default \code{TRUE} in an interactive session.
+#'              Default `TRUE` in an interactive session.
 #'
 #' @export
 #' @rdname newProject
@@ -26,7 +26,7 @@ setGeneric("newProject", function(name, path, open) {
 
 #' @export
 #' @rdname newProject
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 setMethod(
   "newProject",
   signature = c(name = "character", path = "character", open = "logical"),
@@ -54,7 +54,7 @@ setMethod(
 
 #' @export
 #' @rdname newProject
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 setMethod(
   "newProject",
   signature = c(name = "character", path = "character", open = "missing"),
@@ -75,7 +75,7 @@ setGeneric("newProjectCode", function(name, path, open) {
 })
 
 #' @export
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
 #' @rdname newProjectCode
 setMethod(

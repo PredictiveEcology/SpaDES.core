@@ -1,8 +1,6 @@
 test_that("downloadModule downloads and unzips a single module", {
   skip_on_cran()
-
-  if (identical(Sys.getenv("TRAVIS"), "true") &&
-      tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
+  skip_if_not_installed("httr")
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -25,7 +23,7 @@ test_that("downloadModule downloads and unzips a single module", {
   }
   f <- f$value[[1]] %>% unlist() %>% as.character() %>% basename()
 
-  f_expected <- c("LICENSE", "README.txt", "citation.bib", "CHECKSUMS.txt",
+  f_expected <- c("LICENSE", "README.md", "citation.bib", "CHECKSUMS.txt",
                   "test.R", "test.Rmd")
 
   expect_gt(length(f), 0)
@@ -36,9 +34,7 @@ test_that("downloadModule downloads and unzips a single module", {
 
 test_that("downloadModule downloads and unzips a parent module", {
   skip_on_cran()
-
-  if (identical(Sys.getenv("TRAVIS"), "true") &&
-      tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
+  skip_if_not_installed("httr")
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -74,9 +70,7 @@ test_that("downloadModule downloads and unzips a parent module", {
 
 test_that("downloadModule can overwrite existing modules", {
   skip_on_cran()
-
-  if (identical(Sys.getenv("TRAVIS"), "true") &&
-      tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
+  skip_if_not_installed("httr")
 
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
@@ -118,6 +112,7 @@ test_that("downloadModule can overwrite existing modules", {
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
   skip_on_cran()
+  skip_if_not_installed("httr")
 
   if (identical(Sys.getenv("TRAVIS"), "true") &&
       tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")

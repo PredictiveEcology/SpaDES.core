@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{magrittr, RandomFields, raster, reproducible, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{NLMR, raster, reproducible, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,9 +20,12 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-RFavailable <- isTRUE(require(SpaDES.tools) && require(RandomFields))
+hasSuggests <- all(
+  require("NLMR", quietly = TRUE),
+  require("SpaDES.tools", quietly = TRUE)
+)
 
-knitr::opts_chunk$set(eval = RFavailable)
+knitr::opts_chunk$set(eval = hasSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
@@ -41,9 +44,9 @@ Some of the details of the `simList`-specific features of this `Cache` function 
 
 - The function converts all elements that have an environment as part of their attributes into a format that has no unique environment attribute, using `format` if a function, and `as.list` in the case of the `simList` environment.
 
-- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cacheRepo` be specified.
-If called from inside a SpaDES module, `Cache` will use the `cacheRepo` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
-Similarly, if no `cacheRepo` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
+- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cachePath` be specified.
+If called from inside a SpaDES module, `Cache` will use the `cachePath` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
+Similarly, if no `cachePath` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
 To persist between sessions, use `SpaDES::setPaths()` every session.
 
 In a `SpaDES` context, there are several levels of caching that can be used as part of a reproducible workflow.
@@ -56,7 +59,6 @@ This will have the effect of eliminating any stochasticity in the model as the o
 This is likely most useful in situations where reproducibility is more important than "new" stochasticity (*e.g.*, building decision support systems, apps, final version of a manuscript).
 
 ```{r examples, echo=TRUE, message=FALSE}
-library(magrittr)
 library(raster)
 library(reproducible)
 library(SpaDES.core)
@@ -162,13 +164,31 @@ to
 ```{r function-level, echo=TRUE}
 ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
 system.time({
-  map <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim),
+  map <- Cache(NLMR::nlm_mpd,
+               ncol = ncol(ras),
+               nrow = nrow(ras),
+               resolution = unique(res(ras)),
+               roughness = 0.5,
+               rand_dev = 10,
+               rescale = FALSE,
+               verbose = FALSE,
+               cachePath = cachePath(mySim),
+               userTags = "nlm_mpd",
                notOlderThan = Sys.time())
 })
 
 # vastly faster the second time
 system.time({
-  mapCached <- Cache(gaussMap, ras, cacheRepo = cachePath(mySim))
+  mapCached <- Cache(NLMR::nlm_mpd,
+                     ncol = ncol(ras),
+                     nrow = nrow(ras),
+                     resolution = unique(res(ras)),
+                     roughness = 0.5,
+                     rand_dev = 10,
+                     rescale = FALSE,
+                     verbose = FALSE,
+                     cachePath = cachePath(mySim),
+                     userTags = "nlm_mpd")
 })
 
 all.equal(map, mapCached) 
@@ -182,11 +202,9 @@ Also, one can access cached items manually (rather than simply rerunning the sam
 
 ```{r manual-cache}
 cacheDB <- showCache(mySim)
-# examine only the functions that have been cached
-cacheDB[tagKey == "function"]
 
-# get the RasterLayer that was produced with the gaussMap function:
-map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "gaussMap"]$cacheId)
+## get the RasterLayer that was produced with the NLMR::nlm_mpd function:
+map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "nlm_mpd"]$cacheId)
 
 clearPlot()
 Plot(map)

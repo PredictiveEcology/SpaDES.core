@@ -137,7 +137,7 @@ will return \code{"movingAgent"}, and \code{dataPath(sim)} will return
 \code{file.path(modulePath(sim), "movingAgent", "data")}
 }
 \details{
-These are ways to add or access the file paths used by \code{\link{spades}}.
+These are ways to add or access the file paths used by \code{\link[=spades]{spades()}}.
 There are five file paths: \code{cachePath}, \code{modulePath},
 \code{inputPath}, \code{outputPath}, and \code{rasterPath}.
 Each has a function to get or set the value in a \code{simList} object.
@@ -154,7 +154,7 @@ If no paths are specified, the defaults are as follows:
 }
 }
 \seealso{
-\code{\link{SpaDES.core-package}}, specifically the section 1.2.4 on Simulation Paths.
+\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.4 on Simulation Paths.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

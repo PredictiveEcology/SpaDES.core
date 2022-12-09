@@ -1,5 +1,5 @@
 test_that("test event-level cache & memory leaks", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(smcc = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
@@ -69,9 +69,9 @@ test_that("test event-level cache & memory leaks", {
   mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
   expect_true(length(warnsFunction) == 0)
 
-  sims$crazyFunction3 <- sims$.mods$caribouMovement$Init
+  sims$crazyFunction3 <- sims$.mods$caribouMovement$Move
   end(sims) <- end(sims) + 0.1
-  simsOut <- spades(sims, debug = FALSE)
+  # simsOut <- spades(sims, debug = FALSE)
 
   mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
   expect_true(length(warnsFunction) == 0)
@@ -100,7 +100,11 @@ test_that("test event-level cache & memory leaks", {
 
   sims$.mods$caribouMovement$.objects$crazyFunction <- function() { rnorm(1)}
   end(sims) <- end(sims) + 0.1
-  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFunction <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFunction) > 0)
   expect_true(grepl("function", warnsFunction))
   expect_true(grepl("crazyFunction", warnsFunction))
@@ -110,20 +114,21 @@ test_that("test event-level cache & memory leaks", {
 
   sims$.mods$caribouMovement$.objects$crazyFormula <-  formula(hi ~ test)
   end(sims) <- end(sims) + 0.1
-  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFormula <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFormula) > 0)
   expect_true(grepl("formula", warnsFormula))
   expect_true(grepl("mod", warnsFormula))
   expect_true(grepl("crazyFormula", warnsFormula))
   expect_true(!grepl("crazyFunction", warnsFormula))
   expect_true(!grepl("function", warnsFormula))
-
-
 })
 
 test_that("test module-level cache", {
-  skip_if_not_installed("RandomFields")
-
+  skip_if_not_installed("NLMR")
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
 
@@ -270,15 +275,14 @@ test_that("test .robustDigest for simLists", {
     mess1 <- capture_messages(do.call(simInit, args))
     msgGrep <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                     "There is no similar item in the cacheRepo", sep = "|")
+                     "Loading required package[:]",
+                     "There is no similar item in the cachePath", sep = "|")
     expect_true(all(grepl(msgGrep, mess1)))
 
     msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
-    #a <- capture.output(
     expect_message(do.call(simInit, args), regexp = msgGrep)
-    #)
 
-    # make change to .inputObjects code -- should rerun .inputObjects
+    ## make change to .inputObjects code -- should rerun .inputObjects
     xxx <- readLines(fileName)
     startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
     editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
@@ -288,11 +292,11 @@ test_that("test .robustDigest for simLists", {
 
     msgGrep <- paste("Running .input", "module code", "so not checking minimum package",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                     "There is no similar item in the cacheRepo", sep = "|")
+                     "There is no similar item in the cachePath", sep = "|")
     mess1 <- capture_messages(do.call(simInit, args))
     expect_true(all(grepl(msgGrep, mess1)))
 
-    # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
+    ## make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
     xxx <- readLines(fileName)
     startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
     editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
@@ -501,8 +505,6 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(sum(grepl("loaded cached copy of .inputObjects", mess10)) == 1)
   expect_true(exists("newFun", envir = mySim$.mods$test))
 
-
-
   # Test 2 in the "capture failed Cache"...
   # This should not recover the cache because it has a new .inputObjects function
   cat(xxx1[[1]][1:(lineWithInputObjects - 1)], "
@@ -538,11 +540,10 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(sum(grepl("Running .inputObjects", mess11)) == 1)
   expect_true(!exists("newFun", envir = mySim$.mods$test))
   expect_true(sum(grepl("aaa <- 2", format(mySim$.mods$test$.inputObjects))) == 1)
-
 })
 
 test_that("test showSimilar", {
-  skip_if_not_installed("RandomFields")
+  skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(smcc = FALSE, "raster")
   opts <- options("reproducible.cachePath" = tmpdir)
@@ -568,8 +569,7 @@ test_that("test showSimilar", {
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou"),
-                         stringsAsFactors = FALSE)
+    outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
 
   out1 <- spades(Copy(mySim))#, showSimilar = TRUE)
@@ -592,4 +592,3 @@ test_that("test showSimilar", {
   })
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
-
