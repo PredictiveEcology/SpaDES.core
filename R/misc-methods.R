@@ -525,18 +525,31 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
+  newPaths <- lapply(list(
+    cachePath = cachePath,
+    inputPath = inputPath,
+    modulePath = modulePath,
+    outputPath = outputPath,
+    rasterPath = rasterPath,
+    scratchPath = scratchPath,
+    terraPath = terraPath
+  ), checkPath, create = TRUE)
+
+  ## set the new paths via options
   options(
-    rasterTmpDir = rasterPath,
+    rasterTmpDir = newPaths$rasterPath,
     reproducible.cachePath = cachePath,
     spades.inputPath = inputPath,
     spades.modulePath = unlist(modulePath),
     spades.outputPath = outputPath,
     spades.scratchPath = scratchPath
   )
+
   if (requireNamespace("terra", quietly = TRUE)) {
     terra::terraOptions(tempdir = terraPath)
   }
 
+  ## message the user
   modPaths <- if (length(modulePath) > 1) {
     paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
   } else {
@@ -573,7 +586,6 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     }
   }
 
-  lapply(.paths(), checkPath, create = TRUE)
   return(invisible(originalPaths))
 }
 
