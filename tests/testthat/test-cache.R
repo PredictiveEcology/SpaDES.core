@@ -252,7 +252,7 @@ test_that("test .prepareOutput", {
 
 test_that("test .robustDigest for simLists", {
   if (requireNamespace("ggplot2")) {
-    testInitOut <- testInit("igraph", smcc = TRUE,
+    testInitOut <- testInit(c("igraph", "raster"), smcc = TRUE,
                             opts = list(spades.recoveryMode = FALSE,
                                         "reproducible.useMemoise" = FALSE))
     opts <- options("reproducible.cachePath" = tmpdir)

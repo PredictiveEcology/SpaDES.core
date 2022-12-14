@@ -1287,6 +1287,7 @@ setMethod(
                      notOlderThan = notOlderThan,
                      events = events,
                      .plots = .plots,
+                     cache = FALSE,
                      ...
         ))
         # do.call(quote = TRUE, Cache,
