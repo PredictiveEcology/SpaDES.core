@@ -286,7 +286,12 @@ unlink(normalizePath(ftmp))
   
 ```{r eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7}
 # overview of the events in the simulation
-if (!requireNamespace("DiagrammeR", quietly = TRUE)) Require::Install("DiagrammeR")
+if (!requireNamespace("DiagrammeR", quietly = TRUE)) {
+  origRepos <- getOption("repos")
+  if (any(unname(origRepos) == "@CRAN@")) 
+    utils::chooseCRANmirror(ind = 1)
+  Require::Install("DiagrammeR")
+}
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 ```
 
@@ -542,7 +547,7 @@ There is partial string matching of these names, so if the `fun` requires argume
 
 ```{r load-save, echo=TRUE, eval=hasSuggests, message=FALSE}
 # initialize a new simulation, setting the load and save parameters
-library(data.table)
+Require::Require("data.table")
 
 outputDir <- file.path(tempdir(), "simOutputs")
 mySim <- simInit(times = list(start = 0.0, end = 10),
