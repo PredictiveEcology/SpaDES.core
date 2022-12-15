@@ -86,3 +86,138 @@ testOnExit <- function(testInitOut) {
     try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
   )
 }
+
+testCode <- '
+      defineModule(sim, list(
+      name = "test",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "second",
+      citation = list("citation.bib"),
+      documentation = list("README.md", "test.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+        defineParameter("testParA", "numeric", 1, NA, NA, "")
+      ),
+      inputObjects = bindrows(
+        expectsInput("sdf", "sdf", "sdfd")
+      ),
+      outputObjects = bindrows(
+        createsOutput("testPar1", "numeric", "")
+      )
+      ))
+
+      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+      mod$a <- 2 # should have mod$x here
+      sim$testPar1 <- Par$testParA
+
+      if (tryCatch(exists("Init", envir = asNamespace("test"), inherits = FALSE), error = function(x) FALSE)) {
+        sim <- Init(sim)
+      }
+
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
+      },
+      event1 = {
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
+      })
+      return(invisible(sim))
+      }
+
+      .inputObjects <- function(sim) {
+        mod$x <- "sdf"
+        return(sim)
+
+      }
+      '
+
+test2Code <- '
+      defineModule(sim, list(
+      name = "test2",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "second",
+      citation = list("citation.bib"),
+      documentation = list("README.md", "test2.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+        defineParameter("testParB", "numeric", 2, NA, NA, ""),
+        defineParameter("testParC", "numeric", 22, NA, NA, ""),
+        defineParameter("testParD", "numeric", 12, NA, NA, "")
+      ),
+      inputObjects = bindrows(
+        expectsInput("sdf", "sdf", "sdfd")
+      ),
+      outputObjects = bindrows(
+        createsOutput("testPar2", "numeric", "")
+      )
+      ))
+
+      doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
+      P(sim)$testParF <- 77
+      P(sim)$testParA <- 42
+      P(sim, "testParG") <- 79
+      P(sim, "testParH") <- 48
+      switch(
+      eventType,
+      init = {
+      if (tryCatch(exists("Init", envir = asNamespace("test2"), inherits = FALSE), error = function(x) FALSE)) {
+        sim <- Init(sim)
+      }
+
+      if (isTRUE(P(sim)$testParB >= 1100)) {
+         P(sim, "testParB") <-  P(sim)$testParB + 756
+      }
+
+      if (any(grepl("testCommonPar", names(unlist(params(sim)))))) {
+            errorText <- try(paramCheckOtherMods(sim, "testCommonPar"), silent = TRUE)
+            if (identical("try-error", attr(errorText, "class")))
+              message("There was an error")
+            warn <- capture_warnings(paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "warning"))
+            if (length(warn))
+              message("There was a warning")
+            paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "message")
+            paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "silent")
+      }
+      if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
+        stop("testing restartSpades")#browser()
+      }
+
+      mod$a <- 1 # should have mod$y here
+      sim$testPar2 <- Par$testParB
+      sim <- scheduleEvent(sim, start(sim), "test2", "event1", .skipChecks = TRUE)
+      },
+      event1 = {
+      if (isTRUE(P(sim)$testParB >= 1100)) {
+         P(sim, "testParB") <-  P(sim)$testParB + 800
+      }
+      mod$b <- mod$a + 1 # shoudl have mod$a, mod$y by here
+      mod$y <- paste0(mod$y, " is test2") # should have mod$a, mod$b, mod$y
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
+      })
+      return(invisible(sim))
+      }
+      .inputObjects <- function(sim) {
+      if (isTRUE(P(sim)$testParB >= 543)) {
+         P(sim, "testParB") <-  P(sim)$testParB + 654
+      }
+
+      if (isTRUE(P(sim)$testParB > 321321)) {
+         P(sim, "checkpoint")
+      }
+      mod$y <- "This module"
+        return(sim)
+      }
+      '
