@@ -1216,13 +1216,14 @@ setMethod(
       return(invisible(sim))
     },
     warning = function(w) {
-      if (requireNamespace("logging", quietly = TRUE)) {
+      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
     },
     error = function(e) {
-      if (requireNamespace("logging", quietly = TRUE)) {
-        logging::logerror(e)
+      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+        if (debug > 0)
+          logging::logerror(e)
       } else {
         fn <- get0("onError")
         if (!is.null(fn))
