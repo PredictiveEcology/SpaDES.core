@@ -599,13 +599,14 @@ setMethod(
       }
 
       # Make local activeBindings to mod
-      lapply(as.character(sim@modules), function(mod) {
-        makeModActiveBinding(sim = sim, mod = mod)
-      })
-
-      lapply(sim@modules, function(mod) {
-        makeParActiveBinding(sim = sim, mod = mod)
-      })
+      makeSimListActiveBindings(sim)
+      # lapply(as.character(sim@modules), function(mod) {
+      #   makeModActiveBinding(sim = sim, mod = mod)
+      # })
+      #
+      # lapply(sim@modules, function(mod) {
+      #   makeParActiveBinding(sim = sim, mod = mod)
+      # })
 
       ## load user-defined modules
       # browser(expr = exists("._simInit_4"))
