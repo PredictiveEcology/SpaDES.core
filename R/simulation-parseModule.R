@@ -225,9 +225,10 @@ setMethod(
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         tmp <- .parseConditional(envir = envir, filename = filename)
         activeCode <- list()
-        sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
-        attr(sim@.xData$.mods[[mBase]], "name") <- mBase
-        sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
+        sim <- newEnvsByModule(sim, mBase)  # sets up the module environment and the .objects sub environment
+        # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        # attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+        # sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
@@ -598,3 +599,10 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   return(isPack)
 }
 
+
+newEnvsByModule <- function(sim, modu) {
+  sim@.xData$.mods[[modu]] <- new.env(parent = asNamespace("SpaDES.core"))
+  attr(sim@.xData$.mods[[modu]], "name") <- modu
+  sim@.xData$.mods[[modu]]$.objects <- new.env(parent = emptyenv())
+  sim
+}
