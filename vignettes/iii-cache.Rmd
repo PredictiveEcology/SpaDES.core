@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{NLMR, raster, reproducible, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{NLMR, googledrive, raster, reproducible, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -117,7 +117,7 @@ system.time({
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -150,7 +150,7 @@ system.time({
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -205,10 +205,10 @@ In addition, there are several helpers in the `reproducible` package, including 
 Also, one can access cached items manually (rather than simply rerunning the same `Cache` function again).
 
 ```{r manual-cache}
-cacheDB <- showCache(mySim)
+cacheDB <- showCache(mySim, userTags = "nlm_mpd")
 
 ## get the RasterLayer that was produced with the NLMR::nlm_mpd function:
-map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "nlm_mpd"]$cacheId)
+map <- loadFromCache(cacheId = cacheDB$cacheId)
 
 clearPlot()
 Plot(map)

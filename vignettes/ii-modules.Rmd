@@ -10,7 +10,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building `SpaDES` modules}
-  %\VignetteDepends{data.table, DiagrammeR, magrittr, NLMR, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{data.table, DiagrammeR, igraph, magrittr, NLMR, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -547,6 +547,9 @@ There is partial string matching of these names, so if the `fun` requires argume
 
 ```{r load-save, echo=TRUE, eval=hasSuggests, message=FALSE}
 # initialize a new simulation, setting the load and save parameters
+origRepos <- getOption("repos")
+if (any(unname(origRepos) == "@CRAN@")) 
+  utils::chooseCRANmirror(ind = 1)
 Require::Require("data.table")
 
 outputDir <- file.path(tempdir(), "simOutputs")

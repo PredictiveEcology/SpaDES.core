@@ -410,7 +410,6 @@ setMethod(
                                 algo = dots$algo,
                                 quick = dots$quick,
                                 classOptions = dots$classOptions)
-
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
@@ -421,21 +420,23 @@ setMethod(
         which(internalSimList)[1]
       }
 
-      isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
-        names(preDigest[[whSimList]]$.list[[whSimList2]])
-      if (sum(isNewObj)) {
-        newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
-        newObjs <- newObjs[!startsWith(newObjs, "._")]
-        existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-        post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
-        pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
-        # browser()
-        changedObjs <- setdiffNamedRecursive(post, pre)
-        # changedObjs <- names(unlist(post)[!(unlist(post) %in% unlist(pre))])
-        changed <- append(list(changedObjs = newObjs), changedObjs)
-      } else {
-        changed <- character()
-      }
+      out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
+                                   preDigest[[whSimList]]$.list[[whSimList2]])
+      changedObjs <- out[lengths(out)] # remove empty elements
+
+      # isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
+      #   names(preDigest[[whSimList]]$.list[[whSimList2]])
+      # # if (sum(isNewObj)) {
+      # newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
+      # newObjs <- newObjs[!startsWith(newObjs, "._")]
+      # existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
+      # post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
+      # pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
+      # changedObjs <- setdiffNamedRecursive(post, pre)
+      changed <- changedObjs #append(list(changedObjs = newObjs), changedObjs)
+      # } else {
+      #   changed <- character()
+      # }
       changed
     } else {
       character()
@@ -467,7 +468,7 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
   if (length(l1Different)) {
     areList <- unlist(lapply(l1, is.list))
     if (any(areList)) {
-      l1Different <- Map(nl1 = names(l1Different), function(nl1) {
+      l1Different[areList] <- Map(nl1 = names(l1Different)[areList], function(nl1) {
         if (nl1 %in% names(l2)) {
           setdiffNamedRecursive(l1Different[[nl1]], l2[[nl1]])
         } else {
@@ -475,6 +476,11 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
         }
       })
     }
+    if (any(!areList)) {
+      l1Different[!areList] <- Require::setdiffNamed(l1Different[!areList], l2)
+    }
+  } else {
+    l1Different <- Require::setdiffNamed(l1, l2)
   }
   l1Different
 }
@@ -503,6 +509,7 @@ setMethod(
     # only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(simPre, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
+
     if (simListInput) {
       origEnv <- simPre[[whSimList]]@.xData
 
@@ -574,7 +581,7 @@ setMethod(
           createOutputs <- c(createOutputs, currModules)
 
           # take only the ones that the file changed, based on attr(simFromCache, ".Cache")$changed
-          changedOutputs <- createOutputs[createOutputs %in% attr(simFromCache, ".Cache")$changed$changedObjs]
+          changedOutputs <- createOutputs[createOutputs %in% names(attr(simFromCache, ".Cache")$changed)]
 
           expectsInputs <- if (length(hasCurrModule)) {
             deps[[hasCurrModule]]@inputObjects$objectName
@@ -586,7 +593,7 @@ setMethod(
           lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
           if (!is.null(simFromCache@.xData$.mods)) {
             privateObjectsInModules <- attr(simFromCache, ".Cache")$changed
-            objsWithChangeInners <- setdiff(names(privateObjectsInModules), "changedObjs")
+            objsWithChangeInners <- setdiff(names(privateObjectsInModules), changedOutputs)
             changedModEnvObjs <- privateObjectsInModules[objsWithChangeInners]
           }
         }
@@ -594,6 +601,33 @@ setMethod(
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
         list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
 
+        allModules <- modules(simPost)
+        otherModules <- setdiff(allModules, currModules)
+        # Need to pull all things from "other modules" i.e., functions and .objects etc. from non currModules
+        if (length(currModules)) {
+          lapply(currModules, function(currModule) {
+            currMods <- simPre[[whSimList]]@.xData$.mods[[currModule]]
+            objsInModuleActive <- ls(currMods, all.names = TRUE)
+            dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
+            objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
+            if (length(objsInModuleActive))
+              list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[currModule]]),
+                       envir = simPost@.xData$.mods[[currModule]])
+          })
+
+        }
+        if (length(otherModules)) {
+          lapply(otherModules, function(otherModule) {
+            otherMods <- simPre[[whSimList]]@.xData$.mods[[otherModule]]
+            objsInModuleActive <- ls(otherMods, all.names = TRUE)
+            # dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
+            # objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
+            if (length(objsInModuleActive))
+              list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[otherModule]]),
+                       envir = simPost@.xData$.mods[[otherModule]])
+          })
+
+        }
         # Deal with .mods objects
         if (!is.null(simFromCache@.xData$.mods)) {
           sames <- list()
@@ -604,7 +638,7 @@ setMethod(
             list2env(objs, simPost$.mods[[modNam]]$.objects)
           }
           # Now changed objects
-          if (length(changedModEnvObjs)) {
+          if (length(unlist(changedModEnvObjs))) {
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
               objNames <- names(objs$.objects)
               list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
@@ -613,22 +647,9 @@ setMethod(
             # override everything first -- this includes .objects -- take from Cache
             # list2env(mget(changedModEnvObjs, envir = simFromCache@.xData$.mods), envir = simPost@.xData$.mods)
             # BUT functions are so lightweight that they should always return current
-            if (length(currModules)) {
-              lapply(currModules, function(currModule) {
-                currMods <- simPre[[whSimList]]@.xData$.mods[[currModule]]
-                objsInModuleActive <- ls(currMods, all.names = TRUE)
-                dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
-                objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
-                if (length(objsInModuleActive))
-                  list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[currModule]]),
-                           envir = simPost@.xData$.mods[[currModule]])
-              })
-
-            }
           }
-          makeSimListActiveBindings(simPost)
         }
-
+        makeSimListActiveBindings(simPost)
 
         if (length(simPost@current) == 0) {
           ## means it is not in a spades call
@@ -669,13 +690,14 @@ setMethod(
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
+        lsOrigEnv <- lsOrigEnv[!startsWith(lsOrigEnv, "._")]
         keepFromOrig <- !(lsOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
         list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = simPost@.xData)
 
         # Deal with .mods
-        lsOrigModsEnv <- ls(origEnv$.mods, all.names = TRUE)
-        keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData$.mods, all.names = TRUE))
-        list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = origEnv$.mods), envir = simPost@.xData$.mods)
+        # lsOrigModsEnv <- ls(origEnv$.mods, all.names = TRUE)
+        # keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData$.mods, all.names = TRUE))
+        # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = origEnv$.mods), envir = simPost@.xData$.mods)
 
         if (exists("objectSynonyms", envir = simPost@.xData)) {
           objSyns <- lapply(attr(simPost$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
