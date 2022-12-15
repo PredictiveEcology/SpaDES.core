@@ -422,7 +422,7 @@ setMethod(
 
       out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
                                    preDigest[[whSimList]]$.list[[whSimList2]])
-      changedObjs <- out[lengths(out)] # remove empty elements
+      changedObjs <- out[lengths(out) > 0] # remove empty elements
 
       # isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
       #   names(preDigest[[whSimList]]$.list[[whSimList2]])
@@ -466,7 +466,7 @@ if (!isGeneric(".prepareOutput")) {
 setdiffNamedRecursive <- function(l1, l2, missingFill) {
   l1Different <- Require::setdiffNamed(l1, l2)
   if (length(l1Different)) {
-    areList <- unlist(lapply(l1, is.list))
+    areList <- unlist(lapply(l1Different, is.list))
     if (any(areList)) {
       l1Different[areList] <- Map(nl1 = names(l1Different)[areList], function(nl1) {
         if (nl1 %in% names(l2)) {
@@ -593,7 +593,7 @@ setMethod(
           lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
           if (!is.null(simFromCache@.xData$.mods)) {
             privateObjectsInModules <- attr(simFromCache, ".Cache")$changed
-            objsWithChangeInners <- setdiff(names(privateObjectsInModules), changedOutputs)
+            objsWithChangeInners <- setdiff(names(privateObjectsInModules), setdiff(changedOutputs, namesAllMods))
             changedModEnvObjs <- privateObjectsInModules[objsWithChangeInners]
           }
         }
@@ -601,8 +601,7 @@ setMethod(
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
         list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
 
-        allModules <- modules(simPost)
-        otherModules <- setdiff(allModules, currModules)
+        otherModules <- setdiff(namesAllMods, currModules)
         # Need to pull all things from "other modules" i.e., functions and .objects etc. from non currModules
         if (length(currModules)) {
           lapply(currModules, function(currModule) {
