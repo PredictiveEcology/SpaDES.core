@@ -96,6 +96,7 @@
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE) {
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
+  packageFolderName <- dirname(mainModuleFile)
   aa <- parse(mainModuleFile, keep.source = TRUE)
   rlaa <- readLines(mainModuleFile)
   gpd <- getParseData(aa)
@@ -104,10 +105,10 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   whDefModule <- which(defModule)
   whNotDefModule <- which(!defModule)
 
-  NAMESPACEFile <- file.path(dirname(mainModuleFile), "NAMESPACE")
+  NAMESPACEFile <- filenameFromFunction(packageFolderName, "NAMESPACE", fileExt = "")
   hasNamespaceFile <- file.exists(NAMESPACEFile)
 
-  RsubFolder <- file.path(dirname(mainModuleFile), "R")
+  RsubFolder <- file.path(packageFolderName, "R")
   checkPath(RsubFolder, create = TRUE)
 
   parseWithRoxygen <- gpd[grep("#'", gpd$text), ]
@@ -115,7 +116,8 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
   fileNames <- lapply(whNotDefModule, function(element) {
     fn <- aa[[element]][[2]]
-    filePath <- file.path(dirname(mainModuleFile), "R", paste0(gsub("\\.", "", fn), ".R"))
+    filePath <- filenameFromFunction(packageFolderName, fn, "R")
+    # filePath <- file.path(dirname(mainModuleFile), "R", paste0(gsub("\\.", "", fn), ".R"))
 
     fnCh <- as.character(fn)
     parseWithFn <- gpd[which(gpd$text == fnCh & gpd$token == "SYMBOL"),]
@@ -145,16 +147,27 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
     cat(format(aa[[element]]), file = filePath, sep = "\n", append = TRUE)
   })
+
+  otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
+  cat("
+makeActiveBinding('mod', SpaDES.core:::activeModBindingFunction, ",
+paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
+
+makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
+paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
+
+", file = otherStuffFn)
+
   if (length(linesWithRoxygen) > 0) {
     message("There was some roxygen2 documentation that was not immediately above ",
             "a function; it is being saved in R/documentation.R ... please confirm that ",
             "the documentation is correct.")
-    cat(rlaa[linesWithRoxygen], file = file.path(dirname(mainModuleFile), "R", "documentation.R")
+    cat(rlaa[linesWithRoxygen], file = filenameFromFunction(packageFolderName, "documentation", "R")
           , sep = "\n", append = FALSE)
     linesWithRoxygen <- character()
   }
 
-  filePathImportSpadesCore <- file.path(dirname(mainModuleFile), "R", "imports.R")
+  filePathImportSpadesCore <- filenameFromFunction(packageFolderName, "imports", "R")# file.path(dirname(mainModuleFile), "R", "imports.R")
 
   cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
@@ -197,7 +210,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
   d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
 
-  dFile <- file.path(dirname(mainModuleFile), "DESCRIPTION")
+  dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
 
   cat(paste("Package:", d$Package), file = dFile, sep = "\n")
   cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
@@ -224,13 +237,13 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
   if (isTRUE(buildDocuments)) {
     message("Building documentation")
-    m <- dirname(mainModuleFile)
+    m <- packageFolderName
     roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
     pkgload::dev_topic_index_reset(m)
     pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
   }
 
-  RBuildIgnoreFile <- file.path(dirname(mainModuleFile), ".Rbuildignore")
+  RBuildIgnoreFile <- filenameFromFunction(packageFolderName, ".Rbuildignore", fileExt = "")
   cat("^.*\\.Rproj$
 ^\\.Rproj\\.user$
 ^_pkgdown\\.yml$
@@ -260,4 +273,8 @@ vignettes/.*\\.log$
 
   return(invisible())
 
+}
+
+filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fileExt = ".R") {
+  normPath(file.path(packageFolderName, subFolder, paste0(gsub("\\.", "", fn), fileExt)))
 }
