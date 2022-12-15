@@ -429,8 +429,10 @@ setMethod(
         existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
         post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
         pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
-        changedObjs <- names(post[!(unlist(post) %in% unlist(pre))])
-        changed <- c(newObjs, changedObjs)
+        # browser()
+        changedObjs <- setdiffNamedRecursive(post, pre)
+        # changedObjs <- names(unlist(post)[!(unlist(post) %in% unlist(pre))])
+        changed <- append(list(changedObjs = newObjs), changedObjs)
       } else {
         changed <- character()
       }
@@ -459,6 +461,24 @@ if (!isGeneric(".prepareOutput")) {
   })
 }
 
+#' @importFrom Require setdiffNamed
+setdiffNamedRecursive <- function(l1, l2, missingFill) {
+  l1Different <- Require::setdiffNamed(l1, l2)
+  if (length(l1Different)) {
+    areList <- unlist(lapply(l1, is.list))
+    if (any(areList)) {
+      l1Different <- Map(nl1 = names(l1Different), function(nl1) {
+        if (nl1 %in% names(l2)) {
+          setdiffNamedRecursive(l1Different[[nl1]], l2[[nl1]])
+        } else {
+          l1Different
+        }
+      })
+    }
+  }
+  l1Different
+}
+
 #' `.prepareOutput` for `simList` objects
 #'
 #' See [reproducible::.prepareOutput].
@@ -477,60 +497,68 @@ setMethod(
   ".prepareOutput",
   signature = "simList",
   definition = function(object, cachePath, ...) {
-    tmpl <- list(...)
-    # browser(expr = exists("._prepareOutput_5"))
-    tmpl <- .findSimList(tmpl)
+    simFromCache <- object # rename for internal purposes
+    simPre <- list(...)
+    simPre <- .findSimList(simPre)
     # only take first simList -- may be a problem:
-    whSimList <- which(unlist(lapply(tmpl, is, "simList")))[1]
+    whSimList <- which(unlist(lapply(simPre, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
     if (simListInput) {
-      origEnv <- tmpl[[whSimList]]@.xData
+      origEnv <- simPre[[whSimList]]@.xData
 
-      isListOfSimLists <- if (is.list(object)) {
-        if (is(object[[1]], "simList")) TRUE else FALSE
+      isListOfSimLists <- if (is.list(simFromCache)) {
+        if (is(simFromCache[[1]], "simList")) TRUE else FALSE
       } else {
         FALSE
       }
 
       if (isListOfSimLists) {
-        object2 <- list()
-        for (i in seq_along(object)) {
+        simPost <- list()
+        for (i in seq_along(simFromCache)) {
+          stop("It looks like there are more than one simList in the Cached objects; ",
+               "Cache does not correctly deal with this currently.")
           # need to keep the list(...) slots ...
           # i.e., Caching of simLists is mostly about objects in .xData
-          object2[[i]] <- Copy(tmpl[[whSimList]], objects = FALSE)
-          object2[[i]]@.xData <- object[[i]]@.xData
-          object2[[i]]@completed <- object[[i]]@completed
-          object2[[i]]@simtimes <- object[[i]]@simtimes
-          object2[[i]]@current <- object[[i]]@current
-          object2[[i]]@events <- object[[i]]@events
+          simPost[[i]] <- Copy(simPre[[whSimList]], objects = FALSE)
+          simPost[[i]]@.xData <- simFromCache[[i]]@.xData
+          simPost[[i]]@completed <- simFromCache[[i]]@completed
+          simPost[[i]]@simtimes <- simFromCache[[i]]@simtimes
+          simPost[[i]]@current <- simFromCache[[i]]@current
+          simPost[[i]]@events <- simFromCache[[i]]@events
 
           lsOrigEnv <- ls(origEnv, all.names = TRUE)
-          keepFromOrig <- !(lsOrigEnv %in% ls(object2[[i]]@.xData, all.names = TRUE))
+          keepFromOrig <- !(lsOrigEnv %in% ls(simPost[[i]]@.xData, all.names = TRUE))
           # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
-          #          envir = object2[[i]]@.xData)
-          list2env(mget(lsOrigEnv[keepFromOrig], envir = tmpl[[whSimList]]@.xData),
-                   envir = object2[[i]]@.xData)
+          #          envir = simPost[[i]]@.xData)
+          list2env(mget(lsOrigEnv[keepFromOrig], envir = simPre[[whSimList]]@.xData),
+                   envir = simPost[[i]]@.xData)
         }
       } else {
-        # need to keep the tmpl slots ...
-        # i.e., Caching of simLists is mostly about objects in .xData
-        #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
-        object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
+        # Setup some things to use throughout
+        currModules <- currentModule(simPre[[whSimList]])
 
-        currModules <- currentModule(tmpl[[whSimList]])
+        # Step 1 -- copy the non-simEnv slots
+        simPost <- Copy(simPre[[whSimList]], objects = FALSE)
+
+
+        # Step 2 -- copy the objects that are in simPre to simPost
+        # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
+        # objsInPre <- grep("^\\._", objsInPre, value = TRUE, invert = TRUE)
+        # This needs to have different environments, i.e., like what Copy does
+        # list2env(mget(objsInPre, envir = simPre[[whSimList]]@.xData), envir = simPost@.xData)
+
+        # Step 2 -- figure out where to get objects in simEnv from -- preSim or simRecoveredFromCache
         # Convert to numeric index, as some modules don't have names
 
-        # hasCurrModule <- match(currModules, modules(tmpl[[whSimList]]))
+        # hasCurrModule <- match(currModules, modules(simPre[[whSimList]]))
 
-        lsObjectEnv <- ls(object@.xData, all.names = TRUE)
-        if (!is.null(object@.xData$.mods))
-          lsObjectModsEnv <- ls(object@.xData$.mods, all.names = TRUE)
+        lsObjectEnv <- ls(simFromCache@.xData, all.names = TRUE)
+        if (!is.null(simFromCache@.xData$.mods))
+          changedModEnvObjs <- ls(simFromCache@.xData$.mods, all.names = TRUE)
 
-
-
-        deps <- tmpl[[whSimList]]@depends@dependencies
+        deps <- simPre[[whSimList]]@depends@dependencies
         namesAllMods <- names(deps)
-        if (!is.null(namesAllMods)) {
+        if (!is.null(namesAllMods)) { # i.e., no modules exist in the simList
           hasCurrModule <- match(currModules, names(deps))
           if (length(currModules) == 0) currModules <- namesAllMods
 
@@ -545,8 +573,8 @@ setMethod(
           # add the environments for each module - allow local objects
           createOutputs <- c(createOutputs, currModules)
 
-          # take only the ones that the file changed, based on attr(object, ".Cache")$changed
-          changedOutputs <- createOutputs[createOutputs %in% attr(object, ".Cache")$changed]
+          # take only the ones that the file changed, based on attr(simFromCache, ".Cache")$changed
+          changedOutputs <- createOutputs[createOutputs %in% attr(simFromCache, ".Cache")$changed$changedObjs]
 
           expectsInputs <- if (length(hasCurrModule)) {
             deps[[hasCurrModule]]@inputObjects$objectName
@@ -556,52 +584,69 @@ setMethod(
             unique(unlist(aa))
           }
           lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
-          if (!is.null(object@.xData$.mods))
-            lsObjectModsEnv <- lsObjectModsEnv[lsObjectModsEnv %in% changedOutputs | lsObjectModsEnv %in% expectsInputs]
+          if (!is.null(simFromCache@.xData$.mods)) {
+            privateObjectsInModules <- attr(simFromCache, ".Cache")$changed
+            objsWithChangeInners <- setdiff(names(privateObjectsInModules), "changedObjs")
+            changedModEnvObjs <- privateObjectsInModules[objsWithChangeInners]
+          }
         }
 
-        # Copy all objects from createOutputs only -- all others take from tmpl[[whSimList]]
-        list2env(mget(lsObjectEnv, envir = object@.xData), envir = object2@.xData)
+        # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
+        list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
 
         # Deal with .mods objects
-        if (!is.null(object@.xData$.mods))
-          if (length(lsObjectModsEnv)) {
+        if (!is.null(simFromCache@.xData$.mods)) {
+          sames <- list()
+          # These are the unchanged objects
+          for (modNam in currModules) {
+            objs <-
+              setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T), changedModEnvObjs[[modNam]]$.objects)
+            list2env(objs, simPost$.mods[[modNam]]$.objects)
+          }
+          # Now changed objects
+          if (length(changedModEnvObjs)) {
+            Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
+              objNames <- names(objs$.objects)
+              list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
+                       envir = simPost@.xData$.mods[[nam]][[".objects"]])
+            })
             # override everything first -- this includes .objects -- take from Cache
-            list2env(mget(lsObjectModsEnv, envir = object@.xData$.mods), envir = object2@.xData$.mods)
+            # list2env(mget(changedModEnvObjs, envir = simFromCache@.xData$.mods), envir = simPost@.xData$.mods)
             # BUT functions are so lightweight that they should always return current
             if (length(currModules)) {
               lapply(currModules, function(currModule) {
-                currMods <- tmpl[[whSimList]]@.xData$.mods[[currModule]]
+                currMods <- simPre[[whSimList]]@.xData$.mods[[currModule]]
                 objsInModuleActive <- ls(currMods, all.names = TRUE)
                 dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
                 objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
                 if (length(objsInModuleActive))
-                  list2env(mget(objsInModuleActive, envir = tmpl[[whSimList]]@.xData$.mods[[currModule]]),
-                           envir = object2@.xData$.mods[[currModule]])
+                  list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[currModule]]),
+                           envir = simPost@.xData$.mods[[currModule]])
               })
 
             }
           }
-
-
-
-        if (length(object2@current) == 0) {
-          ## means it is not in a spades call
-          object2@completed <- object@completed
+          makeSimListActiveBindings(simPost)
         }
-        if (NROW(current(object2)) == 0) {
+
+
+        if (length(simPost@current) == 0) {
+          ## means it is not in a spades call
+          simPost@completed <- simFromCache@completed
+        }
+        if (NROW(current(simPost)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
-          object2@events <- object@events
-          object2@simtimes <- object@simtimes
+          simPost@events <- simFromCache@events
+          simPost@simtimes <- simFromCache@simtimes
         } else {
           # if this is FALSE, it means that events were added by the event
-          eventsAddedByThisModule <- events(object)$moduleName == current(object2)$moduleName
+          eventsAddedByThisModule <- events(simFromCache)$moduleName == current(simPost)$moduleName
           if (isTRUE(any(eventsAddedByThisModule))) {
-            if (!isTRUE(all.equal(object@events, object2@events))) {
-              b <- object@events
+            if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
+              b <- simFromCache@events
               b <- lapply(b, function(x) {x[["order"]] <- 2; x})
 
-              d <- object2@events
+              d <- simPost@events
               d <- lapply(d, function(x) {x[["order"]] <- 1; x})
 
 
@@ -609,57 +654,57 @@ setMethod(
                            args = alist(append(b[eventsAddedByThisModule], d)))
 
               # a <- do.call(unique,
-              #              args = list(append(object@events[eventsAddedByThisModule], object2@events)))
+              #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
               a1 <- rbindlist(a)
               f1 <- a[order(a1$eventTime, a1$eventPriority, a1$order)]
-              object2@events <- lapply(f1, function(f) {f$order <- NULL; f})
-              # object2@events <- do.call(unique,
-              #                           args = list(append(object@events[eventsAddedByThisModule], object2@events)))
+              simPost@events <- lapply(f1, function(f) {f$order <- NULL; f})
+              # simPost@events <- do.call(unique,
+              #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
             }
           }
-          #object2@events <- unique(rbindlist(list(object@events, object2@events)))
+          #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
-        object2@current <- object@current
+        simPost@current <- simFromCache@current
 
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over
         lsOrigEnv <- ls(origEnv, all.names = TRUE)
-        keepFromOrig <- !(lsOrigEnv %in% ls(object2@.xData, all.names = TRUE))
-        list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = object2@.xData)
+        keepFromOrig <- !(lsOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
+        list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = simPost@.xData)
 
         # Deal with .mods
         lsOrigModsEnv <- ls(origEnv$.mods, all.names = TRUE)
-        keepFromModsOrig <- !(lsOrigModsEnv %in% ls(object2@.xData$.mods, all.names = TRUE))
-        list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = origEnv$.mods), envir = object2@.xData$.mods)
+        keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData$.mods, all.names = TRUE))
+        list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = origEnv$.mods), envir = simPost@.xData$.mods)
 
-        if (exists("objectSynonyms", envir = object2@.xData)) {
-          objSyns <- lapply(attr(object2$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+        if (exists("objectSynonyms", envir = simPost@.xData)) {
+          objSyns <- lapply(attr(simPost$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
-          objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = object2@.xData))
+          objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = simPost@.xData))
           if (any(objNonCanonicalExist))
-            rm(list = objNonCanonical[objNonCanonicalExist], envir = object2@.xData)
-          suppressMessages(objectSynonyms(synonyms = objSyns, envir = object2@.xData))
+            rm(list = objNonCanonical[objNonCanonicalExist], envir = simPost@.xData)
+          suppressMessages(objectSynonyms(synonyms = objSyns, envir = simPost@.xData))
         }
 
       }
-      if (!is.null(attr(object, "removedObjs"))) {
-        if (length(attr(object, "removedObjs"))) {
-          rm(list = attr(object, "removedObjs"), envir = object2@.xData)
+      if (!is.null(attr(simFromCache, "removedObjs"))) {
+        if (length(attr(simFromCache, "removedObjs"))) {
+          rm(list = attr(simFromCache, "removedObjs"), envir = simPost@.xData)
         }
       }
 
-      attrsToGrab <- setdiff(names(attributes(object)), names(attributes(object2)))
+      attrsToGrab <- setdiff(names(attributes(simFromCache)), names(attributes(simPost)))
       for (atts in attrsToGrab) {
-        setattr(object2, atts, attr(object, atts))
-        #attr(object2, atts) <- attr(object, atts)
-        if (!identical(attr(object2, atts), attr(object, atts)))
-          stop("attributes on the cache object are not correct - 6")
+        setattr(simPost, atts, attr(simFromCache, atts))
+        #attr(simPost, atts) <- attr(simFromCache, atts)
+        if (!identical(attr(simPost, atts), attr(simFromCache, atts)))
+          stop("attributes on the cache simFromCache are not correct - 6")
       }
 
-      return(object2)
+      return(simPost)
     } else {
-      return(object)
+      return(simFromCache)
     }
 })
 
