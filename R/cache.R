@@ -68,7 +68,7 @@ setMethod(
       objectsMods <- grep("\\.mods\\$", .objects, value = TRUE)
       objectsMods <- gsub("\\.mods\\$", "", objectsMods)
       names(objectsMods) <- objectsMods
-      objects1ByModWhole <- lapply(objectsMods, function(mod) ls(envir = object@.xData$.mods[[mod]]))
+      objects1ByModWhole <- lapply(objectsMods, function(mod) ls(envir = object@.xData$.mods[[mod]], all.names = TRUE))
 
       .objects <- grep("\\.mods\\$", .objects, value = TRUE, invert = TRUE)
       objects1 <- strsplit(.objects, split = ":")
@@ -472,7 +472,7 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
         if (nl1 %in% names(l2)) {
           setdiffNamedRecursive(l1Different[[nl1]], l2[[nl1]])
         } else {
-          l1Different
+          l1Different[[nl1]]
         }
       })
     }
@@ -511,7 +511,7 @@ setMethod(
     simListInput <- !isTRUE(is.na(whSimList))
 
     if (simListInput) {
-      origEnv <- simPre[[whSimList]]@.xData
+      simPreOrigEnv <- simPre[[whSimList]]@.xData
 
       isListOfSimLists <- if (is.list(simFromCache)) {
         if (is(simFromCache[[1]], "simList")) TRUE else FALSE
@@ -533,11 +533,11 @@ setMethod(
           simPost[[i]]@current <- simFromCache[[i]]@current
           simPost[[i]]@events <- simFromCache[[i]]@events
 
-          lsOrigEnv <- ls(origEnv, all.names = TRUE)
-          keepFromOrig <- !(lsOrigEnv %in% ls(simPost[[i]]@.xData, all.names = TRUE))
-          # list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv),
+          lsSimPreOrigEnv <- ls(simPreOrigEnv, all.names = TRUE)
+          keepFromOrig <- !(lsSimPreOrigEnv %in% ls(simPost[[i]]@.xData, all.names = TRUE))
+          # list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPreOrigEnv),
           #          envir = simPost[[i]]@.xData)
-          list2env(mget(lsOrigEnv[keepFromOrig], envir = simPre[[whSimList]]@.xData),
+          list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPre[[whSimList]]@.xData),
                    envir = simPost[[i]]@.xData)
         }
       } else {
@@ -633,15 +633,16 @@ setMethod(
           # These are the unchanged objects
           for (modNam in currModules) {
             objs <-
-              setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T), changedModEnvObjs[[modNam]]$.objects)
+              setdiffNamedRecursive(changedModEnvObjs[[modNam]]$.objects, as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T))
             list2env(objs, simPost$.mods[[modNam]]$.objects)
           }
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
               objNames <- names(objs$.objects)
-              list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
-                       envir = simPost@.xData$.mods[[nam]][[".objects"]])
+              if (!is.null(objNames))
+                list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
+                         envir = simPost@.xData$.mods[[nam]][[".objects"]])
             })
             # override everything first -- this includes .objects -- take from Cache
             # list2env(mget(changedModEnvObjs, envir = simFromCache@.xData$.mods), envir = simPost@.xData$.mods)
@@ -688,15 +689,14 @@ setMethod(
 
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over
-        lsOrigEnv <- ls(origEnv, all.names = TRUE)
-        lsOrigEnv <- lsOrigEnv[!startsWith(lsOrigEnv, "._")]
-        keepFromOrig <- !(lsOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
-        list2env(mget(lsOrigEnv[keepFromOrig], envir = origEnv), envir = simPost@.xData)
+        lsSimPreOrigEnv <- ls(simPreOrigEnv, all.names = TRUE)
+        keepFromOrig <- !(lsSimPreOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
+        list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPreOrigEnv), envir = simPost@.xData)
 
         # Deal with .mods
-        # lsOrigModsEnv <- ls(origEnv$.mods, all.names = TRUE)
+        # lsOrigModsEnv <- ls(simPreOrigEnv$.mods, all.names = TRUE)
         # keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData$.mods, all.names = TRUE))
-        # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = origEnv$.mods), envir = simPost@.xData$.mods)
+        # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = simPreOrigEnv$.mods), envir = simPost@.xData$.mods)
 
         if (exists("objectSynonyms", envir = simPost@.xData)) {
           objSyns <- lapply(attr(simPost$objectSynonyms, "bindings"), function(x) unname(unlist(x)))

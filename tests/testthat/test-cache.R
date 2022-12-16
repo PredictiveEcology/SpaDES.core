@@ -437,7 +437,7 @@ test_that("Cache sim objs via .Cache attr", {
       sim$co1 <- 1
       sim$co2 <- 1
       sim$co3 <- 1
-      sim$.mods$test$hi <- 1
+      # sim$.mods$test$hi <- 1
       mod$hello <- 2
       ",
       xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
@@ -467,9 +467,9 @@ test_that("Cache sim objs via .Cache attr", {
 
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
-  expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
+  # expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
   mySim2 <- spades(Copy(mySim))
-  expect_true(mySim2$.mods$test$hi == 1) # was affected
+  # expect_true(mySim2$.mods$test$hi == 1) # was affected
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
   expect_true(mySim2$co3 == 1) # was affected
@@ -477,13 +477,13 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim2$co4 == 3) # wasn't affect by init event
   expect_true(is.null(mySim2$co5)) # wan't affected, and isn't there
 
-  # Try again, hi should be there
-  expect_true(is.null(mySim$.mods$test$hi)) # is not in the
+  # # Try again, hi should be there
+  # expect_true(is.null(mySim$.mods$test$hi)) # is not in the
   # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
   mess1 <- capture_messages({
     mySim2 <- spades(Copy(mySim))
   })
-  expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
+  # expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
   expect_true(any(grepl("loaded cached copy", mess1)))
@@ -526,7 +526,7 @@ test_that("Cache sim objs via .Cache attr", {
       sim$co1 <- 1
       sim$co2 <- 1
       sim$co3 <- 1
-      sim$.mods$test$hi <- 1
+      # sim$.mods$test$hi <- 1
       mod$hello <- 2
       ",
       xxx1[[1]][(lineWithInit + 1):lineWithDotInputObjects], "
