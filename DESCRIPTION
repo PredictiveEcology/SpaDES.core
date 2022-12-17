@@ -61,7 +61,6 @@ Suggests:
     NLMR (>= 1.1.1),
     pkgload,
     png,
-    RandomFields (>= 3.3.4),
     RColorBrewer (>= 1.1-2),
     rgdal,
     rmarkdown,
