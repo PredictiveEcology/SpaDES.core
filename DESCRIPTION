@@ -73,7 +73,6 @@ Suggests:
     testthat (>= 1.0.2)
 Remotes:
     ropensci/NLMR,
-    PredictiveEcology/Require@development,
     PredictiveEcology/reproducible@cacheMatchCall,
     PredictiveEcology/SpaDES.tools@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
