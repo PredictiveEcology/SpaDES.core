@@ -32,8 +32,7 @@ jobs:
             any::covr
             fastshp=?ignore
             NLMR=?ignore
-            PredictiveEcology/Require@development
-            PredictiveEcology/reproducible@development
+            PredictiveEcology/reproducible@cacheMatchCall
             PredictiveEcology/SpaDES.tools@development
 
       - name: Install additional package dependencies
