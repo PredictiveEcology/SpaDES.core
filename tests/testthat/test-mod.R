@@ -150,7 +150,7 @@ test_that("local mod object", {
 
 
 test_that("convertToPackage testing", {
-  if (interactive()) {
+  # if (interactive()) {
     if (requireNamespace("pkgload")) {
 
       try(pkgload::unload("test"), silent = TRUE)
@@ -244,5 +244,5 @@ test_that("convertToPackage testing", {
       pkgload::unload("test")
       pkgload::unload("test2")
     }
-  }
+  # }
 })

@@ -410,6 +410,7 @@ setMethod(
                                 algo = dots$algo,
                                 quick = dots$quick,
                                 classOptions = dots$classOptions)
+    if (exists("aaa", .GlobalEnv, inherits = FALSE)) browser()
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
@@ -420,8 +421,18 @@ setMethod(
         which(internalSimList)[1]
       }
 
+      # remove all functions from the module environment; they aren't allowed to be redefined within a function
       out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
                                    preDigest[[whSimList]]$.list[[whSimList2]])
+      for (modNam in modules(object)) {
+        isModElement <- names(out) == modNam
+        if (any(isModElement)) {
+          isDotObjects <- names(out[isModElement][[modNam]]) == ".objects"
+          if (any(!isDotObjects))
+            out[isModElement][[modNam]][!isDotObjects] <- NULL
+        }
+      }
+
       changedObjs <- out[lengths(out) > 0] # remove empty elements
 
       # isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
@@ -593,7 +604,7 @@ setMethod(
           lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
           if (!is.null(simFromCache@.xData$.mods)) {
             privateObjectsInModules <- attr(simFromCache, ".Cache")$changed
-            objsWithChangeInners <- setdiff(names(privateObjectsInModules), setdiff(changedOutputs, namesAllMods))
+            objsWithChangeInners <- intersect(namesAllMods, names(privateObjectsInModules))
             changedModEnvObjs <- privateObjectsInModules[objsWithChangeInners]
           }
         }
@@ -629,12 +640,13 @@ setMethod(
         }
         # Deal with .mods objects
         if (!is.null(simFromCache@.xData$.mods)) {
-          sames <- list()
           # These are the unchanged objects
+          # browser()
           for (modNam in currModules) {
             objs <-
-              setdiffNamedRecursive(changedModEnvObjs[[modNam]]$.objects, as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T))
-            list2env(objs, simPost$.mods[[modNam]]$.objects)
+              setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T), changedModEnvObjs[[modNam]]$.objects)
+            if (length(objs))
+              list2env(objs, simPost$.mods[[modNam]]$.objects)
           }
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
