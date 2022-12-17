@@ -13,7 +13,7 @@ URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2022-12-16
-Version: 1.1.0.9018
+Version: 1.1.0.9019
 Authors@R: c(
     person("Alex M", "Chubaty", email = "achubaty@for-cast.ca",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
@@ -75,7 +75,7 @@ Suggests:
 Remotes:
     ropensci/NLMR,
     PredictiveEcology/Require@development,
-    PredictiveEcology/reproducible@development,
+    PredictiveEcology/reproducible@cacheMatchCall,
     PredictiveEcology/SpaDES.tools@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
