@@ -66,14 +66,22 @@ test_that("test event-level cache & memory leaks", {
   sims$crazyFunction2 <- SpaDES.core:::bindrows
   end(sims) <- end(sims) + 0.1
 
-  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFunction <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFunction) == 0)
 
   sims$crazyFunction3 <- sims$.mods$caribouMovement$Move
   end(sims) <- end(sims) + 0.1
   # simsOut <- spades(sims, debug = FALSE)
 
-  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFunction <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFunction) == 0)
 
   # Take a leaky function -- should trigger memory leak stuff
@@ -82,7 +90,11 @@ test_that("test event-level cache & memory leaks", {
   end(sims) <- end(sims) + 0.1
 
   # simsOut <- spades(sims, debug = FALSE)
-  mess <- capture.output(warnsFunction <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFunction <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFunction) > 0)
   expect_true(grepl("function", warnsFunction))
   expect_true(grepl("crazyFunction", warnsFunction))
@@ -91,7 +103,11 @@ test_that("test event-level cache & memory leaks", {
 
   sims$crazyFormula <- formula(hi ~ test)
   end(sims) <- end(sims) + 0.1
-  mess <- capture.output(warnsFormula <- capture_warnings(simsOut <- spades(sims, debug = FALSE)))
+  mess <- capture.output({
+    warnsFormula <- capture_warnings({
+      simsOut <- spades(sims, debug = FALSE)
+    })
+  })
   expect_true(length(warnsFormula) > 0)
   expect_true(grepl("formula", warnsFormula))
   expect_true(grepl("crazyFormula", warnsFormula))

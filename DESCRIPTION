@@ -12,7 +12,7 @@ Description: Provides the core framework for a discrete event system (DES) to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2022-12-16
+Date: 2022-12-19
 Version: 1.1.0.9019
 Authors@R: c(
     person("Alex M", "Chubaty", email = "achubaty@for-cast.ca",
@@ -32,7 +32,7 @@ Authors@R: c(
 Depends:
     R (>= 4.0),
     quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.9)
+    reproducible (>= 1.2.15)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -73,7 +73,7 @@ Suggests:
     testthat (>= 1.0.2)
 Remotes:
     ropensci/NLMR,
-    PredictiveEcology/reproducible@cacheMatchCall,
+    PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.tools@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
@@ -129,4 +129,4 @@ Collate:
     'suppliedElsewhere.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3

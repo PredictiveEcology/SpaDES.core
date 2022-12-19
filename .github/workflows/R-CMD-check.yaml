@@ -53,13 +53,11 @@ jobs:
             any::rcmdcheck
             fastshp=?ignore
             NLMR=?ignore
-            PredictiveEcology/reproducible@cacheMatchCall
-            PredictiveEcology/SpaDES.tools@development
 
       - name: Install additional package dependencies
         run: |
           pak::pkg_install("ropensci/NLMR")
-          remotes::install_github("s-u/fastshp")
+          pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
