@@ -40,7 +40,7 @@ jobs:
       - name: Install additional package dependencies
         run: |
           pak::pkg_install("ropensci/NLMR")
-          remotes::install_github("s-u/fastshp")
+          pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
 
       - name: Build site
