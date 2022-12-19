@@ -40,7 +40,7 @@ test_that("defineModule correctly handles different inputs", {
     outputObjects = bindrows(
       createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_),
       createsOutput(objectName = "testOutput", objectClass = "list", desc = "another vague
-                   description with spaces for outputs   another space")
+                    description with spaces for outputs   another space")
     )
   )
 
