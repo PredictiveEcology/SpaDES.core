@@ -3,7 +3,8 @@ knitr::opts_chunk$set(eval = TRUE)
 
 hasSuggests <- all(
   require("NLMR", quietly = TRUE),
-  require("SpaDES.tools", quietly = TRUE)
+  require("SpaDES.tools", quietly = TRUE),
+  require("DiagrammeR", quietly = TRUE)
 )
 
 options("spades.moduleCodeChecks" = FALSE,
@@ -101,7 +102,7 @@ unlink(normalizePath(ftmp))
 
 ## ----eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7----
 # overview of the events in the simulation
-if (!requireNamespace("DiagrammeR", quietly = TRUE)) Require::Install("DiagrammeR")
+# Needs DiagrammeR package
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
 ## ----checksums, eval=FALSE----------------------------------------------------
@@ -180,8 +181,6 @@ progressInterval(mySim)
 
 ## ----load-save, echo=TRUE, eval=hasSuggests, message=FALSE--------------------
 # initialize a new simulation, setting the load and save parameters
-library(data.table)
-
 outputDir <- file.path(tempdir(), "simOutputs")
 mySim <- simInit(times = list(start = 0.0, end = 10),
                  params = list(
