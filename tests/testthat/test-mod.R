@@ -223,24 +223,26 @@ test_that("convertToPackage testing", {
   }
   working <- spades(mySim9, debug = FALSE)
 
-  # document -- this exports all functions!! Danger for testing later
-  out <- lapply(c("test", "test2"), function(tt) {
-    roxygen2::roxygenise(file.path(tmpdir, tt))
-  })
+  if (requireNamespace("roxygen2")) {
+    # document -- this exports all functions!! Danger for testing later
+    out <- lapply(c("test", "test2"), function(tt) {
+      roxygen2::roxygenise(file.path(tmpdir, tt))
+    })
 
-  # Will run document() so will have the NAMESPACE and
-  for (tt in c("test", "test2")) {
-    expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-    expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
+    # Will run document() so will have the NAMESPACE and
+    for (tt in c("test", "test2")) {
+      expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+      expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+      expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
+    }
+
+    # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
+    expect_true(is(working, "simList"))
+    expect_true(working$aaaa == 2)
+    expect_true(is(working$cccc, "try-error"))
+    bbb <- test2:::Run2(2)
+    expect_true(bbb == 4)
+    pkgload::unload("test")
+    pkgload::unload("test2")
   }
-
-  # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
-  expect_true(is(working, "simList"))
-  expect_true(working$aaaa == 2)
-  expect_true(is(working$cccc, "try-error"))
-  bbb <- test2:::Run2(2)
-  expect_true(bbb == 4)
-  pkgload::unload("test")
-  pkgload::unload("test2")
 })
