@@ -3,7 +3,8 @@ test_that("test event-level cache & memory leaks", {
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(smcc = FALSE,
-                          opts = list("reproducible.useMemoise" = FALSE))
+                          opts = list(reproducible.useMemoise = FALSE,
+                                      spades.memoryUseInterval = NULL))
   opts <- options("reproducible.cachePath" = tmpdir)
   on.exit({
     options(opts)
