@@ -1,4 +1,4 @@
-test_that("test-load.R: loading inputs does not work correctly", {
+test_that("loading inputs does not work correctly", {
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
@@ -112,7 +112,8 @@ test_that("test-load.R: loading inputs does not work correctly", {
   }
 })
 
-test_that("test-load.R: passing arguments to filelist in simInit does not work correctly", {
+test_that("passing arguments to filelist in simInit does not work correctly", {
+  skip_on_cran()
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
@@ -202,7 +203,7 @@ test_that("test-load.R: passing arguments to filelist in simInit does not work c
   }
 })
 
-test_that("test-load.R: passing objects to simInit does not work correctly", {
+test_that("passing objects to simInit does not work correctly", {
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
@@ -279,7 +280,7 @@ test_that("test-load.R: passing objects to simInit does not work correctly", {
   }
 })
 
-test_that("test-load.R: passing nearly empty file to simInit does not work correctly", {
+test_that("passing nearly empty file to simInit does not work correctly", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -288,8 +289,8 @@ test_that("test-load.R: passing nearly empty file to simInit does not work corre
   mapPath <- system.file("maps", package = "quickPlot")
 
   # test object passing directly
-  if (require(rgdal, quietly = TRUE)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
+  #if (require(rgdal, quietly = TRUE)) {
+  #  on.exit(detach("package:rgdal"), add = TRUE)
     filelist <- data.frame(
       files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
       functions = "raster",
@@ -306,10 +307,10 @@ test_that("test-load.R: passing nearly empty file to simInit does not work corre
 
     expect_true(all(c("DEM", "forestAge") %in% ls(sim3)))
     rm(sim3)
-  }
+  #}
 })
 
-test_that("test-load.R: more tests", {
+test_that("more tests", {
   skip_on_cran()
 
   testInitOut <- testInit()
@@ -362,7 +363,7 @@ test_that("test-load.R: more tests", {
   }
 })
 
-test_that("test-load.R: interval loading of objects from .GlobalEnv", {
+test_that("interval loading of objects from .GlobalEnv", {
   testInitOut <- testInit()
   on.exit({
     testOnExit(testInitOut)
@@ -429,17 +430,18 @@ test_that("Filenames for simList", {
   s$r2 <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
   s$r <- suppressWarnings(writeRaster(s$r, filename = tmpfile[1], overwrite = TRUE))
   s$r2 <- suppressWarnings(writeRaster(s$r2, filename = tmpfile[3], overwrite = TRUE))
-  s$s <- stack(s$r, s$r2)
+  s$s <- raster::stack(s$r, s$r2)
   a <- s$s
   a[] <- a[]
   s$b <- writeRaster(a, filename = tmpfile[5], overwrite = TRUE)
 
   Fns <- Filenames(s)
 
-  fnsGrd <- normPath(c(filename(s$b), gsub("grd$", "gri", filename(s$b))))
+  fnsGrd <- normPath(c(raster::filename(s$b), gsub("grd$", "gri", raster::filename(s$b))))
   expect_true(identical(c(Fns[["b1"]], Fns[["b2"]]), fnsGrd))
-  expect_true(identical(Fns[["r"]], normPath(filename(s$r))))
-  expect_true(identical(Fns[["r2"]], normPath(filename(s$r2))))
+  expect_true(identical(Fns[["r"]], normPath(raster::filename(s$r))))
+  expect_true(identical(Fns[["r2"]], normPath(raster::filename(s$r2))))
   expect_true(identical(c(Fns[["s1"]], Fns[["s2"]]),
-              sapply(seq_len(nlayers(s$s)), function(rInd) normPath(filename(s$s[[rInd]])))))
+              sapply(seq_len(raster::nlayers(s$s)), function(rInd)
+                normPath(raster::filename(s$s[[rInd]])))))
 })

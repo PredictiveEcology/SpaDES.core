@@ -1705,7 +1705,8 @@ getFutureNeeds <- function(deps, curModName) {
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
   message(crayon::magenta("        -- Spawning in a future"))
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
-  modObjs <- mget(ls(envir = modEnv), envir = modEnv)
+  objsToGet <- grep("^\\._", ls(envir = modEnv, all.names = TRUE), value = TRUE, invert = TRUE)
+  modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
   sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
@@ -1715,7 +1716,7 @@ getFutureNeeds <- function(deps, curModName) {
                               globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
                                           "showSimilar", ".pkgEnv", names(modObjs)),
                               packages = c("SpaDES.core", pkgs),
-                              envir = envir),
+                              envir = envir, seed = TRUE),
          thisModOutputs = list(moduleName = cur[["moduleName"]],
                                objects = futureNeeds$thisModOutputs,
                                dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))

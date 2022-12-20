@@ -106,7 +106,7 @@ Init <- function(sim) {
                      ymn = -ny / 2, ymx = ny / 2)
 
   ## Make dummy maps for testing of models
-  DEM <- neutralLandscapeMap(template,
+  DEM <- SpaDES.tools::neutralLandscapeMap(template,
                              roughness = 0.3,
                              rand_dev = 10,
                              rescale = TRUE,
@@ -115,7 +115,7 @@ Init <- function(sim) {
   DEM[] <- round(getValues(DEM), 1) * 300
   # plot(DEM)
 
-  forestAge <- neutralLandscapeMap(template,
+  forestAge <- SpaDES.tools::neutralLandscapeMap(template,
                                    roughness = 0.7,
                                    rand_dev = 10,
                                    rescale = FALSE,
@@ -124,7 +124,7 @@ Init <- function(sim) {
   forestAge[] <- round(getValues(forestAge), 1) * 10
   # plot(forestAge)
 
-  percentPine <- neutralLandscapeMap(template,
+  percentPine <- SpaDES.tools::neutralLandscapeMap(template,
                                      roughness = 0.5,
                                      rand_dev = 10,
                                      rescale = TRUE,

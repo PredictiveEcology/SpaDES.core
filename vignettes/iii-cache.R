@@ -1,8 +1,6 @@
 ## ----setup, include = FALSE---------------------------------------------------
-hasSuggests <- all(
-  require("NLMR", quietly = TRUE),
-  require("SpaDES.tools", quietly = TRUE)
-)
+SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "googledrive")
+hasSuggests <- sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE)
 
 knitr::opts_chunk$set(eval = hasSuggests)
 
@@ -27,16 +25,19 @@ mySim <- simInit(
 
 ## ----spades-------------------------------------------------------------------
 # compare caching ... run once to create cache
-system.time({
-  outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
-})
+if (requireNamespace("SpaDES.tools"))
+  system.time({
+    outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
+  })
 
 ## ----spades-cached------------------------------------------------------------
 # vastly faster 2nd time
-system.time({
-  outSimCached <- spades(Copy(mySim), cache = TRUE)
-})
-all.equal(outSim, outSimCached) 
+if (requireNamespace("SpaDES.tools")) {
+  system.time({
+    outSimCached <- spades(Copy(mySim), cache = TRUE)
+  })
+  all.equal(outSim, outSimCached) 
+}
 
 ## ----module-level, echo=TRUE--------------------------------------------------
 # Module-level
@@ -46,7 +47,7 @@ system.time({
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -65,7 +66,7 @@ system.time({
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -103,10 +104,10 @@ system.time({
 all.equal(map, mapCached) 
 
 ## ----manual-cache-------------------------------------------------------------
-cacheDB <- showCache(mySim)
+cacheDB <- showCache(mySim, userTags = "nlm_mpd")
 
 ## get the RasterLayer that was produced with the NLMR::nlm_mpd function:
-map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "nlm_mpd"]$cacheId)
+map <- loadFromCache(cacheId = cacheDB$cacheId)
 
 clearPlot()
 Plot(map)

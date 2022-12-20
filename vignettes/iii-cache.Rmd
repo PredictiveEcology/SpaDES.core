@@ -20,10 +20,8 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-hasSuggests <- all(
-  require("NLMR", quietly = TRUE),
-  require("SpaDES.tools", quietly = TRUE)
-)
+SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "googledrive")
+hasSuggests <- sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE)
 
 knitr::opts_chunk$set(eval = hasSuggests)
 
@@ -87,7 +85,7 @@ system.time({
 Note that if there were any visualizations (here we turned them off with `.plotInitialTime = NA` above) they will happen the first time through, but not the cached times.
 
 ```{r spades-cached}
-# vastly faster 2nd time
+# faster 2nd time
 system.time({
   outSimCached <- spades(Copy(mySim), cache = TRUE)
 })

@@ -1,4 +1,5 @@
 test_that("test event-level cache & memory leaks", {
+  skip_on_cran()
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit(smcc = FALSE,
