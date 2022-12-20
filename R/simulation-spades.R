@@ -1705,7 +1705,8 @@ getFutureNeeds <- function(deps, curModName) {
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
   message(crayon::magenta("        -- Spawning in a future"))
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
-  modObjs <- mget(ls(envir = modEnv), envir = modEnv)
+  objsToGet <- grep("^\\._", ls(envir = modEnv, all.names = TRUE), value = TRUE, invert = TRUE)
+  modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
   sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
