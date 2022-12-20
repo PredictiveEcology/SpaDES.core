@@ -4,7 +4,8 @@ test_that("test spades.futureEvents", {
   skip_on_cran()
   skip_on_os("windows")
   testInitOut <- testInit(smcc = FALSE, libraries = "future",
-                          opts = list("reproducible.useMemoise" = FALSE, "spades.futureEvents" = TRUE))
+                          opts = list("reproducible.useMemoise" = FALSE,
+                                      "spades.futureEvents" = TRUE))
   tmpdir <- tempdir()
   modPath <- system.file("sampleModules", package = "SpaDES.core")
   newModule("test", path = modPath)
@@ -80,7 +81,7 @@ test_that("test spades.futureEvents", {
   options("spades.futureEvents" = TRUE)
   set.seed(1)
   simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
-  options("spades.spades.futureEvents" = FALSE)
+  options("spades.futureEvents" = FALSE)
   set.seed(1)
   simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
 
