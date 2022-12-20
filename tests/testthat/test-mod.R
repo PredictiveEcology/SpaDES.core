@@ -160,6 +160,8 @@ test_that("convertToPackage testing", {
                               opts = list("reproducible.useMemoise" = FALSE))
       on.exit({
         testOnExit(testInitOut)
+        try(pkgload::unload("test"), silent = TRUE)
+        try(pkgload::unload("test2"), silent = TRUE)
       }, add = TRUE)
 
       newModule("test", tmpdir, open = FALSE)
