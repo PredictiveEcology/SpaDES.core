@@ -21,7 +21,7 @@ editor_options:
 
 ```{r setup, include = FALSE}
 SuggestedPkgsNeeded <- c("googledrive", "NLMR", "SpaDES.tools")
-hasSuggests <- sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE)
+hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
 knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
