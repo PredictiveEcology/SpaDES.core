@@ -227,10 +227,13 @@ runTestsWithTimings <- function(nameOfOuterList = "ff", envir = parent.frame(), 
   if (isTRUE(authorizeGoogle))
     if (Sys.info()[["user"]] == "emcintir")
       googledrive::drive_auth(cache = "~/.secret", email = "predictiveecology@gmail.com")
-  prepend <- "/home/emcintir/GitHub/reproducible/tests/testthat"
+  prepend <- "/home/emcintir/GitHub/SpaDES.core/tests/testthat"
   testFiles <- dir(prepend, pattern = "^test-", full.names = TRUE)
   testFiles <- grep("large", testFiles, value = TRUE, invert = TRUE)
-  rrrr <- get(nameOfOuterList, envir = envir)
+  rrrr <- get0(nameOfOuterList, envir = envir)
+  if (is.null(rrrr)) {
+    assign(nameOfOuterList, list(), envir = .GlobalEnv)
+  }
   testFiles <- setdiff(testFiles, file.path(prepend, names(rrrr)))
   for (tf in testFiles) {
     messageDF(colour = "blue", basename(tf))
@@ -243,9 +246,9 @@ runTestsWithTimings <- function(nameOfOuterList = "ff", envir = parent.frame(), 
       start <- Sys.time()
       try(eval(parsed))
       end <- Sys.time()
-      b <- difftime(end, start)
+      b <- difftime(end, start, units = "secs")
       print(format(b))
-      data.table(elapsed = as.numeric(b), skipOnCRAN = skipOnCran)
+      data.table(elapsed = round(as.numeric(b), 2), skipOnCRAN = skipOnCran)
     })
     ee <- data.table::rbindlist(dd, idcol = "Label")
     ee <- setNames(list(ee), basename(tf))
@@ -258,5 +261,7 @@ runTestsWithTimings <- function(nameOfOuterList = "ff", envir = parent.frame(), 
   gg <- data.table::rbindlist(get(nameOfOuterList, envir = envir),
                               idcol = "TestFile")
   gg[, TestFile := basename(TestFile)]
-  gg
+  gg[, elapsed := round(elapsed, 2)]
+  data.table::setorderv(gg, c("skipOnCRAN", "elapsed"), order = c(1L, -1L))
+  gg[]
 }
