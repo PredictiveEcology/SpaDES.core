@@ -96,7 +96,7 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #' @note The suggested `future` and `future.callr` packages must be available.
 #'
 #' @export
-#' @param sim A completed simList
+#' @param sim A completed `simList`
 #' @param max Logical. If TRUE, then it the return value will be summarized by
 #'   module/event, showing the maximum memory used. If `FALSE`, then
 #'   the raw memory used during each event will be shown.

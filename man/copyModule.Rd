@@ -28,10 +28,6 @@ Invisible logical indicating success (\code{TRUE}) or failure (\code{FALSE}).
 \description{
 Create a copy of an existing module
 }
-\examples{
-\dontrun{copyModule(from, to)}
-
-}
 \author{
 Alex Chubaty
 }

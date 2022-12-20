@@ -120,7 +120,7 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
 \donttest{
 # Note: if this is used inside a SpaDES module, do not define this
 #  function inside another function. Put it outside in a normal
-#  module script. It will cause a memory leak, otherwise.
+#  module script. Otherwise, it will cause a memory leak.
 if (!require("ggplot2")) stop("please install ggplot2")
 fn <- function(d)
   ggplot(d, aes(a)) +
@@ -145,7 +145,7 @@ Plots(data = sim$something, fn = fn,
 
 # Can also be used like quickPlot::Plot, but with control over output type
 r <- raster::raster(raster::extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500))
+Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 
 } # end of dontrun
 }

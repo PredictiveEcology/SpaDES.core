@@ -576,10 +576,6 @@ setMethod("openModules",
 #' @author Alex Chubaty
 #' @export
 #' @rdname copyModule
-#'
-#' @examples
-#' \dontrun{copyModule(from, to)}
-#'
 setGeneric("copyModule", function(from, to, path, ...) {
   standardGeneric("copyModule")
 })

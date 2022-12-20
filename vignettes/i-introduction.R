@@ -15,7 +15,7 @@ options("spades.moduleCodeChecks" = FALSE,
 #        .plotInitialTime = NA, .plotInterval = NA, inRAM = TRUE
 #      ),
 #      caribouMovement = list(
-#        N = 1e2, .saveObjects = c("caribou"),
+#        N = 1e2, .saveObjects = "caribou",
 #        .plotInitialTime = 1, .plotInterval = 1, moveInterval = 1
 #      ),
 #      fireSpread = list(

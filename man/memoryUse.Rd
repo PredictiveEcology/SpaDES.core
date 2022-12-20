@@ -13,7 +13,7 @@ memoryUse(sim, max = TRUE)
 \item{thisPid}{Numeric or integer, the PID of the process. If omitted, it will
 be found with \code{Sys.getpid()}}
 
-\item{sim}{A completed simList}
+\item{sim}{A completed \code{simList}}
 
 \item{max}{Logical. If TRUE, then it the return value will be summarized by
 module/event, showing the maximum memory used. If \code{FALSE}, then
