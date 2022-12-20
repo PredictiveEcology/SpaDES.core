@@ -25,16 +25,19 @@ mySim <- simInit(
 
 ## ----spades-------------------------------------------------------------------
 # compare caching ... run once to create cache
-system.time({
-  outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
-})
+if (requireNamespace("SpaDES.tools"))
+  system.time({
+    outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
+  })
 
 ## ----spades-cached------------------------------------------------------------
 # vastly faster 2nd time
-system.time({
-  outSimCached <- spades(Copy(mySim), cache = TRUE)
-})
-all.equal(outSim, outSimCached) 
+if (requireNamespace("SpaDES.tools")) {
+  system.time({
+    outSimCached <- spades(Copy(mySim), cache = TRUE)
+  })
+  all.equal(outSim, outSimCached) 
+}
 
 ## ----module-level, echo=TRUE--------------------------------------------------
 # Module-level
