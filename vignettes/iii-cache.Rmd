@@ -20,10 +20,11 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "googledrive")
+SuggestedPkgsNeeded <- c("googledrive", "NLMR", "SpaDES.tools")
 hasSuggests <- sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE)
+useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
-knitr::opts_chunk$set(eval = hasSuggests)
+knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
