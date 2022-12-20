@@ -1715,7 +1715,7 @@ getFutureNeeds <- function(deps, curModName) {
                               globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
                                           "showSimilar", ".pkgEnv", names(modObjs)),
                               packages = c("SpaDES.core", pkgs),
-                              envir = envir),
+                              envir = envir, seed = TRUE),
          thisModOutputs = list(moduleName = cur[["moduleName"]],
                                objects = futureNeeds$thisModOutputs,
                                dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
