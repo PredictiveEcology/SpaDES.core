@@ -135,6 +135,7 @@ Plots <- function(data, fn, filename,
                   deviceArgs = list(),
                   ...) {
 
+  simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
