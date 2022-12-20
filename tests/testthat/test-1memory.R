@@ -1,5 +1,6 @@
 test_that("testing memoryUse", {
-  skip_if_not(interactive()) ## still experimental
+  # Needs to run first or else memeory use test fails
+  skip_on_cran()
   # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
   skip_if_not_installed("future")
   skip_if_not_installed("future.callr")
@@ -22,7 +23,7 @@ test_that("testing memoryUse", {
 
   #set.seed(42)
 
-  gc()
+  for (i in 1:10) gc()
   times <- list(start = 0.0, end = if (isWindows()) 60 else 30, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
