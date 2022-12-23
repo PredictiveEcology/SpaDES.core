@@ -1,13 +1,11 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-version 1.1.0.9000
-=============
+# SpaDES.core 1.1.0.9000
 
 ## new features
 * `moduleMetadata` now handles multiple module paths
 
-version 1.1.0
-=============
+# SpaDES.core 1.1.0
 
 ## new features
 * messaging in a module can now handle "same line" messages --> simply use the standard `"\b"` in the message, and it will occur on same line as previous message
@@ -43,21 +41,20 @@ version 1.1.0
 * several minor fixes, including in `Plots`
 * fixes to `saveFiles` related to `data.table` assignment and use in `outputs(sim)`
 
-version 1.0.10
-==============
+# SpaDES.core 1.0.10
 
 ## new features
 * **experimental new feature** `SpaDES` modules can now be R packages.
   The simplest way to convert a module to a package is using the new function `convertToPackage`.
   Benefits of doing this are so that a SpaDES module can benefit from the infrastructure of an R package (e.g., `devtools::document`, `devtools::check`, setting up Continuous Integration systems etc.).
   Any documentation written using `#'` i.e., `roxygen2` will be copied immediately above the function where it was sitting. 
-* `newModule` now correctly places the `SpaDES.core` package dependency in the `reqdPkgs` element of the metadata, instead of `version`. It will put the full Github reference if SpaDES.core was installed directly from GitHub.
+* `newModule` now correctly places the `SpaDES.core` package dependency in the `reqdPkgs` element of the metadata, instead of `# SpaDES.core`. It will put the full Github reference if SpaDES.core was installed directly from GitHub.
 * There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.
 * new function: `paramCheckOtherMods`.
   Can be used within a module to assert that a parameter has the same value as the same parameter in other modules.
   This is therefore a check of a parameter that might be considered a `.global` and passed within `simInit(..., params = list(.globals = list(someParam = "someValue")))`, but the user did not do that.
 * now `spades` messaging when e.g., `debug = 1` can correctly accommodate nested `spades` calls, i.e., a SpaDES module calling `spades` internally.
-* `newModule` now puts `SpaDES.core` dependency in the correct `reqdPkgs` instead of `version` metadata element
+* `newModule` now puts `SpaDES.core` dependency in the correct `reqdPkgs` instead of `# SpaDES.core` metadata element
 * to further the transition to using `.plots` instead of `.plotInitialTime`, `Plots` will check whether `.plotInitialTime` is actually set in the module metadata first.
   Only if it is there, will it evaluate its value. Currently, modules get default values for `.plotInitialTime` even if the module developer did not include it in the module metadata. 
 
@@ -69,8 +66,7 @@ version 1.0.10
 * `Cache`-ing of a `simList`, when `quick` is a character vector, errored. Now fixed.
 * `moduleMetadata` incorrectly dropped `defineModuleListItems` under certain signatures.
 
-version 1.0.9
-=============
+# SpaDES.core 1.0.9
 
 ## new features
 * `moduleCoverage` has been rewritten to estimate code coverage of a module using `covr` package.
@@ -96,22 +92,20 @@ version 1.0.9
 * `simInitAndSpades` now has `.plots` arg to match `spades`
 * fix raster file name query for GDAL 3.3.2 (#174; @rsbivand)
 
-version 1.0.8
-=============
+# SpaDES.core 1.0.8
 
 ## new features
 * `Plots` function can be used like `Plot`, but with `types` specified.
   The devices to save on disk will have some different behaviours to the screen representation, since "wiping" an individual plot on a device doesn't exist for a file device.
 
-version 1.0.7
-=============
+# SpaDES.core 1.0.7
 
 ## new features
 * `Plots` function that will produce zero to 4 types of items that are relevant for plotting: 1) Visual on screen, 2) The plot object saved to disk, 3) The raw data that went into the plot and 4) The plot as one or more image files, e.g., `.png` or `.pdf` via `ggsave`
 * `spades` now accepts an `events` argument, which will limit the events that are run to those specified in the argument. This seems to be most useful for the `init` case, e.g., `spades(sim, events = "init")`. See `?spades`.
 * messaging during `simInit` now is prefixed with `Sys.time()` and `"simInit`"
 * messaging during `spades` is simplified to take up fewer characters: `INFO::` has been removed
-* `simInit` now checks for minimum version of `SpaDES.core` needed in a module and stops if it fails, giving instructions how to upgrade.
+* `simInit` now checks for minimum # SpaDES.core of `SpaDES.core` needed in a module and stops if it fails, giving instructions how to upgrade.
 * several human-readable only elements of a module metadata are no longer enforced, including `spatialExtent`, as they are not used by the spades algorithms
 * new function: `anyPlotting` to test whether plotting of one form or another should occur
 * line-by-line messaging during `spades` call is now more informative, including module name (by default shortened -- can be changed with `options("spades.messagingNumCharsModule"))`) 
@@ -134,11 +128,10 @@ version 1.0.7
 * recovery mode did not work correctly if the file-backed rasters were in the temporary directory, as it would collide with the temporary directory of the recovery mode mechanism. Now recovery mode uses a dedicated temporary directory
 * other minor bugfixes, 
 
-version 1.0.6
-=============
+# SpaDES.core 1.0.6
 
 ## new features
-* more informative message re: module package versions when `spades.useRequire = FALSE` (#141)
+* more informative message re: module package # SpaDES.cores when `spades.useRequire = FALSE` (#141)
 * now detects user-created memory leaks when a user adds a closure or formula to the `sim`; user informed with a `warning`
 
 ## dependencies
@@ -150,8 +143,7 @@ version 1.0.6
 * fix failures on R-devel caused by `RandomFields` being unavailable.
 * minor bug fixes
 
-version 1.0.5
-=============
+# SpaDES.core 1.0.5
 
 ## new features
 * New experimental `spades.futureEvents` option. If set to `TRUE`, spades will run module events in a "future" (see `future` package), if they do not produce outputs for other modules.
@@ -169,8 +161,7 @@ version 1.0.5
 * minor bug fixes
 * use new `all.equal(..., check.environment = FALSE)` for internal testing 
 
-version 1.0.3
-=============
+# SpaDES.core 1.0.3
 
 ## new features
 * none
@@ -180,11 +171,10 @@ version 1.0.3
 * Suggests `sp` because it's linked in documentation (#120)
 
 ## bug fixes
-* fix `pkgDeps` example for new version of `Require`
+* fix `pkgDeps` example for new # SpaDES.core of `Require`
 * minor bug fixes
 
-version 1.0.2
-=============
+# SpaDES.core 1.0.2
 
 ## new features
 * `desc` argument in `defineParameter`, `expectsInput`, and `createsOutput` can now have extraneous spaces and End-of-Line characters.
@@ -204,8 +194,7 @@ version 1.0.2
 * fix CRAN check errors
 * reduced the number of tests run on CRAN (extended tests still run on GitHub Actions)
 
-version 1.0.1
-=============
+# SpaDES.core 1.0.1
 
 ## new features
 
@@ -226,8 +215,7 @@ version 1.0.1
 * tests for `Filenames` function coming from `reproducible` package
 * `options('spades.recoverMode')` was creating temp folders every event and not removing them; now it does.
 
-version 1.0.0
-=============
+# SpaDES.core 1.0.0
 
 ## new features
 
@@ -254,8 +242,7 @@ version 1.0.0
 * removed mention of 'demo' from intro vignette (#110)
 * `objectSynonyms` caused a breakage under some conditions related to recovering a module from `Cache`.
 
-version 0.2.8
-=============
+# SpaDES.core 0.2.8
 
 ## new features
 
@@ -266,8 +253,7 @@ version 0.2.8
 
 * `restartR` minor bug fixes
 
-version 0.2.7
-=============
+# SpaDES.core 0.2.7
 
 ## dependencies
 
@@ -296,12 +282,11 @@ version 0.2.7
 
 * `experiment()`, `experiment2()`, and `POM()` have been moved to the `SpaDES.experiment` package
 
-version 0.2.6
-=============
+# SpaDES.core 0.2.6
 
 ## dependencies
 
-* R 3.5.0 is the minimum version required for `SpaDES.core`.
+* R 3.5.0 is the minimum # SpaDES.core required for `SpaDES.core`.
   Too many dependency packages are not maintaining their backwards compatibility.
 * added `backports` to Imports for R-oldrel support
 * removed `googledrive` dependency (this functionality moved to `reproducible`)
@@ -332,19 +317,17 @@ version 0.2.6
 * packages listed in `reqdPkgs` not being loaded when only listed in child modules. Fixed in `5cd79ac95bc8d190e954313f125928458b0108d2`.
 * fixed issue with saving simulation outputs at simulation end time.
 
-version 0.2.5
-=============
+# SpaDES.core 0.2.5
 
 * improved messaging and fixed test failures when GLPK installed but not used by `igraph`
 * compatibility with `RandomFields` >= 3.3.4
 
-version 0.2.4
-=============
+# SpaDES.core 0.2.4
 
 ## package dependencies
 
 * `archivist` and `devtools` added to Suggests because they are used in vignettes
-* minimium `reproducible` version 0.2.6
+* minimium `reproducible` # SpaDES.core 0.2.6
 
 ## new features
 
@@ -372,8 +355,7 @@ objects (this may have very little/no effect on simList objects)
 * fix to work with latest `data.table` v1.12.0 (#85, @mattdowle)
 * several minor, including to `Copy` (error existed because function inheritance persisted even though the location of the function was moved)
 
-version 0.2.3
-=============
+# SpaDES.core 0.2.3
 
 ## package dependencies
 
@@ -388,7 +370,7 @@ version 0.2.3
 * most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.
 * new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
 * improved messaging when GLPK not installed (*e.g.*, on macOS)
-* `downloadModule()` now prints the module version downloaded (#77)
+* `downloadModule()` now prints the module # SpaDES.core downloaded (#77)
 * 
 
 ## bug fixes
@@ -397,8 +379,7 @@ version 0.2.3
 * module `.inputObjects` evaluated based on module load order (#72)
 * `.robustDigest` fix for simLists -- needed to omit `._startClockTime` and `.timestamp`
 
-version 0.2.2
-=============
+# SpaDES.core 0.2.2
 
 ## package dependencies
 
@@ -412,12 +393,11 @@ version 0.2.2
 
 * fix issues with failing tests on macOS
 
-version 0.2.1
-=============
+# SpaDES.core 0.2.1
 
 ## package dependencies
 
-* requires new version of `reproducible` (>=0.2.2)
+* requires new # SpaDES.core of `reproducible` (>=0.2.2)
 
 ## new features
 
@@ -436,8 +416,7 @@ version 0.2.1
     - functions with `simList` in arguments that return a `simList` will now do a post digest of the output. This will be compared with the predigest, and only those object which changed in the `simList` will be modified.
     - caching of `.inputObjects` function was incorrect. Fixed.
 
-version 0.2.0
-=============
+# SpaDES.core 0.2.0
 
 ## new features
 
@@ -478,10 +457,9 @@ version 0.2.0
 * add package imports `tools`, `pryr`.
 * removed package imports `rgeos`, `RCurl` and `googledrive`.
 
-version 0.1.1
-=============
+# SpaDES.core 0.1.1
 
-* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use version control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`
+* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use # SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`
 * environments in modules are now as follows: 
     
     - Functions defined in a module are sourced into an environment located here: `sim@.envir$<moduleName>`, and it is a is a child of `sim@.envir`. Functions can be found in this environment, but prefixing functions is not necessary, because modules functions are within this environment already. 
@@ -494,7 +472,7 @@ version 0.1.1
 * speed improvements:
 
     - the core DES is now built around lists, rather than `data.table` objects. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
-    - `.parseModule` and `.parseModuePartial` now put their parsed content into a temporary environment (`sim@.envir$.parsedFiles$<Full Filename>)` during the `simInit`, which gets re-used. Previously, files were parsed multiple times in a given `simInit` call. Several functions now have `envir` argument to pass this through (including `moduleVersion`, `packages`, `checkParams`)
+    - `.parseModule` and `.parseModuePartial` now put their parsed content into a temporary environment (`sim@.envir$.parsedFiles$<Full Filename>)` during the `simInit`, which gets re-used. Previously, files were parsed multiple times in a given `simInit` call. Several functions now have `envir` argument to pass this through (including `module# SpaDES.core`, `packages`, `checkParams`)
 
 * parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the `sim` object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., `startSimPlus1 <- start(sim) + 1` can be defined in the module and used in `defineModule`
 * remove `grDevices` from Imports as it was not used (#1)
@@ -513,15 +491,14 @@ version 0.1.1
 * default `debug` option in `spades()` now uses the package option `spades.debug` and default is set to `FALSE` (#5)
 * various other speed improvements and bug fixes
 * convert `P` to a function, rather than S4 generic and method, for speed.
-* importFrom only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
+* `@importFrom` only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
 * new function `remoteFileSize` to check the size of remote files
 * new namespaced function `dataPath` will return `file.path(modulePath(sim), currentModule(sim), "data")`, which will return a different path, depending on which module it is placed inside.
 * add crayon to imports -- now messages are more colour coded
 * bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object
 
 
-version 0.1.0
-=============
+# SpaDES.core 0.1.0
 
 * A new package, which takes all core DES functionality out of the `SpaDES` package:
 
