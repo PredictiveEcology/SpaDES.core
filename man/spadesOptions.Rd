@@ -23,7 +23,7 @@ The following options are likely of interest to most users
   `spades.browserOnError` \tab `FALSE` \tab If `TRUE`, the default, then any
   error rerun the same event with `debugonce` called on it to allow editing
   to be done. When that browser is continued (e.g., with 'c'), then it will save it
-  reparse it into the `simList` and rerun the edited version.
+  re-parse it into the `simList` and rerun the edited version.
   This may allow a `spades()` call to be recovered on error,
   though in many cases that may not be the correct behaviour.
   For example, if the `simList` gets updated inside that event in an iterative
@@ -77,8 +77,8 @@ The following options are likely of interest to most users
 
   `moduleDocument` \tab  `NULL`
     \tab  When a module is an R package e.g., via `convertToPackage`,
-    it will not, by default, rebuild documentation during `simInit`. If
-    the user would like this to happen on every call to `simInit`,
+    it will not, by default, rebuild documentation during `simInit`.
+    If the user would like this to happen on every call to `simInit`,
     set this option to `TRUE` \cr
 
   `spades.modulePath` \tab `file.path(tempdir(), "SpaDES", "modules")`)
@@ -98,7 +98,7 @@ The following options are likely of interest to most users
 
   `spades.recoveryMode` \tab `1L` \tab
   If this a numeric > 0 or TRUE, then the
-  discrete event simulator will take a snapshot of the objects in the simList
+  discrete event simulator will take a snapshot of the objects in the `simList`
   that might change (based on metadata `outputObjects` for that module), prior to
   initiating every event. This will allow the
   user to be able to recover in case of an error or manual interruption (e.g., `Esc`).
@@ -107,7 +107,7 @@ The following options are likely of interest to most users
   > 1 event in the past, i.e., redo some of the "completed" events. Default is
   `TRUE`, i.e., it will keep the state of the `simList`
   at the start of the current event. This can be recovered with `restartSpades`
-  and the differences can be seen in a hidden object in the stashed simList.
+  and the differences can be seen in a hidden object in the stashed `simList`.
   There is a message which describes how to find that. \cr
 
   `spades.scratchPath` \tab `file.path(tempdir(), "SpaDES", "scratch")`)
