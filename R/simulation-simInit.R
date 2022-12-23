@@ -1359,6 +1359,7 @@ buildParentChildGraph <- function(sim, mods, childModules) {
   outDF
 }
 
+#' @importFrom Require getCRANrepos
 loadPkgs <- function(reqdPkgs) {
   uniqueReqdPkgs <- unique(unlist(reqdPkgs))
 
@@ -1369,6 +1370,7 @@ loadPkgs <- function(reqdPkgs) {
     checkSpaDES.coreMinVersion(allPkgs)
 
     if (getOption("spades.useRequire")) {
+      getCRANrepos(ind = 1) # running this first is neutral if it is set
       Require(allPkgs, upgrade = FALSE)
     } else {
       allPkgs <- unique(Require::extractPkgName(allPkgs))
