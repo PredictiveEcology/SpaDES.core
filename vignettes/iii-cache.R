@@ -1,5 +1,5 @@
 ## ----setup, include = FALSE---------------------------------------------------
-SuggestedPkgsNeeded <- c("googledrive", "NLMR", "SpaDES.tools")
+SuggestedPkgsNeeded <- c("googledrive", "NLMR", "SpaDES.tools", "knitr")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 

@@ -19,16 +19,15 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE)
+SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr")
+hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
+useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
-hasSuggests <- all(
-  require("NLMR", quietly = TRUE),
-  require("SpaDES.tools", quietly = TRUE),
-  require("DiagrammeR", quietly = TRUE)
-)
+knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
+
 ```
 
 ```{css, echo=FALSE}
@@ -148,7 +147,7 @@ Every module requires complete metadata, structured as a named list, and passed 
 &nbsp;                | the objects output by the module, with columns `objectName`, `objectClass`, `desc` and other specifications.
 &nbsp;                | Add an output object by using `createsOutput`.
 
-```{r module-metadata, echo=FALSE, eval=TRUE, results="asis"}
+```{r module-metadata, echo=FALSE, results="asis"}
 cat(c(
   "```",
   "## sample module metadata for the default `caribouMovement` module",
@@ -171,7 +170,7 @@ We suggest passing a list of all the parameters needed for a single module toget
 A module's metadata defines default values for module-specific parameters, and these defaults will be used unless overridden by the user.
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
-```{r passing-params, eval=hasSuggests, echo=TRUE}
+```{r passing-params, echo=TRUE}
 library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
@@ -218,7 +217,7 @@ Each module may contain an arbitrary number of event types.
 Each of these event types are defined within the `doEvent.moduleName` call, and are wrapped in a simple `if`/`else` stanza that matches the called event type (NOTE: when several event types are defined, `switch`/`case` can faster than `if`/`else`).
 To keep the `doEvent.moduleName` code block as clear and readable as possible, keep the definitions of each event type minimal, using functions (defined outside of the block) for the details of what is happening for each event.
 
-```{r event-types, echo=FALSE, eval=TRUE, results="asis"}
+```{r event-types, echo=FALSE, results="asis"}
 cat(c(
   "```",
   "## sample event type definitions for the default `caribouMovement` module",
@@ -240,7 +239,7 @@ Note that every module requires an `"init"` event type, which defines the initia
 As such, the `Init()` function is required for initialization.
 Modules may also include `"save"` and `"plot"` events, though these are optional.
 
-```{r event-functions, echo=FALSE, eval=TRUE, results="asis"}
+```{r event-functions, echo=FALSE, results="asis"}
 cat(c(
   "```",
   "## sample Init event function from the default `caribouMovement` module",
@@ -382,7 +381,7 @@ Note that modules need not be inter-dependent on one another: module B may depen
 
 To view the dependencies for a simulation:
 
-```{r module-object-diagrams, eval=hasSuggests, echo=TRUE, message=FALSE, fig.width=7}
+```{r module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7}
 library(SpaDES.core)
 
 times <- list(start = 0.0, end = 20)
@@ -446,7 +445,7 @@ All objects in the global environment including the state of the random number g
 Checkpoint frequency and filename can be passed as parameters to the simulation object as illustrated below.
 By default, checkpointing is not used unless the `interval` parameter is provided; the simulation checkpoint file (if one exists) is loaded if the `file` parameter is specified.
 
-```{r checkpoints, echo=TRUE, eval=hasSuggests, message=FALSE}
+```{r checkpoints, echo=TRUE, message=FALSE}
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 30)
 parameters <- list(
@@ -469,7 +468,7 @@ checkpointInterval(mySim)
 
 Schedule updates to the simulation progress bar.
 
-```{r progress, echo=TRUE, eval=hasSuggests, message=FALSE}
+```{r progress, echo=TRUE, message=FALSE}
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 100.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -541,7 +540,7 @@ Therefore, a call to `outputs(mySim)` will indicate which objects have been save
 
 There is partial string matching of these names, so if the `fun` requires arguments to be passed to it, use `outputArgs()`, and it must be the same length as the `outputs()` `data.frame`.
 
-```{r load-save, echo=TRUE, eval=hasSuggests, message=FALSE}
+```{r load-save, echo=TRUE, message=FALSE}
 # initialize a new simulation, setting the load and save parameters
 outputDir <- file.path(tempdir(), "simOutputs")
 mySim <- simInit(times = list(start = 0.0, end = 10),
@@ -776,6 +775,6 @@ Additionally, `zipModule()` can be used to build the `.zip` file corresponding t
 To submit your module for inclusion in our GitHub repository, login to GitHub with your account and initiate a pull request to the repository.
 See the [GitHub help documentation](https://docs.github.com/articles/creating-a-pull-request/) for more details.
 
-```{r cleanup, eval=hasSuggests, echo=FALSE}
+```{r cleanup, echo=FALSE}
 unlink(outputDir, recursive = TRUE)
 ```

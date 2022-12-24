@@ -1,16 +1,15 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(eval = TRUE)
+SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr")
+hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
+useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
-hasSuggests <- all(
-  require("NLMR", quietly = TRUE),
-  require("SpaDES.tools", quietly = TRUE),
-  require("DiagrammeR", quietly = TRUE)
-)
+knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
 
-## ----module-metadata, echo=FALSE, eval=TRUE, results="asis"-------------------
+
+## ----module-metadata, echo=FALSE, results="asis"------------------------------
 cat(c(
   "```",
   "## sample module metadata for the default `caribouMovement` module",
@@ -18,7 +17,7 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----passing-params, eval=hasSuggests, echo=TRUE------------------------------
+## ----passing-params, echo=TRUE------------------------------------------------
 library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
@@ -57,7 +56,7 @@ mySim <- simInit(times = times, params = parameters, modules = modules,
 #  ## in a module
 #  P(mySim)$N  # Only one parameter if used within a module
 
-## ----event-types, echo=FALSE, eval=TRUE, results="asis"-----------------------
+## ----event-types, echo=FALSE, results="asis"----------------------------------
 cat(c(
   "```",
   "## sample event type definitions for the default `caribouMovement` module",
@@ -65,7 +64,7 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----event-functions, echo=FALSE, eval=TRUE, results="asis"-------------------
+## ----event-functions, echo=FALSE, results="asis"------------------------------
 cat(c(
   "```",
   "## sample Init event function from the default `caribouMovement` module",
@@ -126,7 +125,7 @@ eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 #            to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
 #            overwrite = TRUE)
 
-## ----module-object-diagrams, eval=hasSuggests, echo=TRUE, message=FALSE, fig.width=7----
+## ----module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7------------
 library(SpaDES.core)
 
 times <- list(start = 0.0, end = 20)
@@ -149,7 +148,7 @@ moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module gr
 # detailed visual representation of objects
 objectDiagram(mySim, width = 720)
 
-## ----checkpoints, echo=TRUE, eval=hasSuggests, message=FALSE------------------
+## ----checkpoints, echo=TRUE, message=FALSE------------------------------------
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 30)
 parameters <- list(
@@ -167,7 +166,7 @@ mySim <- simInit(times = times, params = parameters, modules = modules, paths = 
 checkpointFile(mySim)
 checkpointInterval(mySim)
 
-## ----progress, echo=TRUE, eval=hasSuggests, message=FALSE---------------------
+## ----progress, echo=TRUE, message=FALSE---------------------------------------
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 100.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -179,7 +178,7 @@ mySim <- simInit(times = list(start = 0.0, end = 100.0),
 progressType(mySim)
 progressInterval(mySim)
 
-## ----load-save, echo=TRUE, eval=hasSuggests, message=FALSE--------------------
+## ----load-save, echo=TRUE, message=FALSE--------------------------------------
 # initialize a new simulation, setting the load and save parameters
 outputDir <- file.path(tempdir(), "simOutputs")
 mySim <- simInit(times = list(start = 0.0, end = 10),
@@ -294,6 +293,6 @@ unlink(normalizePath(ftmp))
 ## ----module-group-dl, eval=FALSE----------------------------------------------
 #  downloadModule("SpaDES_sampleModules")
 
-## ----cleanup, eval=hasSuggests, echo=FALSE------------------------------------
+## ----cleanup, echo=FALSE------------------------------------------------------
 unlink(outputDir, recursive = TRUE)
 
