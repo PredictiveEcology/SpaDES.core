@@ -58,18 +58,10 @@ simInitAndExperiment <- function(...) {
 #'
 #' @seealso [require()].
 #'
-#' @export
 #' @rdname loadPackages
 #' @importFrom utils install.packages installed.packages
 #'
 #' @author Alex Chubaty
-#'
-#' @examples
-#' \dontrun{
-#'   pkgs <- list("raster", "lme4")
-#'   loadPackages(pkgs) # loads packages if installed
-#'   loadPackages(pkgs, install = TRUE) # loads packages after installation (if needed)
-#' }
 #'
 setGeneric("loadPackages", function(packageList, install = FALSE, quiet = TRUE) {
   standardGeneric("loadPackages")
