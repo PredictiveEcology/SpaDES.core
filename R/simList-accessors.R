@@ -483,11 +483,17 @@ P.simList <- function(sim, param, module) {
 
   # first check if inside an event
   module1 <- sim@current$moduleName
+  mods <- modules(sim)
   if (length(module1) == 0) {
     # then check if inside a .inputObjects call
     inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
     if (length(inSimInit)) {
-      module1 <- get("m", sys.frame(inSimInit[2]))
+      inSimInit <- c(inSimInit + 1) # bump up one because S4 actually runs in a .local
+      for (isi in inSimInit) {
+        module1 <- get0("m", sys.frame(isi))
+        if (!is.null(module1))
+          break
+      }
     } else {
       inManualCall <- .grepSysCalls(sys.calls(), pattern = "(\\.mods\\$|\\[)")
       if (length(inManualCall)) { # this is the case where a user calls the function using the full path
@@ -496,7 +502,6 @@ P.simList <- function(sim, param, module) {
         gg <- gsub("^.+\\.mods(\\$|\\[\\[)", "", as.character(pp)[[1]])
         module1 <- strsplit(gg, split = "\\$|\\[")[[1]][1]
       } else {
-        mods <- modules(sim)
         modFilePaths <- checkPath(names(mods))
 
         scalls <- sys.calls();
@@ -538,15 +543,13 @@ P.simList <- function(sim, param, module) {
           module1 <- param
           param <- module
         }
-      } else {
-
-        # Module missing, only have parameter --> this could be old case of P(sim, module = "something")
-        if (param %in% ls(sim@params[[param]], all.names = TRUE) ||
-            module1 %in% ls(sim@params)) {
-          # module1 is in list of modules; param is not in parameters --> this is likely a reversal
-          warning(reversalMessage)
-          param <- NULL
+      } else { # module is missing; can't be reversal, but can be incorrect module --> params
+        if (any(param %in% mods) && is.null(module1)) {
+          module1 <- param
         }
+        # module1 is in list of modules; param is not in parameters --> this is likely a reversal
+        warning(reversalMessage)
+        param <- NULL
       }
     } else {
       module1 <- module
@@ -2958,15 +2961,10 @@ setMethod("outputObjectNames",
 #'
 #' @examples
 #' \dontrun{
-#' # To pre-install and pre-load all packages prior to `simInit`.
-#'
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' # use Require and reqdPkgs
-#' if (!interactive()) chooseCRANmirror(ind = 1) #
 #' pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
-#' pkgs <- unique(unlist(pkgs))
-#' Require(pkgs)
 #' }
 setGeneric("reqdPkgs", function(sim, module, modulePath) {
   standardGeneric("reqdPkgs")
