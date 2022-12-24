@@ -204,15 +204,10 @@ remoteFileSize <- function(url) {
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
-#' \dontrun{
-#' # For a Google Drive example
-#' # In metadata:
-#' expectsInputs("theFilename.zip", "NA", "NA",
-#'   sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
-#' # create the checksums file
-#' checksums("thisModule", "there", write = TRUE)
-#' downloadData("thisModule", "there", files = "theFilename.zip")
-#' }
+#' # In metadata, each expectsInput has a sourceURL; downloadData will look for
+#' # that and download if it defined
+#' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#' downloadData("caribouMovement") # it is all NAs, so nothing downloaded
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
                                     overwrite = FALSE, files = NULL, checked = NULL,

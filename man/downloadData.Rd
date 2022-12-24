@@ -117,15 +117,10 @@ file if there is a \code{sourceURL} but no entry for that file.
 This is experimental and should be used with caution.
 }
 \examples{
-\dontrun{
-# For a Google Drive example
-# In metadata:
-expectsInputs("theFilename.zip", "NA", "NA",
-  sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
-# create the checksums file
-checksums("thisModule", "there", write = TRUE)
-downloadData("thisModule", "there", files = "theFilename.zip")
-}
+# In metadata, each expectsInput has a sourceURL; downloadData will look for
+# that and download if it defined
+setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+downloadData("caribouMovement") # it is all NAs, so nothing downloaded
 
 }
 \seealso{
