@@ -407,7 +407,9 @@ setMethod(
 #' # Access one of the parameters -- because this line is not inside a module
 #' #  function, we must specify the module name. If used within a module,
 #' #  we can omit the module name
-#' P(mySim, "testModule")$.useCache
+#' P(mySim, module = "testModule") # gets all params in a module
+#' P(mySim, ".useCache", "testModule") # just one param
+#' unlink(tmpdir, recursive = TRUE)
 #' }
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc, ...) {
