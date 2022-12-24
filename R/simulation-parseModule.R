@@ -87,7 +87,7 @@ setMethod(
         }
         if (is(out1, "try-error")) {
           # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
-          if (grep("\\<sim\\>", out)) {
+          if (any(grep("\\<sim\\>", out))) {
             opts <- options(spades.moduleCodeChecks = FALSE)
             on.exit(options(opts))
             m <- tmp[["pf"]][[1]][[3]]$name
