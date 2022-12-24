@@ -91,7 +91,8 @@ setMethod(
             opts <- options(spades.moduleCodeChecks = FALSE)
             on.exit(options(opts))
             m <- tmp[["pf"]][[1]][[3]]$name
-            suppressMessages(sim <- simInit(modules = m))
+            suppressMessages(sim <- simInit(modules = m,
+                                            paths = list(modulePath = dirname(dirname(filename)))))
             newEnv <- new.env(parent = sim@.xData$.mods[[m]])
             newEnv$sim <- sim
             out1 <- eval(out, envir = newEnv)
