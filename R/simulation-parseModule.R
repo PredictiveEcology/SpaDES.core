@@ -77,18 +77,29 @@ setMethod(
         out <- list()
       }
 
-      out <- tryCatch(
-        eval(out),
-        error = function(x) {
-          if (any(grepl("bind_rows", out))) { # historical artifact
-            if (!require("dplyr", quietly = TRUE))
-              stop("To read module: '", gsub("\\.R", "", basename(filename)),
-                   "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
-            out <- eval(out)
-          }
-          out
+      out1 <- try(eval(out), silent = TRUE)
+      if (is(out1, "try-error")) {
+        if (any(grepl("bind_rows", out))) { # historical artifact
+          if (!require("dplyr", quietly = TRUE))
+            stop("To read module: '", gsub("\\.R", "", basename(filename)),
+                 "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
+          out1 <- eval(out)
         }
-      )
+        if (is(out1, "try-error")) {
+          # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
+          if (grep("\\<sim\\>", out)) {
+            opts <- options(spades.moduleCodeChecks = FALSE)
+            on.exit(options(opts))
+            m <- tmp[["pf"]][[1]][[3]]$name
+            suppressMessages(sim <- simInit(modules = m))
+            newEnv <- new.env(parent = sim@.xData$.mods[[m]])
+            newEnv$sim <- sim
+            out1 <- eval(out, envir = newEnv)
+          }
+        }
+      }
+      out <- out1
+
     } else {
       out <- NULL
     }
