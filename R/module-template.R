@@ -89,11 +89,13 @@
 #'
 #' @examples
 #' \dontrun{
+#'   tmpdir <- tempdir2("exampleNewModule")
 #'   ## create a "myModule" module in the "modules" subdirectory.
-#'   newModule("myModule", "modules")
+#'   newModule("myModule", tmpdir)
 #'
 #'   ## create a new parent module in the "modules" subdirectory.
-#'   newModule("myParentModule", "modules", type = "parent", children = c("child1", "child2"))
+#'   newModule("myParentModule", tmpdir, type = "parent", children = c("child1", "child2"))
+#'   unlink(tmpdir, recursive = TRUE)
 #' }
 #'
 setGeneric("newModule", function(name, path, ...) {
@@ -478,7 +480,10 @@ setMethod(
 #' @rdname openModules
 #'
 #' @examples
-#' \dontrun{openModules("~/path/to/my/modules")}
+#' \dontrun{
+#' if (interactive())
+#'   openModules("modules")
+#' }
 #'
 setGeneric("openModules", function(name, path) {
   standardGeneric("openModules")
