@@ -88,7 +88,8 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @examples
 #' \dontrun{
 #'
-#' # This will save the "caribou" object at the save interval of 1 unit of time
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#' #' # This will save the "caribou" object at the save interval of 1 unit of time
 #' #  in the outputPath location
 #' outputPath <- file.path(tempdir(), "test_save")
 #' times <- list(start = 0, end = 6, "month")
@@ -103,19 +104,21 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' modules <- list("randomLandscapes", "caribouMovement")
 #' paths <- list(
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'   outputPath = savePath
+#'   outputPath = outputPath
 #' )
+#' opts <- options(spades.moduleCodeChecks = FALSE)
 #' mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
+#' options(opts)
 #'
 #' # The caribou module has a saveFiles(sim) call, so it will save caribou
 #' spades(mySim)
 #' dir(outputPath)
 #'
 #' # remove the files
-#' file.remove(dir(savePath, full.names = TRUE))
+#' file.remove(dir(outputPath, full.names = TRUE))
 #'
-#' }
+#' }}
 saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   # extract the current module name that called this function

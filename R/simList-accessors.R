@@ -853,6 +853,8 @@ setReplaceMethod("checkpointInterval",
 #'
 #' @examples
 #' \dontrun{
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#' opts <- options(spades.moduleCodeChecks = FALSE)
 #' mySim <- simInit(
 #'   times = list(start=0.0, end=100.0),
 #'   params = list(.globals = list(stackName = "landscape"),
@@ -860,6 +862,7 @@ setReplaceMethod("checkpointInterval",
 #'   checkpoint = list(interval = 10, file = "chkpnt.RData")),
 #'   modules = list("randomLandscapes"),
 #'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
+#' options(opts)
 #'
 #' # progress bar
 #' progressType(mySim) # "text"
@@ -874,7 +877,7 @@ setReplaceMethod("checkpointInterval",
 #' checkpointFile(mySim) # returns the name of the checkpoint file
 #'                       # In this example, "chkpnt.RData"
 #' checkpointInterval(mySim) # 10
-#' }
+#' }}
 setGeneric("progressInterval", function(sim) {
   standardGeneric("progressInterval")
 })
