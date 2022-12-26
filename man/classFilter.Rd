@@ -41,21 +41,6 @@ See \url{https://stackoverflow.com/a/27923346/1380598}.
 These (known) cases are checked manually and corrected.
 }
 \examples{
-\dontrun{
-  ## from global environment
-  a <- list(1:10)     # class `list`
-  b <- letters        # class `character`
-  d <- stats::runif(10)      # class `numeric`
-  f <- sample(1L:10L) # class `numeric`, `integer`
-  g <- lm( jitter(d) ~ d ) # class `lm`
-  h <- glm( jitter(d) ~ d ) # class `lm`, `glm`
-  classFilter(ls(), include=c("character", "list"))
-  classFilter(ls(), include = "numeric")
-  classFilter(ls(), include = "numeric", exclude = "integer")
-  classFilter(ls(), include = "lm")
-  classFilter(ls(), include = "lm", exclude = "glm")
-  rm(a, b, d, f, g, h)
-}
 
 ## from local (e.g., function) environment
 local({
@@ -74,7 +59,7 @@ local({
   rm(a, b, d, e, f, g, h)
 })
 
-## from another environment
+## from another environment (can be omitted if .GlobalEnv)
 e = new.env(parent = emptyenv())
 e$a <- list(1:10)     # class `list`
 e$b <- letters        # class `character`

@@ -229,6 +229,7 @@ with the one just edited. There may be some unexpected consequences if the
 
 \examples{
 \dontrun{
+if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
 mySim <- simInit(
  times = list(start = 0.0, end = 2.0, timeunit = "year"),
  params = list(
@@ -291,7 +292,7 @@ outSomeEvents <- spades(mySim,
         events = list(randomLandscapes = c("init"),
                       fireSpread = c("init", "burn"),
                       save = "init"))
-}
+}}
 
 }
 \references{

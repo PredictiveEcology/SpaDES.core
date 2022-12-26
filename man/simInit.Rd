@@ -262,6 +262,7 @@ Please see the vignette dedicated to this topic.
 
 \examples{
 \dontrun{
+if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
 mySim <- simInit(
  times = list(start = 0.0, end = 2.0, timeunit = "year"),
  params = list(
@@ -364,6 +365,7 @@ if (require(rgdal)) {
  events(mySim) # load event is at time 1 year
  events(mySim2) # load event is at time 1 month, reported in years because of
                 #   update to times above
+}
 }
 }
 

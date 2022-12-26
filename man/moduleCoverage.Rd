@@ -40,7 +40,7 @@ To accurately test your module, the test filename must follow the format
   modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
   moduleName <- "forestAge" # sample module to test
   downloadModule(name = moduleName, path = modulePath) # download sample module
-  testResults <- moduleCoverage(name = moduleName, path = modulePath)
+  testResults <- moduleCoverage(mod = moduleName, modulePath = modulePath)
   report(testResults$moduleCoverage)
   report(testResults$functionCoverage)
   unlink(tmpdir, recursive = TRUE)
