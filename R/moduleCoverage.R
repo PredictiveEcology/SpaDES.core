@@ -28,7 +28,6 @@
 #' @seealso [newModule()].
 #'
 #' @author Yong Luo
-#' @export
 #' @importFrom data.table data.table
 #' @importFrom reproducible .file.move
 #' @include simList-class.R
@@ -40,13 +39,14 @@
 #'   modulePath <- file.path(tmpdir, "Modules") %>% checkPath(create = TRUE)
 #'   moduleName <- "forestAge" # sample module to test
 #'   downloadModule(name = moduleName, path = modulePath) # download sample module
-#'   testResults <- moduleCoverage(name = moduleName, path = modulePath)
+#'   testResults <- moduleCoverage(mod = moduleName, modulePath = modulePath)
 #'   report(testResults$moduleCoverage)
 #'   report(testResults$functionCoverage)
 #'   unlink(tmpdir, recursive = TRUE)
 #'   mc1 <- moduleCoverage("Biomass_core", modulePath = "..")
 #' }
 moduleCoverage <- function(mod, modulePath = "..") {
+  stop("This is a stub that is not intended for use")
   if (requireNamespace("testthat")) {
     if (is.null(getOption("testthat.progress.max_fails"))) {
       options(testthat.progress.max_fails = Inf)
@@ -85,10 +85,9 @@ moduleCoverage <- function(mod, modulePath = "..") {
     ################
     options(opts)
     test_files <- dir(file.path("tests", "testthat"), full.names = TRUE)
-    bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE)),
+    bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE, pattern = "\\.R")),
                               test_files = grep("Ward", test_files, value = TRUE) )
     #################
-    browser()
 
 
     ignore <- lapply(test_files, source)
@@ -99,7 +98,6 @@ moduleCoverage <- function(mod, modulePath = "..") {
     options(opts)
 
     # Now do tests all 2nd time, but this time testing unique function calls without `spades` or `simInit`
-    browser()
     # test_files <- dir(file.path(modulePath, mod, "tests"), pattern = ".R$", full.names = TRUE)
     bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE)),
                         test_files = test_files )
