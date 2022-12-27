@@ -1366,7 +1366,9 @@ loadPkgs <- function(reqdPkgs) {
   uniqueReqdPkgs <- unique(unlist(reqdPkgs))
 
   if (length(uniqueReqdPkgs)) {
-    allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+    allPkgs <- uniqueReqdPkgs
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs)))
+      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
 
     # Check for SpaDES.core minimum version
     checkSpaDES.coreMinVersion(allPkgs)

@@ -2760,8 +2760,12 @@ setMethod(
                                     #  if not NULL, one will be reqdPkgs
       pkgs <- lapply(depsInSim, function(x) {
         x@reqdPkgs
-      }) %>% unlist() %>% c("SpaDES.core") %>% unique()
-      if (!is.null(pkgs)) pkgs <- sort(pkgs)
+      }) %>% unlist()
+      pkgs <- unique(pkgs)
+      if (!any(grepl("SpaDES.core", pkgs)))
+        pkgs <- c("SpaDES.core", pkgs)
+      if (!is.null(pkgs))
+        pkgs <- sort(pkgs)
     } else {
       if (!missing(filenames))  {
         paths <- filenames
@@ -2797,8 +2801,9 @@ setMethod(
         } else {
           pkgs <- character(0)
         }
-        pkgs <- pkgs[nzchar(pkgs)]
-        pkgs <- unique(c("SpaDES.core", pkgs))
+        pkgs <- unique(pkgs[nzchar(pkgs)])
+        if (!any(grepl("SpaDES.core", pkgs)))
+          pkgs <- c("SpaDES.core", pkgs)
         return(pkgs)
       })
       names(pkgs) <- modules
