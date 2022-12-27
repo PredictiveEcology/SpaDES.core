@@ -89,14 +89,16 @@ newModule("testModule", tmpdir, open = FALSE)
 if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 
 # initialize the simList
-mySim <- simInit(modules = "testModule",
-                 paths = list(modulePath = tmpdir))
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  mySim <- simInit(modules = "testModule",
+                   paths = list(modulePath = tmpdir))
 
-# Access one of the parameters -- because this line is not inside a module
-#  function, we must specify the module name. If used within a module,
-#  we can omit the module name
-P(mySim, module = "testModule") # gets all params in a module
-P(mySim, ".useCache", "testModule") # just one param
+  # Access one of the parameters -- because this line is not inside a module
+  #  function, we must specify the module name. If used within a module,
+  #  we can omit the module name
+  P(mySim, module = "testModule") # gets all params in a module
+  P(mySim, ".useCache", "testModule") # just one param
+}
 unlink(tmpdir, recursive = TRUE)
 }
 

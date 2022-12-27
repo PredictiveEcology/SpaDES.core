@@ -36,6 +36,7 @@ jobs:
       _R_CHECK_DEPENDS_ONLY_: ${{ matrix.config.nosuggests }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      SPADES_USE_REQUIRE: false
 
     steps:
       - uses: actions/checkout@v3

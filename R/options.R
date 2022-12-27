@@ -131,6 +131,13 @@
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
 #'     \tab : The default user agent to use for downloading modules from GitHub. \cr
 #'
+#'   `spades.useRequire` \tab `!Sys.getenv("SPADES_USE_REQUIRE") %in% "false"`
+#'     \tab : The default for that environment variable is unset, so this returns
+#'     `TRUE`. If this is `TRUE`, then during the `simInit` call, when pacakges are
+#'     identified as being required, these will be installed if missing, only if
+#'     `spades.useRequire` option is `TRUE`, otherwise, `simInit` will fail because
+#'     packages are not available.\cr
+#'
 #' }
 #'
 spadesOptions <- function() {
@@ -169,7 +176,7 @@ spadesOptions <- function() {
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
-    spades.useRequire = TRUE,
+    spades.useRequire = !Sys.getenv("SPADES_USE_REQUIRE") %in% "false",
     spades.keepCompleted = TRUE
   )
 }

@@ -56,6 +56,7 @@ The \code{simList} will be in the state it was at the time of the error.
 # options("spades.recoveryMode" = 1) # now the default
 s <- simInit()
 s <- spades(s) # if this is interrupted or fails
+# the following line will not work if the previous line didn't fail
 s <- restartSpades(s) # don't need to specify `sim` if previous line fails
                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
 }
