@@ -44,6 +44,7 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   opts <- options(opts1)
 
   if (missing(libraries)) libraries <- list()
+  libraries <- unique(append(list("igraph"), libraries)) # need %>% is a lot of places
   unlist(lapply(libraries, require, character.only = TRUE))
   require("testthat")
   tmpdir <- file.path(tempdir(), rndstr(1, 6))
@@ -82,9 +83,9 @@ testOnExit <- function(testInitOut) {
     options(testInitOut$opts)
   setwd(testInitOut$origDir)
   unlink(testInitOut$tmpdir, recursive = TRUE)
-  lapply(testInitOut$libs, function(lib) {
-    try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
-  )
+  # lapply(testInitOut$libs, function(lib) {
+  #   try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
+  # )
 }
 
 testCode <- '

@@ -36,7 +36,8 @@
 #' @examples
 #' \dontrun{
 #'   tmpdir <- file.path(tempdir(), "coverage")
-#'   modulePath <- file.path(tmpdir, "Modules") %>% checkPath(create = TRUE)
+#'   modulePath <- file.path(tmpdir, "Modules")
+#'   modulePath <- checkPath(modulePath, create = TRUE)
 #'   moduleName <- "forestAge" # sample module to test
 #'   downloadModule(name = moduleName, path = modulePath) # download sample module
 #'   testResults <- moduleCoverage(mod = moduleName, modulePath = modulePath)
