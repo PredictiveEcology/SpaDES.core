@@ -92,6 +92,12 @@
 #'     \tab `file.path(tempdir(), "SpaDES", "outputs")`
 #'     \tab The default local directory in which to save simulation outputs.\cr
 #'
+#'   `spades.plots`
+#'     \tab The value of this will passed to `.plots` within every module; it will thus
+#'     override all module parameter values for `.plots`. This can, e.g., be used
+#'     to turn off all plotting.
+#'     \tab The default is NULL, meaning accept the module-level parameter\cr
+#'
 #'   `spades.recoveryMode` \tab `1L` \tab
 #'   If this a numeric > 0 or TRUE, then the
 #'   discrete event simulator will take a snapshot of the objects in the `simList`
@@ -164,6 +170,7 @@ spadesOptions <- function() {
     spades.moduleDocument = NULL,
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir(), "outputs"),
+    spades.plots = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
     spades.restartRInterval = 0,
