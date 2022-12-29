@@ -235,7 +235,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' outSim <- spades(mySim)
 #'
 #' # A little more complicated with inputs and outputs
-#' if (require(rgdal)) {
+#' if (requireNamespace("rgdal", quietly = TRUE)) {
 #'  mapPath <- system.file("maps", package = "quickPlot")
 #'  mySim <- simInit(
 #'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
