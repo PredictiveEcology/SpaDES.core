@@ -700,8 +700,10 @@ setReplaceMethod("G",
 #' @export
 #' @rdname params
 #' @examples
-#' if (require("NLMR", quietly = TRUE) &&
-#'     require("SpaDES.tools", quietly = TRUE)) {
+#' if (requireNamespace("NLMR", quietly = TRUE) &&
+#'     requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#'   opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
+#'                   "spades.useRequire" = FALSE)       # prevent installing packages
 #'   modules <- list("randomLandscapes")
 #'   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'   mySim <- simInit(modules = modules, paths = paths,
@@ -726,6 +728,8 @@ setReplaceMethod("G",
 #'   # These next 2 are same here because they are not within a module
 #'   P(mySim)          # nx and ny are Gone
 #'   params(mySim)     # nx and ny are Gone
+#'
+#'   options(opts) # reset
 #' }
 setGeneric("parameters", function(sim, asDF = FALSE) {
   standardGeneric("parameters")
@@ -855,7 +859,8 @@ setReplaceMethod("checkpointInterval",
 #' \dontrun{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' opts <- options(spades.moduleCodeChecks = FALSE)
+#' opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
+#'                 "spades.useRequire" = FALSE)       # prevent installing packages
 #' mySim <- simInit(
 #'   times = list(start=0.0, end=100.0),
 #'   params = list(.globals = list(stackName = "landscape"),
@@ -863,7 +868,6 @@ setReplaceMethod("checkpointInterval",
 #'   checkpoint = list(interval = 10, file = "chkpnt.RData")),
 #'   modules = list("randomLandscapes"),
 #'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
-#' options(opts)
 #'
 #' # progress bar
 #' progressType(mySim) # "text"
@@ -878,6 +882,8 @@ setReplaceMethod("checkpointInterval",
 #' checkpointFile(mySim) # returns the name of the checkpoint file
 #'                       # In this example, "chkpnt.RData"
 #' checkpointInterval(mySim) # 10
+#'
+#' options(opts) # reset
 #' }}
 setGeneric("progressInterval", function(sim) {
   standardGeneric("progressInterval")
