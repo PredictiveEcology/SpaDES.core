@@ -924,13 +924,14 @@ setMethod(
           }
           NAItems <- is.na(items)
           if (any(NAItems)) { # delete unnamed list elements; they must be named
-            if (length(names(li[[x]])[NAItems]) == 0) {
+            if (length(li[[x]]) > length(names(expectedInnerClasses[[x]]))) {
+              # too many items; this is an error
+              items <- names(li[[x]])
+            } else {
               # browser(expr = exists("innerClasses"))
               items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
                 !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
               names(li[[x]])[NAItems] <- items[NAItems]
-            } else {
-              items <- names(li[[x]])
             }
 
           }
