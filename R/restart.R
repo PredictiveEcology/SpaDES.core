@@ -79,7 +79,8 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...) {
-  message("This is very experimental and will only work if the event that caused the error has not yet changed the simList.\n",
+  message("This is very experimental and will only work if the event that caused ",
+          "the error has not yet changed the simList.\n",
           "This should be used with caution.")
 
   # browser(expr = exists("._restartSpades_1"))
@@ -94,108 +95,113 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
-  simCompletedList <- as.list(sim@completed)
-  simCompletedList <- simCompletedList[order(as.integer(names(simCompletedList)))]
-  eventsToReverse <- tail(simCompletedList, numMods - 1)
+  if (numMods > 0) {
+    simCompletedList <- as.list(sim@completed)
+    simCompletedList <- simCompletedList[order(as.integer(names(simCompletedList)))]
+    eventsToReverse <- tail(simCompletedList, numMods - 1)
 
-  sim@events <- append(unname(lapply(eventsToReverse, function(x) x[1:4])), sim@events)
-  rm(list = names(eventsToReverse), envir = sim@completed)
+    sim@events <- append(unname(lapply(eventsToReverse, function(x) x[1:4])), sim@events)
+    rm(list = names(eventsToReverse), envir = sim@completed)
 
-  eventsToReplayDT <- events(sim)[seq_len(numMods)]
-  if (numMods > length(sim$.recoverableObjs))
-    message("Cannot replay ", numMods, " events as requested by numMods; ",
-            "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
-  if (numMods < length(sim$.recoverableObjs))
-    sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
-  names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName
+    eventsToReplayDT <- events(sim)[seq_len(numMods)]
+    browser()
+    if (numMods > length(sim$.recoverableObjs))
+      message("Cannot replay ", numMods, " events as requested by numMods; ",
+              "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
+    if (numMods < length(sim$.recoverableObjs))
+      sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
+    names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName
 
-  modules <- eventsToReplayDT$moduleName
-  modules <- unique(modules)
-  names(modules) <- modules
-  modules <- modules[!modules %in% unlist(.coreModules())]
-  # move objects back in place
-  eventIndices <- seq_len(NROW(eventsToReplayDT))
-  eventIndicesRev <- rev(eventIndices)
-  # browser(expr = exists("._restartSpades_2"))
-  out <- lapply(eventIndices, function(event) {
-    objNames <- names(sim$.recoverableObjs[[event]])
-    notYetCreated <- setdiff(outputObjects(sim)[[module]]$objectName, objNames)
-    names(notYetCreated) <- notYetCreated
-    notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
-    sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
-    sim$.recoverableObjs[[event]]
-    objNames <- names(sim$.recoverableObjs[[event]])
-    if (!is.null(objNames)) {
-      # only take objects that changed -- determine which ones are changed
-      fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) .robustDigest(obj)))
-      objNames <- objNames[objNames %in% ls(sim@.xData)]
-      fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj)))
-      if (!is.null(fd2)) {
-        fd1 <- fd1[match(names(fd2), names(fd1))]
-        stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
-        fd1 <- fd1[fd1 != fd2]
+    modules <- eventsToReplayDT$moduleName
+    modules <- unique(modules)
+    names(modules) <- modules
+    modules <- modules[!modules %in% unlist(.coreModules())]
+    # move objects back in place
+    eventIndices <- seq_len(NROW(eventsToReplayDT))
+    eventIndicesRev <- rev(eventIndices)
+    # browser(expr = exists("._restartSpades_2"))
+    out <- lapply(eventIndices, function(event) {
+      objNames <- names(sim$.recoverableObjs[[event]])
+      notYetCreated <- setdiff(outputObjects(sim)[[module]]$objectName, objNames)
+      names(notYetCreated) <- notYetCreated
+      notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
+      sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
+      sim$.recoverableObjs[[event]]
+      objNames <- names(sim$.recoverableObjs[[event]])
+      if (!is.null(objNames)) {
+        # only take objects that changed -- determine which ones are changed
+        fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) .robustDigest(obj)))
+        objNames <- objNames[objNames %in% ls(sim@.xData)]
+        fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj)))
+        if (!is.null(fd2)) {
+          fd1 <- fd1[match(names(fd2), names(fd1))]
+          stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
+          fd1 <- fd1[fd1 != fd2]
+        }
+        list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
       }
-      list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
-    }
-    message(crayon::blue("Reversing event: ",
-                         paste(collapse = " ",
-                               paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
-    invisible()
-  })
+      message(crayon::blue("Reversing event: ",
+                           paste(collapse = " ",
+                                 paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
+      invisible()
+    })
 
-  # modules <- if (!is.list(module)) as.list(module) else module
-  opt <- options("spades.moduleCodeChecks" = FALSE)
+    # modules <- if (!is.list(module)) as.list(module) else module
+    opt <- options("spades.moduleCodeChecks" = FALSE)
 
-  out <- lapply(modules, function(module) {
-    pp <- list()
-    moduleFolder <- file.path(modulePath(sim, module = module), module)
-    if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
-      # pp[[1]] <- .parseConditional(sim, file.path(moduleFolder, paste0(module, ".R")))
-      pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
-      subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
+    out <- lapply(modules, function(module) {
+      pp <- list()
+      moduleFolder <- file.path(modulePath(sim, module = module), module)
+      if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
+        # pp[[1]] <- .parseConditional(sim, file.path(moduleFolder, paste0(module, ".R")))
+        pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
+        subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
 
-      doesntUseNamespacing <- !.isNamespaced(sim, module)
+        doesntUseNamespacing <- !.isNamespaced(sim, module)
 
-      # evaluate the rest of the parsed file
-      if (doesntUseNamespacing) {
-        out1 <- evalWithActiveCode(pp[[1]],
-                                   sim@.xData,
-                                   sim = sim)
+        # evaluate the rest of the parsed file
+        if (doesntUseNamespacing) {
+          out1 <- evalWithActiveCode(pp[[1]],
+                                     sim@.xData,
+                                     sim = sim)
+        }
+
+
+        if (length(subFiles)) {
+          pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
+        }
+        #ee <- new.env()
+        #ee$sim <- sim
+        # sim@.xData[[module]]$sim <- sim
+        lapply(pp, function(pp1) evalWithActiveCode(pp1,
+                                                    sim@.xData$.mods[[module]],
+                                                    sim = sim))
+        message(crayon::blue("Reparsing", module, "source code"))
       }
+      #rm(list = "sim", envir = ee)
+      #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
+      invisible()
+    })
+    options(opt)
 
+    # reset activeBinding mod
+    out <- lapply(modules, function(mod) {
+      makeModActiveBinding(sim = sim, mod = mod)
+    })
+    out <- lapply(modules, function(mod) {
+      makeParActiveBinding(sim = sim, mod = mod)
+    })
 
-      if (length(subFiles)) {
-        pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
-      }
-      #ee <- new.env()
-      #ee$sim <- sim
-      # sim@.xData[[module]]$sim <- sim
-      lapply(pp, function(pp1) evalWithActiveCode(pp1,
-                                                  sim@.xData$.mods[[module]],
-                                                  sim = sim))
-      message(crayon::blue("Reparsing", module, "source code"))
-    }
-    #rm(list = "sim", envir = ee)
-    #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
-    invisible()
-  })
-  options(opt)
+    # Remove all added events that occurred during the events, i.e., via scheduleEvent
+    sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
 
-  # reset activeBinding mod
-  out <- lapply(modules, function(mod) {
-    makeModActiveBinding(sim = sim, mod = mod)
-  })
-  out <- lapply(modules, function(mod) {
-    makeParActiveBinding(sim = sim, mod = mod)
-  })
+    assign(".Random.seed", sim@.xData$._randomSeed[[numMods]], envir = .GlobalEnv)
 
-  # Remove all added events that occurred during the events, i.e., via scheduleEvent
-  sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
-
-  assign(".Random.seed", sim@.xData$._randomSeed[[numMods]], envir = .GlobalEnv)
-
-  if (restart)
-    sim <- spades(sim, ...)
+    if (restart)
+      sim <- spades(sim, ...)
+  } else {
+    message("There was no interrupted spades call; returning sim as is")
+  }
   return(sim)
 }
 

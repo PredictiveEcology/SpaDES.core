@@ -923,17 +923,25 @@ setMethod(
             seq(length(li[[x]]))
           }
           NAItems <- is.na(items)
-          if (any(NAItems)) { # fill in unnamed list elements
-            # browser(expr = exists("innerClasses"))
-            items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
-              !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
-            names(li[[x]])[NAItems] <- items[NAItems]
+          if (any(NAItems)) { # delete unnamed list elements; they must be named
+            if (length(names(li[[x]])[NAItems]) == 0) {
+              # browser(expr = exists("innerClasses"))
+              items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
+                !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
+              names(li[[x]])[NAItems] <- items[NAItems]
+            } else {
+              items <- names(li[[x]])
+            }
 
           }
           namesInner[[x]] <<- items
 
           all(sapply(items, function(y) {
-            is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+            if (is.null(expectedInnerClasses[[x]][[y]])) {
+              FALSE
+            } else {
+              is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+            }
           }))
         } else {
           if (length(li[[x]]) > 0)

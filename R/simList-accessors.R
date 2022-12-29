@@ -1098,70 +1098,74 @@ setReplaceMethod(
   "inputs",
   signature = "simList",
   function(sim, value) {
-   if (length(value) > 0) {
-     whFactors <- sapply(value, function(x) is.factor(x))
-     if (any(whFactors)) {
-       value[, whFactors] <- sapply(value[, whFactors], as.character)
-     }
+    if (length(value) > 0) {
+      whFactors <- sapply(value, function(x) is.factor(x))
+      if (any(whFactors)) {
+        value[, whFactors] <- sapply(value[, whFactors], as.character)
+      }
 
-     if (!is.data.frame(value)) {
-       if (!is.list(value)) {
-         stop("inputs must be a list, data.frame")
-       }
+      if (!is.data.frame(value)) {
+        if (!is.list(value)) {
+          stop("inputs must be a list, data.frame")
+        }
         value <- data.frame(value, stringsAsFactors = FALSE)
-     }
-     sim@inputs <- .fillInputRows(value, start(sim))
-   } else {
-     sim@inputs <- value
-   }
-   # Deal with objects and files differently... if files (via inputs arg in simInit)...
-     # Deal with file names
-     # 2 things: 1. if relative, concatenate inputPath
-     #           2. if absolute, don't use inputPath
-   if (NROW(value) > 0) {
-     sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
+      }
+      sim@inputs <- .fillInputRows(value, start(sim))
+    } else {
+      sim@inputs <- value
+    }
+    # Deal with objects and files differently... if files (via inputs arg in simInit)...
+    # Deal with file names
+    # 2 things: 1. if relative, concatenate inputPath
+    #           2. if absolute, don't use inputPath
+    if (NROW(value) > 0) {
+      sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
 
-     # If a filename is provided, determine if it is absolute path, if so,
-     # use that, if not, then append it to inputPath(sim)
-     isAP <- isAbsolutePath(as.character(sim@inputs$file))
-     sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
-       file.path(inputPath(sim),
-                 sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
+      # If a filename is provided, determine if it is absolute path, if so,
+      # use that, if not, then append it to inputPath(sim)
+      isAP <- isAbsolutePath(as.character(sim@inputs$file))
+      sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
+        file.path(inputPath(sim),
+                  sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
 
-     if (!all(names(sim@inputs) %in% .fileTableInCols)) {
-       stop(paste("input table can only have columns named",
-                  paste(.fileTableInCols, collapse = ", ")))
-     }
-     if (any(is.na(sim@inputs[["loaded"]]))) {
-       if (!all(is.na(sim@inputs[["loadTime"]]))) {
-         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
-         attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
+      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
+        stop(paste("input table can only have columns named",
+                   paste(.fileTableInCols, collapse = ", ")))
+      }
+      if (any(is.na(sim@inputs[["loaded"]]))) {
+        if (!all(is.na(sim@inputs[["loadTime"]]))) {
+          newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
+          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
-         for (nT in newTime) {
-           attributes(nT)$unit <- timeunit(sim)
-           sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
-         }
-         toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
-                                by = c("eventTime", "moduleName", "eventType"))
-         if (any(toRemove)) {
-           if (NROW(current(sim)) > 0)
-             toRemove <- toRemove[-seq_len(NROW(current(sim)))]
-           events(sim) <- events(sim)[!toRemove]
-         }
+          for (nT in newTime) {
+            attributes(nT)$unit <- timeunit(sim)
+            sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
+          }
+          toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
+                                 by = c("eventTime", "moduleName", "eventType"))
+          if (any(toRemove)) {
+            if (NROW(current(sim)) > 0)
+              toRemove <- toRemove[-seq_len(NROW(current(sim)))]
+            events(sim) <- events(sim)[!toRemove]
+          }
 
-       } else {
-         sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
-           sim@simtimes[["current"]]
-         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
-           min(., na.rm = TRUE)
-         attributes(newTime)$unit <- "seconds"
-         sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
-       }
-     }
-   }
+        } else {
+          sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
+            sim@simtimes[["current"]]
+          newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
+            min(., na.rm = TRUE)
+          attributes(newTime)$unit <- "seconds"
+          sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
+        }
+      }
+    }
+    possNewUSON <- inputs(sim)$objectName
+    sim$.userSuppliedObjNames <- if (is.null(sim$.userSuppliedObjNames))
+      possNewUSON else unique(c(sim$.userSuppliedObjNames, possNewUSON))
 
-   return(sim)
-})
+
+    return(sim)
+  })
 
 ################################################################################
 #' Simulation outputs
