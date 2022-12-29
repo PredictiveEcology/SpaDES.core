@@ -14,7 +14,7 @@
 #' for the module.
 #' The `functionCoverage` object contains percentage values for unit test
 #' coverage for each function defined in the module.
-#' Please use [covr::report()] to view the coverage information.
+#' Please use report() from covr package to view the coverage information.
 #' Two data.tables give the information of all the tested and untested functions
 #' in the module.
 #'
@@ -33,19 +33,6 @@
 #' @include simList-class.R
 #' @rdname moduleCoverage
 #'
-#' @examples
-#' \dontrun{
-#'   tmpdir <- file.path(tempdir(), "coverage")
-#'   modulePath <- file.path(tmpdir, "Modules")
-#'   modulePath <- checkPath(modulePath, create = TRUE)
-#'   moduleName <- "forestAge" # sample module to test
-#'   downloadModule(name = moduleName, path = modulePath) # download sample module
-#'   testResults <- moduleCoverage(mod = moduleName, modulePath = modulePath)
-#'   report(testResults$moduleCoverage)
-#'   report(testResults$functionCoverage)
-#'   unlink(tmpdir, recursive = TRUE)
-#'   mc1 <- moduleCoverage("Biomass_core", modulePath = "..")
-#' }
 moduleCoverage <- function(mod, modulePath = "..") {
   stop("This is a stub that is not intended for use")
   if (requireNamespace("testthat")) {

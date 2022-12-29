@@ -301,8 +301,9 @@ setMethod(
 #' @author Alex Chubaty
 #' @examples
 #' \dontrun{
-#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
-#' # Will use quickPlot::Plot
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
+#' library(igraph)
 #' times <- list(start = 0, end = 6, "month")
 #' parameters <- list(
 #'   .globals = list(stackName = "landscape"),
@@ -316,7 +317,8 @@ setMethod(
 #' paths <- list(
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core")
 #' )
-#' opts <- options("spades.moduleCodeChecks" = FALSE)
+#' opts <- options("spades.moduleCodeChecks" = FALSE,
+#'                 "spades.useRequire"= FALSE)
 #' sim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #' options(opts)
@@ -332,7 +334,7 @@ setMethod(
 #' edgeList[from == "_INPUT_", from := "Data"]
 #' edgeList[to == "_INPUT_", to := "Data"]
 #' edgeList <- unique(edgeList)
-#' ig <- igraph::graph_from_data_frame(edgeList[, list(from, to)])
+#' ig <- graph_from_data_frame(edgeList[, list(from, to)])
 #' plot(ig)
 #'
 #' }

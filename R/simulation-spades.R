@@ -363,16 +363,16 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
-#' \dontrun{
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn") # default priority
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()) # default priority
+#'  sim <- simInit()
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn") # default priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()) # default priority
 #'
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()-1) # higher priority
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()+1) # lower priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()-1) # higher priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()+1) # lower priority
 #'
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .highest()) # highest priority
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .lowest()) # lowest priority
-#' }
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
+#'  events(sim) # shows all scheduled events, with eventTime and priority
 scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
@@ -810,7 +810,8 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' @examples
 #' \dontrun{
-#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
 #' mySim <- simInit(
 #'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'  params = list(

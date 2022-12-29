@@ -853,7 +853,8 @@ setReplaceMethod("checkpointInterval",
 #'
 #' @examples
 #' \dontrun{
-#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
 #' opts <- options(spades.moduleCodeChecks = FALSE)
 #' mySim <- simInit(
 #'   times = list(start=0.0, end=100.0),
