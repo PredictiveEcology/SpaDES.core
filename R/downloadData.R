@@ -205,9 +205,10 @@ remoteFileSize <- function(url) {
 #' @rdname downloadData
 #' @examples
 #' # In metadata, each expectsInput has a sourceURL; downloadData will look for
-#' # that and download if it defined
-#' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-#' downloadData("caribouMovement") # it is all NAs, so nothing downloaded
+#' # that and download if it defined; however this sample module has all
+#' # NAs for sourceURL, so nothing to download
+#' modulePath <- system.file("sampleModules", package = "SpaDES.core")
+#' downloadData("caribouMovement", path = modulePath)
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
                                     overwrite = FALSE, files = NULL, checked = NULL,
@@ -267,7 +268,10 @@ setMethod(
       chksums <- chksums[order(-result)]
       chksums <- unique(chksums, by = "expectedFile")
     } else {
+      unlinkAfter <- !dir.exists(dPath) # next line will make the folder and put nothing in it
       chksums <- Checksums(dPath, write = TRUE)
+      if (isTRUE(unlinkAfter))
+        unlink(dPath, recursive = TRUE)
     }
 
     # after download, check for childModules that also require downloading
