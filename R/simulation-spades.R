@@ -678,7 +678,7 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' @seealso [SpaDES.core-package()],
 #' [simInit()], and the caching vignette (very important for reproducibility):
-#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html> which
+#' https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html which
 #' uses [reproducible::Cache()].
 #'
 #'
@@ -699,7 +699,7 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' There are numerous ways in which Caching can be used within SpaDES. Please
 #' see the vignette
-#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html>
+#' https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html
 #' for many examples. Briefly, functions, events, modules, entire spades calls or
 #' experiment calls (see <https://github.com/PredictiveEcology/SpaDES.experiment>)
 #' can be cached and mixtures of all of these will work. For functions, simply
