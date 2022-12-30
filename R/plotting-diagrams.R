@@ -317,8 +317,7 @@ setMethod(
 #' paths <- list(
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core")
 #' )
-#' opts <- options("spades.moduleCodeChecks" = FALSE,
-#'                 "spades.useRequire"= FALSE)
+#' opts <- options("spades.moduleCodeChecks" = FALSE)
 #' sim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #' options(opts)

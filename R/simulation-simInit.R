@@ -210,8 +210,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' \dontrun{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' opts <- options("spades.useRequire" = FALSE,
-#'                 "spades.moduleCodeChecks" = FALSE) # ensures no new packages installed
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example
 #' mySim <- simInit(
 #'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'  params = list(
@@ -1388,7 +1387,7 @@ loadPkgs <- function(reqdPkgs) {
 
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, upgrade = FALSE)
+      Require(allPkgs, standAlone = FALSE, upgrade = FALSE) # basically don't change anything
     } else {
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)

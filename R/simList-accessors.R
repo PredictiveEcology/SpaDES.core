@@ -702,8 +702,7 @@ setReplaceMethod("G",
 #' @examples
 #' if (requireNamespace("NLMR", quietly = TRUE) &&
 #'     requireNamespace("SpaDES.tools", quietly = TRUE)) {
-#'   opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
-#'                   "spades.useRequire" = FALSE)       # prevent installing packages
+#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #'   modules <- list("randomLandscapes")
 #'   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'   mySim <- simInit(modules = modules, paths = paths,
@@ -859,8 +858,7 @@ setReplaceMethod("checkpointInterval",
 #' \dontrun{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
-#'                 "spades.useRequire" = FALSE)       # prevent installing packages
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #' mySim <- simInit(
 #'   times = list(start=0.0, end=100.0),
 #'   params = list(.globals = list(stackName = "landscape"),

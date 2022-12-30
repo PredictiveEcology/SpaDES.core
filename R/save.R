@@ -107,8 +107,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
 #'   outputPath = outputPath
 #' )
-#' opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
-#'                 "spades.useRequire" = FALSE)       # prevent installing packages
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #' mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
