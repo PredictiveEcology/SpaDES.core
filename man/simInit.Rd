@@ -262,7 +262,9 @@ Please see the vignette dedicated to this topic.
 
 \examples{
 \dontrun{
-if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+requireNamespace("NLMR", quietly = TRUE)) {
+opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example
 mySim <- simInit(
  times = list(start = 0.0, end = 2.0, timeunit = "year"),
  params = list(
@@ -286,7 +288,7 @@ mySim <- simInit(
 outSim <- spades(mySim)
 
 # A little more complicated with inputs and outputs
-if (require(rgdal)) {
+if (requireNamespace("rgdal", quietly = TRUE)) {
  mapPath <- system.file("maps", package = "quickPlot")
  mySim <- simInit(
    times = list(start = 0.0, end = 2.0, timeunit = "year"),
@@ -310,7 +312,7 @@ if (require(rgdal)) {
 
  # Use accessors for inputs, outputs
  mySim2 <- simInit(
-   times = list(current = 0, start = 0.0, end = 2.0, timeunit = "year"),
+   times = list(start = 0.0, end = 2.0, timeunit = "year"),
    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
    params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
    paths = list(
@@ -366,6 +368,7 @@ if (require(rgdal)) {
  events(mySim2) # load event is at time 1 month, reported in years because of
                 #   update to times above
 }
+options(opts)
 }
 }
 

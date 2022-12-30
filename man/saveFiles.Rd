@@ -66,7 +66,8 @@ wants it or not.
 \examples{
 \dontrun{
 
-if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+requireNamespace("NLMR", quietly = TRUE)) {
 #' # This will save the "caribou" object at the save interval of 1 unit of time
 #  in the outputPath location
 outputPath <- file.path(tempdir(), "test_save")
@@ -84,10 +85,9 @@ paths <- list(
   modulePath = system.file("sampleModules", package = "SpaDES.core"),
   outputPath = outputPath
 )
-opts <- options(spades.moduleCodeChecks = FALSE)
+opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 mySim <- simInit(times = times, params = parameters, modules = modules,
                  paths = paths)
-options(opts)
 
 # The caribou module has a saveFiles(sim) call, so it will save caribou
 spades(mySim)
@@ -95,6 +95,7 @@ dir(outputPath)
 
 # remove the files
 file.remove(dir(outputPath, full.names = TRUE))
+options(opts) # clean up
 
 }}
 }

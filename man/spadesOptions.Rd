@@ -96,6 +96,12 @@ The following options are likely of interest to most users
     \tab `file.path(tempdir(), "SpaDES", "outputs")`
     \tab The default local directory in which to save simulation outputs.\cr
 
+  `spades.plots`
+    \tab The value of this will passed to `.plots` within every module; it will thus
+    override all module parameter values for `.plots`. This can, e.g., be used
+    to turn off all plotting.
+    \tab The default is NULL, meaning accept the module-level parameter\cr
+
   `spades.recoveryMode` \tab `1L` \tab
   If this a numeric > 0 or TRUE, then the
   discrete event simulator will take a snapshot of the objects in the `simList`

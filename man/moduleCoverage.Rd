@@ -19,7 +19,7 @@ The \code{moduleCoverage} object contains the percent value of unit test coverag
 for the module.
 The \code{functionCoverage} object contains percentage values for unit test
 coverage for each function defined in the module.
-Please use \code{\link[covr:report]{covr::report()}} to view the coverage information.
+Please use report() from covr package to view the coverage information.
 Two data.tables give the information of all the tested and untested functions
 in the module.
 }
@@ -33,19 +33,6 @@ To automatically generate this folder, please set \code{unitTests = TRUE}
 when creating a new module using \code{\link[=newModule]{newModule()}}.
 To accurately test your module, the test filename must follow the format
 \code{test-functionName.R}.
-}
-\examples{
-\dontrun{
-  tmpdir <- file.path(tempdir(), "coverage")
-  modulePath <- file.path(tmpdir, "Modules") \%>\% checkPath(create = TRUE)
-  moduleName <- "forestAge" # sample module to test
-  downloadModule(name = moduleName, path = modulePath) # download sample module
-  testResults <- moduleCoverage(mod = moduleName, modulePath = modulePath)
-  report(testResults$moduleCoverage)
-  report(testResults$functionCoverage)
-  unlink(tmpdir, recursive = TRUE)
-  mc1 <- moduleCoverage("Biomass_core", modulePath = "..")
-}
 }
 \seealso{
 \code{\link[=newModule]{newModule()}}.

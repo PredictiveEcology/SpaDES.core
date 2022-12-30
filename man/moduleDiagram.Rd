@@ -36,8 +36,9 @@ plotting the \code{depsEdgeList} directly with \code{\link[=objectDiagram]{objec
 }
 \examples{
 \dontrun{
-if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
-# Will use quickPlot::Plot
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+requireNamespace("NLMR", quietly = TRUE)) {
+library(igraph)
 times <- list(start = 0, end = 6, "month")
 parameters <- list(
   .globals = list(stackName = "landscape"),
@@ -67,7 +68,7 @@ edgeList <- edgeList[, list(from, to)]
 edgeList[from == "_INPUT_", from := "Data"]
 edgeList[to == "_INPUT_", to := "Data"]
 edgeList <- unique(edgeList)
-ig <- igraph::graph_from_data_frame(edgeList[, list(from, to)])
+ig <- graph_from_data_frame(edgeList[, list(from, to)])
 plot(ig)
 
 }
