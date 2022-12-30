@@ -813,6 +813,7 @@ scheduleConditionalEvent <- function(sim,
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
 #'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+#'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
 #'   mySim <- simInit(
 #'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
 #'    params = list(
@@ -873,7 +874,7 @@ scheduleConditionalEvent <- function(sim,
 #'                         fireSpread = c("init", "burn"),
 #'                         save = "init"))
 #'
-#'   options(opts) # reset
+#'   options(opts) # reset options
 #' }
 #' }
 #'
@@ -1074,9 +1075,10 @@ setMethod(
             needClass = "numeric")
         if (!is.null(.plotInitialTime)) {
           message("Both .plots and .plotInitialTime are supplied; using .plots")
-          .plotInitialTime <- .plots
         }
+        .plotInitialTime <- .plots
       }
+
       if (!is.null(.plotInitialTime)) {
         sim@params <- updateParamSlotInAllModules(
           sim@params, .plotInitialTime, ".plotInitialTime",
