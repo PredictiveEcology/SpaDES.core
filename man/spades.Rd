@@ -232,6 +232,7 @@ with the one just edited. There may be some unexpected consequences if the
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
     requireNamespace("NLMR", quietly = TRUE)) {
   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+  if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
   mySim <- simInit(
    times = list(start = 0.0, end = 1.0, timeunit = "year"),
    params = list(
@@ -292,7 +293,7 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
                         fireSpread = c("init", "burn"),
                         save = "init"))
 
-  options(opts) # reset
+  options(opts) # reset options
 }
 }
 
