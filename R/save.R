@@ -107,10 +107,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
 #'   outputPath = outputPath
 #' )
-#' opts <- options(spades.moduleCodeChecks = FALSE)
+#' opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
+#'                 "spades.useRequire" = FALSE)       # prevent installing packages
 #' mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
-#' options(opts)
 #'
 #' # The caribou module has a saveFiles(sim) call, so it will save caribou
 #' spades(mySim)
@@ -118,6 +118,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' # remove the files
 #' file.remove(dir(outputPath, full.names = TRUE))
+#' options(opts) # clean up
 #'
 #' }}
 saveFiles <- function(sim) {
