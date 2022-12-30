@@ -118,9 +118,10 @@ This is experimental and should be used with caution.
 }
 \examples{
 # In metadata, each expectsInput has a sourceURL; downloadData will look for
-# that and download if it defined
-setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-downloadData("caribouMovement") # it is all NAs, so nothing downloaded
+# that and download if it defined; however this sample module has all
+# NAs for sourceURL, so nothing to download
+modulePath <- system.file("sampleModules", package = "SpaDES.core")
+downloadData("caribouMovement", path = modulePath)
 
 }
 \seealso{

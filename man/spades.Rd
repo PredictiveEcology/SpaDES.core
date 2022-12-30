@@ -231,8 +231,7 @@ with the one just edited. There may be some unexpected consequences if the
 \dontrun{
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
     requireNamespace("NLMR", quietly = TRUE)) {
-  opts <- options("spades.moduleCodeChecks" = FALSE, # not necessary for example
-                  "spades.plots" = NA) # turn off plotting for examples
+  opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
   mySim <- simInit(
    times = list(start = 0.0, end = 1.0, timeunit = "year"),
    params = list(
