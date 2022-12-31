@@ -11,7 +11,7 @@ testObjectForLeak <- function(objs, envir, class, type, customMessage) {
         } else {
           os2 <- sum(unlist(objSize2(x)))
         }
-        if (os2 > os1 * 50) { # was 50; probably should be
+        if (os2 > os1 * 100) { # was 50; probably should be
           memoryLeakWarning(class, type, nam, customMessage = customMessage)
         }
       }
