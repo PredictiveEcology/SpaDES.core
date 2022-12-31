@@ -97,7 +97,8 @@ This must be \code{TRUE} if the use is passing a regular expression.
 Otherwise, \code{userTags} will need to be exact matches. Default is
 missing, which is the same as \code{TRUE}. If there are errors due
 to regular expression problem, try \code{FALSE}. For \code{cc}, it is
-passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}}
+passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
+it can also be \code{sorted = FALSE} to return the object unsorted.}
 }
 \description{
 This will take the \code{cachePath(object)} and pass

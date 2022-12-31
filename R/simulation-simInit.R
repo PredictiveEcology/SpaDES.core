@@ -208,6 +208,9 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #' @examples
 #' \dontrun{
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example
 #' mySim <- simInit(
 #'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'  params = list(
@@ -231,7 +234,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' outSim <- spades(mySim)
 #'
 #' # A little more complicated with inputs and outputs
-#' if (require(rgdal)) {
+#' if (requireNamespace("rgdal", quietly = TRUE)) {
 #'  mapPath <- system.file("maps", package = "quickPlot")
 #'  mySim <- simInit(
 #'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
@@ -255,7 +258,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #'  # Use accessors for inputs, outputs
 #'  mySim2 <- simInit(
-#'    times = list(current = 0, start = 0.0, end = 2.0, timeunit = "year"),
+#'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'    params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
 #'    paths = list(
@@ -310,6 +313,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'  events(mySim) # load event is at time 1 year
 #'  events(mySim2) # load event is at time 1 month, reported in years because of
 #'                 #   update to times above
+#' }
+#' options(opts)
 #' }
 #' }
 #'
@@ -437,7 +442,7 @@ setMethod(
                          filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
                          paths = paths(sim)$modulePath,
                          envir = sim@.xData[[".parsedFiles"]])
-    loadPkgs(reqdPkgs)
+    loadPkgs(reqdPkgs) # does unlist internally
 
     simDTthreads <- getOption("spades.DTthreads", 1L)
     message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
@@ -599,13 +604,14 @@ setMethod(
       }
 
       # Make local activeBindings to mod
-      lapply(as.character(sim@modules), function(mod) {
-        makeModActiveBinding(sim = sim, mod = mod)
-      })
-
-      lapply(sim@modules, function(mod) {
-        makeParActiveBinding(sim = sim, mod = mod)
-      })
+      makeSimListActiveBindings(sim)
+      # lapply(as.character(sim@modules), function(mod) {
+      #   makeModActiveBinding(sim = sim, mod = mod)
+      # })
+      #
+      # lapply(sim@modules, function(mod) {
+      #   makeParActiveBinding(sim = sim, mod = mod)
+      # })
 
       ## load user-defined modules
       # browser(expr = exists("._simInit_4"))
@@ -916,17 +922,26 @@ setMethod(
             seq(length(li[[x]]))
           }
           NAItems <- is.na(items)
-          if (any(NAItems)) { # fill in unnamed list elements
-            # browser(expr = exists("innerClasses"))
-            items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
-              !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
-            names(li[[x]])[NAItems] <- items[NAItems]
+          if (any(NAItems)) { # delete unnamed list elements; they must be named
+            if (length(li[[x]]) > length(names(expectedInnerClasses[[x]]))) {
+              # too many items; this is an error
+              items <- names(li[[x]])
+            } else {
+              # browser(expr = exists("innerClasses"))
+              items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
+                !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
+              names(li[[x]])[NAItems] <- items[NAItems]
+            }
 
           }
           namesInner[[x]] <<- items
 
           all(sapply(items, function(y) {
-            is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+            if (is.null(expectedInnerClasses[[x]][[y]])) {
+              FALSE
+            } else {
+              is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+            }
           }))
         } else {
           if (length(li[[x]]) > 0)
@@ -1358,17 +1373,21 @@ buildParentChildGraph <- function(sim, mods, childModules) {
   outDF
 }
 
+#' @importFrom Require getCRANrepos
 loadPkgs <- function(reqdPkgs) {
   uniqueReqdPkgs <- unique(unlist(reqdPkgs))
 
   if (length(uniqueReqdPkgs)) {
-    allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+    allPkgs <- uniqueReqdPkgs
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs)))
+      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
 
     # Check for SpaDES.core minimum version
     checkSpaDES.coreMinVersion(allPkgs)
 
     if (getOption("spades.useRequire")) {
-      Require(allPkgs, upgrade = FALSE)
+      getCRANrepos(ind = 1) # running this first is neutral if it is set
+      Require(allPkgs, standAlone = FALSE, upgrade = FALSE) # basically don't change anything
     } else {
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)

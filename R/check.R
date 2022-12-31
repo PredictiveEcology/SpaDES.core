@@ -103,7 +103,7 @@ setMethod(
       )
       return(FALSE)
     }
-})
+  })
 
 #' @export
 #' @rdname checkObject
@@ -113,7 +113,7 @@ setMethod(
   definition = function(name, object, layer, ...) {
     stop(paste("Must provide a simList object"))
     return(FALSE)
-})
+  })
 
 ################################################################################
 #' Check use and existence of params passed to simulation.
@@ -167,7 +167,7 @@ setMethod(
           #   might have happened earlier during simInit,
           #   if this checkParams was run from simInit
           tmp <- .parseConditional(envir = sim@.xData[[".parsedFiles"]],
-                                  filename = filename)
+                                   filename = filename)
           deparse(tmp$parsedFile)
         } else {
           readLines(filename)
@@ -176,13 +176,13 @@ setMethod(
 
         # check global params
         #if (length(globalParams) > 0) {
-          for (i in seq(globalParams)) {
-            gP <- names(globalParams[i])
-            result <- grep(gP, readFile[[uM]], value = FALSE, fixed = TRUE)
-            if (length(result) > 0) {
-              globalsFound <- append(globalsFound, gP)
-            }
+        for (i in seq(globalParams)) {
+          gP <- names(globalParams[i])
+          result <- grep(gP, readFile[[uM]], value = FALSE, fixed = TRUE)
+          if (length(result) > 0) {
+            globalsFound <- append(globalsFound, gP)
           }
+        }
         #}
 
         # check user params
@@ -283,4 +283,4 @@ setMethod(
       allFound <- FALSE
     }
     return(invisible(allFound))
-})
+  })

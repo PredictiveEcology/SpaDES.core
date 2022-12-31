@@ -47,16 +47,16 @@ submodules to the simulation. We use S4 classes and methods, and use \code{data.
 instead of \code{data.frame} to implement the event queue (because it is much faster).
 }
 \examples{
-\dontrun{
- scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn") # default priority
- scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()) # default priority
+ sim <- simInit()
+ sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn") # default priority
+ sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()) # default priority
 
- scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()-1) # higher priority
- scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()+1) # lower priority
+ sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()-1) # higher priority
+ sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()+1) # lower priority
 
- scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .highest()) # highest priority
- scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .lowest()) # lowest priority
-}
+ sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
+ sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
+ events(sim) # shows all scheduled events, with eventTime and priority
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).

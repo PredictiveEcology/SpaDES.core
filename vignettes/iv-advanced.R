@@ -1,5 +1,5 @@
 ## ----memoryUse, eval=FALSE, echo=TRUE-----------------------------------------
-#  if (requireNamespace("future", quietly = TRUE)) &&
+#  if (requireNamespace("future", quietly = TRUE) &&
 #    requireNamespace("future.callr", quietly = TRUE)) {
 #    options("spades.memoryUseInterval" = 0.5)
 #  

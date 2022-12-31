@@ -63,8 +63,10 @@ updateList <- function(x, y) {
 #'
 #' @examples
 #' library(igraph) # igraph exports magrittr's pipe operator
-#' tmp1 <- list("apple", "banana") %>% lapply(., `attributes<-`, list(type = "fruit"))
-#' tmp2 <- list("carrot") %>% lapply(., `attributes<-`, list(type = "vegetable"))
+#' tmp1 <- list("apple", "banana")
+#' tmp1 <- lapply(tmp1, `attributes<-`, list(type = "fruit"))
+#' tmp2 <- list("carrot")
+#' tmp2 <- lapply(tmp2, `attributes<-`, list(type = "vegetable"))
 #' append_attr(tmp1, tmp2)
 #' rm(tmp1, tmp2)
 setGeneric("append_attr", function(x, y) {
@@ -216,21 +218,6 @@ setMethod("rndstr",
 #' @author Alex Chubaty
 #'
 #' @examples
-#' \dontrun{
-#'   ## from global environment
-#'   a <- list(1:10)     # class `list`
-#'   b <- letters        # class `character`
-#'   d <- stats::runif(10)      # class `numeric`
-#'   f <- sample(1L:10L) # class `numeric`, `integer`
-#'   g <- lm( jitter(d) ~ d ) # class `lm`
-#'   h <- glm( jitter(d) ~ d ) # class `lm`, `glm`
-#'   classFilter(ls(), include=c("character", "list"))
-#'   classFilter(ls(), include = "numeric")
-#'   classFilter(ls(), include = "numeric", exclude = "integer")
-#'   classFilter(ls(), include = "lm")
-#'   classFilter(ls(), include = "lm", exclude = "glm")
-#'   rm(a, b, d, f, g, h)
-#' }
 #'
 #' ## from local (e.g., function) environment
 #' local({
@@ -249,7 +236,7 @@ setMethod("rndstr",
 #'   rm(a, b, d, e, f, g, h)
 #' })
 #'
-#' ## from another environment
+#' ## from another environment (can be omitted if .GlobalEnv)
 #' e = new.env(parent = emptyenv())
 #' e$a <- list(1:10)     # class `list`
 #' e$b <- letters        # class `character`

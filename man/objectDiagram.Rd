@@ -27,9 +27,12 @@ plotting the \code{depsEdgeList} directly with \code{\link[=moduleDiagram]{modul
 }
 \examples{
 \dontrun{
-objectDiagram(sim)
-# if there are lots of objects, may need to increase width and/or height
-objectDiagram(sim, height = 3000, width = 3000)
+if (requireNamespace("DiagrammeR", quietly = TRUE)) {
+  sim <- simInit()
+  objectDiagram(sim)
+  # if there are lots of objects, may need to increase width and/or height
+  objectDiagram(sim, height = 3000, width = 3000)
+}
 }
 
 }
