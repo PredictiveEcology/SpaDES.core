@@ -36,17 +36,21 @@ test_that("testing memoryUse", {
   #set.seed(1234)
   mySim2 <- simInit(times = times, params = params,
                     modules = modules, objects = list(), paths = paths)
-  mySim3 <- spades(mySim2, debug = TRUE)
-  suppressWarnings({
-    memUse <- memoryUse(mySim3)
-  })
-  expect_true(is(memUse, "data.table"))
-  expect_true(is.numeric(memUse$maxMemory))
-  expect_true(sum(!is.na(memUse$maxMemory)) > 0)
-  suppressWarnings({
-    memUse <- memoryUse(mySim3, max = FALSE)
-  })
-  if (length(unique(memUse$maxMemory)) == 1)
-    browser()
-  expect_true(length(unique(memUse$maxMemory)) > 1) # i.e., the join had to result in multiple values
+
+  if (!identical(Sys.getenv("USING_COVR"), "true")) {
+
+    mySim3 <- spades(mySim2, debug = TRUE)
+    suppressWarnings({
+      memUse <- memoryUse(mySim3)
+    })
+    expect_true(is(memUse, "data.table"))
+    expect_true(is.numeric(memUse$maxMemory))
+    expect_true(sum(!is.na(memUse$maxMemory)) > 0)
+    suppressWarnings({
+      memUse <- memoryUse(mySim3, max = FALSE)
+    })
+    if (length(unique(memUse$maxMemory)) == 1)
+      browser()
+    expect_true(length(unique(memUse$maxMemory)) > 1) # i.e., the join had to result in multiple values
+  }
 })
