@@ -84,8 +84,7 @@ test_that("test event-level cache & memory leaks", {
       simsOut <- spades(sims, debug = FALSE)
     })
   })
-  print(warnsFunction)
-  expect_true(length(grep("causing a memory leak", warnsFunction)) == 0)
+  expect_identical(length(grep("causing a memory leak", warnsFunction)), 0L)
 
   # Take a leaky function -- should trigger memory leak stuff
   fn <- function() { rnorm(1)}
