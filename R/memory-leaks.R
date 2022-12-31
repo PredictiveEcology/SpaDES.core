@@ -11,7 +11,7 @@ testObjectForLeak <- function(objs, envir, class, type, customMessage) {
         } else {
           os2 <- sum(unlist(objSize2(x)))
         }
-        if (os2 > os1 * 100) { # was 50; probably should be higher? This is the ratio of object.size to objSize
+        if (os2 > os1 * getOption("spades.memoryLeakAllowed", 50)) { # was 50; probably should be higher? This is the ratio of object.size to objSize
           memoryLeakWarning(class, type, nam, os1 = os1, os2 = os2, customMessage = customMessage)
         }
       }
