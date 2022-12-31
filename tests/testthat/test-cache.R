@@ -84,6 +84,9 @@ test_that("test event-level cache & memory leaks", {
       simsOut <- spades(sims, debug = FALSE)
     })
   })
+  os1 <- as.numeric(gsub(".+object.size = ([0-9]+).+", "\\1", warnsFunction))
+  os2 <- as.numeric(gsub(".+objSize = ([0-9]+).+", "\\1", warnsFunction))
+  expect_identical(os1, os2)
   expect_identical(length(grep("causing a memory leak", warnsFunction)), 0L)
 
   # Take a leaky function -- should trigger memory leak stuff
@@ -145,7 +148,7 @@ test_that("test event-level cache & memory leaks", {
   expect_true(!grepl("function", warnsFormula))
 })
 
-test_that("test module-level cache", {
+ostest_that("test module-level cache", {
   skip_if_not_installed("NLMR")
   testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
