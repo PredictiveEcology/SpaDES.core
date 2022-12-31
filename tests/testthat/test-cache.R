@@ -86,8 +86,11 @@ test_that("test event-level cache & memory leaks", {
   })
   os1 <- as.numeric(gsub(".+object.size = ([0-9]+).+", "\\1", warnsFunction))
   os2 <- as.numeric(gsub(".+objSize = ([0-9]+).+", "\\1", warnsFunction))
-  # expect_identical(os1, os2)
-  if (length(.grepSysCalls(sysCalls = sys.calls(), "covr")) == 0)
+
+  # On covr::package_coverage -- this shows a HUGE difference ... about 130x. I don't know exactly why,
+  #   but I feel like it is due to capturing of each call, which is unique to covr
+  #   So this should be skipped on covr
+  if (!identical(Sys.getenv("USING_COVR"), "true"))
     expect_identical(length(grep("causing a memory leak", warnsFunction)), 0L)
 
   # Take a leaky function -- should trigger memory leak stuff
