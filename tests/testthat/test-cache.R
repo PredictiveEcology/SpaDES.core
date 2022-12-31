@@ -78,6 +78,8 @@ test_that("test event-level cache & memory leaks", {
   sims$crazyFunction3 <- sims$.mods$caribouMovement$Move
   end(sims) <- end(sims) + 0.1
   # simsOut <- spades(sims, debug = FALSE)
+  opts <- options("spades.memoryLeakAllowed" = 150)
+  on.exit(opts, add = TRUE)
 
   mess <- capture.output({
     warnsFunction <- capture_warnings({
