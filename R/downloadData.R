@@ -204,11 +204,13 @@ remoteFileSize <- function(url) {
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
+#' \dontrun{
 #' # In metadata, each expectsInput has a sourceURL; downloadData will look for
 #' # that and download if it defined; however this sample module has all
 #' # NAs for sourceURL, so nothing to download
 #' modulePath <- system.file("sampleModules", package = "SpaDES.core")
 #' downloadData("caribouMovement", path = modulePath)
+#' }
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
                                     overwrite = FALSE, files = NULL, checked = NULL,

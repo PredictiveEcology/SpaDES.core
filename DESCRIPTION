@@ -12,20 +12,20 @@ Description: Provides the core framework for a discrete event system (DES) to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2022-12-19
-Version: 1.1.0.9019
+Date: 2023-01-05
+Version: 1.1.1
 Authors@R: c(
     person("Alex M", "Chubaty", email = "achubaty@for-cast.ca",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
     person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
            role = c("aut"), comment = c(ORCID = "0000-0002-6914-8316")),
-        person("Yong", "Luo", email = "Yong.Luo@gov.bc.ca",
+    person("Yong", "Luo", email = "Yong.Luo@gov.bc.ca",
            role = c("ctb")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
            role = c("ctb")),
     person("Ceres", "Barros", email = "cbarros@mail.ubc.ca",
            role = c("ctb"), comment = c(ORCID = "0000-0003-4036-977X")),
-    person(paste("Her Majesty the Queen in Right of Canada,",
+    person(paste("His Majesty the King in Right of Canada,",
                  "as represented by the Minister of Natural Resources Canada"),
            role = "cph")
     )
@@ -71,10 +71,6 @@ Suggests:
     tcltk,
     terra,
     testthat (>= 1.0.2)
-Remotes:
-    ropensci/NLMR,
-    PredictiveEcology/Require@development,
-    PredictiveEcology/SpaDES.tools@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA

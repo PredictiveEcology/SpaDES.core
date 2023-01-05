@@ -1,9 +1,15 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-# SpaDES.core 1.1.0.9000
+# SpaDES.core 1.1.1
 
 ## new features
+* updates to handle upstream changes in `Require` and `reproducible`, including renaming `cacheRepo` to `cachePath` in some inherited functions.
+* updates to sample modules to use `SpaDES.tools::neutralLandscapeMap` instead of NLMR package
+* begin migration to use `terra` and `sf` instead of `raster`, `sp`, `rgeos`, and `rgdal`
 * `moduleMetadata` now handles multiple module paths
+* updates to `memoryUse`
+* `.plots` arg in `spades` can be set to `NA` to turn of all plotting. This can also be set with an `option(spades.plots = NA)`, 
+* minor bugfixes
 
 # SpaDES.core 1.1.0
 
