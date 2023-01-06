@@ -31,7 +31,7 @@ defineModule(sim, list(
   reqdPkgs = list(
     "ropensci/NLMR (>= 1.1.1)",
     "raster", "RColorBrewer",
-    "PredictiveEcology/SpaDES.tools@development (>= 1.0.0.9001)"
+    "SpaDES.tools (>= 1.0.1)"
   ),
   parameters = rbind(
     defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
