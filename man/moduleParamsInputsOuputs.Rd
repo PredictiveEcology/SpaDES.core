@@ -37,7 +37,7 @@ that extraneous spaces and End-Of-Line characters will be removed from the
 \code{defineOutputs}
 }
 \examples{
-#' \dontrun{
+\dontrun{
 ## easily include these tables in Rmd files using knitr
 path <- system.file("sampleModules", package = "SpaDES.core")
 sampleModules <- dir(path)
@@ -49,7 +49,7 @@ o <- moduleOutputs(sampleModules[3], path = path)
 knitr::kable(p)
 knitr::kable(i)
 knitr::kable(o)
-#' }
+}
 
 }
 \seealso{
