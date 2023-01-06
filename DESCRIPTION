@@ -41,7 +41,7 @@ Imports:
     methods,
     qs (>= 0.21.1),
     raster (>= 2.5-8),
-    Require (>= 0.2.5),
+    Require (>= 0.2.6),
     stats,
     utils,
     whisker
