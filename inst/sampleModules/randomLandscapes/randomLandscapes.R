@@ -7,7 +7,7 @@ if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
 rm(SpaDES.core.version)
 
 ## this version of the 'randomLandscapes' module loads data from file instead of
-## generating it using 'SpaDES.tools::gaussMap'
+## generating it using 'SpaDES.tools::neutralLandscapeMap'
 
 defineModule(sim, list(
   name = "randomLandscapes",

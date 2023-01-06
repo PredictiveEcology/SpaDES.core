@@ -306,7 +306,7 @@
 #'   These dummy maps can later be replaced with actual data maps.
 #'
 #'   \tabular{ll}{
-#'     [SpaDES.tools::gaussMap()] \tab Creates a random map using Gaussian random fields\cr
+#'     [SpaDES.tools::neutralLandscapeMap()] \tab Creates a random map using Gaussian random fields\cr
 #'     [SpaDES.tools::randomPolygons()] \tab Creates a random polygon with specified number of classes\cr
 #'   }
 #' }
