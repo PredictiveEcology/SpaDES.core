@@ -1319,7 +1319,6 @@ checkSpaDES.coreMinVersion <- function(allPkgs) {
              "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
     }
   }
-
 }
 
 findSmallestTU <- function(sim, mods, childModules) { # recursive function
