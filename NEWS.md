@@ -4,7 +4,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
 ## Enhancements
 * updates to handle upstream changes in `Require` and `reproducible`, including renaming `cacheRepo` to `cachePath` in some inherited functions.
-* updates to sample modules to use `SpaDES.tools::neutralLandscapeMap` instead of NLMR package directly
+* updates to sample modules to use `SpaDES.tools::neutralLandscapeMap` instead of `NLMR` package directly
 * begin migration to use `terra` and `sf` instead of `raster`, `sp`, `rgeos`, and `rgdal`
 * `moduleMetadata` now handles multiple module paths
 * updates to `memoryUse`
