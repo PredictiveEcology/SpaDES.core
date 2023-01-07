@@ -71,11 +71,6 @@ Suggests:
     tcltk,
     terra,
     testthat (>= 1.0.2)
-Remotes:
-    ropensci/NLMR,
-    PredictiveEcology/Require@development,
-    PredictiveEcology/reproducible@development,
-    PredictiveEcology/SpaDES.tools@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
