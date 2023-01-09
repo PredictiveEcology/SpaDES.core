@@ -1304,19 +1304,25 @@ simInitDefaults <- function() {
     poss[exist][1])
 }
 
+#' @importFrom Require extractVersionNumber
+#' @importFrom utils packageVersion
 checkSpaDES.coreMinVersion <- function(allPkgs) {
-  whSC <- startsWith(allPkgs, "SpaDES.core")
+  whSC <- grepl("\\<SpaDES.core\\>", allPkgs)
   if (any(whSC)) {
-    versionSpecs <- Require::getPkgVersions(allPkgs[whSC])
-    sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
-    if (NROW(sc)) {
-      out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
-        comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
-                               sc$versionSpec[iii])}))
-      if (any(out11 < 0))
+    scPackageFullnames <- allPkgs[whSC]
+    sc <- extractVersionNumber(scPackageFullnames)
+    # versionSpecs <- Require::getPkgVersions(scPackageFullnames)
+    scWONA <- na.omit(sc)# [Package == "SpaDES.core" & hasVersionSpec == TRUE]
+    if (NROW(scWONA)) {
+      scCurVersion <- packageVersion("SpaDES.core")
+      ineq <- extractInequality(scPackageFullnames)
+      ok <- compareVersion2(scCurVersion, sc, ineq)
+
+      if (any(ok %in% FALSE))
         stop("One of the modules needs a newer version of SpaDES.core. Please ",
              "restart R and install with: \n",
-             "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+             "Require::Install(c('",
+             paste(scPackageFullnames[ok %in% FALSE], collapse = ", "),"'))")
     }
   }
 }
@@ -1378,16 +1384,16 @@ loadPkgs <- function(reqdPkgs) {
 
   if (length(uniqueReqdPkgs)) {
     allPkgs <- uniqueReqdPkgs
-    if (!any(grepl("SpaDES.core", uniqueReqdPkgs)))
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) # append SpaDES.core if it isn't already there
       allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
 
     # Check for SpaDES.core minimum version
-    checkSpaDES.coreMinVersion(allPkgs)
-
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
       Require(allPkgs, standAlone = FALSE, upgrade = FALSE) # basically don't change anything
     } else {
+      checkSpaDES.coreMinVersion(allPkgs)
+
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }
