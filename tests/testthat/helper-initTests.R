@@ -223,18 +223,16 @@ test2Code <- '
       }
       '
 
-
-runTestsWithTimings <- function(nameOfOuterList = "ff", envir = parent.frame(), authorizeGoogle = FALSE) {
+runTestsWithTimings <- function(pkgPath = ".",
+                                nameOfOuterList = "ff", envir = parent.frame(), authorizeGoogle = FALSE) {
   if (isTRUE(authorizeGoogle))
     if (Sys.info()[["user"]] == "emcintir")
       googledrive::drive_auth(cache = "~/.secret", email = "predictiveecology@gmail.com")
-  prepend <- "/home/emcintir/GitHub/SpaDES.core/tests/testthat"
+  prepend <- file.path(pkgPath, "tests/testthat")
   testFiles <- dir(prepend, pattern = "^test-", full.names = TRUE)
   testFiles <- grep("large", testFiles, value = TRUE, invert = TRUE)
-  rrrr <- get0(nameOfOuterList, envir = envir)
-  if (is.null(rrrr)) {
-    assign(nameOfOuterList, list(), envir = .GlobalEnv)
-  }
+  if (!exists(nameOfOuterList, envir = envir)) assign(nameOfOuterList, list(), envir = envir)
+  rrrr <- get(nameOfOuterList, envir = envir)
   testFiles <- setdiff(testFiles, file.path(prepend, names(rrrr)))
   for (tf in testFiles) {
     messageDF(colour = "blue", basename(tf))
