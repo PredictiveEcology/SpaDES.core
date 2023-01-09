@@ -104,7 +104,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     rm(list = names(eventsToReverse), envir = sim@completed)
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
-    browser()
     if (numMods > length(sim$.recoverableObjs))
       message("Cannot replay ", numMods, " events as requested by numMods; ",
               "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
