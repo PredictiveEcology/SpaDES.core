@@ -66,6 +66,8 @@ Suggests:
     tcltk,
     terra,
     testthat (>= 1.0.2)
+Remotes:
+    ropensci/NLMR
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
