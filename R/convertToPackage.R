@@ -117,8 +117,6 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   fileNames <- lapply(whNotDefModule, function(element) {
     fn <- aa[[element]][[2]]
     filePath <- filenameFromFunction(packageFolderName, fn, "R")
-    # filePath <- file.path(dirname(mainModuleFile), "R", paste0(gsub("\\.", "", fn), ".R"))
-
     fnCh <- as.character(fn)
     parseWithFn <- gpd[which(gpd$text == fnCh & gpd$token == "SYMBOL"),]
     lineWithFn <- parseWithFn[, "line1"]
@@ -216,7 +214,7 @@ paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
   cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
   cat(paste("Title:", d$Title), file = dFile, sep = "\n", append = TRUE)
   cat(paste("Version:", d$Version), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Description:", d$Description), file = dFile, sep = "\n", append = TRUE)
+  cat(paste("Description:", paste(d$Description, collapse = " ")), file = dFile, sep = "\n", append = TRUE)
   cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
 
