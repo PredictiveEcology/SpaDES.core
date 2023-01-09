@@ -139,7 +139,7 @@
 #'
 #'   `spades.useRequire` \tab `!Sys.getenv("SPADES_USE_REQUIRE") %in% "false"`
 #'     \tab : The default for that environment variable is unset, so this returns
-#'     `TRUE`. If this is `TRUE`, then during the `simInit` call, when pacakges are
+#'     `TRUE`. If this is `TRUE`, then during the `simInit` call, when packages are
 #'     identified as being required, these will be installed if missing, only if
 #'     `spades.useRequire` option is `TRUE`, otherwise, `simInit` will fail because
 #'     packages are not available.\cr

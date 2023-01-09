@@ -17,16 +17,16 @@ See `NEWS.md` for a full list of changes.
 * macOS 11.7 Big Sur            (local), R 4.2.2
 * macOs (m1) Big Sur             (rhub), R 4.2.2
 * Ubuntu 20.04                 (GitHub), R 4.2.2
-* Ubuntu 20.04                  (local), R 4.2.2
+* Ubuntu 20.04                  (local), 4.2.2 Patched (2022-11-10 r83330)
 * Windows                      (GitHub), R 4.2.2
 * Windows                       (local), R 4.2.2
 * Windows                 (win-builder), R 4.2.2
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2022-11-24 r83383)
-* Ubuntu 20.04                  (local), R-devel (2022-11-24 r83383)
-* Windows                      (GitHub), R-devel (2022-10-11 r83083 ucrt)
-* Windows                 (win-builder), R-devel (2022-10-11 r83083 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2023-01-04 r83564)
+* Ubuntu 20.04                  (local), R-devel (2023-01-07 r83578)
+* Windows                      (GitHub), R-devel (2023-01-04 r83564 ucrt)
+* Windows                 (win-builder), R-devel (2023-01-04 r83561 ucrt)
 
 ## R CMD check results
 

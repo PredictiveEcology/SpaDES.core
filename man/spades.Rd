@@ -129,7 +129,7 @@ See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details
 
 There are numerous ways in which Caching can be used within SpaDES. Please
 see the vignette
-https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html
+\url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
 for many examples. Briefly, functions, events, modules, entire spades calls or
 experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experiment})
 can be cached and mixtures of all of these will work. For functions, simply
@@ -306,7 +306,7 @@ Retrieved from \url{https://nostarch.com/artofr.htm}
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}},
 \code{\link[=simInit]{simInit()}}, and the caching vignette (very important for reproducibility):
-https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html which
+\url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
 uses \code{\link[reproducible:Cache]{reproducible::Cache()}}.
 }
 \author{

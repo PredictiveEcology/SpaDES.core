@@ -1325,7 +1325,6 @@ checkSpaDES.coreMinVersion <- function(allPkgs) {
              paste(scPackageFullnames[ok %in% FALSE], collapse = ", "),"'))")
     }
   }
-
 }
 
 findSmallestTU <- function(sim, mods, childModules) { # recursive function
