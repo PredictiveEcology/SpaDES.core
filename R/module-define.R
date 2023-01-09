@@ -794,3 +794,5 @@ addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
 
 fileExt <- getFromNamespace("fileExt", "reproducible")
 filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
+extractInequality <- getFromNamespace("extractInequality", "Require")
+compareVersion2 <- getFromNamespace("compareVersion2", "Require")
