@@ -187,8 +187,12 @@ Plots <- function(data, fn, filename,
 
   # has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
-  if (missing(fn) && isTRUE(usePlot)) {
-    fn <- Plot
+  if (missing(fn)) {
+    if (isTRUE(usePlot)) {
+      fn <- Plot
+    } else {
+      fn <- plot
+    }
   }
   fnIsPlot <- identical(fn, Plot)
   if (fnIsPlot) {
