@@ -39,6 +39,10 @@ The following options are likely of interest to most users
   `spades.debug` \tab `TRUE`
     \tab  The default debugging value `debug` argument in `spades()` \cr
 
+  `spades.dotInputObjects` \tab `TRUE`
+    \tab  This is used in `simInit`; if set to `TRUE` then the `.inputObjects`
+          function will be run; if `FALSE`, then it will be skipped.\cr
+
   `spades.DTthreads` \tab `1L`
     \tab  The default number of \pkg{data.table} threads to use.
     See also `?data.table::setDTthreads`. \cr
