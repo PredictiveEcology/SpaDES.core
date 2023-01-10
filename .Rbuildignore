@@ -16,3 +16,4 @@ vignettes/.*\.log$
 ^\.github$
 ^codecov\.yml$
 ^CRAN-SUBMISSION$
+timings.rds
