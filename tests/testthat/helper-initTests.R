@@ -17,6 +17,7 @@ cleanMessage <- function(mm) {
 # sets options("spades.debug" = FALSE) if debug = FALSE
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
                      opts = list(), tmpFileExt = "") {
+  startTime <- Sys.time()
   a <- list(reproducible.inputPaths = NULL,
             reproducible.showSimilar = FALSE,
             spades.moduleCodeChecks = smcc,
@@ -69,7 +70,7 @@ testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPat
   outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
                   origDir = origDir, libs = libraries,
                   tmpCache = tmpCache, optsAsk = optsAsk,
-                  tmpfile = tmpfile)
+                  tmpfile = tmpfile, startTime = startTime)
   list2env(outList, envir = parent.frame())
   return(outList)
 }
@@ -83,6 +84,41 @@ testOnExit <- function(testInitOut) {
     options(testInitOut$opts)
   setwd(testInitOut$origDir)
   unlink(testInitOut$tmpdir, recursive = TRUE)
+  endTime <- Sys.time()
+
+  if (grepl("W-VIC-", Sys.info()["nodename"])) {
+    thisFilename <- NULL
+    wis <- try(whereInStack("test_paths"), silent = TRUE)
+    if (!is(wis, "try-error"))
+      thisFilename <- get0("test_paths", wis)
+    if (is.null(thisFilename)) {
+      wis <- try(whereInStack("tf"), silent = TRUE)
+      if (!is(wis, "try-error"))
+        thisFilename <- basename(get0("tf", wis))
+    }
+
+    sc <- sys.calls(); aa <- grep("test_that", sc);
+
+    skipOnCRAN <- any(grepl("skip_on_cran", sc[[aa]]))
+    timingsFileBase <- "timings.rds"
+    timingsFile <- if (isWindows())
+      file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
+    else
+      file.path("/home/emcintir/SpaDES.core", timingsFileBase)
+    if (file.exists(timingsFile))
+      timings <- readRDS(timingsFile)
+    else
+      timings <- list()
+    desc <- get("desc", whereInStack("desc"))
+    timingsNew <- data.table(filename = thisFilename,
+                             desc = desc,
+                             skipOnCRAN = skipOnCRAN,
+                             elapsed = as.numeric(format(as.numeric(
+                               difftime(endTime, testInitOut$startTime, units = "secs")))))
+    timings[[desc]] <- timingsNew
+    saveRDS(timings, file = timingsFile)
+  }
+
   # lapply(testInitOut$libs, function(lib) {
   #   try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
   # )
