@@ -97,26 +97,28 @@ testOnExit <- function(testInitOut) {
         thisFilename <- basename(get0("tf", wis))
     }
 
-    sc <- sys.calls(); aa <- grep("test_that", sc);
-
-    skipOnCRAN <- any(grepl("skip_on_cran", sc[[aa]]))
-    timingsFileBase <- "timings.rds"
-    timingsFile <- if (isWindows())
-      file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
-    else
-      file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
-    if (file.exists(timingsFile))
-      timings <- readRDS(timingsFile)
-    else
-      timings <- list()
-    desc <- get("desc", whereInStack("desc"))
-    timingsNew <- data.table(filename = thisFilename,
-                             desc = desc,
-                             skipOnCRAN = skipOnCRAN,
-                             elapsed = as.numeric(format(as.numeric(
-                               difftime(endTime, testInitOut$startTime, units = "secs")))))
-    timings[[desc]] <- timingsNew
-    saveRDS(timings, file = timingsFile)
+    sc <- sys.calls();
+    aa <- grep("test_that", sc);
+    if (length(aa)) {
+      skipOnCRAN <- any(grepl("skip_on_cran", sc[[tail(aa, 1)]]))
+      timingsFileBase <- "timings.rds"
+      timingsFile <- if (isWindows())
+        file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
+      else
+        file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
+      if (file.exists(timingsFile))
+        timings <- readRDS(timingsFile)
+      else
+        timings <- list()
+      desc <- get("desc", whereInStack("desc"))
+      timingsNew <- data.table(filename = thisFilename,
+                               desc = desc,
+                               skipOnCRAN = skipOnCRAN,
+                               elapsed = as.numeric(format(as.numeric(
+                                 difftime(endTime, testInitOut$startTime, units = "secs")))))
+      timings[[desc]] <- timingsNew
+      saveRDS(timings, file = timingsFile)
+    }
   }
 
   # lapply(testInitOut$libs, function(lib) {
