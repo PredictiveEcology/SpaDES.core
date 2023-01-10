@@ -104,7 +104,7 @@ testOnExit <- function(testInitOut) {
     timingsFile <- if (isWindows())
       file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
     else
-      file.path("/home/emcintir/SpaDES.core", timingsFileBase)
+      file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
     if (file.exists(timingsFile))
       timings <- readRDS(timingsFile)
     else

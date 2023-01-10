@@ -217,14 +217,14 @@ test_that("saveSimList does not work correctly", {
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 0, filebackedDir = NULL)
 
   sim <- loadSimList(file = tmpfile[3])
-  expect_true(identical(gsub("\\\\", "/", filename(sim$landscape)), tmpfile[1]))
+  expect_true(identical(gsub("\\\\", "/", Filenames(sim$landscape, allowMultiple = FALSE)), tmpfile[1]))
   expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
 
   # Now keep as file-backed, but change name
   saveSimList(mySim, filename = tmpfile[3], fileBackend = 1, filebackedDir = tmpCache)
 
   sim <- loadSimList(file = tmpfile[3])
-  expect_false(identical(filename(sim$landscape), tmpfile[1]))
+  expect_false(identical(Filenames(sim$landscape, allowMultiple = FALSE), tmpfile[1]))
 
   file.remove(dir(dirname(tmpfile[1]), pattern = ".gr", full.names = TRUE))
   # rm(mySim)
