@@ -438,11 +438,13 @@ setMethod(
     mBase <- basename2(unlist(modules))
 
     # Load packages
-    reqdPkgs <- packages(modules = sim@modules,
-                         filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
-                         paths = paths(sim)$modulePath,
-                         envir = sim@.xData[[".parsedFiles"]])
-    loadPkgs(reqdPkgs) # does unlist internally
+    if (getOption("spades.loadReqdPkgs", TRUE)) {
+      reqdPkgs <- packages(modules = sim@modules,
+                           filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
+                           paths = paths(sim)$modulePath,
+                           envir = sim@.xData[[".parsedFiles"]])
+      loadPkgs(reqdPkgs) # does unlist internally
+    }
 
     simDTthreads <- getOption("spades.DTthreads", 1L)
     message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")

@@ -57,6 +57,10 @@ The following options are likely of interest to most users
      \tab Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)
      \tab The default local directory in which to look for simulation inputs.  \cr
 
+  `spades.loadReqdPkgs`
+     \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
+     or `require`. If `FALSE`, no package loading will occur.  \cr
+
   `spades.lowMemory` \tab `FALSE`
     \tab If true, some functions will use more memory
     efficient (but slower) algorithms. \cr

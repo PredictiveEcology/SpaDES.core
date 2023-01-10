@@ -53,6 +53,10 @@
 #'      \tab Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)
 #'      \tab The default local directory in which to look for simulation inputs.  \cr
 #'
+#'   `spades.loadReqdPkgs`
+#'      \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
+#'      or `require`. If `FALSE`, no package loading will occur.  \cr
+#'
 #'   `spades.lowMemory` \tab `FALSE`
 #'     \tab If true, some functions will use more memory
 #'     efficient (but slower) algorithms. \cr
@@ -160,6 +164,7 @@ spadesOptions <- function() {
     spades.futureEvents = FALSE,
     spades.futurePlan = "callr",
     spades.inputPath = file.path(.spadesTempDir(), "inputs"),
+    spades.loadReqdPkgs = TRUE,
     spades.lowMemory = FALSE,
     spades.memoryUseInterval = 0,
     spades.messagingNumCharsModule = 21,
