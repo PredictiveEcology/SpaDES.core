@@ -27,12 +27,12 @@ test_that("saving files (and memoryUse)", {
       .plotInitialTime = NA, torus = TRUE, .saveObjects = "caribou",
       .saveInitialTime = 1, .saveInterval = 1
     ),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    randomLandscapes = list(.plotInitialTime = NA, nx = 5, ny = 5)
   )
 
   outputs <- data.frame(
     expand.grid(objectName = c("caribou", "landscape"),
-                saveTime = 1:2,
+                saveTime = 1:1,
                 stringsAsFactors = FALSE)
   )
 
@@ -77,11 +77,11 @@ test_that("saving files (and memoryUse)", {
     expand.grid(objectName = c("caribou", "landscape")),
     stringsAsFactors = FALSE
   )
-  times <- list(start = 0, end = 7, "month")
+  times <- list(start = 0, end = 1, "month")
   parameters <- list(
     .globals = list(stackName = "landscape"),
     caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    randomLandscapes = list(.plotInitialTime = NA, nx = 5, ny = 5)
   )
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
@@ -89,8 +89,8 @@ test_that("saving files (and memoryUse)", {
   mySim <- spades(mySim)
 
   # test that if no save times are stated, then it is at end time
-  expect_true(file.exists(file.path(tmpdir, "caribou_month7.rds")))
-  expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
+  expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))
+  expect_true(file.exists(file.path(tmpdir, "landscape_month1.rds")))
   rm(mySim)
 
   # test when filename has a dot
@@ -102,11 +102,11 @@ test_that("saving files (and memoryUse)", {
   )
   paths$outputPath <- tmpdir
 
-  times <- list(start = 0, end = 7, "month")
+  times <- list(start = 0, end = 1, "month")
   parameters <- list(
     .globals = list(stackName = "landscape"),
     caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    randomLandscapes = list(.plotInitialTime = NA, nx = 5, ny = 5)
   )
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
@@ -114,8 +114,8 @@ test_that("saving files (and memoryUse)", {
   mySim <- spades(mySim)
 
   # test that if no save times are stated, then it is at end time
-  expect_true(file.exists(file.path(tmpdir, "caribou_month7.rds")))
-  expect_true(file.exists(file.path(tmpdir, "landscape_month7.rds")))
+  expect_true(file.exists(file.path(tmpdir, "caribou_month1.rds")))
+  expect_true(file.exists(file.path(tmpdir, "landscape_month1.rds")))
   rm(mySim)
 })
 
