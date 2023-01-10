@@ -620,24 +620,26 @@ setMethod(
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
         ## run .inputObjects() for each module
-        if (is.character(getOption("spades.covr", FALSE))  ) {
-          mod <- getOption("spades.covr")
-          tf <- tempfile();
-          if (is.null(notOlderThan)) notOlderThan <- "NULL"
-          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
-                                '", notOlderThan = ', notOlderThan,')'))
-          # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-          # unlockBinding(mod, sim$.mods)
-          if (length(objects))
-            list2env(objects, envir(sim))
-          sim$.mods[[mod]]$sim <- sim
-          aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
-          sim <- sim$.mods[[mod]]$sim
-          rm(list = "sim", envir = sim$.mods[[mod]])
-          if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
-          .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-        } else {
-          sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+        if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+          if (is.character(getOption("spades.covr", FALSE))  ) {
+            mod <- getOption("spades.covr")
+            tf <- tempfile();
+            if (is.null(notOlderThan)) notOlderThan <- "NULL"
+            cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
+                                  '", notOlderThan = ', notOlderThan,')'))
+            # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+            # unlockBinding(mod, sim$.mods)
+            if (length(objects))
+              list2env(objects, envir(sim))
+            sim$.mods[[mod]]$sim <- sim
+            aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
+            sim <- sim$.mods[[mod]]$sim
+            rm(list = "sim", envir = sim$.mods[[mod]])
+            if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+            .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+          } else {
+            sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+          }
         }
 
         ## schedule each module's init event:

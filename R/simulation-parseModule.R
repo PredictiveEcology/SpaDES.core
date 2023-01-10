@@ -88,7 +88,8 @@ setMethod(
         if (is(out1, "try-error")) {
           # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
           if (any(grep("\\<sim\\>", out))) {
-            opts <- options(spades.moduleCodeChecks = FALSE)
+            opts <- options(spades.moduleCodeChecks = FALSE, reproducible.useCache = FALSE,
+                            spades.dotInputObjects = FALSE)
             on.exit(options(opts))
             m <- tmp[["pf"]][[1]][[3]]$name
             suppressMessages(sim <- simInit(modules = m,
