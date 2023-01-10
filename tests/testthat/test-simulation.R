@@ -659,6 +659,13 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
     "child4: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects"
   )
 
+  # Test moduleMetadata without `sim` and where there is a `sim` in the module metadata,
+  #   so needs to load it. A non-error is good enough for now.
+  md1 <- moduleMetadata(module = m, path = tmpdir) # no sim in metadata
+  md2 <- moduleMetadata(path = system.file("sampleModules", package = "SpaDES.core"),
+                        module = "randomLandscapes")
+
+
   mm <- capture_messages({
     mySim <- simInit(paths = list(modulePath = tmpdir), modules = m)
   })
