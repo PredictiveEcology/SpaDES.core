@@ -261,7 +261,7 @@ Please see the vignette dedicated to this topic.
 }
 
 \examples{
-\dontrun{
+\dontrun{ # Tests take several seconds
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 requireNamespace("NLMR", quietly = TRUE)) {
 opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example
