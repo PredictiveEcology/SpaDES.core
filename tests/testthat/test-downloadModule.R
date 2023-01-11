@@ -135,10 +135,17 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
+    skipMessReGoogledrive <-
+      "Need a newer version of reproducible for downloadData for non-googledrive urls"
+    if (packageVersion("reproducible") <= "1.2.16")
+      skip(skipMessReGoogledrive)
     f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = TRUE))
     if (!is.null(f$error)) {
       if (grepl("Forbidden", f$error)) {
         skip("Forbidden HTTP 403 on GitHub during downloadModule")
+      }
+      if (grepl("no package called", f$error)) {
+        skip(skipMessReGoogledrive)
       }
     }
     f <- f$value[[1]] %>% unlist() %>% as.character()

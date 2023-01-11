@@ -254,6 +254,7 @@ setMethod(
     notNAs <- !unlist(lapply(urls, is.na))
     dPath <- file.path(path, module, "data")
     if (any(notNAs)) {
+      # This requires googledrive in reproducible 1.2.16; even if not a googledrive url
       res <- Map(reproducible::preProcess,
                  targetFile = targetFiles[notNAs],
                  url = urls[notNAs],
