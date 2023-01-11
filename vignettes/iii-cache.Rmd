@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{NLMR, googledrive, raster, reproducible, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{NLMR, raster, reproducible, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,14 +20,15 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-SuggestedPkgsNeeded <- c("googledrive", "NLMR", "SpaDES.tools", "knitr")
+SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "knitr")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
 knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE)
+        "spades.useRequire" = FALSE,
+        "spades.loadReqdPkgs" = FALSE)
 ```
 
 As part of a reproducible work flow, caching of various function calls are a critical component.

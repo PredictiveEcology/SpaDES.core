@@ -263,9 +263,9 @@ test2Code <- '
 
 runTestsWithTimings <- function(pkgPath = ".",
                                 nameOfOuterList = "ff", envir = parent.frame(), authorizeGoogle = FALSE) {
-  if (isTRUE(authorizeGoogle))
-    if (Sys.info()[["user"]] == "emcintir")
-      googledrive::drive_auth(cache = "~/.secret", email = "predictiveecology@gmail.com")
+  # if (isTRUE(authorizeGoogle))
+  #   if (Sys.info()[["user"]] == "emcintir")
+  #     googledrive::drive_auth(cache = "~/.secret", email = "predictiveecology@gmail.com")
   prepend <- file.path(pkgPath, "tests/testthat")
   testFiles <- dir(prepend, pattern = "^test-", full.names = TRUE)
   testFiles <- grep("large", testFiles, value = TRUE, invert = TRUE)

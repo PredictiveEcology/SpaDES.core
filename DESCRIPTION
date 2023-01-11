@@ -49,7 +49,6 @@ Suggests:
     future,
     future.callr,
     ggplot2,
-    googledrive,
     httr,
     knitr,
     logging,
