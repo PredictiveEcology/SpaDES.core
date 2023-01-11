@@ -16,6 +16,7 @@ Etienne
 GDAL
 GLPK
 Gantt
+GitHub
 Github
 GoogleDrive
 IBMs
@@ -50,6 +51,9 @@ SpatialLines
 SpatialPoints
 SpatialPointsDataFrame
 StackOverflow
+Sys
+Versioned
+Workflow
 XXXX
 activeBindings
 addChangedAttr
@@ -77,6 +81,7 @@ checkUsage
 checkpointFile
 checkpointInterval
 checkpointing
+checksum
 checksums
 childModule
 choosealicense
@@ -92,6 +97,7 @@ color
 colored
 colors
 convertToPackage
+covr
 createsOutput
 crw
 customizations
@@ -108,6 +114,9 @@ distanceFromEachPoint
 divergentColors
 doEvent
 doesn
+dontrun
+donttest
+dotInputObjects
 downloadData
 downloadModule
 downsampling
@@ -136,13 +145,14 @@ fireSpread
 franca
 futureEvents
 ganttStatus
-gaussMap
 getColors
 getModuleVersion
 getOption
 getSetColors
+getenv
 github
 globals
+google
 googledrive
 gowlland
 https
@@ -161,6 +171,8 @@ layerNames
 lingua
 loadFiles
 loadOrder
+loadReqdPkgs
+login
 lowMemory
 macOS
 makeLines
@@ -190,6 +202,7 @@ nCompleted
 namespaced
 namespacing
 natively
+neutralLandscapeMap
 newModule
 newModuleDocumentation
 newPlot
@@ -202,6 +215,7 @@ objectDiagram
 objs
 oldrel
 openModules
+optimizations
 outputObjects
 outputPath
 overplot
@@ -252,6 +266,7 @@ scratchPath
 setColors
 setDTthreads
 showCache
+sim
 sim1
 sim2
 sim2gantt
@@ -292,10 +307,15 @@ unevaluated
 unparsed
 unsetting
 useCache
+useRequire
 userSuppliedObjNames
 useragent
 v1
 vectorized
+versa
+versioning
+workflow
+workflows
 www
 xData
 zipModule

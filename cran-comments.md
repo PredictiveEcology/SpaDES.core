@@ -6,9 +6,8 @@ See `NEWS.md` for a full list of changes.
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 20.04                 (GitHub), R 4.0.5
 * Ubuntu 20.04                 (GitHub), R 4.1.3
-* Windows                      (GitHub), R 4.0.5
+* Windows                       (local), R 4.1.3
 * Windows                      (GitHub), R 4.1.3
 * Windows                 (win-builder), R 4.1.3
 
@@ -26,7 +25,8 @@ See `NEWS.md` for a full list of changes.
 * Ubuntu 20.04                 (GitHub), R-devel (2023-01-04 r83564)
 * Ubuntu 20.04                  (local), R-devel (2023-01-07 r83578)
 * Windows                      (GitHub), R-devel (2023-01-04 r83564 ucrt)
-* Windows                 (win-builder), R-devel (2023-01-04 r83561 ucrt)
+* Windows                 (win-builder), R-devel (2023-01-10 r83596 ucrt)
+* Windows                       (local), R-devel (2023-01-08 r83584 ucrt)
 
 ## R CMD check results
 
@@ -55,6 +55,7 @@ This URL is included as part of the command used to install these additional pac
 Additionally, some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
+          DES
           workflow (6:58)
           workflows (10:64)
 
