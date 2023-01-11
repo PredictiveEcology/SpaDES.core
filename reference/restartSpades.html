@@ -30,7 +30,7 @@ not do anything if the event queue is empty."><!-- mathjax --><script src="https
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -155,7 +155,8 @@ The <code>simList</code> will be in the state it was at the time of the error.</
 <span class="r-in"><span><span class="co"># options("spades.recoveryMode" = 1) # now the default</span></span></span>
 <span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="co"># if this is interrupted or fails</span></span></span>
-<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">restartSpades</span><span class="op">(</span><span class="op">)</span> <span class="co"># don't need to put simList</span></span></span>
+<span class="r-in"><span><span class="co"># the following line will not work if the previous line didn't fail</span></span></span>
+<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">restartSpades</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="co"># don't need to specify `sim` if previous line fails</span></span></span>
 <span class="r-in"><span>                     <span class="co"># will take from SpaDES.core:::.pkgEnv$.sim automatically</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
@@ -172,7 +173,7 @@ The <code>simList</code> will be in the state it was at the time of the error.</
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

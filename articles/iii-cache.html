@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -97,9 +97,10 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>03 Caching <code>SpaDES</code> simulations</h1>
-                        <h4 data-toc-skip class="author">Eliot J. B. McIntire</h4>
+                        <h4 data-toc-skip class="author">Eliot J. B.
+McIntire</h4>
             
-            <h4 data-toc-skip class="date">August 19 2022</h4>
+            <h4 data-toc-skip class="date">January 11 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/vignettes/iii-cache.Rmd" class="external-link"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -108,20 +109,55 @@
 
     
     
-<p>As part of a reproducible work flow, caching of various function calls are a critical component. Down the road, it is likely that an entire work flow from raw data to publication, decision support, report writing, presentation building etc., could be built and be reproducible anywhere, on demand. The <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> function is built to work with any R function. However, it becomes very powerful in a <code>SpaDES</code> context because we can build large, powerful applications that are transparent and tied to the raw data that may be <em>many</em> conceptual steps upstream in the workflow. To do this, we have built several customizations within the <code>SpaDES</code> package. Important to this is dealing correctly with the <code>simList</code>, which is an object that has slot that is an environment. But more important are the various tools that can be used at higher levels, <em>i.e.</em>, not just for “standard” functions.</p>
+<p>As part of a reproducible work flow, caching of various function
+calls are a critical component. Down the road, it is likely that an
+entire work flow from raw data to publication, decision support, report
+writing, presentation building etc., could be built and be reproducible
+anywhere, on demand. The <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> function is
+built to work with any R function. However, it becomes very powerful in
+a <code>SpaDES</code> context because we can build large, powerful
+applications that are transparent and tied to the raw data that may be
+<em>many</em> conceptual steps upstream in the workflow. To do this, we
+have built several customizations within the <code>SpaDES</code>
+package. Important to this is dealing correctly with the
+<code>simList</code>, which is an object that has slot that is an
+environment. But more important are the various tools that can be used
+at higher levels, <em>i.e.</em>, not just for “standard” functions.</p>
 <div class="section level2">
 <h2 id="caching-as-part-of-spades">Caching as part of <code>SpaDES</code><a class="anchor" aria-label="anchor" href="#caching-as-part-of-spades"></a>
 </h2>
-<p>Some of the details of the <code>simList</code>-specific features of this <code>Cache</code> function include:</p>
+<p>Some of the details of the <code>simList</code>-specific features of
+this <code>Cache</code> function include:</p>
 <ul>
-<li><p>The function converts all elements that have an environment as part of their attributes into a format that has no unique environment attribute, using <code>format</code> if a function, and <code>as.list</code> in the case of the <code>simList</code> environment.</p></li>
-<li><p>When used within <code>SpaDES</code> modules, <code>Cache</code> (capital C) does not require that the argument <code>cacheRepo</code> be specified. If called from inside a SpaDES module, <code>Cache</code> will use the <code>cacheRepo</code> argument from a call to <code>cachePath(sim)</code>, taking the <code>sim</code> from the call stack. Similarly, if no <code>cacheRepo</code> argument is specified, then it will use <code>getOption("spades.cachePath")</code>, which will, by default, be a temporary location with no persistence between R sessions! To persist between sessions, use <code>SpaDES::setPaths()</code> every session.</p></li>
+<li><p>The function converts all elements that have an environment as
+part of their attributes into a format that has no unique environment
+attribute, using <code>format</code> if a function, and
+<code>as.list</code> in the case of the <code>simList</code>
+environment.</p></li>
+<li><p>When used within <code>SpaDES</code> modules, <code>Cache</code>
+(capital C) does not require that the argument <code>cachePath</code> be
+specified. If called from inside a SpaDES module, <code>Cache</code>
+will use the <code>cachePath</code> argument from a call to
+<code>cachePath(sim)</code>, taking the <code>sim</code> from the call
+stack. Similarly, if no <code>cachePath</code> argument is specified,
+then it will use <code>getOption("spades.cachePath")</code>, which will,
+by default, be a temporary location with no persistence between R
+sessions! To persist between sessions, use
+<code>SpaDES::setPaths()</code> every session.</p></li>
 </ul>
-<p>In a <code>SpaDES</code> context, there are several levels of caching that can be used as part of a reproducible workflow. Each level can be used to a modeller’s advantage; and, all can be – and are often – used concurrently.</p>
+<p>In a <code>SpaDES</code> context, there are several levels of caching
+that can be used as part of a reproducible workflow. Each level can be
+used to a modeller’s advantage; and, all can be – and are often – used
+concurrently.</p>
 <div class="section level3">
 <h3 id="at-the-spades-level">At the <code>spades</code> level<a class="anchor" aria-label="anchor" href="#at-the-spades-level"></a>
 </h3>
-<p>And entire call to <code>spades</code> can be cached. This will have the effect of eliminating any stochasticity in the model as the output will simply be the cached version of the <code>simList</code>. This is likely most useful in situations where reproducibility is more important than “new” stochasticity (<em>e.g.</em>, building decision support systems, apps, final version of a manuscript).</p>
+<p>And entire call to <code>spades</code> can be cached. This will have
+the effect of eliminating any stochasticity in the model as the output
+will simply be the cached version of the <code>simList</code>. This is
+likely most useful in situations where reproducibility is more important
+than “new” stochasticity (<em>e.g.</em>, building decision support
+systems, apps, final version of a manuscript).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://reproducible.predictiveecology.org" class="external-link">reproducible</a></span><span class="op">)</span></span>
@@ -137,115 +173,134 @@
 <span>  modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span><span class="op">)</span>,</span>
 <span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>This functionality can be achieved within a <code>spades</code> call.</p>
+<p>This functionality can be achieved within a <code>spades</code>
+call.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># compare caching ... run once to create cache</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">outSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span>, notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug19 20:00:04       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 chckpn <span style="color: #00BB00;"> total elpsd: 0.0036 secs | 0 checkpoint init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 save   <span style="color: #00BB00;"> total elpsd: 0.0064 secs | 0 save init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 prgrss <span style="color: #00BB00;"> total elpsd: 0.0088 secs | 0 progress init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 load   <span style="color: #00BB00;"> total elpsd: 0.011 secs | 0 load init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 rndmLn <span style="color: #00BB00;"> total elpsd: 0.013 secs | 0 randomLandscapes init</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.27 secs | 0 fireSpread init 1</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.29 secs | 1 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.36 secs | 1 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.37 secs | 2 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.41 secs | 2 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.41 secs | 3 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.43 secs | 3 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.44 secs | 4 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.47 secs | 4 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.47 secs | 5 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:04 frSprd <span style="color: #00BB00;"> total elpsd: 0.49 secs | 5 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: RColorBrewer</span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:37       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:37 chckpn <span style="color: #00BB00;"> total elpsd: 0.0034 secs | 0 checkpoint init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:37 save   <span style="color: #00BB00;"> total elpsd: 0.0062 secs | 0 save init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:37 prgrss <span style="color: #00BB00;"> total elpsd: 0.0083 secs | 0 progress init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:37 load   <span style="color: #00BB00;"> total elpsd: 0.01 secs | 0 load init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:37 rndmLn <span style="color: #00BB00;"> total elpsd: 0.012 secs | 0 randomLandscapes init</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.53 secs | 0 fireSpread init 1</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.55 secs | 1 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.6 secs | 1 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.61 secs | 2 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.64 secs | 2 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.64 secs | 3 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.66 secs | 3 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.66 secs | 4 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.68 secs | 4 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.68 secs | 5 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:38 frSprd <span style="color: #00BB00;"> total elpsd: 0.7 secs | 5 fireSpread stats 5</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.737   0.040   0.781</span></span></code></pre>
-<p>Note that if there were any visualizations (here we turned them off with <code>.plotInitialTime = NA</code> above) they will happen the first time through, but not the cached times.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># vastly faster 2nd time</span></span>
+<span><span class="co">##   1.011   0.052   1.068</span></span></code></pre>
+<p>Note that if there were any visualizations (here we turned them off
+with <code>.plotInitialTime = NA</code> above) they will happen the
+first time through, but not the cached times.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># faster 2nd time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">outSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  ...(Object to retrieve (5dbbbedd5420e39b.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">  ...(Object to retrieve (bb678c5a91177d08.rds))</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #0000BB;">     loaded cached result from previous spades call</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.404   0.000   0.407</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<span><span class="co">##   0.714   0.004   0.721</span></span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">outSim</span>, <span class="va">outSimCached</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="module-level-caching">Module-level caching<a class="anchor" aria-label="anchor" href="#module-level-caching"></a>
 </h3>
-<p>If the parameter <code>.useCache</code> in the module’s metadata is set to <code>TRUE</code>, then <em>every</em> event in the module will be cached. That means that every time that module is called from within a <code><a href="../reference/spades.html">spades()</a></code> call, <code>Cache</code> will be called. Only the objects inside the <code>simList</code> that correspond to the <code>inputObjects</code> or the <code>outputObjects</code> from the module metadata will be assessed for caching. For general use, module-level caching would be mostly useful for modules that have no stochasticity, such as data-preparation modules, GIS modules etc.</p>
-<p>In this example, we will use the cache on the <code>randomLandscapes</code> module. This means that each subsequent call to spades will result in identical outputs from the <code>randomLandscapes</code> module (only!). This would be useful when only one random landscape is needed simply for trying something out, or putting into production code (<em>e.g.</em>, publication, decision support, etc.).</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<p>If the parameter <code>.useCache</code> in the module’s metadata is
+set to <code>TRUE</code>, then <em>every</em> event in the module will
+be cached. That means that every time that module is called from within
+a <code><a href="../reference/spades.html">spades()</a></code> call, <code>Cache</code> will be called. Only
+the objects inside the <code>simList</code> that correspond to the
+<code>inputObjects</code> or the <code>outputObjects</code> from the
+module metadata will be assessed for caching. For general use,
+module-level caching would be mostly useful for modules that have no
+stochasticity, such as data-preparation modules, GIS modules etc.</p>
+<p>In this example, we will use the cache on the
+<code>randomLandscapes</code> module. This means that each subsequent
+call to spades will result in identical outputs from the
+<code>randomLandscapes</code> module (only!). This would be useful when
+only one random landscape is needed simply for trying something out, or
+putting into production code (<em>e.g.</em>, publication, decision
+support, etc.).</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Module-level</span></span>
 <span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.useCache</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug19 20:00:06       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:06 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:40 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.648   0.000   0.649</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># vastly faster the second time</span></span>
+<span><span class="co">##   1.318   0.000   1.319</span></span></code></pre>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug19 20:00:07       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (ce93a84a7dde15e5.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:07 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (d99c19eefb483b6c.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:41 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.534   0.000   0.536</span></span></code></pre>
-<p>Test that only layers produced in <code>randomLandscapes</code> are identical, not <code>fireSpread</code>.</p>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<span><span class="co">##   0.187   0.000   0.190</span></span></code></pre>
+<p>Test that only layers produced in <code>randomLandscapes</code> are
+identical, not <code>fireSpread</code>.</p>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span><span class="op">)</span></span>
 <span><span class="va">same</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">layers</span>, <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">randomSim</span><span class="op">$</span><span class="va">landscape</span><span class="op">[[</span><span class="va">l</span><span class="op">]</span><span class="op">]</span>, <span class="va">randomSimCached</span><span class="op">$</span><span class="va">landscape</span><span class="op">[[</span><span class="va">l</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
@@ -269,76 +324,94 @@
 <div class="section level3">
 <h3 id="event-level-caching">Event-level caching<a class="anchor" aria-label="anchor" href="#event-level-caching"></a>
 </h3>
-<p>If the parameter <code>.useCache</code> in the module’s metadata is set to a <em>character or character vector</em>, then that or those event(s), identified by their name, will be cached. That means that every time the event is called from within a <code>spades</code> call, <code>Cache</code> will be called. Only the objects inside the <code>simList</code> that correspond to the <code>inputObjects</code> or the <code>outputObjects</code> as defined in the module metadata will be assessed for caching inputs or outputs, respectively. The fact that all and only the named <code>inputObjects</code> and <code>outputObjects</code> are cached and returned may be inefficient (<em>i.e.</em>, it may cache more objects than are necessary) for individual events.</p>
-<p>Similar to module-level caching, event-level caching would be mostly useful for events that have no stochasticity, such as data-preparation events, GIS events etc. Here, we don’t change the module-level caching for <code>randomLandscapes</code>, but we add to it a cache for only the “init” event for <code>fireSpread</code>.</p>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<p>If the parameter <code>.useCache</code> in the module’s metadata is
+set to a <em>character or character vector</em>, then that or those
+event(s), identified by their name, will be cached. That means that
+every time the event is called from within a <code>spades</code> call,
+<code>Cache</code> will be called. Only the objects inside the
+<code>simList</code> that correspond to the <code>inputObjects</code> or
+the <code>outputObjects</code> as defined in the module metadata will be
+assessed for caching inputs or outputs, respectively. The fact that all
+and only the named <code>inputObjects</code> and
+<code>outputObjects</code> are cached and returned may be inefficient
+(<em>i.e.</em>, it may cache more objects than are necessary) for
+individual events.</p>
+<p>Similar to module-level caching, event-level caching would be mostly
+useful for events that have no stochasticity, such as data-preparation
+events, GIS events etc. Here, we don’t change the module-level caching
+for <code>randomLandscapes</code>, but we add to it a cache for only the
+“init” event for <code>fireSpread</code>.</p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">fireSpread</span><span class="op">$</span><span class="va">.useCache</span> <span class="op">&lt;-</span> <span class="st">"init"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug19 20:00:08       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:08 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:42 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.456   0.004   0.486</span></span></code></pre>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># vastly faster the second time</span></span>
+<span><span class="co">##   0.428   0.004   0.437</span></span></code></pre>
+<div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Aug19 20:00:09       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (ce93a84a7dde15e5.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #0000BB;">  ...(Object to retrieve (5988d20716fc3ed8.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #0000BB;">     loaded cached copy of init event in fireSpread module.   </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Aug19 20:00:09 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 save   <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 load   <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 rndmLn <span style="color: #0000BB;">  ...(Object to retrieve (d99c19eefb483b6c.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 rndmLn <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module adding to memoised copy</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #0000BB;">  ...(Object to retrieve (ed360d95fdcf28b6.rds))</span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #0000BB;">     loaded cached copy of init event in fireSpread module.   </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">4         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">4         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">5         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## Jan11 21:57:43 frSprd <span style="color: #00BB00;">5         fireSpread       stats     5            </span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">##  </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span></span>
 <span><span class="co"><span style="color: #BB00BB;">## It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.221   0.000   0.225</span></span></code></pre>
+<span><span class="co">##   0.216   0.000   0.221</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="function-level-caching">Function-level caching<a class="anchor" aria-label="anchor" href="#function-level-caching"></a>
 </h3>
-<p>Any function can be cached using: <code>Cache(FUN = functionName, ...)</code>.</p>
-<p>This will be a slight change to a function call, such as: <code>projectRaster(raster, crs = crs(newRaster))</code> to <code>Cache(projectRaster, raster, crs = crs(newRaster))</code>.</p>
-<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
+<p>Any function can be cached using:
+<code>Cache(FUN = functionName, ...)</code>.</p>
+<p>This will be a slight change to a function call, such as:
+<code>projectRaster(raster, crs = crs(newRaster))</code> to
+<code>Cache(projectRaster, raster, crs = crs(newRaster))</code>.</p>
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ras</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1e3</span>, <span class="fl">0</span>, <span class="fl">1e3</span><span class="op">)</span>, res <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu">NLMR</span><span class="fu">::</span><span class="va"><a href="https://ropensci.github.io/NLMR/reference/nlm_mpd.html" class="external-link">nlm_mpd</a></span>,</span>
@@ -349,13 +422,19 @@
 <span>               rand_dev <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>               rescale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>               verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>               cacheRepo <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
+<span>               cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
 <span>               userTags <span class="op">=</span> <span class="st">"nlm_mpd"</span>,</span>
 <span>               notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## The following arguments are arguments for both Cache and NLMR::nlm_mpd:</span></span>
+<span><span class="co">## verbose</span></span>
+<span><span class="co">## ...passing to both. If more control is needed, pass as a call, e.g., Cache(NLMR::nlm_mpd(...))</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in NLMR::nlm_mpd(ncol = ncol(ras), nrow = nrow(ras), resolution =</span></span>
+<span><span class="co">## unique(res(ras)), : nlm_mpd changes the dimensions of the RasterLayer if even</span></span>
+<span><span class="co">## ncols/nrows are choosen.</span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.713   0.024   0.739</span></span></code></pre>
-<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
+<span><span class="co">##   0.634   0.036   0.673</span></span></code></pre>
+<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># vastly faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">mapCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu">NLMR</span><span class="fu">::</span><span class="va"><a href="https://ropensci.github.io/NLMR/reference/nlm_mpd.html" class="external-link">nlm_mpd</a></span>,</span>
@@ -366,27 +445,38 @@
 <span>                     rand_dev <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                     rescale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                     verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                     cacheRepo <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
+<span>                     cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
 <span>                     userTags <span class="op">=</span> <span class="st">"nlm_mpd"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## The following arguments are arguments for both Cache and NLMR::nlm_mpd:</span></span>
+<span><span class="co">## verbose</span></span>
+<span><span class="co">## ...passing to both. If more control is needed, pass as a call, e.g., Cache(NLMR::nlm_mpd(...))</span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.073   0.000   0.075</span></span></code></pre>
-<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<span><span class="co">##   0.063   0.000   0.066</span></span></code></pre>
+<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">map</span>, <span class="va">mapCached</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="working-with-the-cache-manually">Working with the Cache manually<a class="anchor" aria-label="anchor" href="#working-with-the-cache-manually"></a>
 </h3>
-<p>Since the cache is simply a <code>DBI</code> database table, all <code>DBI</code> functions will work as is. In addition, there are several helpers in the <code>reproducible</code> package, including <code>showCache</code>, <code>keepCache</code> and <code>clearCache</code>, and the more advanced <code>createCache</code>, <code>loadFromCache</code>, <code>rmFromCache</code>, and <code>saveToCache</code> that may be useful. Also, one can access cached items manually (rather than simply rerunning the same <code>Cache</code> function again).</p>
-<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cacheDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/viewCache.html" class="external-link">showCache</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">Cache size: </span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  Total (including Rasters): 2.3 Mb</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  Selected objects (not including Rasters): 2.3 Mb</span></span></span></code></pre>
+<p>Since the cache is simply a <code>DBI</code> database table, all
+<code>DBI</code> functions will work as is. In addition, there are
+several helpers in the <code>reproducible</code> package, including
+<code>showCache</code>, <code>keepCache</code> and
+<code>clearCache</code>, and the more advanced <code>createCache</code>,
+<code>loadFromCache</code>, <code>rmFromCache</code>, and
+<code>saveToCache</code> that may be useful. Also, one can access cached
+items manually (rather than simply rerunning the same <code>Cache</code>
+function again).</p>
 <div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cacheDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/viewCache.html" class="external-link">showCache</a></span><span class="op">(</span><span class="va">mySim</span>, userTags <span class="op">=</span> <span class="st">"nlm_mpd"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Cache size: </span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">  Total (including Rasters): 1.9 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">  Selected objects (not including Rasters): 1.9 Mb</span></span></span></code></pre>
+<div class="sourceCode" id="cb134"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## get the RasterLayer that was produced with the NLMR::nlm_mpd function:</span></span>
-<span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/cache-tools.html" class="external-link">loadFromCache</a></span><span class="op">(</span><span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cacheId <span class="op">=</span> <span class="va">cacheDB</span><span class="op">[</span><span class="va">tagValue</span> <span class="op">==</span> <span class="st">"nlm_mpd"</span><span class="op">]</span><span class="op">$</span><span class="va">cacheId</span><span class="op">)</span></span>
+<span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/CacheHelpers.html" class="external-link">loadFromCache</a></span><span class="op">(</span>cacheId <span class="op">=</span> <span class="va">cacheDB</span><span class="op">$</span><span class="va">cacheId</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">Plot</a></span><span class="op">(</span><span class="va">map</span><span class="op">)</span></span></code></pre></div>
@@ -396,40 +486,73 @@
 <div class="section level2">
 <h2 id="reproducible-workflow">Reproducible Workflow<a class="anchor" aria-label="anchor" href="#reproducible-workflow"></a>
 </h2>
-<p>In general, we feel that a liberal use of <code>Cache</code> will make a reusable and reproducible work flow. <code>shiny</code> apps can be made, taking advantage of <code>Cache</code>. Indeed, much of the difficulty in managing data sets and saving them for future use, can be accommodated by caching.</p>
+<p>In general, we feel that a liberal use of <code>Cache</code> will
+make a reusable and reproducible work flow. <code>shiny</code> apps can
+be made, taking advantage of <code>Cache</code>. Indeed, much of the
+difficulty in managing data sets and saving them for future use, can be
+accommodated by caching.</p>
 <div class="section level3">
 <h3 id="nested-caching">Nested Caching<a class="anchor" aria-label="anchor" href="#nested-caching"></a>
 </h3>
 <ul>
 <li>Imagine we have large model with many modules</li>
-<li>To run this would have a nested structure with the following functions:</li>
+<li>To run this would have a nested structure with the following
+functions:</li>
 </ul>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simInit</span>() <span class="sc">-</span><span class="ot">-&gt;</span> many .inputObjects calls</span>
-<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb131-3"><a href="#cb131-3" aria-hidden="true" tabindex="-1"></a><span class="fu">spades</span>() call <span class="sc">-</span><span class="ot">-&gt;</span> many module calls <span class="sc">-</span><span class="ot">-&gt;</span> many event calls <span class="sc">-</span><span class="ot">-&gt;</span> many <span class="cf">function</span> calls</span></code></pre></div>
-<p>Lets say we start to introduce caching to this structure. We start from the “inner” most functions that we could imaging Caching would be useful. Lets say there are some GIS operations, like <code><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">raster::projectRaster</a></code>, which operates on an input shapefile. We can Cache the <code>projectRaster</code> call to make this much faster, since it will always be the same result for a given input raster.</p>
-<p>If we look back at our structure above, we see that we still have LOTS of places that are not Cached. That means that the <code><a href="../reference/spades.html">spades()</a></code> call will still spawn many module calls, and many event calls, just to get to the one <code>Cache(projectRaster)</code> call which is cached. This function will likely be called many times. This is good, but <strong><code>Cache</code> does take some time</strong>. So, even if <code>Cache(projectRaster)</code> takes only 0.02 seconds, calling it hundreds of times means maybe 4 seconds. If we are doing this for many functions, then this will be too slow for some purposes.</p>
-<p>We can start putting <code>Cache</code> all up the sequence of calls. Unfortunately, the way we use Cache at each of these levels is a bit different, so we need a slightly different approach for each.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simInit</span>() <span class="sc">-</span><span class="ot">-&gt;</span> many .inputObjects calls</span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb135-3"><a href="#cb135-3" aria-hidden="true" tabindex="-1"></a><span class="fu">spades</span>() call <span class="sc">-</span><span class="ot">-&gt;</span> many module calls <span class="sc">-</span><span class="ot">-&gt;</span> many event calls <span class="sc">-</span><span class="ot">-&gt;</span> many <span class="cf">function</span> calls</span></code></pre></div>
+<p>Lets say we start to introduce caching to this structure. We start
+from the “inner” most functions that we could imaging Caching would be
+useful. Lets say there are some GIS operations, like
+<code><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">raster::projectRaster</a></code>, which operates on an input
+shapefile. We can Cache the <code>projectRaster</code> call to make this
+much faster, since it will always be the same result for a given input
+raster.</p>
+<p>If we look back at our structure above, we see that we still have
+LOTS of places that are not Cached. That means that the
+<code><a href="../reference/spades.html">spades()</a></code> call will still spawn many module calls, and many
+event calls, just to get to the one <code>Cache(projectRaster)</code>
+call which is cached. This function will likely be called many times.
+This is good, but <strong><code>Cache</code> does take some
+time</strong>. So, even if <code>Cache(projectRaster)</code> takes only
+0.02 seconds, calling it hundreds of times means maybe 4 seconds. If we
+are doing this for many functions, then this will be too slow for some
+purposes.</p>
+<p>We can start putting <code>Cache</code> all up the sequence of calls.
+Unfortunately, the way we use Cache at each of these levels is a bit
+different, so we need a slightly different approach for each.</p>
 <div class="section level5">
 <h5 id="cache-the-spades-call">Cache the <code>spades</code> call<a class="anchor" aria-label="anchor" href="#cache-the-spades-call"></a>
 </h5>
 <p><code>spades(cache = TRUE)</code></p>
-<p>This will cache the <code>spades</code> call, causing stochasticity/randomness to be frozen.</p>
+<p>This will cache the <code>spades</code> call, causing
+stochasticity/randomness to be frozen.</p>
 </div>
 <div class="section level5">
 <h5 id="cache-a-whole-module">Cache a whole module<a class="anchor" aria-label="anchor" href="#cache-a-whole-module"></a>
 </h5>
-<p>Pass <code>.useCache = TRUE</code> as a parameter to the module, during the <code>simInit</code></p>
-<p>Some modules are inherently non-random, such as GIS modules, or parameter fitting statistical modules. We expect these to be identical results each time, so we can safely cache the entire module.</p>
-<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
+<p>Pass <code>.useCache = TRUE</code> as a parameter to the module,
+during the <code>simInit</code></p>
+<p>Some modules are inherently non-random, such as GIS modules, or
+parameter fitting statistical modules. We expect these to be identical
+results each time, so we can safely cache the entire module.</p>
+<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  FireModule <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>.useCache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span><span class="va">...</span>, params <span class="op">=</span> <span class="va">parameters</span><span class="op">)</span></span>
 <span><span class="va">mySimOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
-<p>The messaging should indicate the caching is happening on every event in that module.</p>
-<p><strong><em>Note: This option REQUIRES that the metadata in inputs and outputs be exactly correct, i.e., all <code>inputObjects</code> and <code>outputObjects</code> must be correctly identified and listed in the <code>defineModule</code> metadata</em></strong></p>
-<p><strong><em>If the module is cached, and there are errors when it is run, it almost is guaranteed to be a problem with the <code>inputObjects</code> and <code>outputObjects</code> incorrectly specified.</em></strong></p>
+<p>The messaging should indicate the caching is happening on every event
+in that module.</p>
+<p><strong><em>Note: This option REQUIRES that the metadata in inputs
+and outputs be exactly correct, i.e., all <code>inputObjects</code> and
+<code>outputObjects</code> must be correctly identified and listed in
+the <code>defineModule</code> metadata</em></strong></p>
+<p><strong><em>If the module is cached, and there are errors when it is
+run, it almost is guaranteed to be a problem with the
+<code>inputObjects</code> and <code>outputObjects</code> incorrectly
+specified.</em></strong></p>
 </div>
 <div class="section level5">
 <h5 id="cache-individual-functions">Cache individual functions<a class="anchor" aria-label="anchor" href="#cache-individual-functions"></a>
@@ -441,8 +564,16 @@
 <div class="section level3">
 <h3 id="data-to-decisions">Data-to-decisions<a class="anchor" aria-label="anchor" href="#data-to-decisions"></a>
 </h3>
-<p>Once nested Caching is used all the way up to the <code>experiment</code> (see <code>SpaDES.experiment</code> package) level and even further up (e.g., if there is a <code>shiny</code> module), then even very complex models can be put into a complete workflow.</p>
-<p>The current vision for <code>SpaDES</code> is that it will allow this type of “data to decisions” complete workflow that allows for deep, robust models, across disciplines, with easily accessible front ends, that are quick and responsive to users, yet can handle data changes, module changes, etc.</p>
+<p>Once nested Caching is used all the way up to the
+<code>experiment</code> (see <code>SpaDES.experiment</code> package)
+level and even further up (e.g., if there is a <code>shiny</code>
+module), then even very complex models can be put into a complete
+workflow.</p>
+<p>The current vision for <code>SpaDES</code> is that it will allow this
+type of “data to decisions” complete workflow that allows for deep,
+robust models, across disciplines, with easily accessible front ends,
+that are quick and responsive to users, yet can handle data changes,
+module changes, etc.</p>
 </div>
 </div>
   </div>
@@ -464,7 +595,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

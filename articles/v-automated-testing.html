@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -97,9 +97,10 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>05 Automated module testing</h1>
-                        <h4 data-toc-skip class="author">Alex M. Chubaty</h4>
+                        <h4 data-toc-skip class="author">Alex M.
+Chubaty</h4>
             
-            <h4 data-toc-skip class="date">August 19 2022</h4>
+            <h4 data-toc-skip class="date">January 11 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/vignettes/v-automated-testing.Rmd" class="external-link"><code>vignettes/v-automated-testing.Rmd</code></a></small>
       <div class="hidden name"><code>v-automated-testing.Rmd</code></div>
@@ -111,9 +112,19 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Regular automated checks of your module code help ensure your module can be run by others and that no errors are introduced when you make a change to your code. Users hosting module code in GitHub repositories can take advantage of free <a href="https://github.com/features/actions" class="external-link">GitHub Actions</a> minutes to automatically run their module.</p>
-<p><em>NOTE:</em> Long-running or memory-intensive code should not be run. GitHub actions limits code execution.</p>
-<p>Since we encourage all module authors to maintain a high-level overview of their module in a <code>.Rmd</code> file, this can be used to demonstrate use of the module, as as well as test that the module can be run without error. By default, the automated testing of the module is done by running (<em>i.e.</em>, rendering) the module’s <code>.Rmd</code> file.</p>
+<p>Regular automated checks of your module code help ensure your module
+can be run by others and that no errors are introduced when you make a
+change to your code. Users hosting module code in GitHub repositories
+can take advantage of free <a href="https://github.com/features/actions" class="external-link">GitHub Actions</a> minutes to
+automatically run their module.</p>
+<p><em>NOTE:</em> Long-running or memory-intensive code should not be
+run. GitHub actions limits code execution.</p>
+<p>Since we encourage all module authors to maintain a high-level
+overview of their module in a <code>.Rmd</code> file, this can be used
+to demonstrate use of the module, as as well as test that the module can
+be run without error. By default, the automated testing of the module is
+done by running (<em>i.e.</em>, rendering) the module’s
+<code>.Rmd</code> file.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-up-module-tests">Setting up module tests<a class="anchor" aria-label="anchor" href="#setting-up-module-tests"></a>
@@ -121,22 +132,35 @@
 <div class="section level3">
 <h3 id="using-testing-with-new-modules">Using testing with new modules<a class="anchor" aria-label="anchor" href="#using-testing-with-new-modules"></a>
 </h3>
-<p>When creating a new module, simply specify <code>useGitHub = TRUE</code> to generate the necessary GitHub Actions configuration file.</p>
+<p>When creating a new module, simply specify
+<code>useGitHub = TRUE</code> to generate the necessary GitHub Actions
+configuration file.</p>
 </div>
 <div class="section level3">
 <h3 id="using-testing-with-existing-modules">Using testing with existing modules<a class="anchor" aria-label="anchor" href="#using-testing-with-existing-modules"></a>
 </h3>
-<p>For existing modules, use <code>use_gha(name = 'moduleName', path = 'modulePath')</code> to add the GitHub Actions testing workflow.</p>
+<p>For existing modules, use
+<code>use_gha(name = 'moduleName', path = 'modulePath')</code> to add
+the GitHub Actions testing workflow.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="customizing-the-test-configuration">Customizing the test configuration<a class="anchor" aria-label="anchor" href="#customizing-the-test-configuration"></a>
 </h2>
-<p>You can modify your module’s workflow file (<code>.github/workflows/render-module-rmd.yaml</code>) to suit your specific needs.</p>
+<p>You can modify your module’s workflow file
+(<code>.github/workflows/render-module-rmd.yaml</code>) to suit your
+specific needs.</p>
 <div class="section level3">
 <h3 id="adding-system-dependencies">Adding system dependencies<a class="anchor" aria-label="anchor" href="#adding-system-dependencies"></a>
 </h3>
-<p>Some packages may require installation of additional system dependencies. The workflow file contains a section named <em>Install GDAL and other dependencies</em>, which can be updated to include additional system packages. To determine which additional packages need to be installed, use <code><a href="https://remotes.r-lib.org/reference/system_requirements.html" class="external-link">remotes::system_requirements</a></code>. For example, to determine the system dependencies required for the <code>usefulFuns</code> package (from GitHub), get the package code and determine what additional system packages need to be installed.</p>
+<p>Some packages may require installation of additional system
+dependencies. The workflow file contains a section named <em>Install
+GDAL and other dependencies</em>, which can be updated to include
+additional system packages. To determine which additional packages need
+to be installed, use <code>remotes::system_requirements</code>. For
+example, to determine the system dependencies required for the
+<code>usefulFuns</code> package (from GitHub), get the package code and
+determine what additional system packages need to be installed.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone https://github.com/PredictiveEcology/usefulFuns</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd usefulFuns</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> Rscript <span class="at">-e</span> <span class="st">'remotes::system_requirements("ubuntu", "18.04")'</span></span>
@@ -162,7 +186,10 @@
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[20]</span> <span class="st">"apt-get install -y git"</span>                 </span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[21]</span> <span class="st">"apt-get install -y libudunits2-dev"</span>     </span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">[22]</span> <span class="st">"apt-get install -y pandoc"</span>  </span></code></pre></div>
-<p>Note that this does not currently capture system dependencies from packages in the <code>Remotes</code> field of the <code>DESCRIPTION</code> file. However, a separate call to those packages will get them.</p>
+<p>Note that this does not currently capture system dependencies from
+packages in the <code>Remotes</code> field of the
+<code>DESCRIPTION</code> file. However, a separate call to those
+packages will get them.</p>
 </div>
 </div>
   </div>
@@ -184,7 +211,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

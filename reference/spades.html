@@ -25,7 +25,7 @@ instead of data.frame to implement the event queue (because it is much faster)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@ instead of <code>data.frame</code> to implement the event queue (because it is m
 <span>  .saveInitialTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  notOlderThan <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  events <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  .plots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"spades.plots"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -108,7 +108,7 @@ instead of <code>data.frame</code> to implement the event queue (because it is m
 <span>  .saveInitialTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  notOlderThan <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  events <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  .plots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"spades.plots"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -122,7 +122,7 @@ instead of <code>data.frame</code> to implement the event queue (because it is m
 <span>  .saveInitialTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  notOlderThan <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  events <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  .plots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"spades.plots"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -233,7 +233,7 @@ See <a href="https://github.com/PredictiveEcology/SpaDES/wiki/Debugging" class="
 
 <p>There are numerous ways in which Caching can be used within SpaDES. Please
 see the vignette
-<a href="https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html" class="external-link">https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html</a>
+<a href="https://spades-core.predictiveecology.org/articles/iii-cache.html">https://spades-core.predictiveecology.org/articles/iii-cache.html</a>
 for many examples. Briefly, functions, events, modules, entire spades calls or
 experiment calls (see <a href="https://github.com/PredictiveEcology/SpaDES.experiment" class="external-link">https://github.com/PredictiveEcology/SpaDES.experiment</a>)
 can be cached and mixtures of all of these will work. For functions, simply
@@ -317,7 +317,7 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="SpaDES.core-package.html">SpaDES.core-package()</a></code>,
 <code><a href="simInit.html">simInit()</a></code>, and the caching vignette (very important for reproducibility):
-<a href="https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html" class="external-link">https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html</a> which
+<a href="https://spades-core.predictiveecology.org/articles/iii-cache.html">https://spades-core.predictiveecology.org/articles/iii-cache.html</a> which
 uses <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache()</a></code>.</p></div>
     </div>
     <div id="author">
@@ -328,68 +328,72 @@ uses <code><a href="https://reproducible.predictiveecology.org/reference/Cache.h
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span> times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">2.0</span>, timeunit <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span>, burnStats <span class="op">=</span> <span class="st">"nPixelsBurned"</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="op">)</span>,</span></span>
-<span class="r-in"><span> modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># set default debug printing for the current session</span></span></span>
-<span class="r-in"><span><span class="co"># setOption(spades.debug = TRUE)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Different debug options (overrides the package option 'spades.debug')</span></span></span>
-<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># Fastest</span></span></span>
-<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="st">"simList"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="st">"print(table(sim$landscape$Fires[]))"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># To get a combination -- use list(debug = list(..., ...))</span></span></span>
-<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>debug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">landscape</span><span class="op">$</span><span class="va">Fires</span><span class="op">[</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Can turn off plotting, and inspect the output simList instead</span></span></span>
-<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># much faster</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="simList-accessors-events.html">completed</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="co"># shows completed events</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># use cache -- simInit should generally be rerun each time a spades call is made</span></span></span>
-<span class="r-in"><span><span class="co">#   to guarantee that it is identical. Here, run spades call twice, first</span></span></span>
-<span class="r-in"><span><span class="co">#   time to establish cache, second time to return cached result</span></span></span>
-<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span> <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">2.0</span>, timeunit <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"NLMR"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.moduleCodeChecks"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># not necessary for example</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="va">opts</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.plots"</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>   times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">1.0</span>, timeunit <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>     .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span>, burnStats <span class="op">=</span> <span class="st">"nPixelsBurned"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>   <span class="op">)</span>,</span></span>
 <span class="r-in"><span>   modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Different debug options (overrides the package option 'spades.debug')</span></span></span>
+<span class="r-in"><span>  <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># Fastest</span></span></span>
+<span class="r-in"><span>  <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="st">"simList"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="st">"print(table(sim$landscape$Fires[]))"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># To get a combination -- use list(debug = list(..., ...))</span></span></span>
+<span class="r-in"><span>  <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, debug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>debug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">landscape</span><span class="op">$</span><span class="va">Fires</span><span class="op">[</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Can turn off plotting, and inspect the output simList instead</span></span></span>
+<span class="r-in"><span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, .plots <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># much faster</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simList-accessors-events.html">completed</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="co"># shows completed events</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># use cache -- simInit should generally be rerun each time a spades call is made</span></span></span>
+<span class="r-in"><span>  <span class="co">#   to guarantee that it is identical. Here, run spades call twice, first</span></span></span>
+<span class="r-in"><span>  <span class="co">#   time to establish cache, second time to return cached result</span></span></span>
+<span class="r-in"><span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>   <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>     times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">1.0</span>, timeunit <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>     params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>       .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span>, burnStats <span class="op">=</span> <span class="st">"nPixelsBurned"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>     <span class="op">)</span>,</span></span>
+<span class="r-in"><span>     modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>     paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>   <span class="op">)</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># E.g., with only the init events</span></span></span>
+<span class="r-in"><span>  <span class="va">outInitsOnly</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, events <span class="op">=</span> <span class="st">"init"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># or more fine grained control</span></span></span>
+<span class="r-in"><span>  <span class="va">outSomeEvents</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>,</span></span>
+<span class="r-in"><span>          events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                        fireSpread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span>, <span class="st">"burn"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># with outputs, the save module gets invoked and must be explicitly limited to "init"</span></span></span>
+<span class="r-in"><span>  <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>   times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">1.0</span>, timeunit <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>     .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span>, burnStats <span class="op">=</span> <span class="st">"nPixelsBurned"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>   <span class="op">)</span>,</span></span>
+<span class="r-in"><span>   modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   outputs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>objectName <span class="op">=</span> <span class="st">"landscape"</span>, saveTime <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># This will print a message saying that caribouMovement will run its events</span></span></span>
+<span class="r-in"><span>  <span class="va">outSomeEvents</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>,</span></span>
+<span class="r-in"><span>          events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                        fireSpread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span>, <span class="st">"burn"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                        save <span class="op">=</span> <span class="st">"init"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span> <span class="co"># reset options</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># E.g., with only the init events</span></span></span>
-<span class="r-in"><span><span class="va">outInitsOnly</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, events <span class="op">=</span> <span class="st">"init"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># or more fine grained control</span></span></span>
-<span class="r-in"><span><span class="va">outSomeEvents</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>,</span></span>
-<span class="r-in"><span>        events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      fireSpread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span>, <span class="st">"burn"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># with outputs, the save module gets invoked and must be explicitly limited to "init"</span></span></span>
-<span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span> times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">2.0</span>, timeunit <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span>, burnStats <span class="op">=</span> <span class="st">"nPixelsBurned"</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="op">)</span>,</span></span>
-<span class="r-in"><span> modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> outputs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>objectName <span class="op">=</span> <span class="st">"landscape"</span>, saveTime <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># This will print a message saying that caribouMovement will run its events</span></span></span>
-<span class="r-in"><span><span class="va">outSomeEvents</span> <span class="op">&lt;-</span> <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>,</span></span>
-<span class="r-in"><span>        events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      fireSpread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"init"</span>, <span class="st">"burn"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      save <span class="op">=</span> <span class="st">"init"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -406,7 +410,7 @@ uses <code><a href="https://reproducible.predictiveecology.org/reference/Cache.h
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

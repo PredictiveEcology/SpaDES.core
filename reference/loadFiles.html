@@ -33,7 +33,7 @@ package: the package from which to load fun.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -146,11 +146,9 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="va">filelist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"maps"</span>, package <span class="op">=</span> <span class="st">"quickPlot"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>            full.names <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">"tif"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    functions <span class="op">=</span> <span class="st">"rasterToMemory"</span>, package <span class="op">=</span> <span class="st">"quickPlot"</span></span></span>
+<span class="r-in"><span>    functions <span class="op">=</span> <span class="st">"rasterToMemory"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">clearPlot</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu">Plot</span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">DEM</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># loads all the maps to sim1 simList</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded</span></span></span>
 <span class="r-in"><span><span class="co">#  at time = 10 and 20 (via "intervals").</span></span></span>
@@ -168,7 +166,9 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span>   intervals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># only does the time = 0 loading; see next</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the object at time 10</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># if we extend the end time and continue running, it will load an object scheduled</span></span></span>
 <span class="r-in"><span><span class="co">#  at time = 10, and it will also schedule a new object loading at 20 because</span></span></span>
@@ -190,7 +190,7 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

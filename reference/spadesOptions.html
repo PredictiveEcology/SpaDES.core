@@ -25,7 +25,7 @@ See Details below."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@ file so they persist between sessions.</p>
 <p>The following options are likely of interest to most users</p><table class="table table"><tr><td>*OPTION*</td><td>*DEFAULT VALUE*</td><td>*DESCRIPTION*</td></tr><tr><td>`spades.browserOnError`</td><td>`FALSE`</td><td>If `TRUE`, the default, then any
   error rerun the same event with `debugonce` called on it to allow editing
   to be done. When that browser is continued (e.g., with 'c'), then it will save it
-  reparse it into the `simList` and rerun the edited version.
+  re-parse it into the `simList` and rerun the edited version.
   This may allow a `spades()` call to be recovered on error,
   though in many cases that may not be the correct behaviour.
   For example, if the `simList` gets updated inside that event in an iterative
@@ -105,27 +105,31 @@ file so they persist between sessions.</p>
   When this option is `TRUE`, then the event will be run at least 3 times: the
   first time makes the error, the second time has `debugonce` and the third time
   is after the error is addressed. `TRUE` is likely somewhat slower.</td></tr><tr><td>`reproducible.cachePath`</td><td>`getOption('reproducible.cachePath')`</td><td>The default local directory in which to cache simulation outputs.
-  Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).</td></tr><tr><td>`spades.debug`</td><td>`TRUE`</td><td>The default debugging value `debug` argument in `spades()`</td></tr><tr><td>`spades.DTthreads`</td><td>`1L`</td><td>The default number of <span class="pkg">data.table</span> threads to use.
+  Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).</td></tr><tr><td>`spades.debug`</td><td>`TRUE`</td><td>The default debugging value `debug` argument in `spades()`</td></tr><tr><td>`spades.dotInputObjects`</td><td>`TRUE`</td><td>This is used in `simInit`; if set to `TRUE` then the `.inputObjects`
+          function will be run; if `FALSE`, then it will be skipped.</td></tr><tr><td>`spades.DTthreads`</td><td>`1L`</td><td>The default number of <span class="pkg">data.table</span> threads to use.
     See also `?data.table::setDTthreads`.</td></tr><tr><td>`spades.futureEvents`</td><td>`FALSE`</td><td>If set to `TRUE`, the event simulator will attempt to spawn events
     whose outputs are not needed (by other events in the sim) into a future. In some
     cases, this will speed up simulations, by running some events in parallel.
-    Still VERY experimental. Use cautiously.</td></tr><tr><td>`spades.inputPath`</td><td>Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td>`spades.lowMemory`</td><td>`FALSE`</td><td>If true, some functions will use more memory
-    efficient (but slower) algorithms.</td></tr><tr><td>`spades.memoryUseInterval`</td><td>`FALSE`</td><td>A numeric in seconds indicating how often sample the memory use. This will
+    Still VERY experimental. Use cautiously.</td></tr><tr><td>`spades.inputPath`</td><td>Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td>`spades.loadReqdPkgs`</td><td>Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
+     or `require`. If `FALSE`, no package loading will occur.</td><td>`spades.lowMemory`</td></tr><tr><td>`FALSE`</td><td>If true, some functions will use more memory
+    efficient (but slower) algorithms.</td><td>`spades.memoryUseInterval`</td></tr><tr><td>`FALSE`</td><td>A numeric in seconds indicating how often sample the memory use. This will
     be run in a separate "future" process so it can monitor the main process.
     To access the resulting memory use table, use `memoryUse(sim)` after the simulation
-    has terminated.</td></tr><tr><td>`spades.messagingNumCharsModule`</td><td>`21`</td><td>The number of characters to use for the messaging preamble on each
-    line of the messaging during spades calls.</td></tr><tr><td>`spades.moduleCodeChecks`</td><td>`list(suppressParamUnused = FALSE,
+    has terminated.</td><td>`spades.messagingNumCharsModule`</td></tr><tr><td>`21`</td><td>The number of characters to use for the messaging preamble on each
+    line of the messaging during spades calls.</td><td>`spades.moduleCodeChecks`</td></tr><tr><td>`list(suppressParamUnused = FALSE,
   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
   skipWith = TRUE)`</td><td>Should the various code checks be run
   during `simInit`. These are passed to codetools::checkUsage.
-  Default is given by the function, plus these:</td></tr><tr><td>`moduleDocument`</td><td>`NULL`</td><td>When a module is an R package e.g., via `convertToPackage`,
-    it will not, by default, rebuild documentation during `simInit`. If
-    the user would like this to happen on every call to `simInit`,
-    set this option to `TRUE`</td></tr><tr><td>`spades.modulePath`</td><td>`file.path(tempdir(), "SpaDES", "modules")`)</td><td>The default local directory where modules and data will be downloaded and stored.
-    Default is a temporary directory</td></tr><tr><td>`spades.moduleRepo`</td><td>`"PredictiveEcology/SpaDES-modules"`</td><td>The default GitHub repository to use when
-    downloading modules via `downloadModule`</td></tr><tr><td>`spades.nCompleted`</td><td>`1000L`</td><td>The maximum number of completed events to
-    retain in the `completed` event queue.</td></tr><tr><td>`spades.outputPath`</td><td>`file.path(tempdir(), "SpaDES", "outputs")`</td><td>The default local directory in which to save simulation outputs.</td></tr><tr><td>`spades.recoveryMode`</td><td>`1L`</td><td>If this a numeric &gt; 0 or TRUE, then the
-  discrete event simulator will take a snapshot of the objects in the simList
+  Default is given by the function, plus these:</td><td>`moduleDocument`</td></tr><tr><td>`NULL`</td><td>When a module is an R package e.g., via `convertToPackage`,
+    it will not, by default, rebuild documentation during `simInit`.
+    If the user would like this to happen on every call to `simInit`,
+    set this option to `TRUE`</td><td>`spades.modulePath`</td></tr><tr><td>`file.path(tempdir(), "SpaDES", "modules")`)</td><td>The default local directory where modules and data will be downloaded and stored.
+    Default is a temporary directory</td><td>`spades.moduleRepo`</td></tr><tr><td>`"PredictiveEcology/SpaDES-modules"`</td><td>The default GitHub repository to use when
+    downloading modules via `downloadModule`</td><td>`spades.nCompleted`</td></tr><tr><td>`1000L`</td><td>The maximum number of completed events to
+    retain in the `completed` event queue.</td><td>`spades.outputPath`</td></tr><tr><td>`file.path(tempdir(), "SpaDES", "outputs")`</td><td>The default local directory in which to save simulation outputs.</td><td>`spades.plots`</td></tr><tr><td>The value of this will passed to `.plots` within every module; it will thus
+    override all module parameter values for `.plots`. This can, e.g., be used
+    to turn off all plotting.</td><td>The default is NULL, meaning accept the module-level parameter</td><td>`spades.recoveryMode`</td></tr><tr><td>`1L`</td><td>If this a numeric &gt; 0 or TRUE, then the
+  discrete event simulator will take a snapshot of the objects in the `simList`
   that might change (based on metadata `outputObjects` for that module), prior to
   initiating every event. This will allow the
   user to be able to recover in case of an error or manual interruption (e.g., `Esc`).
@@ -134,19 +138,23 @@ file so they persist between sessions.</p>
   &gt; 1 event in the past, i.e., redo some of the "completed" events. Default is
   `TRUE`, i.e., it will keep the state of the `simList`
   at the start of the current event. This can be recovered with `restartSpades`
-  and the differences can be seen in a hidden object in the stashed simList.
-  There is a message which describes how to find that.</td></tr><tr><td>`spades.scratchPath`</td><td>`file.path(tempdir(), "SpaDES", "scratch")`)</td><td>The default local directory where transient files from modules and data will written.
+  and the differences can be seen in a hidden object in the stashed `simList`.
+  There is a message which describes how to find that.</td><td>`spades.scratchPath`</td></tr><tr><td>`file.path(tempdir(), "SpaDES", "scratch")`)</td><td>The default local directory where transient files from modules and data will written.
     This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
-    Default is a temporary directory.</td></tr><tr><td>`spades.switchPkgNamespaces`</td><td>`FALSE` to keep computational
+    Default is a temporary directory.</td><td>`spades.switchPkgNamespaces`</td></tr><tr><td>`FALSE` to keep computational
   overhead down.</td><td>Should the search path be modified
     to ensure a module's required packages are listed first?
     If `TRUE`, there should be no name conflicts among package objects,
-    but it is much slower, especially if the events are themselves fast.</td></tr><tr><td>`spades.testMemoryLeaks`</td><td>`TRUE`.</td><td>There is a very easy way to create a memory leak with R and SpaDES,
+    but it is much slower, especially if the events are themselves fast.</td><td>`spades.testMemoryLeaks`</td></tr><tr><td>`TRUE`.</td><td>There is a very easy way to create a memory leak with R and SpaDES,
         by adding formulas or functions to `sim$` when the enclosing environment
         of the formula or function contained a large object, most relevant here is
         the `sim` object. SpaDES.core now tests for likely culprits for this
-        and suggests alternatives with a warning</td></tr><tr><td>`spades.tolerance`</td><td>`.Machine$double.eps^0.5`.</td><td>The default tolerance value used for floating
-    point number comparisons.</td></tr><tr><td>`spades.useragent`</td><td>`"https://github.com/PredictiveEcology/SpaDES"`.</td><td>: The default user agent to use for downloading modules from GitHub.</td></tr></table></div>
+        and suggests alternatives with a warning</td><td>`spades.tolerance`</td></tr><tr><td>`.Machine$double.eps^0.5`.</td><td>The default tolerance value used for floating
+    point number comparisons.</td><td>`spades.useragent`</td></tr><tr><td>`"https://github.com/PredictiveEcology/SpaDES"`.</td><td>: The default user agent to use for downloading modules from GitHub.</td><td>`spades.useRequire`</td></tr><tr><td>`!Sys.getenv("SPADES_USE_REQUIRE") <!-- %in% "false"` --></td><td>: The default for that environment variable is unset, so this returns
+    `TRUE`. If this is `TRUE`, then during the `simInit` call, when packages are
+    identified as being required, these will be installed if missing, only if
+    `spades.useRequire` option is `TRUE`, otherwise, `simInit` will fail because
+    packages are not available.</td><td></td></tr></table></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -160,7 +168,7 @@ file so they persist between sessions.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -25,7 +25,7 @@ the correct one."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -229,13 +229,11 @@ for downloading modules and building a checksums file.</p></div>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># For a Google Drive example</span></span></span>
-<span class="r-in"><span><span class="co"># In metadata:</span></span></span>
-<span class="r-in"><span><span class="fu">expectsInputs</span><span class="op">(</span><span class="st">"theFilename.zip"</span>, <span class="st">"NA"</span>, <span class="st">"NA"</span>,</span></span>
-<span class="r-in"><span>  sourceURL <span class="op">=</span> <span class="st">"https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># create the checksums file</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="checksums.html">checksums</a></span><span class="op">(</span><span class="st">"thisModule"</span>, <span class="st">"there"</span>, write <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">downloadData</span><span class="op">(</span><span class="st">"thisModule"</span>, <span class="st">"there"</span>, files <span class="op">=</span> <span class="st">"theFilename.zip"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># In metadata, each expectsInput has a sourceURL; downloadData will look for</span></span></span>
+<span class="r-in"><span><span class="co"># that and download if it defined; however this sample module has all</span></span></span>
+<span class="r-in"><span><span class="co"># NAs for sourceURL, so nothing to download</span></span></span>
+<span class="r-in"><span><span class="va">modulePath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">downloadData</span><span class="op">(</span><span class="st">"caribouMovement"</span>, path <span class="op">=</span> <span class="va">modulePath</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -252,7 +250,7 @@ for downloading modules and building a checksums file.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

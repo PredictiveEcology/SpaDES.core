@@ -24,7 +24,7 @@ params has a replace method, so can be used to update a parameter value."><!-- m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -170,8 +170,9 @@ Specifying the parameter name is &lt;5% faster.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ropensci.github.io/NLMR/" class="external-link">"NLMR"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://spades-tools.predictiveecology.org" class="external-link">"SpaDES.tools"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"NLMR"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.moduleCodeChecks"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># not necessary for example</span></span></span>
 <span class="r-in"><span>  <span class="va">modules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>modules <span class="op">=</span> <span class="va">modules</span>, paths <span class="op">=</span> <span class="va">paths</span>,</span></span>
@@ -196,6 +197,8 @@ Specifying the parameter name is &lt;5% faster.</p>
 <span class="r-in"><span>  <span class="co"># These next 2 are same here because they are not within a module</span></span></span>
 <span class="r-in"><span>  <span class="fu">P</span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>          <span class="co"># nx and ny are Gone</span></span></span>
 <span class="r-in"><span>  <span class="fu">params</span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>     <span class="co"># nx and ny are Gone</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span> <span class="co"># reset</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
@@ -203,71 +206,21 @@ Specifying the parameter name is &lt;5% faster.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpAzfvD1/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpAzfvD1/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpAzfvD1/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpAzfvD1/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpO4X7g2/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpO4X7g2/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpO4X7g2/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpO4X7g2/myProject/outputs'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpAzfvD1/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpO4X7g2/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpAzfvD1/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpO4X7g2/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: RColorBrewer</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: NLMR</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">randomLandscapes: module code: Init: local variable ‘inMemory’ assigned but may not be used</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">randomLandscapes: inputObjects: stackName is used from sim inside doEvent.randomLandscapes, but is not declared in metadata inputObjects</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1: randomLandscapes stackName</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $.progress</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $.progress$type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $.progress$interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $checkpoint</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $checkpoint$interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $checkpoint$file</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $.globals</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $.globals$stackName</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "landscape"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$inRAM</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$stackName</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "landscape"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$.plotInitialTime</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"unit")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "year"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$.plotInterval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$.saveInitialTime</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$.saveInterval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$.seed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $randomLandscapes$.useCache</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">             module    global</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">1: randomLandscapes stackName</span></span>
 </code></pre></div>
     </div>
   </div>
@@ -282,7 +235,7 @@ Specifying the parameter name is &lt;5% faster.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

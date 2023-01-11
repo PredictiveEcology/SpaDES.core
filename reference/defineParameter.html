@@ -27,7 +27,7 @@ code."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -198,13 +198,17 @@ a module.</p></div>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/file.edit.html" class="external-link">file.edit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmpdir</span>, <span class="st">"testModule"</span>, <span class="st">"testModule.R"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># initialize the simList</span></span></span>
-<span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>modules <span class="op">=</span> <span class="st">"testModule"</span>,</span></span>
-<span class="r-in"><span>                 paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="va">tmpdir</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggplot2"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>modules <span class="op">=</span> <span class="st">"testModule"</span>,</span></span>
+<span class="r-in"><span>                   paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="va">tmpdir</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access one of the parameters -- because this line is not inside a module</span></span></span>
-<span class="r-in"><span><span class="co">#  function, we must specify the module name. If used within a module,</span></span></span>
-<span class="r-in"><span><span class="co">#  we can omit the module name</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="params.html">P</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="st">"testModule"</span><span class="op">)</span><span class="op">$</span><span class="va">.useCache</span></span></span>
+<span class="r-in"><span>  <span class="co"># Access one of the parameters -- because this line is not inside a module</span></span></span>
+<span class="r-in"><span>  <span class="co">#  function, we must specify the module name. If used within a module,</span></span></span>
+<span class="r-in"><span>  <span class="co">#  we can omit the module name</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="params.html">P</a></span><span class="op">(</span><span class="va">mySim</span>, module <span class="op">=</span> <span class="st">"testModule"</span><span class="op">)</span> <span class="co"># gets all params in a module</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="params.html">P</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="st">".useCache"</span>, <span class="st">"testModule"</span><span class="op">)</span> <span class="co"># just one param</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">tmpdir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -221,7 +225,7 @@ a module.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

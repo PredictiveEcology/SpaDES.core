@@ -24,7 +24,7 @@ in a simList if not specified."><!-- mathjax --><script src="https://cdnjs.cloud
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
       </span>
     </div>
 
@@ -123,7 +123,12 @@ in a <code>simList</code> if not specified.</p>
 <span><span class="fu">citation</span><span class="op">(</span><span class="va">package</span>, lib.loc <span class="op">=</span> <span class="cn">NULL</span>, auto <span class="op">=</span> <span class="cn">NULL</span>, module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for character</span></span>
-<span><span class="fu">citation</span><span class="op">(</span><span class="va">package</span>, lib.loc <span class="op">=</span> <span class="cn">NULL</span>, auto <span class="op">=</span> <span class="cn">NULL</span>, module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">citation</span><span class="op">(</span><span class="va">package</span>, lib.loc <span class="op">=</span> <span class="cn">NULL</span>, auto <span class="op">=</span> <span class="cn">NULL</span>, module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">sessInfo</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for simList</span></span>
+<span><span class="fu">sessInfo</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -174,15 +179,10 @@ a <code>simList</code> or a character string for a package name.</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># To pre-install and pre-load all packages prior to `simInit`.</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># set modulePath</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="setPaths.html">setPaths</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># use Require and reqdPkgs</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/chooseCRANmirror.html" class="external-link">chooseCRANmirror</a></span><span class="op">(</span>ind <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co">#</span></span></span>
 <span class="r-in"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu">reqdPkgs</span><span class="op">(</span>module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"caribouMovement"</span>, <span class="st">"randomLandscapes"</span>, <span class="st">"fireSpread"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">pkgs</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require</a></span><span class="op">(</span><span class="va">pkgs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -198,7 +198,7 @@ a <code>simList</code> or a character string for a package name.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
