@@ -52,7 +52,12 @@ test_that("downloadModule downloads and unzips a parent module", {
 
   ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
-  if (length(dir(tmpdir)) < 16) skip("Download didn't work correctly; likely no GITHUB_PAT")
+  dirTD <- dir(tmpdir)
+  gotAllMods <- all(unlist(Map(yy = c("caribouMovementLcc", "cropReprojectLccAge", "fireSpreadLcc",
+           "forestAge", "forestSuccessionBeacons", "LCC2005", "LccToBeaconsReclassify"),
+         function(yy) any(grepl(yy, x = dirTD)))))
+  if (!isTRUE(gotAllMods)) skip("Download didn't work correctly; likely no GITHUB_PAT")
+  if (length(dirTD) < 16) skip("Download didn't work correctly; likely no GITHUB_PAT")
   if (!is.null(f$error)) {
     if (grepl("Forbidden", f$error)) {
       skip("Forbidden HTTP 403 on GitHub during downloadModule")
