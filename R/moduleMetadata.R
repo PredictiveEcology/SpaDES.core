@@ -52,38 +52,48 @@ setMethod(
                     reproducible.useCache = FALSE, spades.loadReqdPkgs = FALSE)
     on.exit(options(opts))
 
-    suppressMessages(sim <- simInit(modules = module, paths = list(modulePath = path)))
-    metadata <- moduleMetadata(sim)[defineModuleListItems]
+    # There are 2 ways to get module metadata; read them directly or call `simInit`
+    #   to do it it. Calling `simInit` allows us to use the internal tools built
+    #   within `simInit`; BUT, it also means it parses the whole module. Normally
+    #   that is only functions, but old SpaDES modules (e.g., LCC2005 and family)
+    #   have a line stopifnot(packageVersion("SpaDES") >= "1.2.0.9009"),
+    #   which fails using the simInit approach, so need the .parseModulePartial
+    suppressMessages(sim <- try(simInit(modules = module, paths = list(modulePath = path))))
 
-    # metadata <- lapply(defineModuleListItems, function(xx) {
-    #   pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-    #                              defineModuleElement = xx)
-    #   out2 <- suppressMessages(try(eval(pmp), silent = TRUE))
-    #   if (is(out2, "try-error")) {
-    #     inner2 <- lapply(pmp, function(yyy) {
-    #       # pmp is whole rbind statement
-    #       out4 <- try(eval(yyy), silent = TRUE)
-    #       if (is(out4, "try-error")) {
-    #         yyy <- lapply(yyy, function(yyyyy) {
-    #           # yyy is whole defineParameter statement
-    #           out5 <- try(eval(yyyyy), silent = TRUE)
-    #           if (is(out5, "try-error")) yyyyy <- deparse(yyyyy)
-    #           return(yyyyy)
-    #         })
-    #       }
-    #       if (is.list(yyy)) yyy <- as.call(yyy)
-    #       return(yyy)
-    #     })
-    #
-    #     out2 <- as.call(inner2)
-    #   }
-    #   # Remove extra spaces
-    #   aa <- capture.output(type = "message", {bb <- eval(out2)})
-    #   return(bb)
-    # })
-    # names(metadata) <- defineModuleListItems
-    # # #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
-    # metadata <- rmExtraSpacesEOLList(metadata)
+    if (!is(sim, "try-error")) {
+      metadata <- moduleMetadata(sim)[defineModuleListItems]
+
+    } else {
+      metadata <- lapply(defineModuleListItems, function(xx) {
+        pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                   defineModuleElement = xx)
+        out2 <- suppressMessages(try(eval(pmp), silent = TRUE))
+        if (is(out2, "try-error")) {
+          inner2 <- lapply(pmp, function(yyy) {
+            # pmp is whole rbind statement
+            out4 <- try(eval(yyy), silent = TRUE)
+            if (is(out4, "try-error")) {
+              yyy <- lapply(yyy, function(yyyyy) {
+                # yyy is whole defineParameter statement
+                out5 <- try(eval(yyyyy), silent = TRUE)
+                if (is(out5, "try-error")) yyyyy <- deparse(yyyyy)
+                return(yyyyy)
+              })
+            }
+            if (is.list(yyy)) yyy <- as.call(yyy)
+            return(yyy)
+          })
+
+          out2 <- as.call(inner2)
+        }
+        # Remove extra spaces
+        aa <- capture.output(type = "message", {bb <- eval(out2)})
+        return(bb)
+      })
+      names(metadata) <- defineModuleListItems
+      # #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
+      metadata <- rmExtraSpacesEOLList(metadata)
+    }
     return(metadata)
 })
 
