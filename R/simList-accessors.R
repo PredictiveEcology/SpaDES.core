@@ -483,11 +483,17 @@ P.simList <- function(sim, param, module) {
 
   # first check if inside an event
   module1 <- sim@current$moduleName
+  mods <- modules(sim)
   if (length(module1) == 0) {
     # then check if inside a .inputObjects call
     inSimInit <- .grepSysCalls(sys.calls(), pattern = "(^.parseModule)")
     if (length(inSimInit)) {
-      module1 <- get("m", sys.frame(inSimInit[2]))
+      inSimInit <- c(inSimInit + 1) # bump up one because S4 actually runs in a .local
+      for (isi in inSimInit) {
+        module1 <- get0("m", sys.frame(isi))
+        if (!is.null(module1))
+          break
+      }
     } else {
       inManualCall <- .grepSysCalls(sys.calls(), pattern = "(\\.mods\\$|\\[)")
       if (length(inManualCall)) { # this is the case where a user calls the function using the full path
@@ -496,7 +502,6 @@ P.simList <- function(sim, param, module) {
         gg <- gsub("^.+\\.mods(\\$|\\[\\[)", "", as.character(pp)[[1]])
         module1 <- strsplit(gg, split = "\\$|\\[")[[1]][1]
       } else {
-        mods <- modules(sim)
         modFilePaths <- checkPath(names(mods))
 
         scalls <- sys.calls();
@@ -538,15 +543,13 @@ P.simList <- function(sim, param, module) {
           module1 <- param
           param <- module
         }
-      } else {
-
-        # Module missing, only have parameter --> this could be old case of P(sim, module = "something")
-        if (param %in% ls(sim@params[[param]], all.names = TRUE) ||
-            module1 %in% ls(sim@params)) {
-          # module1 is in list of modules; param is not in parameters --> this is likely a reversal
-          warning(reversalMessage)
-          param <- NULL
+      } else { # module is missing; can't be reversal, but can be incorrect module --> params
+        if (any(param %in% mods) && is.null(module1)) {
+          module1 <- param
         }
+        # module1 is in list of modules; param is not in parameters --> this is likely a reversal
+        warning(reversalMessage)
+        param <- NULL
       }
     } else {
       module1 <- module
@@ -697,8 +700,9 @@ setReplaceMethod("G",
 #' @export
 #' @rdname params
 #' @examples
-#' if (require("NLMR", quietly = TRUE) &&
-#'     require("SpaDES.tools", quietly = TRUE)) {
+#' if (requireNamespace("NLMR", quietly = TRUE) &&
+#'     requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #'   modules <- list("randomLandscapes")
 #'   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'   mySim <- simInit(modules = modules, paths = paths,
@@ -723,6 +727,8 @@ setReplaceMethod("G",
 #'   # These next 2 are same here because they are not within a module
 #'   P(mySim)          # nx and ny are Gone
 #'   params(mySim)     # nx and ny are Gone
+#'
+#'   options(opts) # reset
 #' }
 setGeneric("parameters", function(sim, asDF = FALSE) {
   standardGeneric("parameters")
@@ -850,6 +856,9 @@ setReplaceMethod("checkpointInterval",
 #'
 #' @examples
 #' \dontrun{
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #' mySim <- simInit(
 #'   times = list(start=0.0, end=100.0),
 #'   params = list(.globals = list(stackName = "landscape"),
@@ -871,7 +880,9 @@ setReplaceMethod("checkpointInterval",
 #' checkpointFile(mySim) # returns the name of the checkpoint file
 #'                       # In this example, "chkpnt.RData"
 #' checkpointInterval(mySim) # 10
-#' }
+#'
+#' options(opts) # reset
+#' }}
 setGeneric("progressInterval", function(sim) {
   standardGeneric("progressInterval")
 })
@@ -1091,70 +1102,74 @@ setReplaceMethod(
   "inputs",
   signature = "simList",
   function(sim, value) {
-   if (length(value) > 0) {
-     whFactors <- sapply(value, function(x) is.factor(x))
-     if (any(whFactors)) {
-       value[, whFactors] <- sapply(value[, whFactors], as.character)
-     }
+    if (length(value) > 0) {
+      whFactors <- sapply(value, function(x) is.factor(x))
+      if (any(whFactors)) {
+        value[, whFactors] <- sapply(value[, whFactors], as.character)
+      }
 
-     if (!is.data.frame(value)) {
-       if (!is.list(value)) {
-         stop("inputs must be a list, data.frame")
-       }
+      if (!is.data.frame(value)) {
+        if (!is.list(value)) {
+          stop("inputs must be a list, data.frame")
+        }
         value <- data.frame(value, stringsAsFactors = FALSE)
-     }
-     sim@inputs <- .fillInputRows(value, start(sim))
-   } else {
-     sim@inputs <- value
-   }
-   # Deal with objects and files differently... if files (via inputs arg in simInit)...
-     # Deal with file names
-     # 2 things: 1. if relative, concatenate inputPath
-     #           2. if absolute, don't use inputPath
-   if (NROW(value) > 0) {
-     sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
+      }
+      sim@inputs <- .fillInputRows(value, start(sim))
+    } else {
+      sim@inputs <- value
+    }
+    # Deal with objects and files differently... if files (via inputs arg in simInit)...
+    # Deal with file names
+    # 2 things: 1. if relative, concatenate inputPath
+    #           2. if absolute, don't use inputPath
+    if (NROW(value) > 0) {
+      sim@inputs[["file"]][is.na(sim@inputs$file)] <- NA
 
-     # If a filename is provided, determine if it is absolute path, if so,
-     # use that, if not, then append it to inputPath(sim)
-     isAP <- isAbsolutePath(as.character(sim@inputs$file))
-     sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
-       file.path(inputPath(sim),
-                 sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
+      # If a filename is provided, determine if it is absolute path, if so,
+      # use that, if not, then append it to inputPath(sim)
+      isAP <- isAbsolutePath(as.character(sim@inputs$file))
+      sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)] <-
+        file.path(inputPath(sim),
+                  sim@inputs[["file"]][!isAP & !is.na(sim@inputs$file)])
 
-     if (!all(names(sim@inputs) %in% .fileTableInCols)) {
-       stop(paste("input table can only have columns named",
-                  paste(.fileTableInCols, collapse = ", ")))
-     }
-     if (any(is.na(sim@inputs[["loaded"]]))) {
-       if (!all(is.na(sim@inputs[["loadTime"]]))) {
-         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
-         attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
+      if (!all(names(sim@inputs) %in% .fileTableInCols)) {
+        stop(paste("input table can only have columns named",
+                   paste(.fileTableInCols, collapse = ", ")))
+      }
+      if (any(is.na(sim@inputs[["loaded"]]))) {
+        if (!all(is.na(sim@inputs[["loadTime"]]))) {
+          newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
+          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
-         for (nT in newTime) {
-           attributes(nT)$unit <- timeunit(sim)
-           sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
-         }
-         toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
-                                by = c("eventTime", "moduleName", "eventType"))
-         if (any(toRemove)) {
-           if (NROW(current(sim)) > 0)
-             toRemove <- toRemove[-seq_len(NROW(current(sim)))]
-           events(sim) <- events(sim)[!toRemove]
-         }
+          for (nT in newTime) {
+            attributes(nT)$unit <- timeunit(sim)
+            sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
+          }
+          toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
+                                 by = c("eventTime", "moduleName", "eventType"))
+          if (any(toRemove)) {
+            if (NROW(current(sim)) > 0)
+              toRemove <- toRemove[-seq_len(NROW(current(sim)))]
+            events(sim) <- events(sim)[!toRemove]
+          }
 
-       } else {
-         sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
-           sim@simtimes[["current"]]
-         newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
-           min(., na.rm = TRUE)
-         attributes(newTime)$unit <- "seconds"
-         sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
-       }
-     }
-   }
+        } else {
+          sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
+            sim@simtimes[["current"]]
+          newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
+            min(., na.rm = TRUE)
+          attributes(newTime)$unit <- "seconds"
+          sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
+        }
+      }
+    }
+    possNewUSON <- inputs(sim)$objectName
+    sim$.userSuppliedObjNames <- if (is.null(sim$.userSuppliedObjNames))
+      possNewUSON else unique(c(sim$.userSuppliedObjNames, possNewUSON))
 
-   return(sim)
-})
+
+    return(sim)
+  })
 
 ################################################################################
 #' Simulation outputs
@@ -1684,8 +1699,6 @@ setReplaceMethod(
     return(sim)
 })
 
-
-
 #' @inheritParams paths
 #' @include simList-class.R
 #' @export
@@ -1706,9 +1719,6 @@ setMethod("logPath",
             lp <- checkPath(lp, create = TRUE)
             return(lp)
 })
-
-
-
 
 # modulePath ----------------------------------------------------------------------------------
 
@@ -2759,8 +2769,12 @@ setMethod(
                                     #  if not NULL, one will be reqdPkgs
       pkgs <- lapply(depsInSim, function(x) {
         x@reqdPkgs
-      }) %>% unlist() %>% c("SpaDES.core") %>% unique()
-      if (!is.null(pkgs)) pkgs <- sort(pkgs)
+      }) %>% unlist()
+      pkgs <- unique(pkgs)
+      if (!any(grepl("SpaDES.core", pkgs)))
+        pkgs <- c("SpaDES.core", pkgs)
+      if (!is.null(pkgs))
+        pkgs <- sort(pkgs)
     } else {
       if (!missing(filenames))  {
         paths <- filenames
@@ -2796,8 +2810,9 @@ setMethod(
         } else {
           pkgs <- character(0)
         }
-        pkgs <- pkgs[nzchar(pkgs)]
-        pkgs <- unique(c("SpaDES.core", pkgs))
+        pkgs <- unique(pkgs[nzchar(pkgs)])
+        if (!any(grepl("SpaDES.core", pkgs)))
+          pkgs <- c("SpaDES.core", pkgs)
         return(pkgs)
       })
       names(pkgs) <- modules
@@ -2963,15 +2978,10 @@ setMethod("outputObjectNames",
 #'
 #' @examples
 #' \dontrun{
-#' # To pre-install and pre-load all packages prior to `simInit`.
-#'
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' # use Require and reqdPkgs
-#' if (!interactive()) chooseCRANmirror(ind = 1) #
 #' pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
-#' pkgs <- unique(unlist(pkgs))
-#' Require(pkgs)
 #' }
 setGeneric("reqdPkgs", function(sim, module, modulePath) {
   standardGeneric("reqdPkgs")
@@ -3088,6 +3098,29 @@ setMethod("citation",
 })
 
 ################################################################################
+#' @param package For compatibility with [utils::citation()]. This can be
+#'                a `simList` or a character string for a package name.
+#' @inheritParams P
+#' @inheritParams utils::citation
+#' @include simList-class.R
+#' @export
+#' @rdname simList-accessors-metadata
+#'
+#' @aliases simList-accessors-metadata
+setGeneric("sessInfo", function(sim) {
+  standardGeneric("sessInfo")
+})
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @aliases simList-accessors-metadata
+setMethod("sessInfo",
+          signature = "simList",
+          definition = function(sim) {
+            return(sim@.xData[["._sessionInfo"]])
+})
+
+################################################################################
 #' @export
 #' @include simList-class.R
 #' @include times.R
@@ -3133,6 +3166,5 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   }
   return(ret[])
 }
-
 
 .knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")

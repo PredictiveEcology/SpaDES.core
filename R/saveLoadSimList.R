@@ -265,7 +265,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
   if (tolower(tools::file_ext(filename)) == "rds") {
     load(filename)
   } else if (tolower(tools::file_ext(filename)) == "qs") {
-    sim <- qs::qread(filename, nthreads = getOption("spades.nThreads", 1))
+    sim <- qs::qread(filename, nthreads = getOption("spades.qsThreads", 1))
 
     # Work around for bug in qs that recovers data.tables as lists
     objectName <- ls(sim)

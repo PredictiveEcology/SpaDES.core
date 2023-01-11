@@ -317,7 +317,7 @@ the suggested `SpaDES.tools` package, and are summarized below.*
   These dummy maps can later be replaced with actual data maps.
 
   \tabular{ll}{
-    [SpaDES.tools::gaussMap()] \tab Creates a random map using Gaussian random fields\cr
+    [SpaDES.tools::neutralLandscapeMap()] \tab Creates a random map using Gaussian random fields\cr
     [SpaDES.tools::randomPolygons()] \tab Creates a random polygon with specified number of classes\cr
   }
 }
@@ -537,7 +537,7 @@ These can be found with `file.path(find.package("SpaDES.core"), "sampleModules")
 
 Authors:
 \itemize{
-  \item Eliot J B McIntire \email{eliot.mcintire@nrcan-rncan.gc.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
+  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
 }
 
 Other contributors:
@@ -545,7 +545,7 @@ Other contributors:
   \item Yong Luo \email{Yong.Luo@gov.bc.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
   \item Ceres Barros \email{cbarros@mail.ubc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID}) [contributor]
-  \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
+  \item His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
 
 }

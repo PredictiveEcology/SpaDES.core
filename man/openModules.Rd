@@ -43,7 +43,10 @@ user types it at the command prompt. A message with the correct lines to copy
 and paste is provided.
 }
 \examples{
-\dontrun{openModules("~/path/to/my/modules")}
+\dontrun{
+if (interactive())
+  openModules("modules")
+}
 
 }
 \author{

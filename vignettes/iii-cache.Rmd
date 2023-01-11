@@ -20,15 +20,15 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-hasSuggests <- all(
-  require("NLMR", quietly = TRUE),
-  require("SpaDES.tools", quietly = TRUE)
-)
+SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "knitr")
+hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
+useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
-knitr::opts_chunk$set(eval = hasSuggests)
+knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
 options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE)
+        "spades.useRequire" = FALSE,
+        "spades.loadReqdPkgs" = FALSE)
 ```
 
 As part of a reproducible work flow, caching of various function calls are a critical component.
@@ -44,9 +44,9 @@ Some of the details of the `simList`-specific features of this `Cache` function 
 
 - The function converts all elements that have an environment as part of their attributes into a format that has no unique environment attribute, using `format` if a function, and `as.list` in the case of the `simList` environment.
 
-- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cacheRepo` be specified.
-If called from inside a SpaDES module, `Cache` will use the `cacheRepo` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
-Similarly, if no `cacheRepo` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
+- When used within `SpaDES` modules, `Cache` (capital C) does not require that the argument `cachePath` be specified.
+If called from inside a SpaDES module, `Cache` will use the `cachePath` argument from a call to `cachePath(sim)`, taking the `sim` from the call stack.
+Similarly, if no `cachePath` argument is specified, then it will use `getOption("spades.cachePath")`, which will, by default, be a temporary location with no persistence between R sessions!
 To persist between sessions, use `SpaDES::setPaths()` every session.
 
 In a `SpaDES` context, there are several levels of caching that can be used as part of a reproducible workflow.
@@ -87,7 +87,7 @@ system.time({
 Note that if there were any visualizations (here we turned them off with `.plotInitialTime = NA` above) they will happen the first time through, but not the cached times.
 
 ```{r spades-cached}
-# vastly faster 2nd time
+# faster 2nd time
 system.time({
   outSimCached <- spades(Copy(mySim), cache = TRUE)
 })
@@ -113,7 +113,7 @@ system.time({
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -146,7 +146,7 @@ system.time({
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -172,7 +172,7 @@ system.time({
                rand_dev = 10,
                rescale = FALSE,
                verbose = FALSE,
-               cacheRepo = cachePath(mySim),
+               cachePath = cachePath(mySim),
                userTags = "nlm_mpd",
                notOlderThan = Sys.time())
 })
@@ -187,7 +187,7 @@ system.time({
                      rand_dev = 10,
                      rescale = FALSE,
                      verbose = FALSE,
-                     cacheRepo = cachePath(mySim),
+                     cachePath = cachePath(mySim),
                      userTags = "nlm_mpd")
 })
 
@@ -201,10 +201,10 @@ In addition, there are several helpers in the `reproducible` package, including 
 Also, one can access cached items manually (rather than simply rerunning the same `Cache` function again).
 
 ```{r manual-cache}
-cacheDB <- showCache(mySim)
+cacheDB <- showCache(mySim, userTags = "nlm_mpd")
 
 ## get the RasterLayer that was produced with the NLMR::nlm_mpd function:
-map <- loadFromCache(cachePath(mySim), cacheId = cacheDB[tagValue == "nlm_mpd"]$cacheId)
+map <- loadFromCache(cacheId = cacheDB$cacheId)
 
 clearPlot()
 Plot(map)

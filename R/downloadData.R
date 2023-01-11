@@ -200,18 +200,16 @@ remoteFileSize <- function(url) {
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @importFrom reproducible compareNA
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
 #' \dontrun{
-#' # For a Google Drive example
-#' # In metadata:
-#' expectsInputs("theFilename.zip", "NA", "NA",
-#'   sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
-#' # create the checksums file
-#' checksums("thisModule", "there", write = TRUE)
-#' downloadData("thisModule", "there", files = "theFilename.zip")
+#' # In metadata, each expectsInput has a sourceURL; downloadData will look for
+#' # that and download if it defined; however this sample module has all
+#' # NAs for sourceURL, so nothing to download
+#' modulePath <- system.file("sampleModules", package = "SpaDES.core")
+#' downloadData("caribouMovement", path = modulePath)
 #' }
 #'
 setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
@@ -256,6 +254,7 @@ setMethod(
     notNAs <- !unlist(lapply(urls, is.na))
     dPath <- file.path(path, module, "data")
     if (any(notNAs)) {
+      # This requires googledrive in reproducible 1.2.16; even if not a googledrive url
       res <- Map(reproducible::preProcess,
                  targetFile = targetFiles[notNAs],
                  url = urls[notNAs],
@@ -272,7 +271,10 @@ setMethod(
       chksums <- chksums[order(-result)]
       chksums <- unique(chksums, by = "expectedFile")
     } else {
+      unlinkAfter <- !dir.exists(dPath) # next line will make the folder and put nothing in it
       chksums <- Checksums(dPath, write = TRUE)
+      if (isTRUE(unlinkAfter))
+        unlink(dPath, recursive = TRUE)
     }
 
     # after download, check for childModules that also require downloading

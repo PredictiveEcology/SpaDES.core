@@ -15,7 +15,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
-  .plots = NULL,
+  .plots = getOption("spades.plots", NULL),
   ...
 )
 
@@ -28,7 +28,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
-  .plots = NULL,
+  .plots = getOption("spades.plots", NULL),
   ...
 )
 
@@ -41,7 +41,7 @@ spades(
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
-  .plots = NULL,
+  .plots = getOption("spades.plots", NULL),
   ...
 )
 }
@@ -129,7 +129,7 @@ See \url{https://github.com/PredictiveEcology/SpaDES/wiki/Debugging} for details
 
 There are numerous ways in which Caching can be used within SpaDES. Please
 see the vignette
-\url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html}
+\url{https://spades-core.predictiveecology.org/articles/iii-cache.html}
 for many examples. Briefly, functions, events, modules, entire spades calls or
 experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experiment})
 can be cached and mixtures of all of these will work. For functions, simply
@@ -229,68 +229,72 @@ with the one just edited. There may be some unexpected consequences if the
 
 \examples{
 \dontrun{
-mySim <- simInit(
- times = list(start = 0.0, end = 2.0, timeunit = "year"),
- params = list(
-   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
- ),
- modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
- paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-)
-spades(mySim)
-
-# set default debug printing for the current session
-# setOption(spades.debug = TRUE)
-
-# Different debug options (overrides the package option 'spades.debug')
-spades(mySim, debug = TRUE) # Fastest
-spades(mySim, debug = "simList")
-spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
-# To get a combination -- use list(debug = list(..., ...))
-spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
-
-# Can turn off plotting, and inspect the output simList instead
-out <- spades(mySim, .plotInitialTime = NA) # much faster
-completed(out) # shows completed events
-
-# use cache -- simInit should generally be rerun each time a spades call is made
-#   to guarantee that it is identical. Here, run spades call twice, first
-#   time to establish cache, second time to return cached result
-for (i in 1:2) {
- mySim <- simInit(
-   times = list(start = 0.0, end = 2.0, timeunit = "year"),
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+    requireNamespace("NLMR", quietly = TRUE)) {
+  opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+  if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
+  mySim <- simInit(
+   times = list(start = 0.0, end = 1.0, timeunit = "year"),
    params = list(
      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
    ),
    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
- )
- print(system.time(out <- spades(mySim, cache = TRUE)))
+  )
+  spades(mySim)
+
+  # Different debug options (overrides the package option 'spades.debug')
+  spades(mySim, debug = TRUE) # Fastest
+  spades(mySim, debug = "simList")
+  spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
+  # To get a combination -- use list(debug = list(..., ...))
+  spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
+
+  # Can turn off plotting, and inspect the output simList instead
+  out <- spades(mySim, .plots = NA) # much faster
+  completed(out) # shows completed events
+
+  # use cache -- simInit should generally be rerun each time a spades call is made
+  #   to guarantee that it is identical. Here, run spades call twice, first
+  #   time to establish cache, second time to return cached result
+  for (i in 1:2) {
+   mySim <- simInit(
+     times = list(start = 0.0, end = 1.0, timeunit = "year"),
+     params = list(
+       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+     ),
+     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+     paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+   )
+   print(system.time(out <- spades(mySim, cache = TRUE)))
+  }
+
+  # E.g., with only the init events
+  outInitsOnly <- spades(mySim, events = "init")
+
+  # or more fine grained control
+  outSomeEvents <- spades(mySim,
+          events = list(randomLandscapes = c("init"),
+                        fireSpread = c("init", "burn")))
+
+  # with outputs, the save module gets invoked and must be explicitly limited to "init"
+  mySim <- simInit(
+   times = list(start = 0.0, end = 1.0, timeunit = "year"),
+   params = list(
+     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+   ),
+   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+   outputs = data.frame(objectName = "landscape", saveTime = 0:2),
+   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  )
+  # This will print a message saying that caribouMovement will run its events
+  outSomeEvents <- spades(mySim,
+          events = list(randomLandscapes = c("init"),
+                        fireSpread = c("init", "burn"),
+                        save = "init"))
+
+  options(opts) # reset options
 }
-
-# E.g., with only the init events
-outInitsOnly <- spades(mySim, events = "init")
-
-# or more fine grained control
-outSomeEvents <- spades(mySim,
-        events = list(randomLandscapes = c("init"),
-                      fireSpread = c("init", "burn")))
-
-# with outputs, the save module gets invoked and must be explicitly limited to "init"
-mySim <- simInit(
- times = list(start = 0.0, end = 2.0, timeunit = "year"),
- params = list(
-   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
- ),
- modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
- outputs = data.frame(objectName = "landscape", saveTime = 0:2),
- paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-)
-# This will print a message saying that caribouMovement will run its events
-outSomeEvents <- spades(mySim,
-        events = list(randomLandscapes = c("init"),
-                      fireSpread = c("init", "burn"),
-                      save = "init"))
 }
 
 }
@@ -302,7 +306,7 @@ Retrieved from \url{https://nostarch.com/artofr.htm}
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}},
 \code{\link[=simInit]{simInit()}}, and the caching vignette (very important for reproducibility):
-\url{https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html} which
+\url{https://spades-core.predictiveecology.org/articles/iii-cache.html} which
 uses \code{\link[reproducible:Cache]{reproducible::Cache()}}.
 }
 \author{

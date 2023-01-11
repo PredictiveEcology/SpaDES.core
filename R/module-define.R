@@ -18,14 +18,14 @@ moduleDefaults <- list(
     if (!is(pers, "person"))
       pers <- tryCatch(eval(parse(text = pers)), error = function(e) pers)
     pers
-    },
+  },
   childModules = character(0),
   version = "0.0.0.9000", ## numeric_versions don't deparse well
   extent = quote(raster::extent(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
-  reqdPkgs = list("ggplot2")
+  reqdPkgs = list("ggplot2", "raster")
 )
 
 ################################################################################
@@ -401,13 +401,17 @@ setMethod(
 #' if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 #'
 #' # initialize the simList
-#' mySim <- simInit(modules = "testModule",
-#'                  paths = list(modulePath = tmpdir))
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   mySim <- simInit(modules = "testModule",
+#'                    paths = list(modulePath = tmpdir))
 #'
-#' # Access one of the parameters -- because this line is not inside a module
-#' #  function, we must specify the module name. If used within a module,
-#' #  we can omit the module name
-#' P(mySim, "testModule")$.useCache
+#'   # Access one of the parameters -- because this line is not inside a module
+#'   #  function, we must specify the module name. If used within a module,
+#'   #  we can omit the module name
+#'   P(mySim, module = "testModule") # gets all params in a module
+#'   P(mySim, ".useCache", "testModule") # just one param
+#' }
+#' unlink(tmpdir, recursive = TRUE)
 #' }
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc, ...) {
@@ -790,3 +794,5 @@ addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
 
 fileExt <- getFromNamespace("fileExt", "reproducible")
 filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
+extractInequality <- getFromNamespace("extractInequality", "Require")
+compareVersion2 <- getFromNamespace("compareVersion2", "Require")

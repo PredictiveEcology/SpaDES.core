@@ -199,7 +199,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @importFrom data.table setDTthreads
 #' @importFrom reproducible basename2
 #' @importFrom Require Require trimVersionNumber modifyList2
-#' @importFrom utils compareVersion
+#' @importFrom utils compareVersion sessionInfo
 #' @rdname simInit
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -207,7 +207,10 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
-#' \dontrun{
+#' \dontrun{ # Tests take several seconds
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example
 #' mySim <- simInit(
 #'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'  params = list(
@@ -231,7 +234,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' outSim <- spades(mySim)
 #'
 #' # A little more complicated with inputs and outputs
-#' if (require(rgdal)) {
+#' if (requireNamespace("rgdal", quietly = TRUE)) {
 #'  mapPath <- system.file("maps", package = "quickPlot")
 #'  mySim <- simInit(
 #'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
@@ -255,7 +258,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #'  # Use accessors for inputs, outputs
 #'  mySim2 <- simInit(
-#'    times = list(current = 0, start = 0.0, end = 2.0, timeunit = "year"),
+#'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'    params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
 #'    paths = list(
@@ -310,6 +313,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'  events(mySim) # load event is at time 1 year
 #'  events(mySim2) # load event is at time 1 month, reported in years because of
 #'                 #   update to times above
+#' }
+#' options(opts)
 #' }
 #' }
 #'
@@ -368,10 +373,16 @@ setMethod(
     sim <- new("simList")
 
     if (length(simPrev) > 0) {
-      sim$._simPrevs <- append(sys.frames()[tail(simPrev, 1)], sim$._simPrev)
+      sim[["._simPrevs"]] <- append(sys.frames()[tail(simPrev, 1)], sim[["._simPrevs"]])
     } else {
-      sim$._simPrevs <- list()
+      sim[["._simPrevs"]] <- list()
     }
+
+    # add project/session info -- use list to allow subsequent addition (e.g., git, spatial libs)
+    sim@.xData[["._sessionInfo"]] <- list(
+      sessionInfo = utils::sessionInfo(),
+      timestamp = Sys.time()
+    )
 
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
@@ -427,11 +438,13 @@ setMethod(
     mBase <- basename2(unlist(modules))
 
     # Load packages
-    reqdPkgs <- packages(modules = sim@modules,
-                         filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
-                         paths = paths(sim)$modulePath,
-                         envir = sim@.xData[[".parsedFiles"]])
-    loadPkgs(reqdPkgs)
+    if (getOption("spades.loadReqdPkgs", TRUE)) {
+      reqdPkgs <- packages(modules = sim@modules,
+                           filenames = file.path(names(sim@modules), paste0(mBase, ".R")),
+                           paths = paths(sim)$modulePath,
+                           envir = sim@.xData[[".parsedFiles"]])
+      loadPkgs(reqdPkgs) # does unlist internally
+    }
 
     simDTthreads <- getOption("spades.DTthreads", 1L)
     message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
@@ -593,13 +606,14 @@ setMethod(
       }
 
       # Make local activeBindings to mod
-      lapply(as.character(sim@modules), function(mod) {
-        makeModActiveBinding(sim = sim, mod = mod)
-      })
-
-      lapply(sim@modules, function(mod) {
-        makeParActiveBinding(sim = sim, mod = mod)
-      })
+      makeSimListActiveBindings(sim)
+      # lapply(as.character(sim@modules), function(mod) {
+      #   makeModActiveBinding(sim = sim, mod = mod)
+      # })
+      #
+      # lapply(sim@modules, function(mod) {
+      #   makeParActiveBinding(sim = sim, mod = mod)
+      # })
 
       ## load user-defined modules
       # browser(expr = exists("._simInit_4"))
@@ -608,24 +622,26 @@ setMethod(
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
         ## run .inputObjects() for each module
-        if (is.character(getOption("spades.covr", FALSE))  ) {
-          mod <- getOption("spades.covr")
-          tf <- tempfile();
-          if (is.null(notOlderThan)) notOlderThan <- "NULL"
-          cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
-                                '", notOlderThan = ', notOlderThan,')'))
-          # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-          # unlockBinding(mod, sim$.mods)
-          if (length(objects))
-            list2env(objects, envir(sim))
-          sim$.mods[[mod]]$sim <- sim
-          aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
-          sim <- sim$.mods[[mod]]$sim
-          rm(list = "sim", envir = sim$.mods[[mod]])
-          if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
-          .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-        } else {
-          sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+        if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+          if (is.character(getOption("spades.covr", FALSE))  ) {
+            mod <- getOption("spades.covr")
+            tf <- tempfile();
+            if (is.null(notOlderThan)) notOlderThan <- "NULL"
+            cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
+                                  '", notOlderThan = ', notOlderThan,')'))
+            # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+            # unlockBinding(mod, sim$.mods)
+            if (length(objects))
+              list2env(objects, envir(sim))
+            sim$.mods[[mod]]$sim <- sim
+            aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
+            sim <- sim$.mods[[mod]]$sim
+            rm(list = "sim", envir = sim$.mods[[mod]])
+            if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+            .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+          } else {
+            sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+          }
         }
 
         ## schedule each module's init event:
@@ -634,7 +650,6 @@ setMethod(
         ### add module name to the loaded list
         names(m) <- mFullPath
         modulesLoaded <- append(modulesLoaded, m)
-
 
         ### add NAs to any of the dotParams that are not specified by user
         # ensure the modules sublist exists by creating a tmp value in it
@@ -911,17 +926,26 @@ setMethod(
             seq(length(li[[x]]))
           }
           NAItems <- is.na(items)
-          if (any(NAItems)) { # fill in unnamed list elements
-            # browser(expr = exists("innerClasses"))
-            items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
-              !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
-            names(li[[x]])[NAItems] <- items[NAItems]
+          if (any(NAItems)) { # delete unnamed list elements; they must be named
+            if (length(li[[x]]) > length(names(expectedInnerClasses[[x]]))) {
+              # too many items; this is an error
+              items <- names(li[[x]])
+            } else {
+              # browser(expr = exists("innerClasses"))
+              items[NAItems] <- names(expectedInnerClasses[[x]][NAItems])[
+                !names(expectedInnerClasses[[x]])[NAItems] %in% na.omit(items)]
+              names(li[[x]])[NAItems] <- items[NAItems]
+            }
 
           }
           namesInner[[x]] <<- items
 
           all(sapply(items, function(y) {
-            is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+            if (is.null(expectedInnerClasses[[x]][[y]])) {
+              FALSE
+            } else {
+              is(li[[x]][[y]], expectedInnerClasses[[x]][[y]])
+            }
           }))
         } else {
           if (length(li[[x]]) > 0)
@@ -1014,7 +1038,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   objsSpades <- append(alist(sim = sim), objsAll[spadesFormals])
   sim <- do.call(spades, objsSpades)
 }
-
 
 #' Identify Child Modules from a recursive list
 #'
@@ -1185,7 +1208,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                        notOlderThan = notOlderThan,
                        outputObjects = moduleSpecificInputObjects,
                        quick = getOption("reproducible.quick", FALSE),
-                       cacheRepo = sim@paths$cachePath,
+                       cachePath = sim@paths$cachePath,
                        classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                                             params = sim@params[[mBase]],
                                             modules = mBase),
@@ -1285,22 +1308,27 @@ simInitDefaults <- function() {
     poss[exist][1])
 }
 
+#' @importFrom Require extractVersionNumber
+#' @importFrom utils packageVersion
 checkSpaDES.coreMinVersion <- function(allPkgs) {
-  whSC <- startsWith(allPkgs, "SpaDES.core")
+  whSC <- grepl("\\<SpaDES.core\\>", allPkgs)
   if (any(whSC)) {
-    versionSpecs <- Require::getPkgVersions(allPkgs[whSC])
-    sc <- versionSpecs[Package == "SpaDES.core" & hasVersionSpec == TRUE]
-    if (NROW(sc)) {
-      out11 <- unlist(lapply(which(sc$hasVersionSpec), function(iii) {
-        comp <- compareVersion(as.character(packageVersion(sc$Package[iii])),
-                               sc$versionSpec[iii])}))
-      if (any(out11 < 0))
+    scPackageFullnames <- allPkgs[whSC]
+    sc <- extractVersionNumber(scPackageFullnames)
+    # versionSpecs <- Require::getPkgVersions(scPackageFullnames)
+    scWONA <- na.omit(sc)# [Package == "SpaDES.core" & hasVersionSpec == TRUE]
+    if (NROW(scWONA)) {
+      scCurVersion <- packageVersion("SpaDES.core")
+      ineq <- extractInequality(scPackageFullnames)
+      ok <- compareVersion2(scCurVersion, sc, ineq)
+
+      if (any(ok %in% FALSE))
         stop("One of the modules needs a newer version of SpaDES.core. Please ",
              "restart R and install with: \n",
-             "Require::Require('",sc$packageFullName[1],"')") # 1 is the highest
+             "Require::Install(c('",
+             paste(scPackageFullnames[ok %in% FALSE], collapse = ", "),"'))")
     }
   }
-
 }
 
 findSmallestTU <- function(sim, mods, childModules) { # recursive function
@@ -1354,18 +1382,22 @@ buildParentChildGraph <- function(sim, mods, childModules) {
   outDF
 }
 
+#' @importFrom Require getCRANrepos
 loadPkgs <- function(reqdPkgs) {
   uniqueReqdPkgs <- unique(unlist(reqdPkgs))
 
   if (length(uniqueReqdPkgs)) {
-    allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+    allPkgs <- uniqueReqdPkgs
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) # append SpaDES.core if it isn't already there
+      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
 
     # Check for SpaDES.core minimum version
-    checkSpaDES.coreMinVersion(allPkgs)
-
     if (getOption("spades.useRequire")) {
-      Require(allPkgs, upgrade = FALSE)
+      getCRANrepos(ind = 1) # running this first is neutral if it is set
+      Require(allPkgs, standAlone = FALSE, upgrade = FALSE) # basically don't change anything
     } else {
+      checkSpaDES.coreMinVersion(allPkgs)
+
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }

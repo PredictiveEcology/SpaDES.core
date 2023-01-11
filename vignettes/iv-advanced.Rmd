@@ -36,7 +36,7 @@ The procedure is:
 At that point, the function `memoryUse` can be called on the `simList` and it will do a join on the `sim$.memoryUse$obj` with the `completed(sim)` _by_ time stamp, so each event shows its memory use.
 
 ```{r memoryUse, eval=FALSE, echo=TRUE}
-if (requireNamespace("future", quietly = TRUE)) &&
+if (requireNamespace("future", quietly = TRUE) &&
   requireNamespace("future.callr", quietly = TRUE)) {
   options("spades.memoryUseInterval" = 0.5)
   

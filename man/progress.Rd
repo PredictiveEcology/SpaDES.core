@@ -48,6 +48,9 @@ See examples.
 }
 \examples{
 \dontrun{
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+requireNamespace("NLMR", quietly = TRUE)) {
+opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 mySim <- simInit(
   times = list(start=0.0, end=100.0),
   params = list(.globals = list(stackName = "landscape"),
@@ -69,7 +72,9 @@ globals(mySim) # returns only global parameters
 checkpointFile(mySim) # returns the name of the checkpoint file
                       # In this example, "chkpnt.RData"
 checkpointInterval(mySim) # 10
-}
+
+options(opts) # reset
+}}
 }
 \seealso{
 Other functions to access elements of a 'simList' object: 

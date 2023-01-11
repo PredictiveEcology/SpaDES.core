@@ -36,47 +36,66 @@ setMethod(
   signature = c(sim = "missing", module = "character", path = "character"),
   definition = function(module, path, defineModuleListItems) {
     filename <- paste(path, "/", module, "/", module, ".R", sep = "")
-    if (!file.exists(filename)) {
+    if (!any(file.exists(filename))) {
       stop(paste(filename, "does not exist. This was created by putting",
-                 "modulePath with the module name as a folder and filename. ",
-                 "Please correct the modulePath or module name in",
-                 "the simInit() call."))
+                 "modulePath with the module name as a folder and filename.",
+                 "Please correct the modulePath or module name in the simInit() call."))
+    } else {
+      ## check which of the module paths the file exists in -- use that file and path below
+      id <- which(file.exists(filename))
+      filename <- filename[id]
+      path <- path[id]
     }
 
     ## store metadata as list
+    opts <- options(spades.moduleCodeChecks = FALSE, spades.dotInputObjects = FALSE,
+                    reproducible.useCache = FALSE, spades.loadReqdPkgs = FALSE)
+    on.exit(options(opts))
 
-    metadata <- lapply(defineModuleListItems, function(xx) {
-      pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                                 defineModuleElement = xx)
-      out2 <- suppressMessages(try(eval(pmp), silent = TRUE))
-      if (is(out2, "try-error")) {
-        inner2 <- lapply(pmp, function(yyy) {
-          # pmp is whole rbind statement
-          out4 <- try(eval(yyy), silent = TRUE)
-          if (is(out4, "try-error")) {
-            yyy <- lapply(yyy, function(yyyyy) {
-              # yyy is whole defineParameter statement
-              out5 <- try(eval(yyyyy), silent = TRUE)
-              if (is(out5, "try-error")) yyyyy <- deparse(yyyyy)
-              return(yyyyy)
-            })
-          }
-          if (is.list(yyy)) yyy <- as.call(yyy)
-          return(yyy)
-        })
+    # There are 2 ways to get module metadata; read them directly or call `simInit`
+    #   to do it it. Calling `simInit` allows us to use the internal tools built
+    #   within `simInit`; BUT, it also means it parses the whole module. Normally
+    #   that is only functions, but old SpaDES modules (e.g., LCC2005 and family)
+    #   have a line stopifnot(packageVersion("SpaDES") >= "1.2.0.9009"),
+    #   which fails using the simInit approach, so need the .parseModulePartial
+    suppressMessages(sim <- try(simInit(modules = module,
+                                        paths = list(modulePath = path)),
+                                silent = TRUE)) # any failure will just pass to next try
 
-        out2 <- as.call(inner2)
-      }
-      # Remove extra spaces
-      aa <- capture.output(type = "message", {bb <- eval(out2)})
-      return(bb)
-    })
+    if (!is(sim, "try-error")) {
+      metadata <- moduleMetadata(sim)[defineModuleListItems]
 
-    names(metadata) <- defineModuleListItems
+    } else {
+      metadata <- lapply(defineModuleListItems, function(xx) {
+        pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                   defineModuleElement = xx)
+        out2 <- suppressMessages(try(eval(pmp), silent = TRUE))
+        if (is(out2, "try-error")) {
+          inner2 <- lapply(pmp, function(yyy) {
+            # pmp is whole rbind statement
+            out4 <- try(eval(yyy), silent = TRUE)
+            if (is(out4, "try-error")) {
+              yyy <- lapply(yyy, function(yyyyy) {
+                # yyy is whole defineParameter statement
+                out5 <- try(eval(yyyyy), silent = TRUE)
+                if (is(out5, "try-error")) yyyyy <- deparse(yyyyy)
+                return(yyyyy)
+              })
+            }
+            if (is.list(yyy)) yyy <- as.call(yyy)
+            return(yyy)
+          })
 
-    #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
-
-    metadata <- rmExtraSpacesEOLList(metadata)
+          out2 <- as.call(inner2)
+        }
+        # Remove extra spaces
+        aa <- capture.output(type = "message", {bb <- eval(out2)})
+        return(bb)
+      })
+      names(metadata) <- defineModuleListItems
+      # #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
+      metadata <- rmExtraSpacesEOLList(metadata)
+    }
     return(metadata)
 })
 

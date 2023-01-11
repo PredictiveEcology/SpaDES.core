@@ -1,4 +1,5 @@
 test_that("Plots function 1", {
+  skip_on_cran()
   skip_if_not_installed("ggplot2")
 
   testInitOut <- testInit()
@@ -205,7 +206,7 @@ test_that("Plots function 2", {
 
 test_that("Plots function 3 - use as Plot", {
   if (interactive()) {
-    testInitOut <- testInit("raster")
+    testInitOut <- testInit("raster", opts = list(spades.PlotsUsePlot = TRUE))
     on.exit({
       testOnExit(testInitOut)
     }, add = TRUE)
@@ -229,5 +230,24 @@ test_that("Plots function 3 - use as Plot", {
     stk2[[2]][11:20] <- 0.6
     stk2 <- raster::stack(stk2)
     Plot(stk2) # should show first row on left plot only as lower -- 0.25
+
+
+    clearPlot()
+    # should show plots as a using raster::plot
+    Plots(data = stk1, types = "screen", usePlot = FALSE, fn = raster::plot)
+
   }
+})
+
+test_that("Plots test .guessPkgFun", {
+  testInitOut <- testInit("raster")
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
+  test <- sapply(pkgFun, function(x) {
+    exists(sub(".*:", "", x), where = paste0("package:", sub(":.*", "", x)), mode = "function")
+  })
+  expect_true(all(test))
 })

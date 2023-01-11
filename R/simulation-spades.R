@@ -363,16 +363,16 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
-#' \dontrun{
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn") # default priority
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()) # default priority
+#'  sim <- simInit()
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn") # default priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()) # default priority
 #'
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()-1) # higher priority
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .normal()+1) # lower priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()-1) # higher priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .normal()+1) # lower priority
 #'
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .highest()) # highest priority
-#'  scheduleEvent(x, time(sim) + 1.0, "firemodule", "burn", .lowest()) # lowest priority
-#' }
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
+#'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
+#'  events(sim) # shows all scheduled events, with eventTime and priority
 scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
@@ -678,7 +678,7 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' @seealso [SpaDES.core-package()],
 #' [simInit()], and the caching vignette (very important for reproducibility):
-#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html> which
+#' <https://spades-core.predictiveecology.org/articles/iii-cache.html> which
 #' uses [reproducible::Cache()].
 #'
 #'
@@ -699,7 +699,7 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' There are numerous ways in which Caching can be used within SpaDES. Please
 #' see the vignette
-#' <https://CRAN.R-project.org/package=SpaDES.core/vignettes/iii-cache.html>
+#' <https://spades-core.predictiveecology.org/articles/iii-cache.html>
 #' for many examples. Briefly, functions, events, modules, entire spades calls or
 #' experiment calls (see <https://github.com/PredictiveEcology/SpaDES.experiment>)
 #' can be cached and mixtures of all of these will work. For functions, simply
@@ -810,75 +810,79 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' @examples
 #' \dontrun{
-#' mySim <- simInit(
-#'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
-#'  params = list(
-#'    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-#'  ),
-#'  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-#' )
-#' spades(mySim)
-#'
-#' # set default debug printing for the current session
-#' # setOption(spades.debug = TRUE)
-#'
-#' # Different debug options (overrides the package option 'spades.debug')
-#' spades(mySim, debug = TRUE) # Fastest
-#' spades(mySim, debug = "simList")
-#' spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
-#' # To get a combination -- use list(debug = list(..., ...))
-#' spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
-#'
-#' # Can turn off plotting, and inspect the output simList instead
-#' out <- spades(mySim, .plotInitialTime = NA) # much faster
-#' completed(out) # shows completed events
-#'
-#' # use cache -- simInit should generally be rerun each time a spades call is made
-#' #   to guarantee that it is identical. Here, run spades call twice, first
-#' #   time to establish cache, second time to return cached result
-#' for (i in 1:2) {
-#'  mySim <- simInit(
-#'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#'     requireNamespace("NLMR", quietly = TRUE)) {
+#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+#'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
+#'   mySim <- simInit(
+#'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
 #'    params = list(
 #'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
 #'    ),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-#'  )
-#'  print(system.time(out <- spades(mySim, cache = TRUE)))
+#'   )
+#'   spades(mySim)
+#'
+#'   # Different debug options (overrides the package option 'spades.debug')
+#'   spades(mySim, debug = TRUE) # Fastest
+#'   spades(mySim, debug = "simList")
+#'   spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
+#'   # To get a combination -- use list(debug = list(..., ...))
+#'   spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
+#'
+#'   # Can turn off plotting, and inspect the output simList instead
+#'   out <- spades(mySim, .plots = NA) # much faster
+#'   completed(out) # shows completed events
+#'
+#'   # use cache -- simInit should generally be rerun each time a spades call is made
+#'   #   to guarantee that it is identical. Here, run spades call twice, first
+#'   #   time to establish cache, second time to return cached result
+#'   for (i in 1:2) {
+#'    mySim <- simInit(
+#'      times = list(start = 0.0, end = 1.0, timeunit = "year"),
+#'      params = list(
+#'        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'      ),
+#'      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'    )
+#'    print(system.time(out <- spades(mySim, cache = TRUE)))
+#'   }
+#'
+#'   # E.g., with only the init events
+#'   outInitsOnly <- spades(mySim, events = "init")
+#'
+#'   # or more fine grained control
+#'   outSomeEvents <- spades(mySim,
+#'           events = list(randomLandscapes = c("init"),
+#'                         fireSpread = c("init", "burn")))
+#'
+#'   # with outputs, the save module gets invoked and must be explicitly limited to "init"
+#'   mySim <- simInit(
+#'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+#'    params = list(
+#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'    ),
+#'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'    outputs = data.frame(objectName = "landscape", saveTime = 0:2),
+#'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'   )
+#'   # This will print a message saying that caribouMovement will run its events
+#'   outSomeEvents <- spades(mySim,
+#'           events = list(randomLandscapes = c("init"),
+#'                         fireSpread = c("init", "burn"),
+#'                         save = "init"))
+#'
+#'   options(opts) # reset options
 #' }
-#'
-#' # E.g., with only the init events
-#' outInitsOnly <- spades(mySim, events = "init")
-#'
-#' # or more fine grained control
-#' outSomeEvents <- spades(mySim,
-#'         events = list(randomLandscapes = c("init"),
-#'                       fireSpread = c("init", "burn")))
-#'
-#' # with outputs, the save module gets invoked and must be explicitly limited to "init"
-#' mySim <- simInit(
-#'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
-#'  params = list(
-#'    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-#'  ),
-#'  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'  outputs = data.frame(objectName = "landscape", saveTime = 0:2),
-#'  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
-#' )
-#' # This will print a message saying that caribouMovement will run its events
-#' outSomeEvents <- spades(mySim,
-#'         events = list(randomLandscapes = c("init"),
-#'                       fireSpread = c("init", "burn"),
-#'                       save = "init"))
 #' }
 #'
 setGeneric(
   "spades",
   function(sim, debug = getOption("spades.debug"), progress = NA, cache,
            .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
-           events = NULL, .plots = NULL, ...) {
+           events = NULL, .plots = getOption("spades.plots", NULL), ...) {
     standardGeneric("spades")
 })
 
@@ -1016,7 +1020,7 @@ setMethod(
             sim <- memoryUseOnExit(sim, originalPlan)
           }, add = TRUE)
         } else {
-          message(futureMessage)
+          stop(futureMessage)
         }
       }
 
@@ -1069,7 +1073,12 @@ setMethod(
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_integer_, ".plotInitialTime",
             needClass = "numeric")
+        if (!is.null(.plotInitialTime)) {
+          message("Both .plots and .plotInitialTime are supplied; using .plots")
+        }
+        .plotInitialTime <- .plots
       }
+
       if (!is.null(.plotInitialTime)) {
         sim@params <- updateParamSlotInAllModules(
           sim@params, .plotInitialTime, ".plotInitialTime",
@@ -1216,13 +1225,14 @@ setMethod(
       return(invisible(sim))
     },
     warning = function(w) {
-      if (requireNamespace("logging", quietly = TRUE)) {
+      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
     },
     error = function(e) {
-      if (requireNamespace("logging", quietly = TRUE)) {
-        logging::logerror(e)
+      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+        if (debug > 0)
+          logging::logerror(e)
       } else {
         fn <- get0("onError")
         if (!is.null(fn))
@@ -1278,23 +1288,35 @@ setMethod(
 
     if (cache) {
       return(
-        do.call(quote = TRUE, Cache,
-                args = append(
-                  list(
-                    spades,
-                    sim = sim,
-                    debug = debug,
-                    progress = progress,
-                    .plotInitialTime = .plotInitialTime,
-                    .saveInitialTime = .saveInitialTime,
-                    omitArgs = omitArgs,
-                    notOlderThan = notOlderThan,
-                    events = events,
-                    .plots = .plots
-                  ),
-                  dots
-               )
-        )
+        Cache(spades(sim = sim,
+                     debug = debug,
+                     progress = progress,
+                     .plotInitialTime = .plotInitialTime,
+                     .saveInitialTime = .saveInitialTime,
+                     omitArgs = omitArgs,
+                     notOlderThan = notOlderThan,
+                     events = events,
+                     .plots = .plots,
+                     cache = FALSE,
+                     ...
+        ))
+        # do.call(quote = TRUE, Cache,
+        #         args = append(
+        #           list(
+        #             spades,
+        #             sim = sim,
+        #             debug = debug,
+        #             progress = progress,
+        #             .plotInitialTime = .plotInitialTime,
+        #             .saveInitialTime = .saveInitialTime,
+        #             omitArgs = omitArgs,
+        #             notOlderThan = notOlderThan,
+        #             events = events,
+        #             .plots = .plots
+        #           ),
+        #           dots
+        #        )
+        # )
       )
     } else {
       return(
@@ -1325,12 +1347,14 @@ setMethod(
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                           paths = FALSE, outputs = FALSE,
                            params = sim@params[[cur[["moduleName"]]]],
                            modules = cur[["moduleName"]])
     }
   }
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
-    expression(Cache(FUN = get(moduleCall, envir = fnEnv),
+    modCall <- get(moduleCall, envir = fnEnv)
+    expression(Cache(FUN = modCall,
                 sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,
@@ -1338,7 +1362,7 @@ setMethod(
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
                 showSimilar = showSimilar,
-                     cacheRepo = sim@paths[["cachePath"]]))
+                     cachePath = sim@paths[["cachePath"]]))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
@@ -1690,7 +1714,8 @@ getFutureNeeds <- function(deps, curModName) {
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
   message(crayon::magenta("        -- Spawning in a future"))
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
-  modObjs <- mget(ls(envir = modEnv), envir = modEnv)
+  objsToGet <- grep("^\\._", ls(envir = modEnv, all.names = TRUE), value = TRUE, invert = TRUE)
+  modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
   sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
@@ -1700,7 +1725,7 @@ getFutureNeeds <- function(deps, curModName) {
                               globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
                                           "showSimilar", ".pkgEnv", names(modObjs)),
                               packages = c("SpaDES.core", pkgs),
-                              envir = envir),
+                              envir = envir, seed = TRUE),
          thisModOutputs = list(moduleName = cur[["moduleName"]],
                                objects = futureNeeds$thisModOutputs,
                                dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))

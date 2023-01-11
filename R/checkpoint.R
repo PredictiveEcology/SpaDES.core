@@ -28,7 +28,7 @@
 #' @include environment.R
 #' @include priority.R
 #' @importFrom quickPlot .objectNames
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @export
 #' @rdname checkpoint
 #'

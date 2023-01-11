@@ -118,13 +118,11 @@ This is experimental and should be used with caution.
 }
 \examples{
 \dontrun{
-# For a Google Drive example
-# In metadata:
-expectsInputs("theFilename.zip", "NA", "NA",
-  sourceURL = "https://drive.google.com/open?id=1Ngb-jIRCSs1G6zcuaaCEFUwldbkI_K8Ez")
-# create the checksums file
-checksums("thisModule", "there", write = TRUE)
-downloadData("thisModule", "there", files = "theFilename.zip")
+# In metadata, each expectsInput has a sourceURL; downloadData will look for
+# that and download if it defined; however this sample module has all
+# NAs for sourceURL, so nothing to download
+modulePath <- system.file("sampleModules", package = "SpaDES.core")
+downloadData("caribouMovement", path = modulePath)
 }
 
 }

@@ -77,18 +77,31 @@ setMethod(
         out <- list()
       }
 
-      out <- tryCatch(
-        eval(out),
-        error = function(x) {
-          if (any(grepl("bind_rows", out))) { # historical artifact
-            if (!require("dplyr", quietly = TRUE))
-              stop("To read module: '", gsub("\\.R", "", basename(filename)),
-                   "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
-            out <- eval(out)
-          }
-          out
+      out1 <- try(eval(out), silent = TRUE)
+      if (is(out1, "try-error")) {
+        if (any(grepl("bind_rows", out))) { # historical artifact
+          if (!require("dplyr", quietly = TRUE))
+            stop("To read module: '", gsub("\\.R", "", basename(filename)),
+                 "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
+          out1 <- eval(out)
         }
-      )
+        if (is(out1, "try-error")) {
+          # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
+          if (any(grep("\\<sim\\>", out))) {
+            opts <- options(spades.moduleCodeChecks = FALSE, reproducible.useCache = FALSE,
+                            spades.dotInputObjects = FALSE)
+            on.exit(options(opts))
+            m <- tmp[["pf"]][[1]][[3]]$name
+            suppressMessages(sim <- simInit(modules = m,
+                                            paths = list(modulePath = dirname(dirname(filename)))))
+            newEnv <- new.env(parent = sim@.xData$.mods[[m]])
+            newEnv$sim <- sim
+            out1 <- eval(out, envir = newEnv)
+          }
+        }
+      }
+      out <- out1
+
     } else {
       out <- NULL
     }
@@ -225,9 +238,10 @@ setMethod(
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         tmp <- .parseConditional(envir = envir, filename = filename)
         activeCode <- list()
-        sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
-        attr(sim@.xData$.mods[[mBase]], "name") <- mBase
-        sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
+        sim <- newEnvsByModule(sim, mBase)  # sets up the module environment and the .objects sub environment
+        # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        # attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+        # sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
@@ -598,3 +612,10 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   return(isPack)
 }
 
+
+newEnvsByModule <- function(sim, modu) {
+  sim@.xData$.mods[[modu]] <- new.env(parent = asNamespace("SpaDES.core"))
+  attr(sim@.xData$.mods[[modu]], "name") <- modu
+  sim@.xData$.mods[[modu]]$.objects <- new.env(parent = emptyenv())
+  sim
+}

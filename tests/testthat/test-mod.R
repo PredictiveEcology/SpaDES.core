@@ -11,140 +11,9 @@ test_that("local mod object", {
   test2FilePath <- file.path(tmpdir, "test2", "test2.R")
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  cat(file = testFilePath,'
-      defineModule(sim, list(
-      name = "test",
-      description = "insert module description here",
-      keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
-      childModules = character(0),
-      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
-      timeframe = as.POSIXlt(c(NA, NA)),
-      timeunit = "second",
-      citation = list("citation.bib"),
-      documentation = list("README.md", "test.Rmd"),
-      reqdPkgs = list(),
-      parameters = rbind(
-        defineParameter("testParA", "numeric", 1, NA, NA, "")
-      ),
-      inputObjects = bindrows(
-        expectsInput("sdf", "sdf", "sdfd")
-      ),
-      outputObjects = bindrows(
-        createsOutput("testPar1", "numeric", "")
-      )
-      ))
+  cat(file = testFilePath, testCode, fill = TRUE)
 
-      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
-      switch(
-      eventType,
-      init = {
-      mod$a <- 2
-      sim$testPar1 <- Par$testParA
-
-      if (tryCatch(exists("Init", envir = asNamespace("test"), inherits = FALSE), error = function(x) FALSE)) {
-        sim <- Init(sim)
-      }
-
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
-      },
-      event1 = {
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
-      })
-      return(invisible(sim))
-      }
-
-      .inputObjects <- function(sim) {
-        mod$x <- "sdf"
-        return(sim)
-
-      }
-      ', fill = TRUE)
-
-  cat(file = test2FilePath,'
-      defineModule(sim, list(
-      name = "test2",
-      description = "insert module description here",
-      keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
-      childModules = character(0),
-      version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
-      timeframe = as.POSIXlt(c(NA, NA)),
-      timeunit = "second",
-      citation = list("citation.bib"),
-      documentation = list("README.md", "test2.Rmd"),
-      reqdPkgs = list(),
-      parameters = rbind(
-        defineParameter("testParB", "numeric", 2, NA, NA, ""),
-        defineParameter("testParC", "numeric", 22, NA, NA, ""),
-        defineParameter("testParD", "numeric", 12, NA, NA, "")
-      ),
-      inputObjects = bindrows(
-        expectsInput("sdf", "sdf", "sdfd")
-      ),
-      outputObjects = bindrows(
-        createsOutput("testPar2", "numeric", "")
-      )
-      ))
-
-      doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
-      P(sim)$testParF <- 77
-      P(sim)$testParA <- 42
-      P(sim, "testParG") <- 79
-      P(sim, "testParH") <- 48
-      switch(
-      eventType,
-      init = {
-      if (tryCatch(exists("Init", envir = asNamespace("test2"), inherits = FALSE), error = function(x) FALSE)) {
-        sim <- Init(sim)
-      }
-
-      if (isTRUE(P(sim)$testParB >= 1100)) {
-         P(sim, "testParB") <-  P(sim)$testParB + 756
-      }
-
-      if (any(grepl("testCommonPar", names(unlist(params(sim)))))) {
-            errorText <- try(paramCheckOtherMods(sim, "testCommonPar"), silent = TRUE)
-            if (identical("try-error", attr(errorText, "class")))
-              message("There was an error")
-            warn <- capture_warnings(paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "warning"))
-            if (length(warn))
-              message("There was a warning")
-            paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "message")
-            paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "silent")
-      }
-      if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
-        stop("testing restartSpades")#browser()
-      }
-
-      mod$a <- 1
-      sim$testPar2 <- Par$testParB
-      sim <- scheduleEvent(sim, start(sim), "test2", "event1", .skipChecks = TRUE)
-      },
-      event1 = {
-      if (isTRUE(P(sim)$testParB >= 1100)) {
-         P(sim, "testParB") <-  P(sim)$testParB + 800
-      }
-      mod$b <- mod$a + 1
-      mod$y <- paste0(mod$y, " is test2")
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
-      })
-      return(invisible(sim))
-      }
-      .inputObjects <- function(sim) {
-      if (isTRUE(P(sim)$testParB >= 543)) {
-         P(sim, "testParB") <-  P(sim)$testParB + 654
-      }
-
-      if (isTRUE(P(sim)$testParB > 321321)) {
-         P(sim, "checkpoint")
-      }
-      mod$y <- "This module"
-        return(sim)
-      }
-      ', fill = TRUE)
+  cat(file = test2FilePath, test2Code, fill = TRUE)
 
   mySim <- simInit(times = list(start = 0, end = 0),
                    paths = list(modulePath = tmpdir), modules = c("test", "test2"))
@@ -258,9 +127,7 @@ test_that("local mod object", {
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
-    err <- try({
-      ss <- spades(mySim8, debug = FALSE)
-    }, silent = TRUE)
+    ss <- try(spades(mySim8, debug = FALSE), silent = TRUE)
 
     sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
     err <- capture_error({
@@ -278,11 +145,34 @@ test_that("local mod object", {
     expect_true(NROW(completed(sim3)) == 7)
     options("spades.recoveryMode" = FALSE)
   }
+})
 
+test_that("convertToPackage testing", {
+  skip_if_not_installed('pkgload')
+  skip_on_cran()
+
+  try(pkgload::unload("test"), silent = TRUE)
+  try(pkgload::unload("test2"), silent = TRUE)
+
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE,
+                          opts = list("reproducible.useMemoise" = FALSE))
+  on.exit({
+    testOnExit(testInitOut)
+    try(pkgload::unload("test"), silent = TRUE)
+    try(pkgload::unload("test2"), silent = TRUE)
+  }, add = TRUE)
+
+  newModule("test", tmpdir, open = FALSE)
+  newModule("test2", tmpdir, open = FALSE)
+  testFilePath <- file.path(tmpdir, "test", "test.R")
+  test2FilePath <- file.path(tmpdir, "test2", "test2.R")
+
+  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  cat(file = testFilePath, testCode, fill = TRUE)
+
+  cat(file = test2FilePath, test2Code, fill = TRUE)
   # Test converting these to packages
-  if (interactive()) {
-    if (requireNamespace("pkgload")) {
-      cat(file = testFilePath,'
+  cat(file = testFilePath,'
       Init <- function(sim) {
         sim$aaaa <- Run(1)
         return(sim)
@@ -293,7 +183,7 @@ test_that("local mod object", {
       }
       ', fill = TRUE, append = TRUE)
 
-      cat(file = test2FilePath,'
+  cat(file = test2FilePath,'
       Init <- function(sim) {
         sim$cccc <- try(Run(1), silent = TRUE)
         return(sim)
@@ -304,55 +194,55 @@ test_that("local mod object", {
       }
       ', fill = TRUE, append = TRUE)
 
-      # aaaaa <<- 1
+  # aaaaa <<- 1
 
-      for (tt in c("test", "test2")) {
-        expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-        expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-      }
-      convertToPackage(module = "test", path = tmpdir, buildDocuments = FALSE)
-      convertToPackage(module = "test2", path = tmpdir, buildDocuments = FALSE)
-      for (tt in c("test", "test2")) {
-        expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-        expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-        expect_true(dir.exists(file.path(tmpdir, tt, "R")))
-      }
-      expect_true(file.exists(file.path(tmpdir, "test", "R", "Init.R")))
-      expect_true(file.exists(file.path(tmpdir, "test2", "R", "Init.R")))
-      expect_true(file.exists(file.path(tmpdir, "test", "R", "Run.R")))
-      expect_true(file.exists(file.path(tmpdir, "test2", "R", "Run2.R")))
+  for (tt in c("test", "test2")) {
+    expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+    expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+  }
+  convertToPackage(module = "test", path = tmpdir, buildDocuments = FALSE)
+  convertToPackage(module = "test2", path = tmpdir, buildDocuments = FALSE)
+  for (tt in c("test", "test2")) {
+    expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+    expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    expect_true(dir.exists(file.path(tmpdir, tt, "R")))
+  }
+  expect_true(file.exists(file.path(tmpdir, "test", "R", "Init.R")))
+  expect_true(file.exists(file.path(tmpdir, "test2", "R", "Init.R")))
+  expect_true(file.exists(file.path(tmpdir, "test", "R", "Run.R")))
+  expect_true(file.exists(file.path(tmpdir, "test2", "R", "Run2.R")))
 
-      mySim9 <- simInit(times = list(start = 0, end = 0),
-                        paths = list(modulePath = tmpdir), modules = c("test", "test2"))
+  mySim9 <- simInit(times = list(start = 0, end = 0),
+                    paths = list(modulePath = tmpdir), modules = c("test", "test2"))
 
-      # doesn't document
-      for (tt in c("test", "test2")) {
-        expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-        expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-        expect_true(dir.exists(file.path(tmpdir, tt, "R")))
-      }
-      working <- spades(mySim9, debug = FALSE)
+  # doesn't document
+  for (tt in c("test", "test2")) {
+    expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+    expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    expect_true(dir.exists(file.path(tmpdir, tt, "R")))
+  }
+  working <- spades(mySim9, debug = FALSE)
 
-      # document -- this exports all functions!! Danger for testing later
-      out <- lapply(c("test", "test2"), function(tt) {
-        roxygen2::roxygenise(file.path(tmpdir, tt))
-      })
+  if (requireNamespace("roxygen2")) {
+    # document -- this exports all functions!! Danger for testing later
+    out <- lapply(c("test", "test2"), function(tt) {
+      roxygen2::roxygenise(file.path(tmpdir, tt))
+    })
 
-      # Will run document() so will have the NAMESPACE and
-      for (tt in c("test", "test2")) {
-        expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-        expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-        expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
-      }
-
-      # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
-      expect_true(is(working, "simList"))
-      expect_true(working$aaaa == 2)
-      expect_true(is(working$cccc, "try-error"))
-      bbb <- Run2(2)
-      expect_true(bbb == 4)
-      pkgload::unload("test")
-      pkgload::unload("test2")
+    # Will run document() so will have the NAMESPACE and
+    for (tt in c("test", "test2")) {
+      expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+      expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+      expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
     }
+
+    # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
+    expect_true(is(working, "simList"))
+    expect_true(working$aaaa == 2)
+    expect_true(is(working$cccc, "try-error"))
+    bbb <- test2:::Run2(2)
+    expect_true(bbb == 4)
+    pkgload::unload("test")
+    pkgload::unload("test2")
   }
 })

@@ -88,7 +88,9 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @examples
 #' \dontrun{
 #'
-#' # This will save the "caribou" object at the save interval of 1 unit of time
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
+#' #' # This will save the "caribou" object at the save interval of 1 unit of time
 #' #  in the outputPath location
 #' outputPath <- file.path(tempdir(), "test_save")
 #' times <- list(start = 0, end = 6, "month")
@@ -103,8 +105,9 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' modules <- list("randomLandscapes", "caribouMovement")
 #' paths <- list(
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'   outputPath = savePath
+#'   outputPath = outputPath
 #' )
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #' mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
@@ -113,9 +116,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' dir(outputPath)
 #'
 #' # remove the files
-#' file.remove(dir(savePath, full.names = TRUE))
+#' file.remove(dir(outputPath, full.names = TRUE))
+#' options(opts) # clean up
 #'
-#' }
+#' }}
 saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   # extract the current module name that called this function
@@ -204,6 +208,7 @@ saveFiles <- function(sim) {
 #' @importFrom data.table setnames
 #' @rdname loadFiles
 .saveFileExtensions <- function() {
+  ## TODO: try to guess other file types -- see .guessPkgFun
   .sFE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
     "rds", "saveRDS", "base",
     "qs", "qsave", "qs",

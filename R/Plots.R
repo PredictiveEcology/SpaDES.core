@@ -96,10 +96,10 @@
 #'
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #' # Note: if this is used inside a SpaDES module, do not define this
 #' #  function inside another function. Put it outside in a normal
-#' #  module script. It will cause a memory leak, otherwise.
+#' #  module script. Otherwise, it will cause a memory leak.
 #' if (!require("ggplot2")) stop("please install ggplot2")
 #' fn <- function(d)
 #'   ggplot(d, aes(a)) +
@@ -123,8 +123,8 @@
 #'       )
 #'
 #' # Can also be used like quickPlot::Plot, but with control over output type
-#' r <- raster::raster(extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-#' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500))
+#' r <- raster::raster(raster::extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+#' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 #'
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
@@ -135,6 +135,7 @@ Plots <- function(data, fn, filename,
                   deviceArgs = list(),
                   ...) {
 
+  simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
@@ -186,8 +187,12 @@ Plots <- function(data, fn, filename,
 
   # has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
-  if (missing(fn) && isTRUE(usePlot)) {
-    fn <- Plot
+  if (missing(fn)) {
+    if (isTRUE(usePlot)) {
+      fn <- Plot
+    } else {
+      fn <- plot
+    }
   }
   fnIsPlot <- identical(fn, Plot)
   if (fnIsPlot) {
@@ -319,10 +324,12 @@ Plots <- function(data, fn, filename,
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
         if (!is(plotted, "try-error")) {
-          if (exists("sim", inherits = FALSE))
+          if (exists("sim", inherits = FALSE)) {
+            pkgAndFn <- .guessPkgFun(bsf)
             sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
                                          objectName = filePathSansExt(basename(theFilename)),
-                                         file = theFilename, fun = "unknown", args = NA,  ...)
+                                         file = theFilename, fun = pkgAndFn, args = NA,  ...)
+          }
           message("Saved figure to: ", theFilename)
         }
 
@@ -361,7 +368,6 @@ Plots <- function(data, fn, filename,
   return(invisible(NULL))
 }
 
-
 outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
   outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
                                      saved = TRUE, arguments = I(args)),
@@ -370,12 +376,13 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
     outputs[["arguments"]] <- I(outputs[["arguments"]])
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
-#' Test whether there should be any plotting from .plot parameter
+
+#' Test whether there should be any plotting from `.plot` parameter
 #'
 #' This will do all the various tests needed to determine whether
-#' plotting of one sort or another will occur. Testing any of the
-#' types as listed in [Plots()] argument `types`. Only the
-#' first 3 letters of the type are required.
+#' plotting of one sort or another will occur.
+#' Testing any of the types as listed in [Plots()] argument `types`.
+#' Only the first 3 letters of the type are required.
 #'
 #' @param .plots Usually will be the `P(sim)$.plots` is used within
 #'   a module.
@@ -394,3 +401,14 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 
 filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
+
+#' Guess package of a function
+#'
+#' @param bsf character. A function name
+#'
+#' @return character. The package and function name as "pkg::bsf"
+
+.guessPkgFun <- function(bsf) {
+  pkgName <- eval(parse(text = paste0("environmentName(environment(", bsf, "))")))
+  return(paste0(pkgName, "::", bsf))
+}

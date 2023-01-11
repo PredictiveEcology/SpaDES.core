@@ -32,14 +32,6 @@ invisibly returning a logical vector of successes.
 \description{
 Deprecated. Please use \code{\link[Require:Require]{Require::Require()}}
 }
-\examples{
-\dontrun{
-  pkgs <- list("raster", "lme4")
-  loadPackages(pkgs) # loads packages if installed
-  loadPackages(pkgs, install = TRUE) # loads packages after installation (if needed)
-}
-
-}
 \seealso{
 \code{\link[=require]{require()}}.
 }

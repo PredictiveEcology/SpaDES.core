@@ -13,7 +13,7 @@ memoryUse(sim, max = TRUE)
 \item{thisPid}{Numeric or integer, the PID of the process. If omitted, it will
 be found with \code{Sys.getpid()}}
 
-\item{sim}{A completed simList}
+\item{sim}{A completed \code{simList}}
 
 \item{max}{Logical. If TRUE, then it the return value will be summarized by
 module/event, showing the maximum memory used. If \code{FALSE}, then
@@ -28,8 +28,10 @@ Normally, this is run in a different session.
 This will only work if the user has specified before running
 the \code{spades} call, set the interval, in seconds, that ps is
 run with \code{options("spades.memoryUseInterval" = 0.5)}, will assess
-memory use every 0.5 seconds. The default
-is 0, meaning no interval, "off".
+memory use every 0.5 seconds. The default is \code{0}, meaning no interval, "off".
+}
+\note{
+The suggested \code{future} and \code{future.callr} packages must be available.
 }
 \seealso{
 The \code{vignette("iv-modules")}

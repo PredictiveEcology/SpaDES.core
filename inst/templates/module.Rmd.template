@@ -13,7 +13,6 @@ output:
 editor_options:
   chunk_output_type: console
   bibliography: citations/references_{{{name}}}.bib
-citation-style: citations/ecology-letters.csl
 link-citations: true
 always_allow_html: true
 ---
@@ -25,12 +24,6 @@ always_allow_html: true
 
 ```{r setup-{{{name2}}}, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
-
-## get citation style
-if (!file.exists("citations/ecology-letters.csl")) {
-  dir.create("citations", showWarnings = FALSE)
-  download.file("https://www.zotero.org/styles/ecology-letters", destfile = "citations/ecology-letters.csl")
-}
 
 if (!require(dplyr)) {
   install.packages("dplyr")
@@ -44,7 +37,7 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
               mode = 'wb')
 ```
 
-[![made-with-Markdown](figures/markdownBadge.png)](http://commonmark.org)
+[![made-with-Markdown](figures/markdownBadge.png)](https://commonmark.org)
 
 <!-- if knitting to pdf remember to add the pandoc_args: ["--extract-media", "."] option to yml in order to get the badge images -->
 

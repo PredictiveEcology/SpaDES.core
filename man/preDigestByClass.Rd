@@ -7,16 +7,16 @@
 \S4method{.preDigestByClass}{simList}(object)
 }
 \arguments{
-\item{object}{Any R object.}
+\item{object}{Any R object returned from a function}
 }
 \description{
 Takes a snapshot of \code{simList} objects.
 }
 \details{
-See \link[reproducible:preDigestByClass]{reproducible::.preDigestByClass}.
+See \link[reproducible:exportedMethods]{reproducible::.preDigestByClass}.
 }
 \seealso{
-\link[reproducible:preDigestByClass]{reproducible::.preDigestByClass}
+\link[reproducible:exportedMethods]{reproducible::.preDigestByClass}
 }
 \author{
 Eliot McIntire

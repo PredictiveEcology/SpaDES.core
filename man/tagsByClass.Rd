@@ -7,14 +7,14 @@
 \S4method{.tagsByClass}{simList}(object)
 }
 \arguments{
-\item{object}{Any R object.}
+\item{object}{Any R object returned from a function}
 }
 \description{
-See \link[reproducible:tagsByClass]{reproducible::.tagsByClass}. Adds current \code{moduleName},
+See \link[reproducible:exportedMethods]{reproducible::.tagsByClass}. Adds current \code{moduleName},
 \code{eventType}, \code{eventTime}, and \verb{function:spades} as \code{userTags}.
 }
 \seealso{
-\link[reproducible:tagsByClass]{reproducible::.tagsByClass}
+\link[reproducible:exportedMethods]{reproducible::.tagsByClass}
 }
 \author{
 Eliot McIntire

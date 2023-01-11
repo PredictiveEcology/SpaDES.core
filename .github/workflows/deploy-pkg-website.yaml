@@ -24,7 +24,7 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r@v3
         with:
           use-public-rspm: true
 
@@ -35,15 +35,12 @@ jobs:
             local::.
             fastshp=?ignore
             NLMR=?ignore
-            PredictiveEcology/Require@development
-            PredictiveEcology/reproducible@development
-            PredictiveEcology/SpaDES.tools@development
           needs: website
 
       - name: Install additional package dependencies
         run: |
           pak::pkg_install("ropensci/NLMR")
-          remotes::install_github("s-u/fastshp")
+          pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
 
       - name: Build site

@@ -1,7 +1,7 @@
 test_that("simList object initializes correctly (1)", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit()
+  testInitOut <- testInit(smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -202,7 +202,7 @@ test_that("simList object initializes correctly (1)", {
 test_that("simList object initializes correctly (2)", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit("raster")
+  testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -220,14 +220,14 @@ test_that("simList object initializes correctly (2)", {
                      modules = list("test"), paths = paths,
                      objects = obj)
     }))
-  expect_length(aa, 0)
+  expect_length(grep("was built under R version", aa, invert = TRUE), 0)
 })
 
 test_that("simList test all signatures", {
   skip_on_cran()
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
+  testInitOut <- testInit(smcc = FALSE)
 
   on.exit({
     testOnExit(testInitOut)
@@ -334,7 +334,7 @@ test_that("simList test all signatures", {
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   skip_on_cran()
   ## Test resulting from bug found by Greg Paradis April 7, 2019
-  testInitOut <- testInit("raster")
+  testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -355,7 +355,7 @@ test_that("test that module directory exists, but not files", {
   skip_on_cran()
 
   ## Test resulting from bug found by Eliot McIntire April 28, 2019
-  testInitOut <- testInit("raster")
+  testInitOut <- testInit("raster", smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)

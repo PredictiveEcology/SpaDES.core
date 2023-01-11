@@ -89,11 +89,13 @@
 #'
 #' @examples
 #' \dontrun{
+#'   tmpdir <- tempdir2("exampleNewModule")
 #'   ## create a "myModule" module in the "modules" subdirectory.
-#'   newModule("myModule", "modules")
+#'   newModule("myModule", tmpdir)
 #'
 #'   ## create a new parent module in the "modules" subdirectory.
-#'   newModule("myParentModule", "modules", type = "parent", children = c("child1", "child2"))
+#'   newModule("myParentModule", tmpdir, type = "parent", children = c("child1", "child2"))
+#'   unlink(tmpdir, recursive = TRUE)
 #' }
 #'
 setGeneric("newModule", function(name, path, ...) {
@@ -102,7 +104,7 @@ setGeneric("newModule", function(name, path, ...) {
 
 #' @export
 #' @rdname newModule
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 setMethod(
   "newModule",
   signature = c(name = "character", path = "character"),
@@ -195,7 +197,7 @@ setGeneric("newModuleCode", function(name, path, open, type, children) {
 
 #' @export
 #' @family module creation helpers
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
 #' @rdname newModuleCode
 # igraph exports %>% from magrittr
@@ -231,11 +233,11 @@ setMethod(
     } else {
       SpaDES.core.pkgName <- "SpaDES.core"
     }
-    SpaDES.core.Fullname <- paste0(SpaDES.core.pkgName, " (>=",SpaDES.core.version,")")
+    SpaDES.core.Fullname <- paste0(SpaDES.core.pkgName, " (>= ", SpaDES.core.version, ")")
 
     modulePartialMeta <- list(
-      reqdPkgs = deparse(c(SpaDES.core.Fullname,
-                                moduleDefaults[["reqdPkgs"]]))
+      reqdPkgs = deparse1(append(list(SpaDES.core.Fullname), moduleDefaults[["reqdPkgs"]]),
+                          collapse = "")
     )
     modulePartialMetaTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
                                                      "modulePartialMeta.R.template"))
@@ -287,7 +289,7 @@ setMethod(
 #' @inheritParams newModuleCode
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @export
 #' @family module creation helpers
 #' @rdname newModuleDocumentation
@@ -411,7 +413,7 @@ use_gha <- function(name, path) {
 #'                  \file{.gitignore}) and configures basic GitHub actions for module code checking.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @export
 #' @family module creation helpers
 #' @rdname newModuleTests
@@ -474,11 +476,14 @@ setMethod(
 #' @author Eliot McIntire
 #' @export
 #' @importFrom raster extension
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @rdname openModules
 #'
 #' @examples
-#' \dontrun{openModules("~/path/to/my/modules")}
+#' \dontrun{
+#' if (interactive())
+#'   openModules("modules")
+#' }
 #'
 setGeneric("openModules", function(name, path) {
   standardGeneric("openModules")
@@ -576,10 +581,6 @@ setMethod("openModules",
 #' @author Alex Chubaty
 #' @export
 #' @rdname copyModule
-#'
-#' @examples
-#' \dontrun{copyModule(from, to)}
-#'
 setGeneric("copyModule", function(from, to, path, ...) {
   standardGeneric("copyModule")
 })
@@ -662,7 +663,7 @@ setMethod("copyModule",
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @importFrom Require checkPath
+#' @importFrom reproducible checkPath
 #' @importFrom utils zip
 #' @rdname zipModule
 #'

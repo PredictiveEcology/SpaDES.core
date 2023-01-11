@@ -51,11 +51,9 @@ containing the columns:
 filelist <- data.frame(
     files = dir(system.file("maps", package = "quickPlot"),
             full.names = TRUE, pattern = "tif"),
-    functions = "rasterToMemory", package = "quickPlot"
+    functions = "rasterToMemory", package = "SpaDES.core"
 )
-sim1 <- loadFiles(filelist = filelist)
-clearPlot()
-if (interactive()) Plot(sim1$DEM)
+sim1 <- loadFiles(filelist = filelist) # loads all the maps to sim1 simList
 
 # Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded
 #  at time = 10 and 20 (via "intervals").
@@ -73,7 +71,9 @@ filelist = data.frame(
    intervals = c(rep(NA, length(files)-1), 10)
 )
 
-sim2 <- loadFiles(filelist = filelist)
+sim2 <- loadFiles(filelist = filelist) # only does the time = 0 loading; see next
+end(sim2) <- 10
+sim2 <- spades(sim2) # loads the object at time 10
 
 # if we extend the end time and continue running, it will load an object scheduled
 #  at time = 10, and it will also schedule a new object loading at 20 because
