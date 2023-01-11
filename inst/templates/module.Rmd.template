@@ -13,7 +13,6 @@ output:
 editor_options:
   chunk_output_type: console
   bibliography: citations/references_{{{name}}}.bib
-citation-style: citations/ecology-letters.csl
 link-citations: true
 always_allow_html: true
 ---
@@ -25,12 +24,6 @@ always_allow_html: true
 
 ```{r setup-{{{name2}}}, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
-
-## get citation style
-if (!file.exists("citations/ecology-letters.csl")) {
-  dir.create("citations", showWarnings = FALSE)
-  download.file("https://www.zotero.org/styles/ecology-letters", destfile = "citations/ecology-letters.csl")
-}
 
 if (!require(dplyr)) {
   install.packages("dplyr")
