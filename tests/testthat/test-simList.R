@@ -220,7 +220,7 @@ test_that("simList object initializes correctly (2)", {
                      modules = list("test"), paths = paths,
                      objects = obj)
     }))
-  expect_length(aa, 0)
+  expect_length(grep("was built under R version", aa, invert = TRUE), 0)
 })
 
 test_that("simList test all signatures", {
