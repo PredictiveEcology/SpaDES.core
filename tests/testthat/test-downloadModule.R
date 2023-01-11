@@ -35,14 +35,15 @@ test_that("downloadModule downloads and unzips a single module", {
 test_that("downloadModule downloads and unzips a parent module", {
   skip_on_cran()
   skip_if_not_installed("httr")
+  skip_if_not_installed("dplyr") # needed for bind_rows in these old modules
 
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
-  } else {
-    options(download.file.method = "curl")
-  }
+  # if (Sys.info()["sysname"] == "Windows") {
+  #   options(download.file.method = "auto")
+  # } else {
+  #   options(download.file.method = "curl")
+  # }
 
-  testInitOut <- testInit("raster", smcc = FALSE)
+  testInitOut <- testInit(c("raster", "dplyr"), smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
