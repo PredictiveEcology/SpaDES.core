@@ -15,7 +15,7 @@ URL:
 Date: 2023-01-10
 Version: 1.1.1
 Authors@R: c(
-    person("Alex M", "Chubaty", , "eliotmcintire@gmail.com", role = c("aut", "cre"),
+    person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7146-8135")),
     person("Eliot J B", "McIntire", , "eliot.mcintire@canada.ca", role = "aut",
            comment = c(ORCID = "0000-0002-6914-8316")),
