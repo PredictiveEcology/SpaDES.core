@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{NLMR, raster, reproducible, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{raster, reproducible, SpaDES.core, SpaDES.tools}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
