@@ -58,7 +58,9 @@ setMethod(
     #   that is only functions, but old SpaDES modules (e.g., LCC2005 and family)
     #   have a line stopifnot(packageVersion("SpaDES") >= "1.2.0.9009"),
     #   which fails using the simInit approach, so need the .parseModulePartial
-    suppressMessages(sim <- try(simInit(modules = module, paths = list(modulePath = path))))
+    suppressMessages(sim <- try(simInit(modules = module,
+                                        paths = list(modulePath = path)),
+                                silent = TRUE)) # any failure will just pass to next try
 
     if (!is(sim, "try-error")) {
       metadata <- moduleMetadata(sim)[defineModuleListItems]
