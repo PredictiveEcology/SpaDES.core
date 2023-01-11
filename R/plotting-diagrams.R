@@ -302,7 +302,7 @@ setMethod(
 #' @examples
 #' \dontrun{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-#' requireNamespace("NLMR", quietly = TRUE)) {
+#'     requireNamespace("NLMR", quietly = TRUE)) {
 #' library(igraph)
 #' times <- list(start = 0, end = 6, "month")
 #' parameters <- list(
@@ -317,7 +317,9 @@ setMethod(
 #' paths <- list(
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core")
 #' )
-#' opts <- options("spades.moduleCodeChecks" = FALSE)
+#'
+#' # Set some options so example runs faster
+#' opts <- options(spades.moduleCodeChecks = FALSE, spades.loadReqdPkgs = FALSE)
 #' sim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #' options(opts)
