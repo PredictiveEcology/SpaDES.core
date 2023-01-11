@@ -1,4 +1,5 @@
 test_that("simulation runs with simInit and spades with set.seed; events arg", {
+  skip_on_cran() # too long
   skip_if_not_installed("NLMR")
 
   testInitOut <- testInit()
