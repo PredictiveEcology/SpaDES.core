@@ -1,7 +1,7 @@
 test_that("testing memoryUse", {
-  # Needs to run first or else memeory use test fails
+  # Needs to run first or else memory use test fails
   skip_on_cran()
-  # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+
   skip_if_not_installed("future")
   skip_if_not_installed("future.callr")
   skip_if_not_installed("NLMR")

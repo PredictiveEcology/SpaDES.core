@@ -3,6 +3,10 @@ options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
 
 ## ----SpaDES-demo, eval=FALSE, echo=TRUE---------------------------------------
+#  ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
+#  #install.packages("SpaDES.taols")
+#  #install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
+#  
 #  library(SpaDES.core)
 #  
 #  demoSim <- suppressMessages(simInit(

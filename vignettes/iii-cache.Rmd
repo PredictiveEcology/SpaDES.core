@@ -64,7 +64,7 @@ library(reproducible)
 library(SpaDES.core)
 
 mySim <- simInit(
-  times = list(start = 0.0, end = 5.0),
+  times = list(start = 0.0, end = 3.0),
   params = list(
     .globals = list(stackName = "landscape", burnStats = "testStats"),
     randomLandscapes = list(.plotInitialTime = NA),
@@ -164,31 +164,17 @@ to
 ```{r function-level, echo=TRUE}
 ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
 system.time({
-  map <- Cache(NLMR::nlm_mpd,
-               ncol = ncol(ras),
-               nrow = nrow(ras),
-               resolution = unique(res(ras)),
-               roughness = 0.5,
-               rand_dev = 10,
-               rescale = FALSE,
-               verbose = FALSE,
+  map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
                cachePath = cachePath(mySim),
-               userTags = "nlm_mpd",
+               userTags = "neutralLandscapeMap",
                notOlderThan = Sys.time())
 })
 
 # vastly faster the second time
 system.time({
-  mapCached <- Cache(NLMR::nlm_mpd,
-                     ncol = ncol(ras),
-                     nrow = nrow(ras),
-                     resolution = unique(res(ras)),
-                     roughness = 0.5,
-                     rand_dev = 10,
-                     rescale = FALSE,
-                     verbose = FALSE,
+  mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
                      cachePath = cachePath(mySim),
-                     userTags = "nlm_mpd")
+                     userTags = "neutralLandscapeMap")
 })
 
 all.equal(map, mapCached) 
@@ -201,9 +187,9 @@ In addition, there are several helpers in the `reproducible` package, including 
 Also, one can access cached items manually (rather than simply rerunning the same `Cache` function again).
 
 ```{r manual-cache}
-cacheDB <- showCache(mySim, userTags = "nlm_mpd")
+cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")
 
-## get the RasterLayer that was produced with the NLMR::nlm_mpd function:
+## get the RasterLayer that was produced with neutralLandscapeMap()
 map <- loadFromCache(cacheId = cacheDB$cacheId)
 
 clearPlot()
