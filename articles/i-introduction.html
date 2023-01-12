@@ -306,7 +306,11 @@ and plotting of raster map layers; 2) the computational speed of
 modeling spatial spread processes; and 3) the implementation of an
 agent-based (a.k.a., individual-based) model.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co">## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed</span></span>
+<span><span class="co">#install.packages("SpaDES.taols")</span></span>
+<span><span class="co">#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">demoSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span></span>
 <span>  times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
