@@ -25,9 +25,9 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
 * removed `googledrive` Suggests;
 
-## bugfixes
+## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
-* many examples that were protected behind \dontrun or \donttest were stale; these have been updated
+* many examples that were protected behind `\dontrun` or `\donttest` were stale; these have been updated
 
 # SpaDES.core 1.1.0
 
