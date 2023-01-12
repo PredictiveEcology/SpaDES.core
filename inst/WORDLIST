@@ -16,7 +16,6 @@ Etienne
 GDAL
 GLPK
 Gantt
-GitHub
 Github
 GoogleDrive
 IBMs
@@ -52,8 +51,6 @@ SpatialPoints
 SpatialPointsDataFrame
 StackOverflow
 Sys
-Versioned
-Workflow
 XXXX
 activeBindings
 addChangedAttr
@@ -81,7 +78,6 @@ checkUsage
 checkpointFile
 checkpointInterval
 checkpointing
-checksum
 checksums
 childModule
 choosealicense
@@ -114,8 +110,6 @@ distanceFromEachPoint
 divergentColors
 doEvent
 doesn
-dontrun
-donttest
 dotInputObjects
 downloadData
 downloadModule
@@ -152,7 +146,6 @@ getSetColors
 getenv
 github
 globals
-google
 googledrive
 gowlland
 https
@@ -172,7 +165,6 @@ lingua
 loadFiles
 loadOrder
 loadReqdPkgs
-login
 lowMemory
 macOS
 makeLines
@@ -215,7 +207,6 @@ objectDiagram
 objs
 oldrel
 openModules
-optimizations
 outputObjects
 outputPath
 overplot
@@ -266,7 +257,6 @@ scratchPath
 setColors
 setDTthreads
 showCache
-sim
 sim1
 sim2
 sim2gantt
@@ -312,10 +302,6 @@ userSuppliedObjNames
 useragent
 v1
 vectorized
-versa
-versioning
-workflow
-workflows
 www
 xData
 zipModule
