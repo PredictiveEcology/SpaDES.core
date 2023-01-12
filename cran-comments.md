@@ -22,10 +22,10 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.2.2
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2023-01-04 r83564)
+* Ubuntu 20.04                 (GitHub), R-devel (2023-01-11 r83598)
 * Ubuntu 20.04                  (local), R-devel (2023-01-07 r83578)
-* Windows                      (GitHub), R-devel (2023-01-04 r83564 ucrt)
-* Windows                 (win-builder), R-devel (2023-01-10 r83596 ucrt)
+* Windows                      (GitHub), R-devel (2023-01-11 r83598 ucrt)
+* Windows                 (win-builder), R-devel (2023-01-11 r83598 ucrt))
 * Windows                       (local), R-devel (2023-01-08 r83584 ucrt)
 
 ## R CMD check results
@@ -55,9 +55,9 @@ This URL is included as part of the command used to install these additional pac
 Additionally, some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
-          DES
-          workflow (6:58)
-          workflows (10:64)
+            DES (5:71, 7:14, 12:53)
+            modularity (7:40)
+
 
 ## Downstream dependencies
 
