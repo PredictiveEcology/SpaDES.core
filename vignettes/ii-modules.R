@@ -21,7 +21,7 @@ cat(c(
 library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
-times <- list(start = 0.0, end = 20.0)
+times <- list(start = 0.0, end = 5.0)
 parameters <- list(
   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
   .progress = list(NA),
@@ -126,9 +126,13 @@ eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 #            overwrite = TRUE)
 
 ## ----module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7------------
+## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
+#install.packages("SpaDES.taols")
+#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
+
 library(SpaDES.core)
 
-times <- list(start = 0.0, end = 20)
+times <- list(start = 0.0, end = 1.0)
 parameters <- list(
   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
 )
@@ -150,10 +154,10 @@ objectDiagram(mySim, width = 720)
 
 ## ----checkpoints, echo=TRUE, message=FALSE------------------------------------
 # initialize a new simulation, setting the checkpoint interval and filename.
-times <- list(start = 0, end = 30)
+times <- list(start = 0, end = 5)
 parameters <- list(
   .globals = list(stackName = "landscape"),
-  .checkpoint = list(interval = 10, file = "chkpnt.RData")
+  .checkpoint = list(interval = 2, file = "chkpnt.RData")
 )
 modules <- list("randomLandscapes", "caribouMovement")
 paths <- list(
@@ -168,9 +172,9 @@ checkpointInterval(mySim)
 
 ## ----progress, echo=TRUE, message=FALSE---------------------------------------
 # initialize a new simulation, setting the progress parameters
-mySim <- simInit(times = list(start = 0.0, end = 100.0),
+mySim <- simInit(times = list(start = 0.0, end = 10.0),
                  params = list(.globals = list(stackName = "landscape"),
-                               .progress = list(type = "text", interval = 10)),
+                               .progress = list(type = "text", interval = 1)),
                  modules = list("randomLandscapes"),
                  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
 
@@ -181,11 +185,11 @@ progressInterval(mySim)
 ## ----load-save, echo=TRUE, message=FALSE--------------------------------------
 # initialize a new simulation, setting the load and save parameters
 outputDir <- file.path(tempdir(), "simOutputs")
-mySim <- simInit(times = list(start = 0.0, end = 10),
+mySim <- simInit(times = list(start = 0, end = 5),
                  params = list(
                    .globals = list(stackName = "landscape"),
                    randomLandscapes = list(
-                     .saveInitialTime = 0, .saveInterval = 10,
+                     .saveInitialTime = 0, .saveInterval = 2,
                      .saveObjects = c("landscape"),
                      .savePath = file.path(outputDir, "randomLandscapes"))
                    ),
@@ -227,7 +231,7 @@ unlink(normalizePath(ftmp))
 
 ## ----plotting, echo=TRUE, eval=FALSE, message=FALSE---------------------------
 #  # initialize a new simulation, setting the load and save parameters
-#  mySim <- simInit(times = list(start = 0.0, end = 100),
+#  mySim <- simInit(times = list(start = 0, end = 5),
 #                   params = list(
 #                     .globals = list(stackName = "landscape"),
 #                     randomLandscapes = list(.plotInitialTime = 0, .plotInterval = 1)
