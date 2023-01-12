@@ -121,9 +121,6 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   skip_on_cran()
   skip_if_not_installed("httr")
 
-  if (identical(Sys.getenv("TRAVIS"), "true") &&
-      tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
   } else {
@@ -134,25 +131,23 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    skipMessReGoogledrive <-
-      "Need a newer version of reproducible for downloadData for non-googledrive urls"
-    if (packageVersion("reproducible") <= "1.2.16")
-      skip(skipMessReGoogledrive)
-    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = TRUE))
-    if (!is.null(f$error)) {
-      if (grepl("Forbidden", f$error)) {
-        skip("Forbidden HTTP 403 on GitHub during downloadModule")
-      }
-      if (grepl("no package called", f$error)) {
-        skip(skipMessReGoogledrive)
-      }
+  skipMessReGoogledrive <-
+    "Need a newer version of reproducible for downloadData for non-googledrive urls"
+  if (packageVersion("reproducible") <= "1.2.16")
+    skip(skipMessReGoogledrive)
+  f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = TRUE))
+  if (!is.null(f$error)) {
+    if (grepl("Forbidden", f$error)) {
+      skip("Forbidden HTTP 403 on GitHub during downloadModule")
     }
-    f <- f$value[[1]] %>% unlist() %>% as.character()
-    d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
-
-    d_expected <- sort(c(m, "data"))
-
-    expect_equal(d, d_expected)
+    if (grepl("no package called", f$error)) {
+      skip(skipMessReGoogledrive)
+    }
   }
+  f <- f$value[[1]] %>% unlist() %>% as.character()
+  d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
+
+  d_expected <- sort(c(m, "data"))
+
+  expect_equal(d, d_expected)
 })
