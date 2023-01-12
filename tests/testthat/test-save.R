@@ -246,7 +246,7 @@ test_that("saveSimList does not work correctly", {
   landscape3 <- suppressWarnings(writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE))
   landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE))
   sim$ListOfRasters <- list(landscape2, landscape3)
-  zipSimList(sim, zipfile = tmpZip, filename = "test.qs")
+  suppressMessages(zipSimList(sim, zipfile = tmpZip, filename = "test.qs"))
 
   unlink(Filenames(sim))
   files <- dir()

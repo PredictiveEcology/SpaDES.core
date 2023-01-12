@@ -340,8 +340,8 @@ test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   }, add = TRUE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
-  newModule(childModName, tmpdir, type = "child")
-  newModule("parent_module", tmpdir, type = "parent", children = c("child_module"))
+  newModule(childModName, tmpdir, type = "child", open = FALSE)
+  newModule("parent_module", tmpdir, type = "parent", children = c("child_module"), open = FALSE)
   paths <- getPaths()
   modules <- list("parent_module")
   times <- list(start = 1, end = 10)

@@ -18,11 +18,13 @@ cleanMessage <- function(mm) {
 testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
                      opts = list(), tmpFileExt = "") {
   startTime <- Sys.time()
+  data.table::setDTthreads(2L)
   a <- list(reproducible.inputPaths = NULL,
             reproducible.showSimilar = FALSE,
+            reproducible.useNewDigestAlgorithm = 2,
+            spades.DTthreads = 2L,
             spades.moduleCodeChecks = smcc,
-            spades.useRequire = FALSE,
-            reproducible.useNewDigestAlgorithm = 2)
+            spades.useRequire = FALSE)
   a[names(opts)] <- opts
   opts1 <- a
 
