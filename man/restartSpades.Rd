@@ -26,7 +26,7 @@ with the module code parsed into the \code{simList}}
 \item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
 }
 \value{
-A simList as if \code{spades} had been called on a simList.
+A \code{simList} as if \code{spades} had been called on a \code{simList}.
 }
 \description{
 This is very experimental and has not been thoroughly tested. Use with caution.

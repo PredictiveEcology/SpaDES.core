@@ -332,6 +332,8 @@ if (!isGeneric(".checkCacheRepo")) {
 #'
 #' @inheritParams reproducible::.checkCacheRepo
 #'
+#' @return character string representing a directory path to the cache repo
+#'
 #' @export
 #' @exportMethod .checkCacheRepo
 #' @importFrom reproducible .checkCacheRepo .grepSysCalls
@@ -379,7 +381,7 @@ if (!isGeneric(".addChangedAttr")) {
 #'
 #' @inheritParams reproducible::.addChangedAttr
 #'
-#' @seealso [reproducible::.addChangedAttr].
+#' @return returns the object with attribute added
 #'
 #' @export
 #' @exportMethod .addChangedAttr
@@ -502,6 +504,8 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
 #'
 #' @inheritParams reproducible::.prepareOutput
 #'
+#' @return the modified `object`
+#'
 #' @export
 #' @exportMethod .prepareOutput
 #' @include simList-class.R
@@ -557,7 +561,6 @@ setMethod(
 
         # Step 1 -- copy the non-simEnv slots
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
-
 
         # Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
@@ -624,7 +627,6 @@ setMethod(
               list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[currModule]]),
                        envir = simPost@.xData$.mods[[currModule]])
           })
-
         }
         if (length(otherModules)) {
           lapply(otherModules, function(otherModule) {
@@ -636,7 +638,6 @@ setMethod(
               list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[otherModule]]),
                        envir = simPost@.xData$.mods[[otherModule]])
           })
-
         }
         # Deal with .mods objects
         if (!is.null(simFromCache@.xData$.mods)) {
@@ -682,9 +683,7 @@ setMethod(
               d <- simPost@events
               d <- lapply(d, function(x) {x[["order"]] <- 1; x})
 
-
-              a <- do.call(unique,
-                           args = alist(append(b[eventsAddedByThisModule], d)))
+              a <- do.call(unique, args = alist(append(b[eventsAddedByThisModule], d)))
 
               # a <- do.call(unique,
               #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
@@ -749,6 +748,8 @@ setMethod(
 #'
 #' @inheritParams reproducible::.preDigestByClass
 #'
+#' @return character vector corresponding to the names of objects stored in the `.xData` slot
+#'
 #' @author Eliot McIntire
 #' @export
 #' @exportMethod .preDigestByClass
@@ -776,6 +777,8 @@ if (!isGeneric(".addTagsToOutput")) {
 #' See [reproducible::.addTagsToOutput].
 #'
 #' @inheritParams reproducible::.addTagsToOutput
+#'
+#' @return modified `object`, with attributes added
 #'
 #' @author Eliot McIntire
 #' @exportMethod .addTagsToOutput
@@ -876,8 +879,10 @@ if (!exists("objSize")) {
 #' @importFrom reproducible objSize
 #' @importFrom lobstr obj_size
 #' @inheritParams reproducible::objSize
-#' @export
 #'
+#' @return an estimate of the size of the object, in bytes.
+#'
+#' @export
 #' @examples
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
@@ -907,14 +912,13 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #'
 #' @inheritParams reproducible::makeMemoisable
 #'
-#' @return A `simList_` object or a `simList`, in the case
-#' of `unmakeMemoisable`.
+#' @return A `simList_` object or a `simList`, in the case of `unmakeMemoisable`.
 #'
+#' @export
 #' @importFrom reproducible makeMemoisable
 #' @include simList-class.R
 #' @rdname makeMemoisable
 #' @seealso [reproducible::makeMemoisable()]
-#' @export
 makeMemoisable.simList <- function(x) {
   as(x, "simList_")
 }
@@ -974,6 +978,10 @@ if (!isGeneric("clearCache")) {
 #'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #'
+#' @return Will clear all objects (or those that match `userTags`, or those between `after`
+#' or `before`) from the repository located at `cachePath` of the `sim` object, if `sim` is provided,
+#' or located in `cachePath.` Invisibly returns a `data.table` of the removed items.
+#'
 #' @export
 #' @importFrom reproducible clearCache
 #' @importMethodsFrom reproducible clearCache
@@ -1001,9 +1009,7 @@ if (!isGeneric("showCache")) {
 
 #' `showCache` for `simList` objects
 #'
-#' This will take the `cachePath(object)` and pass
 #' @export
-#'
 #' @importFrom reproducible showCache
 #' @importMethodsFrom reproducible showCache
 #' @rdname clearCache
@@ -1024,9 +1030,7 @@ if (!isGeneric("keepCache")) {
 
 #' `keepCache` for `simList` objects
 #'
-#' This will take the `cachePath(object)` and pass
 #' @export
-#'
 #' @importFrom reproducible keepCache
 #' @importMethodsFrom reproducible keepCache
 #' @rdname clearCache

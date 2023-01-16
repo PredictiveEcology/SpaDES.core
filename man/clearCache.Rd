@@ -100,10 +100,11 @@ to regular expression problem, try \code{FALSE}. For \code{cc}, it is
 passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
 it can also be \code{sorted = FALSE} to return the object unsorted.}
 }
+\value{
+Will clear all objects (or those that match \code{userTags}, or those between \code{after}
+or \code{before}) from the repository located at \code{cachePath} of the \code{sim} object, if \code{sim} is provided,
+or located in \code{cachePath.} Invisibly returns a \code{data.table} of the removed items.
+}
 \description{
-This will take the \code{cachePath(object)} and pass
-
-This will take the \code{cachePath(object)} and pass
-
 This will take the \code{cachePath(object)} and pass
 }

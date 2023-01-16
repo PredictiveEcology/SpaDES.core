@@ -2,7 +2,7 @@
 % Please edit documentation in R/copy.R
 \name{Copy,simList-method}
 \alias{Copy,simList-method}
-\title{Copy for simList class objects}
+\title{Copy for \code{simList} class objects}
 \usage{
 \S4method{Copy}{simList}(object, objects, queues, ...)
 }
@@ -18,14 +18,16 @@ should be copied. Default \code{TRUE}, which may be slow.}
 
 \item{...}{Only used for custom Methods}
 }
+\value{
+a copy of \code{object}
+}
 \description{
-Because a simList works with an environment to hold all objects,
-all objects within that slot are pass-by-reference. That means
-it is not possible to simply copy an object with an assignment operator:
-the two objects will share the same objects. As one simList object changes
-so will the other. when this is not the desired behaviour, use this function.
-NOTE: use capital C, to limit confusion with \code{data.table::copy()}
-See \code{\link[reproducible:Copy]{reproducible::Copy()}}.
+Because a \code{simList} works with an environment to hold all objects,
+all objects within that slot are pass-by-reference.
+That means it is not possible to simply copy an object with an assignment operator:
+the two objects will share the same objects.
+As one \code{simList} object changes so will the other.
+When this is not the desired behaviour, use this function.
 }
 \details{
 \code{simList} objects can contain a lot of information, much of which could be
@@ -35,7 +37,12 @@ are file-backed, it is likely \emph{very} important to give unique file-backed
 directories. This should be passed here, which gets passed on to the many methods
 of \code{Copy} in \code{reproducible}.
 }
+\note{
+uses capital C, to limit confusion with e.g., \code{data.table::copy()}.
+}
 \seealso{
+\code{\link[reproducible:Copy]{reproducible::Copy()}}
+
 \code{\link[reproducible:Copy]{reproducible::Copy()}}
 }
 \author{

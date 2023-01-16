@@ -57,6 +57,9 @@ e.g., plotting a \code{RasterLayer}.}
 
 \item{...}{Anything needed by \code{fn}, all named.}
 }
+\value{
+Called for its side effect of plot creation.
+}
 \description{
 This is a single function call that allows a user to change which format in which
 the plots will occur.
@@ -116,7 +119,6 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
 }
 
 \examples{
-
 \donttest{
 # Note: if this is used inside a SpaDES module, do not define this
 #  function inside another function. Put it outside in a normal

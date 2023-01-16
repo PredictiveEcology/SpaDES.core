@@ -31,13 +31,11 @@
 #'       \item To disk as a \file{.png} or other image file, e.g., \file{.pdf}
 #'     }
 #'
-#'
 #' To turn off plotting both to screen and disk, set both
 #' `.plotInititalTime = NA` and `.plots = NA` or any other
 #' value that will not trigger a TRUE with a `grepl` with the `types`
 #' argument (e.g., `""` will omit all saving).
 #'
-#' @export
 #' @param data An (optional) arbitrary data object. If supplied, it will be passed as
 #'   the first argument to `Plot` function, and should contain all the data
 #'   required for the inner plotting. If passing a `RasterLayer`,
@@ -70,10 +68,7 @@
 #'
 #' @param ... Anything needed by `fn`, all named.
 #'
-#' @importFrom grDevices dev.off dev.cur
-#' @importFrom qs qsave
-#' @importFrom raster writeRaster
-#' @importFrom quickPlot clearPlot Plot whereInStack
+#' @return Called for its side effect of plot creation.
 #'
 #' @details
 #'
@@ -94,8 +89,13 @@
 #' `simList` of the module. This will, therefore, keep a record of figures saved
 #' *within* the `simList`
 #'
-#' @examples
+#' @export
+#' @importFrom grDevices dev.off dev.cur
+#' @importFrom qs qsave
+#' @importFrom raster writeRaster
+#' @importFrom quickPlot clearPlot Plot whereInStack
 #'
+#' @examples
 #' \donttest{
 #' # Note: if this is used inside a SpaDES module, do not define this
 #' #  function inside another function. Put it outside in a normal
@@ -361,10 +361,11 @@ Plots <- function(data, fn, filename,
                                      objectName = filePathSansExt(basename(filename11)),
                                      file = filename11, fun = "qs::qsave", args = NA,  ...)
     }
-
   }
+
   if (exists("sim", inherits = FALSE))
     assign("sim", sim, envir = simIsIn)
+
   return(invisible(NULL))
 }
 
@@ -386,6 +387,8 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
 #'
 #' @param .plots Usually will be the `P(sim)$.plots` is used within
 #'   a module.
+#'
+#' @return logical of length 1
 #'
 #' @export
 anyPlotting <- function(.plots) {

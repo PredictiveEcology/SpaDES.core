@@ -20,7 +20,7 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
-#' Being deprecated. Use [utils::modifyList()] (which can not handle NULL) or
+#' Defunct. Use [utils::modifyList()] (which can not handle NULL) or
 #' [Require::modifyList2()] for case with >2 lists and can handle NULL lists.
 #'
 #' @param x   a named list
@@ -34,14 +34,13 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' @export
 #' @importFrom Require modifyList2
 #' @rdname updateList
-#'
 updateList <- function(x, y) {
-  .Deprecated("Require::modifyList2", "Require")
-  if (missing(x)) x <- list()
-  if (missing(y)) y <- list()
-  if (is.null(y)) y <- list()
-  if (is.null(x)) x <- list()
-  modifyList2(x = x, val = y)
+  .Defunct("Require::modifyList2", "Require")
+  # if (missing(x)) x <- list()
+  # if (missing(y)) y <- list()
+  # if (is.null(y)) y <- list()
+  # if (is.null(x)) x <- list()
+  # modifyList2(x = x, val = y)
 }
 
 ################################################################################
@@ -464,11 +463,12 @@ getPaths <- function() {
 #' @rdname setPaths
 Paths <- .paths()
 
+#' @param silent Logical. Should the messaging occur.
+#'
 #' @export
-#' @rdname setPaths
 #' @importFrom raster tmpDir
 #' @importFrom reproducible checkPath
-#' @param silent Logical. Should the messaging occur.
+#' @rdname setPaths
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
                      terraPath, silent = FALSE) {
   defaults <- list(
@@ -582,6 +582,9 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 #' `use.names = TRUE`
 #'
 #' @param ... 1 or more `data.frame`, `data.table`, or `list` objects
+#'
+#' @return a `data.table` object
+#'
 #' @export
 bindrows <- function(...) {
   # Deal with things like "trailing commas"
@@ -601,8 +604,11 @@ bindrows <- function(...) {
 #'
 #' This can be used e.g., for Caching, to identify which files have changed.
 #'
-#' @export
 #' @inheritParams simInit
+#'
+#' @return character vector of file paths.
+#'
+#' @export
 moduleCodeFiles <- function(paths, modules) {
   path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
@@ -613,15 +619,7 @@ moduleCodeFiles <- function(paths, modules) {
 #' This function is intended to be part of module code and will test whether
 #' the value of a parameter within the current module matches the value of the
 #' same parameter in other modules. This is a test for parameters that might expect
-#' to be part of a `params = list(.globals = list(someParam = "test"))` passed
-#' to the `simInit`
-#'
-#' @return
-#' If the value of the `paramToCheck` in the current module is either `NULL` or
-#' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
-#' then this will return a character string with the value of the single parameter value
-#' in the other module(s). It will return the current value if there are no other modules
-#' with the same parameter.
+#' to be part of a `params = list(.globals = list(someParam = "test"))` passed to `simInit`.
 #'
 #' It is considered a "fail" under several conditions:
 #' \enumerate{
@@ -631,19 +629,24 @@ moduleCodeFiles <- function(paths, modules) {
 #'     so it is ambiguous which one to return.
 #' }
 #'
-#' \code{} either the current module is different than other modules,
-#' unless it is "default" or NULL.
+#' Either the current module is different than other modules, unless it is "default" or NULL.
 #'
-#' @export
-#' @rdname paramCheckOtherMods
 #' @param sim A simList
 #' @param paramToCheck A character string, length one, of a parameter name to
 #'   check and compare between the current module and one or more or all others
 #' @param moduleToUse A character vector of module names to check against. This can be
 #'   `"all"` which will compare against all other modules.
-#' @param ifSetButDifferent A character string indicating whether to `"error"`
-#'   the default, or send a `"warning"`, `message` or just silently continue
-#'   (any other value).
+#' @param ifSetButDifferent A character string indicating whether to `"error"` the default,
+#'   or send a `"warning"`, `message` or just silently continue (any other value).
+#'
+#' @return If the value of the `paramToCheck` in the current module is either `NULL` or
+#' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
+#' then this will return a character string with the value of the single parameter value
+#' in the other module(s).
+#' It will return the current value if there are no other modules with the same parameter.
+#'
+#' @export
+#' @rdname paramCheckOtherMods
 paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
                                 ifSetButDifferent = c("error", "warning", "message", "silent")) {
   currentModule <- currentModule(sim)

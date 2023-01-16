@@ -13,11 +13,10 @@ convertToPackage(
 \arguments{
 \item{module}{Character string of module name, without path}
 
-\item{path}{Character string of modulePath. Defaults to
-\code{getOption("spades.modulePath")}}
+\item{path}{Character string of modulePath. Defaults to  \code{getOption("spades.modulePath")}.}
 
 \item{buildDocuments}{A logical. If \code{TRUE}, the default, then the documentation
-will be built, if any exists, using \code{roxygen2::roxygenise}}
+will be built, if any exists, using \code{roxygen2::roxygenise}.}
 }
 \value{
 This is run for its side effects. There will be a new or modified
@@ -33,6 +32,8 @@ build documentation via \code{roxygen2::roxygenise} within the \code{simInit} ca
 This means that any modifications to source code
 will be read in during the \code{simInit} call, as is the practice when a module
 is not a package.
+
+invoked for the side effect of converting a module to a package
 }
 \description{
 \emph{EXPERIMENTAL -- USE WITH CAUTION}. This function will only create the

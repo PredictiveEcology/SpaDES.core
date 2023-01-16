@@ -261,17 +261,17 @@ setMethod(
   list(value = value, warning = warn, error = err)
 }
 
-#' All equal method for simLists
+#' All equal method for `simList` objects
 #'
 #' This function removes a few attributes that are added internally
-#' by SpaDES.core and are not relevant to the `all.equal`. One
-#' key element removed is any time stamps, as these are guaranteed
-#' to be different.
+#' by \pkg{SpaDES.core} and are not relevant to the `all.equal`.
+#' One key element removed is any time stamps, as these are guaranteed to be different.
 #'
 #' @inheritParams base::all.equal
+#'
+#' @return See [base::all.equal()]
+#'
 #' @export
-#' @return
-#' See [base::all.equal()]
 all.equal.simList <- function(target, current, ...) {
   attr(target, ".Cache")$newCache <- NULL
   attr(current, ".Cache")$newCache <- NULL

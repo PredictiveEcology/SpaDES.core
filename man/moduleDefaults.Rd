@@ -3,15 +3,17 @@
 \docType{data}
 \name{moduleDefaults}
 \alias{moduleDefaults}
-\title{Defaults values used in defineModule}
+\title{Defaults values used in \code{defineModule}}
 \format{
 An object of class \code{list} of length 12.
 }
 \usage{
 moduleDefaults
 }
+\value{
+named list of default module metadata
+}
 \description{
-Where individual elements are missing in \code{defineModule},
-these defaults will be used.
+Where individual elements are missing in \code{defineModule}, these defaults will be used.
 }
 \keyword{datasets}

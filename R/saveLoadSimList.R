@@ -135,6 +135,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
 #'    zip archive. Defaults to `FALSE` as this could be large, and may include many
 #'    out of date elements. See Details.
+#'
+#' @return invoked for side effect of zip archive creation
+#'
 #' @export
 #' @md
 #' @rdname saveSimList

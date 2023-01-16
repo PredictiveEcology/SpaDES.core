@@ -13,7 +13,7 @@ remoteFileSize(url)
 A numeric indicating the size of the remote file in bytes.
 }
 \description{
-Deprecated.
+Defunct. Will be removed by mid-2023.
 }
 \author{
 Eliot McIntire and Alex Chubaty

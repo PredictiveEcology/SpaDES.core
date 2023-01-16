@@ -42,6 +42,9 @@ The actual directory for a given \code{spades} call that is restarting will be:
 The random string is to prevent parallel processes that started at the same clock
 time from colliding.}
 }
+\value{
+inveoked for side effect of restarting the R session
+}
 \description{
 This will attempt to restart the R session, reloading all packages, and
 saving and reloading the \code{simList}.

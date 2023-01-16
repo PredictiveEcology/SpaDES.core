@@ -87,12 +87,16 @@
 #' `simInit` will nevertheless run `pkgload::load_all` to ensure the
 #' `spades` call will be using the current source code.
 #'
-#' @export
 #' @param module Character string of module name, without path
-#' @param path Character string of modulePath. Defaults to
-#'   `getOption("spades.modulePath")`
+#'
+#' @param path Character string of modulePath. Defaults to  `getOption("spades.modulePath")`.
+#'
 #' @param buildDocuments A logical. If `TRUE`, the default, then the documentation
-#'   will be built, if any exists, using `roxygen2::roxygenise`
+#'   will be built, if any exists, using `roxygen2::roxygenise`.
+#'
+#' @return invoked for the side effect of converting a module to a package
+#'
+#' @export
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE) {
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
@@ -135,7 +139,6 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
       #   any left over at the end, we will put them into their own file
       linesWithRoxygen <<- setdiff(linesWithRoxygen, roxygenLinesForThisFn)
       cat(rlaa[roxygenLinesForThisFn], file = filePath, sep = "\n", append = FALSE)
-
     }
 
     if (isTRUE(grepl("^doEvent", fn))) {
@@ -266,8 +269,6 @@ vignettes/.*\\.log$
 ^.gitmodules
     ", sep = "\n",
       file = RBuildIgnoreFile, fill = TRUE)
-
-
 
   return(invisible())
 

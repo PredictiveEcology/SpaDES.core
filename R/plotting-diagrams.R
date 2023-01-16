@@ -223,8 +223,7 @@ setMethod(
 #' @param ...  Additional arguments passed to `DiagrammeR::mermaid`.
 #'             Useful for specifying `height` and `width`.
 #'
-#' @return Plots a sequence diagram, invisibly returning a
-#'   `DiagrammeR::mermaid` object.
+#' @return Plots a sequence diagram, invisibly returning a `DiagrammeR::mermaid` object.
 #'
 #' @seealso `DiagrammeR::mermaid`.
 #'
@@ -493,8 +492,7 @@ setMethod(
 #'
 #' @param ... Arguments passed to `Plot`
 #'
-#' @return A list with 2 elements, an [igraph()] object and an `igraph`
-#' communities object.
+#' @return A list with 2 elements, an [igraph()] object and an `igraph` communities object.
 #'
 #' @author Eliot McIntire
 #' @export

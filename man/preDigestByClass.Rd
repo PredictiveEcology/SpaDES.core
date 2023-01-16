@@ -9,6 +9,9 @@
 \arguments{
 \item{object}{Any R object returned from a function}
 }
+\value{
+character vector corresponding to the names of objects stored in the \code{.xData} slot
+}
 \description{
 Takes a snapshot of \code{simList} objects.
 }

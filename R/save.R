@@ -74,15 +74,17 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' This is the least modular approach, as it will happen whether a module user
 #' wants it or not.
 #'
-#' @author Eliot McIntire
-#' @author Alex Chubaty
 #' @note It is not possible to schedule separate saving events for each object
 #' that is listed in the `.saveObjects`.
 #'
 #' @param sim A `simList` simulation object.
 #'
-#' @importFrom data.table data.table
+#' @return (invisibly) the modified `sim` object.
+#'         invoked for side effect of saving the simulation to file.
+#'
 #' @export
+#' @author Eliot McIntire and Alex Chubaty
+#' @importFrom data.table data.table
 #' @rdname saveFiles
 #'
 #' @examples
@@ -203,6 +205,8 @@ saveFiles <- function(sim) {
 #'   \item `fun`: the function to use for files with this file extension;
 #'   \item `package`: the package from which to load `fun`.
 #' }
+#'
+#' @return `data.frame`
 #'
 #' @export
 #' @importFrom data.table setnames

@@ -20,7 +20,7 @@
 .normal()
 }
 \value{
-A numeric.
+numeric
 }
 \description{
 Preset event priorities: 1 = first (highest); 5 = normal; 10 = last (lowest).

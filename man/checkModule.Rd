@@ -19,6 +19,9 @@ checkModule(name, repo)
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.}
 }
+\value{
+(invisibly) a character vector of module file paths
+}
 \description{
 Looks in the remote \code{repo} for a module named \code{name}.
 }

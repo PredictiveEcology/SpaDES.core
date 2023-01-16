@@ -7,8 +7,8 @@
 spadesOptions()
 }
 \description{
-These provide top-level, powerful settings for a comprehensive
-SpaDES workflow. To see defaults, run `spadesOptions()`.
+These provide top-level, powerful settings for a comprehensive SpaDES workflow.
+To see defaults, run `spadesOptions()`.
 See Details below.
 }
 \details{

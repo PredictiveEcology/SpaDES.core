@@ -41,8 +41,7 @@ Default is to use the \code{spades.modulePath} option.}
 about.}
 }
 \value{
-A list of module metadata, matching the structure in
-\code{\link[=defineModule]{defineModule()}}.
+A list of module metadata, matching the structure in \code{\link[=defineModule]{defineModule()}}.
 }
 \description{
 Parse and extract module metadata

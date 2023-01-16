@@ -1,4 +1,3 @@
-###############################################################################
 #' Check for existence of object(s) referenced by a `objects` slot of a
 #' `simList` object
 #'
@@ -21,13 +20,11 @@
 #'
 #' @seealso [library()].
 #'
+#' @author Alex Chubaty and Eliot McIntire
+#' @export
 #' @importFrom quickPlot .objectNames
 #' @include simList-class.R
-#' @export
 #' @rdname checkObject
-#'
-#' @author Alex Chubaty and Eliot McIntire
-#'
 setGeneric("checkObject", function(sim, name, object, layer, ...) {
   standardGeneric("checkObject")
 })
@@ -51,7 +48,7 @@ setMethod(
                     "does not exist."))
       return(FALSE)
     }
-  })
+})
 
 #' @export
 #' @rdname checkObject
@@ -66,7 +63,7 @@ setMethod(
                     "does not exist"))
       return(FALSE)
     }
-  })
+})
 
 #' @export
 #' @rdname checkObject
@@ -81,7 +78,7 @@ setMethod(
       message(paste(name, "does not exist in", simName))
       return(FALSE)
     }
-  })
+})
 
 #' @export
 #' @rdname checkObject
@@ -103,7 +100,7 @@ setMethod(
       )
       return(FALSE)
     }
-  })
+})
 
 #' @export
 #' @rdname checkObject
@@ -113,22 +110,21 @@ setMethod(
   definition = function(name, object, layer, ...) {
     stop(paste("Must provide a simList object"))
     return(FALSE)
-  })
+})
 
-################################################################################
-#' Check use and existence of params passed to simulation.
+#' Check use and existence of parameters passed to simulation.
 #'
 #' Checks that all parameters passed are used in a module,
 #' and that all parameters used in a module are passed.
 #'
-#' @param sim    A simList simulation object.
+#' @param sim    A `simList` simulation object.
 #'
 #' @param coreParams List of default core parameters.
 #'
 #' @param ...    Additional arguments. Not implemented.
 #'
 #' @return  Invisibly return `TRUE` indicating object exists; `FALSE` if not.
-#'          Sensible messages are be produced identifying missing parameters.
+#'          Sensible messages are produced identifying missing parameters.
 #'
 #' @include simList-class.R
 #' @export

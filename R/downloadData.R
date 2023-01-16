@@ -111,17 +111,17 @@ checksums <- function(module, path, ...) {
 
 #' Determine the size of a remotely hosted file
 #'
-#' Deprecated.
+#' Defunct. Will be removed by mid-2023.
 #'
 #' @param url  The url of the remote file.
 #'
 #' @return A numeric indicating the size of the remote file in bytes.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @export
 #'
+#' @export
 remoteFileSize <- function(url) {
-  .Deprecated()
+  .Defunct()
   # contentLength <- vapply(url, function(u) {
   #   header <- RCurl::url.exists(u, .header = TRUE)
   #   status <- tryCatch(as.numeric(header[["status"]]), error = function(e) 0)
@@ -134,8 +134,6 @@ remoteFileSize <- function(url) {
   #
   # return(contentLength)
 }
-
-
 
 ################################################################################
 #' Download module data

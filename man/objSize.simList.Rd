@@ -14,6 +14,9 @@ the returned value, with each of the elements' object size returned also.}
 
 \item{...}{Additional arguments (currently unused), enables backwards compatible use.}
 }
+\value{
+an estimate of the size of the object, in bytes.
+}
 \description{
 Recursively, runs \code{\link[reproducible:objSize]{reproducible::objSize()}} on the \code{simList} environment,
 so it estimates the correct size of functions stored there (e.g., with their enclosing

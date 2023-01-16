@@ -56,6 +56,8 @@ out of date elements. See Details.}
 \code{\link[=saveSimList]{saveSimList()}}: A saved \code{.qs} file in \code{filename} location.
 
 \code{\link[=zipSimList]{zipSimList()}}: A saved \code{.zip} file in \code{zipfile} location.
+
+invoked for side effect of zip archive creation
 }
 \description{
 Saving a \code{simList} may not work using the standard approaches (e.g.,

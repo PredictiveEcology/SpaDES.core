@@ -4,22 +4,28 @@ if (!isGeneric("Copy")) {
   })
 }
 
-#' Copy for simList class objects
+#' Copy for `simList` class objects
 #'
-#' Because a simList works with an environment to hold all objects,
-#' all objects within that slot are pass-by-reference. That means
-#' it is not possible to simply copy an object with an assignment operator:
-#' the two objects will share the same objects. As one simList object changes
-#' so will the other. when this is not the desired behaviour, use this function.
-#' NOTE: use capital C, to limit confusion with `data.table::copy()`
-#' See [reproducible::Copy()].
+#' Because a `simList` works with an environment to hold all objects,
+#' all objects within that slot are pass-by-reference.
+#' That means it is not possible to simply copy an object with an assignment operator:
+#' the two objects will share the same objects.
+#' As one `simList` object changes so will the other.
+#' When this is not the desired behaviour, use this function.
+#'
+#' @note uses capital C, to limit confusion with e.g., `data.table::copy()`.
+#'
+#' @seealso [reproducible::Copy()]
 #'
 #' @inheritParams reproducible::Copy
+#'
 #' @param objects  Whether the objects contained within the simList environment
 #'                 should be copied. Default `TRUE`, which may be slow.
 #' @param queues Logical. Should the events queues (`events`,
 #'               `current`, `completed`) be deep copied via
 #'               `data.table::copy`
+#'
+#'@return a copy of `object`
 #'
 #' @details
 #' `simList` objects can contain a lot of information, much of which could be

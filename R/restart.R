@@ -47,26 +47,29 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' earliest event recovered, thereby returning to the exact stochastic simulation
 #' trajectory.
 #'
-#' @note
-#' This will only work reliably
+#' @note This will only work reliably
 #' *if the `simList` was not modified yet during the event which caused the error*.
 #' The `simList` will be in the state it was at the time of the error.
 #'
 #' @param sim A simList. If not supplied (the default), this will take the sim from
 #'    `SpaDES.core:::.pkgEnv$.sim`, i.e., the one that was interrupted
+#'
 #' @param module A character string length one naming the module that caused the error and
 #'   whose source code was fixed. This module will be reparsed and placed into the simList
+#'
 #' @param restart Logical. If `TRUE`, then the call to `spades` will be made, i.e.,
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
 #'   with the module code parsed into the `simList`
+#'
 #' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
 #'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then
 #'   there will be a list in the `simList` called `.recoverableObjs`. These will be
 #'   replayed backwards in time to reproduce the initial state of the simList before
 #'   the event that is `numEvents` back from the first event in `events(sim)`.
+#'
 #' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
-#' @return
-#' A simList as if `spades` had been called on a simList.
+#'
+#' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
 #' @examples
@@ -251,6 +254,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
 #'     The random string is to prevent parallel processes that started at the same clock
 #'     time from colliding.
+#'
+#' @return inveoked for side effect of restarting the R session
 #'
 #' @details
 #' The process responds to several options. Though under most cases,

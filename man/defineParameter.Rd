@@ -45,7 +45,7 @@ having to use \code{paste}; any character strings after \code{desc}
 will be \code{paste}d together with \code{desc}.}
 }
 \value{
-data.frame
+a \code{data.frame}
 }
 \description{
 Used to specify a parameter's name, value, and set a default. The \code{min} and

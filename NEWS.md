@@ -13,6 +13,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * `moduleMetadata` no longer runs `.inputObjects`. In addition to being unnecessary and slow, it was also failing with `reproducible (==1.2.16)` because it was trying to run `Cache`, which had a bug for this case. Now, `moduleMetadata` no longer runs the `.inputObjects` internally, so this bug is no longer relevant.
 * two new options -- `spades.loadReqdPkgs`, so a user can turn off loading of packages, and `spades.dotInputObjects`, so a user can omit running of the `.inputObjects` function in modules during `simInit`. These are updated in `spadesOptions`.
 * some tests and examples have been shortened, to fit within the CRAN guidelines
+* improved documentation
 
 ## Dependency Changes
 
@@ -21,6 +22,9 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
 * many examples that were protected behind `\dontrun` or `\donttest` were stale; these have been updated
+
+## Deprecated, Defunct, and Removed Features
+* several previously-deprecated functions have been made defunct: `remoteFileSize()`, `updateList()`. These will be removed by mid-2023.
 
 # SpaDES.core 1.1.0
 

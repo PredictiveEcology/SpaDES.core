@@ -29,12 +29,21 @@ loadFiles(sim, filelist, ...)
 
 \item{...}{Additional arguments.}
 }
+\value{
+\code{data.frame} of file extension, package, and function mappings
+
+the modified \code{sim}, invisibly.
+
+\code{data.frame}
+}
 \description{
 How to load various types of files in R.
 
-This function has two roles: 1) to proceed with the loading of files that
-are in a simList or 2) as a short cut to simInit(inputs = filelist). Generally
-not to be used by a user.
+This function has two roles:
+\enumerate{
+\item to proceed with the loading of files that are in a \code{simList}; or
+\item as a shortcut to \code{simInit(inputs = filelist)}.
+}
 
 A \code{data.frame} with information on how to load various types of files in R,
 containing the columns:
@@ -44,9 +53,11 @@ containing the columns:
 \item \code{package}: the package from which to load \code{fun}.
 }
 }
+\note{
+Generally not intended to be used by users.
+}
 \examples{
 \dontrun{
-
 # Load random maps included with package
 filelist <- data.frame(
     files = dir(system.file("maps", package = "quickPlot"),

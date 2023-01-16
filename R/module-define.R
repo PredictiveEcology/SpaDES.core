@@ -1,9 +1,10 @@
-#' Defaults values used in defineModule
+#' Defaults values used in `defineModule`
 #'
-#' Where individual elements are missing in `defineModule`,
-#' these defaults will be used.
+#' Where individual elements are missing in `defineModule`, these defaults will be used.
+#'
+#' @return named list of default module metadata
+#'
 #' @export
-#'
 moduleDefaults <- list(
   ## these need to match up with `.emptyMetadata` list in helpers.R
   timeunit = .timeunitDefault(),
@@ -363,7 +364,7 @@ setMethod(
 #'                  having to use `paste`; any character strings after `desc`
 #'                  will be `paste`d together with `desc`.
 #'
-#' @return data.frame
+#' @return a `data.frame`
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
@@ -507,8 +508,7 @@ setMethod(
 #'
 #' @param ...          Other specifications of the input object.
 #'
-#' @return A `data.frame` suitable to be passed to `inputObjects` in a
-#' module's metadata.
+#' @return A `data.frame` suitable to be passed to `inputObjects` in a module's metadata.
 #'
 #' @author Yong Luo
 #' @export

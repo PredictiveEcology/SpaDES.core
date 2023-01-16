@@ -188,6 +188,8 @@ setMethod(
 #' @param children   Required when `type = "parent"`. A character vector
 #'                   specifying the names of child modules.
 #'
+#' @return Nothing is returned. Invoked for its side effect of creating new module code files.
+#'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @rdname newModuleCode
@@ -288,6 +290,8 @@ setMethod(
 #'
 #' @inheritParams newModuleCode
 #'
+#' @return Nothing is returned. Invoked for its side effect of creating new module code files.
+#'
 #' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath
 #' @export
@@ -384,6 +388,8 @@ setMethod("newModuleDocumentation",
 #' @param name module name
 #' @param path module path
 #'
+#' @return Invoked for its side effect of creating new GitHub Actions workflow files.
+#'
 #' @export
 #' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
@@ -411,6 +417,8 @@ use_gha <- function(name, path) {
 #' @param useGitHub Logical indicating whether GitHub will be used.
 #'                  If `TRUE` (default), creates suitable configuration files (e.g.,
 #'                  \file{.gitignore}) and configures basic GitHub actions for module code checking.
+#'
+#' @return Nothing is returned. Invoked for its side effect of creating new module test files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath
@@ -660,6 +668,8 @@ setMethod("copyModule",
 #' @param ...     Additional arguments to [zip()]:
 #'                e.g., add `"-q"` using `flags="-q -r9X"`
 #'                (the default flags are `"-r9X"`).
+#'
+#' @return Nothing is returned. Invoked for its side effect of zipping module files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export

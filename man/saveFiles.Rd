@@ -9,6 +9,10 @@ saveFiles(sim)
 \arguments{
 \item{sim}{A `simList` simulation object.}
 }
+\value{
+(invisibly) the modified `sim` object.
+        invoked for side effect of saving the simulation to file.
+}
 \description{
 In the [simInit()] call, a parameter called `.saveObjects` can be provided in
 each module.
@@ -100,7 +104,5 @@ options(opts) # clean up
 }}
 }
 \author{
-Eliot McIntire
-
-Alex Chubaty
+Eliot McIntire and Alex Chubaty
 }

@@ -13,10 +13,9 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @param repo  GitHub repository name, specified as `"username/repo"`.
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
-#'              Only `master` branches can be used at this point.
+#'              Only `master`/`main` branches can be used at this point.
 #'
-#' @export
-#' @rdname getModuleVersion
+#' @return `numeric_version`
 #'
 #' @details
 #' `getModuleVersion` extracts a module's most recent version by
@@ -29,7 +28,8 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' (<https://github.com/PredictiveEcology/SpaDES-modules>).
 #'
 #' @author Alex Chubaty
-#'
+#' @export
+#' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
 # igraph exports %>% from magrittr
@@ -81,13 +81,12 @@ setMethod("getModuleVersion",
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
 #'
-#' @export
-#' @rdname checkModule
-#' @importFrom utils packageVersion
+#' @return (invisibly) a character vector of module file paths
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#'
-# igraph exports %>% from magrittr
+#' @export
+#' @importFrom utils packageVersion
+#' @rdname checkModule
 setGeneric("checkModule", function(name, repo) {
   standardGeneric("checkModule")
 })

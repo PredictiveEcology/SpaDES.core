@@ -18,7 +18,10 @@ getModuleVersion(name, repo)
 \item{repo}{GitHub repository name, specified as \code{"username/repo"}.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
-Only \code{master} branches can be used at this point.}
+Only \code{master}/\code{main} branches can be used at this point.}
+}
+\value{
+\code{numeric_version}
 }
 \description{
 Modified from \url{https://stackoverflow.com/a/25485782/1380598}.

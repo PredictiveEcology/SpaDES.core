@@ -35,6 +35,7 @@
 #'
 #' @export
 #' @include simList-class.R
+#'
 #' @examples
 #' sim <- simInit()
 #'

@@ -12,7 +12,7 @@ writeRNGInfo(file = "seed.txt", append = FALSE)
 \item{append}{Logical indicating whether to append to the file (default \code{FALSE}).}
 }
 \value{
-Nothing returned. Invoked for its side-effect of writing to file.
+Nothing returned. Invoked for its side effect of writing to file.
 }
 \description{
 Useful for debugging and ensuring reproducibility.

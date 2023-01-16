@@ -14,8 +14,7 @@
 See individual methods in other packages.}
 }
 \value{
-A \code{simList_} object or a \code{simList}, in the case
-of \code{unmakeMemoisable}.
+A \code{simList_} object or a \code{simList}, in the case of \code{unmakeMemoisable}.
 }
 \description{
 Because of the environment slot, \code{simList} objects don't correctly
