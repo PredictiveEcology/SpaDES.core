@@ -1076,13 +1076,13 @@ setMethod(
         if (!is.null(.plotInitialTime)) {
           message("Both .plots and .plotInitialTime are supplied; using .plots")
         }
-        .plotInitialTime <- .plots
+        .plotInitialTime <- .plots ## TODO: .plotInitialTime is numeric, not character! fails check below
       }
 
       if (!is.null(.plotInitialTime)) {
         sim@params <- updateParamSlotInAllModules(
           sim@params, .plotInitialTime, ".plotInitialTime",
-          needClass = "numeric")
+          needClass = "numeric") ## TODO: fails if .plotInitialTime takes .plots value above
         if (is.na(.plotInitialTime))
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_character_, ".plots",
@@ -1847,7 +1847,7 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
   if (!is(newParamValues, needClass) && !is.na(newParamValues)) {
     if (missing(needValuesMess))
       needValuesMess <- ""
-    stop(newParamValues, " must be class '",needClass,"'. It must be ", needValuesMess)
+    stop(newParamValues, " must be class '", needClass, "'. It must be ", needValuesMess)
   }
   paramsLocal <- paramsList
   whNonHiddenModules <- !grepl(names(paramsList), pattern = "\\.")
@@ -1857,7 +1857,6 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
   })
   paramsList
 }
-
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   st <- Sys.time()

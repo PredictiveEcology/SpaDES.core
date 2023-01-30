@@ -675,7 +675,7 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
         message("... setting to '", newVal,
                 "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
       } else if (length(paramInOtherMods) > 1) {
-        mess <- paste0("Modules in this simList have multiple values for ",paramToCheck," (",
+        mess <- paste0("Modules in this simList have multiple values for ", paramToCheck," (",
                        paste(paramInOtherMods, collapse = ", "),
                        messSuff)
         fail <- TRUE

@@ -6,7 +6,7 @@ utils::globalVariables(c(
 ### `show` generic is already defined in the methods package
 #' Show an Object
 #'
-#' @param object  `simList`
+#' @param object `simList`
 #'
 #' @author Alex Chubaty
 #' @export

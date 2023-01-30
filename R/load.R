@@ -394,4 +394,3 @@ rasterCreate.RasterStack <- function(x, ...) {
 rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
 }
-

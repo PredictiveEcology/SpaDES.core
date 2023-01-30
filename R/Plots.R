@@ -294,7 +294,6 @@ Plots <- function(data, fn, filename,
         sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
                                      objectName = filePathSansExt(basename(rasterFilename)),
                                      file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
-
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
@@ -303,7 +302,6 @@ Plots <- function(data, fn, filename,
                                      objectName = filePathSansExt(basename(rawFilename)),
                                      file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
-
   }
 
   if (needSave) {
