@@ -185,6 +185,7 @@ setMethod(
           }
         }
       }
+      pth <- unique(pth)
       pth <- simEdgeList[pth, on = c("from", "to")]
       #pth <- pth %>% inner_join(simEdgeList, by = c("from", "to"))
       #if (!identical(pth, pth2)) browser()
