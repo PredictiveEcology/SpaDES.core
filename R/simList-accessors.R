@@ -1715,7 +1715,9 @@ setGeneric("logPath", function(sim) {
 setMethod("logPath",
           signature = "simList",
           definition = function(sim) {
-            lp <- file.path(sim@paths$outputPath, "log")
+            lp <- getOption("spades.logPath")
+            if (is.null(lp))
+              lp <- file.path(sim@paths$outputPath, "log")
             lp <- checkPath(lp, create = TRUE)
             return(lp)
 })
