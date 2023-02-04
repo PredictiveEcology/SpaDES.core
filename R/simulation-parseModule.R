@@ -353,9 +353,10 @@ setMethod(
             try(mess)
         })
 
-        mess <- capture.output({
+        #mess <- capture.output({
           out <- try(eval(pf, envir = env))
-        }, type = "message")
+        #}, type = "message")
+          mess <- NULL
         if (is(out, "try-error")) stop(out)
         opt <- getOption("spades.moduleCodeChecks")
         if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {
