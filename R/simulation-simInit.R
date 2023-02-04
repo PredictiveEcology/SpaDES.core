@@ -533,23 +533,24 @@ setMethod(
 
     # push globals onto parameters within each module
     if (length(sim@params$.globals)) {
-      globalsUsed <- globalsUsedInModules <- NULL
-      globalsDF <- list()
-      for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
-        common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
-        if (length(common)) {
-          globalsUsed <- paste(common, sep = ", ")
-          globalsUsedInModules <- rep(mod, length(common))
-          globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
-          sim@params[[mod]][common] <- sim@params$.globals[common]
-        }
-      }
-      if (!is.null(globalsUsed)) {
-        globalsDF <- rbindlist(globalsDF)
-        setkeyv(globalsDF, c("global", "module"))
-        message("The following .globals were used:")
-        reproducible::messageDF(globalsDF)
-      }
+      sim <- updateParamsFromGlobals(sim)
+      # globalsUsed <- globalsUsedInModules <- NULL
+      # globalsDF <- list()
+      # for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
+      #   common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
+      #   if (length(common)) {
+      #     globalsUsed <- paste(common, sep = ", ")
+      #     globalsUsedInModules <- rep(mod, length(common))
+      #     globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
+      #     sim@params[[mod]][common] <- sim@params$.globals[common]
+      #   }
+      # }
+      # if (!is.null(globalsUsed)) {
+      #   globalsDF <- rbindlist(globalsDF)
+      #   setkeyv(globalsDF, c("global", "module"))
+      #   message("The following .globals were used:")
+      #   reproducible::messageDF(globalsDF)
+      # }
     }
     # From here, capture messaging and prepend it
     withCallingHandlers({
@@ -1453,4 +1454,27 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
     list2env(as.list(simAltOut@completed), sim@completed)
   }
   loadOrder
+}
+
+updateParamsFromGlobals
+
+updateParamsFromGlobals <- function(sim) {
+  globalsUsed <- globalsUsedInModules <- NULL
+  globalsDF <- list()
+  for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
+    common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
+    if (length(common)) {
+      globalsUsed <- paste(common, sep = ", ")
+      globalsUsedInModules <- rep(mod, length(common))
+      globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
+      sim@params[[mod]][common] <- sim@params$.globals[common]
+    }
+  }
+  if (!is.null(globalsUsed)) {
+    globalsDF <- rbindlist(globalsDF)
+    setkeyv(globalsDF, c("global", "module"))
+    message("The following .globals were used:")
+    reproducible::messageDF(globalsDF)
+  }
+  sim
 }
