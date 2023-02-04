@@ -1407,7 +1407,7 @@ loadPkgs <- function(reqdPkgs) {
 
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   depsGr <- depsGraph(sim, plot = FALSE)
-  depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
+  depsGrDF <- (depsEdgeList(sim, FALSE) %>% .depsPruneEdges())
   cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
   hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
   canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
