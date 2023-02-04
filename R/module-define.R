@@ -415,79 +415,56 @@ setMethod(
 #' unlink(tmpdir, recursive = TRUE)
 #' }
 #'
-setGeneric("defineParameter", function(name, class, default, min, max, desc, ...) {
-  standardGeneric("defineParameter")
-})
-
-#' @rdname defineParameter
-setMethod("defineParameter",
-          signature(name = "character", class = "character", default = "ANY",
-                    min = "ANY", max = "ANY", desc = "character"),
-          definition = function(name, class, default, min, max, desc, ...) {
-            # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
-            # we can't just coerece these because it wouldn't allow for character,
-            #  e.g., start(sim)
-            anyNAs <- suppressWarnings(c(is.na(default), is.na(min), is.na(max)))
-            if (!all(anyNAs)) {
-              # if some or all are NA -- need to check
-              wrongClass <- lapply(class, function(cla)
-                # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
-                lapply(c(default, min, max)[!anyNAs], function(val)
-                  is(val, cla)))
-              classWrong <- all(!unlist(wrongClass))
-              if (classWrong) {
-                # any messages here are captured if this is run from .parseModule
-                #   It will append module name
-                message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
-                                        class, "'.", sep = ""))
-              }
-            }
-
-            desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
-
-            # previously used `substitute()` instead of `I()`,
-            # but it did not allow for a vector to be passed with `c()`
-            df <- data.frame(
-              paramName = name, paramClass = I(list(class)), default = I(list(default)),
-              min = I(list(min)), max = I(list(max)), paramDesc = desc,
-              stringsAsFactors = FALSE)
-            return(df)
-})
-
-#' @rdname defineParameter
-setMethod("defineParameter",
-          signature(name = "character", class = "character",
-                    default = "ANY", min = "missing", max = "missing",
-                    desc = "character"),
-          definition = function(name, class, default, desc, ...) {
-            NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
-            if (class %in% NAtypes) {
-              # coerce `min` and `max` to same type as `default`
-              min <- as(NA, class)
-              max <- as(NA, class)
-            } else {
-              min <- NA
-              max <- NA
-            }
-            df <- defineParameter(name = name, class = class, default = default,
-                            min = min, max = max, desc = desc, ...)
-
-            return(df)
-})
-
-#' @rdname defineParameter
-setMethod(
-  "defineParameter",
-  signature(name = "missing", class = "missing", default = "missing",
-            min = "missing", max = "missing", desc = "missing"),
-  definition = function() {
-    df <- data.frame(
+defineParameter <- function(name, class, default, min, max, desc, ...) {
+  if (missing(name) && missing(class) && missing(default) && missing(min) && missing(max) && missing(desc))
+    return(data.frame(
       paramName = character(0), paramClass = character(0),
       default = I(list()), min = I(list()), max = I(list()),
-      paramDesc = character(0), stringsAsFactors = FALSE)
-    return(df)
-})
+      paramDesc = character(0), stringsAsFactors = FALSE))
+  if (is.character(name) && is.character(class) && missing(min) && missing(max)) {
+    NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
+    if (class %in% NAtypes) {
+      # coerce `min` and `max` to same type as `default`
+      min <- as(NA, class)
+      max <- as(NA, class)
+    } else {
+      min <- NA
+      max <- NA
+    }
+  }
 
+  anyNAs <- suppressWarnings(c(is.na(default), is.na(min), is.na(max)))
+  if (!all(anyNAs)) {
+    # if some or all are NA -- need to check
+    wrongClass <- lapply(class, function(cla)
+      # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
+      lapply(c(default, min, max)[!anyNAs], function(val)
+        is(val, cla)))
+    classWrong <- all(!unlist(wrongClass))
+    if (classWrong) {
+      # any messages here are captured if this is run from .parseModule
+      #   It will append module name
+      message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
+                              class, "'.", sep = ""))
+    }
+  }
+
+  desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
+
+  # previously used `substitute()` instead of `I()`,
+  # but it did not allow for a vector to be passed with `c()`
+  # df <- data.table::setDF(list(
+  #   paramName = name, paramClass = I(list(class)), default = I(list(default)),
+  #   min = I(list(min)), max = I(list(max)), paramDesc = desc))
+  df <- data.frame(
+    paramName = name, paramClass = I(list(class)), default = I(list(default)),
+    min = I(list(min)), max = I(list(max)), paramDesc = desc,
+    stringsAsFactors = FALSE)
+  # if (!identical(df, df1)) browser()
+  return(df)
+
+
+}
 ################################################################################
 #' Define an input object that the module expects.
 #'

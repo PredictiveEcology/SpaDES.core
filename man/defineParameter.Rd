@@ -2,18 +2,9 @@
 % Please edit documentation in R/module-define.R
 \name{defineParameter}
 \alias{defineParameter}
-\alias{defineParameter,character,character,ANY,ANY,ANY,character-method}
-\alias{defineParameter,character,character,ANY,missing,missing,character-method}
-\alias{defineParameter,missing,missing,missing,missing,missing,missing-method}
 \title{Define a parameter used in a module}
 \usage{
 defineParameter(name, class, default, min, max, desc, ...)
-
-\S4method{defineParameter}{character,character,ANY,ANY,ANY,character}(name, class, default, min, max, desc, ...)
-
-\S4method{defineParameter}{character,character,ANY,missing,missing,character}(name, class, default, min, max, desc, ...)
-
-\S4method{defineParameter}{missing,missing,missing,missing,missing,missing}()
 }
 \arguments{
 \item{name}{Character string giving the parameter name.}
