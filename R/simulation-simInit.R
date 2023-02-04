@@ -1406,10 +1406,9 @@ loadPkgs <- function(reqdPkgs) {
 
 }
 
-#' @importFrom Require messageVerbose
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   depsGr <- depsGraph(sim, plot = FALSE)
-  depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
+  depsGrDF <- (depsEdgeList(sim, FALSE) %>% .depsPruneEdges())
   cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
   hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
   canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
@@ -1418,11 +1417,11 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 
   if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
     verbose <- getOption("reproducible.verbose")
-    messageVerbose(yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
-    messageVerbose(yellow("as their outputs are needed by the other modules and ",
+    messageVerbose(crayon::yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
+    messageVerbose(crayon::yellow("as their outputs are needed by the other modules and ",
                           "can be safely run"), verbose = verbose)
     safeToRunModules <- paste(canSafelyRunInit, collapse = ", ")
-    messageVerbose(yellow(safeToRunModules), verbose = verbose)
+    messageVerbose(crayon::yellow(safeToRunModules), verbose = verbose)
     stripNchars <- getOption("spades.messagingNumCharsModule") - 5
     stripNcharsSpades <- stripNchars + 7
     stripNcharsSimInit <- stripNchars + 15
@@ -1430,7 +1429,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                         objects = objects, inputs = inputs, outputs = outputs)
       messageVerbose(paste(rep(" ", stripNcharsSpades), collapse = ""),
-                     yellow("**** Running spades call for ", safeToRunModules, " ****"), verbose = verbose)
+                     crayon::yellow("**** Running spades call for ", safeToRunModules, " ****"), verbose = verbose)
       simAltOut <- spades(simAlt)
     },
     message = function(m) {
