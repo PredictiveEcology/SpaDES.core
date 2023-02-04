@@ -1405,11 +1405,12 @@ loadPkgs <- function(reqdPkgs) {
 
 }
 
+#' @importFrom Require messageVerbose
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   depsGr <- depsGraph(sim, plot = FALSE)
-  depsGrDF <- as.data.table(get.edgelist(depsGr, names = TRUE))
-  cannotSafelyRunInit <- unique(depsGrDF[V1 != "_INPUT_"]$V2)
-  hasUnresolvedInputs <- unique(depsGrDF[V1 == "_INPUT_"]$V2)
+  depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
+  cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
+  hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
   canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
   shouldRunAltSimInit <- !all(sim@modules %in% canSafelyRunInit)
   loadOrder <- .depsLoadOrder(sim, depsGr)
@@ -1433,10 +1434,15 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
     },
     message = function(m) {
       if (all(!grepl("setDTthreads|Setting:", m$message))) {
-        if (grepl("simInit:", m$message))
-          stripNchars <- stripNcharsSimInit
-        else
-          stripNchars <- stripNcharsSpades
+        if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
+            !startsWith(prefix = "The following .globals", m$message)) {
+          if (grepl("simInit:", m$message))
+            stripNchars <- stripNcharsSimInit
+          else
+            stripNchars <- stripNcharsSpades
+        } else {
+          stripNchars <- 0
+        }
         message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
       }
       invokeRestart("muffleMessage")
