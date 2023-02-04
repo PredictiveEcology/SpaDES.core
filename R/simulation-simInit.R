@@ -1405,7 +1405,6 @@ loadPkgs <- function(reqdPkgs) {
 
 }
 
-#' @importFrom Require messageVerbose
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   depsGr <- depsGraph(sim, plot = FALSE)
   depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
