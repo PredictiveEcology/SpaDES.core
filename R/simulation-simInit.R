@@ -1455,8 +1455,6 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   loadOrder
 }
 
-updateParamsFromGlobals
-
 updateParamsFromGlobals <- function(sim) {
   globalsUsed <- globalsUsedInModules <- NULL
   globalsDF <- list()
