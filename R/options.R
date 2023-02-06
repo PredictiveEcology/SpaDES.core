@@ -17,10 +17,12 @@
 #' \tabular{lcl}{
 #'   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
 #'   `spades.allowInitDuringSimInit` \tab `FALSE`
-#'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; `simInit` will
+#'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; If set to `TRUE`,
+#'      `simInit` will
 #'      evaluate the dependencies in the metadata objects and determine whether
 #'      there are modules whose `init` events can be run safely prior to
-#'      the `.inputObjects` of other modules.  \cr
+#'      the `.inputObjects` of other modules, i.e., if a module's `expectsInput`
+#'      is not being supplied by any other module's `createsOutput`. \cr
 #'
 #'
 #'   `spades.browserOnError` \tab `FALSE` \tab If `TRUE`, the default, then any

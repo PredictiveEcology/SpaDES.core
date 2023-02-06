@@ -20,6 +20,15 @@ file so they persist between sessions.
 The following options are likely of interest to most users
 \tabular{lcl}{
   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
+  `spades.allowInitDuringSimInit` \tab `FALSE`
+     \tab New feature as of `SpaDES.core > 1.1.1.9001`; If set to `TRUE`,
+     `simInit` will
+     evaluate the dependencies in the metadata objects and determine whether
+     there are modules whose `init` events can be run safely prior to
+     the `.inputObjects` of other modules, i.e., if a module's `expectsInput`
+     is not being supplied by any other module's `createsOutput`. \cr
+
+
   `spades.browserOnError` \tab `FALSE` \tab If `TRUE`, the default, then any
   error rerun the same event with `debugonce` called on it to allow editing
   to be done. When that browser is continued (e.g., with 'c'), then it will save it
