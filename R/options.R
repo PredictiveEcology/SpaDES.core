@@ -16,6 +16,13 @@
 #' The following options are likely of interest to most users
 #' \tabular{lcl}{
 #'   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
+#'   `spades.allowInitDuringSimInit` \tab `TRUE`
+#'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; `simInit` will
+#'      evaluate the dependencies in the metadata objects and determine whether
+#'      there are modules whose `init` events can be run safely prior to
+#'      the `.inputObjects` of other modules.  \cr
+#'
+#'
 #'   `spades.browserOnError` \tab `FALSE` \tab If `TRUE`, the default, then any
 #'   error rerun the same event with `debugonce` called on it to allow editing
 #'   to be done. When that browser is continued (e.g., with 'c'), then it will save it
@@ -156,6 +163,7 @@
 #'
 spadesOptions <- function() {
   list( # nolint
+    spades.allowInitDuringSimInit = TRUE,
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
