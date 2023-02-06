@@ -1431,7 +1431,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
                         objects = objects, inputs = inputs, outputs = outputs)
       messageVerbose(paste(rep(" ", stripNcharsSpades), collapse = ""),
                      crayon::yellow("**** Running spades call for ", safeToRunModules, " ****"), verbose = verbose)
-      simAltOut <- spades(simAlt)
+      simAltOut <- spades(simAlt, events = "init")
     },
     message = function(m) {
       if (all(!grepl("setDTthreads|Setting:", m$message))) {
