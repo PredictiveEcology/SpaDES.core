@@ -1415,7 +1415,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   shouldRunAltSimInit <- !all(sim@modules %in% canSafelyRunInit)
   loadOrder <- .depsLoadOrder(sim, depsGr)
 
-  if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
+  if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)
+      && getOption("spades.allowInitDuringSimInit", TRUE)) {
     verbose <- getOption("reproducible.verbose")
     messageVerbose(crayon::yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
     messageVerbose(crayon::yellow("as their outputs are needed by the other modules and ",
