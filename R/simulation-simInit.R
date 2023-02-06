@@ -1409,49 +1409,55 @@ loadPkgs <- function(reqdPkgs) {
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   depsGr <- depsGraph(sim, plot = FALSE)
   depsGrDF <- (depsEdgeList(sim, FALSE) %>% .depsPruneEdges())
-  cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
-  hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
-  canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
-  shouldRunAltSimInit <- !all(sim@modules %in% canSafelyRunInit)
+  if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+    cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
+    hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
+    canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
+    shouldRunAltSimInit <- !all(sim@modules %in% canSafelyRunInit)
+  }
+
   loadOrder <- .depsLoadOrder(sim, depsGr)
 
-  if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)
-      && getOption("spades.allowInitDuringSimInit", TRUE)) {
-    verbose <- getOption("reproducible.verbose")
-    messageVerbose(crayon::yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
-    messageVerbose(crayon::yellow("as their outputs are needed by the other modules and ",
-                          "can be safely run"), verbose = verbose)
-    safeToRunModules <- paste(canSafelyRunInit, collapse = ", ")
-    messageVerbose(crayon::yellow(safeToRunModules), verbose = verbose)
-    stripNchars <- getOption("spades.messagingNumCharsModule") - 5
-    stripNcharsSpades <- stripNchars + 7
-    stripNcharsSimInit <- stripNchars + 15
-    squash <- withCallingHandlers({
-      simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
-                        objects = objects, inputs = inputs, outputs = outputs)
-      messageVerbose(paste(rep(" ", stripNcharsSpades), collapse = ""),
-                     crayon::yellow("**** Running spades call for ", safeToRunModules, " ****"), verbose = verbose)
-      simAltOut <- spades(simAlt, events = "init")
-    },
-    message = function(m) {
-      if (all(!grepl("setDTthreads|Setting:", m$message))) {
-        if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
-            !startsWith(prefix = "The following .globals", m$message)) {
-          if (grepl("simInit:", m$message))
-            stripNchars <- stripNcharsSimInit
-          else
-            stripNchars <- stripNcharsSpades
-        } else {
-          stripNchars <- 0
+  if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+    if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
+      verbose <- getOption("reproducible.verbose")
+      messageVerbose(crayon::yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
+      messageVerbose(crayon::yellow("as their outputs are needed by the other modules and ",
+                                    "can be safely run"), verbose = verbose)
+      safeToRunModules <- paste(canSafelyRunInit, collapse = ", ")
+      messageVerbose(crayon::yellow(safeToRunModules), verbose = verbose)
+      stripNchars <- getOption("spades.messagingNumCharsModule") - 5
+      stripNcharsSpades <- stripNchars + 7
+      stripNcharsSimInit <- stripNchars + 15
+      squash <- withCallingHandlers({
+        simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
+                          objects = objects, inputs = inputs, outputs = outputs)
+        messageVerbose(paste(rep(" ", stripNcharsSpades), collapse = ""),
+                       crayon::yellow("**** Running spades call for ", safeToRunModules, " ****"), verbose = verbose)
+        simAltOut <- spades(simAlt, events = "init")
+      },
+      message = function(m) {
+        if (all(!grepl("setDTthreads|Setting:", m$message))) {
+          if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
+              !startsWith(prefix = "The following .globals", m$message)) {
+            if (grepl("simInit:", m$message))
+              stripNchars <- stripNcharsSimInit
+            else
+              stripNchars <- stripNcharsSpades
+          } else {
+            stripNchars <- 0
+          }
+          message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
         }
-        message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
-      }
-      invokeRestart("muffleMessage")
-    })
+        invokeRestart("muffleMessage")
+      })
 
-    list2env(objs(simAltOut), envir(sim))
-    loadOrder <- loadOrder[loadOrder != canSafelyRunInit]
-    list2env(as.list(simAltOut@completed), sim@completed)
+      list2env(objs(simAltOut), envir(sim))
+      loadOrder <- loadOrder[loadOrder != canSafelyRunInit]
+      list2env(as.list(simAltOut@completed), sim@completed)
+      if (length(simAltOut@events))
+        sim@events <- append(sim@events, simAltOut@events)
+    }
   }
   loadOrder
 }
