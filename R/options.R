@@ -16,7 +16,7 @@
 #' The following options are likely of interest to most users
 #' \tabular{lcl}{
 #'   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
-#'   `spades.allowInitDuringSimInit` \tab `TRUE`
+#'   `spades.allowInitDuringSimInit` \tab `FALSE`
 #'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; `simInit` will
 #'      evaluate the dependencies in the metadata objects and determine whether
 #'      there are modules whose `init` events can be run safely prior to
@@ -163,7 +163,7 @@
 #'
 spadesOptions <- function() {
   list( # nolint
-    spades.allowInitDuringSimInit = TRUE,
+    spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
