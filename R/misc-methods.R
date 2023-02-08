@@ -689,6 +689,13 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
       }
     }
     if (isTRUE(fail)) {
+      dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
+      dfOther <- data.frame(module = names(paramToUpdateValInOtherMods), value = paramToUpdateValInOtherMods, row.names = NULL)
+      messageVerbose("This module", verbose = verbose)
+      messageDF(dfThis, colour = "green", verbose = verbose)
+      messageVerbose("Other modules", verbose = verbose)
+      messageDF(dfOther, verbose = verbose)
+
       if (identical(ifSetButDifferent[1], "error")) stop(mess)
       if (identical(ifSetButDifferent[1], "warning")) warning(mess)
       if (identical(ifSetButDifferent[1], "message")) message(mess)
