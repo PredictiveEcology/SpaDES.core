@@ -649,6 +649,7 @@ setReplaceMethod("globals",
                  signature = "simList",
                  function(sim, value) {
                    sim@params$.globals <- value
+                   sim <- updateParamsFromGlobals(sim)
                    validObject(sim)
                    return(sim)
 })
