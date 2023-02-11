@@ -3,6 +3,8 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 # SpaDES.core 1.1.1
 
 ## Enhancements
+* messaging during nested `simInit` or `spades` calls will now not duplicate time prefix
+* `params` and `.globals` were previously not expected to change during `Cache`d events. Thus returned cached values were always the same as input as `params` and `.globals`. They are now assessed and returned as part of the `Cache`, as expected.
 * updates to handle upstream changes in `Require` and `reproducible`, including renaming `cacheRepo` to `cachePath` in some inherited functions.
 * updates to sample modules to use `SpaDES.tools::neutralLandscapeMap` instead of `NLMR` package directly
 * begin migration to use `terra` and `sf` instead of `raster`, `sp`, `rgeos`, and `rgdal`
