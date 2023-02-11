@@ -1897,16 +1897,23 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   } else {
     modName8Chars <- ""
   }
-  if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
-  if (!is.null(suffix))
-    modName8Chars <- paste0(modName8Chars, suffix)
-  if (!is.null(prefix))
-    modName8Chars <- paste0(prefix, modName8Chars)
+  prependTime <- strftime(st, format = stForm2)
+  if (grepl(prependTime, mess)) { # spades or simInit inside a spades or simInit
+    browser()
+    prependTime <- " -- "
 
-  mess <- paste0(modName8Chars, mess)
-  mess <- gsub("\\n", "", mess)
+  } else {
+    if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
+    if (!is.null(suffix))
+      modName8Chars <- paste0(modName8Chars, suffix)
+    if (!is.null(prefix))
+      modName8Chars <- paste0(prefix, modName8Chars)
 
-  paste0(strftime(st, format = stForm2), mess)
+    mess <- paste0(modName8Chars, mess)
+    mess <- gsub("\\n", "", mess)
+
+  }
+  paste0(prependTime, mess)
 }
 
 
