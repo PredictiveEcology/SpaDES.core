@@ -1349,6 +1349,7 @@ setMethod(
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                            paths = FALSE, outputs = FALSE,
                            params = sim@params[[cur[["moduleName"]]]],
+                           .globals = sim@params[[".globals"]],
                            modules = cur[["moduleName"]])
     }
   }

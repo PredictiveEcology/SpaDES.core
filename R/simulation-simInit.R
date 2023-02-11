@@ -534,23 +534,6 @@ setMethod(
     # push globals onto parameters within each module
     if (length(sim@params$.globals)) {
       sim <- updateParamsFromGlobals(sim)
-      # globalsUsed <- globalsUsedInModules <- NULL
-      # globalsDF <- list()
-      # for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
-      #   common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
-      #   if (length(common)) {
-      #     globalsUsed <- paste(common, sep = ", ")
-      #     globalsUsedInModules <- rep(mod, length(common))
-      #     globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
-      #     sim@params[[mod]][common] <- sim@params$.globals[common]
-      #   }
-      # }
-      # if (!is.null(globalsUsed)) {
-      #   globalsDF <- rbindlist(globalsDF)
-      #   setkeyv(globalsDF, c("global", "module"))
-      #   message("The following .globals were used:")
-      #   reproducible::messageDF(globalsDF)
-      # }
     }
     # From here, capture messaging and prepend it
     withCallingHandlers({
@@ -590,7 +573,8 @@ setMethod(
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
-        loadOrder <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
+        sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
+        loadOrder <- unlist(unname(sim@modules))
       }
 
       mBase <- basename2(unlist(sim@modules))
@@ -1211,8 +1195,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                        quick = getOption("reproducible.quick", FALSE),
                        cachePath = sim@paths$cachePath,
                        classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                            params = sim@params[[mBase]],
-                                            modules = mBase),
+                                           params = sim@params[[mBase]],
+                                           .globals = sim@params[[".globals"]],
+                                           modules = mBase),
                        showSimilar = showSimilar,
                        userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
@@ -1407,6 +1392,7 @@ loadPkgs <- function(reqdPkgs) {
 }
 
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
+  # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
   depsGrDF <- (depsEdgeList(sim, FALSE) %>% .depsPruneEdges())
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
@@ -1451,6 +1437,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         }
         invokeRestart("muffleMessage")
       })
+
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
       list2env(objs(simAltOut), envir(sim))
       loadOrder <- loadOrder[loadOrder != canSafelyRunInit]
@@ -1459,7 +1446,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         sim@events <- append(sim@events, simAltOut@events)
     }
   }
-  loadOrder
+  sim@modules <- sim@modules[match(loadOrder, sim@modules)]
+  sim
 }
 
 updateParamsFromGlobals <- function(sim) {

@@ -142,11 +142,16 @@ setMethod(
       }
     }
 
-    # Sort the params and .list with dots first, to allow Linux and Windows to be compatible
-    if (!is.null(classOptions$params)) if (length(classOptions$params)) {
-      object@params <- list(classOptions$params)
-      names(object@params) <- classOptions$modules
+    if (!is.null(classOptions$.globals)) {# if (length(classOptions$.globals)) {
+      newGlobals <- object@params$.globals
     }
+
+    # Sort the params and .list with dots first, to allow Linux and Windows to be compatible
+    # if (!is.null(classOptions$params)) {#if (length(classOptions$params)) {
+    #   object@params <- list(classOptions$params)
+    #   names(object@params) <- classOptions$modules
+    # }
+
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
@@ -160,6 +165,12 @@ setMethod(
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
+
+    # Deal with globals
+    if (!is.null(classOptions$.globals)) {# if (length(classOptions$.globals)) {
+      object@params <- append(list(.globals = newGlobals), object@params)
+    }
+
 
     nonDotList <- grep(".list|.Data", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
@@ -562,6 +573,9 @@ setMethod(
         # Step 1 -- copy the non-simEnv slots
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
 
+        # This was unnecessary if the parameters never change; but they can
+        simPost@params <- simFromCache@params
+
         # Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
         # objsInPre <- grep("^\\._", objsInPre, value = TRUE, invert = TRUE)
@@ -697,6 +711,8 @@ setMethod(
           #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
         simPost@current <- simFromCache@current
+
+
 
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over
