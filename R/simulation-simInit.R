@@ -570,10 +570,13 @@ setMethod(
       sim@params <- tmp
 
       ## check user-supplied load order & init dependencies
+      sim@.xData$._ranInitDuringSimInit <- FALSE
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
         sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
+        if (length(sim@completed))
+          sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
         loadOrder <- unlist(unname(sim@modules))
       }
 
@@ -606,31 +609,39 @@ setMethod(
       for (m in loadOrder) {
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
-        ## run .inputObjects() for each module
-        if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
-          if (is.character(getOption("spades.covr", FALSE))  ) {
-            mod <- getOption("spades.covr")
-            tf <- tempfile();
-            if (is.null(notOlderThan)) notOlderThan <- "NULL"
-            cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
-                                  '", notOlderThan = ', notOlderThan,')'))
-            # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-            # unlockBinding(mod, sim$.mods)
-            if (length(objects))
-              list2env(objects, envir(sim))
-            sim$.mods[[mod]]$sim <- sim
-            aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
-            sim <- sim$.mods[[mod]]$sim
-            rm(list = "sim", envir = sim$.mods[[mod]])
-            if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
-            .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-          } else {
-            sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
-          }
+        needInitAndInputObjects <- TRUE
+        if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
+          if (m %in% sim@.xData$._ranInitDuringSimInit)
+            needInitAndInputObjects <- FALSE
         }
 
+        ## run .inputObjects() for each module
+        if (needInitAndInputObjects)
+          if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+            if (is.character(getOption("spades.covr", FALSE))  ) {
+              mod <- getOption("spades.covr")
+              tf <- tempfile();
+              if (is.null(notOlderThan)) notOlderThan <- "NULL"
+              cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
+                                    '", notOlderThan = ', notOlderThan,')'))
+              # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+              # unlockBinding(mod, sim$.mods)
+              if (length(objects))
+                list2env(objects, envir(sim))
+              sim$.mods[[mod]]$sim <- sim
+              aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
+              sim <- sim$.mods[[mod]]$sim
+              rm(list = "sim", envir = sim$.mods[[mod]])
+              if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+              .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+            } else {
+              sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+            }
+          }
+
         ## schedule each module's init event:
-        sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+        if (needInitAndInputObjects)
+          sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
 
         ### add module name to the loaded list
         names(m) <- mFullPath
@@ -1403,6 +1414,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   }
 
   loadOrder <- .depsLoadOrder(sim, depsGr)
+  sim@modules <- sim@modules[match(loadOrder, sim@modules)]
 
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
@@ -1413,30 +1425,29 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       safeToRunModules <- paste(canSafelyRunInit, collapse = ", ")
       messageVerbose(crayon::yellow(safeToRunModules), verbose = verbose)
       stripNchars <- getOption("spades.messagingNumCharsModule") - 5
-      stripNcharsSpades <- stripNchars + 7
-      stripNcharsSimInit <- stripNchars + 15
+      stripNcharsSpades <- 2 #stripNchars + 2
+      stripNcharsSimInit <- stripNchars + 5
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs)
-        messageVerbose(paste(rep(" ", stripNcharsSpades), collapse = ""),
-                       crayon::yellow("**** Running spades call for ", safeToRunModules, " ****"), verbose = verbose)
+        messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
         simAltOut <- spades(simAlt, events = "init")
-      },
-      message = function(m) {
-        if (all(!grepl("setDTthreads|Setting:", m$message))) {
-          if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
-              !startsWith(prefix = "The following .globals", m$message)) {
-            if (grepl("simInit:", m$message))
-              stripNchars <- stripNcharsSimInit
-            else
-              stripNchars <- stripNcharsSpades
-          } else {
-            stripNchars <- 0
-          }
-          message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
-        }
-        invokeRestart("muffleMessage")
-      })
+      })#,
+      # message = function(m) {
+      #   if (all(!grepl("setDTthreads|Setting:", m$message))) {
+      #     if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
+      #         !startsWith(prefix = "The following .globals", m$message)) {
+      #       if (grepl("simInit:", m$message))
+      #         stripNchars <- stripNcharsSimInit
+      #       else
+      #         stripNchars <- stripNcharsSpades
+      #     } else {
+      #       stripNchars <- 0
+      #     }
+      #     message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
+      #   }
+      #   invokeRestart("muffleMessage")
+      # })
 
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
       list2env(objs(simAltOut), envir(sim))
@@ -1446,7 +1457,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         sim@events <- append(sim@events, simAltOut@events)
     }
   }
-  sim@modules <- sim@modules[match(loadOrder, sim@modules)]
+  # sim@modules <- sim@modules[match(loadOrder, sim@modules)]
   sim
 }
 

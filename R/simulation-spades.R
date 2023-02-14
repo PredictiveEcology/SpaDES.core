@@ -291,9 +291,16 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           assign(as.character(attr(sim, "completedCounter")), value = cur, envir = sim@completed)
           #sim@completed[[as.character(attr(sim, "completedCounter"))]] <- cur
         } else {
-          attr(sim, "completedCounter") <- 1
-          attr(sim, "completedSize") <- 2
-          sim@completed[["1"]] <- cur
+          if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
+            cc <- NROW(sim@completed) + 1
+            cs <- cc * 2
+          } else {
+            cc <- 1
+            cs <- 2
+          }
+          attr(sim, "completedCounter") <- cc
+          attr(sim, "completedSize") <- cs
+          sim@completed[[as.character(cc)]] <- cur
         }
       }
 
@@ -1130,12 +1137,14 @@ setMethod(
       if (length(sim@completed)) {
         existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
         prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
-        prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
-        if (length(.grepSysCalls(sys.calls(), "restartSpades")) == 0)
-          if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]] &&
-              (time(sim, unit = attr(prevStart[["eventTime"]], "unit")) ==
-               start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
+        # prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
+        if (length(.grepSysCalls(sys.calls(), "restartSpades")) == 0 &&
+            sim@.xData$._ranInitDuringSimInit %in% FALSE) { # don't crop off completed events if Init(s) ran during simInit
+          prevEvUnit <- attr(prevStart[["eventTime"]], "unit")
+          stTime <- start(sim, unit = prevEvUnit)
+          if (stTime <= prevStart[["eventTime"]] && (time(sim, unit = prevEvUnit) == stTime))
             sim@completed <- new.env(parent = emptyenv())
+        }
       }
 
       if (recoverMode > 0) {
@@ -1899,9 +1908,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   }
   prependTime <- strftime(st, format = stForm2)
   if (grepl(prependTime, mess)) { # spades or simInit inside a spades or simInit
-    browser()
     prependTime <- " -- "
-
   } else {
     if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
     if (!is.null(suffix))
@@ -1910,9 +1917,8 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
       modName8Chars <- paste0(prefix, modName8Chars)
 
     mess <- paste0(modName8Chars, mess)
-    mess <- gsub("\\n", "", mess)
-
   }
+  mess <- gsub("\\n", "", mess)
   paste0(prependTime, mess)
 }
 
