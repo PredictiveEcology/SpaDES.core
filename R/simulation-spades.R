@@ -1079,7 +1079,7 @@ setMethod(
         if (is.null(.plotInitialTime) && !any(.plots %in% "screen"))
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_integer_, ".plotInitialTime",
-            needClass = "numeric")
+            needClass = "integer")
         if (!is.null(.plotInitialTime)) {
           message("Both .plots and .plotInitialTime are supplied; using .plots")
         }
