@@ -1449,6 +1449,12 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       #   invokeRestart("muffleMessage")
       # })
 
+      Map(mod = canSafelyRunInit, function(mod) {
+        objEnv <- simAltOut$.mods[[mod]]$.objects
+        objsNames <- ls(objEnv, all.names = TRUE)
+        objs <- mget(objsNames, objEnv)
+        list2env(objs, sim$.mods[[mod]]$.objects)
+      })
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
       list2env(objs(simAltOut), envir(sim))
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
