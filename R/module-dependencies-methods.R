@@ -57,7 +57,11 @@ setMethod("depsEdgeList",
   lapply(deps@dependencies, function(x) {
     if (!is.null(x)) {
       z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
+      if (NROW(z.in) == 0)
+        z.in <- as.data.table(list(objectName = ".dummyIn", objectClass = NA))
       z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
+      if (NROW(z.out) == 0)
+        z.in <- as.data.table(list(objectName = ".dummyOut", objectClass = NA))
       z.in$module <- z.out$module <- x@name
       if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
         sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
@@ -245,6 +249,10 @@ setMethod(".depsLoadOrder",
           definition = function(sim, simGraph) {
             # only works if simGraph is acyclic!
             tsort <- topo_sort(simGraph, "out")
+
+            el <- depsEdgeList(sim, FALSE)
+            depsGrDF <- (el %>% .depsPruneEdges())
+
             if (length(tsort)) {
               loadOrder <- names(simGraph[[tsort, ]]) %>% .[!(. %in% "_INPUT_" )]
             } else {
@@ -255,6 +263,11 @@ setMethod(".depsLoadOrder",
                 loadOrder <- character()
               }
             }
+
+            doFirst <- loadOrder[loadOrder %in% setdiff(unique(c(depsGrDF$from, depsGrDF$to)), "_INPUT_")]
+            doSecond <- setdiff(loadOrder, doFirst)
+            loadOrder <- c(doFirst, doSecond)
+
             # make sure modules with no deps get added
             if (!all(sim@modules %in% loadOrder)) {
               ids <- which(sim@modules %in% loadOrder)
