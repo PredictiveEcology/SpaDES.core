@@ -26,6 +26,7 @@ moduleDefaults <- list(
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
+  loadOrder = list(after = NULL, before = NULL),
   reqdPkgs = list("ggplot2", "raster")
 )
 
@@ -171,7 +172,8 @@ setMethod(
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
 
-    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation")
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation",
+                     "loadOrder")
     if (!all(metadataProvided)) {
       # inputObjects and outputObjects are dealt with differently in parseModule
       #   don't trigger a warning here.

@@ -94,6 +94,14 @@ setMethod("._outputObjectsDF",
 #'
 #' @slot documentation  List of filenames referring to module documentation sources.
 #'
+#' @slot loadOrder      An optional list of up to 2 named character vectors, named
+#'                      "before" and "after". If specified, then SpaDES.core will
+#'                      use this information to help disentangle ambiguous module
+#'                      load order estimation. Any module that is specified
+#'                      in the "before" element will have its "init" event scheduled
+#'                      before this module; any module specified in the "after"
+#'                      element will have its "init" event scheduled after this module.
+#'
 #' @slot reqdPkgs       Character vector of R package names to be loaded.
 #'                      Defaults to `NA_character_`.
 #'
@@ -130,14 +138,15 @@ setClass(
     name = "character", description = "character", keywords = "character",
     childModules = "character", authors = "person", version = "numeric_version",
     spatialExtent = "Extent", timeframe = "POSIXt", timeunit = "ANY",
-    citation = "list", documentation = "list", reqdPkgs = "list",
+    citation = "list", documentation = "list", loadOrder = "list", reqdPkgs = "list",
     parameters = "data.frame", inputObjects = "data.frame", outputObjects = "data.frame"
   ),
   prototype = list(
     name = character(0), description = character(0), keywords = character(0),
     childModules = character(0), authors = person(), version = numeric_version("0.0.0"),
     spatialExtent = extent(rep(NA_real_, 4L)), timeframe = as.POSIXlt(c(NA, NA)),
-    timeunit = NA_real_, citation = list(), documentation = list(), reqdPkgs = list(),
+    timeunit = NA_real_, citation = list(), documentation = list(),
+    loadOrder = list(), reqdPkgs = list(),
     parameters = data.frame(
       paramName = character(0), paramClass = character(0),
       default = I(list()), min = I(list()), max = I(list()),
@@ -153,6 +162,7 @@ setClass(
     if (length(object@authors) < 1L) stop("authors must be specified.")
     if (length(object@timeframe) != 2L) stop("timeframe must be specified using two date-times.")
     if (length(object@timeunit) < 1L) stop("timeunit must be specified.")
+    # if (length(object@loadOrder) < 1L) stop("loadOrder must be specified.") # optional
     if (length(object@reqdPkgs)) {
       if (!any(unlist(lapply(object@reqdPkgs, is.character)))) {
         stop("reqdPkgs must be specified as a list of package names.")

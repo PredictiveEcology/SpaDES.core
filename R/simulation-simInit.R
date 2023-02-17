@@ -570,7 +570,7 @@ setMethod(
       sim@params <- tmp
 
       ## check user-supplied load order & init dependencies
-      sim@.xData$._ranInitDuringSimInit <- FALSE
+      sim@.xData$._ranInitDuringSimInit <- character()
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
@@ -610,7 +610,7 @@ setMethod(
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
         needInitAndInputObjects <- TRUE
-        if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
+        if (length(sim@.xData$._ranInitDuringSimInit)) {
           if (m %in% sim@.xData$._ranInitDuringSimInit)
             needInitAndInputObjects <- FALSE
         }
