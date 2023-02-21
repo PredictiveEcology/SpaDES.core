@@ -104,4 +104,7 @@ setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 # use Require and reqdPkgs
 pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 }
+# findObjects
+path <- system.file("sampleModules", package = "SpaDES.core")
+findObjects(path = path, module = dir(path), objects = "caribou")
 }

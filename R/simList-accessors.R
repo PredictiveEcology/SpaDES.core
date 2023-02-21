@@ -3185,9 +3185,12 @@ moduleObjects <- function(sim, module, path) {
     b <- rbindlist(outputObjects(sim = sim), idcol = "module", fill = TRUE)
   }
   set(a, NULL, "type", "input")
-  set(a, NULL, "sourceURL", NULL)
+  srcURL <- "sourceURL"
+  if (srcURL %in% colnames(a))
+    set(a, NULL, "sourceURL", NULL)
   set(b, NULL, "type", "output")
-  set(b, NULL, "sourceURL", NULL)
+  if (srcURL %in% colnames(b))
+    set(b, NULL, "sourceURL", NULL)
   d <- rbindlist(list(a, b), use.names = TRUE, fill = TRUE)
   data.table::setcolorder(d, neworder = c("objectName", "module", "type"))
   d[]
@@ -3196,6 +3199,10 @@ moduleObjects <- function(sim, module, path) {
 #' @export
 #' @rdname simList-accessors-metadata
 #' @importFrom data.table set rbindlist
+#' @examples
+#' # findObjects
+#' path <- system.file("sampleModules", package = "SpaDES.core")
+#' findObjects(path = path, module = dir(path), objects = "caribou")
 findObjects <- function(sim, module, path, objects) {
   mo <- moduleObjects(sim, module, path)
   mo[grep(paste(objects, collapse = "|"), objectName), ]
