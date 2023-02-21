@@ -574,7 +574,10 @@ setMethod(
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
 
         # This was unnecessary if the parameters never change; but they can
-        simPost@params <- simFromCache@params
+        #  -- but draw from Cache only from this module -- other modules may have
+        #     changed during this simInit/spades call --> don't want their cached copies
+        simPost@params[currModules] <- simFromCache@params[currModules]
+        # simPost@params <- simFromCache@params
 
         # Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
