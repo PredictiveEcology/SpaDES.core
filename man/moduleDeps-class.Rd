@@ -43,6 +43,14 @@ Defaults to \code{NA_character_}.}
 
 \item{\code{documentation}}{List of filenames referring to module documentation sources.}
 
+\item{\code{loadOrder}}{An optional list of up to 2 named character vectors, named
+"before" and "after". If specified, then SpaDES.core will
+use this information to help disentangle ambiguous module
+load order estimation. Any module that is specified
+in the "before" element will have its "init" event scheduled
+before this module; any module specified in the "after"
+element will have its "init" event scheduled after this module.}
+
 \item{\code{reqdPkgs}}{Character vector of R package names to be loaded.
 Defaults to \code{NA_character_}.}
 
