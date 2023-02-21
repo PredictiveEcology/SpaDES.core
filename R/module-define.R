@@ -172,7 +172,8 @@ setMethod(
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
 
-    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation")
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation",
+                     "loadOrder")
     if (!all(metadataProvided)) {
       # inputObjects and outputObjects are dealt with differently in parseModule
       #   don't trigger a warning here.

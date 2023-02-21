@@ -94,8 +94,15 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("s" %in% forms$where) {
-    match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
-
+    out <- match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
+    # check not in because it is just declared as a objectSynonym
+    if (isTRUE(out)) {
+      if (!is.null(sim$objectSynonyms)) {
+        if (is.null(sim[[objDeparsed]]) && (objDeparsed %in% unlist(sim$objectSynonyms)))
+          out <- FALSE
+      }
+    }
+    out
   } else {
     FALSE
   }

@@ -570,7 +570,7 @@ setMethod(
       sim@params <- tmp
 
       ## check user-supplied load order & init dependencies
-      sim@.xData$._ranInitDuringSimInit <- FALSE
+      sim@.xData$._ranInitDuringSimInit <- character()
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
@@ -610,7 +610,7 @@ setMethod(
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
         needInitAndInputObjects <- TRUE
-        if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
+        if (length(sim@.xData$._ranInitDuringSimInit)) {
           if (m %in% sim@.xData$._ranInitDuringSimInit)
             needInitAndInputObjects <- FALSE
         }
@@ -1155,6 +1155,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       }
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
+
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1402,6 +1403,7 @@ loadPkgs <- function(reqdPkgs) {
 
 }
 
+#' @importFrom quickPlot whereInStack
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
@@ -1427,11 +1429,18 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       stripNchars <- getOption("spades.messagingNumCharsModule") - 5
       stripNcharsSpades <- 2 #stripNchars + 2
       stripNcharsSimInit <- stripNchars + 5
+      hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+      debug <- getOption("spades.debug")
+      if (!isFALSE(hasDebug)) {
+        newDebug <- try(get("debug", hasDebug), silent = TRUE)
+        if (!is(newDebug, "try-error"))
+          debug <- newDebug
+      }
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs)
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
-        simAltOut <- spades(simAlt, events = "init")
+        simAltOut <- spades(simAlt, events = "init", debug = debug)
       })#,
       # message = function(m) {
       #   if (all(!grepl("setDTthreads|Setting:", m$message))) {
@@ -1449,9 +1458,15 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       #   invokeRestart("muffleMessage")
       # })
 
+      Map(mod = canSafelyRunInit, function(mod) {
+        objEnv <- simAltOut$.mods[[mod]]$.objects
+        objsNames <- ls(objEnv, all.names = TRUE)
+        objs <- mget(objsNames, objEnv)
+        list2env(objs, sim$.mods[[mod]]$.objects)
+      })
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
       list2env(objs(simAltOut), envir(sim))
-      loadOrder <- loadOrder[loadOrder != canSafelyRunInit]
+      loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
       list2env(as.list(simAltOut@completed), sim@completed)
       if (length(simAltOut@events))
         sim@events <- append(sim@events, simAltOut@events)
