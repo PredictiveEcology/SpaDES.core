@@ -3171,3 +3171,32 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 }
 
 .knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")
+
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @importFrom data.table set rbindlist setcolorder
+moduleObjects <- function(sim, module, path) {
+  if (missing(sim)) {
+    a <- rbindlist(inputObjects(module = module, path = path), idcol = "module")
+    b <- rbindlist(outputObjects(module = module, path = path), idcol = "module", fill = TRUE)
+  } else {
+    a <- rbindlist(inputObjects(sim = sim), idcol = "module")
+    b <- rbindlist(outputObjects(sim = sim), idcol = "module", fill = TRUE)
+  }
+  set(a, NULL, "type", "input")
+  set(a, NULL, "sourceURL", NULL)
+  set(b, NULL, "type", "output")
+  set(b, NULL, "sourceURL", NULL)
+  d <- rbindlist(list(a, b), use.names = TRUE, fill = TRUE)
+  data.table::setcolorder(d, neworder = c("objectName", "module", "type"))
+  d[]
+}
+
+#' @export
+#' @rdname simList-accessors-metadata
+#' @importFrom data.table set rbindlist
+findObjects <- function(sim, module, path, objects) {
+  mo <- moduleObjects(sim, module, path)
+  mo[grep(paste(objects, collapse = "|"), objectName), ]
+}

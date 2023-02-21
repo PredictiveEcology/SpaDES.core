@@ -5,7 +5,7 @@
 \alias{moduleDefaults}
 \title{Defaults values used in \code{defineModule}}
 \format{
-An object of class \code{list} of length 12.
+An object of class \code{list} of length 13.
 }
 \usage{
 moduleDefaults
