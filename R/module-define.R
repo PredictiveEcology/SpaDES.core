@@ -26,6 +26,7 @@ moduleDefaults <- list(
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
+  loadOrder = list(after = NULL, before = NULL),
   reqdPkgs = list("ggplot2", "raster")
 )
 
