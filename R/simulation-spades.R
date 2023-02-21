@@ -1382,7 +1382,6 @@ setMethod(
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
-    #fnEnv[[moduleCall]](sim, cur[["eventTime"]], cur[["eventType"]])
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
   # Test for memory leaks
@@ -1777,6 +1776,8 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
+  if (!debug %in% 1:2)
+    debug <- append(list(1L), debug)
   for (i in seq_along(debug)) {
     if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
       if (length(cur) > 0) {
@@ -1806,10 +1807,10 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
           outMess <- paste(unname(evnts1), collapse = ' ')
         }
       }
-    } else if (identical(debug[[i]], 1)) {
+    } else if (isTRUE(debug[[i]] %in% 1)) {
       outMess <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
-    } else if (identical(debug[[i]], 2)) {
+    } else if (isTRUE(debug[[i]] %in% 2)) {
       compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                          attr(sim, "completedCounter") == 1) {
         sim@.xData$._startClockTime
@@ -1835,10 +1836,13 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
         }
       } else if (!any(debug[[i]] %in% c("browser"))) { # any other
         if (!is.function(debug[[i]])) {
-          outMess <- try(do.call(debug[[i]], list(sim)))
+          outMess <- tryCatch(do.call(debug[[i]], list(sim)), silent = TRUE,
+                              error = function(e) NULL)
         } else  {
           outMess <- try(debug[[i]](sim))
         }
+      } else {
+        outMess <- NULL
       }
     }
     if (is.data.frame(outMess)) {
