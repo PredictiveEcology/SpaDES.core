@@ -1155,6 +1155,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       }
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
+
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1402,6 +1403,7 @@ loadPkgs <- function(reqdPkgs) {
 
 }
 
+#' @importFrom quickPlot whereInStack
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
@@ -1427,11 +1429,18 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       stripNchars <- getOption("spades.messagingNumCharsModule") - 5
       stripNcharsSpades <- 2 #stripNchars + 2
       stripNcharsSimInit <- stripNchars + 5
+      hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+      debug <- getOption("spades.debug")
+      if (!isFALSE(hasDebug)) {
+        newDebug <- try(get("debug", hasDebug), silent = TRUE)
+        if (!is(newDebug, "try-error"))
+          debug <- newDebug
+      }
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs)
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
-        simAltOut <- spades(simAlt, events = "init")
+        simAltOut <- spades(simAlt, events = "init", debug = debug)
       })#,
       # message = function(m) {
       #   if (all(!grepl("setDTthreads|Setting:", m$message))) {
