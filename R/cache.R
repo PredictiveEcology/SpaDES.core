@@ -576,7 +576,14 @@ setMethod(
         # This was unnecessary if the parameters never change; but they can
         #  -- but draw from Cache only from this module -- other modules may have
         #     changed during this simInit/spades call --> don't want their cached copies
+        #   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
+        #   cached copy of other modules
         simPost@params[currModules] <- simFromCache@params[currModules]
+        anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
+        if (length(anyNewGlobals)) {
+          suppressMessages(
+            simPost@params <- updateParamsSlotFromGlobals(simFromCache@params))
+        }
         # simPost@params <- simFromCache@params
 
         # Step 2 -- copy the objects that are in simPre to simPost
@@ -659,7 +666,6 @@ setMethod(
         # Deal with .mods objects
         if (!is.null(simFromCache@.xData$.mods)) {
           # These are the unchanged objects
-          # browser()
           for (modNam in currModules) {
             objs <-
               setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T), changedModEnvObjs[[modNam]]$.objects)
