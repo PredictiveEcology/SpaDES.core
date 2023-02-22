@@ -3175,14 +3175,22 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
 #' @export
 #' @rdname simList-accessors-metadata
+#' @return
+#' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
+#' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
+#' will be determined either from a `simList` or from the module source code.
 #' @importFrom data.table set rbindlist setcolorder
 moduleObjects <- function(sim, module, path) {
   if (missing(sim)) {
     a <- rbindlist(inputObjects(module = module, path = path), idcol = "module")
     b <- rbindlist(outputObjects(module = module, path = path), idcol = "module", fill = TRUE)
   } else {
-    a <- rbindlist(inputObjects(sim = sim), idcol = "module")
-    b <- rbindlist(outputObjects(sim = sim), idcol = "module", fill = TRUE)
+    if (missing(module))
+      module <- modules(sim)
+    if (missing(path))
+      path <- modulePath(sim)
+    a <- rbindlist(inputObjects(module = module, path = path), fill = TRUE)
+    b <- rbindlist(outputObjects(module = module, path = path), fill = TRUE)
   }
   set(a, NULL, "type", "input")
   srcURL <- "sourceURL"
@@ -3198,6 +3206,9 @@ moduleObjects <- function(sim, module, path) {
 
 #' @export
 #' @rdname simList-accessors-metadata
+#' @return
+#' `findObjects` returns a data.table similar to `moduleObjects`, but with only the
+#' objects provided by `objects`.
 #' @importFrom data.table set rbindlist
 #' @examples
 #' # findObjects
