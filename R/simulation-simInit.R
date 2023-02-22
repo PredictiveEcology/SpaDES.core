@@ -1477,15 +1477,20 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 }
 
 updateParamsFromGlobals <- function(sim) {
+  sim@params <- updateParamsSlotFromGlobals(sim@params)
+  sim
+}
+
+updateParamsSlotFromGlobals <- function(params) {
   globalsUsed <- globalsUsedInModules <- NULL
   globalsDF <- list()
-  for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
-    common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
+  for (mod in ls(params)) { # don't include the dot params; just non hidden
+    common <- intersect(names(params[[mod]]), names(params$.globals))
     if (length(common)) {
       globalsUsed <- paste(common, sep = ", ")
       globalsUsedInModules <- rep(mod, length(common))
       globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
-      sim@params[[mod]][common] <- sim@params$.globals[common]
+      params[[mod]][common] <- params$.globals[common]
     }
   }
   if (!is.null(globalsUsed)) {
@@ -1494,5 +1499,5 @@ updateParamsFromGlobals <- function(sim) {
     message("The following .globals were used:")
     reproducible::messageDF(globalsDF)
   }
-  sim
+  params
 }
