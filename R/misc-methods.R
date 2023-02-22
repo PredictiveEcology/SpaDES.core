@@ -638,6 +638,7 @@ moduleCodeFiles <- function(paths, modules) {
 #'   `"all"` which will compare against all other modules.
 #' @param ifSetButDifferent A character string indicating whether to `"error"` the default,
 #'   or send a `"warning"`, `message` or just silently continue (any other value).
+#' @param verbose Logical or Numeric, follows `reproducible.verbose` value by default.
 #'
 #' @return If the value of the `paramToCheck` in the current module is either `NULL` or
 #' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
@@ -648,7 +649,8 @@ moduleCodeFiles <- function(paths, modules) {
 #' @export
 #' @rdname paramCheckOtherMods
 paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
-                                ifSetButDifferent = c("error", "warning", "message", "silent")) {
+                                ifSetButDifferent = c("error", "warning", "message", "silent"),
+                                verbose = getOption("reproducible.verbose")) {
   currentModule <- currentModule(sim)
   paramsInSim <- params(sim)
   paramInCurrentMod <- P(sim)[[paramToCheck]]
