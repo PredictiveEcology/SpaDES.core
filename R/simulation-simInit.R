@@ -1481,16 +1481,21 @@ updateParamsFromGlobals <- function(sim) {
   sim
 }
 
-updateParamsSlotFromGlobals <- function(params) {
+updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
+  if (missing(paramsWithUpdates)) {
+    paramsWithUpdates <- paramsOrig
+  }
   globalsUsed <- globalsUsedInModules <- NULL
   globalsDF <- list()
-  for (mod in ls(params)) { # don't include the dot params; just non hidden
-    common <- intersect(names(params[[mod]]), names(params$.globals))
+  for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
+    modParams <- names(paramsOrig[[mod]])
+    modParams <- union(modParams, .knownDotParams)
+    common <- intersect(modParams, names(paramsWithUpdates$.globals))
     if (length(common)) {
       globalsUsed <- paste(common, sep = ", ")
       globalsUsedInModules <- rep(mod, length(common))
       globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
-      params[[mod]][common] <- params$.globals[common]
+      paramsOrig[[mod]][common] <- paramsWithUpdates$.globals[common]
     }
   }
   if (!is.null(globalsUsed)) {
@@ -1499,5 +1504,5 @@ updateParamsSlotFromGlobals <- function(params) {
     message("The following .globals were used:")
     reproducible::messageDF(globalsDF)
   }
-  params
+  paramsOrig
 }

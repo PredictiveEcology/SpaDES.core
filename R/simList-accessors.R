@@ -3181,16 +3181,45 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #' will be determined either from a `simList` or from the module source code.
 #' @importFrom data.table set rbindlist setcolorder
 moduleObjects <- function(sim, module, path) {
+  sim <- NULL # can't set `sim = NULL` because `whereInStack`
   if (missing(sim)) {
-    a <- rbindlist(inputObjects(module = module, path = path), idcol = "module")
-    b <- rbindlist(outputObjects(module = module, path = path), idcol = "module", fill = TRUE)
-  } else {
+    if (missing(module)) {
+      for (i in seq(length(sys.frames()))[-1]) {
+        simTry <- suppressWarnings(try(get("sim", whereInStack("sim", whFrame = -i)), silent = TRUE))
+        if (!is(simTry, "try-error")) {
+          sim <- simTry
+          break
+        }
+      }
+    }
+  }
+
+  if (!is.null(sim)) {
+    path <- modulePath(sim)
     if (missing(module))
       module <- modules(sim)
-    if (missing(path))
-      path <- modulePath(sim)
-    a <- rbindlist(inputObjects(module = module, path = path), fill = TRUE)
-    b <- rbindlist(outputObjects(module = module, path = path), fill = TRUE)
+    a <- Map(nam = unlist(unname(module)),
+        mod = module, function(mod, nam) inputObjects(sim, module = mod))
+    b <- Map(nam = unlist(unname(module)),
+             mod = module, function(mod, nam) inputObjects(sim, module = mod))
+    a <- rbindlist(a, idcol = "module", fill = TRUE)
+    b <- rbindlist(b, idcol = "module", fill = TRUE)
+  } else {
+    if (missing(path)) {
+      path <- getOption("spades.modulePath")
+    }
+    if (missing(module)) {
+      module <- dir(path)
+    }
+    a <- Map(nam = unlist(unname(module)), pat = path,
+             mod = module, function(mod, nam, pat)
+               inputObjects(module = mod, path = pat)[[1]])
+    b <- Map(nam = unlist(unname(module)), pat = path,
+             mod = module, function(mod, nam, pat)
+               outputObjects(module = mod, path = pat)[[1]])
+
+    a <- rbindlist(a, fill = TRUE, use.names = TRUE, idcol = "module")
+    b <- rbindlist(b, fill = TRUE, use.names = TRUE, idcol = "module")
   }
   set(a, NULL, "type", "input")
   srcURL <- "sourceURL"
@@ -3214,7 +3243,7 @@ moduleObjects <- function(sim, module, path) {
 #' # findObjects
 #' path <- system.file("sampleModules", package = "SpaDES.core")
 #' findObjects(path = path, module = dir(path), objects = "caribou")
-findObjects <- function(sim, module, path, objects) {
+findObjects <- function(objects, sim, module, path) {
   mo <- moduleObjects(sim, module, path)
   mo[grep(paste(objects, collapse = "|"), objectName), ]
 }

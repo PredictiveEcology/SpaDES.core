@@ -1776,7 +1776,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
-  if (!debug %in% 1:2)
+  if (!any(vapply(debug, function(x) x %in% 1:2, FUN.VALUE = logical(1))))
     debug <- append(list(1L), debug)
   for (i in seq_along(debug)) {
     if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {

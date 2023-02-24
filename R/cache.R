@@ -580,9 +580,12 @@ setMethod(
         #   cached copy of other modules
         simPost@params[currModules] <- simFromCache@params[currModules]
         anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
+
+        # if ("TriSect_SpringPredator" %in% current(simPost)$moduleName)
+        #  browser()
         if (length(anyNewGlobals)) {
           suppressMessages(
-            simPost@params <- updateParamsSlotFromGlobals(simFromCache@params))
+            simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
         }
         # simPost@params <- simFromCache@params
 
