@@ -261,11 +261,11 @@ setMethod(".depsLoadOrder",
                 Map(lo = loadOrdersInMetaData, nam = names(loadOrdersInMetaData),
                     function(lo, nam) {
                       lapply(lo[["after"]], function(aft) {
-                        a <- setDT(list(from = aft, to = nam, objName = Require:::.rndstr(1)))
+                        a <- setDT(list(from = aft, to = nam, objName = .rndstr(1)))
                         dt <<- rbindlist(list(dt, a), fill = TRUE)
                       })
                       lapply(lo[["before"]], function(bef) {
-                        a <- setDT(list(from = nam, to = bef, objName = Require:::.rndstr(1)))
+                        a <- setDT(list(from = nam, to = bef, objName = .rndstr(1)))
                         dt <<- rbindlist(list(dt, a), fill = TRUE)
                       })
                     })
@@ -337,3 +337,10 @@ setMethod(".depsLoadOrder",
             }
             return(loadOrder)
 })
+
+.rndstr <- function (n = 1, len = 8) {
+  unlist(lapply(character(n), function(x) {
+    x <- paste0(sample(c(0:9, letters, LETTERS), size = len,
+                       replace = TRUE), collapse = "")
+  }))
+}
