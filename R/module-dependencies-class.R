@@ -146,7 +146,7 @@ setClass(
     childModules = character(0), authors = person(), version = numeric_version("0.0.0"),
     spatialExtent = extent(rep(NA_real_, 4L)), timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = NA_real_, citation = list(), documentation = list(),
-    loadOrder = list(), reqdPkgs = list(),
+    loadOrder = list(after = NULL, before = NULL), reqdPkgs = list(),
     parameters = data.frame(
       paramName = character(0), paramClass = character(0),
       default = I(list()), min = I(list()), max = I(list()),
