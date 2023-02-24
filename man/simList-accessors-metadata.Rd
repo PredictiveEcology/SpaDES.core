@@ -62,7 +62,7 @@ sessInfo(sim)
 
 moduleObjects(sim, module, path)
 
-findObjects(sim, module, path, objects)
+findObjects(objects, sim, module, path)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or

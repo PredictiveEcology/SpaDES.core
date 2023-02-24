@@ -3235,6 +3235,10 @@ moduleObjects <- function(sim, module, path) {
 
 #' @export
 #' @rdname simList-accessors-metadata
+#' @params objects A character vector of length >= 1 with name(s) of objects to look
+#'   for in the metadata. This is used in a `grep`, meaning it will do partial
+#'   matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
+#'   use `regexp`.
 #' @return
 #' `findObjects` returns a data.table similar to `moduleObjects`, but with only the
 #' objects provided by `objects`.
