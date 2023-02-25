@@ -1487,9 +1487,10 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
   }
   globalsUsed <- globalsUsedInModules <- NULL
   globalsDF <- list()
+  knownParamsWOdotPlotInitialTime <- setdiff(.knownDotParams, ".plotInitialTime")
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
     modParams <- names(paramsOrig[[mod]])
-    modParams <- union(modParams, .knownDotParams)
+    modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
     if (length(common)) {
       globalsUsed <- paste(common, sep = ", ")
