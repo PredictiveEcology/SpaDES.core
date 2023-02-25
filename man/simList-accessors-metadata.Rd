@@ -92,6 +92,11 @@ a \code{simList} or a character string for a package name.}
     \file{CITATION} file is used if it exists, or an object of class
     \code{"\link[utils]{packageDescription}"} with package metadata (see
     below).}
+
+\item{objects}{A character vector of length >= 1 with name(s) of objects to look
+for in the metadata. This is used in a \code{grep}, meaning it will do partial
+matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
+use \code{regexp}.}
 }
 \value{
 \code{moduleObjects} returns a data.table with 4 columns, \code{module}, \code{objectName}, \code{type}, and \code{desc},
