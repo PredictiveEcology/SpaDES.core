@@ -183,6 +183,10 @@ setMethod(
 
         # check user params
         userParams <- params[[uM]][-which(names(params[[uM]]) %in% coreParams)]
+        anyKnown <- names(userParams) %in% .knownDotParams
+        if (any(anyKnown %in% TRUE)) {
+          userParams <- userParams[!anyKnown]
+        }
         collapsedSrc <- paste(readFile[[uM]], collapse = "");
         isInCode <- sapply(names(userParams), function(pp) grepl(pp, collapsedSrc, fixed = TRUE))
         if (any(!isInCode)) {
@@ -191,17 +195,6 @@ setMethod(
             message(paste("Parameter", uP, "is not used in module", uM)))
         }
 
-        #
-        # #if (length(userParams) > 0) {
-        #   for (i in seq(userParams)) {
-        #     uP <- names(userParams[i])
-        #     result <- grep(uP, readFile[[uM]], value = FALSE, fixed = TRUE)
-        #     if (length(result) <= 0) {
-        #       allFound <- FALSE
-        #       message(paste("Parameter", uP, "is not used in module", uM))
-        #     }
-        #   }
-        # #}
       }
 
       globalsFound <- unique(globalsFound)
