@@ -128,23 +128,15 @@
 #'
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
-                  types = params(sim)[[currentModule(sim)]]$.plots,
-                  path = file.path(outputPath(sim), "figures"),
-                  .plotInitialTime = params(sim)[[currentModule(sim)]]$.plotInitialTime,
+                  types = quote(params(sim)[[currentModule(sim)]]$.plots),
+                  path = quote(file.path(outputPath(sim), "figures")),
+                  .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
                   deviceArgs = list(),
                   ...) {
 
-  typesSub <- substitute(types)
-  pathSub <- substitute(path)
-  .plotInitialTimeSub <- substitute(.plotInitialTime)
-
   simIsIn <- NULL
-  typesHasSim <- any(grepl("\\<sim\\>", typesSub))
-  pathHasSim <- any(grepl("\\<sim\\>", pathSub))
-  .plotInitialTimeHasSim <- any(grepl("\\<sim\\>", .plotInitialTimeSub))
-  if (typesHasSim || pathHasSim || .plotInitialTimeHasSim) {
-  # if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
+  if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
       simIsIn <- try(whereInStack("sim"), silent = TRUE)
@@ -163,15 +155,9 @@ Plots <- function(data, fn, filename,
       .plotInitialTime <- 0L
   }
 
-  if (!is.null(simIsIn)) {
-    if (typesHasSim)
-      types <- eval(typesSub, envir = simIsIn)
-    if (pathHasSim)
-      path <- eval(pathSub, envir = simIsIn)
-    if (.plotInitialTimeHasSim)
-      .plotInitialTime <- eval(.plotInitialTimeSub, envir = simIsIn)
-  }
-
+  if (!is.null(simIsIn))
+    if (is(types, "call"))
+      types <- eval(types, envir = simIsIn)
   if (is(types, "list"))
     types <- unlist(types)
 
@@ -263,7 +249,6 @@ Plots <- function(data, fn, filename,
         }
       }
 
-      browser()
       gg <- fn(ggListToScreen, ...)
       .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
       qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)

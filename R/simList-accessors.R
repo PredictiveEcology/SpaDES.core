@@ -3181,18 +3181,19 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #' will be determined either from a `simList` or from the module source code.
 #' @importFrom data.table set rbindlist setcolorder
 moduleObjects <- function(sim, module, path) {
-  sim <- NULL # can't set `sim = NULL` because `whereInStack`
+  simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      for (i in seq(length(sys.frames()))[-1]) {
+      for (i in seq(length(sys.frames()))[-1]) { # don't start in this environment; not here
         simTry <- suppressWarnings(try(get("sim", whereInStack("sim", whFrame = -i)), silent = TRUE))
         if (!is(simTry, "try-error")) {
-          sim <- simTry
           break
         }
       }
     }
   }
+
+  sim <- simTry
 
   if (!is.null(sim)) {
     path <- modulePath(sim)
@@ -3235,7 +3236,7 @@ moduleObjects <- function(sim, module, path) {
 
 #' @export
 #' @rdname simList-accessors-metadata
-#' @params objects A character vector of length >= 1 with name(s) of objects to look
+#' @param objects A character vector of length >= 1 with name(s) of objects to look
 #'   for in the metadata. This is used in a `grep`, meaning it will do partial
 #'   matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
 #'   use `regexp`.
