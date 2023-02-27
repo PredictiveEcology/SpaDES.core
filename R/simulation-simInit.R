@@ -397,6 +397,7 @@ setMethod(
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
+    adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
     # Check that modules exist in paths$modulePath
     modulePaths <- .checkModuleDirsAndFiles(modules = modules, modulePath = sim@paths$modulePath)
@@ -1156,6 +1157,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
 
+      if ("newObjects" %in% unlist(getOption("spades.debug")))
+        objsIsNullBefore <- objsAreNull(sim)
+
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1222,6 +1226,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           sim <- .inputObjects(sim)
         }
       }
+      if ("newObjects" %in% unlist(getOption("spades.debug")))
+        objectsCreatedPost(sim, objsIsNullBefore)
+
     }
   } else {
     message("All required input Objects provided; skipping .inputObjects")
@@ -1506,4 +1513,38 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
     reproducible::messageDF(globalsDF)
   }
   paramsOrig
+}
+
+
+objectsCreatedPost <- function(sim, objsIsNullBefore) {
+  objsIsNullAfter <- objsAreNull(sim)
+  newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
+  if (length(newObjs)) {
+    df <- data.frame(`New objects created:` = names(newObjs))
+    reproducible:::messageColoured("New objects created:", colour = "yellow")
+    messageDF(df, colour = "yellow", colnames = FALSE)
+  }
+}
+
+objsAreNull <- function(sim) {
+  mapply(obj = mget(grep("._|.mods|.parsedFiles|.userSuppliedObjNames",
+                         ls(sim, all.names = TRUE), invert = TRUE,
+                         value = TRUE), envir = envir(sim)),
+         function(obj) is.null(obj))
+}
+
+
+adjustModuleNameSpacing <- function(modNames) {
+  nchar <- getOption("spades.messagingNumCharsModule") - loggingMessagePrefixLength
+  for(i in seq(nchar, max(nchar(modNames)))) {
+    modName8Chars <- mapply(modName = unname(modNames),
+                            MoreArgs = list(ncm = i),
+                            function(modName, ncm)
+                              moduleNameStripped(modName, numCharsMax = ncm)
+    )
+    if (all(!duplicated(modName8Chars))) {
+      options("spades.messagingNumCharsModule" = i + loggingMessagePrefixLength)
+      break
+    }
+  }
 }

@@ -939,8 +939,6 @@ setMethod(
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
       } else {
-        warning("debug cannot be a list unless logging package is installed: install.packages('logging')\n",
-                "setting debug to non-list using unlist(debug)")
         debug <- unlist(debug)
 
       }
@@ -1379,11 +1377,17 @@ setMethod(
                    envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
+  if ("newObjects" %in% debug)
+    objsIsNullBefore <- objsAreNull(sim)
+
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
+  if ("newObjects" %in% debug)
+    objectsCreatedPost(sim, objsIsNullBefore)
+
   # Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
     if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))
@@ -1872,11 +1876,13 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
   paramsList
 }
 
+loggingMessagePrefixLength <- 15
+
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   st <- Sys.time()
   stForm1 <- "%h%d"
   stForm2 <- paste(stForm1, "%H:%M:%S")
-  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
+  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
   if (numCharsMax > 0) {
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
     simEnv <- whereInStack("sim")
@@ -1892,20 +1898,21 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     }
 
     if (length(sim@current)) {
-      modName <- sim@current$moduleName
-
+      modName <- sim@current$moduleName # only defined if in doEvent
       if (is.null(modName)) modName <- sim@events[[1]]$moduleName
-      nchr <- nchar(modName)
-      tooManyVowels <- nchr - numCharsMax
-      numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
-      tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
-      modName8Chars <-
-        paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
-                                       tooFewVowels,",",tooManyVowels,"}"), "",
-                                modName, perl=TRUE), 1, numCharsMax))
-      if (nchr < numCharsMax)
-        modName8Chars <- paste0(modName8Chars,
-                                paste(collapse = "", rep(" ", numCharsMax - nchr)))
+
+      modName8Chars <- moduleNameStripped(modName, numCharsMax)
+      # nchr <- nchar(modName)
+      # tooManyVowels <- nchr - numCharsMax
+      # numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+      # tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+      # modName8Chars <-
+      #   paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+      #                                  tooFewVowels,",",tooManyVowels,"}"), "",
+      #                           modName, perl=TRUE), 1, numCharsMax))
+      # if (nchr < numCharsMax)
+      #   modName8Chars <- paste0(modName8Chars,
+      #                           paste(collapse = "", rep(" ", numCharsMax - nchr)))
     }
   } else {
     modName8Chars <- ""
@@ -2042,3 +2049,18 @@ makeEventFn <- function(curModuleName, eventType) {
 
 eventFnElement <- function() ".eventFnDigest"
 eventFnElementEnvir <- function() ".eventFnEnvir"
+
+moduleNameStripped <- function(modName, numCharsMax) {
+  nchr <- nchar(modName)
+  tooManyVowels <- nchr - numCharsMax
+  numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+  tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+  modName8Chars <-
+    paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+                                   tooFewVowels,",",tooManyVowels,"}"), "",
+                            modName, perl=TRUE), 1, numCharsMax))
+  if (nchr < numCharsMax)
+    modName8Chars <- paste0(modName8Chars,
+                            paste(collapse = "", rep(" ", numCharsMax - nchr)))
+  modName8Chars
+}
