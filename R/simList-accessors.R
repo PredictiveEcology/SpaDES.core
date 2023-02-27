@@ -3181,18 +3181,19 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #' will be determined either from a `simList` or from the module source code.
 #' @importFrom data.table set rbindlist setcolorder
 moduleObjects <- function(sim, module, path) {
-  sim <- NULL # can't set `sim = NULL` because `whereInStack`
+  simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      for (i in seq(length(sys.frames()))[-1]) {
+      for (i in seq(length(sys.frames()))[-1]) { # don't start in this environment; not here
         simTry <- suppressWarnings(try(get("sim", whereInStack("sim", whFrame = -i)), silent = TRUE))
         if (!is(simTry, "try-error")) {
-          sim <- simTry
           break
         }
       }
     }
   }
+
+  sim <- simTry
 
   if (!is.null(sim)) {
     path <- modulePath(sim)
