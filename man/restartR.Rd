@@ -43,7 +43,7 @@ The random string is to prevent parallel processes that started at the same cloc
 time from colliding.}
 }
 \value{
-inveoked for side effect of restarting the R session
+invoked for side effect of restarting the R session
 }
 \description{
 This will attempt to restart the R session, reloading all packages, and

@@ -12,9 +12,9 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.1.3
 
 ### Current R versions
-* macOS 11.7 Big Sur           (GitHub), R 4.2.2
-* macOS 11.7 Big Sur            (local), R 4.2.2
-* macOs (m1) Big Sur             (rhub), R 4.2.2
+* macOS 12.6.3 Monterey        (GitHub), R 4.2.2
+* macOS (M2) 13.2.1 Ventura     (local), R 4.2.2
+* macOS (M1) Big Sur             (rhub), R 4.2.2
 * Ubuntu 20.04                 (GitHub), R 4.2.2
 * Ubuntu 20.04                  (local), 4.2.2 Patched (2022-11-10 r83330)
 * Windows                      (GitHub), R 4.2.2
@@ -22,11 +22,11 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.2.2
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2023-01-11 r83598)
-* Ubuntu 20.04                  (local), R-devel (2023-01-07 r83578)
-* Windows                      (GitHub), R-devel (2023-01-11 r83598 ucrt)
-* Windows                 (win-builder), R-devel (2023-01-11 r83598 ucrt))
-* Windows                       (local), R-devel (2023-01-08 r83584 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2023-02-26 r83908)
+* Ubuntu 20.04                  (local), R-devel (2023-02-28 r83913)
+* Windows                      (GitHub), R-devel (2023-02-27 r83911 ucrt)
+* Windows                 (win-builder), R-devel (2023-02-27 r83911 ucrt))
+* Windows                       (local), R-devel (2023-02-27 r83911 ucrt)
 
 ## R CMD check results
 
@@ -55,9 +55,12 @@ This URL is included as part of the command used to install these additional pac
 Additionally, some words were flagged as possibly misspelled, but they are false positives:
 
         Possibly mis-spelled words in DESCRIPTION:
-            DES (5:71, 7:14, 12:53)
-            modularity (7:40)
-
+            Barros (8:5)
+            DES (5:71, 9:14, 14:53)
+            McIntire (7:12)
+            al (7:24, 8:15)
+            et (7:21, 8:12)
+            modularity (9:40)
 
 ## Downstream dependencies
 

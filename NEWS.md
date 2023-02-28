@@ -8,7 +8,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * begin migration to use `terra` and `sf` instead of `raster`, `sp`, `rgeos`, and `rgdal`
 * `moduleMetadata` now handles multiple module paths
 * updates to `memoryUse`
-* `.plots` arg in `spades` can be set to `NA` to turn of all plotting. This can also be set with an `option(spades.plots = NA)`, 
+* `.plots` arg in `spades` can be set to `NA` to turn of all plotting. This can also be set with `option(spades.plots = NA)`, 
 * minor bugfixes
 * `moduleMetadata` no longer runs `.inputObjects`. In addition to being unnecessary and slow, it was also failing with `reproducible (==1.2.16)` because it was trying to run `Cache`, which had a bug for this case. Now, `moduleMetadata` no longer runs the `.inputObjects` internally, so this bug is no longer relevant.
 * two new options -- `spades.loadReqdPkgs`, so a user can turn off loading of packages, and `spades.dotInputObjects`, so a user can omit running of the `.inputObjects` function in modules during `simInit`. These are updated in `spadesOptions`.

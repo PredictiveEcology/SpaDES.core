@@ -286,7 +286,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #'     The random string is to prevent parallel processes that started at the same clock
 #'     time from colliding.
 #'
-#' @return inveoked for side effect of restarting the R session
+#' @return invoked for side effect of restarting the R session
 #'
 #' @export
 #' @importFrom crayon bgBlue white
