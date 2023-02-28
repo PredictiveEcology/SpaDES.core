@@ -1537,15 +1537,17 @@ objsAreNull <- function(sim) {
 
 adjustModuleNameSpacing <- function(modNames) {
   nchar <- getOption("spades.messagingNumCharsModule") - loggingMessagePrefixLength
-  for(i in seq(nchar, max(nchar(modNames)))) {
-    modName8Chars <- mapply(modName = unname(modNames),
-                            MoreArgs = list(ncm = i),
-                            function(modName, ncm)
-                              moduleNameStripped(modName, numCharsMax = ncm)
-    )
-    if (all(!duplicated(modName8Chars))) {
-      options("spades.messagingNumCharsModule" = i + loggingMessagePrefixLength)
-      break
+  if (length(modNames)) {
+    for(i in seq(nchar, max(nchar(modNames)))) {
+      modName8Chars <- mapply(modName = unname(modNames),
+                              MoreArgs = list(ncm = i),
+                              function(modName, ncm)
+                                moduleNameStripped(modName, numCharsMax = ncm)
+      )
+      if (all(!duplicated(modName8Chars))) {
+        options("spades.messagingNumCharsModule" = i + loggingMessagePrefixLength)
+        break
+      }
     }
   }
 }
