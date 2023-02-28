@@ -226,7 +226,7 @@ test_that("test module-level cache", {
 
   # Test that cached part comes up identical in both (all maps but Fires),
   #   but non-cached part are different (Fires should be different because stochastic)
-  expect_equal(landscapeMaps1, landscapeMaps2)
+  expect_equal(landscapeMaps1, landscapeMaps2) ## TODO: #236
   expect_false(isTRUE(suppressWarnings(all.equal(fireMap1, fireMap2))))
 })
 
@@ -279,7 +279,8 @@ test_that("test .prepareOutput", {
     cat(file = testFile, "\n##############################\n", append = TRUE)
     cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
   }
-  expect_true(all.equal(simCached1, simCached2))
+
+  expect_true(all.equal(simCached1, simCached2)) ## TODO: #236
 })
 
 test_that("test .robustDigest for simLists", {

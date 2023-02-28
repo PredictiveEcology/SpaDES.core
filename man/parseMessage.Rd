@@ -12,7 +12,8 @@
 \item{message}{rest of message}
 }
 \value{
-A message with that starts with paste0(m, ":", message)
+returns \code{TRUE}; invoked for side effect of generating message with that starts with
+\code{paste0(m, ":", message)}.
 }
 \description{
 Also makes it blue.

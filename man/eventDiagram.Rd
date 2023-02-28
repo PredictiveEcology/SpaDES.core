@@ -16,8 +16,7 @@ eventDiagram(sim, n, startDate, ...)
 \S4method{eventDiagram}{simList,missing,missing}(sim, n, startDate, ...)
 }
 \arguments{
-\item{sim}{A \code{simList} object (typically corresponding to a
-completed simulation).}
+\item{sim}{A \code{simList} object (typically corresponding to a completed simulation).}
 
 \item{n}{The number of most recently completed events to plot.}
 

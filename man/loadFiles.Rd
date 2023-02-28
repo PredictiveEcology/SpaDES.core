@@ -57,7 +57,7 @@ containing the columns:
 Generally not intended to be used by users.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load random maps included with package
 filelist <- data.frame(
     files = dir(system.file("maps", package = "quickPlot"),

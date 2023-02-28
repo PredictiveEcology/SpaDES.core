@@ -44,7 +44,14 @@ even if the condition is met. Defaults to \code{end(sim)}}
 }
 \value{
 Returns the modified \code{simList} object, i.e., \code{sim$._conditionalEvents}.
-
+}
+\description{
+Adds a new event to the simulation's conditional event queue,
+updating the simulation object by creating or appending to
+\code{sim$._conditionalEvents}.
+\emph{This is very experimental. Use with caution.}
+}
+\details{
 This conditional event queue will be assessed at every single event in the normal event
 queue. If there are no conditional events, then \code{spades} will proceed as normal.
 As conditional event conditions are found to be true, then it will trigger a call to
@@ -53,12 +60,6 @@ it will remove the conditional event from the conditional queue.
 If the user would like the triggered conditional event to occur as the very next event,
 then a possible strategy would be to set \code{eventPriority} of the conditional event
 to very low or even negative to ensure it gets inserted at the top of the event queue.
-}
-\description{
-Adds a new event to the simulation's conditional event queue,
-updating the simulation object by creating or appending to
-\code{sim$._conditionalEvents}.
-\emph{This is very experimental. Use with caution.}
 }
 \examples{
   sim <- simInit(times = list(start = 0, end = 2))

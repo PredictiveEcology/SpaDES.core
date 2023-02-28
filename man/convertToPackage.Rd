@@ -19,7 +19,7 @@ convertToPackage(
 will be built, if any exists, using \code{roxygen2::roxygenise}.}
 }
 \value{
-This is run for its side effects. There will be a new or modified
+Invoked for its side effects. There will be a new or modified
 \code{DESCRIPTION} file in the root directory of the module. Any functions that
 were in the main module script (i.e., the .R file whose filename is the name of
 the module and is in the root directory of the module) will be moved to individual

@@ -207,7 +207,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
-#' \dontrun{ # Tests take several seconds
+#' \donttest{ # Tests take several seconds
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
 #' opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example

@@ -101,9 +101,10 @@ passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCa
 it can also be \code{sorted = FALSE} to return the object unsorted.}
 }
 \value{
-Will clear all objects (or those that match \code{userTags}, or those between \code{after}
-or \code{before}) from the repository located at \code{cachePath} of the \code{sim} object, if \code{sim} is provided,
-or located in \code{cachePath.} Invisibly returns a \code{data.table} of the removed items.
+A \code{data.table} object showing the subset of items in the cache, located at \code{cachePath}
+of the \code{sim} object, if \code{sim} is provided, or located in \code{cachePath}.
+For \code{clearCache} (invoked for its side effect of clearing objects matching \code{userTags}, or those
+between \code{after} or \code{before}), the returned \code{data.table} shows the removed items (invisibly).
 }
 \description{
 This will take the \code{cachePath(object)} and pass

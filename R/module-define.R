@@ -148,7 +148,7 @@ moduleDefaults <- list(
 #' @seealso moduleDefaults [defineEvent()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'   ## a default version of the defineModule is created with a call to newModule
 #'   newModule("test", path = tempdir(), open = FALSE)
 #'
@@ -390,7 +390,7 @@ setMethod(
 #'
 #' )
 #'
-#' \dontrun{
+#' \donttest{
 #' # Create a new module, then access parameters using `P`
 #' tmpdir <- file.path(tempdir(), "test")
 #' checkPath(tmpdir, create = TRUE)

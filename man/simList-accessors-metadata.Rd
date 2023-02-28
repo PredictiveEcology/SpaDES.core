@@ -92,7 +92,7 @@ These accessors extract the metadata for a module (if specified) or all modules
 in a \code{simList} if not specified.
 }
 \examples{
-\dontrun{
+\donttest{
 # set modulePath
 setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 # use Require and reqdPkgs

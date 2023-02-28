@@ -6,6 +6,8 @@
 #'
 #' @export
 #' @noMd
+#' @return named list of the *default* package options.
+#'
 #' @details
 #'
 #' Below are options that can be set with `options("spades.xxx" = newValue)`,

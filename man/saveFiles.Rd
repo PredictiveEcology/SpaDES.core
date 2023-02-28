@@ -68,7 +68,7 @@ wants it or not.
 }
 
 \examples{
-\dontrun{
+\donttest{
 
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 requireNamespace("NLMR", quietly = TRUE)) {

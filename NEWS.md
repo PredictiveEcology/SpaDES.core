@@ -486,7 +486,7 @@ objects (this may have very little/no effect on simList objects)
 
 # SpaDES.core 0.1.1
 
-* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use # SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`
+* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a GitHub package, e.g,. `achubaty/amc@development`
 * environments in modules are now as follows: 
     
     - Functions defined in a module are sourced into an environment located here: `sim@.envir$<moduleName>`, and it is a is a child of `sim@.envir`. Functions can be found in this environment, but prefixing functions is not necessary, because modules functions are within this environment already. 

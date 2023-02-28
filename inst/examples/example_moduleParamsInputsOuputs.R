@@ -1,4 +1,4 @@
-\dontrun{
+\donttest{
 ## easily include these tables in Rmd files using knitr
 path <- system.file("sampleModules", package = "SpaDES.core")
 sampleModules <- dir(path)

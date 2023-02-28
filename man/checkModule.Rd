@@ -20,7 +20,7 @@ Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.}
 }
 \value{
-(invisibly) a character vector of module file paths
+a character vector of module file paths (invisibly).
 }
 \description{
 Looks in the remote \code{repo} for a module named \code{name}.

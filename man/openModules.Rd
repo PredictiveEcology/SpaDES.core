@@ -43,7 +43,7 @@ user types it at the command prompt. A message with the correct lines to copy
 and paste is provided.
 }
 \examples{
-\dontrun{
+\donttest{
 if (interactive())
   openModules("modules")
 }

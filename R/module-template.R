@@ -88,7 +88,7 @@
 #' @rdname newModule
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'   tmpdir <- tempdir2("exampleNewModule")
 #'   ## create a "myModule" module in the "modules" subdirectory.
 #'   newModule("myModule", tmpdir)
@@ -488,7 +488,7 @@ setMethod(
 #' @rdname openModules
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' if (interactive())
 #'   openModules("modules")
 #' }

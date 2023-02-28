@@ -931,13 +931,12 @@ unmakeMemoisable.simList_ <- function(x) {
   as(x, "simList")
 }
 
-#' Attach missing attributes from x to y
+#' Attach missing attributes from `x` to `y`
 #'
 #' This is an internal helper.
 #'
 #' @param x an object with attributes
 #' @param y an object with attributes
-#'
 #'
 #' @importFrom data.table setattr
 #' @keywords internal
@@ -978,9 +977,10 @@ if (!isGeneric("clearCache")) {
 #'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #'
-#' @return Will clear all objects (or those that match `userTags`, or those between `after`
-#' or `before`) from the repository located at `cachePath` of the `sim` object, if `sim` is provided,
-#' or located in `cachePath.` Invisibly returns a `data.table` of the removed items.
+#' @return A `data.table` object showing the subset of items in the cache, located at `cachePath`
+#' of the `sim` object, if `sim` is provided, or located in `cachePath`.
+#' For `clearCache` (invoked for its side effect of clearing objects matching `userTags`, or those
+#' between `after` or `before`), the returned `data.table` shows the removed items (invisibly).
 #'
 #' @export
 #' @importFrom reproducible clearCache

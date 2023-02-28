@@ -6,6 +6,9 @@
 \usage{
 spadesOptions()
 }
+\value{
+named list of the *default* package options.
+}
 \description{
 These provide top-level, powerful settings for a comprehensive SpaDES workflow.
 To see defaults, run `spadesOptions()`.
