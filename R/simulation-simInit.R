@@ -1400,7 +1400,7 @@ loadPkgs <- function(reqdPkgs) {
     # Check for SpaDES.core minimum version
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, standAlone = FALSE, upgrade = FALSE) # basically don't change anything
+      RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
       checkSpaDES.coreMinVersion(allPkgs)
 
@@ -1549,5 +1549,36 @@ adjustModuleNameSpacing <- function(modNames) {
         break
       }
     }
+  }
+}
+
+RequireWithHandling <- function(allPkgs, standAlone = FALSE, upgrade = FALSE) {
+  alreadyLoadedMess <- c()
+  withCallingHandlers(
+    Require(allPkgs, standAlone = standAlone, upgrade = upgrade) # basically don't change anything
+    , message = function(m) {
+      if (any(grepl("Error: package or namespace", m$message))) {
+        pkg <- gsub("^.+namespace ‘(.+)’ .+ is already loaded.+$", "\\1", m$message)
+        alreadyLoadedMess <<- c(alreadyLoadedMess, pkg)
+      }
+    }
+    , warning = function(w) {
+      warnMess <- "^.+ersion .+ of ‘(.+)’ masked by .+$"
+      if (any(grepl(warnMess, w$message))) {
+        pkg <- gsub(warnMess, "\\1", w$message)
+        alreadyLoadedMess <<- c(alreadyLoadedMess, pkg)
+      }
+    }
+  )
+  if (length(alreadyLoadedMess)) {
+    alreadyLoadedMess <- unique(alreadyLoadedMess)
+    alreadyLoadedMess <- paste(alreadyLoadedMess, collapse = ", ")
+    stop("\nThe above error(s) likely mean(s) you must restart R and run again.",
+         "\nIf this/these occur(s) again, your session likely ",
+         "pre-loads old packages from e.g., your personal library. ",
+         "\nTry to restart, then update with:",
+         "\ninstall.packages(c('", alreadyLoadedMess, "'))",
+         "\n... then restart again")
+
   }
 }
