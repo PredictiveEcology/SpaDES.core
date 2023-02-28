@@ -1157,7 +1157,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
 
-      if ("newObjects" %in% unlist(getOption("spades.debug")))
+      debug <- unlist(getOption("spades.debug"))
+      if (!(FALSE %in% debug || any(is.na(debug))) )
         objsIsNullBefore <- objsAreNull(sim)
 
       if (isTRUE(cacheIt)) {
@@ -1226,7 +1227,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           sim <- .inputObjects(sim)
         }
       }
-      if ("newObjects" %in% unlist(getOption("spades.debug")))
+      if (!(FALSE %in% debug || any(is.na(debug))) )
         objectsCreatedPost(sim, objsIsNullBefore)
 
     }

@@ -1377,7 +1377,7 @@ setMethod(
                    envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
-  if ("newObjects" %in% debug)
+  if (!(FALSE %in% debug || any(is.na(debug))) )
     objsIsNullBefore <- objsAreNull(sim)
 
   if (.pkgEnv[["spades.browserOnError"]]) {
@@ -1385,7 +1385,7 @@ setMethod(
   } else {
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
-  if ("newObjects" %in% debug)
+  if (!(FALSE %in% debug || any(is.na(debug))) )
     objectsCreatedPost(sim, objsIsNullBefore)
 
   # Test for memory leaks
