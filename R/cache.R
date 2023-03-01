@@ -932,6 +932,35 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   return(total)
 }
 
+
+
+#' Methods for .dealWithClass and .dealWithClassOnRecovery
+#'
+#' @inheritParams reproducible::.dealWithClass
+#'
+#' @return The same obj as passed into the function, but dealt with so that it can be
+#' saved to disk.
+#'
+#' @importFrom reproducible .dealWithClass
+#' @include simList-class.R
+#' @export
+#' @rdname dealWithClass
+.dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                                       conn = getOption("reproducible.conn", NULL),
+                                       verbose = getOption("reproducible.verbose")) {
+  browser()
+
+  obj2 <- as.list(obj, all.names = FALSE)
+  out <- .dealWithClass(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  obj <- Copy(obj)
+  obj2 <- list2envAttempts(out, obj)
+  if (!is.null(obj2)) obj <- obj2
+
+  obj
+
+}
+
+
 #' Make `simList` correctly work with `memoise`
 #'
 #' Because of the environment slot, `simList` objects don't correctly
