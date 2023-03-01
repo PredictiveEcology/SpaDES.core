@@ -961,6 +961,26 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 }
 
 
+#' @export
+#' @importFrom reproducible .dealWithClassOnRecovery
+#' @rdname dealWithClass
+.dealWithClassOnRecovery.simList <- function(obj, cachePath, cacheId,
+                                                 drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                                                 conn = getOption("reproducible.conn", NULL)) {
+
+  # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
+  objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
+
+  outList <- .dealWithClassOnRecovery(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
+  browser()
+  output2 <- list2envAttempts(outList, obj) # don't return it if the list2env retured nothing (a normal environment situation; not simList)
+  if (!is.null(output2)) obj <- output2
+
+  obj
+
+}
+
+
 #' Make `simList` correctly work with `memoise`
 #'
 #' Because of the environment slot, `simList` objects don't correctly
