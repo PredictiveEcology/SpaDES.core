@@ -55,6 +55,7 @@
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
+  browser()
   dots <- list(...)
 
   quiet <- if (is.null(dots$quiet)) {
@@ -104,6 +105,8 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
       qs::qsave(get(simName, envir = tmpEnv), file = filename)
     }
   } else {
+    browser()
+    sim <- .dealWithClass(sim)
     if (tolower(tools::file_ext(filename)) == "rds") {
       save(sim, file = filename)
     } else if (tolower(tools::file_ext(filename)) == "qs") {
@@ -269,41 +272,43 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
     load(filename)
   } else if (tolower(tools::file_ext(filename)) == "qs") {
     sim <- qs::qread(filename, nthreads = getOption("spades.qsThreads", 1))
-
-    # Work around for bug in qs that recovers data.tables as lists
-    objectName <- ls(sim)
-    names(objectName) <- objectName
-    objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
-    dt <- data.table(objectName, objectClassInSim)
-
-    io <- inputObjects(sim)
-    oo <- outputObjects(sim)
-    if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
-    if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
-    objs <- rbindlist(list(io, oo), fill = TRUE)
-    objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
-
-    objs <- objs[dt, on = "objectName"]
-    objs <- objs[objectClass == "data.table"]
-    objs <- objs[objectClass != objectClassInSim]
-    if (NROW(objs)) {
-      message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
-      message("Converting all known data.table objects (according to metadata) from list to data.table")
-      simEnv <- envir(sim)
-      out <- lapply(objs$objectName, function(on) {
-        tryCatch(assign(on, copy(as.data.table(sim[[on]])), envir = simEnv),
-                 error = function(e) warning(e))
-      })
-    }
+#
+#     # Work around for bug in qs that recovers data.tables as lists
+#     objectName <- ls(sim)
+#     names(objectName) <- objectName
+#     objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
+#     dt <- data.table(objectName, objectClassInSim)
+#
+#     io <- inputObjects(sim)
+#     oo <- outputObjects(sim)
+#     if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
+#     if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
+#     objs <- rbindlist(list(io, oo), fill = TRUE)
+#     objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
+#
+#     objs <- objs[dt, on = "objectName"]
+#     objs <- objs[objectClass == "data.table"]
+#     objs <- objs[objectClass != objectClassInSim]
+#     if (NROW(objs)) {
+#       message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
+#       message("Converting all known data.table objects (according to metadata) from list to data.table")
+#       simEnv <- envir(sim)
+#       out <- lapply(objs$objectName, function(on) {
+#         tryCatch(assign(on, copy(as.data.table(sim[[on]])), envir = simEnv),
+#                  error = function(e) warning(e))
+#       })
+#     }
   }
+  browser()
+  sim <- .dealWithClassOnRecovery(sim)
 
   mods <- setdiff(sim@modules, .coreModules())
   ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
-  lapply(mods, function(mod) {
-    if (!is.null(sim$.mods[[mod]]))
-      rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
-    makeModActiveBinding(sim = sim, mod = mod)
-  })
+  # lapply(mods, function(mod) {
+  #   if (!is.null(sim$.mods[[mod]]))
+  #     rm("mod", envir = sim$.mods[[mod]], inherits = FALSE)
+  #   makeModActiveBinding(sim = sim, mod = mod)
+  # })
 
   # Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {
