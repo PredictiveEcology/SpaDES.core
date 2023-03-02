@@ -948,14 +948,10 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", RSQLite::SQLite()),
                                        conn = getOption("reproducible.conn", NULL),
                                        verbose = getOption("reproducible.verbose")) {
-  browser()
-
-  obj2 <- as.list(obj, all.names = FALSE)
+  obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects
   out <- .dealWithClass(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
   obj <- Copy(obj)
-  obj2 <- list2envAttempts(out, obj)
-  if (!is.null(obj2)) obj <- obj2
-
+  list2env(out, envir = envir(obj))
   obj
 
 }
@@ -972,9 +968,35 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
   outList <- .dealWithClassOnRecovery(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
+  list2env(outList, envir = envir(obj))
+
   browser()
-  output2 <- list2envAttempts(outList, obj) # don't return it if the list2env retured nothing (a normal environment situation; not simList)
-  if (!is.null(output2)) obj <- output2
+
+  # Work around for bug in qs that recovers data.tables as lists
+  objectName <- ls(obj)
+  names(objectName) <- objectName
+  objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = obj))[1])
+  dt <- data.table(objectName, objectClassInSim)
+
+  io <- inputObjects(obj)
+  oo <- outputObjects(obj)
+  if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
+  if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
+  objs <- rbindlist(list(io, oo), fill = TRUE)
+  objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
+
+  objs <- objs[dt, on = "objectName"]
+  objs <- objs[objectClass == "data.table"]
+  objs <- objs[objectClass != objectClassInSim]
+  if (NROW(objs)) {
+    message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
+    message("Converting all known data.table objects (according to metadata) from list to data.table")
+    simEnv <- envir(obj)
+    out <- lapply(objs$objectName, function(on) {
+      tryCatch(assign(on, copy(as.data.table(obj[[on]])), envir = simEnv),
+               error = function(e) warning(e))
+    })
+  }
 
   obj
 
