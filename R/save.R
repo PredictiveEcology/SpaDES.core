@@ -151,26 +151,30 @@ saveFiles <- function(sim) {
   if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
-      if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
-        args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
-                            file = outputs(sim)[["file"]][i]),
-                       outputArgs(sim)[[i]])
-        args <- args[!sapply(args, is.null)]
-        args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
-          isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
-        }))])
+      objExists <- exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)
+      isSimList <- identical(outputs(sim)[["objectName"]][i], "sim")
+      if (objExists || isSimList) {
+        if (objExists) {
+          args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
+                              file = outputs(sim)[["file"]][i]),
+                         outputArgs(sim)[[i]])
+          args <- args[!sapply(args, is.null)]
+          args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
+            isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
+          }))])
 
-        # The actual save line
-        do.call(outputs(sim)[["fun"]][i], args = args,
-                envir = getNamespace(outputs(sim)[["package"]][i]))
+          # The actual save line
+          do.call(outputs(sim)[["fun"]][i], args = args,
+                  envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        ## using @ works when outputs is a DT
+          ## using @ works when outputs is a DT
+        } else {
+          saveSimList(sim, filename = outputs(sim)[["file"]][i])
+        }
         outputs(sim)[["saved"]][i] <- TRUE
-        # sim@outputs[["saved"]][i] <- TRUE
       } else {
-        warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
+        warning(paste(outputs(sim)[["objectName"]][i], "is not an object in the simList. Cannot save."))
         outputs(sim)[["saved"]][i] <- FALSE
-        # sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
