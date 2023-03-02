@@ -1157,7 +1157,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
 
-      debug <- unlist(getOption("spades.debug"))
+      debug <- getDebug() # from options first, then override if in a simInitAndSpades
+
       if (!(FALSE %in% debug || any(is.na(debug))) )
         objsIsNullBefore <- objsAreNull(sim)
 
@@ -1204,6 +1205,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           } else {
             isTRUE(sim@params[[mBase]][[".showSimilar"]])
           }
+
+          if (any(".inputObjects" %in% debug))
+            debugonce(.inputObjects)
 
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
@@ -1437,13 +1441,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       stripNchars <- getOption("spades.messagingNumCharsModule") - 5
       stripNcharsSpades <- 2 #stripNchars + 2
       stripNcharsSimInit <- stripNchars + 5
-      hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
-      debug <- getOption("spades.debug")
-      if (!isFALSE(hasDebug)) {
-        newDebug <- try(get("debug", hasDebug), silent = TRUE)
-        if (!is(newDebug, "try-error"))
-          debug <- newDebug
-      }
+      debug <- getDebug() # from options first, then override if in a simInitAndSpades
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs)
@@ -1590,4 +1588,15 @@ stopMessForRequireFail <- function(pkg) {
   yellow("\nrestart R"),
   "\nThis should trigger a re-installation, or allow ",
   "for a manual install.packages ...")
+}
+
+getDebug <- function() {
+  hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+  debug <- getOption("spades.debug")
+  if (!isFALSE(hasDebug)) {
+    newDebug <- try(get("debug", hasDebug), silent = TRUE)
+    if (!is(newDebug, "try-error"))
+      debug <- newDebug
+  }
+  debug
 }
