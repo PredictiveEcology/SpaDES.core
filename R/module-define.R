@@ -717,12 +717,15 @@ setMethod(
     outputDF$fun[usesSemiColon] <- sapply(splitPackFun, function(x) x[2])
   }
 
+  .fileExts <- .saveFileExtensions()
+  fileExtFromReproducible <- getOption("reproducible.cacheSaveFormat", "rds")
+  rowInDotFileExts <- which(.fileExts$exts %in% fileExtFromReproducible)
   if (any(is.na(outputDF[, "fun"]))) {
-    .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
     exts <- fileExt(fl)
     if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
-      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
+      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
+        .fileExts$fun[rowInDotFileExts]
     }
     if (any(is.na(outputDF[, "fun"]))) {
       extsAvail <- checkKnownExts(exts, .fileExts)
@@ -731,11 +734,10 @@ setMethod(
   }
 
   if (any(is.na(outputDF[, "package"]))) {
-    .fileExts <- .saveFileExtensions()
     fl <- outputDF$file
     exts <- fileExt(fl)
     if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
-      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
+      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
     }
     if (any(is.na(outputDF[, "package"]))) {
       exts <- fileExt(fl)
