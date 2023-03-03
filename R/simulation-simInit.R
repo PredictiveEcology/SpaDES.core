@@ -1539,10 +1539,9 @@ objectsCreatedPost <- function(sim, objsIsNullBefore) {
 }
 
 objsAreNull <- function(sim) {
-  mapply(obj = mget(grep("._|.mods|.parsedFiles|.userSuppliedObjNames",
-                         ls(sim, all.names = TRUE), invert = TRUE,
-                         value = TRUE), envir = envir(sim)),
-         function(obj) is.null(obj))
+  mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
+                         ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
+                    envir = envir(sim)), function(obj) is.null(obj))
 }
 
 
