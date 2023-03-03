@@ -228,7 +228,7 @@ with the one just edited. There may be some unexpected consequences if the
 }
 
 \examples{
-\dontrun{
+\donttest{
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
     requireNamespace("NLMR", quietly = TRUE)) {
   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example

@@ -466,13 +466,21 @@ scheduleEvent <- function(sim,
   return(invisible(sim))
 }
 
-################################################################################
 #' Schedule a conditional simulation event
 #'
 #' Adds a new event to the simulation's conditional event queue,
 #' updating the simulation object by creating or appending to
 #' `sim$._conditionalEvents`.
 #' *This is very experimental. Use with caution.*
+#'
+#' This conditional event queue will be assessed at every single event in the normal event
+#' queue. If there are no conditional events, then `spades` will proceed as normal.
+#' As conditional event conditions are found to be true, then it will trigger a call to
+#' `scheduleEvent(...)` with the current time passed to `eventTime` *and*
+#' it will remove the conditional event from the conditional queue.
+#' If the user would like the triggered conditional event to occur as the very next event,
+#' then a possible strategy would be to set `eventPriority` of the conditional event
+#' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
 #' @inheritParams scheduleEvent
 #'
@@ -489,14 +497,6 @@ scheduleEvent <- function(sim,
 #'
 #' @return Returns the modified `simList` object, i.e., `sim$._conditionalEvents`.
 #'
-#' This conditional event queue will be assessed at every single event in the normal event
-#' queue. If there are no conditional events, then `spades` will proceed as normal.
-#' As conditional event conditions are found to be true, then it will trigger a call to
-#' `scheduleEvent(...)` with the current time passed to `eventTime` *and*
-#' it will remove the conditional event from the conditional queue.
-#' If the user would like the triggered conditional event to occur as the very next event,
-#' then a possible strategy would be to set `eventPriority` of the conditional event
-#' to very low or even negative to ensure it gets inserted at the top of the event queue.
 #'
 #' @include priority.R
 #' @export
@@ -816,7 +816,7 @@ scheduleConditionalEvent <- function(sim,
 #'             Retrieved from <https://nostarch.com/artofr.htm>
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
 #'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
@@ -1994,7 +1994,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #' sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
 #' # Look at event queue
 #' events(sim) # shows the "init" we just added
-#' \dontrun{
+#' \donttest{
 #'   # this is skipped when running in automated tests; it is fine in interactive use
 #'   out <- spades(sim)
 #' }

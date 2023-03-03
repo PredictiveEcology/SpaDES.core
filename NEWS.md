@@ -11,7 +11,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * `moduleMetadata` now handles multiple module paths
 * updates to `memoryUse`
 * new option: setting `options("spades.allowInitDuringSimInit" = TRUE)`, a user will have `init` events of *one ore more* modules run during the `simInit` call, but only if they have no upstream dependencies, i.e., their `expectsInputs` cannot be supplied by another module's `createsOutputs`. `simInit` will determine which modules have no upstream dependencies and *only* these will be selected for running *only* their `init` events. This can be useful e.g., if there is a module that `createsOutputs` for a `studyArea`.
-* `.plots` arg in `spades` can be set to `NA` to turn of all plotting. This can also be set with an `option(spades.plots = NA)`, 
+* `.plots` arg in `spades` can be set to `NA` to turn of all plotting. This can also be set with `option(spades.plots = NA)`, 
 * minor bugfixes
 * `moduleMetadata` no longer runs `.inputObjects`. In addition to being unnecessary and slow, it was also failing with `reproducible (==1.2.16)` because it was trying to run `Cache`, which had a bug for this case. Now, `moduleMetadata` no longer runs the `.inputObjects` internally, so this bug is no longer relevant.
 * two new options -- `spades.loadReqdPkgs`, so a user can turn off loading of packages, and `spades.dotInputObjects`, so a user can omit running of the `.inputObjects` function in modules during `simInit`. These are updated in `spadesOptions`.
@@ -489,7 +489,7 @@ objects (this may have very little/no effect on simList objects)
 
 # SpaDES.core 0.1.1
 
-* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use # SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. `achubaty/amc@development`
+* uses `reproducible::Require` instead of `SpaDES.core::loadPackages` to load required packages. Currently, does not use SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a GitHub package, e.g,. `achubaty/amc@development`
 * environments in modules are now as follows: 
     
     - Functions defined in a module are sourced into an environment located here: `sim@.envir$<moduleName>`, and it is a is a child of `sim@.envir`. Functions can be found in this environment, but prefixing functions is not necessary, because modules functions are within this environment already. 

@@ -35,9 +35,9 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param type Either "get", "assign", or "globals". See details.
 #'
 #' @details
-#' `.findElementsInEnv` is a wrapper around `.findElements`. It will convert
-#' function code to a call, and then pass it to `.findElements`. It also does
-#' some cleaning for duplications, `NA` values, and cases where the element
+#' `.findElementsInEnv` is a wrapper around `.findElements`.
+#' It will convert function code to a call, and then pass it to `.findElements`.
+#' It also does some cleaning for duplications, `NA` values, and cases where the element
 #' inside a `sim[["xxx"]]` is a variable that should be evaluated, rather than
 #' simply taken verbatim (e.g., `sim[[P(sim)$stackName]])`.
 #'
@@ -48,8 +48,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' scans for all functions (i.e., "globals") being used. This is similar to
 #' `codetools::findGlobals`, but faster.
 #'
-#' @return
-#' A character string with all sim objects found
+#' @return A character string with all `sim` objects found.
 #'
 #' @author Eliot McIntire
 #' @keywords internal
@@ -255,8 +254,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param message rest of message
 #' @param hadPrevMessage
 #'
-#' @return
-#' A message with that starts with paste0(m, ":", message)
+#' @return NULL (invisibly); invoked for side effect of generating message with that starts with
+#' `paste0(m, ":", message)`.
 #'
 #' @keywords internal
 #' @rdname runCodeChecks
@@ -544,8 +543,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param m module name
 #' @param message rest of message
 #'
-#' @return
-#' A message with that starts with paste0(m, ":", message)
+#' @return returns `TRUE`; invoked for side effect of generating message with that starts with
+#' `paste0(m, ":", message)`.
 #'
 #' @keywords internal
 #' @rdname parseMessage
@@ -572,8 +571,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #'
 #' @param item The item to accord conjugation with. If length 1, then "is" else "are".
 #'
-#' @return
-#' "is" or "are"
+#' @return character string "is" or "are".
 #'
 #' @keywords internal
 #' @rdname verb

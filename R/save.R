@@ -88,7 +88,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @rdname saveFiles
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
@@ -231,13 +231,14 @@ saveFiles <- function(sim) {
 
 #' Generate simulation file name
 #'
-#' Assists with saving and retrieving simulations
-#' (e.g., with `saveSimList` and `loadSimList`).
+#' Assists with saving and retrieving simulations (e.g., with `saveSimList` and `loadSimList`).
 #'
 #' @param name Object name (e.g., `"mySimOut"`)
 #' @param path Directory location in where the file will be located (e.g., an `outputPath`).
 #' @param time Optional simulation time to use as filename suffix. Default `NULL`.
 #' @param ext  The file extension to use (default `"rds"`).
+#'
+#' @return character string giving a file path for a simulation file
 #'
 #' @export
 #' @importFrom reproducible normPath

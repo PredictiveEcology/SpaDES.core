@@ -1,9 +1,8 @@
-################################################################################
 #' Event priority
 #'
 #' Preset event priorities: 1 = first (highest); 5 = normal; 10 = last (lowest).
 #'
-#' @return numeric
+#' @return numeric of length 1.
 #'
 #' @author Alex Chubaty
 #' @export

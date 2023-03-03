@@ -68,7 +68,7 @@ parameters = rbind(
 
 )
 
-\dontrun{
+\donttest{
 # Create a new module, then access parameters using `P`
 tmpdir <- file.path(tempdir(), "test")
 checkPath(tmpdir, create = TRUE)

@@ -32,7 +32,6 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
-# igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
   standardGeneric("getModuleVersion")
 })
@@ -81,7 +80,7 @@ setMethod("getModuleVersion",
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
 #'
-#' @return (invisibly) a character vector of module file paths
+#' @return a character vector of module file paths (invisibly).
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
@@ -277,12 +276,9 @@ setMethod(
 #'    including whether it was downloaded or not, and whether it was renamed
 #'    (because there was a local copy that had the wrong file name).
 #'
+#' @author Alex Chubaty
 #' @export
 #' @rdname downloadModule
-#'
-#' @author Alex Chubaty
-#'
-#'
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
                                       quickCheck = FALSE, overwrite = FALSE) {
   standardGeneric("downloadModule")

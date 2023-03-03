@@ -406,7 +406,7 @@ setMethod(
 #'                   so be sure to monitor this directory and remove unnecessary temp files
 #'                   that may contribute to excessive disk usage.
 #'
-#' @return Returns a named list of the user's default working directories.
+#' @return `getPaths` returns a named list of the user's default working directories.
 #' `setPaths` is invoked for the side effect of setting these directories.
 #'
 #' @author Alex Chubaty
@@ -416,7 +416,7 @@ setMethod(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' getPaths()                       ## returns the current default working paths
 #'
 #' ## set individual custom paths

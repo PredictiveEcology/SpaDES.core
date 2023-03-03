@@ -544,7 +544,7 @@ Other contributors:
 \itemize{
   \item Yong Luo \email{Yong.Luo@gov.bc.ca} [contributor]
   \item Steve Cumming \email{Steve.Cumming@sbf.ulaval.ca} [contributor]
-  \item Ceres Barros \email{cbarros@mail.ubc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID}) [contributor]
+  \item Ceres Barros \email{ceres.barros@ubc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID}) [contributor]
   \item His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada [copyright holder]
 }
 

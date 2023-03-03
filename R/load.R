@@ -76,7 +76,7 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' @rdname loadFiles
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load random maps included with package
 #' filelist <- data.frame(
 #'     files = dir(system.file("maps", package = "quickPlot"),

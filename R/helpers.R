@@ -233,18 +233,17 @@ setMethod(
 }
 
 #' @keywords internal
-.corePackages <- c(".GlobalEnv","Autoloads","SpaDES.core","base","grDevices",
-                   "rstudio","devtools_shims",
-                   "methods","utils","graphics","datasets","stats", "testthat") # nolint
+.corePackages <- c(".GlobalEnv", "Autoloads", "SpaDES.core", "base", "grDevices",
+                   "rstudio", "devtools_shims",
+                   "methods", "utils", "graphics", "datasets", "stats", "testthat") # nolint
 .corePackagesGrep <- paste(.corePackages, collapse = "|")
 
 # .pkgEnv$corePackagesVec <- unlist(strsplit(.corePackagesGrep, split = "\\|"))
-.corePackagesVec <- c(.corePackages[(1:2)],
-                      paste0("package:", .corePackages[-(1:2)]))
+.corePackagesVec <- c(.corePackages[(1:2)], paste0("package:", .corePackages[-(1:2)]))
 
-#' tryCatch that keeps warnings, errors and value (result)
+#' `tryCatch` that keeps warnings, errors and value (result)
 #'
-#' This is from https://stackoverflow.com/a/24569739/3890027
+#' From <https://stackoverflow.com/a/24569739/3890027>
 #'
 #' @keywords internal
 #' @rdname tryCatch
@@ -304,8 +303,11 @@ all.equal.simList <- function(target, current, ...) {
   all.equal.default(target, current, check.environment = FALSE)
 }
 
-needInstall <- function(pkg = "methods", minVersion = NULL,
-                        messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {
+needInstall <- function(
+    pkg = "methods",
+    minVersion = NULL,
+    messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"),
+                          " is required. Try: ")) {
   need <- FALSE
   if (!requireNamespace(pkg, quietly = TRUE)) {
     need <- TRUE
@@ -315,7 +317,7 @@ needInstall <- function(pkg = "methods", minVersion = NULL,
   }
   if (need) {
     stop(messageStart,
-         "install.packages('",pkg,"')")
+         "install.packages('", pkg, "')")
   }
 }
 

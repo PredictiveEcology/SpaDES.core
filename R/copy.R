@@ -25,7 +25,7 @@ if (!isGeneric("Copy")) {
 #'               `current`, `completed`) be deep copied via
 #'               `data.table::copy`
 #'
-#'@return a copy of `object`
+#' @return a copy of `object`
 #'
 #' @details
 #' `simList` objects can contain a lot of information, much of which could be

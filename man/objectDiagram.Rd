@@ -25,7 +25,7 @@ simulation. Offers a more detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link[=moduleDiagram]{moduleDiagram()}}.
 }
 \examples{
-\dontrun{
+\donttest{
 if (requireNamespace("DiagrammeR", quietly = TRUE)) {
   sim <- simInit()
   objectDiagram(sim)

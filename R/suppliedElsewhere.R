@@ -14,14 +14,6 @@ utils::globalVariables(c("objName", "V1"))
 #' This function can be used as a check to determine whether the module needs
 #' to proceed in getting and assigning its default value.
 #'
-#' @param object Character vector
-#' @param sim A `simList` in which to evaluated whether the object is supplied elsewhere
-#' @param where Character vector with one to three of "sim", "user", or "initEvent".
-#'        Default is all three. Partial matching is used. See details.
-#' @param returnWhere Logical, default `FALSE`, whether the vector of length
-#'   3 logical should be returned, or a logical of length one
-#' @export
-#'
 #' @details
 #'
 #' `where` indicates which of three places to search, either `"sim"` i.e.,
@@ -39,6 +31,16 @@ utils::globalVariables(c("objName", "V1"))
 #' it is in the outputs of that module, and that it is a module that is loaded prior to
 #' this one.
 #'
+#' @param object Character vector
+#' @param sim A `simList` in which to evaluated whether the object is supplied elsewhere
+#' @param where Character vector with one to three of "sim", "user", or "initEvent".
+#'        Default is all three. Partial matching is used. See details.
+#' @param returnWhere Logical, default `FALSE`, whether the vector of length
+#'   3 logical should be returned, or a logical of length one
+#'
+#' @return logical
+#' @export
+#'
 #' @examples
 #' mySim <- simInit()
 #' suppliedElsewhere("test", mySim) # FALSE
@@ -54,7 +56,7 @@ utils::globalVariables(c("objName", "V1"))
 #' mySim <- simInit(objects = list("test" = test))
 #' suppliedElsewhere("test", mySim) # TRUE
 #'
-#' \dontrun{
+#' \donttest{
 #' # Example with prepInputs
 #' # Put chunks like this in your .inputObjects
 #' if (!suppliedElsewhere("test", mySim))

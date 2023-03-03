@@ -337,8 +337,6 @@ setReplaceMethod("depends",
 ################################################################################
 #' Namespacing within `SpaDES`
 #'
-#' `.callingModuleName` returns the name of the module that is currently
-#' the active module calling functions like `scheduleEvent`.
 #' This will only return the module name if it is inside a `spades` call,
 #' i.e., it will return `NULL` if used in interactive mode.
 #' The related function `currentModule` is simply a rapid accessor for the
@@ -347,11 +345,13 @@ setReplaceMethod("depends",
 #'
 #' @inheritParams modules
 #'
+#' @return `.callingModuleName` returns the name of the module that is currently
+#' the active module calling functions like `scheduleEvent`.
+#'
 #' @author Eliot McIntire
 #' @export
 #' @importFrom reproducible .grepSysCalls
 #' @include simList-class.R
-#' @keywords internal
 #' @rdname namespacing
 #'
 setGeneric(".callingModuleName", function(sim) {
@@ -465,8 +465,7 @@ setReplaceMethod("params",
 #' `P` is a concise way to access parameters within a module. It works more like
 #' a namespaced function in the sense that the module from which it is called is the
 #' default place it will look for the parameter. To access a parameter from within
-#' a module, you can use `P(sim)$paramName` instead of
-#' `params(sim)$moduleName$paramName`
+#' a module, you can use `P(sim)$paramName` instead of #' `params(sim)$moduleName$paramName`
 #'
 #' @aliases simList-accessors-params
 #' @export
@@ -839,7 +838,7 @@ setReplaceMethod("checkpointInterval",
 #' Get and set simulation progress bar details
 #'
 #' The progress bar can be set in two ways in SpaDES. First, by setting values
-#' in the .progress list element in the params list element passed to [simInit()].
+#' in the `.progress` list element in the params list element passed to [simInit()].
 #' Second, at the [spades()] call itself, which can be simpler. See examples.
 #'
 #' @details Progress Bar:
@@ -850,13 +849,17 @@ setReplaceMethod("checkpointInterval",
 #' See examples.
 #'
 #' @inheritParams params
-#' @include simList-class.R
+#'
+#' @return for `progressInterval`, a numeric corresponding to the progress update interval;
+#'         for `progressInterval<-`, an updated `simList` object.
+#'
 #' @export
 #' @family functions to access elements of a 'simList' object
+#' @include simList-class.R
 #' @rdname progress
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
 #' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
@@ -2980,7 +2983,7 @@ setMethod("outputObjectNames",
 #' @aliases simList-accessors-metadata
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # set modulePath
 #' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #' # use Require and reqdPkgs

@@ -73,7 +73,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # options("spades.recoveryMode" = 1) # now the default
 #' s <- simInit()
 #' s <- spades(s) # if this is interrupted or fails
@@ -229,34 +229,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' e.g., `sim <- SpaDES.core:::.pkgEnv$.sim`.
 #' This is stated in a message.
 #'
-#' @param sim Required. A `simList` to be retained through the restart
-#' @param reloadPkgs Logical. If `TRUE`, it will attempt to reload all the packages
-#'    as they were in previous session, in the same order. If `FALSE`, it will
-#'    load no packages beyond normal R startup. Default `TRUE`
-#' @param .First A function to save to \file{~/.qs} which will
-#'    be loaded at restart from \file{~/.qs} and run. Default is `NULL`,
-#'    meaning it will use the non-exported `SpaDES.core:::First`. If a
-#'    user wants to make a custom `First` file, it should built off that one.
-#' @param .RDataFile A filename for saving the `simList`.
-#'     Defaults to `getOption("spades.restartR.filename")`, and the directory will
-#'     be in `restartDir`. The simulation time will be mid-pended to this
-#'     name, as in: `basename(file), "_time",`
-#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`
-#'
-#' @param restartDir A character string indicating root directory to
-#'     save `simList` and other ancillary files during restart.
-#'     Defaults to `getOption("spades.restartR.restartDir", NULL)`.
-#'     If `NULL`, then it will try, in order, `outputPath(sim)`,
-#'     `modulePath(sim)`, `inputPath(sim)`, `cachePath(sim)`,
-#'     taking the first one that is not inside the `tempdir()`, which will
-#'     disappear during restart of R.
-#'     The actual directory for a given `spades` call that is restarting will be:
-#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
-#'     The random string is to prevent parallel processes that started at the same clock
-#'     time from colliding.
-#'
-#' @return inveoked for side effect of restarting the R session
-#'
 #' @details
 #' The process responds to several options. Though under most cases,
 #' the default behaviour should suffice. These are of 3 types: `restartRInterval`
@@ -284,6 +256,37 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #'
 #' To keep the saved `simList`, use `options("spades.restartR.clearFiles" = TRUE)`.
 #' The default is to treat these files as temporary files and so will be removed.
+#'
+#' @param sim Required. A `simList` to be retained through the restart
+#'
+#' @param reloadPkgs Logical. If `TRUE`, it will attempt to reload all the packages
+#'    as they were in previous session, in the same order. If `FALSE`, it will
+#'    load no packages beyond normal R startup. Default `TRUE`
+#'
+#' @param .First A function to save to \file{~/.qs} which will
+#'    be loaded at restart from \file{~/.qs} and run. Default is `NULL`,
+#'    meaning it will use the non-exported `SpaDES.core:::First`. If a
+#'    user wants to make a custom `First` file, it should built off that one.
+#'
+#' @param .RDataFile A filename for saving the `simList`.
+#'     Defaults to `getOption("spades.restartR.filename")`, and the directory will
+#'     be in `restartDir`. The simulation time will be mid-pended to this
+#'     name, as in: `basename(file), "_time",`
+#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`
+#'
+#' @param restartDir A character string indicating root directory to
+#'     save `simList` and other ancillary files during restart.
+#'     Defaults to `getOption("spades.restartR.restartDir", NULL)`.
+#'     If `NULL`, then it will try, in order, `outputPath(sim)`,
+#'     `modulePath(sim)`, `inputPath(sim)`, `cachePath(sim)`,
+#'     taking the first one that is not inside the `tempdir()`, which will
+#'     disappear during restart of R.
+#'     The actual directory for a given `spades` call that is restarting will be:
+#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
+#'     The random string is to prevent parallel processes that started at the same clock
+#'     time from colliding.
+#'
+#' @return invoked for side effect of restarting the R session
 #'
 #' @export
 #' @importFrom crayon bgBlue white

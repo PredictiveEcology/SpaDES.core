@@ -27,7 +27,7 @@ this is calling \code{\link[=moduleGraph]{moduleGraph()}}. Default \code{FALSE}.
 \item{...}{Additional arguments passed to plotting function specified by \code{type}.}
 }
 \value{
-Plots module dependency diagram.
+invoked for its side effect of plotting the module dependency diagram.
 }
 \description{
 Create a network diagram illustrating the simplified module dependencies of a
@@ -35,7 +35,7 @@ simulation. Offers a less detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link[=objectDiagram]{objectDiagram()}}.
 }
 \examples{
-\dontrun{
+\donttest{
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
     requireNamespace("NLMR", quietly = TRUE)) {
 library(igraph)

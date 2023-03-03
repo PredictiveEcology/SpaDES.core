@@ -1,6 +1,7 @@
 1000L
 1L
 1e5
+210X
 24b9cd12973aa81a9a4923a02225e095fa28f77a
 4x
 Amongst
@@ -22,6 +23,7 @@ IBMs
 Init
 Landis
 Matloff
+MiB
 Modularity
 Namespaced
 Namespacing
@@ -53,10 +55,10 @@ StackOverflow
 Sys
 XXXX
 activeBindings
-addChangedAttr
 addTagsToOutput
 ageMap
 agentLocation
+al
 amongst
 aren
 arg
@@ -110,18 +112,20 @@ distanceFromEachPoint
 divergentColors
 doEvent
 doesn
+doi
 dotInputObjects
-downloadData
 downloadModule
 downsampling
 duplications
 durations
 edgelist
 elapsedTime
+ele
 envir
 eps
 equalExtent
 errored
+et
 eventDiagram
 eventName
 eventPriority
@@ -155,7 +159,6 @@ ing
 init
 initEvent
 initiateAgents
-inputObject
 inputObjects
 inputPath
 julia
@@ -214,7 +217,6 @@ paddedFloatToChar
 paramName
 params
 parseElems
-paste0
 pixelated
 pre
 preDigestByClass
@@ -224,7 +226,6 @@ probs
 programmatically
 progressInterval
 progressType
-ps
 quickPlot
 randomLandscapes
 randomPolygons
@@ -271,7 +272,6 @@ spadesOptions
 specificNumPerPatch
 specnumperpatch
 spread2
-stackoverflow
 startDate
 stochasticity
 str
@@ -292,7 +292,7 @@ timeunit
 timeunits
 timezones
 tmp
-tryCatch
+tolower
 unevaluated
 unparsed
 unsetting

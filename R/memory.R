@@ -91,15 +91,19 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 #'
 #' This will only work if the user has specified before running the `spades` call,
 #' set the interval, in seconds, that `ps` is run.
-#' E.g., using `options("spades.memoryUseInterval" = 0.5)`, will assess memory use every 0.5 seconds.
+#' E.g., `options("spades.memoryUseInterval" = 0.5)`, will assess memory use every 0.5 seconds.
 #' The default is `0`, meaning no interval, "off".
 #'
 #' @note The suggested `future` and `future.callr` packages must be available.
 #'
 #' @param sim A completed `simList`
+#'
 #' @param max Logical. If TRUE, then it the return value will be summarized by
 #'   module/event, showing the maximum memory used. If `FALSE`, then
 #'   the raw memory used during each event will be shown.
+#'
+#' @return `data.table` summarizing the estimated memory use (in MiB) for each event type,
+#' for each module, during the simulation.
 #'
 #' @export
 #' @seealso The `vignette("iv-modules")`

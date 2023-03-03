@@ -22,6 +22,9 @@ Default is all three. Partial matching is used. See details.}
 \item{returnWhere}{Logical, default \code{FALSE}, whether the vector of length
 3 logical should be returned, or a logical of length one}
 }
+\value{
+logical
+}
 \description{
 When loading objects into a \code{simList}, especially during the
 \code{simInit} call, and inside the \code{.inputObjects} functions of modules,
@@ -65,7 +68,7 @@ test <- 1
 mySim <- simInit(objects = list("test" = test))
 suppliedElsewhere("test", mySim) # TRUE
 
-\dontrun{
+\donttest{
 # Example with prepInputs
 # Put chunks like this in your .inputObjects
 if (!suppliedElsewhere("test", mySim))

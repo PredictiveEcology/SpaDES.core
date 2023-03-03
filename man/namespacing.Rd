@@ -24,9 +24,11 @@ in which to replace element(s).}
 
 \item{x}{A \code{simList}}
 }
-\description{
+\value{
 \code{.callingModuleName} returns the name of the module that is currently
 the active module calling functions like \code{scheduleEvent}.
+}
+\description{
 This will only return the module name if it is inside a \code{spades} call,
 i.e., it will return \code{NULL} if used in interactive mode.
 The related function \code{currentModule} is simply a rapid accessor for the

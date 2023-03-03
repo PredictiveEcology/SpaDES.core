@@ -53,9 +53,8 @@ zip archive. Defaults to \code{FALSE} as this could be large, and may include ma
 out of date elements. See Details.}
 }
 \value{
-\code{\link[=saveSimList]{saveSimList()}}: A saved \code{.qs} file in \code{filename} location.
-
-\code{\link[=zipSimList]{zipSimList()}}: A saved \code{.zip} file in \code{zipfile} location.
+For \code{\link[=saveSimList]{saveSimList()}}, a saved \code{.qs} file in \code{filename} location.
+For \code{\link[=zipSimList]{zipSimList()}}, a saved \code{.zip} file in \code{zipfile} location.
 
 invoked for side effect of zip archive creation
 }

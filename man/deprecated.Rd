@@ -5,6 +5,7 @@
 \alias{experiment2}
 \alias{POM}
 \alias{simInitAndExperiment}
+\alias{loadPackages}
 \title{Deprecated functions}
 \usage{
 experiment(...)
@@ -14,10 +15,12 @@ experiment2(...)
 POM(...)
 
 simInitAndExperiment(...)
+
+loadPackages(...)
 }
 \arguments{
 \item{...}{Unused.}
 }
 \description{
-These functions have been moved to \code{SpaDES.experiment} package.
+These functions have been moved to other packages.
 }

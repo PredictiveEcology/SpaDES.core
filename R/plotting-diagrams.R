@@ -120,8 +120,7 @@ setMethod(
 #' A red vertical line corresponding to the current date may appear on the figure.
 #' This is useful for Gantt Charts generally but can be considered a 'bug' here.
 #'
-#' @param sim  A `simList` object (typically corresponding to a
-#'             completed simulation).
+#' @param sim  A `simList` object (typically corresponding to a completed simulation).
 #'
 #' @param n    The number of most recently completed events to plot.
 #'
@@ -233,7 +232,7 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' if (requireNamespace("DiagrammeR", quietly = TRUE)) {
 #'   sim <- simInit()
 #'   objectDiagram(sim)
@@ -288,7 +287,7 @@ setMethod(
 #'
 #' @param ...  Additional arguments passed to plotting function specified by `type`.
 #'
-#' @return Plots module dependency diagram.
+#' @return invoked for its side effect of plotting the module dependency diagram.
 #'
 #' @seealso [igraph()], [moduleGraph()] for a version that accounts for
 #' parent and children module structure.
@@ -299,7 +298,7 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
 #' library(igraph)
@@ -340,7 +339,7 @@ setMethod(
 #' }
 #' }
 #'
-# igraph is being imported in spades-package.R
+# NOTE: `igraph` is being imported in spades-package.R
 setGeneric("moduleDiagram", function(sim, type, showParents = TRUE, ...) {
   standardGeneric("moduleDiagram")
 })
@@ -497,11 +496,11 @@ setMethod(
 #' @author Eliot McIntire
 #' @export
 #' @importFrom data.table rbindlist
-# @importFrom igraph graph_from_data_frame cluster_optimal edges # already with import igraph
 #' @include simList-class.R
 #' @rdname moduleGraph
 #' @seealso moduleDiagram
 #'
+# `igraph` is being imported in spades-package.R
 setGeneric("moduleGraph", function(sim, plot, ...) {
   standardGeneric("moduleGraph")
 })

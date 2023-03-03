@@ -123,7 +123,7 @@ that will cause these objects to be put into the
 }
 
 \examples{
-\dontrun{
+\donttest{
   ## a default version of the defineModule is created with a call to newModule
   newModule("test", path = tempdir(), open = FALSE)
 

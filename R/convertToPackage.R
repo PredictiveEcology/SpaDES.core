@@ -34,8 +34,7 @@
 #' package from `.libPaths` and delete the `DESCRIPTION` file and
 #' `SpaDES.core` will treat it as a normal module.
 #'
-#' @return
-#' This is run for its side effects. There will be a new or modified
+#' @return Invoked for its side effects. There will be a new or modified
 #' `DESCRIPTION` file in the root directory of the module. Any functions that
 #' were in the main module script (i.e., the .R file whose filename is the name of
 #' the module and is in the root directory of the module) will be moved to individual
