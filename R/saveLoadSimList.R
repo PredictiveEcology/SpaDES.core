@@ -55,7 +55,6 @@
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
-  browser()
   dots <- list(...)
 
   quiet <- if (is.null(dots$quiet)) {
@@ -105,8 +104,8 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
       qs::qsave(get(simName, envir = tmpEnv), file = filename)
     }
   } else {
-    browser()
     sim <- .dealWithClass(sim)
+    sim@current <- list() # it is presumed that this event should be considered finished prior to saving
     if (tolower(tools::file_ext(filename)) == "rds") {
       save(sim, file = filename)
     } else if (tolower(tools::file_ext(filename)) == "qs") {
