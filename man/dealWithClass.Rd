@@ -5,7 +5,7 @@
 \alias{.dealWithClassOnRecovery.simList}
 \title{Methods for .dealWithClass and .dealWithClassOnRecovery}
 \usage{
-\method{.dealWithClass}{simList}(
+.dealWithClass.simList(
   obj,
   cachePath,
   drv = getOption("reproducible.drv", RSQLite::SQLite()),
@@ -13,34 +13,13 @@
   verbose = getOption("reproducible.verbose")
 )
 
-\method{.dealWithClassOnRecovery}{simList}(
+.dealWithClassOnRecovery.simList(
   obj,
   cachePath,
   cacheId,
   drv = getOption("reproducible.drv", RSQLite::SQLite()),
   conn = getOption("reproducible.conn", NULL)
 )
-}
-\arguments{
-\item{obj}{Any arbitrary R object.}
-
-\item{cachePath}{A repository used for storing cached objects.
-This is optional if \code{Cache} is used inside a SpaDES module.}
-
-\item{drv}{an object that inherits from \linkS4class{DBIDriver},
-or an existing \linkS4class{DBIConnection}
-object (in order to clone an existing connection).}
-
-\item{conn}{A \linkS4class{DBIConnection} object, as returned by
-\code{\link[DBI:dbConnect]{dbConnect()}}.}
-
-\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
-1 showing more messaging, 2 being more messaging, etc.
-Default is 1. Above 3 will output much more information about the internals of
-Caching, which may help diagnose Caching challenges. Can set globally with an
-option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
-
-\item{cacheId}{Used strictly for messaging. This should be the cacheId of the object being recovered.}
 }
 \value{
 The same obj as passed into the function, but dealt with so that it can be

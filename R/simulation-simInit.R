@@ -185,7 +185,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
 #'
-#' @seealso [spades()],
+#' @seealso [spades()], [defineModule()] to get help on metadata elements,
 #' [times()], [params()], [objs()], [paths()],
 #' [modules()], [inputs()], [outputs()]
 #'

@@ -379,7 +379,7 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link[=spades]{spades()}},
+\code{\link[=spades]{spades()}}, \code{\link[=defineModule]{defineModule()}} to get help on metadata elements,
 \code{\link[=times]{times()}}, \code{\link[=params]{params()}}, \code{\link[=objs]{objs()}}, \code{\link[=paths]{paths()}},
 \code{\link[=modules]{modules()}}, \code{\link[=inputs]{inputs()}}, \code{\link[=outputs]{outputs()}}
 }

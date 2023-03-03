@@ -87,7 +87,18 @@ moduleDefaults <- list(
 #'                         it is for human readers only.\cr
 #'    `documentation` \tab List of filenames referring to module documentation sources.
 #'                              This is currently not parsed by SpaDES;
-#'                              it is for human readers only.\cr\cr
+#'                              it is for human readers only.\cr
+#'    `loadOrder` \tab Named list of length 0, 1, or 2, with names being `after` and `before`.
+#'                     Each element should be a character string/vector naming 1 or more
+#'                     modules that will be loaded `after` or `before` this module.
+#'                     `after` and `before` are used from the current module's
+#'                     perspective. So, `list(after = c("Biomass_core"))` means that
+#'                     this module must come *after* `"Biomass_core"`. This should only
+#'                     be used when there are cyclic dependencies (2 or more modules
+#'                     have 1 or more objects that is in both `inputObjects` and
+#'                     `outputObjects` of both/all modules) between this module
+#'                     and other modules. In cases where the dependencies are not cyclic,
+#'                     SpaDES is able to resolve the order correctly.\cr
 #'    `reqdPkgs` \tab List of R package names required by the module. These
 #'                         packages will be loaded when `simInit` is called.
 #'                         [Require::Require()] will be used internally

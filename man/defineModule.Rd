@@ -74,7 +74,17 @@ This is currently not parsed by SpaDES;
 it is for human readers only.\cr
 \code{documentation} \tab List of filenames referring to module documentation sources.
 This is currently not parsed by SpaDES;
-it is for human readers only.\cr\cr
+it is for human readers only.\cr
+\code{loadOrder} \tab Named list of length 0, 1, or 2, with names being \code{after} and \code{before}.
+Each element should be a character string/vector naming 1 or more
+modules that will be loaded \code{after} or \code{before} this module.
+\code{after} and \code{before} are used from the current module's
+perspective. So, \code{list(after = c("Biomass_core"))} means that
+this module must come \emph{after} \code{"Biomass_core"}. This should only
+be used when there are cyclic dependencies (2 or more modules
+have the common \code{inputObjects} and \code{outputObjects}) between this module
+and other modules. In cases where the dependencies are not cyclic,
+SpaDES is able to resolve the order correctly.\cr
 \code{reqdPkgs} \tab List of R package names required by the module. These
 packages will be loaded when \code{simInit} is called.
 \code{\link[Require:Require]{Require::Require()}} will be used internally
