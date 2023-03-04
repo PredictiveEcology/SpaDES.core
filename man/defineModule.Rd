@@ -82,7 +82,8 @@ modules that will be loaded \code{after} or \code{before} this module.
 perspective. So, \code{list(after = c("Biomass_core"))} means that
 this module must come \emph{after} \code{"Biomass_core"}. This should only
 be used when there are cyclic dependencies (2 or more modules
-have the common \code{inputObjects} and \code{outputObjects}) between this module
+have 1 or more objects that is in both \code{inputObjects} and
+\code{outputObjects} of both/all modules) between this module
 and other modules. In cases where the dependencies are not cyclic,
 SpaDES is able to resolve the order correctly.\cr
 \code{reqdPkgs} \tab List of R package names required by the module. These
