@@ -3194,9 +3194,9 @@ moduleObjects <- function(sim, module, path) {
         }
       }
     }
+    sim <- simTry
   }
 
-  sim <- simTry
 
   if (!is.null(sim)) {
     path <- modulePath(sim)
