@@ -264,7 +264,8 @@ test_that("test .prepareOutput", {
     objects = c("landscape")
   )
 
-  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(), debug = FALSE)
+  # simCached3 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(), debug = FALSE) # not sure why this causes caching to occur
+  simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(), debug = FALSE) # not sure why
   simCached2 <- spades(Copy(mySim), cache = TRUE, debug = FALSE)
 
   if (interactive()) {
@@ -280,6 +281,9 @@ test_that("test .prepareOutput", {
     cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
   }
 
+  # The Filebacking changed during `.dealWithClass`
+  simCached1$landscape[] <- simCached1$landscape[]
+  simCached2$landscape[] <- simCached2$landscape[]
   expect_true(all.equal(simCached1, simCached2)) ## TODO: #236
 })
 
@@ -287,7 +291,8 @@ test_that("test .robustDigest for simLists", {
   if (requireNamespace("ggplot2")) {
     testInitOut <- testInit(c("igraph", "raster"), smcc = TRUE,
                             opts = list(spades.recoveryMode = FALSE,
-                                        "reproducible.useMemoise" = FALSE))
+                                        "reproducible.useMemoise" = FALSE,
+                                        reproducible.showSimilar = TRUE))
     opts <- options("reproducible.cachePath" = tmpdir)
     on.exit({
       options(opts)
@@ -304,7 +309,6 @@ test_that("test .robustDigest for simLists", {
                  params = list(test = list(.useCache = ".inputObjects")))
 
     try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
-
     mess1 <- capture_messages(do.call(simInit, args))
     msgGrep <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
@@ -615,16 +619,16 @@ test_that("test showSimilar", {
   })
   mySim$a <- 1
   mess <- capture_messages({
-    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+    out3 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_true(any(grepl("Cache of.*differs", mess))) ## TODO: no longer true; confirm why.
+  expect_false(any(grepl("Cache of.*differs", mess))) ## Now it is function-specific -- no previous spades call
   mySim$a <- 2
   mess <- capture_messages({
-    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+    out4 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
   expect_true(any(grepl("Cache of.*differs", mess))) ## TODO: no longer true; confirm why.
   mess <- capture_messages({
-    out1 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+    out5 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
