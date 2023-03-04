@@ -20,8 +20,6 @@
 \alias{citation,character-method}
 \alias{sessInfo}
 \alias{sessInfo,simList-method}
-\alias{moduleObjects}
-\alias{findObjects}
 \title{Metadata accessors}
 \usage{
 inputObjects(sim, module, path)
@@ -59,10 +57,6 @@ citation(package, lib.loc = NULL, auto = NULL, module = character())
 sessInfo(sim)
 
 \S4method{sessInfo}{simList}(sim)
-
-moduleObjects(sim, module, path)
-
-findObjects(objects, sim, module, path)
 }
 \arguments{
 \item{sim}{A \code{simList} object from which to extract element(s) or
@@ -92,19 +86,6 @@ a \code{simList} or a character string for a package name.}
     \file{CITATION} file is used if it exists, or an object of class
     \code{"\link[utils]{packageDescription}"} with package metadata (see
     below).}
-
-\item{objects}{A character vector of length >= 1 with name(s) of objects to look
-for in the metadata. This is used in a \code{grep}, meaning it will do partial
-matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
-use \code{regexp}.}
-}
-\value{
-\code{moduleObjects} returns a data.table with 4 columns, \code{module}, \code{objectName}, \code{type}, and \code{desc},
-pulled directly from the object metadata in the \code{createsOutputs} and \code{expectsInputs}. These
-will be determined either from a \code{simList} or from the module source code.
-
-\code{findObjects} returns a data.table similar to \code{moduleObjects}, but with only the
-objects provided by \code{objects}.
 }
 \description{
 These accessors extract the metadata for a module (if specified) or all modules
@@ -117,7 +98,4 @@ setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 # use Require and reqdPkgs
 pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 }
-# findObjects
-path <- system.file("sampleModules", package = "SpaDES.core")
-findObjects(path = path, module = dir(path), objects = "caribou")
 }

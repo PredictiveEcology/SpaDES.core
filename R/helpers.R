@@ -151,8 +151,6 @@ setMethod(
 #' @author Eliot McIntire
 #' @importFrom reproducible .grepSysCalls
 #' @keywords internal
-#' @name findObjects
-#' @rdname findObjects
 .findObjects <- function(objects, functionCall = "simInit") {
   scalls <- sys.calls()
   grep1 <- .grepSysCalls(scalls, functionCall)

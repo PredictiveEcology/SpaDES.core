@@ -1533,7 +1533,7 @@ objectsCreatedPost <- function(sim, objsIsNullBefore) {
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
   if (length(newObjs)) {
     df <- data.frame(`New objects created:` = names(newObjs))
-    reproducible:::messageColoured("New objects created:", colour = "yellow")
+    messageColoured("New objects created:", colour = "yellow")
     messageDF(df, colour = "yellow", colnames = FALSE)
   }
 }
@@ -1568,13 +1568,13 @@ RequireWithHandling <- function(allPkgs, standAlone = FALSE, upgrade = FALSE) {
     Require(allPkgs, standAlone = standAlone, upgrade = upgrade) # basically don't change anything
     , message = function(m) {
       if (any(grepl("Error: package or namespace", m$message))) {
-        pkg <- gsub("^.+namespace ‘(.+)’ .+ is already loaded.+$", "\\1", m$message)
+        pkg <- gsub("^.+namespace \u2018(.+)\u2019 .+ is already loaded.+$", "\\1", m$message)
         message(m)
         stop(stopMessForRequireFail(pkg))
       }
     }
     , warning = function(w) {
-      warnMess <- "^.+ersion .+ of ‘(.+)’ masked by .+$"
+      warnMess <- "^.+ersion .+ of \u2018(.+)\u2019 masked by .+$"
       if (any(grepl(warnMess, w$message))) {
         pkg <- gsub(warnMess, "\\1", w$message)
         warning(w)
@@ -1589,15 +1589,15 @@ stopMessForRequireFail <- function(pkg) {
   "\nIf this/these occur(s) again, your session likely ",
   "pre-loads old packages from e.g., your personal library. ",
   "The best thing to do is try to\n",
-  yellow("restart R without loading any packages."),
+  crayon::yellow("restart R without loading any packages."),
   "\n\nIf that is not easy to do, you can try to update it in that location with (for a CRAN package) e.g., :\n",
-  yellow("restart R "),
-  blue(paste0("\ninstall.packages(c('", pkg, "'))")),
-  yellow("\nrestart R"),
+  crayon::yellow("restart R "),
+  crayon::blue(paste0("\ninstall.packages(c('", pkg, "'))")),
+  crayon::yellow("\nrestart R"),
   "\n\nIf that does not work (including non-CRAN packages), perhaps removing the old one...",
-  yellow("\nrestart R "),
-  blue(paste0("\nremove.packages(c('", pkg, "'))")),
-  yellow("\nrestart R"),
+  crayon::yellow("\nrestart R "),
+  crayon::blue(paste0("\nremove.packages(c('", pkg, "'))")),
+  crayon::yellow("\nrestart R"),
   "\nThis should trigger a re-installation, or allow ",
   "for a manual install.packages ...")
 }

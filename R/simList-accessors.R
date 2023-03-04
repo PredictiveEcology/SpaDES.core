@@ -3177,7 +3177,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
 
 #' @export
-#' @rdname simList-accessors-metadata
+#' @rdname objects
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
@@ -3238,7 +3238,7 @@ moduleObjects <- function(sim, module, path) {
 }
 
 #' @export
-#' @rdname simList-accessors-metadata
+#' @rdname objects
 #' @param objects A character vector of length >= 1 with name(s) of objects to look
 #'   for in the metadata. This is used in a `grep`, meaning it will do partial
 #'   matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
