@@ -936,12 +936,15 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 
 #' Methods for .dealWithClass and .dealWithClassOnRecovery
 #'
-#' @inheritParams reproducible::.dealWithClass
 #'
 #' @return The same obj as passed into the function, but dealt with so that it can be
 #' saved to disk.
 #'
-#' @inheritParams clearCache
+#' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
+#' @param drv an object that inherits from `DBIDriver`, or an existing
+#'            `DBIConnection` object (in order to clone an existing connection).
+#' @inheritParams reproducible::clearCache
+#' @inheritParams reproducible::.dealWithClass
 #' @importFrom reproducible .dealWithClass
 #' @include simList-class.R
 #' @export
@@ -959,6 +962,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 
 
 #' @export
+#' @inheritParams reproducible::.dealWithClassOnRecovery
 #' @importFrom reproducible .dealWithClassOnRecovery
 #' @rdname dealWithClass
 .dealWithClassOnRecovery.simList <- function(obj, cachePath, cacheId,
@@ -1043,9 +1047,7 @@ if (!isGeneric("clearCache")) {
 #'
 #' This will take the `cachePath(object)` and pass
 #'
-#' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
-#' @param drv an object that inherits from `DBIDriver`, or an existing
-#'            `DBIConnection` object (in order to clone an existing connection).
+#' @inheritParams .dealWithClass.simList
 #' @inheritParams reproducible::clearCache
 #'
 #' @return A `data.table` object showing the subset of items in the cache, located at `cachePath`
