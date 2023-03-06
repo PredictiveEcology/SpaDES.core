@@ -30,6 +30,11 @@ in which to replace element(s).}
 
 \item{value}{objects to assign to the \code{simList}}
 
+\item{module}{Character vector of module name(s)}
+
+\item{path}{The path to the module., i.e., the \code{modulePath}.
+Only relevant if \code{sim} not supplied.}
+
 \item{objects}{A character vector of length >= 1 with name(s) of objects to look
 for in the metadata. This is used in a \code{grep}, meaning it will do partial
 matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can

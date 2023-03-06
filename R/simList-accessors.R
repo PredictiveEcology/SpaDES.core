@@ -3178,6 +3178,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
 #' @export
 #' @rdname objects
+#' @inheritParams inputObjects
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These

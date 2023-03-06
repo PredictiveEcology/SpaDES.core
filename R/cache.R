@@ -941,6 +941,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @return The same obj as passed into the function, but dealt with so that it can be
 #' saved to disk.
 #'
+#' @inheritParams clearCache
 #' @importFrom reproducible .dealWithClass
 #' @include simList-class.R
 #' @export
