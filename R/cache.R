@@ -754,6 +754,9 @@ setMethod(
         }
       }
 
+      # Need the .Cache attributes from the recovered simFromCache
+      attr(simPost, ".Cache") <- attr(simFromCache, ".Cache")
+
       attrsToGrab <- setdiff(names(attributes(simFromCache)), names(attributes(simPost)))
       for (atts in attrsToGrab) {
         setattr(simPost, atts, attr(simFromCache, atts))
