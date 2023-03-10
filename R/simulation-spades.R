@@ -1363,14 +1363,15 @@ setMethod(
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
     expression(Cache(FUN = modCall,
-                sim = sim,
+                     sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
-                showSimilar = showSimilar,
-                     cachePath = sim@paths[["cachePath"]]))
+                     showSimilar = showSimilar,
+                     cachePath = sim@paths[["cachePath"]],
+                     .functionName = moduleCall))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
