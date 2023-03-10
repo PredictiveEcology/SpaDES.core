@@ -128,6 +128,8 @@ setMethod(
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
+    object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
+
     if (NROW(object@inputs))
       object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
     deps <- object@depends@dependencies
@@ -204,7 +206,7 @@ setMethod(
     #   not files
     nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
     obj[nonDotListNoOutputs] <- lapply(nonDotListNoOutputs, function(x) .robustDigest(slot(object, x), algo = algo))
-    obj["outputs"] <- .robustDigest(object@outputs, quick = TRUE)
+    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
