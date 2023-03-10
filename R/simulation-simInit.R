@@ -1236,7 +1236,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
     }
   } else {
-    message(crayon::green("All required input Objects provided; skipping .inputObjects"))
+    message(crayon::green("All required inputObjects for ",mBase, " provided; skipping .inputObjects"))
   }
 
   sim@current <- list()
