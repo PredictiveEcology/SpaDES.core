@@ -71,7 +71,7 @@ Suggests:
     terra,
     testthat (>= 1.0.2)
 Remotes:
-    PredictiveEcology/reproducible@cacheAtts
+    PredictiveEcology/reproducible@terra-migration
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
