@@ -77,18 +77,32 @@ setMethod(
         out <- list()
       }
 
-      out <- tryCatch(
-        eval(out),
-        error = function(x) {
-          if (any(grepl("bind_rows", out))) { # historical artifact
-            if (!require("dplyr", quietly = TRUE))
-              stop("To read module: '", gsub("\\.R", "", basename(filename)),
-                   "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '",.libPaths()[1],"')")
-            out <- eval(out)
-          }
-          out
+      out1 <- try(eval(out), silent = TRUE)
+      if (is(out1, "try-error")) {
+        if (any(grepl("bind_rows", out))) { # historical artifact
+          if (!require("dplyr", quietly = TRUE))
+            stop("To read module: '", gsub("\\.R", "", basename(filename)),
+                 "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '", .libPaths()[1], "')")
+          out1 <- eval(out)
         }
-      )
+        if (is(out1, "try-error")) {
+          # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
+          if (any(grep("\\<sim\\>", out))) {
+            opts <- options(spades.moduleCodeChecks = FALSE, reproducible.useCache = FALSE,
+                            spades.dotInputObjects = FALSE)
+            on.exit(options(opts))
+            m <- tmp[["pf"]][[1]][[3]]$name
+            suppressMessages({
+              sim <- simInit(modules = m, paths = list(modulePath = dirname(dirname(filename))))
+            })
+            newEnv <- new.env(parent = sim@.xData$.mods[[m]])
+            newEnv$sim <- sim
+            out1 <- eval(out, envir = newEnv)
+          }
+        }
+      }
+      out <- out1
+
     } else {
       out <- NULL
     }
@@ -152,8 +166,8 @@ setMethod(
 #'
 #' @param userSuppliedObjNames Character string (or `NULL`, the default)
 #'                             indicating the names of objects that user has passed
-#'                             into simInit via objects or inputs.
-#'                             If all module inputObject dependencies are provided by user,
+#'                             into `simInit` via objects or inputs.
+#'                             If all module `inputObject` dependencies are provided by user,
 #'                             then the `.inputObjects` code will be skipped.
 #'
 #' @param notOlderThan Passed to `Cache` that may be used for .inputObjects function call.
@@ -171,10 +185,9 @@ setMethod(
 #' @rdname parseModule
 #'
 setGeneric(".parseModule",
-           function(sim, modules, userSuppliedObjNames = NULL, envir = NULL,
-                    notOlderThan, ...) {
+           function(sim, modules, userSuppliedObjNames = NULL, envir = NULL, notOlderThan, ...) {
              standardGeneric(".parseModule")
-           })
+})
 
 #' @rdname parseModule
 setMethod(
@@ -225,9 +238,10 @@ setMethod(
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         tmp <- .parseConditional(envir = envir, filename = filename)
         activeCode <- list()
-        sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
-        attr(sim@.xData$.mods[[mBase]], "name") <- mBase
-        sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
+        sim <- newEnvsByModule(sim, mBase)  # sets up the module environment and the .objects sub environment
+        # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
+        # attr(sim@.xData$.mods[[mBase]], "name") <- mBase
+        # sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
@@ -268,11 +282,11 @@ setMethod(
 
           # evaluate the rest of the parsed file
           if (doesntUseNamespacing) {
-            stop("Module ",crayon::green(mBase)," still uses the old way of function naming.\n  ",
-                    "It is now recommended to define functions that are not prefixed with the module name\n  ",
-                    "and to no longer call the functions with sim$functionName.\n  ",
-                    "Simply call functions in your module with their name: e.g.,\n  ",
-                    "sim <- Init(sim), rather than sim <- sim$myModule_Init(sim)")
+            stop("Module ", crayon::green(mBase), " still uses the old way of function naming.\n  ",
+                 "It is now recommended to define functions that are not prefixed with the module name\n  ",
+                 "and to no longer call the functions with sim$functionName.\n  ",
+                 "Simply call functions in your module with their name: e.g.,\n  ",
+                 "`sim <- Init(sim)`, rather than `sim <- sim$myModule_Init(sim)`.")
             #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
             out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                        sim@.xData$.mods,
@@ -598,3 +612,9 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   return(isPack)
 }
 
+newEnvsByModule <- function(sim, modu) {
+  sim@.xData$.mods[[modu]] <- new.env(parent = asNamespace("SpaDES.core"))
+  attr(sim@.xData$.mods[[modu]], "name") <- modu
+  sim@.xData$.mods[[modu]]$.objects <- new.env(parent = emptyenv())
+  sim
+}

@@ -40,7 +40,7 @@ test_that("defineModule correctly handles different inputs", {
     outputObjects = bindrows(
       createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_),
       createsOutput(objectName = "testOutput", objectClass = "list", desc = "another vague
-                   description with spaces for outputs   another space")
+                    description with spaces for outputs   another space")
     )
   )
 
@@ -119,7 +119,17 @@ test_that("defineModule correctly handles different inputs", {
 
 test_that("depsEdgeList and depsGraph work", {
   skip_if_not_installed("NLMR")
+  skip_on_cran() # requires installation of NLMR, from a Git Repo
 
+  origRepos <- getOption("repos")
+  print(origRepos)
+  if (any(unname(origRepos) == "@CRAN@")) {
+    suppressMessages(utils::chooseCRANmirror(ind = 1))
+    on.exit({
+      options(repos = origRepos)
+      print(getOption("repos"))
+    } , add = TRUE)
+  }
   times <- list(start = 0.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),

@@ -16,14 +16,18 @@ if (!isGeneric("Plot")) {
 #' reproducibly digestible between sessions, operating systems, or machines.
 #' This will likely still not allow identical digest results across R versions.
 #'
+#' @inheritParams quickPlot::Plot
+#'
+#' @return invoked for side effect of plotting
+#'
+#' @exportMethod Plot
+#' @export
 #' @importFrom quickPlot gpar Plot
 #' @importMethodsFrom quickPlot Plot
-#' @inheritParams quickPlot::Plot
 #' @include simList-class.R
-#' @seealso `quickPlot::Plot`
-#' @exportMethod Plot
 #' @rdname Plot
-#' @export
+#' @seealso `quickPlot::Plot`
+#'
 setMethod(
   "Plot",
   signature("simList"),
@@ -57,6 +61,8 @@ if (!isGeneric(".parseElems")) {
 #' See [quickPlot::.parseElems].
 #'
 #' @inheritParams quickPlot::.parseElems
+#'
+#' @return An object, parsed from a character string and an environment.
 #'
 #' @exportMethod .parseElems
 #' @export

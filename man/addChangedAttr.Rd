@@ -17,6 +17,9 @@ were the source for \code{preDigest}}
 
 \item{...}{Anything passed to methods.}
 }
+\value{
+returns the object with attribute added
+}
 \description{
 This will evaluate which elements in the \code{simList} object changed following
 this Cached function call. It will add a named character string as an
@@ -25,7 +28,5 @@ When this function is subsequently called again, only these changed objects
 will be returned. All other \code{simList} objects will remain unchanged.
 }
 \seealso{
-\link[reproducible:exportedMethods]{reproducible::.addChangedAttr}.
-
 \link[reproducible:exportedMethods]{reproducible::.addChangedAttr}
 }

@@ -16,6 +16,9 @@ return. This is only relevant for list, environment (or similar) objects}
 
 \item{preDigestByClass}{A list, usually from \code{.preDigestByClass}}
 }
+\value{
+modified \code{object}, with attributes added
+}
 \description{
 See \link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}.
 }

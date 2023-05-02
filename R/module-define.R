@@ -1,9 +1,10 @@
-#' Defaults values used in defineModule
+#' Defaults values used in `defineModule`
 #'
-#' Where individual elements are missing in `defineModule`,
-#' these defaults will be used.
+#' Where individual elements are missing in `defineModule`, these defaults will be used.
+#'
+#' @return named list of default module metadata
+#'
 #' @export
-#'
 moduleDefaults <- list(
   ## these need to match up with `.emptyMetadata` list in helpers.R
   timeunit = .timeunitDefault(),
@@ -147,7 +148,7 @@ moduleDefaults <- list(
 #' @seealso moduleDefaults [defineEvent()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'   ## a default version of the defineModule is created with a call to newModule
 #'   newModule("test", path = tempdir(), open = FALSE)
 #'
@@ -363,7 +364,7 @@ setMethod(
 #'                  having to use `paste`; any character strings after `desc`
 #'                  will be `paste`d together with `desc`.
 #'
-#' @return data.frame
+#' @return a `data.frame`
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
@@ -389,7 +390,7 @@ setMethod(
 #'
 #' )
 #'
-#' \dontrun{
+#' \donttest{
 #' # Create a new module, then access parameters using `P`
 #' tmpdir <- file.path(tempdir(), "test")
 #' checkPath(tmpdir, create = TRUE)
@@ -401,13 +402,17 @@ setMethod(
 #' if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 #'
 #' # initialize the simList
-#' mySim <- simInit(modules = "testModule",
-#'                  paths = list(modulePath = tmpdir))
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   mySim <- simInit(modules = "testModule",
+#'                    paths = list(modulePath = tmpdir))
 #'
-#' # Access one of the parameters -- because this line is not inside a module
-#' #  function, we must specify the module name. If used within a module,
-#' #  we can omit the module name
-#' P(mySim, "testModule")$.useCache
+#'   # Access one of the parameters -- because this line is not inside a module
+#'   #  function, we must specify the module name. If used within a module,
+#'   #  we can omit the module name
+#'   P(mySim, module = "testModule") # gets all params in a module
+#'   P(mySim, ".useCache", "testModule") # just one param
+#' }
+#' unlink(tmpdir, recursive = TRUE)
 #' }
 #'
 setGeneric("defineParameter", function(name, class, default, min, max, desc, ...) {
@@ -503,8 +508,7 @@ setMethod(
 #'
 #' @param ...          Other specifications of the input object.
 #'
-#' @return A `data.frame` suitable to be passed to `inputObjects` in a
-#' module's metadata.
+#' @return A `data.frame` suitable to be passed to `inputObjects` in a module's metadata.
 #'
 #' @author Yong Luo
 #' @export
@@ -790,3 +794,5 @@ addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
 
 fileExt <- getFromNamespace("fileExt", "reproducible")
 filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
+extractInequality <- getFromNamespace("extractInequality", "Require")
+compareVersion2 <- getFromNamespace("compareVersion2", "Require")

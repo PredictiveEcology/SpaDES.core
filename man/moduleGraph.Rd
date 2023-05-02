@@ -24,8 +24,7 @@ Default is \code{FALSE}.}
 \item{...}{Arguments passed to \code{Plot}}
 }
 \value{
-A list with 2 elements, an \code{\link[=igraph]{igraph()}} object and an \code{igraph}
-communities object.
+A list with 2 elements, an \code{\link[=igraph]{igraph()}} object and an \code{igraph} communities object.
 }
 \description{
 This is still experimental, but this will show the hierarchical structure of

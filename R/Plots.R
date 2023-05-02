@@ -31,13 +31,11 @@
 #'       \item To disk as a \file{.png} or other image file, e.g., \file{.pdf}
 #'     }
 #'
-#'
 #' To turn off plotting both to screen and disk, set both
 #' `.plotInititalTime = NA` and `.plots = NA` or any other
 #' value that will not trigger a TRUE with a `grepl` with the `types`
 #' argument (e.g., `""` will omit all saving).
 #'
-#' @export
 #' @param data An (optional) arbitrary data object. If supplied, it will be passed as
 #'   the first argument to `Plot` function, and should contain all the data
 #'   required for the inner plotting. If passing a `RasterLayer`,
@@ -70,10 +68,7 @@
 #'
 #' @param ... Anything needed by `fn`, all named.
 #'
-#' @importFrom grDevices dev.off dev.cur
-#' @importFrom qs qsave
-#' @importFrom raster writeRaster
-#' @importFrom quickPlot clearPlot Plot whereInStack
+#' @return Called for its side effect of plot creation.
 #'
 #' @details
 #'
@@ -94,12 +89,17 @@
 #' `simList` of the module. This will, therefore, keep a record of figures saved
 #' *within* the `simList`
 #'
-#' @examples
+#' @export
+#' @importFrom grDevices dev.off dev.cur
+#' @importFrom qs qsave
+#' @importFrom raster writeRaster
+#' @importFrom quickPlot clearPlot Plot whereInStack
 #'
-#' \dontrun{
+#' @examples
+#' \donttest{
 #' # Note: if this is used inside a SpaDES module, do not define this
 #' #  function inside another function. Put it outside in a normal
-#' #  module script. It will cause a memory leak, otherwise.
+#' #  module script. Otherwise, it will cause a memory leak.
 #' if (!require("ggplot2")) stop("please install ggplot2")
 #' fn <- function(d)
 #'   ggplot(d, aes(a)) +
@@ -123,8 +123,8 @@
 #'       )
 #'
 #' # Can also be used like quickPlot::Plot, but with control over output type
-#' r <- raster::raster(extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-#' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500))
+#' r <- raster::raster(raster::extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+#' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 #'
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
@@ -135,6 +135,7 @@ Plots <- function(data, fn, filename,
                   deviceArgs = list(),
                   ...) {
 
+  simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
@@ -186,8 +187,12 @@ Plots <- function(data, fn, filename,
 
   # has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
-  if (missing(fn) && isTRUE(usePlot)) {
-    fn <- Plot
+  if (missing(fn)) {
+    if (isTRUE(usePlot)) {
+      fn <- Plot
+    } else {
+      fn <- plot
+    }
   }
   fnIsPlot <- identical(fn, Plot)
   if (fnIsPlot) {
@@ -289,7 +294,6 @@ Plots <- function(data, fn, filename,
         sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
                                      objectName = filePathSansExt(basename(rasterFilename)),
                                      file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
-
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
@@ -298,7 +302,6 @@ Plots <- function(data, fn, filename,
                                      objectName = filePathSansExt(basename(rawFilename)),
                                      file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
-
   }
 
   if (needSave) {
@@ -356,10 +359,11 @@ Plots <- function(data, fn, filename,
                                      objectName = filePathSansExt(basename(filename11)),
                                      file = filename11, fun = "qs::qsave", args = NA,  ...)
     }
-
   }
+
   if (exists("sim", inherits = FALSE))
     assign("sim", sim, envir = simIsIn)
+
   return(invisible(NULL))
 }
 
@@ -381,6 +385,8 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
 #'
 #' @param .plots Usually will be the `P(sim)$.plots` is used within
 #'   a module.
+#'
+#' @return logical of length 1
 #'
 #' @export
 anyPlotting <- function(.plots) {

@@ -4,6 +4,8 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #'
 #' How to load various types of files in R.
 #'
+#' @return `data.frame` of file extension, package, and function mappings
+#'
 #' @export
 #' @rdname loadFiles
 .fileExtensions <- function() {
@@ -48,9 +50,11 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 ###############################################################################
 #' Load simulation objects according to `filelist`
 #'
-#' This function has two roles: 1) to proceed with the loading of files that
-#' are in a simList or 2) as a short cut to simInit(inputs = filelist). Generally
-#' not to be used by a user.
+#' This function has two roles:
+#' 1. to proceed with the loading of files that are in a `simList`; or
+#' 2. as a shortcut to `simInit(inputs = filelist)`.
+#'
+#' @note Generally not intended to be used by users.
 #'
 #' @seealso [inputs()]
 #'
@@ -61,27 +65,25 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #'
 #' @param ...      Additional arguments.
 #'
+#' @return the modified `sim`, invisibly.
+#'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist
 #' @importFrom raster inMemory
 #' @importFrom utils getFromNamespace
 #' @include simulation-simInit.R
-#' @name loadFiles
 #' @rdname loadFiles
 #'
 #' @examples
-#' \dontrun{
-#'
+#' \donttest{
 #' # Load random maps included with package
 #' filelist <- data.frame(
 #'     files = dir(system.file("maps", package = "quickPlot"),
 #'             full.names = TRUE, pattern = "tif"),
-#'     functions = "rasterToMemory", package = "quickPlot"
+#'     functions = "rasterToMemory", package = "SpaDES.core"
 #' )
-#' sim1 <- loadFiles(filelist = filelist)
-#' clearPlot()
-#' if (interactive()) Plot(sim1$DEM)
+#' sim1 <- loadFiles(filelist = filelist) # loads all the maps to sim1 simList
 #'
 #' # Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded
 #' #  at time = 10 and 20 (via "intervals").
@@ -99,7 +101,9 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #'    intervals = c(rep(NA, length(files)-1), 10)
 #' )
 #'
-#' sim2 <- loadFiles(filelist = filelist)
+#' sim2 <- loadFiles(filelist = filelist) # only does the time = 0 loading; see next
+#' end(sim2) <- 10
+#' sim2 <- spades(sim2) # loads the object at time 10
 #'
 #' # if we extend the end time and continue running, it will load an object scheduled
 #' #  at time = 10, and it will also schedule a new object loading at 20 because
@@ -294,20 +298,16 @@ setMethod("loadFiles",
 #'
 #' @param x An object passed directly to the function raster (e.g., character string of a filename).
 #'
-#' @param ... Additional arguments to `raster::raster`, `raster::stack`,
-#' or `raster::brick`.
+#' @param ... Additional arguments to `raster::raster`, `raster::stack`, or `raster::brick`.
 #'
 #' @return A raster object whose values are stored in memory.
 #'
 #' @seealso [raster()].
 #'
-#' @name rasterToMemory
-#' @importFrom raster getValues raster setValues
-#' @export
-#' @rdname rasterToMemory
-#'
 #' @author Eliot McIntire and Alex Chubaty
-#'
+#' @export
+#' @importFrom raster getValues raster setValues
+#' @rdname rasterToMemory
 setGeneric("rasterToMemory", function(x, ...) {
   standardGeneric("rasterToMemory")
 })
@@ -352,19 +352,19 @@ setMethod("rasterToMemory",
 
 
 #' Simple wrapper to load any `Raster*` object
-#' This wraps either `raster::raster`, `raster::stack`,
-#' or `raster::brick`, allowing a single function to be used
-#' to create a new object of the same class as a template.
 #'
-#' @export
+#' This wraps either `raster::raster`, `raster::stack`, or `raster::brick`,
+#' allowing a single function to be used to create a new object of the same class as a template.
+#'
 #' @param x An object, notably a `Raster*` object. All others will simply
 #'   be passed through with no effect.
+#'
 #' @param ... Passed to `raster::raster`, `raster::stack`,
 #' or `raster::brick`
 #'
-#' @details
-#' A new (empty) object of same class as the original.
+#' @return  a new (empty) object of same class as the original.
 #'
+#' @export
 rasterCreate <- function(x, ...) {
   UseMethod("rasterCreate")
 }
@@ -394,4 +394,3 @@ rasterCreate.RasterStack <- function(x, ...) {
 rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
 }
-

@@ -25,13 +25,12 @@
 #'
 #' @author Alex Chubaty
 #'
-#' @include environment.R
-#' @include priority.R
+#' @export
 #' @importFrom quickPlot .objectNames
 #' @importFrom reproducible checkPath
-#' @export
+#' @include environment.R
+#' @include priority.R
 #' @rdname checkpoint
-#'
 doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
   ### determine whether to use checkpointing
   ### default is not to use checkpointing if unspecified
@@ -80,9 +79,10 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 #' @param file The checkpoint file.
-#' @rdname checkpoint
+#'
 #' @export
 #' @importFrom raster extension
+#' @rdname checkpoint
 checkpointLoad <- function(file) {
   stopifnot(raster::extension(file) == ".qs")
 
@@ -99,8 +99,8 @@ checkpointLoad <- function(file) {
   }
 }
 
-#' @rdname checkpoint
 #' @importFrom stats runif
+#' @rdname checkpoint
 .checkpointSave <- function(sim, file) {
   sim$._timestamp <- Sys.time() # nolint
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)

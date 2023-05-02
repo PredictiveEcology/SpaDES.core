@@ -13,10 +13,9 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @param repo  GitHub repository name, specified as `"username/repo"`.
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
-#'              Only `master` branches can be used at this point.
+#'              Only `master`/`main` branches can be used at this point.
 #'
-#' @export
-#' @rdname getModuleVersion
+#' @return `numeric_version`
 #'
 #' @details
 #' `getModuleVersion` extracts a module's most recent version by
@@ -29,10 +28,10 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' (<https://github.com/PredictiveEcology/SpaDES-modules>).
 #'
 #' @author Alex Chubaty
-#'
+#' @export
+#' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
-# igraph exports %>% from magrittr
 setGeneric("getModuleVersion", function(name, repo) {
   standardGeneric("getModuleVersion")
 })
@@ -81,13 +80,12 @@ setMethod("getModuleVersion",
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
 #'
-#' @export
-#' @rdname checkModule
-#' @importFrom utils packageVersion
+#' @return a character vector of module file paths (invisibly).
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#'
-# igraph exports %>% from magrittr
+#' @export
+#' @importFrom utils packageVersion
+#' @rdname checkModule
 setGeneric("checkModule", function(name, repo) {
   standardGeneric("checkModule")
 })
@@ -278,12 +276,9 @@ setMethod(
 #'    including whether it was downloaded or not, and whether it was renamed
 #'    (because there was a local copy that had the wrong file name).
 #'
+#' @author Alex Chubaty
 #' @export
 #' @rdname downloadModule
-#'
-#' @author Alex Chubaty
-#'
-#'
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
                                       quickCheck = FALSE, overwrite = FALSE) {
   standardGeneric("downloadModule")

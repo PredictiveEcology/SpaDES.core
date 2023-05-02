@@ -26,7 +26,7 @@ with the module code parsed into the \code{simList}}
 \item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
 }
 \value{
-A simList as if \code{spades} had been called on a simList.
+A \code{simList} as if \code{spades} had been called on a \code{simList}.
 }
 \description{
 This is very experimental and has not been thoroughly tested. Use with caution.
@@ -52,11 +52,12 @@ This will only work reliably
 The \code{simList} will be in the state it was at the time of the error.
 }
 \examples{
-\dontrun{
+\donttest{
 # options("spades.recoveryMode" = 1) # now the default
 s <- simInit()
 s <- spades(s) # if this is interrupted or fails
-s <- restartSpades() # don't need to put simList
+# the following line will not work if the previous line didn't fail
+s <- restartSpades(s) # don't need to specify `sim` if previous line fails
                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
 }
 }

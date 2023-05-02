@@ -7,7 +7,7 @@ if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
 rm(SpaDES.core.version)
 
 ## this version of the 'randomLandscapes' module loads data from file instead of
-## generating it using 'SpaDES.tools::gaussMap'
+## generating it using 'SpaDES.tools::neutralLandscapeMap'
 
 defineModule(sim, list(
   name = "randomLandscapes",
@@ -31,7 +31,7 @@ defineModule(sim, list(
   reqdPkgs = list(
     "ropensci/NLMR (>= 1.1.1)",
     "raster", "RColorBrewer",
-    "PredictiveEcology/SpaDES.tools@development (>= 1.0.0.9001)"
+    "SpaDES.tools (>= 1.0.1)"
   ),
   parameters = rbind(
     defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
@@ -106,7 +106,7 @@ Init <- function(sim) {
                      ymn = -ny / 2, ymx = ny / 2)
 
   ## Make dummy maps for testing of models
-  DEM <- neutralLandscapeMap(template,
+  DEM <- SpaDES.tools::neutralLandscapeMap(template,
                              roughness = 0.3,
                              rand_dev = 10,
                              rescale = TRUE,
@@ -115,7 +115,7 @@ Init <- function(sim) {
   DEM[] <- round(getValues(DEM), 1) * 300
   # plot(DEM)
 
-  forestAge <- neutralLandscapeMap(template,
+  forestAge <- SpaDES.tools::neutralLandscapeMap(template,
                                    roughness = 0.7,
                                    rand_dev = 10,
                                    rescale = FALSE,
@@ -124,7 +124,7 @@ Init <- function(sim) {
   forestAge[] <- round(getValues(forestAge), 1) * 10
   # plot(forestAge)
 
-  percentPine <- neutralLandscapeMap(template,
+  percentPine <- SpaDES.tools::neutralLandscapeMap(template,
                                      roughness = 0.5,
                                      rand_dev = 10,
                                      rescale = TRUE,

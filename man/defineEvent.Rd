@@ -69,7 +69,7 @@ grow <- function(sim) {
 sim <- scheduleEvent(sim, 0, "thisTestModule", "init")
 # Look at event queue
 events(sim) # shows the "init" we just added
-\dontrun{
+\donttest{
   # this is skipped when running in automated tests; it is fine in interactive use
   out <- spades(sim)
 }

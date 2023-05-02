@@ -130,6 +130,9 @@ let Plot function do it automatically.}
 \item{plotFn}{An optional function name to do the plotting internally, e.g.,
 "barplot" to get a barplot() call. Default "plot".}
 }
+\value{
+invoked for side effect of plotting
+}
 \description{
 Extends \code{quickPlot::Plot} for \code{simList} objects.
 }

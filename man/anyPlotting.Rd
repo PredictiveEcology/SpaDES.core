@@ -10,6 +10,9 @@ anyPlotting(.plots)
 \item{.plots}{Usually will be the \code{P(sim)$.plots} is used within
 a module.}
 }
+\value{
+logical of length 1
+}
 \description{
 This will do all the various tests needed to determine whether
 plotting of one sort or another will occur.

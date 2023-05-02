@@ -28,7 +28,7 @@ the element accessing the simList is actually a call, e.g.,
 \item{x}{A call in which to search for sim}
 }
 \value{
-A character string with all sim objects found
+A character string with all \code{sim} objects found.
 }
 \description{
 Find all references to \verb{sim$}
@@ -37,9 +37,9 @@ Find all references to \verb{sim$}
 \code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
 }
 \details{
-\code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
-function code to a call, and then pass it to \code{.findElements}. It also does
-some cleaning for duplications, \code{NA} values, and cases where the element
+\code{.findElementsInEnv} is a wrapper around \code{.findElements}.
+It will convert function code to a call, and then pass it to \code{.findElements}.
+It also does some cleaning for duplications, \code{NA} values, and cases where the element
 inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
 simply taken verbatim (e.g., \verb{sim[[P(sim)$stackName]])}.
 

@@ -11,6 +11,12 @@
 #' large `Raster*` objects. When using `fileBackend = 0` or `fileBackend = 1`, and
 #' when errors are noticed, please file a bug report on GitHub.
 #'
+#' @details
+#' There is a family of 4 functions that are mutually useful for saving and
+#' loading `simList` objects and their associated files (e.g., file-backed
+#' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()],
+#' [zipSimList()], [unzipSimList()]
+#'
 #' @param sim Either a `simList` or a character string of the name
 #'        of a `simList` that can be found in `envir`. Using
 #'        a character string will assign that object name to the saved
@@ -35,16 +41,8 @@
 #'        will be interpreted as a path to copy all rasters to.
 #' @param ... Passed to `save`, e.g., `compression`
 #'
-#' @return
-#' [saveSimList()]: A saved `.qs` file in `filename` location.
-#'
-#' [zipSimList()]: A saved `.zip` file in `zipfile` location.
-#'
-#' @details
-#' There is a family of 4 functions that are mutually useful for saving and
-#' loading `simList` objects and their associated files (e.g., file-backed
-#' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()],
-#' [zipSimList()], [unzipSimList()]
+#' @return For [saveSimList()], a saved `.qs` file in `filename` location.
+#'         For [zipSimList()], a saved `.zip` file in `zipfile` location.
 #'
 #' @aliases saveSim
 #' @export
@@ -135,6 +133,9 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
 #'    zip archive. Defaults to `FALSE` as this could be large, and may include many
 #'    out of date elements. See Details.
+#'
+#' @return invoked for side effect of zip archive creation
+#'
 #' @export
 #' @md
 #' @rdname saveSimList
@@ -247,11 +248,9 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'   a different computer, path, or drive. This could be the output from `unzipSimList`
 #'   (which is calls `loadSimList` internally, passing the unzipped filenames)
 #'
-#' @return
-#'
-#' * [loadSimList()]: A `simList` object.
-#' * [unzipSimList()]: Either a character vector of file names unzipped (if `load = FALSE`),
-#'   or a `simList` object.
+#' @return For [loadSimList()], a `simList` object.
+#'         For [unzipSimList()], either a character vector of file names unzipped
+#'         (if `load = FALSE`), or a `simList` object.
 #'
 #' @export
 #' @rdname loadSimList
@@ -376,15 +375,17 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 #' all the files are correctly identified and passed to
 #' `loadSimList(..., otherFiles = xxx)`. See [zipSimList] for details.
 #'
-#' @export
+#' @details
+#' If `cache` is used, it is likely that it should be trimmed before
+#' zipping, to include only cache elements that are relevant.
+#'
 #' @param zipfile Filename of a zipped simList
 #' @param load Logical. If `TRUE`, the default, then the simList will
 #'   also be loaded into R.
 #' @param ... passed to `unzip`
+#'
+#' @export
 #' @rdname loadSimList
-#' @details
-#' If `cache` is used, it is likely that it should be trimmed before
-#' zipping, to include only cache elements that are relevant.
 unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   zipfile <- normPath(zipfile)
   outFilenames <- unzip(zipfile = zipfile, list = TRUE)

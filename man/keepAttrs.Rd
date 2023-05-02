@@ -2,7 +2,7 @@
 % Please edit documentation in R/cache.R
 \name{.keepAttrs}
 \alias{.keepAttrs}
-\title{Attach missing attributes from x to y}
+\title{Attach missing attributes from \code{x} to \code{y}}
 \usage{
 .keepAttrs(x, y, omitAttrs = c(".envir", ".list", ".xData", ".Data"))
 }

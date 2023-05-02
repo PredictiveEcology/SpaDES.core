@@ -51,6 +51,8 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @param sim A `simList` simulation object.
 #'
+#' @return invoked for side effect of creating progress bar
+#'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
 #' @include environment.R

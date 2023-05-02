@@ -97,12 +97,15 @@ This must be \code{TRUE} if the use is passing a regular expression.
 Otherwise, \code{userTags} will need to be exact matches. Default is
 missing, which is the same as \code{TRUE}. If there are errors due
 to regular expression problem, try \code{FALSE}. For \code{cc}, it is
-passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}}
+passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
+it can also be \code{sorted = FALSE} to return the object unsorted.}
+}
+\value{
+A \code{data.table} object showing the subset of items in the cache, located at \code{cachePath}
+of the \code{sim} object, if \code{sim} is provided, or located in \code{cachePath}.
+For \code{clearCache} (invoked for its side effect of clearing objects matching \code{userTags}, or those
+between \code{after} or \code{before}), the returned \code{data.table} shows the removed items (invisibly).
 }
 \description{
-This will take the \code{cachePath(object)} and pass
-
-This will take the \code{cachePath(object)} and pass
-
 This will take the \code{cachePath(object)} and pass
 }

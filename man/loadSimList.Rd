@@ -31,11 +31,9 @@ also be loaded into R.}
 \item{...}{passed to \code{unzip}}
 }
 \value{
-\itemize{
-\item \code{\link[=loadSimList]{loadSimList()}}: A \code{simList} object.
-\item \code{\link[=unzipSimList]{unzipSimList()}}: Either a character vector of file names unzipped (if \code{load = FALSE}),
-or a \code{simList} object.
-}
+For \code{\link[=loadSimList]{loadSimList()}}, a \code{simList} object.
+For \code{\link[=unzipSimList]{unzipSimList()}}, either a character vector of file names unzipped
+(if \code{load = FALSE}), or a \code{simList} object.
 }
 \description{
 Loading a \code{simList} from file can be problematic as there are non-standard

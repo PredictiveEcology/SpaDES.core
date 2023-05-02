@@ -20,6 +20,9 @@ newProject(name, path, open)
 \item{open}{Logical. Should the new project file be opened after creation?
 Default \code{TRUE} in an interactive session.}
 }
+\value{
+invoked for side effect of project file creation
+}
 \description{
 Initialize a project with subdirectories \file{cache/}, \file{modules/},
 \file{inputs/}, \file{outputs/}, and \code{setPaths} accordingly.

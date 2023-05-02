@@ -16,7 +16,8 @@
 \item{message}{rest of message}
 }
 \value{
-A message with that starts with paste0(m, ":", message)
+NULL (invisibly); invoked for side effect of generating message with that starts with
+\code{paste0(m, ":", message)}.
 }
 \description{
 This uses custom tools and some optional tools in \code{codetools}

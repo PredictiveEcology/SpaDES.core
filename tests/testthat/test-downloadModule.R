@@ -35,14 +35,15 @@ test_that("downloadModule downloads and unzips a single module", {
 test_that("downloadModule downloads and unzips a parent module", {
   skip_on_cran()
   skip_if_not_installed("httr")
+  skip_if_not_installed("dplyr") # needed for bind_rows in these old modules
 
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
-  } else {
-    options(download.file.method = "curl")
-  }
+  # if (Sys.info()["sysname"] == "Windows") {
+  #   options(download.file.method = "auto")
+  # } else {
+  #   options(download.file.method = "curl")
+  # }
 
-  testInitOut <- testInit("raster", smcc = FALSE)
+  testInitOut <- testInit(c("raster", "dplyr"), smcc = FALSE)
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -51,6 +52,12 @@ test_that("downloadModule downloads and unzips a parent module", {
 
   ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
+  dirTD <- dir(tmpdir)
+  gotAllMods <- all(unlist(Map(yy = c("caribouMovementLcc", "cropReprojectLccAge", "fireSpreadLcc",
+           "forestAge", "forestSuccessionBeacons", "LCC2005", "LccToBeaconsReclassify"),
+         function(yy) any(grepl(yy, x = dirTD)))))
+  if (!isTRUE(gotAllMods)) skip("Download didn't work correctly; likely no GITHUB_PAT")
+  if (length(dirTD) < 16) skip("Download didn't work correctly; likely no GITHUB_PAT")
   if (!is.null(f$error)) {
     if (grepl("Forbidden", f$error)) {
       skip("Forbidden HTTP 403 on GitHub during downloadModule")
@@ -114,9 +121,6 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   skip_on_cran()
   skip_if_not_installed("httr")
 
-  if (identical(Sys.getenv("TRAVIS"), "true") &&
-      tolower(Sys.info()[["sysname"]]) == "darwin") skip("On Travis OSX")
-
   if (Sys.info()["sysname"] == "Windows") {
     options(download.file.method = "auto")
   } else {
@@ -127,18 +131,23 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  if (paste0(R.version$major, ".", R.version$minor) > "3.4.2") {
-    f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = TRUE))
-    if (!is.null(f$error)) {
-      if (grepl("Forbidden", f$error)) {
-        skip("Forbidden HTTP 403 on GitHub during downloadModule")
-      }
+  skipMessReGoogledrive <-
+    "Need a newer version of reproducible for downloadData for non-googledrive urls"
+  if (packageVersion("reproducible") <= "1.2.16")
+    skip(skipMessReGoogledrive)
+  f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = TRUE))
+  if (!is.null(f$error)) {
+    if (grepl("Forbidden", f$error)) {
+      skip("Forbidden HTTP 403 on GitHub during downloadModule")
     }
-    f <- f$value[[1]] %>% unlist() %>% as.character()
-    d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
-
-    d_expected <- sort(c(m, "data"))
-
-    expect_equal(d, d_expected)
+    if (grepl("no package called", f$error)) {
+      skip(skipMessReGoogledrive)
+    }
   }
+  f <- f$value[[1]] %>% unlist() %>% as.character()
+  d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
+
+  d_expected <- sort(c(m, "data"))
+
+  expect_equal(d, d_expected)
 })

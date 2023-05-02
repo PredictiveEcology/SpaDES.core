@@ -74,21 +74,25 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' This is the least modular approach, as it will happen whether a module user
 #' wants it or not.
 #'
-#' @author Eliot McIntire
-#' @author Alex Chubaty
 #' @note It is not possible to schedule separate saving events for each object
 #' that is listed in the `.saveObjects`.
 #'
 #' @param sim A `simList` simulation object.
 #'
-#' @importFrom data.table data.table
+#' @return (invisibly) the modified `sim` object.
+#'         invoked for side effect of saving the simulation to file.
+#'
 #' @export
+#' @author Eliot McIntire and Alex Chubaty
+#' @importFrom data.table data.table
 #' @rdname saveFiles
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'
-#' # This will save the "caribou" object at the save interval of 1 unit of time
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#' requireNamespace("NLMR", quietly = TRUE)) {
+#' #' # This will save the "caribou" object at the save interval of 1 unit of time
 #' #  in the outputPath location
 #' outputPath <- file.path(tempdir(), "test_save")
 #' times <- list(start = 0, end = 6, "month")
@@ -103,8 +107,9 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' modules <- list("randomLandscapes", "caribouMovement")
 #' paths <- list(
 #'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'   outputPath = savePath
+#'   outputPath = outputPath
 #' )
+#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #' mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
@@ -113,9 +118,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' dir(outputPath)
 #'
 #' # remove the files
-#' file.remove(dir(savePath, full.names = TRUE))
+#' file.remove(dir(outputPath, full.names = TRUE))
+#' options(opts) # clean up
 #'
-#' }
+#' }}
 saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   # extract the current module name that called this function
@@ -200,6 +206,8 @@ saveFiles <- function(sim) {
 #'   \item `package`: the package from which to load `fun`.
 #' }
 #'
+#' @return `data.frame`
+#'
 #' @export
 #' @importFrom data.table setnames
 #' @rdname loadFiles
@@ -219,13 +227,14 @@ saveFiles <- function(sim) {
 
 #' Generate simulation file name
 #'
-#' Assists with saving and retrieving simulations
-#' (e.g., with `saveSimList` and `loadSimList`).
+#' Assists with saving and retrieving simulations (e.g., with `saveSimList` and `loadSimList`).
 #'
 #' @param name Object name (e.g., `"mySimOut"`)
 #' @param path Directory location in where the file will be located (e.g., an `outputPath`).
 #' @param time Optional simulation time to use as filename suffix. Default `NULL`.
 #' @param ext  The file extension to use (default `"rds"`).
+#'
+#' @return character string giving a file path for a simulation file
 #'
 #' @export
 #' @importFrom reproducible normPath

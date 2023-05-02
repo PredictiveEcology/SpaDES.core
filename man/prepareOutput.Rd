@@ -14,6 +14,9 @@ This is optional if \code{Cache} is used inside a SpaDES module.}
 
 \item{...}{Anything passed to methods.}
 }
+\value{
+the modified \code{object}
+}
 \description{
 See \link[reproducible:exportedMethods]{reproducible::.prepareOutput}.
 }

@@ -25,8 +25,10 @@ Similar to \code{updateList} but does not require named lists.
 }
 \examples{
 library(igraph) # igraph exports magrittr's pipe operator
-tmp1 <- list("apple", "banana") \%>\% lapply(., `attributes<-`, list(type = "fruit"))
-tmp2 <- list("carrot") \%>\% lapply(., `attributes<-`, list(type = "vegetable"))
+tmp1 <- list("apple", "banana")
+tmp1 <- lapply(tmp1, `attributes<-`, list(type = "fruit"))
+tmp2 <- list("carrot")
+tmp2 <- lapply(tmp2, `attributes<-`, list(type = "vegetable"))
 append_attr(tmp1, tmp2)
 rm(tmp1, tmp2)
 }

@@ -20,7 +20,7 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 ################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
-#' Being deprecated. Use [utils::modifyList()] (which can not handle NULL) or
+#' Defunct. Use [utils::modifyList()] (which can not handle NULL) or
 #' [Require::modifyList2()] for case with >2 lists and can handle NULL lists.
 #'
 #' @param x   a named list
@@ -34,14 +34,13 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' @export
 #' @importFrom Require modifyList2
 #' @rdname updateList
-#'
 updateList <- function(x, y) {
-  .Deprecated("Require::modifyList2", "Require")
-  if (missing(x)) x <- list()
-  if (missing(y)) y <- list()
-  if (is.null(y)) y <- list()
-  if (is.null(x)) x <- list()
-  modifyList2(x = x, val = y)
+  .Defunct("Require::modifyList2", "Require")
+  # if (missing(x)) x <- list()
+  # if (missing(y)) y <- list()
+  # if (is.null(y)) y <- list()
+  # if (is.null(x)) x <- list()
+  # modifyList2(x = x, val = y)
 }
 
 ################################################################################
@@ -63,8 +62,10 @@ updateList <- function(x, y) {
 #'
 #' @examples
 #' library(igraph) # igraph exports magrittr's pipe operator
-#' tmp1 <- list("apple", "banana") %>% lapply(., `attributes<-`, list(type = "fruit"))
-#' tmp2 <- list("carrot") %>% lapply(., `attributes<-`, list(type = "vegetable"))
+#' tmp1 <- list("apple", "banana")
+#' tmp1 <- lapply(tmp1, `attributes<-`, list(type = "fruit"))
+#' tmp2 <- list("carrot")
+#' tmp2 <- lapply(tmp2, `attributes<-`, list(type = "vegetable"))
 #' append_attr(tmp1, tmp2)
 #' rm(tmp1, tmp2)
 setGeneric("append_attr", function(x, y) {
@@ -216,21 +217,6 @@ setMethod("rndstr",
 #' @author Alex Chubaty
 #'
 #' @examples
-#' \dontrun{
-#'   ## from global environment
-#'   a <- list(1:10)     # class `list`
-#'   b <- letters        # class `character`
-#'   d <- stats::runif(10)      # class `numeric`
-#'   f <- sample(1L:10L) # class `numeric`, `integer`
-#'   g <- lm( jitter(d) ~ d ) # class `lm`
-#'   h <- glm( jitter(d) ~ d ) # class `lm`, `glm`
-#'   classFilter(ls(), include=c("character", "list"))
-#'   classFilter(ls(), include = "numeric")
-#'   classFilter(ls(), include = "numeric", exclude = "integer")
-#'   classFilter(ls(), include = "lm")
-#'   classFilter(ls(), include = "lm", exclude = "glm")
-#'   rm(a, b, d, f, g, h)
-#' }
 #'
 #' ## from local (e.g., function) environment
 #' local({
@@ -249,7 +235,7 @@ setMethod("rndstr",
 #'   rm(a, b, d, e, f, g, h)
 #' })
 #'
-#' ## from another environment
+#' ## from another environment (can be omitted if .GlobalEnv)
 #' e = new.env(parent = emptyenv())
 #' e$a <- list(1:10)     # class `list`
 #' e$b <- letters        # class `character`
@@ -420,7 +406,7 @@ setMethod(
 #'                   so be sure to monitor this directory and remove unnecessary temp files
 #'                   that may contribute to excessive disk usage.
 #'
-#' @return Returns a named list of the user's default working directories.
+#' @return `getPaths` returns a named list of the user's default working directories.
 #' `setPaths` is invoked for the side effect of setting these directories.
 #'
 #' @author Alex Chubaty
@@ -430,7 +416,7 @@ setMethod(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' getPaths()                       ## returns the current default working paths
 #'
 #' ## set individual custom paths
@@ -477,11 +463,12 @@ getPaths <- function() {
 #' @rdname setPaths
 Paths <- .paths()
 
+#' @param silent Logical. Should the messaging occur.
+#'
 #' @export
-#' @rdname setPaths
 #' @importFrom raster tmpDir
 #' @importFrom reproducible checkPath
-#' @param silent Logical. Should the messaging occur.
+#' @rdname setPaths
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
                      terraPath, silent = FALSE) {
   defaults <- list(
@@ -595,6 +582,9 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 #' `use.names = TRUE`
 #'
 #' @param ... 1 or more `data.frame`, `data.table`, or `list` objects
+#'
+#' @return a `data.table` object
+#'
 #' @export
 bindrows <- function(...) {
   # Deal with things like "trailing commas"
@@ -614,8 +604,11 @@ bindrows <- function(...) {
 #'
 #' This can be used e.g., for Caching, to identify which files have changed.
 #'
-#' @export
 #' @inheritParams simInit
+#'
+#' @return character vector of file paths.
+#'
+#' @export
 moduleCodeFiles <- function(paths, modules) {
   path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
@@ -626,15 +619,7 @@ moduleCodeFiles <- function(paths, modules) {
 #' This function is intended to be part of module code and will test whether
 #' the value of a parameter within the current module matches the value of the
 #' same parameter in other modules. This is a test for parameters that might expect
-#' to be part of a `params = list(.globals = list(someParam = "test"))` passed
-#' to the `simInit`
-#'
-#' @return
-#' If the value of the `paramToCheck` in the current module is either `NULL` or
-#' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
-#' then this will return a character string with the value of the single parameter value
-#' in the other module(s). It will return the current value if there are no other modules
-#' with the same parameter.
+#' to be part of a `params = list(.globals = list(someParam = "test"))` passed to `simInit`.
 #'
 #' It is considered a "fail" under several conditions:
 #' \enumerate{
@@ -644,19 +629,24 @@ moduleCodeFiles <- function(paths, modules) {
 #'     so it is ambiguous which one to return.
 #' }
 #'
-#' \code{} either the current module is different than other modules,
-#' unless it is "default" or NULL.
+#' Either the current module is different than other modules, unless it is "default" or NULL.
 #'
-#' @export
-#' @rdname paramCheckOtherMods
 #' @param sim A simList
 #' @param paramToCheck A character string, length one, of a parameter name to
 #'   check and compare between the current module and one or more or all others
 #' @param moduleToUse A character vector of module names to check against. This can be
 #'   `"all"` which will compare against all other modules.
-#' @param ifSetButDifferent A character string indicating whether to `"error"`
-#'   the default, or send a `"warning"`, `message` or just silently continue
-#'   (any other value).
+#' @param ifSetButDifferent A character string indicating whether to `"error"` the default,
+#'   or send a `"warning"`, `message` or just silently continue (any other value).
+#'
+#' @return If the value of the `paramToCheck` in the current module is either `NULL` or
+#' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
+#' then this will return a character string with the value of the single parameter value
+#' in the other module(s).
+#' It will return the current value if there are no other modules with the same parameter.
+#'
+#' @export
+#' @rdname paramCheckOtherMods
 paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
                                 ifSetButDifferent = c("error", "warning", "message", "silent")) {
   currentModule <- currentModule(sim)
@@ -692,7 +682,7 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
         message("... setting to '", newVal,
                 "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
       } else if (length(paramInOtherMods) > 1) {
-        mess <- paste0("Modules in this simList have multiple values for ",paramToCheck," (",
+        mess <- paste0("Modules in this simList have multiple values for ", paramToCheck," (",
                        paste(paramInOtherMods, collapse = ", "),
                        messSuff)
         fail <- TRUE

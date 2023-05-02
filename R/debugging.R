@@ -3,10 +3,10 @@
 #' Useful for debugging.
 #'
 #' @param sim     A `simList` object.
-#' @param file    Character specifying the filename (default \file{"events.txt"}).
+#' @param file    Character specifying the file name (default \file{"events.txt"}).
 #' @param append  Logical indicating whether to append to the file (default `FALSE`).
 #'
-#' @return Nothing returned. Invoked for its side-effect of writing to file.
+#' @return Nothing returned. Invoked for its side effect of writing to file.
 #'
 #' @author Alex Chubaty
 #' @export
@@ -25,7 +25,7 @@ writeEventInfo <- function(sim, file = "events.txt", append = FALSE) {
 #' @param file    Character specifying the filename (default `"seed.txt"`).
 #' @param append  Logical indicating whether to append to the file (default `FALSE`).
 #'
-#' @return Nothing returned. Invoked for its side-effect of writing to file.
+#' @return Nothing returned. Invoked for its side effect of writing to file.
 #'
 #' @author Alex Chubaty
 #' @export

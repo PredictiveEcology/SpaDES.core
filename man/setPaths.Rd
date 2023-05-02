@@ -63,7 +63,7 @@ that may contribute to excessive disk usage.}
 \item{silent}{Logical. Should the messaging occur.}
 }
 \value{
-Returns a named list of the user's default working directories.
+\code{getPaths} returns a named list of the user's default working directories.
 \code{setPaths} is invoked for the side effect of setting these directories.
 }
 \description{
@@ -72,7 +72,7 @@ Note: there is an active binding made to \code{Paths}, so a user can use
 \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
 }
 \examples{
-\dontrun{
+\donttest{
 getPaths()                       ## returns the current default working paths
 
 ## set individual custom paths

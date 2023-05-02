@@ -33,9 +33,13 @@ in which to replace element(s).}
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
+\value{
+for \code{progressInterval}, a numeric corresponding to the progress update interval;
+for \verb{progressInterval<-}, an updated \code{simList} object.
+}
 \description{
 The progress bar can be set in two ways in SpaDES. First, by setting values
-in the .progress list element in the params list element passed to \code{\link[=simInit]{simInit()}}.
+in the \code{.progress} list element in the params list element passed to \code{\link[=simInit]{simInit()}}.
 Second, at the \code{\link[=spades]{spades()}} call itself, which can be simpler. See examples.
 }
 \details{
@@ -47,7 +51,10 @@ These both can get set by passing a
 See examples.
 }
 \examples{
-\dontrun{
+\donttest{
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+requireNamespace("NLMR", quietly = TRUE)) {
+opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 mySim <- simInit(
   times = list(start=0.0, end=100.0),
   params = list(.globals = list(stackName = "landscape"),
@@ -69,7 +76,9 @@ globals(mySim) # returns only global parameters
 checkpointFile(mySim) # returns the name of the checkpoint file
                       # In this example, "chkpnt.RData"
 checkpointInterval(mySim) # 10
-}
+
+options(opts) # reset
+}}
 }
 \seealso{
 Other functions to access elements of a 'simList' object: 

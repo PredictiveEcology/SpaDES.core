@@ -45,7 +45,7 @@ having to use \code{paste}; any character strings after \code{desc}
 will be \code{paste}d together with \code{desc}.}
 }
 \value{
-data.frame
+a \code{data.frame}
 }
 \description{
 Used to specify a parameter's name, value, and set a default. The \code{min} and
@@ -77,7 +77,7 @@ parameters = rbind(
 
 )
 
-\dontrun{
+\donttest{
 # Create a new module, then access parameters using `P`
 tmpdir <- file.path(tempdir(), "test")
 checkPath(tmpdir, create = TRUE)
@@ -89,13 +89,17 @@ newModule("testModule", tmpdir, open = FALSE)
 if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 
 # initialize the simList
-mySim <- simInit(modules = "testModule",
-                 paths = list(modulePath = tmpdir))
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  mySim <- simInit(modules = "testModule",
+                   paths = list(modulePath = tmpdir))
 
-# Access one of the parameters -- because this line is not inside a module
-#  function, we must specify the module name. If used within a module,
-#  we can omit the module name
-P(mySim, "testModule")$.useCache
+  # Access one of the parameters -- because this line is not inside a module
+  #  function, we must specify the module name. If used within a module,
+  #  we can omit the module name
+  P(mySim, module = "testModule") # gets all params in a module
+  P(mySim, ".useCache", "testModule") # just one param
+}
+unlink(tmpdir, recursive = TRUE)
 }
 
 }

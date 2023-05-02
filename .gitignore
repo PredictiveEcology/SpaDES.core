@@ -39,3 +39,7 @@ inst/doc
 revdep/.cache.rds
 
 .secret/
+
+.timings.rds
+
+timings.rds

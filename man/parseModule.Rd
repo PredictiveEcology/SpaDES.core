@@ -50,8 +50,8 @@ have no effect.}
 
 \item{userSuppliedObjNames}{Character string (or \code{NULL}, the default)
 indicating the names of objects that user has passed
-into simInit via objects or inputs.
-If all module inputObject dependencies are provided by user,
+into \code{simInit} via objects or inputs.
+If all module \code{inputObject} dependencies are provided by user,
 then the \code{.inputObjects} code will be skipped.}
 
 \item{notOlderThan}{Passed to \code{Cache} that may be used for .inputObjects function call.}

@@ -3,6 +3,10 @@ options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
 
 ## ----SpaDES-demo, eval=FALSE, echo=TRUE---------------------------------------
+#  ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
+#  #install.packages("SpaDES.taols")
+#  #install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
+#  
 #  library(SpaDES.core)
 #  
 #  demoSim <- suppressMessages(simInit(
@@ -15,7 +19,7 @@ options("spades.moduleCodeChecks" = FALSE,
 #        .plotInitialTime = NA, .plotInterval = NA, inRAM = TRUE
 #      ),
 #      caribouMovement = list(
-#        N = 1e2, .saveObjects = c("caribou"),
+#        N = 1e2, .saveObjects = "caribou",
 #        .plotInitialTime = 1, .plotInterval = 1, moveInterval = 1
 #      ),
 #      fireSpread = list(
