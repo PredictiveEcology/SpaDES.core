@@ -62,7 +62,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @section 2. Module-level saving:
 #'
 #' Using the `saveFiles` function inside a module.
-#' This must be accompanied by a `.saveObjects` list element in the
+#' This must be accompanied by a `.saveObjects` vector or list element in the
 #' `params` slot in the [simList()].
 #' Usually a module developer will create this method for future users of
 #' their module.
@@ -137,7 +137,9 @@ saveFiles <- function(sim) {
   if (moduleName != "save") {
     # i.e., a module driven save event
     toSave <- lapply(params(sim), function(y) return(y$.saveObjects))[[moduleName]] %>%
-      data.frame(objectName = ., saveTime = curTime, file = ., stringsAsFactors = FALSE)
+      unlist() %>%
+      data.table(objectName = ., saveTime = curTime, file = ., stringsAsFactors = FALSE) %>%
+      as.data.frame()
     toSave <- .fillOutputRows(toSave)
     outputs(sim) <- rbind(outputs(sim), toSave)
 
