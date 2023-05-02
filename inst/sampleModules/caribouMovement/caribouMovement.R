@@ -53,6 +53,8 @@ defineModule(sim, list(
   ),
   outputObjects = bindrows(
     createsOutput(objectName = "caribou", objectClass = "SpatialPointsDataFrame",
+                  desc = NA_character_),
+    createsOutput(objectName = "habitatQuality", objectClass = "SpatialPointsDataFrame",
                   desc = NA_character_)
   )
 ))
@@ -147,8 +149,10 @@ Move <- function(sim) {
   sim$caribou <- crop(sim$caribou, sim[[SpaDES.core::P(sim)$stackName]])
   if (length(sim$caribou) == 0) stop("All agents are off map")
 
+  habitatQuality <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]]
+
   # find out what pixels the individuals are on now
-  ex <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]][sim$caribou]
+  ex <- habitatQuality[sim$caribou]
 
   # step length is a function of current cell's habitat quality
   sl <- 0.25 / ex
@@ -160,6 +164,9 @@ Move <- function(sim) {
                       extent = extent(sim[[SpaDES.core::P(sim)$stackName]]),
                       stepLength = ln, stddev = sd, lonlat = FALSE,
                       torus = SpaDES.core::P(sim)$torus)
+
+  ## export habitat quality
+  sim$habitatQuality <- habitatQuality
 
   return(invisible(sim))
 }
