@@ -166,7 +166,7 @@ test_that("saving csv files does not work correctly", {
 test_that("saveSimList does not work correctly", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", ""))
+  testInitOut <- testInit(libraries = c("raster"), tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd"))
   unlink(tmpfile[5])
   unlink(tmpfile[6])
   on.exit({
@@ -192,6 +192,7 @@ test_that("saveSimList does not work correctly", {
   mySim <- spades(mySim)
   mySim$landscape[] <- round(mySim$landscape[], 4) # after saving, these come back different, unless rounded
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
+  mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
   ## test using qs
   # removes the file-backing, loading it into R as an inMemory object
@@ -245,7 +246,8 @@ test_that("saveSimList does not work correctly", {
   landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hi", fileBackend = 1))
   landscape3 <- suppressWarnings(writeRaster(landscape3, filename = tmpfile[[4]], overwrite = TRUE))
   landscape3 <- suppressMessages(Copy(sim$landscape, filebackedDir = "hello", fileBackend = 1, overwrite = TRUE))
-  sim$ListOfRasters <- list(landscape2, landscape3)
+  habitatQuality <- suppressMessages(Copy(sim$habitatQuality, filename = tmpfile[[7]], filebackedDir = "hello", fileBackend = 1, overwrite = TRUE))
+  sim$ListOfRasters <- list(landscape2, landscape3, habitatQuality)
   suppressMessages(zipSimList(sim, zipfile = tmpZip, filename = "test.qs"))
 
   unlink(Filenames(sim))
