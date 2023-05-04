@@ -14,7 +14,7 @@ defineModule(sim, list(
   childModules = character(),
   authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
                      role = c("aut", "cre"))),
-  version = list(caribouMovement = "1.6.0"),
+  version = list(caribouMovement = "1.6.1"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "month",
@@ -54,7 +54,7 @@ defineModule(sim, list(
   outputObjects = bindrows(
     createsOutput(objectName = "caribou", objectClass = "SpatialPointsDataFrame",
                   desc = NA_character_),
-    createsOutput(objectName = "habitatQuality", objectClass = "SpatialPointsDataFrame",
+    createsOutput(objectName = "habitatQuality", objectClass = "RasterLayer",
                   desc = NA_character_)
   )
 ))
