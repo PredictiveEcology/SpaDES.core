@@ -52,7 +52,7 @@ time, and it gets automatically scheduled during the
 
 
 Using the `saveFiles` function inside a module.
-This must be accompanied by a `.saveObjects` list element in the
+This must be accompanied by a `.saveObjects` vector or list element in the
 `params` slot in the [simList()].
 Usually a module developer will create this method for future users of
 their module.
