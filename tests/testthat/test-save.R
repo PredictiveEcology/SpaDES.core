@@ -211,8 +211,11 @@ test_that("saveSimList does not work correctly", {
 
   # Now put it back to disk for subsequent test
   unlink(c(tmpfile[1], extension(tmpfile[1], "gri"))) ## needed because of hardlink shenanigans
+  unlink(c(tmpfile[7], extension(tmpfile[7], "gri"))) ## needed because of hardlink shenanigans
   sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1])
+  sim$habitatQuality <- writeRaster(sim$habitatQuality, filename = tmpfile[7])
   mySim$landscape <- raster::setMinMax(mySim$landscape)
+  mySim$habitatQuality <- raster::setMinMax(mySim$habitatQuality)
   expect_true(all.equal(mySim, sim, check.environment = FALSE))
 
   # Now try to keep filename intact
