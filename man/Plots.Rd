@@ -149,5 +149,18 @@ Plots(data = sim$something, fn = fn,
 r <- raster::raster(raster::extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
 Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 
+# with ggplotify, Plots can also be used to plot/save
+# non-ggplot objects:
+
+if (!require("ggplotify")) stop("please install ggplotify")
+if (!require("lattice")) stop("please install lattice")
+
+plotFile <- tempfile()
+
+p1 <- densityplot(~mpg|cyl, data=mtcars)
+Plots(data = p1, fn = as.ggplot, filename = plotFile,
+      ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
+      types = c("screen", "png"), .plotInitialTime = 1)
+
 } # end of dontrun
 }
