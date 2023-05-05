@@ -60,6 +60,8 @@ jobs:
         run: |
           pak::pkg_install("ropensci/NLMR")
           pak::pkg_install("s-u/fastshp")
+          pak::pkg_install("ggplotify")
+          pak::pkg_install("lattice")
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
