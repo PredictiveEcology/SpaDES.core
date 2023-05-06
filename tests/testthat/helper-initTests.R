@@ -104,11 +104,16 @@ testOnExit <- function(testInitOut) {
     if (length(aa)) {
       skipOnCRAN <- any(grepl("skip_on_cran", sc[[tail(aa, 1)]]))
       timingsFileBase <- "timings.rds"
-      timingsFile <- if (isWindows())
-        file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
-      else
-        file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
-      if (file.exists(timingsFile))
+      timingsFile <- if (Sys.info()["user"] == "emcintir") {
+        if (isWindows())
+          file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
+        else
+          file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
+      } else {
+        file.path(getwd(), timingsFileBase)
+      }
+
+      if (length(timingsFile) > 0 && file.exists(timingsFile))
         timings <- readRDS(timingsFile)
       else
         timings <- list()

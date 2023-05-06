@@ -14,7 +14,7 @@ defineModule(sim, list(
   childModules = character(),
   authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
                      role = c("aut", "cre"))),
-  version = list(caribouMovement = "1.6.0"),
+  version = list(caribouMovement = "1.6.1"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "month",
@@ -53,6 +53,8 @@ defineModule(sim, list(
   ),
   outputObjects = bindrows(
     createsOutput(objectName = "caribou", objectClass = "SpatialPointsDataFrame",
+                  desc = NA_character_),
+    createsOutput(objectName = "habitatQuality", objectClass = "RasterLayer",
                   desc = NA_character_)
   )
 ))
@@ -147,8 +149,10 @@ Move <- function(sim) {
   sim$caribou <- crop(sim$caribou, sim[[SpaDES.core::P(sim)$stackName]])
   if (length(sim$caribou) == 0) stop("All agents are off map")
 
+  habitatQuality <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]]
+
   # find out what pixels the individuals are on now
-  ex <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]][sim$caribou]
+  ex <- habitatQuality[sim$caribou]
 
   # step length is a function of current cell's habitat quality
   sl <- 0.25 / ex
@@ -160,6 +164,9 @@ Move <- function(sim) {
                       extent = extent(sim[[SpaDES.core::P(sim)$stackName]]),
                       stepLength = ln, stddev = sd, lonlat = FALSE,
                       torus = SpaDES.core::P(sim)$torus)
+
+  ## export habitat quality
+  sim$habitatQuality <- habitatQuality
 
   return(invisible(sim))
 }
