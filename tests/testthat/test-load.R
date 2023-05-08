@@ -162,7 +162,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
 
     sim2 <- spades(sim2)
     expect_true(all(c("DEM", "forestAge", "forestCover") %in% ls(sim2)))
-    expect_true(!any(c("habitatQuality") %in% ls(sim2)))
+    expect_true(!any(c("percentPine") %in% ls(sim2)))
 
     rm(forestAge, envir = envir(sim2))
     expect_true(!("forestAge" %in% ls(sim2)))
