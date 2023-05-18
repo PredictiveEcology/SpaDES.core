@@ -1,6 +1,6 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-# SpaDES.core 1.1.1
+# SpaDES.core 1.1.2
 
 ## Enhancements
 * updates to handle upstream changes in `Require` and `reproducible`, including renaming `cacheRepo` to `cachePath` in some inherited functions.
@@ -16,8 +16,8 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * improved documentation
 
 ## Dependency Changes
-
-* removed `googledrive` Suggests;
+* drop support for R 4.0 as dependency packages no longer support it
+* removed `googledrive` from Suggests;
 
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
