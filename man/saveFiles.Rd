@@ -52,7 +52,7 @@ time, and it gets automatically scheduled during the
 
 
 Using the `saveFiles` function inside a module.
-This must be accompanied by a `.saveObjects` list element in the
+This must be accompanied by a `.saveObjects` vector or list element in the
 `params` slot in the [simList()].
 Usually a module developer will create this method for future users of
 their module.
@@ -99,6 +99,24 @@ dir(outputPath)
 
 # remove the files
 file.remove(dir(outputPath, full.names = TRUE))
+
+## save multiple outputs
+parameters <- list(
+  .globals = list(stackName = "landscape"),
+  caribouMovement = list(
+    .saveObjects = c("caribou", "habitatQuality"),
+    .saveInitialTime = 1, .saveInterval = 1
+  ),
+  randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+
+mySim <- simInit(times = times, params = parameters, modules = modules,
+                 paths = paths)
+
+spades(mySim)
+dir(outputPath)
+# remove the files
+file.remove(dir(outputPath, full.names = TRUE))
+
 options(opts) # clean up
 
 }}
