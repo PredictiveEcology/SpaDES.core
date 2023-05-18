@@ -129,16 +129,17 @@
 #' # with ggplotify, Plots can also be used to plot/save
 #' # non-ggplot objects:
 #'
-#' if (!require("ggplotify")) stop("please install ggplotify")
-#' if (!require("lattice")) stop("please install lattice")
 #'
-#' plotFile <- tempfile()
+#' if (require("ggplotify")) {
+#'   if (!require("lattice")) stop("please install lattice")
 #'
-#' p1 <- densityplot(~mpg|cyl, data=mtcars)
-#' Plots(data = p1, fn = as.ggplot, filename = plotFile,
-#'       ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
-#'       types = c("screen", "png"), .plotInitialTime = 1)
+#'   plotFile <- tempfile()
 #'
+#'   p1 <- densityplot(~mpg|cyl, data=mtcars)
+#'   Plots(data = p1, fn = as.ggplot, filename = plotFile,
+#'         ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
+#'         types = c("screen", "png"), .plotInitialTime = 1)
+#' }
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
