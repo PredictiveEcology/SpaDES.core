@@ -17,6 +17,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
 ## Dependency Changes
 * drop support for R 4.0 as dependency packages no longer support it
+* require `reproducible` v2.0.2 or higher
 * removed `googledrive` from Suggests;
 
 ## Bug Fixes
