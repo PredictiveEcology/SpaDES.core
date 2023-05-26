@@ -93,8 +93,9 @@ A module consists of a collection of files and folders that ...
           |_ CHECKSUMS.txt      # contains checksums for data files
       |_ tests/                 # contains unit tests for module code
       |_ citation.bib           # bibtex citation for the module
-      |_ LICENSE.txt            # describes module's legal usage
-      |_ README.txt             # provide overview of key aspects
+      |_ LICENSE.md             # describes module's legal usage
+      |_ NEWS.md                # log of changes made to module code
+      |_ README.md              # symlink to rendered documentation file (moduleName.md)
       |_ moduleName.R           # module code file (incl. metadata)
       |_ moduleName.Rmd         # documentation, usage info, etc.
       |_ moduleName_x.y.z.zip   # zip archive of previous versions
