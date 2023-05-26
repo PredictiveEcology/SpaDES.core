@@ -177,6 +177,7 @@ setMethod(
 #' @return A `simList` simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
+#' @importFrom crayon blue green
 #' @importFrom reproducible Cache
 #' @include environment.R
 #' @include module-dependencies-class.R
