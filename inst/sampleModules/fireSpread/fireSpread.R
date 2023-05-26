@@ -18,7 +18,7 @@ defineModule(sim, list(
   childModules = character(),
   authors = c(
     person(c("Alex", "M"), "Chubaty", email = "achubaty@for-cast.ca", role = c("aut", "cre")),
-    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca", role = c("aut"))
   ),
   version = list(fireSpread = "1.6.0"),

@@ -12,7 +12,7 @@ defineModule(sim, list(
   description = "Simulate caribou movement via correlated random walk.",
   keywords = c("caribou", "individual based movement model", "correlated random walk"),
   childModules = character(),
-  authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
+  authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
                      role = c("aut", "cre"))),
   version = list(caribouMovement = "1.6.1"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),

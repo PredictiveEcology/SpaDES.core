@@ -2,7 +2,7 @@ defineModule(sim, list(
   name = "SpaDES_sampleModules",
   description = "Sample SpaDES modules included with the 'SpaDES.core' package",
   keywords = c("demo, example"),
-  authors = c(person(c("Alex", "M."), "Chubaty", email = "alexander.chubaty@canada.ca",
+  authors = c(person(c("Alex", "M."), "Chubaty", email = "achubaty@for-cast.ca",
                      role = c("aut", "cre"))),
   childModules = c("caribouMovement", "fireSpread", "randomLandscapes"),
   version = list(SpaDES_sampleModules = "1.3.0", randomLandscapes = "1.6.0", caribouMovement = "1.6.0"),
