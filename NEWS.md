@@ -1,6 +1,6 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-# SpaDES.core 1.1.1
+# SpaDES.core 1.1.2
 
 ## Enhancements
 * messaging during nested `simInit` or `spades` calls will now not duplicate time prefix
@@ -19,8 +19,9 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * improved documentation
 
 ## Dependency Changes
-
-* removed `googledrive` Suggests;
+* drop support for R 4.0 as dependency packages no longer support it
+* require `reproducible` v2.0.2 or higher
+* removed `googledrive` from Suggests;
 
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`

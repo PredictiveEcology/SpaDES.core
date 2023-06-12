@@ -84,6 +84,7 @@ setMethod("getModuleVersion",
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
+#' @importFrom crayon magenta
 #' @importFrom utils packageVersion
 #' @rdname checkModule
 setGeneric("checkModule", function(name, repo) {

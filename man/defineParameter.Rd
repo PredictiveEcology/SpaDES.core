@@ -95,8 +95,7 @@ unlink(tmpdir, recursive = TRUE)
 
 }
 \seealso{
-\code{\link[=P]{P()}}, \code{\link[=params]{params()}} for accessing these parameters in
-a module.
+\code{\link[=P]{P()}}, \code{\link[=params]{params()}} for accessing these parameters in a module.
 }
 \author{
 Alex Chubaty and Eliot McIntire

@@ -546,6 +546,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @return returns `TRUE`; invoked for side effect of generating message with that starts with
 #' `paste0(m, ":", message)`.
 #'
+#' @importFrom crayon magenta
 #' @keywords internal
 #' @rdname parseMessage
 .parseMessage <- function(m, problem, message) {

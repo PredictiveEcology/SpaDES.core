@@ -163,9 +163,9 @@ saveFiles <- function(sim) {
 
     # don't need to save exactly same thing more than once - use data.table here because distinct
     # from dplyr does not do as expected
-    outputs(sim) <- data.table(outputs(sim)) %>%
-      unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
-      data.frame(.)
+    outputs(sim) <- data.table(outputs(sim)) |>
+      unique(by = c("objectName", "saveTime", "file", "fun", "package")) |>
+      data.frame()
   }
 
   if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
@@ -242,7 +242,8 @@ saveFiles <- function(sim) {
     "qs", "qsave", "qs",
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
-    "grd", "writeRaster", "raster"
+    "grd", "writeRaster", "raster",
+    "tif", "writeRaster", "terra"
   )), stringsAsFactors = FALSE)
   setnames(.sFE, new = c("exts", "fun", "package"), old = paste0("X", 1:3))
   .sFE <- .sFE[order(.sFE$package, .sFE$fun), ]

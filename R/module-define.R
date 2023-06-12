@@ -355,6 +355,8 @@ setMethod(
 #'       real (`NA_real_`), complex (`NA_complex_`), or character (`NA_character_`).
 #'       See [NA()].
 #'
+#' @seealso [P()], [params()] for accessing these parameters in a module.
+#'
 #' @param name      Character string giving the parameter name.
 #' @param class     Character string giving the parameter class.
 #' @param default   The default value to use when none is specified by the user.
@@ -381,10 +383,8 @@ setMethod(
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @rdname defineParameter
+#' @importFrom crayon magenta
 #'
-#' @seealso [P()], [params()] for accessing these parameters in
-#'          a module.
 #' @examples
 #' parameters = rbind(
 #'   defineParameter("lambda", "numeric", 1.23, desc = "intrinsic rate of increase"),
