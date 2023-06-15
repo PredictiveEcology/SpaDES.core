@@ -801,6 +801,7 @@ scheduleConditionalEvent <- function(sim,
 #' See <https://github.com/PredictiveEcology/SpaDES/wiki/Debugging> for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
+#' @importFrom crayon blue magenta
 #' @importFrom data.table setDTthreads
 #' @export
 #' @rdname spades
@@ -1765,6 +1766,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
   i
 }
 
+#' @importFrom crayon green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
   for (i in seq_along(debug)) {

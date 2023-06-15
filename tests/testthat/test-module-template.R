@@ -17,11 +17,13 @@ test_that("module templates work", {
 
   expect_true(file.exists(mpath))
   expect_true(file.exists(file.path(mpath, "citation.bib")))
-  expect_true(file.exists(file.path(mpath, "LICENSE")))
+  expect_true(file.exists(file.path(mpath, "LICENSE.md")))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".R"))))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".Rmd"))))
-  expect_true(file.exists(file.path(mpath, "README.md")))
-
+  expect_true(file.exists(file.path(mpath, "NEWS.md")))
+  expect_true(
+    utils::file_test("-h", file.path(mpath, "README.md")) | file.exists(file.path(mpath, "README.md"))
+  )
   expect_true(dir.exists(file.path(mpath, ".github")))
   expect_true(dir.exists(file.path(mpath, ".github", "workflows")))
   expect_true(file.exists(file.path(mpath, ".github", "workflows", "render-module-rmd.yaml")))
@@ -47,6 +49,7 @@ test_that("module templates work", {
                            output = file.path(mpath, paste0(moduleName, ".md")),
                            quiet = TRUE),
                file.path(mpath, paste0(moduleName, ".md")))
+  expect_true(file.exists(file.path(mpath, "README.md"))) ## file should exist now, post-knit
 
   # Test that the dummy unit tests work
   #test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
