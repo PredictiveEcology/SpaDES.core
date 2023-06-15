@@ -1115,6 +1115,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' and remove it from the `simList` so next module won't rerun it.
 #'
 #' @keywords internal
+#' @importFrom crayon green
 #' @importFrom reproducible basename2
 #' @rdname runModuleInputsObjects
 .runModuleInputObjects <- function(sim, m, objects, notOlderThan) {

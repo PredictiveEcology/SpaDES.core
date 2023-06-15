@@ -1,4 +1,4 @@
-SpaDES.core.version <- "1.0.7"
+SpaDES.core.version <- "2.0.0"
 if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'caribouMovement' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
@@ -12,7 +12,7 @@ defineModule(sim, list(
   description = "Simulate caribou movement via correlated random walk.",
   keywords = c("caribou", "individual based movement model", "correlated random walk"),
   childModules = character(),
-  authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
+  authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
                      role = c("aut", "cre"))),
   version = list(caribouMovement = "1.6.1"),
   spatialExtent = raster::extent(rep(NA_real_, 4)),
@@ -20,7 +20,7 @@ defineModule(sim, list(
   timeunit = "month",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("grid", "raster", "sp", "stats", "SpaDES.tools"),
+  reqdPkgs = list("grid", "terra", "sp", "stats", "SpaDES.tools (>= 2.0.0)"),
   parameters = rbind(
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
     defineParameter("moveInitialTime", "numeric", start(sim) + 1, start(sim) + 1, end(sim),
@@ -45,16 +45,16 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, module = "caribouMovement")$stackName,
-                 objectClass = "RasterStack", desc = "layername = \"habitatQuality\"",
+                 objectClass = "SpatRaster", desc = "layername = \"habitatQuality\"",
                  sourceURL = NA_character_),
     expectsInput(objectName = "caribou",
-                 objectClass = "SpatialPointsDataFrame", desc = "Object holding caribou locations",
+                 objectClass = "SpatVector", desc = "Object holding caribou locations",
                  sourceURL = NA_character_)
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = "caribou", objectClass = "SpatialPointsDataFrame",
+    createsOutput(objectName = "caribou", objectClass = "SpatVector",
                   desc = NA_character_),
-    createsOutput(objectName = "habitatQuality", objectClass = "RasterLayer",
+    createsOutput(objectName = "habitatQuality", objectClass = "SpatRaster",
                   desc = NA_character_)
   )
 ))
@@ -88,17 +88,24 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot.init = {
       # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
+      ## TODO: restore plotting
+      ##   Error: could not find function "$"
+      # Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
+      #      new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
     },
     plot = {
       # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-           new = FALSE, pch = 19, size = 0.2, gp = gpar(cex = 0.6))
-      Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
+      ## TODO: restore plotting
+      ##   Error: could not find function "$"
+      # Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
+      #      new = FALSE, pch = 19, size = 0.2, gp = gpar(cex = 0.6))
+
+      ## TODO: restore plotting
+      ## Error: [subset] invalid name(s)
+      # Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
@@ -137,9 +144,7 @@ Init <- function(sim) {
                   y = runif(N, yrange[1], yrange[2]))
 
   # create the caribou agent object
-  sim$caribou <- SpatialPointsDataFrame(coords = starts,
-                                        data = data.frame(x1, y1, sex, age))
-  row.names(sim$caribou) <- IDs # alternatively, add IDs as column in data.frame above
+  sim$caribou <- vect(cbind(starts, data.frame(IDs, x1, y1, sex, age)), geom = c("x", "y"))
 
   return(invisible(sim))
 }
@@ -152,7 +157,7 @@ Move <- function(sim) {
   habitatQuality <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]]
 
   # find out what pixels the individuals are on now
-  ex <- habitatQuality[sim$caribou]
+  ex <- cellFromXY(habitatQuality, crds(sim$caribou))
 
   # step length is a function of current cell's habitat quality
   sl <- 0.25 / ex
@@ -161,9 +166,9 @@ Move <- function(sim) {
   sd <- 30 # could be specified globally in params
 
   sim$caribou <- move("crw", agent = sim$caribou,
-                      extent = extent(sim[[SpaDES.core::P(sim)$stackName]]),
+                      extent = ext(sim[[SpaDES.core::P(sim)$stackName]]),
                       stepLength = ln, stddev = sd, lonlat = FALSE,
-                      torus = SpaDES.core::P(sim)$torus)
+                      torus = SpaDES.core::P(sim)$torus) ## TODO: crw() is dropping attributes!
 
   ## export habitat quality
   sim$habitatQuality <- habitatQuality

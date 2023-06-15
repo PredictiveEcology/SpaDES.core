@@ -1331,11 +1331,11 @@ setReplaceMethod(
 
        # file extension stuff
        fileExts <- .saveFileExtensions()
-       fe <- setDT(fileExts)[setDT(sim@outputs[,c("fun", "package")]), on = c("fun","package")]$exts
+       fe <- setDT(fileExts)[setDT(sim@outputs[, c("fun", "package")]),
+                             on = c("fun", "package")]$exts
 
        # grep allows for file extensions from 1 to 5 characters
-       wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) &
-         (nzchar(fe, keepNA = TRUE))
+       wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) & nzchar(fe, keepNA = TRUE)
        sim@outputs[["file"]][wh] <- paste0(sim@outputs[["file"]][wh], ".", fe[wh])
 
        # If the file name already has a time unit on it,

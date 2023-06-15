@@ -7,26 +7,27 @@ See `NEWS.md` for a full list of changes.
 
 ### Previous R versions
 * Ubuntu 20.04                 (GitHub), R 4.1.3
-* Windows                       (local), R 4.1.3
+* Ubuntu 20.04                 (GitHub), R 4.2.3
 * Windows                      (GitHub), R 4.1.3
-* Windows                 (win-builder), R 4.1.3
+* Windows                      (GitHub), R 4.2.3
+* Windows                 (win-builder), R 4.2.3
 
 ### Current R versions
-* macOS 12.6.3 Monterey        (GitHub), R 4.2.2
-* macOS (M2) 13.2.1 Ventura     (local), R 4.2.2
-* macOS (M1) Big Sur             (rhub), R 4.2.2
-* Ubuntu 20.04                 (GitHub), R 4.2.2
-* Ubuntu 20.04                  (local), 4.2.2 Patched (2022-11-10 r83330)
-* Windows                      (GitHub), R 4.2.2
-* Windows                       (local), R 4.2.2
-* Windows                 (win-builder), R 4.2.2
+* macOS 12.6.3 Monterey        (GitHub), R 4.3.0
+* macOS (M2) 13.2.1 Ventura     (local), R 4.3.0
+* macOS (M1) Big Sur             (rhub), R 4.3.0
+* Ubuntu 20.04                 (GitHub), R 4.3.0
+* Ubuntu 20.04                  (local), R 4.3.0
+* Windows                      (GitHub), R 4.3.0
+* Windows                       (local), R 4.3.0
+* Windows                 (win-builder), R 4.3.0
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2023-02-26 r83908)
-* Ubuntu 20.04                  (local), R-devel (2023-02-28 r83913)
-* Windows                      (GitHub), R-devel (2023-02-27 r83911 ucrt)
-* Windows                 (win-builder), R-devel (2023-02-27 r83911 ucrt))
-* Windows                       (local), R-devel (2023-02-27 r83911 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2023-05-18 r84448)
+* Ubuntu 20.04                  (local), R-devel (2023-05-18 r84448)
+* Windows                      (GitHub), R-devel (2023-05-18 r84448 ucrt)
+* Windows                 (win-builder), R-devel (2023-05-18 r84448 ucrt))
+* Windows                       (local), R-devel (2023-05-18 r84448 ucrt)
 
 ## R CMD check results
 

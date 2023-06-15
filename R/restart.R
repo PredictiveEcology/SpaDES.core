@@ -72,6 +72,8 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
+#' @importFrom crayon blue
+#'
 #' @examples
 #' \donttest{
 #' # options("spades.recoveryMode" = 1) # now the default
@@ -406,6 +408,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   }
 }
 
+#' @keywords internal
 FirstFromR <- function(...) {
   ca <- commandArgs()
   .rndString <- ca[4]
@@ -413,6 +416,8 @@ FirstFromR <- function(...) {
   First(.rndString = .rndString)
 }
 
+#' @importFrom crayon green
+#' @keywords internal
 First <- function(...) {
   # From Rstudio, it gets all the correct, session-specific files.
   #   From R, it does not. Only has the commandArgs -- must rebuild objects
