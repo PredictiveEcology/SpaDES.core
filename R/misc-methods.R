@@ -61,7 +61,6 @@ updateList <- function(x, y) {
 #' @rdname append_attr
 #'
 #' @examples
-#' library(igraph) # igraph exports magrittr's pipe operator
 #' tmp1 <- list("apple", "banana")
 #' tmp1 <- lapply(tmp1, `attributes<-`, list(type = "fruit"))
 #' tmp2 <- list("carrot")
@@ -466,7 +465,6 @@ Paths <- .paths()
 #' @param silent Logical. Should the messaging occur.
 #'
 #' @export
-#' @importFrom raster tmpDir
 #' @importFrom reproducible checkPath
 #' @rdname setPaths
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,

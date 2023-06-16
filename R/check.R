@@ -132,7 +132,6 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #'
-# igraph exports %>% from magrittr
 setGeneric("checkParams", function(sim, coreParams, ...) {
   standardGeneric("checkParams")
 })

@@ -75,6 +75,7 @@ setMethod("Copy",
               sim_ <- newEnvsByModule(sim_, modNam)
             }
 
+            if (exists("aaaa")) browser()
             if (objects) {
               # browser(expr = exists("._Copy_6"))
               objNames <- ls(object@.xData$.mods, all.names = TRUE)

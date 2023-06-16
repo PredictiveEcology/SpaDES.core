@@ -146,7 +146,7 @@ Plots(data = sim$something, fn = fn,
       )
 
 # Can also be used like quickPlot::Plot, but with control over output type
-r <- raster::raster(raster::extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
 Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 
 } # end of dontrun

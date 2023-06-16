@@ -75,7 +75,7 @@ directory information.\cr
 load that file. Defaults to the known extensions in \code{SpaDES} (found by
 examining \code{.fileExtensions()}). The \code{package} and \code{fun} can be
 jointly specified here as \code{"packageName::functionName"}, e.g.,
-\code{"raster::raster"}.\cr
+\code{"terra::rast"}.\cr
 
 \code{package} \tab optional character string indicating the package in
 which to find the \code{fun});\cr
@@ -134,9 +134,8 @@ the module will get it here:
 sim <- simInit()
 
 test <- 1:10
-library(igraph) # for \%>\%
 library(reproducible) # for checkPath
-tmpdir <- file.path(tempdir(), "inputs") \%>\% checkPath(create = TRUE)
+tmpdir <- file.path(tempdir(), "inputs") |> checkPath(create = TRUE)
 tmpFile <- file.path(tmpdir, "test.rds")
 saveRDS(test, file = tmpFile)
 inputs(sim) <- data.frame(file = tmpFile) # using only required column, "file"
@@ -151,35 +150,33 @@ allTifs <- dir(system.file("maps", package = "quickPlot"),
 
 # next: .objectNames are taken from the filenames (without the extension)
 # This will load all 5 tifs in the SpaDES sample directory, using
-#   the raster fuction in the raster package, all at time = 0
-if (require("rgdal", quietly = TRUE)) {
-  sim <- simInit(
-    inputs = data.frame(
-      files = allTifs,
-      functions = "raster",
-      package = "raster",
-      loadTime = 0,
-      stringsAsFactors = FALSE)
-    )
+#   the rast fuction in the terra package, all at time = 0
+sim <- simInit(
+  inputs = data.frame(
+    files = allTifs,
+    functions = "rast",
+    package = "terra",
+    loadTime = 0,
+    stringsAsFactors = FALSE)
+)
 
-  ##############################
-  #A fully described inputs object, including arguments:
-  files <- dir(system.file("maps", package = "quickPlot"),
-               full.names = TRUE, pattern = "tif")
-  # arguments must be a list of lists. This may require I() to keep it as a list
-  #   once it gets coerced into the data.frame.
-  arguments = I(rep(list(native = TRUE), length(files)))
-  filelist = data.frame(
-     objectName = paste0("Maps", 1:5),
-     files = files,
-     functions = "raster::raster",
-     arguments = arguments,
-     loadTime = 0,
-     intervals = c(rep(NA, length(files) - 1), 10)
-  )
-  inputs(sim) <- filelist
-  spades(sim)
-}
+##############################
+#A fully described inputs object, including arguments:
+files <- dir(system.file("maps", package = "quickPlot"),
+             full.names = TRUE, pattern = "tif")
+# arguments must be a list of lists. This may require I() to keep it as a list
+#   once it gets coerced into the data.frame.
+# arguments = I(rep(list(native = TRUE), length(files)))
+filelist = data.frame(
+  objectName = paste0("Maps", 1:5),
+  files = files,
+  functions = "terra::rast",
+  # arguments = arguments,
+  loadTime = 0,
+  intervals = c(rep(NA, length(files) - 1), 10)
+)
+inputs(sim) <- filelist
+spades(sim)
 
 # Example showing loading multiple objects from global environment onto the
 #   same object in the simList, but at different load times

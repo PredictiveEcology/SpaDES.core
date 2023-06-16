@@ -300,8 +300,8 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
                 outputPath = tempdir()),
    inputs = data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "raster",
-     package = "raster",
+     functions = "rast",
+     package = "terra",
      loadTime = 1,
      stringsAsFactors = FALSE),
    outputs = data.frame(
@@ -324,8 +324,8 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
  # add by accessor is equivalent
  inputs(mySim2) <- data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "raster",
-     package = "raster",
+     functions = "rast",
+     package = "terra",
      loadTime = 1,
      stringsAsFactors = FALSE)
  outputs(mySim2) <- data.frame(
@@ -345,8 +345,8 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
                 outputPath = tempdir()),
    inputs = data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "raster",
-     package = "raster",
+     functions = "rast",
+     package = "terra",
      loadTime = 1,
      stringsAsFactors = FALSE),
    outputs = data.frame(

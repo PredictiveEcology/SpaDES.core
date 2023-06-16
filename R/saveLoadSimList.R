@@ -53,6 +53,7 @@
 saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
   stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
+  if (exists("aaaa")) browser()
   dots <- list(...)
 
   quiet <- if (is.null(dots$quiet)) {
@@ -96,20 +97,28 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   if (exists("simName", inherits = FALSE)) {
     tmpEnv <- new.env(parent = emptyenv())
     assign(simName, sim, envir = tmpEnv)
-    if (tolower(tools::file_ext(filename)) == "rds") {
-      save(list = simName, envir = tmpEnv, file = filename)
-    } else if (tolower(tools::file_ext(filename)) == "qs") {
-      qs::qsave(get(simName, envir = tmpEnv), file = filename)
-    }
-  } else {
-    sim <- .dealWithClass(sim)
-    sim@current <- list() # it is presumed that this event should be considered finished prior to saving
-    if (tolower(tools::file_ext(filename)) == "rds") {
-      save(sim, file = filename)
-    } else if (tolower(tools::file_ext(filename)) == "qs") {
-      qs::qsave(sim, file = filename)
-    }
+    sim <- get(simName, envir = tmpEnv)
   }
+  # if (tolower(tools::file_ext(filename)) == "rds") {
+  #   save(list = simName, envir = tmpEnv, file = filename)
+  # } else if (tolower(tools::file_ext(filename)) == "qs") {
+  #   qs::qsave(get(simName, envir = tmpEnv), file = filename)
+  # }
+  # } else {
+  fns <- Filenames(sim)
+  sim <- .dealWithClass(sim)
+  sim@current <- list() # it is presumed that this event should be considered finished prior to saving
+  empties <- nchar(fns) > 0
+  if (any(empties)) {
+    fns <- fns[empties]
+    fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
+  }
+  if (tolower(tools::file_ext(filename)) == "rds") {
+    save(sim, file = filename)
+  } else if (tolower(tools::file_ext(filename)) == "qs") {
+    qs::qsave(sim, file = filename)
+  }
+
 
   if (isFALSE(quiet)) message("    ... saved!")
 
@@ -189,6 +198,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' If `cache` is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
+  browser()
   dots <- list(...)
   # if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".qs")
   # tmpDir <- file.path(tempdir(), rndstr(1, 6))
@@ -263,40 +273,42 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
   stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
+  # browser()
   if (tolower(tools::file_ext(filename)) == "rds") {
-    load(filename)
+    load(filename, envir = environment())
+    sim <- sim
   } else if (tolower(tools::file_ext(filename)) == "qs") {
     sim <- qs::qread(filename, nthreads = getOption("spades.qsThreads", 1))
-
-    browser()
-    # Work around for bug in qs that recovers data.tables as lists
-    objectName <- ls(sim)
-    names(objectName) <- objectName
-    objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
-    dt <- data.table(objectName, objectClassInSim)
-
-    io <- inputObjects(sim)
-    oo <- outputObjects(sim)
-    if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
-    if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
-    objs <- rbindlist(list(io, oo), fill = TRUE)
-    objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
-
-    objs <- objs[dt, on = "objectName"]
-    objs <- objs[objectClass == "data.table"]
-    objs <- objs[objectClass != objectClassInSim]
-    if (NROW(objs)) {
-      message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
-      message("Converting all known data.table objects (according to metadata) from list to data.table")
-      simEnv <- envir(sim)
-      out <- lapply(objs$objectName, function(on) {
-        tryCatch(assign(on, copy(as.data.table(sim[[on]])), envir = simEnv),
-                 error = function(e) warning(e))
-      })
-    }
   }
-  browser()
-  sim <- .dealWithClassOnRecovery(sim)
+  sim <- .dealWithClassOnRecovery(sim) # convert e.g., PackedSpatRaster
+
+  # Work around for bug in qs that recovers data.tables as lists
+  objectName <- ls(sim)
+  names(objectName) <- objectName
+  objectClassInSim <- lapply(objectName, function(x) is(get(x, envir = sim))[1])
+  dt <- data.table(objectName, objectClassInSim)
+
+  io <- inputObjects(sim)
+  oo <- outputObjects(sim)
+  if (is(io, "list")) io <- rbindlist(io, fill = TRUE)
+  if (is(oo, "list")) oo <- rbindlist(oo, fill = TRUE)
+  objs <- rbindlist(list(io, oo), fill = TRUE)
+  objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
+
+  objs <- objs[dt, on = "objectName"]
+  objs <- objs[objectClass == "data.table"]
+  objs <- objs[objectClass != objectClassInSim]
+  if (NROW(objs)) {
+    message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
+    message("Converting all known data.table objects (according to metadata) from list to data.table")
+    simEnv <- envir(sim)
+    out <- lapply(objs$objectName, function(on) {
+      tryCatch(assign(on, copy(as.data.table(sim[[on]])), envir = simEnv),
+               error = function(e) warning(e))
+    })
+  }
+
+  # sim <- .dealWithClassOnRecovery(sim)
 
   mods <- setdiff(sim@modules, .coreModules())
   ## TODO: this should be unnecessary after June 2020 R-devel fix for active bindings
@@ -392,6 +404,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 #' @export
 #' @rdname loadSimList
 unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
+  # browser()
   zipfile <- normPath(zipfile)
   outFilenames <- unzip(zipfile = zipfile, list = TRUE)
 

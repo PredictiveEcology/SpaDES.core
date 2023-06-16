@@ -4,8 +4,8 @@ utils::globalVariables(c(
 ))
 
 # register the S3 `igraph` class for use with S4 methods.
-setOldClass("igraph")
-selectMethod("show", "igraph")
+# setOldClass("igraph")
+# selectMethod("show", "igraph")
 
 ################################################################################
 #' Build edge list for module dependency graph
@@ -97,7 +97,7 @@ setMethod("depsEdgeList",
 #'
 #' @inheritParams depsEdgeList
 #'
-#' @return An [igraph()] object.
+#' @return An `igraph()` object.
 #'
 #' @author Alex Chubaty
 #' @export

@@ -1,15 +1,10 @@
 test_that("test event-level cache & memory leaks", {
   skip_on_cran()
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE,
+  testInitOut <- testInit(smcc = FALSE, c("NLMR"),
                           opts = list(reproducible.useMemoise = FALSE,
                                       spades.memoryUseInterval = NULL))
   opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
-    options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   modPath <- system.file("sampleModules", package = "SpaDES.core")
 
@@ -17,7 +12,8 @@ test_that("test event-level cache & memory leaks", {
   pkgs <- reqdPkgs(module = mods, modulePath = modPath)
   expect_true(length(pkgs) == 3)
   expect_true(all(names(pkgs) == mods))
-  expect_true(all(c("raster", "sp", "SpaDES.tools", "RColorBrewer") %in% unlist(pkgs)))
+  browser() # check `raster` and `sp`
+  expect_true(all(c("terra", "SpaDES.tools", "RColorBrewer") %in% unlist(pkgs)))
 
   # Example of changing parameter values
   mySim <- simInit(
@@ -164,11 +160,6 @@ test_that("test module-level cache", {
                           opts = list("reproducible.useMemoise" = FALSE))
 
   opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
-    options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
-
   tmpfile <- tempfile(fileext = ".pdf")
   tmpfile1 <- tempfile(fileext = ".pdf")
   expect_true(file.create(tmpfile))
@@ -236,10 +227,6 @@ test_that("test .prepareOutput", {
 
   testInitOut <- testInit("raster", smcc = FALSE)
   opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
-    options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
   mapPath <- system.file("maps", package = "quickPlot")
@@ -248,7 +235,7 @@ test_that("test .prepareOutput", {
     stringsAsFactors = FALSE
   )
   layers <- lapply(filelist$files, rasterToMemory)
-  landscape <- raster::stack(layers)
+  landscape <- terra::rast(layers)
 
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
@@ -293,11 +280,7 @@ test_that("test .robustDigest for simLists", {
                             opts = list(spades.recoveryMode = FALSE,
                                         "reproducible.useMemoise" = FALSE,
                                         reproducible.showSimilar = TRUE))
-    opts <- options("reproducible.cachePath" = tmpdir)
-    on.exit({
-      options(opts)
-      testOnExit(testInitOut)
-    }, add = TRUE)
+    # opts <- options("reproducible.cachePath" = tmpdir)
 
     modName <- "test"
     newModule(modName, path = tmpdir, open = FALSE)
@@ -379,13 +362,7 @@ test_that("test .robustDigest for simLists", {
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
-  testInitOut <- testInit("igraph", smcc = TRUE)
-  opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
-    options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
-  #tmpCache <- file.path(tmpdir, "testCache") %>% checkPath(create = TRUE)
+  testInitOut <- testInit(smcc = TRUE)
 
   awesomeCacheFun <- function() tmpCache ;
   options("reproducible.cachePath" = awesomeCacheFun)
@@ -423,9 +400,6 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
 
 test_that("test objSize", {
   testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
@@ -435,11 +409,6 @@ test_that("test objSize", {
 test_that("Cache sim objs via .Cache attr", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE,
                                                                    "reproducible.useMemoise" = FALSE))
-  opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
-    options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
   Cache(rnorm, 1)
 
   m1 <- "test"
@@ -587,10 +556,6 @@ test_that("test showSimilar", {
 
   testInitOut <- testInit(smcc = FALSE, "raster")
   opts <- options("reproducible.cachePath" = tmpdir)
-  on.exit({
-    options(opts)
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   # Example of changing parameter values
   params <- list(

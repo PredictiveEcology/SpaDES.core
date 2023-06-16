@@ -75,7 +75,7 @@ files = dir(system.file("maps", package = "quickPlot"),
 arguments = I(rep(list(native = TRUE), length(files)))
 filelist = data.frame(
    files = files,
-   functions = "raster::raster",
+   functions = "terra::rast",
    objectName = NA,
    arguments = arguments,
    loadTime = 0,

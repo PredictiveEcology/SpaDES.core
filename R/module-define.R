@@ -22,12 +22,12 @@ moduleDefaults <- list(
   },
   childModules = character(0),
   version = "0.0.0.9000", ## numeric_versions don't deparse well
-  extent = quote(raster::extent(rep(NA_real_, 4))),
+  extent = quote(terra::ext(rep(NA_real_, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
   loadOrder = list(after = NULL, before = NULL),
-  reqdPkgs = list("ggplot2", "raster")
+  reqdPkgs = list()
 )
 
 ################################################################################
@@ -66,7 +66,7 @@ moduleDefaults <- list(
 #'                        that is made to the module. See <https://semver.org/>
 #'                        for a widely accepted standard for version numbering.\cr
 #'    `spatialExtent` \tab The spatial extent of the module supplied via
-#'                              `raster::extent`. This is currently unimplemented.
+#'                              `terra::ext`. This is currently unimplemented.
 #'                              Once implemented, this should define what spatial region this
 #'                              module is scientifically reasonable to be used in.\cr
 #'    `timeframe` \tab Vector (length 2) of POSIXt dates specifying the temporal extent
@@ -153,7 +153,7 @@ moduleDefaults <- list(
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom raster extent
+#' @importFrom terra ext
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
@@ -233,14 +233,14 @@ setMethod(
     }
     x$version <- as.numeric_version(x$version)
 
-    x$spatialExtent <- if (!is(x$spatialExtent, "Extent")) {
+    x$spatialExtent <- if (!isExtents(x$spatialExtent)) {
       if (is.null(x$spatialExtent)) {
         eval(moduleDefaults$extent)
       } else {
         if (is.na(x$spatialExtent)) {
           moduleDefaults$extent
         } else {
-          extent(x$spatialExtent)
+          ext(x$spatialExtent)
         }
       }
     }

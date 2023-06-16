@@ -1,10 +1,5 @@
 test_that("timeunit works correctly", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("NLMR")
 
   times <- list(start = 0.0, end = 10)
   params <- list(
@@ -85,11 +80,7 @@ test_that("timeunit works correctly", {
 test_that("timeunits with child and parent modules work correctly", {
   skip_on_cran()
 
-  m <- testInit("igraph", smcc = TRUE)
-  options("spades.memoryUseInterval" = 0)
-  on.exit({
-    testOnExit(m)
-  }, add = TRUE)
+  m <- testInit(smcc = TRUE, opts = list("spades.memoryUseInterval" = 0))
 
   newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
   newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)

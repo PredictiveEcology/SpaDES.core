@@ -125,7 +125,6 @@ setMethod("._outputObjectsDF",
 #'
 #' @aliases .moduleDeps
 #' @rdname moduleDeps-class
-#' @importFrom raster extent
 #' @keywords internal
 #'
 #' @seealso `.simDeps`, [spadesClasses()]
@@ -137,14 +136,14 @@ setClass(
   slots = list(
     name = "character", description = "character", keywords = "character",
     childModules = "character", authors = "person", version = "numeric_version",
-    spatialExtent = "Extent", timeframe = "POSIXt", timeunit = "ANY",
+    spatialExtent = "ANY", timeframe = "POSIXt", timeunit = "ANY",
     citation = "list", documentation = "list", loadOrder = "list", reqdPkgs = "list",
     parameters = "data.frame", inputObjects = "data.frame", outputObjects = "data.frame"
   ),
   prototype = list(
     name = character(0), description = character(0), keywords = character(0),
     childModules = character(0), authors = person(), version = numeric_version("0.0.0"),
-    spatialExtent = extent(rep(NA_real_, 4L)), timeframe = as.POSIXlt(c(NA, NA)),
+    spatialExtent = terra::ext(rep(0L, 4L)), timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = NA_real_, citation = list(), documentation = list(),
     loadOrder = list(after = NULL, before = NULL), reqdPkgs = list(),
     parameters = data.frame(
@@ -156,6 +155,8 @@ setClass(
     outputObjects = ._outputObjectsDF()
   ),
   validity = function(object) {
+    if (!(isExtents(object@spatialExtent)))
+      stop("spatialExtent must be an Extent object or SpatExtent")
     if (length(object@name) != 1L) stop("name must be a single character string.")
     if (length(object@description) != 1L) stop("description must be a single character string.")
     if (length(object@keywords) < 1L) stop("keywords must be supplied.")
@@ -236,3 +237,6 @@ setClass(
 })
 
 .emptySimDeps <- new(".simDeps")
+
+isExtents <- function(x)
+  is(x, "SpatExtent") || is(x, "Extent")

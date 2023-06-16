@@ -502,7 +502,6 @@ setMethod(
 #'
 #' @author Eliot McIntire
 #' @export
-#' @importFrom raster extension
 #' @importFrom reproducible checkPath
 #' @rdname openModules
 #'
@@ -523,7 +522,7 @@ setMethod(
   signature = c(name = "character", path = "character"),
   definition = function(name, path) {
     basedir <- checkPath(path, create = FALSE)
-    fileExtension <- sub(extension(name), pattern = ".", replacement = "")
+    fileExtension <- tools::file_ext(name)
     if (length(unique(fileExtension)) > 1) {
       stop("Can only open one file type at a time.")
     }

@@ -53,7 +53,7 @@ The module developer should update manually this with each change
 that is made to the module. See \url{https://semver.org/}
 for a widely accepted standard for version numbering.\cr
 \code{spatialExtent} \tab The spatial extent of the module supplied via
-\code{raster::extent}. This is currently unimplemented.
+\code{terra::ext}. This is currently unimplemented.
 Once implemented, this should define what spatial region this
 module is scientifically reasonable to be used in.\cr
 \code{timeframe} \tab Vector (length 2) of POSIXt dates specifying the temporal extent

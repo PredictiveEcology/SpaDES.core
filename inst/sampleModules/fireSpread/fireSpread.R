@@ -22,7 +22,7 @@ defineModule(sim, list(
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca", role = c("aut"))
   ),
   version = list(fireSpread = "2.0.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list(),

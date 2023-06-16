@@ -1,10 +1,7 @@
 test_that("simList object initializes correctly (1)", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("NLMR", smcc = FALSE)
 
   defaults <- .coreModules() %>% unname()
   times <- list(start = 1.0, end = 10)
@@ -172,7 +169,7 @@ test_that("simList object initializes correctly (1)", {
   expect_equal("second", attr(mySim@simtimes$current, "unit"))
 
   ### required packages
-  pkgs <- c("grid", "methods", "NLMR", "raster", "RColorBrewer", "sp",
+  pkgs <- c("grid", "methods", "NLMR", "terra", "RColorBrewer", "sf",
             "SpaDES.core", "SpaDES.tools", "stats")
   expect_equal(sort(packages(mySim, clean = TRUE)), sort(pkgs))
 
@@ -200,12 +197,8 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit(c("NLMR", "terra"), smcc = FALSE)
   ## test with outputs
   abundRasters <- list(raster(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
 
@@ -225,12 +218,10 @@ test_that("simList object initializes correctly (2)", {
 
 test_that("simList test all signatures", {
   skip_on_cran()
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE)
+  testInitOut <- testInit("NLMR", smcc = FALSE)
 
   on.exit({
-    testOnExit(testInitOut)
     if (!curPathIsPkgPath) {
       setPaths(modulePath = origDir)
     }
@@ -334,10 +325,7 @@ test_that("simList test all signatures", {
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   skip_on_cran()
   ## Test resulting from bug found by Greg Paradis April 7, 2019
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("terra", smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   newModule(childModName, tmpdir, type = "child", open = FALSE)
@@ -355,10 +343,7 @@ test_that("test that module directory exists, but not files", {
   skip_on_cran()
 
   ## Test resulting from bug found by Eliot McIntire April 28, 2019
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("terra", smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   parentModName <- "parent_module"
@@ -395,12 +380,8 @@ test_that("test that module directory exists, but not files", {
 })
 
 test_that("inputObjects on module arg not sim", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("NLMR", smcc = FALSE)
 
   defaults <- .coreModules() %>% unname()
   times <- list(start = 1.0, end = 10)

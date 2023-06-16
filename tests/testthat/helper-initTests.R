@@ -15,8 +15,89 @@ cleanMessage <- function(mm) {
 # loads and libraries indicated plus testthat,
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
-testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
-                     opts = list(), tmpFileExt = "") {
+# puts tmpdir, tmpCache, tmpfile (can be vectorized with length >1 tmpFileExt),
+#   optsAsk in this environment,
+# loads and libraries indicated plus testthat,
+# sets options("reproducible.ask" = FALSE) if ask = FALSE
+testInit <- function(libraries = character(), ask = FALSE, verbose, tmpFileExt = "",
+                     opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
+
+  set.randomseed()
+
+  pf <- parent.frame()
+
+  if (isTRUE(needGoogleDriveAuth))
+    libraries <- c(libraries, "googledrive")
+  if (length(libraries)) {
+    libraries <- unique(libraries)
+    loadedAlready <- vapply(libraries, function(pkg)
+      any(grepl(paste0("package:", pkg), search())), FUN.VALUE = logical(1))
+    libraries <- libraries[!loadedAlready]
+
+    if (length(libraries)) {
+      pkgsLoaded <- unlist(lapply(libraries, requireNamespace, quietly = TRUE))
+      if (!all(pkgsLoaded)) {
+        lapply(libraries[!pkgsLoaded], skip_if_not_installed)
+      }
+      lapply(libraries, withr::local_package, .local_envir = pf)
+    }
+  }
+
+
+  skip_gauth <- identical(Sys.getenv("SKIP_GAUTH"), "true") # only set in setup.R for covr
+  if (isTRUE(needGoogleDriveAuth) ) {
+    if (!skip_gauth) {
+      if (interactive()) {
+        if (!googledrive::drive_has_token()) {
+          getAuth <- FALSE
+          if (is.null(getOption("gargle_oauth_email"))) {
+            possLocalCache <- "c:/Eliot/.secret"
+            cache <- if (file.exists(possLocalCache))
+              possLocalCache else TRUE
+            switch(Sys.info()["user"],
+                   emcintir = {options(gargle_oauth_email = "eliotmcintire@gmail.com",
+                                       gargle_oauth_cache = cache)},
+                   NULL)
+          }
+          if (is.null(getOption("gargle_oauth_email"))) {
+            if (.isRstudioServer()) {
+              .requireNamespace("httr", stopOnFALSE = TRUE)
+              options(httr_oob_default = TRUE)
+            }
+          }
+          getAuth <- TRUE
+          if (isTRUE(getAuth))
+            googledrive::drive_auth()
+        }
+      }
+    }
+    skip_if_no_token()
+  }
+
+  out <- list()
+  withr::local_options("reproducible.ask" = ask, .local_envir = pf)
+  withr::local_options("spades.moduleCodeChecks" = smcc, .local_envir = pf)
+
+  if (!missing(verbose))
+    withr::local_options("reproducible.verbose" = verbose, .local_envir = pf)
+  if (!is.null(opts))
+    withr::local_options(opts, .local_envir = pf)
+  tmpdir <- normPath(withr::local_tempdir(tmpdir = tempdir2(), .local_envir = pf))
+  tmpCache <- normPath(withr::local_tempdir(tmpdir = tmpdir, .local_envir = pf))
+  if (isTRUE(any(nzchar(tmpFileExt)))) {
+    dotStart <- startsWith(tmpFileExt, ".")
+    if (any(!dotStart))
+      tmpFileExt[!dotStart] <- paste0(".", tmpFileExt)
+    out$tmpfile <- normPath(withr::local_tempfile(fileext = tmpFileExt))
+  }
+  withr::local_dir(tmpdir, .local_envir = pf)
+
+  out <- append(out, list(tmpdir = tmpdir, tmpCache = tmpCache))
+  list2env(out, envir = pf)
+  return(out)
+
+
+
   startTime <- Sys.time()
   data.table::setDTthreads(2L)
   a <- list(reproducible.inputPaths = NULL,
@@ -84,7 +165,7 @@ testOnExit <- function(testInitOut) {
     options("reproducible.ask" = testInitOut$optsAsk[[1]])
   if (length(testInitOut$opts))
     options(testInitOut$opts)
-  setwd(testInitOut$origDir)
+  # setwd(testInitOut$origDir)
   unlink(testInitOut$tmpdir, recursive = TRUE)
   endTime <- Sys.time()
 
@@ -141,7 +222,7 @@ testCode <- '
       authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(NA_real_, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
@@ -192,7 +273,7 @@ test2Code <- '
       authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(NA_real_, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),

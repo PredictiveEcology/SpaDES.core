@@ -957,9 +957,14 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", RSQLite::SQLite()),
                                        conn = getOption("reproducible.conn", NULL),
                                        verbose = getOption("reproducible.verbose")) {
+  if (exists("aaaa")) browser()
+  # need to make a Copy of the objects or else the original will have its objects
+  #   converted to e.g., SpatRaster
+  obj <- Copy(obj, objects = TRUE, drv = drv, conn = conn, verbose = verbose)
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects
   out <- .dealWithClass(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
-  obj <- Copy(obj)
+
+  # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(obj))
   obj
 

@@ -22,12 +22,12 @@ test_that("defineModule correctly handles different inputs", {
                        email = "alex.chubaty@gmail.com",
                        role = c("aut", "cre"))),
     version = list(testModule = "0.0.0.9000"),
-    spatialExtent = raster::extent(rep(NA_real_, 4)),
+    spatialExtent = terra::ext(rep(NA_real_, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list(),
     documentation = list(),
-    reqdPkgs = list("grid", "raster", "sp"),
+    reqdPkgs = list("grid", "terra", "sf"),
     parameters = rbind(
       defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description
                       with spaces")
@@ -98,7 +98,7 @@ test_that("defineModule correctly handles different inputs", {
 
   ## check reqdPkgs
   x2 <- x1
-  x2$reqdPkgs <- c("grid", "raster", "sp") # not a list
+  x2$reqdPkgs <- c("grid", "terra", "sf") # not a list
   expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
 
   ## check parameters

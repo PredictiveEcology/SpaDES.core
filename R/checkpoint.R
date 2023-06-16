@@ -81,10 +81,11 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param file The checkpoint file.
 #'
 #' @export
-#' @importFrom raster extension
+#' @importFrom tools file_ext
 #' @rdname checkpoint
 checkpointLoad <- function(file) {
-  stopifnot(raster::extension(file) == ".qs")
+  stopifnot(tools::file_ext(file) == "qs")
+  # stopifnot(raster::extension(file) == ".qs")
 
   # check for previous checkpoint files
   if (file.exists(file)) {

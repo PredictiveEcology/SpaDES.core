@@ -10,9 +10,9 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
-    "asc", "raster", "raster",
+    "asc", "terra", "rast",
     "csv", "read.csv", "utils",
-    "png", "raster", "raster",
+    "png", "terra", "rast",
     "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
@@ -20,7 +20,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
     "shp", "readOGR", "rgdal",
-    "tif", "raster", "raster",
+    "tif", "terra", "rast",
     "txt", "read.table", "utils"
     )),
     stringsAsFactors = FALSE)
@@ -70,7 +70,7 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist
-#' @importFrom raster inMemory
+#' @importFrom terra inMemory
 #' @importFrom utils getFromNamespace
 #' @include simulation-simInit.R
 #' @rdname loadFiles
@@ -94,7 +94,7 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' arguments = I(rep(list(native = TRUE), length(files)))
 #' filelist = data.frame(
 #'    files = files,
-#'    functions = "raster::raster",
+#'    functions = "terra::rast",
 #'    objectName = NA,
 #'    arguments = arguments,
 #'    loadTime = 0,
@@ -231,6 +231,7 @@ setMethod(
             }
             filelist[y, "loaded"] <- TRUE
 
+            browser() # convert to terra
             if (loadFun[y] == "raster") {
               message(paste0(
                 filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
@@ -302,30 +303,30 @@ setMethod("loadFiles",
 #'
 #' @return A raster object whose values are stored in memory.
 #'
-#' @seealso [raster()].
+#' @seealso `raster()`, [terra::rast()].
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @importFrom raster getValues raster setValues
+#' @importFrom terra values rast
 #' @rdname rasterToMemory
 setGeneric("rasterToMemory", function(x, ...) {
   standardGeneric("rasterToMemory")
 })
 
-#' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "Raster"),
-          definition = function(x, ...) {
-            if (any(nchar(Filenames(x)) > 0)) {
-              r <- rasterCreate(x, ...)
-              r[] <- getValues(x)
-              if (is(x, "RasterStack") && !is(r, "RasterStack")) {
-                r <- raster::stack(r, ...)
-              }
-              x <- r
-            }
-            return(x)
-})
+# # @rdname rasterToMemory
+# setMethod("rasterToMemory",
+#           signature = c(x = "Raster"),
+#           definition = function(x, ...) {
+#             if (any(nchar(Filenames(x)) > 0)) {
+#               r <- rasterCreate(x, ...)
+#               r[] <- terra::values(r)
+#               if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+#                 r <- raster::stack(r, ...)
+#               }
+#               x <- r
+#             }
+#             return(x)
+# })
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
@@ -338,6 +339,25 @@ setMethod("rasterToMemory",
 setMethod("rasterToMemory",
           signature = c(x = "ANY"),
           definition = function(x, ...) {
+
+            if (isRaster(x)) {
+              if (any(nchar(Filenames(x)) > 0)) {
+                r <- rasterCreate(x, ...)
+                r[] <- terra::values(r)
+                if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+                  r <- raster::stack(r, ...)
+                }
+                x <- r
+              }
+
+            } else if (isSpat(x)) {
+              if (any(nchar(Filenames(x)) > 0)) {
+                r <- rasterCreate(x, ...)
+                r[] <- terra::values(x)
+                x <- r
+              }
+
+            }
             x
 })
 
@@ -393,4 +413,9 @@ rasterCreate.RasterStack <- function(x, ...) {
 #'   less commonly used `Raster*` classes, e.g., `RasterLayerSparse`
 rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
+}
+
+#' @describeIn rasterCreate Uses `terra::rast` when a layer is `SpatRast`,
+rasterCreate.SpatRaster <- function(x, ...) {
+  terra::rast(x, ...)
 }

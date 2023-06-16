@@ -1,11 +1,7 @@
 test_that("test checkpointing", {
   skip_on_cran()
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("NLMR", smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
 
   file <- file.path("chkpnt.qs")
   ## save checkpoints; no load/restore
@@ -48,12 +44,8 @@ test_that("test checkpointing", {
 
 test_that("test checkpointing with disk-backed raster", {
   skip_on_cran()
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("NLMR", smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
 
   file <- file.path("chkpnt.qs")
 
@@ -72,7 +64,7 @@ test_that("test checkpointing with disk-backed raster", {
     outputPath = tmpdir
   )
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
-  simA$ras <- raster(extent(0, 10, 0, 10), vals = 1)
+  simA$ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1)
   tmpRasFilename <- tempfile("tmpRas", fileext = ".grd") %T>%
     file.create() %>%
     normPath()
@@ -83,7 +75,7 @@ test_that("test checkpointing with disk-backed raster", {
   ## save checkpoints; with load/restore
   set.seed(1234)
   simB <- simInit(times = times, params = parameters, modules = modules, paths = paths)
-  simB$ras <- raster(extent(0,10,0,10), vals = 1)
+  simB$ras <- terra::rast(terra::ext(0,10,0,10), vals = 1)
   expect_error(simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename))
 
   # Eliot uncommented this next line Sept 17, 2019 b/c writeRaster next line newly failed

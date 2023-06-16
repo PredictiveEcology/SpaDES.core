@@ -105,7 +105,7 @@ setMethod(
 #' @param x  Not used. Should be missing.
 #'
 #' @author Alex Chubaty
-#' @importFrom raster extent
+#' @importFrom terra ext
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname emptyMetadata
@@ -125,7 +125,7 @@ setMethod(
       childModules = moduleDefaults[["childModules"]],
       authors = moduleDefaults[["authors"]],
       version = moduleDefaults[["version"]],
-      spatialExtent = raster::extent(rep(NA_real_, 4)), ## match up with moduleDefaults
+      spatialExtent = terra::ext(rep(NA_real_, 4)), ## match up with moduleDefaults
       timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
       timeunit = moduleDefaults[["timeunit"]],
       citation = moduleDefaults[["citation"]],

@@ -24,7 +24,6 @@ attributes of items in the list (but not of the list itself).
 Similar to \code{updateList} but does not require named lists.
 }
 \examples{
-library(igraph) # igraph exports magrittr's pipe operator
 tmp1 <- list("apple", "banana")
 tmp1 <- lapply(tmp1, `attributes<-`, list(type = "fruit"))
 tmp2 <- list("carrot")

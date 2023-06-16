@@ -23,7 +23,7 @@ defineModule(sim, list(
            role = c("aut", "cre"))
   ),
   version = list(randomLandscapes = "1.7.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list(),

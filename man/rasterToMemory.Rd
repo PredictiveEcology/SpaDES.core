@@ -33,7 +33,7 @@ just a pass through, so this can be safely used on large complex objects,
 recursively, e.g., a \code{simList}.
 }
 \seealso{
-\code{\link[=raster]{raster()}}.
+\code{raster()}, \code{\link[terra:rast]{terra::rast()}}.
 }
 \author{
 Eliot McIntire and Alex Chubaty

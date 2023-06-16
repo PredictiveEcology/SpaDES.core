@@ -7,13 +7,12 @@ test_that("testing memoryUse", {
   skip_if_not_installed("NLMR")
 
   rm(list = ls())
-  testInitOut <- testInit(c("raster", "future.callr", "future"),
+  testInitOut <- testInit(c("terra", "future.callr", "future"),
                           opts = list(spades.moduleCodeChecks = FALSE,
                                       spades.memoryUseInterval = 0.2,
                                       spades.futurePlan = "callr"))
   oldPlan <- future::plan()
   on.exit({
-    testOnExit(testInitOut)
     if (!identical(future::plan(), oldPlan)) {
       future::plan(oldPlan)
     }

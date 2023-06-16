@@ -7,7 +7,7 @@ defineModule(sim, list(
   childModules = c("caribouMovement", "fireSpread", "randomLandscapes"),
   version = list(SpaDES_sampleModules = "2.0.0", fireSpread = "2.0.0", caribouMovement = "2.0.0",
                  randomLandscapes = "2.0.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = NA_character_, # e.g., "year"
   citation = list(),

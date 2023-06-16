@@ -992,7 +992,7 @@ setReplaceMethod("progressType",
 #' load that file. Defaults to the known extensions in `SpaDES` (found by
 #' examining `.fileExtensions()`). The `package` and `fun` can be
 #' jointly specified here as `"packageName::functionName"`, e.g.,
-#' `"raster::raster"`.\cr
+#' `"terra::rast"`.\cr
 #'
 #' `package` \tab optional character string indicating the package in
 #' which to find the `fun`);\cr
