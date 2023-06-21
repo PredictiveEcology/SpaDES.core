@@ -329,6 +329,13 @@ setMethod("rasterToMemory",
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
+          signature = c(x = "character"),
+          definition = function(x, ...) {
+            rasterToMemory(terra::rast(x, ...))
+          })
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
           signature = c(x = "ANY"),
           definition = function(x, ...) {
 
