@@ -362,7 +362,7 @@ setMethod(
     ### Make README file
     filenameMd <- paste0(tools::file_path_sans_ext(filenameRmd), ".md")
     success <- tryCatch({
-      file.symlink(filenameMd, filenameREADME)
+      linkOrCopy(filenameMd, filenameREADME, verbose = FALSE)
     }, error = function(e) FALSE)
     if (isFALSE(success)) {
       ReadmeTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "README.template"))

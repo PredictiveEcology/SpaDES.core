@@ -22,7 +22,7 @@ test_that("defineModule correctly handles different inputs", {
                        email = "alex.chubaty@gmail.com",
                        role = c("aut", "cre"))),
     version = list(testModule = "0.0.0.9000"),
-    spatialExtent = terra::ext(rep(NA_real_, 4)),
+    spatialExtent = terra::ext(rep(0, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list(),

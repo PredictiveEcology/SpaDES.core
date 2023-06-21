@@ -19,7 +19,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "shp", "readOGR", "rgdal",
+    "shp", "terra", "vect",
     "tif", "terra", "rast",
     "txt", "read.table", "utils"
     )),
@@ -231,21 +231,13 @@ setMethod(
             }
             filelist[y, "loaded"] <- TRUE
 
-            browser() # convert to terra
-            if (loadFun[y] == "raster") {
-              message(paste0(
-                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
-                "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")",
-                ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
-                       paste("\n  at time", filelist[y, "loadTime"]), "")
-              ))
-            } else {
-              message(paste0(
-                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
-                ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
-                       paste("\n   at time", filelist[y, "loadTime"]), "")
-              ))
+            mess <- paste0(filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y])
+            if (loadFun[y] %in% c("raster", "rast")) {
+                mess <- paste0(mess, "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")")
             }
+            mess <- paste0(mess, paste0(ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
+                                               paste("\n   at time", filelist[y, "loadTime"]), "")))
+            message(mess)
           }
         } # end y
         # add new rows of files to load based on filelistDT$Interval

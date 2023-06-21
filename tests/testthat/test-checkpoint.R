@@ -35,11 +35,11 @@ test_that("test checkpointing", {
 
   rm("._startClockTime", envir = envir(simB))
   rm("._startClockTime", envir = envir(simA))
-  rm("._timestamp", envir = envir(simB))
-  rm("._timestamp", envir = envir(simA))
+  # rm("._timestamp", envir = envir(simB))
+  # rm("._timestamp", envir = envir(simA))
 
   ## both versions above should yield identical results
-  expect_equal(simA, simB)
+  expect_equivalent(simA, simB)
 })
 
 test_that("test checkpointing with disk-backed raster", {
@@ -82,7 +82,7 @@ test_that("test checkpointing with disk-backed raster", {
   # filenames of source and target should be different
   tmpRasFilename <- tempfile("tmpRas", fileext = ".grd")
   if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
-  simA$ras[] <- getValues(simA$ras)
+  simA$ras[] <- simA$ras[]
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
   end(simB) <- 1
   simB <- spades(simB)

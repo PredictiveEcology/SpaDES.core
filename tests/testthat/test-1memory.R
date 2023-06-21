@@ -7,7 +7,7 @@ test_that("testing memoryUse", {
   skip_if_not_installed("NLMR")
 
   rm(list = ls())
-  testInitOut <- testInit(c("terra", "future.callr", "future"),
+  testInitOut <- testInit(c("terra", "future", "future.callr"),
                           opts = list(spades.moduleCodeChecks = FALSE,
                                       spades.memoryUseInterval = 0.2,
                                       spades.futurePlan = "callr"))

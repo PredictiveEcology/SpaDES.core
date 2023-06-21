@@ -125,7 +125,7 @@ setMethod(
       childModules = moduleDefaults[["childModules"]],
       authors = moduleDefaults[["authors"]],
       version = moduleDefaults[["version"]],
-      spatialExtent = terra::ext(rep(NA_real_, 4)), ## match up with moduleDefaults
+      spatialExtent = terra::ext(rep(0, 4)), ## match up with moduleDefaults
       timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
       timeunit = moduleDefaults[["timeunit"]],
       citation = moduleDefaults[["citation"]],
@@ -286,6 +286,7 @@ all.equal.simList <- function(target, current, ...) {
   objsTarget <- mget(objNamesTarget, envir = envir(target))
   objsCurrent <- mget(objNamesCurrent, envir = envir(current))
   on.exit({
+    # put them back on.exit
     list2env(objsTarget, envir = envir(target))
     list2env(objsCurrent, envir = envir(current))
   })
@@ -298,7 +299,9 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current, check.environment = FALSE)
+  target1 <- .dealWithClass(target) # deals with SpatVector/SpatRaster etc.
+  current1 <- .dealWithClass(current) # deals with SpatVector/SpatRaster etc.
+  all.equal.default(target1, current1, check.environment = FALSE)
 }
 
 needInstall <- function(
@@ -320,5 +323,8 @@ needInstall <- function(
 }
 
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
+isRaster <- getFromNamespace("isRaster", "reproducible")
+isSpat <- getFromNamespace("isSpat", "reproducible")
+layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))

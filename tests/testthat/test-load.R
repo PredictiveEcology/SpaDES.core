@@ -1,77 +1,76 @@
 test_that("loading inputs does not work correctly", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(c("NLMR", "quickPlot"))
 
   mapPath <- system.file("maps", package = "quickPlot")
 
-  filelist <- data.frame(
-    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-    functions = "raster",
-    package = "raster",
-    stringsAsFactors = FALSE
-  )
+  functions <- c("raster", "rast")
+  packages <- c("raster", "terra")
+  for (i in seq(functions)) {
+    filelist <- data.frame(
+      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+      functions = functions[i],
+      package = packages[i],
+      stringsAsFactors = FALSE
+    )
 
-  times <- list(start = 0, end = 1)
-  parameters <- list(
-    .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-  )
-  modules <- list("randomLandscapes", "caribouMovement")
-  paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
-    inputPath = mapPath,
-    outputPath = tmpdir
-  )
+    times <- list(start = 0, end = 1)
+    parameters <- list(
+      .globals = list(stackName = "landscape"),
+      caribouMovement = list(.plotInitialTime = NA),
+      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    )
+    modules <- list("randomLandscapes", "caribouMovement")
+    paths <- list(
+      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      inputPath = mapPath,
+      outputPath = tmpdir
+    )
 
-  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths)
-  mySim <- spades(mySim)
-  expect_true(all(c("DEM", "forestAge") %in% names(mySim$landscape)))
+    mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths)
+    mySim <- spades(mySim)
+    expect_true(all(c("DEM", "forestAge") %in% names(mySim$landscape)))
 
-  # test overall inputs setReplaceMethod
-  inputs  <- data.frame(
-    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-    functions = "raster",
-    package = "raster",
-    loadTime = c(0, 3),
-    stringsAsFactors = FALSE
-  )
-  inputs(mySim) <- inputs
-  expect_equal(inputs(mySim)[, c("file", "fun", "package", "loadTime")], inputs)
-  expect_equal(fileName(inputs(mySim)$file), inputs(mySim)$objectName)
-  expect_equal(inputs(mySim)$loaded, rep(NA, NROW(inputs(mySim))))
+    # test overall inputs setReplaceMethod
+    inputs  <- data.frame(
+      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+      functions = functions[i],
+      package = packages[i],
+      loadTime = c(0, 3),
+      stringsAsFactors = FALSE
+    )
+    inputs(mySim) <- inputs
+    expect_equal(inputs(mySim)[, c("file", "fun", "package", "loadTime")], inputs)
+    expect_equal(fileName(inputs(mySim)$file), inputs(mySim)$objectName)
+    expect_equal(inputs(mySim)$loaded, rep(NA, NROW(inputs(mySim))))
 
-  # test fill in objectName and function and package
-  inputs  <- data.frame(
-    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-    loadTime = c(0, 3),
-    stringsAsFactors = FALSE
-  )
-  inputs(mySim) <- inputs
-  expect_equal(inputs(mySim)[, c("file", "loadTime")], inputs)
-  expect_equal(fileName(inputs(mySim)$file), inputs(mySim)$objectName)
-  expect_equal(inputs(mySim)$loaded, rep(NA, NROW(inputs(mySim))))
+    # test fill in objectName and function and package
+    inputs  <- data.frame(
+      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+      loadTime = c(0, 3),
+      stringsAsFactors = FALSE
+    )
+    inputs(mySim) <- inputs
+    expect_equal(inputs(mySim)[, c("file", "loadTime")], inputs)
+    expect_equal(fileName(inputs(mySim)$file), inputs(mySim)$objectName)
+    expect_equal(inputs(mySim)$loaded, rep(NA, NROW(inputs(mySim))))
 
-  # test override default object name
-  inputs  <- data.frame(
-    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-    objectName = c("rasDEM", "rasForestAge"),
-    stringsAsFactors = FALSE
-  )
-  inputs(mySim) <- inputs
-  expect_equal(inputs(mySim)[, c("file", "objectName")], inputs)
-  expect_equal(inputs(mySim)$objectName, inputs$objectName)
-  expect_equal(inputs(mySim)$loaded, rep(NA, NROW(inputs(mySim))))
+    # test override default object name
+    inputs  <- data.frame(
+      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+      objectName = c("rasDEM", "rasForestAge"),
+      stringsAsFactors = FALSE
+    )
+    inputs(mySim) <- inputs
+    expect_equal(inputs(mySim)[, c("file", "objectName")], inputs)
+    expect_equal(inputs(mySim)$objectName, inputs$objectName)
+    expect_equal(inputs(mySim)$loaded, rep(NA, NROW(inputs(mySim))))
 
-  rm(mySim)
+    rm(mySim)
+  }
 
   # use loadFiles directly
-  if (require(rgdal, quietly = TRUE)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
+  # if (require(rgdal, quietly = TRUE)) {
+  #   on.exit(detach("package:rgdal"), add = TRUE)
     sim1 <- loadFiles(
       filelist = filelist,
       paths = list(
@@ -83,43 +82,41 @@ test_that("loading inputs does not work correctly", {
     rm(sim1)
 
     # load at future time, i.e., nothing gets loaded
-    inputs <- data.frame(
-      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-      functions = "raster",
-      package = "raster",
-      loadTime = 3,
-      stringsAsFactors = FALSE
-    )
-    mySim <- simInit(times = times, params = parameters, modules = modules,
-                     paths = paths, inputs = inputs)
-    expect_true(!any(c("DEM", "forestAge") %in% ls(mySim)))
-    rm(mySim)
+    for (i in seq(packages)) {
+      inputs <- data.frame(
+        files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+        functions = functions[i],
+        package = packages[i],
+        loadTime = 3,
+        stringsAsFactors = FALSE
+      )
+      mySim <- simInit(times = times, params = parameters, modules = modules,
+                       paths = paths, inputs = inputs)
+      expect_true(!any(c("DEM", "forestAge") %in% ls(mySim)))
+      rm(mySim)
 
-    # load some at future time, i.e., only one gets loaded
-    inputs <- data.frame(
-      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-      functions = "raster",
-      package = "raster",
-      loadTime = c(0, 3),
-      stringsAsFactors = FALSE
-    )
-    mySim <- simInit(times = times, params = parameters, modules = modules,
-                     paths = paths, inputs = inputs)
+      # load some at future time, i.e., only one gets loaded
+      inputs <- data.frame(
+        files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+        functions = functions[i],
+        package = packages[i],
+        loadTime = c(0, 3),
+        stringsAsFactors = FALSE
+      )
+      mySim <- simInit(times = times, params = parameters, modules = modules,
+                       paths = paths, inputs = inputs)
 
-    expect_true(c("DEM") %in% ls(mySim))
-    expect_true(!any(c("forestAge") %in% ls(mySim)))
-    rm(mySim)
-  }
+      expect_true(c("DEM") %in% ls(mySim))
+      expect_true(!any(c("forestAge") %in% ls(mySim)))
+      rm(mySim)
+    }
+  # }
 })
 
 test_that("passing arguments to filelist in simInit does not work correctly", {
   skip_on_cran()
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit(c("NLMR", "quickPlot", "data.table"))
 
   # Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded
   #  at time = 10 and 20 (via "intervals").
@@ -139,25 +136,31 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
     outputPath = tmpdir
   )
 
-  inputs <- data.frame(
-    files = files,
-    functions = rep("raster::raster", 4),
-    objectName = rep(NA, 4),
-    loadTime = c(0, 1, 1, 3),
-    intervals = c(NA, 1, 2, NA),
-    args = I(rep(list("native" = TRUE), 4)),
-    stringsAsFactors = FALSE
-  )
-  times <- list(start = 0, end = 1, timeunit = "seconds")
+  fns <- c("raster::raster", "terra::rast")
+  args <- list(I(rep(list("native" = TRUE), 4)), NULL)
+  for (i in seq(fns)) {
+    inputs <- data.frame(
+      files = files,
+      functions = rep(fns[i], 4),
+      objectName = rep(NA, 4),
+      loadTime = c(0, 1, 1, 3),
+      intervals = c(NA, 1, 2, NA),
+      stringsAsFactors = FALSE
+    )
+    if (length(args[[i]]))
+      inputs$args = args[[i]]
 
-  if (require(rgdal, quietly = TRUE)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
+    times <- list(start = 0, end = 1, timeunit = "seconds")
+
+    # if (require(rgdal, quietly = TRUE)) {
+    #  on.exit(detach("package:rgdal"), add = TRUE)
     sim2 <- simInit(times = times, params = parameters, modules = modules,
                     paths = paths, inputs = inputs)
     expect_true(c("DEM") %in% ls(sim2))
 
     # Test that arguments got passed in correctly
-    expect_equal(inputs(sim2)$arguments, I(rep(list(native = TRUE), 4)))
+    if (length(args[[i]]))
+      expect_equal(inputs(sim2)$arguments, I(rep(list(native = TRUE), 4)))
     expect_true(!any(c("forestCover", "forestAge", "habitatQuality") %in% ls(sim2)))
 
     sim2 <- spades(sim2)
@@ -177,49 +180,51 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
     expect_message(spades(sim2), "forestAge")
     expect_true(all(c("DEM", "forestAge", "forestCover") %in% ls(sim2)))
     rm(sim2)
-
-    # test without package specified
-    dt <- data.table::data.table(a = 3, b = 2)
-    tmpFile <- tempfile()
-    write.table(dt, file = tmpFile, sep = "\t", col.names = TRUE, row.names = FALSE)
-    inputs <- data.frame(
-      files = tmpFile,
-      functions = "data.table::fread",
-      stringsAsFactors = FALSE
-    )
-    sim2 <- simInit(times = times, params = parameters, modules = modules,
-                    paths = paths, inputs = inputs)
-    expect_equal(sim2@.xData[[basename(tmpFile)]], dt)
-
-    inputs <- data.frame(
-      files = tmpFile,
-      functions = "fread",
-      stringsAsFactors = FALSE
-    )
-    require(data.table)
-    mess <- capture_messages(simInit(times = times, params = parameters, modules = modules,
-                                     paths = paths, inputs = inputs))
-    expect_true(any(grepl(paste(basename(tmpFile)), mess)))
   }
+  # test without package specified
+  dt <- data.table::data.table(a = 3, b = 2)
+  tmpFile <- tempfile()
+  write.table(dt, file = tmpFile, sep = "\t", col.names = TRUE, row.names = FALSE)
+  inputs <- data.frame(
+    files = tmpFile,
+    functions = "data.table::fread",
+    stringsAsFactors = FALSE
+  )
+  sim2 <- simInit(times = times, params = parameters, modules = modules,
+                  paths = paths, inputs = inputs)
+  expect_equal(sim2@.xData[[basename(tmpFile)]], dt)
+
+  inputs <- data.frame(
+    files = tmpFile,
+    functions = "fread",
+    stringsAsFactors = FALSE
+  )
+  mess <- capture_messages(simInit(times = times, params = parameters, modules = modules,
+                                   paths = paths, inputs = inputs))
+  expect_true(any(grepl(paste(basename(tmpFile)), mess)))
+  # }
 })
 
 test_that("passing objects to simInit does not work correctly", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit(c("NLMR", "terra", "quickPlot"))
 
   mapPath <- mapPath <- system.file("maps", package = "quickPlot")
 
   # test object passing directly
-  if (require(rgdal, quietly = TRUE)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
+  # if (require(rgdal, quietly = TRUE)) {
+#    on.exit(detach("package:rgdal"), add = TRUE)
+  functions <- c("raster", "rast")
+  packages <- c("raster", "terra")
+  if (!requireNamespace("raster", quietly = TRUE)) {
+    functions <- functions[2]
+    packages <- packages[2]
+  }
+
+  for (i in seq(functions)) {
     filelist <- data.frame(
       files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-      functions = "raster",
-      package = "raster",
+      functions = functions[i],
+      package = packages[i],
       stringsAsFactors = FALSE
     )
     layers <- lapply(filelist$files, raster)
@@ -264,8 +269,8 @@ test_that("passing objects to simInit does not work correctly", {
     # test object passing directly
     filelist <- data.frame(
       files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[2],
-      functions = "raster",
-      package = "raster",
+      functions = functions[i],
+      package = packages[i],
       loadTime = 1,
       stringsAsFactors = FALSE
     )
@@ -281,23 +286,34 @@ test_that("passing objects to simInit does not work correctly", {
 })
 
 test_that("passing nearly empty file to simInit does not work correctly", {
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit(c("terra", "quickPlot"))
 
-  mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- mapPath <- system.file("maps", package = "quickPlot")
 
   # test object passing directly
-  #if (require(rgdal, quietly = TRUE)) {
-  #  on.exit(detach("package:rgdal"), add = TRUE)
+  # if (require(rgdal, quietly = TRUE)) {
+  #    on.exit(detach("package:rgdal"), add = TRUE)
+  functions <- c("raster", "rast")
+  packages <- c("raster", "terra")
+  if (!requireNamespace("raster", quietly = TRUE)) {
+    functions <- functions[2]
+    packages <- packages[2]
+  }
+
+  for (i in seq(functions)) {
+
+    mapPath <- system.file("maps", package = "quickPlot")
+
+    # test object passing directly
+    #if (require(rgdal, quietly = TRUE)) {
+    #  on.exit(detach("package:rgdal"), add = TRUE)
     filelist <- data.frame(
       files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-      functions = "raster",
-      package = "raster",
+      functions = functions[i],
+      package = packages[i],
       stringsAsFactors = FALSE
     )
-    layers <- lapply(filelist$files, raster)
+    layers <- lapply(filelist$files, getFromNamespace(functions[i], ns = packages[i]))
     DEM <- layers[[1]]
     forestAge <- layers[[2]]
 
@@ -307,16 +323,13 @@ test_that("passing nearly empty file to simInit does not work correctly", {
 
     expect_true(all(c("DEM", "forestAge") %in% ls(sim3)))
     rm(sim3)
-  #}
+  }
 })
 
 test_that("more tests", {
   skip_on_cran()
 
   testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   sim <- simInit()
   test <- 1:10
@@ -364,7 +377,7 @@ test_that("more tests", {
 })
 
 test_that("interval loading of objects from .GlobalEnv", {
-  testInitOut <- testInit()
+  testInitOut <- testInit("ggplot2")
   on.exit({
     testOnExit(testInitOut)
   }, add = TRUE)
@@ -416,32 +429,46 @@ test_that("interval loading of objects from .GlobalEnv", {
 })
 
 test_that("Filenames for simList", {
-  testInitOut <- testInit(c("raster"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
+  testInitOut <- testInit(c("terra"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
                           opts = list("reproducible.ask" = FALSE))
 
-  on.exit({
-    testOnExit(testInitOut)
-    options(opts)
-    rm(s)
-  }, add = TRUE)
+  mapPath <- mapPath <- system.file("maps", package = "quickPlot")
+
+  testInitOut <- testInit(c("terra"), )
+
+    # TODO -- convert to terra & raster
 
   s <- simInit()
-  s$r <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
-  s$r2 <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
-  s$r <- suppressWarnings(writeRaster(s$r, filename = tmpfile[1], overwrite = TRUE))
-  s$r2 <- suppressWarnings(writeRaster(s$r2, filename = tmpfile[3], overwrite = TRUE))
-  s$s <- raster::stack(s$r, s$r2)
-  a <- s$s
-  a[] <- a[]
-  s$b <- writeRaster(a, filename = tmpfile[5], overwrite = TRUE)
+  packages <- c("raster", "terra")
+  functions <- cbind(c("raster", "extent", "stack", "nlayers"),
+                     c("rast", "ext", "rast", "nlyr"))
+  for (i in seq(packages)) {
+    read <- getFromNamespace(functions[1, i], ns = packages[i])
+    ext <- getFromNamespace(functions[2, i], ns = packages[i])
+    if (packages[i] %in% "raster")
+      stk <- getFromNamespace(functions[3, i], ns = packages[i])
+    else
+      stk <- c
+    nlyr <- getFromNamespace(functions[4, i], ns = packages[i])
 
-  Fns <- Filenames(s)
+    s$r <- read(ext(0, 10, 0, 10), vals = 1, res = 1)
+    s$r2 <- read(ext(0, 10, 0, 10), vals = 1, res = 1)
+    s$r <- suppressWarnings(writeRaster(s$r, filename = tmpfile[1], overwrite = TRUE))
+    s$r2 <- suppressWarnings(writeRaster(s$r2, filename = tmpfile[3], overwrite = TRUE))
+    s$s <- stk(s$r, s$r2)
+    a <- s$s
+    a[] <- a[]
+    a <- stk(a)
+    s$b <- writeRaster(a, filename = tmpfile[5], overwrite = TRUE)
+    s$b <- stk(s$b)
+    Fns <- Filenames(s)
 
-  fnsGrd <- normPath(c(raster::filename(s$b), gsub("grd$", "gri", raster::filename(s$b))))
-  expect_true(identical(c(Fns[["b1"]], Fns[["b2"]]), fnsGrd))
-  expect_true(identical(Fns[["r"]], normPath(raster::filename(s$r))))
-  expect_true(identical(Fns[["r2"]], normPath(raster::filename(s$r2))))
-  expect_true(identical(c(Fns[["s1"]], Fns[["s2"]]),
-              sapply(seq_len(raster::nlayers(s$s)), function(rInd)
-                normPath(raster::filename(s$s[[rInd]])))))
+    fnsGrd <- normPath(c(Filenames(s$b)))#, gsub("grd$", "gri", Filenames(s$b))))
+    expect_true(identical(c(Fns[["b1"]], Fns[["b2"]]), fnsGrd))
+    expect_true(identical(Fns[["r"]], normPath(Filenames(s$r))))
+    expect_true(identical(Fns[["r2"]], normPath(Filenames(s$r2))))
+    expect_true(identical(c(Fns[["s1"]], Fns[["s2"]]),
+                          sapply(seq_len(nlyr(s$s)), function(rInd)
+                            normPath(Filenames(s$s[[rInd]])))))
+  }
 })

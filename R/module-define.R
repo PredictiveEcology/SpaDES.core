@@ -22,7 +22,7 @@ moduleDefaults <- list(
   },
   childModules = character(0),
   version = "0.0.0.9000", ## numeric_versions don't deparse well
-  extent = quote(terra::ext(rep(NA_real_, 4))),
+  extent = quote(terra::ext(rep(0, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),

@@ -40,7 +40,7 @@ test_that("simulation runs with simInit and spades", {
       authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-      spatialExtent = terra::ext(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(0, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "year",
       citation = list("citation.bib"),

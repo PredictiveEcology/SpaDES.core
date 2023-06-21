@@ -2,15 +2,12 @@
 % Please edit documentation in R/load.R
 \name{rasterToMemory}
 \alias{rasterToMemory}
-\alias{rasterToMemory,Raster-method}
 \alias{rasterToMemory,list-method}
 \alias{rasterToMemory,ANY-method}
 \alias{rasterToMemory,simList-method}
 \title{Read raster to memory}
 \usage{
 rasterToMemory(x, ...)
-
-\S4method{rasterToMemory}{Raster}(x, ...)
 
 \S4method{rasterToMemory}{list}(x, ...)
 

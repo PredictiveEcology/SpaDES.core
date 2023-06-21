@@ -205,7 +205,11 @@ setMethod(
     # outputs --> should not be treated like inputs; if they change, it is OK, so just outputs as a data.frame,
     #   not files
     nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
-    obj[nonDotListNoOutputs] <- lapply(nonDotListNoOutputs, function(x) .robustDigest(slot(object, x), algo = algo))
+    dependsSeparate <- setdiff(nonDotListNoOutputs, "depends")
+    obj[dependsSeparate] <- lapply(dependsSeparate, function(x)
+      .robustDigest(slot(object, x), algo = algo))
+    obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
+    obj <- .sortDotsUnderscoreFirst(obj)
     obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
@@ -313,6 +317,7 @@ setMethod(
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module\n"))
         }
       } else {
+        if (exists("aaaa")) browser()
         if (isTRUE(fromMemoise)) {
           message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
@@ -413,7 +418,7 @@ setMethod(
     # browser(expr = exists("._addChangedAttr_5"))
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
-      .setSubAttrInList(object, ".Cache", "newCache", NULL)
+      object <- .setSubAttrInList(object, ".Cache", "newCache", NULL)
       #attr(object, ".Cache")$newCache <- NULL
 
       if (!identical(attr(object, ".Cache")$newCache, NULL))
@@ -468,7 +473,7 @@ setMethod(
       character()
     }
 
-    .setSubAttrInList(object, ".Cache", "changed", changed)
+    object <- .setSubAttrInList(object, ".Cache", "changed", changed)
     #attr(object, ".Cache")$changed <- changed
     if (!identical(attr(object, ".Cache")$changed, changed))
       stop("attributes on the cache object are not correct - 5")

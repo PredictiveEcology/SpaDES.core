@@ -19,7 +19,8 @@ cleanMessage <- function(mm) {
 #   optsAsk in this environment,
 # loads and libraries indicated plus testthat,
 # sets options("reproducible.ask" = FALSE) if ask = FALSE
-testInit <- function(libraries = character(), ask = FALSE, verbose, tmpFileExt = "",
+testInit <- function(libraries = character(), ask = FALSE, verbose,
+                     debug = TRUE, tmpFileExt = "",
                      opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
 
   set.randomseed()
@@ -76,6 +77,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose, tmpFileExt =
 
   out <- list()
   withr::local_options("reproducible.ask" = ask, .local_envir = pf)
+  withr::local_options("spades.debug" = debug, .local_envir = pf)
   withr::local_options("spades.moduleCodeChecks" = smcc, .local_envir = pf)
 
   if (!missing(verbose))
@@ -222,7 +224,7 @@ testCode <- '
       authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-      spatialExtent = terra::ext(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(0, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
@@ -273,7 +275,7 @@ test2Code <- '
       authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
-      spatialExtent = terra::ext(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(0, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),

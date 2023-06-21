@@ -234,27 +234,25 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' outSim <- spades(mySim)
 #'
 #' # A little more complicated with inputs and outputs
-#' if (requireNamespace("rgdal", quietly = TRUE)) {
-#'  mapPath <- system.file("maps", package = "quickPlot")
-#'  mySim <- simInit(
-#'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
-#'    params = list(
-#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-#'    ),
-#'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'                 outputPath = tempdir()),
-#'    inputs = data.frame(
-#'      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-#'      functions = "rast",
-#'      package = "terra",
-#'      loadTime = 1,
-#'      stringsAsFactors = FALSE),
-#'    outputs = data.frame(
-#'      expand.grid(objectName = c("caribou","landscape"),
-#'      saveTime = 1:2,
-#'      stringsAsFactors = FALSE))
-#'  )
+#' mapPath <- system.file("maps", package = "quickPlot")
+#' mySim <- simInit(
+#'   times = list(start = 0.0, end = 2.0, timeunit = "year"),
+#'   params = list(
+#'     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'   ),
+#'   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'                outputPath = tempdir()),
+#'   inputs = data.frame(
+#'     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+#'     functions = "rast",
+#'     package = "terra",
+#'     loadTime = 1,
+#'     stringsAsFactors = FALSE),
+#'   outputs = data.frame(
+#'     expand.grid(objectName = c("caribou","landscape"),
+#'     saveTime = 1:2,
+#'     stringsAsFactors = FALSE))
 #'
 #'  # Use accessors for inputs, outputs
 #'  mySim2 <- simInit(
@@ -1403,11 +1401,13 @@ loadPkgs <- function(reqdPkgs) {
       allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
 
     # Check for SpaDES.core minimum version
+    checkSpaDES.coreMinVersion(allPkgs)
+    allPkgs <- grep("^SpaDES.core\\>", allPkgs, value = TRUE, invert = TRUE)
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
+      Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
+      # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      checkSpaDES.coreMinVersion(allPkgs)
 
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
