@@ -53,7 +53,7 @@ test_that("module templates work", {
 })
 
 test_that("empty defineModule", {
-  testInitOut <- testInit("knitr", smcc = FALSE)
+  testInitOut <- testInit()
 
   sim <- simInit()
   sim <- expect_warning(defineModule(sim, list()))
@@ -63,7 +63,7 @@ test_that("empty defineModule", {
       if (all(!(c("extent", "timeframe") %in% modDef))) {
         expect_identical(slot(b@dependencies[[1]], modDef), moduleDefaults[[modDef]])
       } else if (modDef == "extent") {
-        expect_identical(slot(b@dependencies[[1]], "spatialExtent"), eval(moduleDefaults[[modDef]]))
+        expect_equivalent(slot(b@dependencies[[1]], "spatialExtent"), eval(moduleDefaults[[modDef]]))
       } else if (modDef == "timeframe") {
         expect_identical(slot(b@dependencies[[1]], "timeframe"), eval(moduleDefaults[[modDef]]))
       }

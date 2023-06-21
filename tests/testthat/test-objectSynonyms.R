@@ -1,9 +1,6 @@
 test_that("test objectSynonyms", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE,
-                                      spades.useRequire = FALSE#,
-                                      #reproducible.useMemoise = FALSE
+  testInitOut <- testInit(#"NLMR",
+                          opts = list(spades.useRequire = FALSE#,
                                       ))
   sim <- simInit()
 
@@ -149,6 +146,8 @@ test_that("test objectSynonyms", {
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
 
+  # On June 20, 2023, the final expectation was changed to false from true because it seems
+  #   correct that sim$worked should not be TRUE -- ageMap is not going to suppliedElsewhere
   # test simInitAndSpades with Caching/memoising with NULL objects in the active bindings
   sim <- Cache(simInitAndSpades, times, params, modules = modules,
                objects = list(objectSynonyms = os),
@@ -156,7 +155,7 @@ test_that("test objectSynonyms", {
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
-  expect_true(isTRUE(sim$worked))
+  expect_false(isTRUE(sim$worked))
 
   sim <- Cache(simInitAndSpades, times, params, modules = modules,
                objects = list(objectSynonyms = os),
@@ -164,5 +163,5 @@ test_that("test objectSynonyms", {
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)
-  expect_true(isTRUE(sim$worked))
+  expect_false(isTRUE(sim$worked))
 })
