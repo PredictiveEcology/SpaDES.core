@@ -5,9 +5,6 @@ test_that("test objectSynonyms", {
                                       spades.useRequire = FALSE#,
                                       #reproducible.useMemoise = FALSE
                                       ))
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
   sim <- simInit()
 
   sim$age <- 1:10;

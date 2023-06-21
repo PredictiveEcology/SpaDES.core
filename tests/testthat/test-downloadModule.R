@@ -9,9 +9,6 @@ test_that("downloadModule downloads and unzips a single module", {
   }
 
   testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   m <- "test"
 
@@ -44,10 +41,6 @@ test_that("downloadModule downloads and unzips a parent module", {
   # }
 
   testInitOut <- testInit(c("raster", "dplyr"), smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
-
   m <- "LCC2005"
 
   ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()

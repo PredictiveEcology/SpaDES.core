@@ -160,61 +160,6 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
   return(outList)
 }
 
-testOnExit <- function(testInitOut) {
-  if (length(testInitOut$optsVerbose))
-    options("reproducible.verbose" = testInitOut$optsVerbose[[1]])
-  if (length(testInitOut$optsAsk))
-    options("reproducible.ask" = testInitOut$optsAsk[[1]])
-  if (length(testInitOut$opts))
-    options(testInitOut$opts)
-  # setwd(testInitOut$origDir)
-  unlink(testInitOut$tmpdir, recursive = TRUE)
-  endTime <- Sys.time()
-
-  if (grepl("W-VIC-", Sys.info()["nodename"])) {
-    thisFilename <- NULL
-    wis <- try(whereInStack("test_paths"), silent = TRUE)
-    if (!is(wis, "try-error"))
-      thisFilename <- get0("test_paths", wis)
-    if (is.null(thisFilename)) {
-      wis <- try(whereInStack("tf"), silent = TRUE)
-      if (!is(wis, "try-error"))
-        thisFilename <- basename(get0("tf", wis))
-    }
-
-    sc <- sys.calls();
-    aa <- grep("test_that", sc);
-    if (length(aa)) {
-      skipOnCRAN <- any(grepl("skip_on_cran", sc[[tail(aa, 1)]]))
-      timingsFileBase <- "timings.rds"
-      timingsFile <- if (Sys.info()["user"] == "emcintir") {
-        if (isWindows())
-          file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
-        else
-          file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
-      } else {
-        file.path(getwd(), timingsFileBase)
-      }
-
-      if (length(timingsFile) > 0 && file.exists(timingsFile))
-        timings <- readRDS(timingsFile)
-      else
-        timings <- list()
-      desc <- get("desc", whereInStack("desc"))
-      timingsNew <- data.table(filename = thisFilename,
-                               desc = desc,
-                               skipOnCRAN = skipOnCRAN,
-                               elapsed = as.numeric(format(as.numeric(
-                                 difftime(endTime, testInitOut$startTime, units = "secs")))))
-      timings[[desc]] <- timingsNew
-      saveRDS(timings, file = timingsFile)
-    }
-  }
-
-  # lapply(testInitOut$libs, function(lib) {
-  #   try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
-  # )
-}
 
 testCode <- '
       defineModule(sim, list(

@@ -1,9 +1,6 @@
 test_that("local mod object", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   newModule("test", tmpdir, open = FALSE)
   newModule("test2", tmpdir, open = FALSE)
@@ -157,7 +154,6 @@ test_that("convertToPackage testing", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE))
   on.exit({
-    testOnExit(testInitOut)
     try(pkgload::unload("test"), silent = TRUE)
     try(pkgload::unload("test2"), silent = TRUE)
   }, add = TRUE)

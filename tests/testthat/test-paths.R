@@ -3,9 +3,6 @@ test_that("paths file does not work correctly", {
 
   testInitOut <- testInit(setPaths = FALSE)
 
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   times <- list(start = 0.0, end = 10)
   params <- list(.globals = list(burnStats = "npixelsburned", stackName = "landscape"))

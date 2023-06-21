@@ -1,8 +1,5 @@
 test_that("Copy does not work correctly", {
   testInitOut <- testInit(smcc = FALSE, libraries = "data.table")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   s <- simInit()
   s$dt <- data.table(a = 1)

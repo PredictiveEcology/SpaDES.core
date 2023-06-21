@@ -378,9 +378,6 @@ test_that("more tests", {
 
 test_that("interval loading of objects from .GlobalEnv", {
   testInitOut <- testInit("ggplot2")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   times <- 0:10
   test1 <- "hi"

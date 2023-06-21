@@ -1,8 +1,5 @@
 test_that("misc tests", {
   testInitOut <- testInit(smcc = FALSE, debug = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   expect_error(needInstall("httr2", minVersion = "1.4.1"), "is required")
   expect_error(needInstall("httr", minVersion = "100000.4.1"), "httr\\(>=")
@@ -12,9 +9,6 @@ test_that("misc tests", {
 
 test_that(".emptyEventList tests", {
   testInitOut <- testInit(smcc = FALSE, libraries = "data.table")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
   a <- .emptyEventList()
   expect_true(is(a, "data.table"))
   b <- .emptyEventList(1, "a", "b", 5)
@@ -27,10 +21,7 @@ test_that(".emptyEventList tests", {
 })
 
 test_that("modify search path", {
-  testInitOut <- testInit(smcc = FALSE, "digest")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit(smcc = FALSE)
 
   pkgToAttach <- "crayon"
   spPre <- search()
@@ -55,9 +46,6 @@ test_that("modify search path", {
 
 test_that("test all.equal.simList", {
   testInitOut <- testInit(smcc = FALSE, "digest")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   s1 <- simInit()
   s2 <- simInit()
@@ -71,3 +59,4 @@ test_that("test all.equal.simList", {
   expect_true(all.equal(a1, b1))
   expect_true(all.equal(a2, b2))
 })
+

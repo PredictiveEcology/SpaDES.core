@@ -3,9 +3,6 @@ test_that("Plots function 1", {
   skip_if_not_installed("ggplot2")
 
   testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   newModule("test", tmpdir, open = FALSE)
 
@@ -121,9 +118,6 @@ test_that("testing .plotInitialTime & .plots", {
 
   if (interactive()) {
     testInitOut <- testInit()
-    on.exit({
-      testOnExit(testInitOut)
-    }, add = TRUE)
 
     times <- list(start = 0.0, end = 1, timeunit = "year")
     params <- list(
@@ -154,9 +148,6 @@ test_that("Plots function 2", {
   skip_if_not_installed("ggplot2")
 
   testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   newModule("test", tmpdir, open = FALSE)
 
@@ -207,9 +198,6 @@ test_that("Plots function 2", {
 test_that("Plots function 3 - use as Plot", {
   if (interactive()) {
     testInitOut <- testInit("raster", opts = list(spades.PlotsUsePlot = TRUE))
-    on.exit({
-      testOnExit(testInitOut)
-    }, add = TRUE)
     ras <- raster(extent(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
     stk1 <- raster::stack(ras, ras)
     stk2 <- raster::stack(ras, ras)
@@ -239,9 +227,6 @@ test_that("Plots function 3 - use as Plot", {
 
 test_that("Plots test .guessPkgFun", {
   testInitOut <- testInit("raster")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
   test <- sapply(pkgFun, function(x) {

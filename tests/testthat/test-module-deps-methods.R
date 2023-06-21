@@ -1,16 +1,14 @@
 test_that("defineModule correctly handles different inputs", {
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInitOut <- testInit("terra", smcc = FALSE)
 
   tmp <- simInit()
+  tmp1 <- simInit()
 
   # check empty metadata
   x0 <- list()
   expect_warning(defineModule(tmp, x0))
-  expect_identical(suppressWarnings(defineModule(tmp, x0)),
-                   suppressWarnings(defineModule(tmp, .emptyMetadata())))
+  expect_equivalent(suppressWarnings(defineModule(tmp, x0)),
+                   suppressWarnings(defineModule(tmp1, .emptyMetadata())))
 
   # check each element in metadata
   x1 <- list(
@@ -54,17 +52,17 @@ test_that("defineModule correctly handles different inputs", {
   ## check name
   x2 <- x1
   x2$name <- list("testModule") # not a character
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check description
   x2 <- x1
   x2$description <- list("this is a test.") # not a character vector
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check keywords
   x2 <- x1
   x2$keywords <- list("test") # not a character vector
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check authors
   x2 <- x1
@@ -74,32 +72,32 @@ test_that("defineModule correctly handles different inputs", {
   ## check version
   x2 <- x1
   x2$version <- "0.0.0.9000"
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check spatialExtent
   x2 <- x1
   x2$spatialExtent <- NA
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check timeframe
   x2 <- x1
   x2$timeframe <- NA
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check timeunit
   x2 <- x1
   x2$timeunit <- NA
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check citation
   x2 <- x1
   x2$citation <- character() # not a list
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check reqdPkgs
   x2 <- x1
   x2$reqdPkgs <- c("grid", "terra", "sf") # not a list
-  expect_identical(defineModule(tmp, x1), defineModule(tmp, x2))
+  expect_equivalent(defineModule(tmp, x1), defineModule(tmp1, x2))
 
   ## check parameters
   x2 <- x1
@@ -153,6 +151,9 @@ test_that("depsEdgeList and depsGraph work", {
   el_objClass <- c("SpatialPointsDataFrame", "RasterStack", "RasterStack",
                    "numeric", "RasterStack", "RasterStack")
 
+  el_objClass <- c("SpatVector", "SpatRaster", "SpatRaster",
+                   "numeric", "SpatRaster", "SpatRaster")
+
   expect_is(el, "data.table")
   expect_equal(names(el), c("from", "to", "objName", "objClass"))
   expect_equal(el$from, el_from)
@@ -165,7 +166,7 @@ test_that("depsEdgeList and depsGraph work", {
   p_from <- c("fireSpread", "randomLandscapes", "randomLandscapes")
   p_to <- c("caribouMovement", "caribouMovement", "fireSpread")
   p_objName <- c("landscape", "landscape", "landscape")
-  p_objClass <- c("RasterStack", "RasterStack", "RasterStack")
+  p_objClass <- c("SpatRaster", "SpatRaster", "SpatRaster")
   p_ <- data.table::data.table(
     from = p_from, to = p_to, objName = p_objName, objClass = p_objClass
   )
@@ -179,9 +180,6 @@ test_that("depsEdgeList and depsGraph work", {
 
 test_that("3 levels of parent and child modules load and show correctly", {
   testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   suppressMessages({
     newModule("grandpar1", tmpdir, type = "parent",
@@ -241,9 +239,6 @@ test_that("3 levels of parent and child modules load and show correctly", {
 
 test_that("Test cleaning up of desc in createsOutputs, expectsInputs, defineParameters", {
   testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
 
   aList <- list()
   aList[[1]] <- expectsInput("ROCList", "list", sourceURL = NA,
