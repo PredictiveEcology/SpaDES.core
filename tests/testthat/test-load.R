@@ -227,7 +227,7 @@ test_that("passing objects to simInit does not work correctly", {
       package = packages[i],
       stringsAsFactors = FALSE
     )
-    layers <- lapply(filelist$files, raster)
+    layers <- lapply(filelist$files, getFromNamespace(functions[i], ns = packages[i]))
     DEM <- layers[[1]]
     forestAge <- layers[[2]]
 
