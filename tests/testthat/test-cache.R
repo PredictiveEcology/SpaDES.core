@@ -412,9 +412,10 @@ test_that("test objSize", {
 
 test_that("Cache sim objs via .Cache attr", {
   testInitOut <- testInit("ggplot2",
-                          smcc = FALSE, debug = FALSE, opts = list(spades.recoveryMode = FALSE,
-                                                                   "reproducible.useMemoise" = FALSE))
-  Cache(rnorm, 1)
+                          smcc = FALSE, debug = FALSE,
+                          opts = list(spades.recoveryMode = FALSE,
+                                      "reproducible.useMemoise" = FALSE))
+  withr::local_options(list(reproducible.cachePath = tmpdir))
 
   m1 <- "test"
   m <- c(m1)
@@ -457,7 +458,7 @@ test_that("Cache sim objs via .Cache attr", {
       xxx1[[1]][(lineWithDotInputObjects + 1):length(xxx1[[1]])],
       sep = "\n", fill = FALSE, file = fileNames[1])
 
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
+  try(clearCache(ask = FALSE), silent = TRUE)
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    params = list(test = list(.useCache = "init")))
   mySim$co4 <- 5
@@ -478,9 +479,9 @@ test_that("Cache sim objs via .Cache attr", {
 
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
-  expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
+  # expect_true(is.null(mySim$.mods$test$hi)) # hi was removed from module
   mySim2 <- spades(Copy(mySim))
-  # expect_true(mySim2$.mods$test$hi == 1) # was affected
+  # expect_true(mySim2$.mods$test$hi == 1) # hi was removed from module
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
   expect_true(mySim2$co3 == 1) # was affected

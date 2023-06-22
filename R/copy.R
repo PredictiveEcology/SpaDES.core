@@ -68,7 +68,6 @@ setMethod("Copy",
               sim_ <- newEnvsByModule(sim_, modNam)
             }
 
-            browser()
             if (objects == 2) {
               dotObjsNotDotMods <- grep("\\.mods", ls(object@.xData, pattern = "^\\.", all.names = TRUE),
                                         invert = TRUE, value = TRUE)

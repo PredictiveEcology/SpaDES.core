@@ -962,10 +962,11 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", RSQLite::SQLite()),
                                        conn = getOption("reproducible.conn", NULL),
                                        verbose = getOption("reproducible.verbose")) {
-  # need to make a Copy of the objects or else the original will have its objects
-  #   converted to e.g., SpatRaster
-  objTmp <- Copy(obj, objects = FALSE, drv = drv, conn = conn, verbose = verbose)
-  obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects
+  # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
+  objTmp <- Copy(obj, objects = 2, drv = drv, conn = conn, verbose = verbose)
+  # Deal with the potentially large things -- convert to list -- not a copy
+  obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
+  # Now the individual objects
   out <- .dealWithClass(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
@@ -983,7 +984,6 @@ objSize.simList <- function(x, quick = TRUE, ...) {
                                                  drv = getOption("reproducible.drv", RSQLite::SQLite()),
                                                  conn = getOption("reproducible.conn", NULL)) {
 
-  browser()
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
