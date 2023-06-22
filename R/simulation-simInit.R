@@ -313,7 +313,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'                 #   update to times above
 #' }
 #' options(opts)
-#' }
+#'
 #' }
 #'
 setGeneric(

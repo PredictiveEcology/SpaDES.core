@@ -728,32 +728,35 @@ setMethod(
     outputDF$fun[usesSemiColon] <- sapply(splitPackFun, function(x) x[2])
   }
 
-  .fileExts <- .saveFileExtensions()
-  fileExtFromReproducible <- getOption("reproducible.cacheSaveFormat", "rds")
-  rowInDotFileExts <- which(.fileExts$exts %in% fileExtFromReproducible)
-  if (any(is.na(outputDF[, "fun"]))) {
-    fl <- outputDF$file
-    exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
-      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
-        .fileExts$fun[rowInDotFileExts]
-    }
-    if (any(is.na(outputDF[, "fun"]))) {
-      extsAvail <- checkKnownExts(exts, .fileExts)
-      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
-    }
-  }
+  if (any(!outputDF$saved %in% TRUE)) {
+    .fileExts <- .saveFileExtensions()
+    fileExtFromReproducible <- getOption("reproducible.cacheSaveFormat", "rds")
+    rowInDotFileExts <- which(.fileExts$exts %in% fileExtFromReproducible)
 
-  if (any(is.na(outputDF[, "package"]))) {
-    fl <- outputDF$file
-    exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
-      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
-    }
-    if (any(is.na(outputDF[, "package"]))) {
+    if (any(is.na(outputDF[, "fun"]))) {
+      fl <- outputDF$file
       exts <- fileExt(fl)
-      extsAvail <- checkKnownExts(exts, .fileExts)
-      outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
+      if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+        outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
+          .fileExts$fun[rowInDotFileExts]
+      }
+      if (any(is.na(outputDF[, "fun"]))) {
+        extsAvail <- checkKnownExts(exts, .fileExts)
+        outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
+      }
+    }
+
+    if (any(is.na(outputDF[, "package"]))) {
+      fl <- outputDF$file
+      exts <- fileExt(fl)
+      if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+        outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
+      }
+      if (any(is.na(outputDF[, "package"]))) {
+        exts <- fileExt(fl)
+        extsAvail <- checkKnownExts(exts, .fileExts)
+        outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
+      }
     }
   }
   return(outputDF)

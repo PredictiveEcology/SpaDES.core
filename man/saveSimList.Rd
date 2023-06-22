@@ -6,7 +6,17 @@
 \alias{zipSimList}
 \title{Save a whole \code{simList} object to disk}
 \usage{
-saveSimList(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...)
+saveSimList(
+  sim,
+  filename,
+  fileBackend = 0,
+  filebackedDir = NULL,
+  outputs = TRUE,
+  inputs = TRUE,
+  cache = FALSE,
+  envir,
+  ...
+)
 
 zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
 }
@@ -33,15 +43,6 @@ files will be copied to the directory:
 \code{file.path(dirname(filename), "rasters")}. A character string
 will be interpreted as a path to copy all rasters to.}
 
-\item{envir}{If \code{sim} is a character string, then this must be provided.
-It is the environment where the object named \code{sim} can be found.}
-
-\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones
-such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}
-arguments in that function.}
-
-\item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
-
 \item{outputs}{Logical. If \code{TRUE}, all files identified in
 \code{outputs(sim)} will be included in the zip.}
 
@@ -51,6 +52,15 @@ arguments in that function.}
 \item{cache}{Logical. Not yet implemented. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
 zip archive. Defaults to \code{FALSE} as this could be large, and may include many
 out of date elements. See Details.}
+
+\item{envir}{If \code{sim} is a character string, then this must be provided.
+It is the environment where the object named \code{sim} can be found.}
+
+\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones
+such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}
+arguments in that function.}
+
+\item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
 }
 \value{
 For \code{\link[=saveSimList]{saveSimList()}}, a saved \code{.qs} file in \code{filename} location.
@@ -86,7 +96,10 @@ loading \code{simList} objects and their associated files (e.g., file-backed
 
 There are 3 different workflows for "save - move files - load" that work in our tests:
 \enumerate{
-\item \code{filebackend = 0}: No renaming of file-backed rasters, on recovery attempts to rebuild
+\item \code{fileBackend = 0}: No renaming of file-backed rasters. This is unlikely to
+work for most use-cases as the original file paths are left intact. Recovery
+of this saved simList will only work if the file-backed objects' files are
+present and in the exact same paths.
 
 This approach is attempting to emulate a "relative filenames" approach,
 i.e., attempt to treat the file-backed raster file names as if they were
@@ -104,7 +117,7 @@ in a wide array of testing.
 pths <- getPaths(mySim)
 out <- unzipSimList(tmpZip, paths = pths)
 }\if{html}{\out{</div>}}
-\item \code{filebackend = 1}: On-the-fly renaming of file-backed rasters;
+\item \code{fileBackend = 1}: On-the-fly renaming of file-backed rasters;
 \enumerate{
 \item Save the sim object with a filename, e.g.,  \code{file},
 \item make a copy of all file-backed rasters to \code{fileBackedDir},
@@ -114,7 +127,7 @@ out <- unzipSimList(tmpZip, paths = pths)
 \if{html}{\out{<div class="sourceCode">}}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
 simNew <- loadSimList(file = "sim.qs")
 }\if{html}{\out{</div>}}
-\item \code{filebackend = 2}: On-the-fly bringing to memory of all rasters
+\item \code{fileBackend = 2}: On-the-fly bringing to memory of all rasters
 
 All rasters are brought to memory, and then saved into \code{sim.qs}
 

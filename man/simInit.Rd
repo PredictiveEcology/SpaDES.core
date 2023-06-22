@@ -288,27 +288,25 @@ mySim <- simInit(
 outSim <- spades(mySim)
 
 # A little more complicated with inputs and outputs
-if (requireNamespace("rgdal", quietly = TRUE)) {
- mapPath <- system.file("maps", package = "quickPlot")
- mySim <- simInit(
-   times = list(start = 0.0, end = 2.0, timeunit = "year"),
-   params = list(
-     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-   ),
-   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                outputPath = tempdir()),
-   inputs = data.frame(
-     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "rast",
-     package = "terra",
-     loadTime = 1,
-     stringsAsFactors = FALSE),
-   outputs = data.frame(
-     expand.grid(objectName = c("caribou","landscape"),
-     saveTime = 1:2,
-     stringsAsFactors = FALSE))
- )
+mapPath <- system.file("maps", package = "quickPlot")
+mySim <- simInit(
+  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  params = list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+  ),
+  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+               outputPath = tempdir()),
+  inputs = data.frame(
+    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+    functions = "rast",
+    package = "terra",
+    loadTime = 1,
+    stringsAsFactors = FALSE),
+  outputs = data.frame(
+    expand.grid(objectName = c("caribou","landscape"),
+    saveTime = 1:2,
+    stringsAsFactors = FALSE))
 
  # Use accessors for inputs, outputs
  mySim2 <- simInit(
@@ -369,7 +367,7 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
                 #   update to times above
 }
 options(opts)
-}
+
 }
 
 }

@@ -90,7 +90,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
     dotStart <- startsWith(tmpFileExt, ".")
     if (any(!dotStart))
       tmpFileExt[!dotStart] <- paste0(".", tmpFileExt)
-    out$tmpfile <- normPath(withr::local_tempfile(fileext = tmpFileExt))
+    out$tmpfile <- normPath(withr::local_tempfile(tmpdir = tmpdir, fileext = tmpFileExt))
   }
   withr::local_dir(tmpdir, .local_envir = pf)
 
@@ -98,66 +98,66 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
   list2env(out, envir = pf)
   return(out)
 
-
-
-  startTime <- Sys.time()
-  data.table::setDTthreads(2L)
-  a <- list(reproducible.inputPaths = NULL,
-            reproducible.showSimilar = FALSE,
-            reproducible.useNewDigestAlgorithm = 2,
-            spades.DTthreads = 2L,
-            spades.moduleCodeChecks = smcc,
-            spades.useRequire = FALSE)
-  a[names(opts)] <- opts
-  opts1 <- a
-
-  optsDebug <- if (!debug)
-    list(spades.debug = debug)
-  else
-    list()
-
-  if (length(optsDebug)) {
-    opts1 <- append( opts1, optsDebug)
-  }
-
-  optsAsk <- if (!ask)
-    list(reproducible.ask = ask)
-  else
-    list()
-  if (length(optsAsk)) {
-    opts1 <- append(opts1, optsAsk)
-  }
-  opts <- options(opts1)
-
-  if (missing(libraries)) libraries <- list()
-  libraries <- unique(append(list("igraph"), libraries)) # need %>% is a lot of places
-  unlist(lapply(libraries, require, character.only = TRUE))
-  require("testthat")
-  tmpdir <- file.path(tempdir(), rndstr(1, 6))
-  if (setPaths)
-    setPaths(cachePath = tmpdir)
-
-
-  checkPath(tmpdir, create = TRUE)
-  origDir <- setwd(tmpdir)
-  tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
-  try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
-
-  if (!is.null(tmpFileExt)) {
-    ranfiles <- unlist(lapply(tmpFileExt, function(x) paste0(rndstr(1, 7), ".", x)))
-    tmpfile <- file.path(tmpdir, ranfiles)
-    tmpfile <- gsub(pattern = "\\.\\.", tmpfile, replacement = "\\.")
-    file.create(tmpfile)
-    tmpfile <- normPath(tmpfile)
-  }
-
-  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
-                  origDir = origDir, libs = libraries,
-                  tmpCache = tmpCache, optsAsk = optsAsk,
-                  tmpfile = tmpfile, startTime = startTime)
-  list2env(outList, envir = parent.frame())
-  return(outList)
+#
+#
+#   startTime <- Sys.time()
+#   data.table::setDTthreads(2L)
+#   a <- list(reproducible.inputPaths = NULL,
+#             reproducible.showSimilar = FALSE,
+#             reproducible.useNewDigestAlgorithm = 2,
+#             spades.DTthreads = 2L,
+#             spades.moduleCodeChecks = smcc,
+#             spades.useRequire = FALSE)
+#   a[names(opts)] <- opts
+#   opts1 <- a
+#
+#   optsDebug <- if (!debug)
+#     list(spades.debug = debug)
+#   else
+#     list()
+#
+#   if (length(optsDebug)) {
+#     opts1 <- append( opts1, optsDebug)
+#   }
+#
+#   optsAsk <- if (!ask)
+#     list(reproducible.ask = ask)
+#   else
+#     list()
+#   if (length(optsAsk)) {
+#     opts1 <- append(opts1, optsAsk)
+#   }
+#   opts <- options(opts1)
+#
+#   if (missing(libraries)) libraries <- list()
+#   libraries <- unique(append(list("igraph"), libraries)) # need %>% is a lot of places
+#   unlist(lapply(libraries, require, character.only = TRUE))
+#   require("testthat")
+#   tmpdir <- file.path(tempdir(), rndstr(1, 6))
+#   if (setPaths)
+#     setPaths(cachePath = tmpdir)
+#
+#
+#   checkPath(tmpdir, create = TRUE)
+#   origDir <- setwd(tmpdir)
+#   tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
+#   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
+#   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
+#
+#   if (!is.null(tmpFileExt)) {
+#     ranfiles <- unlist(lapply(tmpFileExt, function(x) paste0(rndstr(1, 7), ".", x)))
+#     tmpfile <- file.path(tmpdir, ranfiles)
+#     tmpfile <- gsub(pattern = "\\.\\.", tmpfile, replacement = "\\.")
+#     file.create(tmpfile)
+#     tmpfile <- normPath(tmpfile)
+#   }
+#
+#   outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
+#                   origDir = origDir, libs = libraries,
+#                   tmpCache = tmpCache, optsAsk = optsAsk,
+#                   tmpfile = tmpfile, startTime = startTime)
+#   list2env(outList, envir = parent.frame())
+#   return(outList)
 }
 
 

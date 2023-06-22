@@ -39,6 +39,13 @@
 #'        files will be copied to the directory:
 #'        `file.path(dirname(filename), "rasters")`. A character string
 #'        will be interpreted as a path to copy all rasters to.
+#' @param outputs Logical. If `TRUE`, all files identified in
+#'    `outputs(sim)` will be included in the zip.
+#' @param inputs Logical. If `TRUE`, all files identified in
+#'    `inputs(sim)` will be included in the zip.
+#' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
+#'    zip archive. Defaults to `FALSE` as this could be large, and may include many
+#'    out of date elements. See Details.
 #' @param ... Passed to `save`, e.g., `compression`
 #'
 #' @return For [saveSimList()], a saved `.qs` file in `filename` location.
@@ -50,16 +57,16 @@
 #' @importFrom stats runif
 #' @importFrom tools file_ext
 #' @rdname saveSimList
-saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, envir, ...) {
-  stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
+saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL,
+                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir, ...) {
+  # stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
-  if (exists("aaaa")) browser()
   dots <- list(...)
 
   quiet <- if (is.null(dots$quiet)) {
     FALSE
   } else {
-    if (isTRUE(dots$quiet)) TRUE else FALSE
+    isTRUE(dots$quiet)
   }
 
   # clean up misnamed arguments
@@ -76,7 +83,10 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     simName <- sim
     sim <- get(simName, envir = envir)
   }
-  if (isTRUE(fileBackend[1] > 0)) {
+
+  if (isTRUE(fileBackend[1] == 2)) {
+    sim <- rasterToMemory(sim)
+  } else if (isTRUE(fileBackend[1] == 1)) {
     mess <- capture.output(type = "message", {
       sim <- do.call(Copy, append(list(sim, filebackedDir = filebackedDir), dots))
     })
@@ -84,9 +94,6 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
     if (length(mess))
       lapply(mess, message)
 
-    if (isTRUE(fileBackend[1] == 2)) {
-      sim <- rasterToMemory(sim)
-    }
   }
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
@@ -106,18 +113,23 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
   # }
   # } else {
   fns <- Filenames(sim)
-  sim <- .dealWithClass(sim)
+  sim <- .dealWithClass(sim) # makes a copy of filebacked object files
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
-  empties <- nchar(fns) > 0
-  if (any(empties)) {
-    fns <- fns[empties]
+  empties <- nchar(fns) == 0
+  if (any(!empties)) {
+    fns <- fns[!empties]
     fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
   }
-  if (tolower(tools::file_ext(filename)) == "rds") {
-    save(sim, file = filename)
-  } else if (tolower(tools::file_ext(filename)) == "qs") {
-    qs::qsave(sim, file = filename)
-  }
+  browser()
+  # if (tolower(tools::file_ext(filename)) == "rds") {
+  #   save(sim, file = filename)
+  # } else if (tolower(tools::file_ext(filename)) == "qs") {
+  qsFile <- gsub(tools::file_ext(filename), "qs", filename)
+  zipFile <- gsub(tools::file_ext(filename), "zip", filename)
+  qs::qsave(sim, file = qsFile)
+  relFns <- reproducible:::makeRelative(c(qsFile, fns), absoluteBase = dirname(filename))
+  zip(filename, files = relFns)
+  # }
 
 
   if (isFALSE(quiet)) message("    ... saved!")
@@ -137,13 +149,6 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'    such as `filename`. Also see `fileBackend` and `filebackedDir`
 #'    arguments in that function.
 #' @param zipfile A character string indicating the filename for the zip file. Passed to `zip`.
-#' @param outputs Logical. If `TRUE`, all files identified in
-#'    `outputs(sim)` will be included in the zip.
-#' @param inputs Logical. If `TRUE`, all files identified in
-#'    `inputs(sim)` will be included in the zip.
-#' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
-#'    zip archive. Defaults to `FALSE` as this could be large, and may include many
-#'    out of date elements. See Details.
 #'
 #' @return invoked for side effect of zip archive creation
 #'
@@ -156,7 +161,10 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'
 #' There are 3 different workflows for "save - move files - load" that work in our tests:
 #'
-#' 3. `filebackend = 0`: No renaming of file-backed rasters, on recovery attempts to rebuild
+#' 3. `fileBackend = 0`: No renaming of file-backed rasters. This is unlikely to
+#'     work for most use-cases as the original file paths are left intact. Recovery
+#'     of this saved simList will only work if the file-backed objects' files are
+#'     present and in the exact same paths.
 #'
 #'     This approach is attempting to emulate a "relative filenames" approach,
 #'     i.e., attempt to treat the file-backed raster file names as if they were
@@ -176,7 +184,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'     out <- unzipSimList(tmpZip, paths = pths)
 #'     ```
 #'
-#' 1. `filebackend = 1`: On-the-fly renaming of file-backed rasters;
+#' 1. `fileBackend = 1`: On-the-fly renaming of file-backed rasters;
 #'
 #'     1. Save the sim object with a filename, e.g.,  `file`,
 #'     2. make a copy of all file-backed rasters to `fileBackedDir`,
@@ -186,7 +194,7 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #'     saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
 #'     simNew <- loadSimList(file = "sim.qs")
 #'     ```
-#' 2. `filebackend = 2`: On-the-fly bringing to memory of all rasters
+#' 2. `fileBackend = 2`: On-the-fly bringing to memory of all rasters
 #'
 #'     All rasters are brought to memory, and then saved into `sim.qs`
 #'
@@ -198,7 +206,6 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL, en
 #' If `cache` is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
-  browser()
   dots <- list(...)
   # if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".qs")
   # tmpDir <- file.path(tempdir(), rndstr(1, 6))
@@ -271,15 +278,19 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @importFrom reproducible updateFilenameSlots
 #' @importFrom tools file_ext
 loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
-  stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
+  # stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
-  # browser()
   if (tolower(tools::file_ext(filename)) == "rds") {
     load(filename, envir = environment())
     sim <- sim
   } else if (tolower(tools::file_ext(filename)) == "qs") {
     sim <- qs::qread(filename, nthreads = getOption("spades.qsThreads", 1))
   }
+  td <- tempdir2()
+  filesInZip <- unzip(filename, list = TRUE)
+  out <- unzip(filename, exdir = td)
+  sim <- qs::qread(out[1])
+  hardLinkOrCopy(out[-1], gsub(paste0(td, "/"), "", out[-1]))
   sim <- .dealWithClassOnRecovery(sim) # convert e.g., PackedSpatRaster
 
   # Work around for bug in qs that recovers data.tables as lists
@@ -320,6 +331,7 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 
   # Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {
+    browser()
     pathsInOldSim <- paths(sim)
     sim@paths <- paths
     fnsSingle <- Filenames(sim, allowMultiple = FALSE)

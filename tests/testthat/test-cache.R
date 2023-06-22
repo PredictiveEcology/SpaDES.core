@@ -224,9 +224,8 @@ test_that("test module-level cache", {
 
 test_that("test .prepareOutput", {
   skip_on_cran() # too long
-  skip_if_not_installed("SpaDES.tools")
 
-  testInitOut <- testInit("terra", smcc = FALSE)
+  testInitOut <- testInit(c("terra", "SpaDES.tools"), smcc = FALSE)
   opts <- options("reproducible.cachePath" = tmpdir)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
@@ -236,8 +235,8 @@ test_that("test .prepareOutput", {
     stringsAsFactors = FALSE
   )
   layers1 <- unname(sapply(filelist$files, rasterToMemory))
-  newFns <- file.path(tmpdir, basename(layers1))
-  layers <- linkOrCopy(layers1, newFns)
+  newFns <- file.path(tmpdir, basename(filelist$files))
+  layers <- linkOrCopy(filelist$files, newFns)
   landscape <- terra::rast(unlist(newFns))
 
   mySim <- simInit(
@@ -479,7 +478,7 @@ test_that("Cache sim objs via .Cache attr", {
 
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
-  # expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
+  expect_true(is.null(mySim$.mods$test$hi)) # will be changed by init
   mySim2 <- spades(Copy(mySim))
   # expect_true(mySim2$.mods$test$hi == 1) # was affected
   expect_true(mySim2$co1 == 1) # was affected

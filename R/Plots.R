@@ -295,14 +295,14 @@ Plots <- function(data, fn, filename,
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(rasterFilename)),
                                      file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(rawFilename)),
                                      file = rawFilename, fun = "qs::qsave", args = NA,  ...)
     }
@@ -328,7 +328,7 @@ Plots <- function(data, fn, filename,
         if (!is(plotted, "try-error")) {
           if (exists("sim", inherits = FALSE)) {
             pkgAndFn <- .guessPkgFun(bsf)
-            sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+            sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                          objectName = filePathSansExt(basename(theFilename)),
                                          file = theFilename, fun = pkgAndFn, args = NA,  ...)
           }
@@ -348,7 +348,7 @@ Plots <- function(data, fn, filename,
         }
         do.call(ggplot2::ggsave, args = args)
         if (exists("sim", inherits = FALSE))
-          sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+          sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                        objectName = filePathSansExt(basename(theFilename)),
                                        file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
         message("Saved figure to: ", theFilename)
@@ -359,7 +359,7 @@ Plots <- function(data, fn, filename,
       filename11 <- file.path(path, paste0(filename, "_gg.qs"))
       qs::qsave(gg, file = filename11)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(filename11)),
                                      file = filename11, fun = "qs::qsave", args = NA,  ...)
     }
@@ -371,13 +371,44 @@ Plots <- function(data, fn, filename,
   return(invisible(NULL))
 }
 
-outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
-  outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
-                                     saved = TRUE, arguments = I(args)),
-                          endTime = endTime)
-  if (!is(outputs[["arguments"]], "AsIs"))
+outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = NA, args = I(list(NA)), ...) {
+  if (!is(args, "list") && !is(args, "AsIs")) {
+    stop("args must a list (with same length as file) of lists (with named elements), ",
+         ", wrapped with I(  )")
+  }
+  if (length(args) < length(file))
+    args <- I(rep(args, length(file)))
+  df <- data.frame(file = file, saved = TRUE, objectName = objectName, fun = fun, args = args)
+
+
+  outs <- .fillOutputRows(df, endTime = saveTime)
+  if (!is(outputs[["arguments"]], "AsIs")) # needed for rbindlist
     outputs[["arguments"]] <- I(outputs[["arguments"]])
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
+}
+
+#' @export
+#' @rdname simList-accessors-outputs
+#' @param sim A `simList`
+#' @param filename The filename to register in the outputs(sim) `data.frame`.
+#' @details
+#' Note using `registerOutputs`: a user can pass any other
+#' arguments to `registerOutputs` that are in the
+#' `outputs(sim)` data.frame, such as `objectName`, `fun`, `package`, though these
+#' will not be used to save the files as this function is only about
+#' registering an output that has already been saved.
+#'
+#' @seealso [Plots()], [outputs()]
+#' @examples
+#' # For `registerOutputs`
+#' sim <- simInit()
+#' # This would normally be a save call, e.g., `writeRaster`
+#' tf <- reproducible::tempfile2(fileext = ".tif")
+#' sim <- registerOutputs(sim, filename = tf)
+#'
+registerOutputs <- function(sim, filename, ...) {
+  sim@outputs <- outputsAppend(sim@outputs, saveTime = time(sim), file = filename, ...)
+  sim
 }
 
 #' Test whether there should be any plotting from `.plot` parameter

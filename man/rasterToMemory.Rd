@@ -3,6 +3,7 @@
 \name{rasterToMemory}
 \alias{rasterToMemory}
 \alias{rasterToMemory,list-method}
+\alias{rasterToMemory,character-method}
 \alias{rasterToMemory,ANY-method}
 \alias{rasterToMemory,simList-method}
 \title{Read raster to memory}
@@ -10,6 +11,8 @@
 rasterToMemory(x, ...)
 
 \S4method{rasterToMemory}{list}(x, ...)
+
+\S4method{rasterToMemory}{character}(x, ...)
 
 \S4method{rasterToMemory}{ANY}(x, ...)
 
