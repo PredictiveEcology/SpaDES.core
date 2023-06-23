@@ -1,7 +1,5 @@
 test_that("paths file does not work correctly", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit()
+  testInit(sampleModReqdPkgs)
 
   times <- list(start = 0.0, end = 10)
   params <- list(.globals = list(burnStats = "npixelsburned", stackName = "landscape"))

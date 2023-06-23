@@ -1,9 +1,9 @@
 test_that("test event-level cache & memory leaks", {
   skip_on_cran()
 
-  testInitOut <- testInit(smcc = FALSE, c("NLMR"),
-                          opts = list(reproducible.useMemoise = FALSE,
-                                      spades.memoryUseInterval = NULL))
+  testInit(sampleModReqdPkgs,
+           opts = list(reproducible.useMemoise = FALSE,
+                       spades.memoryUseInterval = NULL))
   opts <- options("reproducible.cachePath" = tmpdir)
 
   modPath <- system.file("sampleModules", package = "SpaDES.core")
@@ -156,8 +156,7 @@ test_that("test event-level cache & memory leaks", {
 })
 
 test_that("test module-level cache", {
-  skip_if_not_installed("NLMR")
-  testInitOut <- testInit("raster", smcc = FALSE, debug = FALSE, ask = FALSE,
+  testInit(sampleModReqdPkgs,
                           opts = list("reproducible.useMemoise" = FALSE))
 
   opts <- options("reproducible.cachePath" = tmpdir)
@@ -225,7 +224,7 @@ test_that("test module-level cache", {
 test_that("test .prepareOutput", {
   skip_on_cran() # too long
 
-  testInitOut <- testInit(c("terra", "SpaDES.tools"), smcc = FALSE)
+  testInit(sampleModReqdPkgs)
   opts <- options("reproducible.cachePath" = tmpdir)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
@@ -279,7 +278,7 @@ test_that("test .prepareOutput", {
 })
 
 test_that("test .robustDigest for simLists", {
-  testInitOut <- testInit(c("terra", "ggplot2"), smcc = TRUE,
+  testInit(c("terra", "ggplot2"), smcc = TRUE,
                           opts = list(spades.recoveryMode = FALSE,
                                       reproducible.verbose = 0,
                                       "reproducible.useMemoise" = FALSE,
@@ -366,7 +365,7 @@ test_that("test .robustDigest for simLists", {
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
-  testInitOut <- testInit(smcc = TRUE)
+  testInit(smcc = TRUE)
 
   awesomeCacheFun <- function() tmpCache ;
   options("reproducible.cachePath" = awesomeCacheFun)
@@ -403,7 +402,7 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
 })
 
 test_that("test objSize", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInit(smcc = FALSE)
 
   a <- simInit(objects = list(d = 1:10, b = 2:20))
   os <- objSize(a)
@@ -411,7 +410,7 @@ test_that("test objSize", {
 })
 
 test_that("Cache sim objs via .Cache attr", {
-  testInitOut <- testInit("ggplot2",
+  testInit("ggplot2",
                           smcc = FALSE, debug = FALSE,
                           opts = list(spades.recoveryMode = FALSE,
                                       "reproducible.useMemoise" = FALSE))
@@ -558,9 +557,8 @@ test_that("Cache sim objs via .Cache attr", {
 })
 
 test_that("test showSimilar", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE, "terra", verbose = TRUE)
+  testInit(sampleModReqdPkgs, verbose = TRUE)
   opts <- options("reproducible.cachePath" = tmpdir)
 
   # Example of changing parameter values

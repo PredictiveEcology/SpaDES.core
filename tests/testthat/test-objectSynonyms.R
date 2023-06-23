@@ -1,7 +1,5 @@
 test_that("test objectSynonyms", {
-  testInitOut <- testInit(#"NLMR",
-                          opts = list(spades.useRequire = FALSE#,
-                                      ))
+  testInit(sampleModReqdPkgs, opts = list(spades.useRequire = FALSE))
   sim <- simInit()
 
   sim$age <- 1:10;

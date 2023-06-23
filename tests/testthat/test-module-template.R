@@ -3,7 +3,7 @@ test_that("module templates work", {
   skip_if_not_installed("knitr")
   skip_if_not_installed("rmarkdown")
 
-  testInitOut <- testInit(c("knitr", "rmarkdown"), smcc = FALSE)
+  testInit(c("knitr", "rmarkdown"), smcc = FALSE)
 
   expect_true(dir.exists(tmpdir))
   moduleName <- "myModule"
@@ -53,7 +53,7 @@ test_that("module templates work", {
 })
 
 test_that("empty defineModule", {
-  testInitOut <- testInit()
+  testInit()
 
   sim <- simInit()
   sim <- expect_warning(defineModule(sim, list()))

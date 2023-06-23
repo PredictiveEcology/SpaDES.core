@@ -1,5 +1,5 @@
 test_that("test userSuppliedObj", {
-  testInitOut <- testInit("terra", smcc = TRUE)
+  testInit("terra", smcc = TRUE)
 
   m <- "test"
   newModule(m, tmpdir, open = FALSE)

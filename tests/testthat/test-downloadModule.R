@@ -1,14 +1,14 @@
 test_that("downloadModule downloads and unzips a single module", {
   skip_on_cran()
-  skip_if_not_installed("httr")
 
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
+  opts <- list(reproducible.inputPaths = NULL)
+  if (isWindows()) {
+    opts <- append(opts, list(download.file.method = "auto"))
   } else {
-    options(download.file.method = "curl", download.file.extra = "-L")
+    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
 
-  testInitOut <- testInit("raster", smcc = FALSE)
+  testInit(opts = opts, "httr")
 
   m <- "test"
 
@@ -34,13 +34,7 @@ test_that("downloadModule downloads and unzips a parent module", {
   skip_if_not_installed("httr")
   skip_if_not_installed("dplyr") # needed for bind_rows in these old modules
 
-  # if (Sys.info()["sysname"] == "Windows") {
-  #   options(download.file.method = "auto")
-  # } else {
-  #   options(download.file.method = "curl")
-  # }
-
-  testInitOut <- testInit(c("raster", "dplyr"), smcc = FALSE)
+  testInit(c("terra", "dplyr"), smcc = FALSE)
   m <- "LCC2005"
 
   ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
@@ -70,13 +64,13 @@ test_that("downloadModule downloads and unzips a parent module", {
 
 test_that("downloadModule can overwrite existing modules", {
   skip_on_cran()
-  skip_if_not_installed("httr")
-
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
+  opts <- list(reproducible.inputPaths = NULL)
+  if (isWindows()) {
+    opts <- append(opts, list(download.file.method = "auto"))
   } else {
-    options(download.file.method = "curl", download.file.extra = "-L")
+    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
+  testInit("httr")
 
   m <- "LccToBeaconsReclassify"
   tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
@@ -112,17 +106,16 @@ test_that("downloadModule can overwrite existing modules", {
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
   skip_on_cran()
-  skip_if_not_installed("httr")
 
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
+  opts <- list(reproducible.inputPaths = NULL, "reproducible.verbose" = TRUE)
+  if (isWindows()) {
+    opts <- append(opts, list(download.file.method = "auto"))
   } else {
-    options(download.file.method = "curl", download.file.extra = "-L")
+    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
 
+  testInit(c("httr", "dplyr"), opts = opts)
   m <- "test"
-  tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   skipMessReGoogledrive <-
     "Need a newer version of reproducible for downloadData for non-googledrive urls"

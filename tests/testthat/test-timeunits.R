@@ -1,5 +1,5 @@
 test_that("timeunit works correctly", {
-  testInitOut <- testInit("NLMR")
+  testInit(sampleModReqdPkgs)
 
   times <- list(start = 0.0, end = 10)
   params <- list(
@@ -80,7 +80,7 @@ test_that("timeunit works correctly", {
 test_that("timeunits with child and parent modules work correctly", {
   skip_on_cran()
 
-  m <- testInit(smcc = TRUE, opts = list("spades.memoryUseInterval" = 0))
+  m <- testInit("ggplot2", smcc = TRUE, opts = list("spades.memoryUseInterval" = 0))
 
   newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
   newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)

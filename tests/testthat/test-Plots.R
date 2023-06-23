@@ -2,7 +2,7 @@ test_that("Plots function 1", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")
 
-  testInitOut <- testInit()
+  testInit()
 
   newModule("test", tmpdir, open = FALSE)
 
@@ -114,16 +114,15 @@ test_that("Plots function 1", {
 })
 
 test_that("testing .plotInitialTime & .plots", {
-  skip_if_not_installed("NLMR")
+  testInit(sampleModReqdPkgs)
 
   if (interactive()) {
-    testInitOut <- testInit()
 
     times <- list(start = 0.0, end = 1, timeunit = "year")
     params <- list(
       .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
       randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-      caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+      # caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
       fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
     )
     modules <- list("randomLandscapes", #"caribouMovement",
@@ -134,7 +133,7 @@ test_that("testing .plotInitialTime & .plots", {
 
     mySim@params$randomLandscapes$.plotInitialTime <- 0
     mySim@params$fireSpread$.plotInitialTime <- 0
-    mySim@params$caribouMovement$.plotInitialTime <- 0
+    # mySim@params$caribouMovement$.plotInitialTime <- 0
 
     # Makes plots
     spades(mySim)
@@ -147,7 +146,7 @@ test_that("testing .plotInitialTime & .plots", {
 test_that("Plots function 2", {
   skip_if_not_installed("ggplot2")
 
-  testInitOut <- testInit()
+  testInit()
 
   newModule("test", tmpdir, open = FALSE)
 
@@ -197,7 +196,7 @@ test_that("Plots function 2", {
 
 test_that("Plots function 3 - use as Plot", {
   if (interactive()) {
-    testInitOut <- testInit("raster", opts = list(spades.PlotsUsePlot = TRUE))
+    testInit("raster", opts = list(spades.PlotsUsePlot = TRUE))
     ras <- raster(extent(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
     stk1 <- raster::stack(ras, ras)
     stk2 <- raster::stack(ras, ras)
@@ -226,7 +225,7 @@ test_that("Plots function 3 - use as Plot", {
 })
 
 test_that("Plots test .guessPkgFun", {
-  testInitOut <- testInit("raster")
+  testInit("raster")
 
   pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
   test <- sapply(pkgFun, function(x) {

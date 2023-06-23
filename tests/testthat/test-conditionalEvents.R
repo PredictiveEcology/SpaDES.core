@@ -1,9 +1,8 @@
 if (interactive()) library(testthat)
 
 test_that("simulation runs with simInit and spades", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
+  testInit(sampleModReqdPkgs, opts = list(spades.moduleCodeChecks = FALSE))
 
   set.seed(42)
 

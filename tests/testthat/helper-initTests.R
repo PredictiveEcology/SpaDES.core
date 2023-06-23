@@ -100,7 +100,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
 
   out <- append(out, list(tmpdir = tmpdir, tmpCache = tmpCache))
   list2env(out, envir = pf)
-  return(out)
+  return(invisible(out))
 
 #
 #
@@ -164,6 +164,9 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
 #   return(outList)
 }
 
+sampleModReqdPkgs <- c("NLMR", # Only randomLandscapes
+                       "terra", "SpaDES.tools", "RColorBrewer", # randomLandscapes & fireSpread
+                       "sf", "CircStats") # caribouMovement
 
 testCode <- '
       defineModule(sim, list(

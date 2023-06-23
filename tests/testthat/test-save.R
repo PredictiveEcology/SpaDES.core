@@ -3,8 +3,8 @@ test_that("saving files (and memoryUse)", {
 #   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
   skip_on_covr() ## issue with memoryUseSetup
 
-  testInitOut <- testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
-                          libraries = c("NLMR", "data.table", "future", "future.callr"))
+  testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
+           c(sampleModReqdPkgs, "future", "future.callr"))
 
   origPlan <- future::plan()
   if (is(origPlan, "sequential")) {
@@ -115,7 +115,7 @@ test_that("saving files (and memoryUse)", {
 })
 
 test_that("saving csv files does not work correctly", {
-  testInitOut <- testInit(smcc = FALSE)
+  testInit(smcc = FALSE)
 
    tempObj <- 1:10
    tempObj2 <- paste("val", 1:10)
@@ -154,11 +154,12 @@ test_that("saving csv files does not work correctly", {
    expect_false(identical(df1, newObj))
 })
 
+
 test_that("saveSimList does not work correctly", {
 
-  testInitOut <- testInit(smcc = FALSE, libraries = c("terra"),
-                          tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
-                          opts = list(reproducible.verbose = 0))
+  testInit(sampleModReqdPkgs,
+           tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
+           opts = list(reproducible.verbose = 0))
   unlink(tmpfile[5])
   unlink(tmpfile[6])
   mapPath <- system.file("maps", package = "quickPlot")
@@ -260,8 +261,8 @@ test_that("saveSimList does not work correctly", {
 
 
 test_that("saveSimList with file backed objs", {
-  testInitOut <- testInit(smcc = FALSE, libraries = c("terra"),
-                          tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
+  testInit(sampleModReqdPkgs,
+           tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
   mapPath <- system.file("maps", package = "quickPlot")
 
   times <- list(start = 0, end = 1)
@@ -310,10 +311,8 @@ test_that("restart does not work correctly", {
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
   #devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
-  testInitOut <- testInit(libraries = c("NLMR", "terra"), tmpFileExt = c("grd", "Rdata", "Rdata"),
-                          opts = list("spades.restartRInterval" = 1, "spades.moduleCodeChecks" = FALSE))
-  options("spades.restartRInterval" = 0, "spades.saveSimList.fileBackend" = 0,
-          "spades.restartR.clearFiles" = FALSE)
+  testInit(sampleModReqdPkgs, tmpFileExt = c("grd", "Rdata", "Rdata"),
+           opts = list("spades.restartRInterval" = 0, "spades.restartR.clearFiles" = FALSE))
 
   tmpdir <- "~"
   testNum = 3
@@ -395,14 +394,13 @@ test_that("restart does not work correctly", {
 
 test_that("restart with logging", {
   skip("restartR with logging not possible in automated tests")
-  skip_if_not_installed("NLMR")
 
   # Must be run manually
   setwd("~/GitHub/SpaDES.core")
   library(SpaDES.core)
   #devtools::install(update.dependencies = FALSE, dependencies = FALSE) # need to install latest so that at restart it has everything
-  options("spades.restartRInterval" = 0, "spades.saveSimList.fileBackend" = 0,
-          "spades.restartR.clearFiles" = FALSE)
+  testInit(sampleModReqdPkgs, opts = list("spades.restartRInterval" = 0,
+                                          "spades.restartR.clearFiles" = FALSE))
 
   tmpdir <- "~"
   testNum = 3

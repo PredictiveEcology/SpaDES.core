@@ -45,6 +45,7 @@ Imports:
     utils,
     whisker
 Suggests:
+    CircStats,
     codetools,
     covr,
     DiagrammeR (>= 0.8.2),

@@ -141,6 +141,12 @@ The following options are likely of interest to most users
     This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
     Default is a temporary directory. \cr
 
+  `spades.sessionInfo` \tab `TRUE`)
+    \tab Assigns the [utils::sessionInfo()] to the `simList` during `simInit` with
+    the name `sim$._sessionInfo`. This takes about 75 milliseconds, which may be
+    undesireable for some situations where speed is critical. If `FALSE`, then
+    this is not assigned to the `simList`.\cr
+
   `spades.switchPkgNamespaces` \tab `FALSE` to keep computational
   overhead down. \tab Should the search path be modified
     to ensure a module's required packages are listed first?

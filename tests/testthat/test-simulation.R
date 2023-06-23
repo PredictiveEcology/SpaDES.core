@@ -1,6 +1,6 @@
 test_that("simulation runs with simInit and spades with set.seed; events arg", {
   skip_on_cran() # too long
-  testInitOut <- testInit("NLMR")
+  testInit(sampleModReqdPkgs)
 
   set.seed(42)
 
@@ -134,9 +134,8 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
 })
 
 test_that("spades calls - diff't signatures", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(verbose = TRUE)
+  testInit(sampleModReqdPkgs, verbose = TRUE)
 
   a <- simInit()
   a1 <- Copy(a)
@@ -215,7 +214,7 @@ test_that("spades calls - diff't signatures", {
 test_that("simInit with R subfolder scripts", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit()
+  testInit()
 
   newModule("child1", ".", open = FALSE)
   cat(file = file.path("child1", "R", "script.R"),
@@ -230,9 +229,7 @@ test_that("simInit with R subfolder scripts", {
 })
 
 test_that("simulation runs with simInit with duplicate modules named", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit()
+  testInit(sampleModReqdPkgs)
 
   set.seed(42)
 
@@ -254,7 +251,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 test_that("simulation runs with simInit with duplicate modules named", {
   skip("benchmarking DES")
 
-  testInitOut <- testInit()
+  testInit()
 
   newModule("test", tmpdir, open = FALSE)
   newModule("test2", tmpdir, open = FALSE)
@@ -414,7 +411,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 })
 
 test_that("conflicting function types", {
-  testInitOut <- testInit(smcc = TRUE)
+  testInit(sampleModReqdPkgs, smcc = TRUE)
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)
@@ -676,7 +673,7 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
-  testInitOut <- testInit(smcc = TRUE)
+  testInit(smcc = TRUE)
 
   m <- "test"
   newModule(m, tmpdir, open = FALSE)
@@ -698,7 +695,7 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
 })
 
 test_that("messaging with multiple modules", {
-  testInitOut <- testInit(smcc = TRUE)
+  testInit(smcc = TRUE)
 
   m1 <- "test"
   m2 <- "test2"
@@ -845,7 +842,7 @@ test_that("messaging with multiple modules", {
 })
 
 test_that("Module code checking -- pipe with matrix product with backtick & data.table", {
-  testInitOut <- testInit(smcc = TRUE)
+  testInit(smcc = TRUE)
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)
@@ -922,7 +919,7 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
 
 test_that("simInitAndSpades", {
 
-  testInitOut <- testInit("NLMR", opts = list("spades.moduleCodeChecks" = FALSE))
+  testInit(sampleModReqdPkgs)
 
   set.seed(42)
 
@@ -948,7 +945,7 @@ test_that("simInitAndSpades", {
 })
 
 test_that("scheduleEvent with invalid values for eventTime", {
-  testInitOut <- testInit()
+  testInit()
   s <- simInit(times = list(start = 1, end = 10))
   expect_error({
     s <- scheduleEvent(s, eventTime = -1, eventType = "test1", moduleName = "test")
@@ -963,7 +960,7 @@ test_that("scheduleEvent with invalid values for eventTime", {
 
 test_that("debug using logging", {
 
-  testInitOut <- testInit(c("NLMR", "logging"), tmpFileExt = "log")
+  testInit(c(sampleModReqdPkgs, "logging"), tmpFileExt = "log")
 
   set.seed(42)
 

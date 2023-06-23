@@ -1,11 +1,9 @@
 test_that("test spades.futureEvents", {
-  skip_if_not_installed("NLMR")
-
   skip_on_cran() ## these are longer tests (~2m)
   skip_on_os("windows")
-  testInitOut <- testInit(smcc = FALSE, libraries = "future",
-                          opts = list("reproducible.useMemoise" = FALSE,
-                                      "spades.futureEvents" = TRUE))
+  testInit(c(sampleModReqdPkgs, "future"),
+           opts = list("reproducible.useMemoise" = FALSE,
+                       "spades.futureEvents" = TRUE))
   tmpdir <- tempdir()
   modPath <- system.file("sampleModules", package = "SpaDES.core")
   newModule("test", path = modPath)

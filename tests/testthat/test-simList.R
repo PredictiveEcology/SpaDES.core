@@ -1,5 +1,5 @@
 test_that("simList object initializes correctly (1)", {
-  testInitOut <- testInit()
+  testInit(sampleModReqdPkgs)
 
   defaults <- .coreModules() %>% unname()
   times <- list(start = 1.0, end = 10)
@@ -196,7 +196,7 @@ test_that("simList object initializes correctly (1)", {
 
 test_that("simList object initializes correctly (2)", {
 
-  testInitOut <- testInit(c("terra"), smcc = FALSE)
+  testInit(c("terra"), smcc = FALSE)
   ## test with outputs
   abundRasters <- list(terra::rast(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
 
@@ -217,7 +217,7 @@ test_that("simList object initializes correctly (2)", {
 test_that("simList test all signatures", {
   skip_on_cran()
 
-  testInitOut <- testInit(opts = list(spades.useRequire = FALSE))
+  testInit(sampleModReqdPkgs, opts = list(spades.useRequire = FALSE))
 
   on.exit({
     if (!curPathIsPkgPath) {
@@ -324,7 +324,7 @@ test_that("simList test all signatures", {
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   skip_on_cran()
   ## Test resulting from bug found by Greg Paradis April 7, 2019
-  testInitOut <- testInit("terra", smcc = FALSE)
+  testInit("terra", smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   newModule(childModName, tmpdir, type = "child", open = FALSE)
@@ -342,7 +342,7 @@ test_that("test that module directory exists, but not files", {
   skip_on_cran()
 
   ## Test resulting from bug found by Eliot McIntire April 28, 2019
-  testInitOut <- testInit("terra", smcc = FALSE)
+  testInit("terra", smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   parentModName <- "parent_module"
@@ -380,7 +380,7 @@ test_that("test that module directory exists, but not files", {
 
 test_that("inputObjects on module arg not sim", {
 
-  testInitOut <- testInit("NLMR", smcc = FALSE)
+  testInit(sampleModReqdPkgs)
 
   defaults <- .coreModules() %>% unname()
   times <- list(start = 1.0, end = 10)

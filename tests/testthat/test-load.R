@@ -1,5 +1,5 @@
 test_that("loading inputs does not work correctly", {
-  testInit(c("NLMR", "quickPlot"))
+  testInit(c(sampleModReqdPkgs, "quickPlot"))
 
   mapPath <- system.file("maps", package = "quickPlot")
 
@@ -116,7 +116,7 @@ test_that("loading inputs does not work correctly", {
 test_that("passing arguments to filelist in simInit does not work correctly", {
   skip_on_cran()
 
-  testInitOut <- testInit(c("NLMR", "quickPlot", "data.table"))
+  testInit(c(sampleModReqdPkgs, "quickPlot", "data.table"))
 
   # Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded
   #  at time = 10 and 20 (via "intervals").
@@ -206,7 +206,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
 })
 
 test_that("passing objects to simInit does not work correctly", {
-  testInitOut <- testInit(c("NLMR", "terra", "quickPlot"))
+  testInit(c(sampleModReqdPkgs, "quickPlot"))
 
   mapPath <- mapPath <- system.file("maps", package = "quickPlot")
 
@@ -286,7 +286,7 @@ test_that("passing objects to simInit does not work correctly", {
 })
 
 test_that("passing nearly empty file to simInit does not work correctly", {
-  testInitOut <- testInit(c("terra", "quickPlot"))
+  testInit(c("terra", "quickPlot"))
 
   mapPath <- mapPath <- system.file("maps", package = "quickPlot")
 
@@ -329,7 +329,7 @@ test_that("passing nearly empty file to simInit does not work correctly", {
 test_that("more tests", {
   skip_on_cran()
 
-  testInitOut <- testInit()
+  testInit()
 
   sim <- simInit()
   test <- 1:10
@@ -377,7 +377,7 @@ test_that("more tests", {
 })
 
 test_that("interval loading of objects from .GlobalEnv", {
-  testInitOut <- testInit("ggplot2")
+  testInit("ggplot2")
 
   times <- 0:10
   test1 <- "hi"
@@ -426,19 +426,19 @@ test_that("interval loading of objects from .GlobalEnv", {
 })
 
 test_that("Filenames for simList", {
-  testInitOut <- testInit(c("terra"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
+  testInit(c("terra"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
                           opts = list("reproducible.ask" = FALSE))
 
   mapPath <- mapPath <- system.file("maps", package = "quickPlot")
-
-  testInitOut <- testInit(c("terra"), )
-
-    # TODO -- convert to terra & raster
 
   s <- simInit()
   packages <- c("raster", "terra")
   functions <- cbind(c("raster", "extent", "stack", "nlayers"),
                      c("rast", "ext", "rast", "nlyr"))
+  if (!requireNamespace("raster", quietly = TRUE)) {
+    functions <- functions[, 2,drop = FALSE]
+    packages <- packages[2]
+  }
   for (i in seq(packages)) {
     read <- getFromNamespace(functions[1, i], ns = packages[i])
     ext <- getFromNamespace(functions[2, i], ns = packages[i])

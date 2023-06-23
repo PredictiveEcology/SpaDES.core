@@ -1,5 +1,5 @@
 test_that("defineModule correctly handles different inputs", {
-  testInitOut <- testInit("terra", smcc = FALSE)
+  testInit("terra", smcc = FALSE)
 
   tmp <- simInit()
   tmp1 <- simInit()
@@ -116,8 +116,8 @@ test_that("defineModule correctly handles different inputs", {
 })
 
 test_that("depsEdgeList and depsGraph work", {
-  skip_if_not_installed("NLMR")
   skip_on_cran() # requires installation of NLMR, from a Git Repo
+  testInit(sampleModReqdPkgs)
 
   origRepos <- getOption("repos")
   print(origRepos)
@@ -179,7 +179,7 @@ test_that("depsEdgeList and depsGraph work", {
 })
 
 test_that("3 levels of parent and child modules load and show correctly", {
-  testInitOut <- testInit("raster", smcc = FALSE)
+  testInit("terra", smcc = FALSE)
 
   suppressMessages({
     newModule("grandpar1", tmpdir, type = "parent",
@@ -238,7 +238,7 @@ test_that("3 levels of parent and child modules load and show correctly", {
 
 
 test_that("Test cleaning up of desc in createsOutputs, expectsInputs, defineParameters", {
-  testInitOut <- testInit("raster", smcc = FALSE)
+  testInit("terra", smcc = FALSE)
 
   aList <- list()
   aList[[1]] <- expectsInput("ROCList", "list", sourceURL = NA,

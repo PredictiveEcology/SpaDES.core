@@ -1,15 +1,14 @@
 test_that("downloadData downloads and unzips module data", {
   skip_on_cran()
-  # skip_if_not_installed("googledrive")
 
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
+  opts <- list(reproducible.inputPaths = NULL)
+  if (isWindows()) {
+    opts <- append(opts, list(download.file.method = "auto"))
   } else {
-    options(download.file.method = "curl", download.file.extra = "-L")
+    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
 
-  testInitOut <- testInit(c("googledrive", "terra"),
-                          smcc = FALSE, opts = list(reproducible.inputPaths = NULL))
+  testInit(c("googledrive", "terra"), opts = opts)
 
   m <- "test"
   datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
