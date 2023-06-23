@@ -136,7 +136,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
 test_that("spades calls - diff't signatures", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit()
+  testInitOut <- testInit(verbose = TRUE)
 
   a <- simInit()
   a1 <- Copy(a)
@@ -155,8 +155,8 @@ test_that("spades calls - diff't signatures", {
     expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
         "eventTime *moduleName *eventType *eventPriority")
   } else {
-    expect_warning(expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
-                   "eventTime *moduleName *eventType *eventPriority"))
+    expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+                   "eventTime *moduleName *eventType *eventPriority")
   }
   expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA), "moduleName")
   expect_message(spades(a, debug = "simList", .plotInitialTime = NA), "Completed Events")
