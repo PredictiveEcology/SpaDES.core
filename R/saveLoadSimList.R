@@ -116,19 +116,23 @@ saveSimList <- function(sim, filename, fileBackend = 0, filebackedDir = NULL,
   sim <- .dealWithClass(sim) # makes a copy of filebacked object files
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
   empties <- nchar(fns) == 0
-  if (any(!empties)) {
+  if (any(empties)) {
     fns <- fns[!empties]
     fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
   }
-  browser()
+  qsFile <- gsub(tools::file_ext(filename), "qs", filename)
+  qs::qsave(sim, file = qsFile)
+
+  if (length(fns)) {
+    filename <- gsub(tools::file_ext(filename), "zip", filename)
+    relFns <- reproducible:::makeRelative(c(qsFile, fns), absoluteBase = dirname(filename))
+    zip(filename, files = relFns)
+    unlink(qsFile)
+
+  }
   # if (tolower(tools::file_ext(filename)) == "rds") {
   #   save(sim, file = filename)
   # } else if (tolower(tools::file_ext(filename)) == "qs") {
-  qsFile <- gsub(tools::file_ext(filename), "qs", filename)
-  zipFile <- gsub(tools::file_ext(filename), "zip", filename)
-  qs::qsave(sim, file = qsFile)
-  relFns <- reproducible:::makeRelative(c(qsFile, fns), absoluteBase = dirname(filename))
-  zip(filename, files = relFns)
   # }
 
 
@@ -280,17 +284,26 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
   # stopifnot(tolower(tools::file_ext(filename)) %in% c("qs", "rds"))
 
+
+  browser()
+  filename <- checkArchiveAlternative(filename)
+
+  if (length(filename) > 1) {
+    browser()
+  }
   if (tolower(tools::file_ext(filename)) == "rds") {
     load(filename, envir = environment())
     sim <- sim
   } else if (tolower(tools::file_ext(filename)) == "qs") {
     sim <- qs::qread(filename, nthreads = getOption("spades.qsThreads", 1))
   }
-  td <- tempdir2()
-  filesInZip <- unzip(filename, list = TRUE)
-  out <- unzip(filename, exdir = td)
-  sim <- qs::qread(out[1])
-  hardLinkOrCopy(out[-1], gsub(paste0(td, "/"), "", out[-1]))
+  if (FALSE) {
+    td <- tempdir2()
+    filesInZip <- unzip(filename, list = TRUE)
+    out <- unzip(filename, exdir = td)
+    sim <- qs::qread(out[1])
+    hardLinkOrCopy(out[-1], gsub(paste0(td, "/"), "", out[-1]))
+  }
   sim <- .dealWithClassOnRecovery(sim) # convert e.g., PackedSpatRaster
 
   # Work around for bug in qs that recovers data.tables as lists
@@ -416,7 +429,11 @@ loadSimList <- function(filename, paths = getPaths(), otherFiles = "") {
 #' @export
 #' @rdname loadSimList
 unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
-  # browser()
+  .Deprecated("loadSimList")
+  sim <- loadSimList(zipfile, ...)
+
+  return(sim)
+
   zipfile <- normPath(zipfile)
   outFilenames <- unzip(zipfile = zipfile, list = TRUE)
 
@@ -444,3 +461,23 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   }
   return(unzippedFiles)
 }
+
+checkArchiveAlternative <- function(filename) {
+  if (!file.exists(filename[1])) {
+    browser()
+    archiveExts <- "(tar$|tar\\.gz$|zip$)"
+    baseN <- tools::file_path_sans_ext(basename(filename))
+    possZips <- dir(dirname(filename), pattern = paste0(baseN, ".", archiveExts))
+    if (length(possZips)) {
+      filename <- possZips[1]
+      if (grepl(archiveExts, tolower(tools::file_ext(filename)))) {
+        td <- tempdir2()
+        filesInZip <- unzip(filename, list = TRUE)
+        filename <- unzip(filename, exdir = td)
+      }
+    }
+
+  }
+  filename
+}
+

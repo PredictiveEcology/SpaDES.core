@@ -88,8 +88,9 @@ checkpointLoad <- function(file) {
   # stopifnot(raster::extension(file) == ".qs")
 
   # check for previous checkpoint files
-  if (file.exists(file)) {
-    sim <- loadSimList(file)
+  file <- checkArchiveAlternative(file)
+  if (file.exists(file[1])) {
+    sim <- loadSimList(file[1])
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
@@ -111,6 +112,10 @@ checkpointLoad <- function(file) {
   tmpEnv <- new.env(parent = emptyenv())
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
+  if (file.exists(file[1])) {
+    if (length(file) > 1) browser()
+    unlink(file)
+  }
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
               filename = file, fileBackend = 1, envir = tmpEnv)
 
