@@ -5,7 +5,13 @@
 \alias{unzipSimList}
 \title{Load a saved \code{simList} and ancillary files}
 \usage{
-loadSimList(filename, paths = getPaths(), otherFiles = "")
+loadSimList(
+  filename,
+  projectPath = getwd(),
+  paths = getPaths(),
+  otherFiles = "",
+  verbose = getOption("reproducible.verbose")
+)
 
 unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 }

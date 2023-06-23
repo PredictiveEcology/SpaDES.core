@@ -297,14 +297,14 @@ Plots <- function(data, fn, filename,
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(rasterFilename)),
-                                     file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
+                                     file = rasterFilename, fun = "terra::writeRaster", ...)
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(rawFilename)),
-                                     file = rawFilename, fun = "qs::qsave", args = NA,  ...)
+                                     file = rawFilename, fun = "qs::qsave", ...)
     }
   }
 
@@ -330,7 +330,7 @@ Plots <- function(data, fn, filename,
             pkgAndFn <- .guessPkgFun(bsf)
             sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                          objectName = filePathSansExt(basename(theFilename)),
-                                         file = theFilename, fun = pkgAndFn, args = NA,  ...)
+                                         file = theFilename, fun = pkgAndFn, ...)
           }
           message("Saved figure to: ", theFilename)
         }
@@ -347,10 +347,11 @@ Plots <- function(data, fn, filename,
           args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
+
         if (exists("sim", inherits = FALSE))
           sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                        objectName = filePathSansExt(basename(theFilename)),
-                                       file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
+                                       file = theFilename, fun = "ggplot2::ggsave", ...)
         message("Saved figure to: ", theFilename)
       }
     }
@@ -358,10 +359,11 @@ Plots <- function(data, fn, filename,
     if (any(grepl("object", types))) {
       filename11 <- file.path(path, paste0(filename, "_gg.qs"))
       qs::qsave(gg, file = filename11)
+
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(filename11)),
-                                     file = filename11, fun = "qs::qsave", args = NA,  ...)
+                                     file = filename11, fun = "qs::qsave", ...)
     }
   }
 
@@ -371,7 +373,8 @@ Plots <- function(data, fn, filename,
   return(invisible(NULL))
 }
 
-outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = NA, args = I(list(NA)), ...) {
+outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = NA,
+                          args = I(list(NA)), ...) {
   if (!is(args, "list") && !is(args, "AsIs")) {
     stop("args must a list (with same length as file) of lists (with named elements), ",
          ", wrapped with I(  )")

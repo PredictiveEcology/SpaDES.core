@@ -105,7 +105,7 @@ See the modules vignette for more details (\code{browseVignettes("SpaDES.core")}
 sim <- simInit()
 # This would normally be a save call, e.g., `writeRaster`
 tf <- reproducible::tempfile2(fileext = ".tif")
-sim <- registerOutput(sim, filename = tf)
+sim <- registerOutputs(sim, filename = tf)
 
 #######################
 # outputs

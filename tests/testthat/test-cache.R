@@ -560,7 +560,7 @@ test_that("Cache sim objs via .Cache attr", {
 test_that("test showSimilar", {
   skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE, "raster")
+  testInitOut <- testInit(smcc = FALSE, "terra", verbose = TRUE)
   opts <- options("reproducible.cachePath" = tmpdir)
 
   # Example of changing parameter values
@@ -597,7 +597,7 @@ test_that("test showSimilar", {
   mess <- capture_messages({
     out4 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_true(any(grepl("Cache of.*differs", mess))) ## TODO: no longer true; confirm why.
+  expect_true(any(grepl("Cache of.*differs", mess)))
   mess <- capture_messages({
     out5 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })

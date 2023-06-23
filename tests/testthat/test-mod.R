@@ -1,5 +1,5 @@
 test_that("local mod object", {
-  testInitOut <- testInit(smcc = FALSE, debug = FALSE,
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE, verbose = TRUE,
                           opts = list("reproducible.useMemoise" = FALSE))
 
   newModule("test", tmpdir, open = FALSE)

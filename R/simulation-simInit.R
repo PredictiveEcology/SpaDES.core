@@ -319,7 +319,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 setGeneric(
   "simInit",
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
-           notOlderThan = NULL) {
+           notOlderThan = NULL, ...) {
     standardGeneric("simInit")
 })
 
@@ -344,7 +344,7 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
 
     opt <- options("encoding" = "UTF-8")
     on.exit(options(opt), add = TRUE)
@@ -353,6 +353,8 @@ setMethod(
       checkPath(p, create = TRUE)
     )
 
+    if (length(...names()))
+      objects <- append(objects, list(...))
     objNames <- names(objects)
     if (length(objNames) != length(objects)) {
       stop(
@@ -769,8 +771,10 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
     namesMatchCall <- names(match.call())
+    namesMatchCall <- setdiff(namesMatchCall, ...names())
+
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
@@ -785,7 +789,7 @@ setMethod(
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
                    outputs = li$outputs, loadOrder = li$loadOrder,
-                   notOlderThan = li$notOlderThan)
+                   notOlderThan = li$notOlderThan, ...)
 
     # sim <- do.call("simInit", args = li, quote = TRUE)
 
@@ -814,8 +818,9 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
     namesMatchCall <- names(match.call())
+    namesMatchCall <- setdiff(namesMatchCall, ...names())
 
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
@@ -827,7 +832,7 @@ setMethod(
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
                    outputs = li$outputs, loadOrder = li$loadOrder,
-                   notOlderThan = li$notOlderThan)
+                   notOlderThan = li$notOlderThan, ...)
 
     return(invisible(sim))
   }
@@ -855,9 +860,11 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
     # browser(expr = exists("._simInit_1"))
     namesMatchCall <- names(match.call())
+    namesMatchCall <- setdiff(namesMatchCall, ...names())
+
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
 
@@ -980,7 +987,7 @@ setMethod(
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
                    outputs = li$outputs, loadOrder = li$loadOrder,
-                   notOlderThan = li$notOlderThan)
+                   notOlderThan = li$notOlderThan, ...)
 
     # sim2 <- do.call("simInit", args = li, quote = TRUE)
 
@@ -1025,7 +1032,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                  modules = objsSimInit$modules, objects = objsSimInit$objects,
                  paths = objsSimInit$paths, inputs = objsSimInit$inputs,
                  outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
-                 notOlderThan = objsSimInit$notOlderThan)
+                 notOlderThan = objsSimInit$notOlderThan, ...)
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
@@ -1266,8 +1273,10 @@ simInitDefaults <- function() {
 
 .fillInSimInit <- function(li, namesMatchCall) {
 
-  isMissing <- !formalArgs(simInit) %in% namesMatchCall[-1]
-  formalsTF <- formalArgs(simInit)
+  fa <- formalArgs(simInit)
+  fa <- fa[!fa %in% "..."]
+  isMissing <- !fa %in% namesMatchCall[-1]
+  formalsTF <- fa
 
   names(isMissing) <- formalsTF
 

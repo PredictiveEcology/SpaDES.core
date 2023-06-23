@@ -20,7 +20,7 @@ cleanMessage <- function(mm) {
 # loads and libraries indicated plus testthat,
 # sets options("reproducible.ask" = FALSE) if ask = FALSE
 testInit <- function(libraries = character(), ask = FALSE, verbose,
-                     debug = TRUE, tmpFileExt = "",
+                     debug = FALSE, tmpFileExt = "",
                      opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
 
   set.randomseed()
@@ -40,7 +40,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
       if (!all(pkgsLoaded)) {
         lapply(libraries[!pkgsLoaded], skip_if_not_installed)
       }
-      lapply(libraries, withr::local_package, .local_envir = pf)
+      suppressWarnings(lapply(libraries, withr::local_package, .local_envir = pf))
     }
   }
 
@@ -79,6 +79,8 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
   withr::local_options("reproducible.ask" = ask, .local_envir = pf)
   withr::local_options("spades.debug" = debug, .local_envir = pf)
   withr::local_options("spades.moduleCodeChecks" = smcc, .local_envir = pf)
+  withr::local_options("spades.recoveryMode" = FALSE, .local_envir = pf)
+  withr::local_options("reproducible.verbose" = FALSE, .local_envir = pf)
 
   if (!missing(verbose))
     withr::local_options("reproducible.verbose" = verbose, .local_envir = pf)

@@ -45,7 +45,8 @@ test_that("test checkpointing", {
 test_that("test checkpointing with disk-backed raster", {
   skip_on_cran()
 
-  testInitOut <- testInit("NLMR", smcc = FALSE, opts = list(spades.recoveryMode = FALSE))
+  testInitOut <- testInit("NLMR", smcc = FALSE,
+                          opts = list(spades.recoveryMode = FALSE))
 
   file <- file.path("chkpnt.qs")
 

@@ -9,6 +9,7 @@
 saveSimList(
   sim,
   filename,
+  projectPath = getwd(),
   fileBackend = 0,
   filebackedDir = NULL,
   outputs = TRUE,

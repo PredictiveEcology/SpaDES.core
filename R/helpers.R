@@ -299,8 +299,8 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  target1 <- .dealWithClass(target) # deals with SpatVector/SpatRaster etc.
-  current1 <- .dealWithClass(current) # deals with SpatVector/SpatRaster etc.
+  target1 <- .dealWithClass(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  current1 <- .dealWithClass(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
   all.equal.default(target1, current1, check.environment = FALSE)
 }
 
@@ -322,6 +322,8 @@ needInstall <- function(
   }
 }
 
+isWindows <-  getFromNamespace("isWindows", "reproducible")
+makeRelative <- getFromNamespace("makeRelative", "reproducible")
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 isRaster <- getFromNamespace("isRaster", "reproducible")
 isSpat <- getFromNamespace("isSpat", "reproducible")
