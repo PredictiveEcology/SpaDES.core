@@ -8,7 +8,7 @@
 loadSimList(
   filename,
   projectPath = getwd(),
-  paths = getPaths(),
+  paths = NULL,
   otherFiles = "",
   verbose = getOption("reproducible.verbose")
 )

@@ -18,7 +18,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{list,list,list,list,list,data.frame,data.frame,character}(
@@ -30,7 +31,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{ANY,ANY,ANY,character,ANY,ANY,ANY,ANY}(
@@ -42,7 +44,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{ANY,ANY,character,ANY,ANY,ANY,ANY,ANY}(
@@ -54,7 +57,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(
@@ -66,7 +70,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 simInitDefaults()

@@ -10,8 +10,6 @@ saveSimList(
   sim,
   filename,
   projectPath = getwd(),
-  fileBackend = 0,
-  filebackedDir = NULL,
   outputs = TRUE,
   inputs = TRUE,
   cache = FALSE,
@@ -30,19 +28,6 @@ name.}
 
 \item{filename}{Character string with the path for saving \code{simList} to or
 reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs} file types are supported.}
-
-\item{fileBackend}{Numeric. \code{0} means don't do anything with
-file backed rasters. Leave their file intact as is, in its place.
-\code{1} means save a copy of the file backed rasters in \code{fileBackedDir}.
-\code{2} means move all data in file-backed rasters to memory. This
-means that the objects will be part of the main \code{qs} file
-of the \code{simList}. Default is \code{0}.}
-
-\item{filebackedDir}{Only used if \code{fileBackend} is 1.
-\code{NULL}, the default, or Character string. If \code{NULL}, then then the
-files will be copied to the directory:
-\code{file.path(dirname(filename), "rasters")}. A character string
-will be interpreted as a path to copy all rasters to.}
 
 \item{outputs}{Logical. If \code{TRUE}, all files identified in
 \code{outputs(sim)} will be included in the zip.}
