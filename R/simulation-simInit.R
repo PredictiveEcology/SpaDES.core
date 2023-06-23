@@ -379,10 +379,11 @@ setMethod(
     }
 
     # add project/session info -- use list to allow subsequent addition (e.g., git, spatial libs)
-    sim@.xData[["._sessionInfo"]] <- list(
-      sessionInfo = utils::sessionInfo(),
-      timestamp = Sys.time()
-    )
+    if (getOption("spades.sessionInfo", TRUE))
+      sim@.xData[["._sessionInfo"]] <- list(
+        sessionInfo = utils::sessionInfo(),
+        timestamp = Sys.time()
+      )
 
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())

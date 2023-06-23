@@ -81,6 +81,8 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
   withr::local_options("spades.moduleCodeChecks" = smcc, .local_envir = pf)
   withr::local_options("spades.recoveryMode" = FALSE, .local_envir = pf)
   withr::local_options("reproducible.verbose" = FALSE, .local_envir = pf)
+  withr::local_options("spades.useRequire" = FALSE, .local_envir = pf)
+  withr::local_options("spades.sessionInfo" = FALSE, .local_envir = pf)
 
   if (!missing(verbose))
     withr::local_options("reproducible.verbose" = verbose, .local_envir = pf)
