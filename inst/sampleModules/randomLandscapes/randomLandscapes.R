@@ -35,6 +35,8 @@ defineModule(sim, list(
     defineParameter("nx", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the x dimension"),
     defineParameter("ny", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the y dimension"),
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".plotInitialTime", "numeric", start(sim), start(sim), NA, "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", NA_real_, NA, NA, "time interval between plot events"),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time to schedule first save event"),
@@ -73,7 +75,7 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
     plot = {
       # do stuff for this event
       stackName <- SpaDES.core::P(sim)$stackName ## Plot doesn't like long variables
-      Plot(sim[[stackName]])
+      Plots(sim[[stackName]])
     },
     save = {
       # do stuff for this event

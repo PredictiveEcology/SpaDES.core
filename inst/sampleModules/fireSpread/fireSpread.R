@@ -36,6 +36,8 @@ defineModule(sim, list(
     defineParameter("returnInterval", "numeric", 1.0, 1.0, 1.0, "fire return interval"),
     defineParameter("spreadprob", "numeric", 0.225, 0.05, 0.5, "probability of fire spreading into a pixel"),
     defineParameter("startTime", "numeric", start(sim) + 1, 0, end(sim), "time of initial fire ignition"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".plotInitialTime", "numeric", start(sim), start(sim), end(sim) + 1,
                     "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, 1, 1, "time interval between plot events"),
@@ -111,7 +113,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
 
       clearPlot()
       stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long names -- create local variable
-      Plot(sim[[stackName]],
+      Plots(sim[[stackName]],
            legendRange = list(0:maxFn(sim[[SpaDES.core::P(sim)$stackName]]$DEM), 0:100,
                               c(0, 1), 0:100, 0:10))
 
@@ -120,10 +122,9 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
                            "fireSpread", "plot", .last())
     },
     plot = {
-      browser()
       # do stuff for this event
       stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long names -- create local variable
-      Plot(sim[[stackName]]$Fires, new = FALSE)
+      Plots(sim[[stackName]]$Fires, new = FALSE)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval,
