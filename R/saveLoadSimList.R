@@ -129,7 +129,9 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
   }
 
-  filename <- gsub(tools::file_ext(filename), "qs", filename)
+  # This forces it to be qs instead of zip or tar.gz or rds
+  filename <- archiveConvertFileExt(filename, "qs")
+  # filename <- gsub(tools::file_ext(filename), "qs", filename)
   if (tolower(tools::file_ext(filename)) == "rds") {
     saveRDS(sim, file = filename)
   } else if (tolower(tools::file_ext(filename)) == "qs") {
@@ -176,21 +178,8 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
     relFns <- makeRelative(c(fileToDelete, allFns), absoluteBase = projectPath)
 
-    if (requireNamespace("archive") && !isWindows()) {
-      filename <- gsub(tools::file_ext(filename), "tar.gz", filename)
-      compLev <- getOption("spades.compressionLevel", 1)
-      archive::archive_write_files(filename, relFns, options = paste0("compression-level=", compLev))
-      # archive::archive_write_files(filename, files = relFns)
-    } else {
-      filename <- gsub(tools::file_ext(filename), "zip", filename)
-      # the qs file doesn't deflate at all
-      extras <- list("--compression-method store", NULL)
-      if (verbose <= 0) {
-        extras <- lapply(extras, function(ex) c(ex, "--quiet"))
-      }
-      zip(filename, files = relFns[1], extras = extras[[1]])
-      zip(filename, files = relFns[-1], extras = extras[[2]])
-    }
+    archiveWrite(filename, relFns, verbose)
+
     unlink(fileToDelete)
   }
 
@@ -350,7 +339,7 @@ loadSimList <- function(filename, projectPath = getwd(),
 
   if (grepl(archiveExts, tolower(tools::file_ext(filename)))) {
     td <- tempdir2(sub = .rndstr())
-    filename <- unzip(filename, exdir = td)
+    filename <- archiveExtract(filename, exdir = td)
     filenameRel <- gsub(paste0(td, "/"), "", filename[-1])
 
     # This will put the files to relative path of getwd()
@@ -431,38 +420,39 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
 
   return(sim)
 
-  zipfile <- normPath(zipfile)
-  outFilenames <- unzip(zipfile = zipfile, list = TRUE)
-
-  dots <- list(...)
-  dots <- modifyList2(
-    list(exdir = tempdir2(sub = "TransferFolder2"),
-         junkpaths = TRUE),
-    dots)
-  dots <- modifyList2(list(zipfile = zipfile),
-                     dots)
-  checkPath(dots$exdir, create = TRUE)
-  unzippedFiles <- do.call(unzip, dots)
-  if (is.null(dots$exdir)) {
-    on.exit({
-      unlink(unzippedFiles, recursive = TRUE, force = TRUE)
-      unlink(dots$exdir, recursive = TRUE, force = TRUE)
-    })
-  }
-
-  if (isTRUE(load)) {
-    sim <- loadSimList(file.path(dots$exdir, basename(outFilenames[["Name"]])[[1]]),
-                       paths = paths,
-                       otherFiles = unzippedFiles)
-    return(sim)
-  }
-  return(unzippedFiles)
+  # zipfile <- normPath(zipfile)
+  # outFilenames <- unzip(zipfile = zipfile, list = TRUE)
+  #
+  # dots <- list(...)
+  # dots <- modifyList2(
+  #   list(exdir = tempdir2(sub = "TransferFolder2"),
+  #        junkpaths = TRUE),
+  #   dots)
+  # dots <- modifyList2(list(zipfile = zipfile),
+  #                    dots)
+  # checkPath(dots$exdir, create = TRUE)
+  # unzippedFiles <- do.call(unzip, dots)
+  # if (is.null(dots$exdir)) {
+  #   on.exit({
+  #     unlink(unzippedFiles, recursive = TRUE, force = TRUE)
+  #     unlink(dots$exdir, recursive = TRUE, force = TRUE)
+  #   })
+  # }
+  #
+  # if (isTRUE(load)) {
+  #   sim <- loadSimList(file.path(dots$exdir, basename(outFilenames[["Name"]])[[1]]),
+  #                      paths = paths,
+  #                      otherFiles = unzippedFiles)
+  #   return(sim)
+  # }
+  # return(unzippedFiles)
 }
 
 checkArchiveAlternative <- function(filename) {
   if (!file.exists(filename[1])) {
     baseN <- tools::file_path_sans_ext(basename(filename))
-    possZips <- dir(dirname(filename), pattern = paste0(baseN, ".", archiveExts))
+    possZips <- dir(dirname(filename), pattern = paste0(baseN, ".", archiveExts),
+                    full.names = TRUE)
     if (length(possZips)) {
       filename <- possZips[1]
     }
@@ -472,7 +462,7 @@ checkArchiveAlternative <- function(filename) {
 }
 
 
-archiveExts <- "(tar$|tar\\.gz$|zip$)"
+archiveExts <- "(tar$|tar\\.gz$|zip$|gz$)"
 
 recoverDataTableFromQs <- function(sim) {
   objectName <- ls(sim)
@@ -580,4 +570,45 @@ warnDeprecFileBacked <- function(arg) {
                   "prior to saveSimList"),
          stop("No deprecation warning with that arg: ", arg)
          )
+}
+
+archiveExtract <- function(archiveName, exdir) {
+  if (requireNamespace("archive") && !isWindows()) {
+    archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
+    # if (!endsWith(archiveName, "tar.gz")) {
+    #   archiveName <- gsub(tools::file_ext(archiveName), "tar.gz", archiveName)
+    # }
+    filename <- archive::archive_extract(archiveName)
+    # archive::archive_write_files(archiveName, files = relFns)
+  } else {
+    filename <- unzip(filename, exdir = exdir)
+  }
+  filename
+}
+
+archiveWrite <- function(archiveName, relFns, verbose) {
+  if (requireNamespace("archive") && !isWindows()) {
+    archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
+    # archiveName <- gsub(tools::file_ext(archiveName), "tar.gz", archiveName)
+    compLev <- getOption("spades.compressionLevel", 1)
+    archive::archive_write_files(archiveName, relFns, options = paste0("compression-level=", compLev))
+    # archive::archive_write_files(archiveName, files = relFns)
+  } else {
+    archiveName <- archiveConvertFileExt(archiveName, "zip")
+    # archiveName <- gsub(tools::file_ext(archiveName), "zip", archiveName)
+    # the qs file doesn't deflate at all
+    extras <- list("--compression-method store", NULL)
+    if (verbose <= 0) {
+      extras <- lapply(extras, function(ex) c(ex, "--quiet"))
+    }
+    zip(archiveName, files = relFns[1], extras = extras[[1]])
+    zip(archiveName, files = relFns[-1], extras = extras[[2]])
+  }
+}
+
+archiveConvertFileExt <- function(filename, convertTo = "tar.gz") {
+  if (!(endsWith(filename, "tar.gz") && identical(convertTo, "tar.gz"))) {
+    filename <- gsub(tools::file_ext(filename), convertTo, filename)
+  }
+  filename
 }
