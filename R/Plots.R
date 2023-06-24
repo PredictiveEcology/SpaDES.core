@@ -191,7 +191,10 @@ Plots <- function(data, fn, filename,
     if (isTRUE(usePlot)) {
       fn <- Plot
     } else {
-      fn <- plot
+      if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp")))
+        fn <- terra::plot
+      else
+        fn <- plot
     }
   }
   fnIsPlot <- identical(fn, Plot)
@@ -230,7 +233,9 @@ Plots <- function(data, fn, filename,
 
   if (needScreen) {
     if (fnIsPlot) {
-      if (is.list(data) || !is(data, "RasterStack") || !is(data, "RasterBrick")) {
+      if (is.list(data) || !(is(data, "RasterStack") || is(data, "RasterBrick")) )# ||
+      #    is(data, "SpatRaster") || is(data, "SpatVector")))
+        {
         dataListToScreen <- data
       } else {
         dataListToScreen <- list(data)
@@ -249,7 +254,14 @@ Plots <- function(data, fn, filename,
         }
       }
 
-      gg <- fn(ggListToScreen, ...)
+      # cludge to make title of plots have data$ not dataListToScreen$
+      dataOrig <- data
+      data <- dataListToScreen
+
+      gg <- fn(data, ...)
+
+      data <- dataOrig
+
       .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
       qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
       objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
