@@ -71,7 +71,9 @@ The following options are likely of interest to most users
 
   `spades.loadReqdPkgs`
      \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
-     or `require`. If `FALSE`, no package loading will occur.  \cr
+     or `require`. If `FALSE`, no package loading will occur. This will mean that
+     modules must prefix every function call from a package with that package name
+     with double colon (::).  \cr
 
   `spades.lowMemory` \tab `FALSE`
     \tab If true, some functions will use more memory

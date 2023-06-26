@@ -8,7 +8,7 @@
 \method{.dealWithClass}{simList}(
   obj,
   cachePath,
-  drv = getOption("reproducible.drv", RSQLite::SQLite()),
+  drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
   verbose = getOption("reproducible.verbose")
 )
@@ -17,7 +17,7 @@
   obj,
   cachePath,
   cacheId,
-  drv = getOption("reproducible.drv", RSQLite::SQLite()),
+  drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL)
 )
 }
