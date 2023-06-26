@@ -3,19 +3,19 @@
 #' Saving a `simList` may not work using the standard approaches (e.g.,
 #' `save`, `saveRDS`, and `qs::qsave`). There are 2 primary reasons why this doesn't
 #' work as expected: the `activeBindings` that are in place within modules (these
-#' allow the `mod` and `Par` to exist), and file-backed rasters. Because of these,
-#' a user should use `saveSimList` and `loadSimList` (and the `zipSimList`/`unzipSimList`
-#' alternatives).
-#' The most robust way if there are file-backed Raster* objects seems to be to
-#' set `fileBackend = 2`, though this may not be desirable if there are many
-#' large `Raster*` objects. When using `fileBackend = 0` or `fileBackend = 1`, and
-#' when errors are noticed, please file a bug report on GitHub.
+#' allow the `mod` and `Par` to exist), and file-backed objects, such as `SpatRaster`
+#' and `Raster*`. Because of these, a user should use `saveSimList` and `loadSimList`.
+#' These will save the object and recover the object using the `filename` supplied,
+#' if there are no file-backed objects. If there are file-backed objects, then it
+#' will save an archive (default is `.tar.gz` using the `archive` package for non-Windows
+#' and [zip()] if using Windows, as there is currently an unidentified bug in `archive*`
+#' on Windows). The user does not need to specify the filename any differently,
+#' as the code will search based on the filename without the file extension.
 #'
 #' @details
-#' There is a family of 4 functions that are mutually useful for saving and
+#' There is a family of 2 functions that are mutually useful for saving and
 #' loading `simList` objects and their associated files (e.g., file-backed
-#' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()],
-#' [zipSimList()], [unzipSimList()]
+#' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()].
 #'
 #' @param sim Either a `simList` or a character string of the name
 #'        of a `simList` that can be found in `envir`. Using
@@ -37,8 +37,9 @@
 #'    out of date elements. See Details.
 #' @param ... Passed to `save`, e.g., `compression`
 #'
-#' @return For [saveSimList()], a saved `.qs` file in `filename` location.
-#'         For [zipSimList()], a saved `.zip` file in `zipfile` location.
+#' @return
+#' For [saveSimList()], a saved `.qs` file in `filename` location or
+#' a `.tar.gz` (non-Windows) or `.zip` (Windows).
 #'
 #' @aliases saveSim
 #' @export
