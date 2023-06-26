@@ -349,9 +349,6 @@ loadSimList <- function(filename, projectPath = getwd(),
     filenameRel <- gsub(paste0(projectPath, "/"), "", filename)
   }
 
-  # if (length(filename) > 1) {
-  #   hardLinkOrCopy(out[-1], gsub(paste0(td, "/"), "", out[-1]))
-  # }
   if (tolower(tools::file_ext(filename[1])) == "rds") {
     sim <- readRDS(filename)
   } else if (tolower(tools::file_ext(filename[1])) == "qs") {
@@ -420,32 +417,6 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
 
   return(sim)
 
-  # zipfile <- normPath(zipfile)
-  # outFilenames <- unzip(zipfile = zipfile, list = TRUE)
-  #
-  # dots <- list(...)
-  # dots <- modifyList2(
-  #   list(exdir = tempdir2(sub = "TransferFolder2"),
-  #        junkpaths = TRUE),
-  #   dots)
-  # dots <- modifyList2(list(zipfile = zipfile),
-  #                    dots)
-  # checkPath(dots$exdir, create = TRUE)
-  # unzippedFiles <- do.call(unzip, dots)
-  # if (is.null(dots$exdir)) {
-  #   on.exit({
-  #     unlink(unzippedFiles, recursive = TRUE, force = TRUE)
-  #     unlink(dots$exdir, recursive = TRUE, force = TRUE)
-  #   })
-  # }
-  #
-  # if (isTRUE(load)) {
-  #   sim <- loadSimList(file.path(dots$exdir, basename(outFilenames[["Name"]])[[1]]),
-  #                      paths = paths,
-  #                      otherFiles = unzippedFiles)
-  #   return(sim)
-  # }
-  # return(unzippedFiles)
 }
 
 checkArchiveAlternative <- function(filename) {
@@ -575,13 +546,9 @@ warnDeprecFileBacked <- function(arg) {
 archiveExtract <- function(archiveName, exdir) {
   if (requireNamespace("archive") && !isWindows()) {
     archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
-    # if (!endsWith(archiveName, "tar.gz")) {
-    #   archiveName <- gsub(tools::file_ext(archiveName), "tar.gz", archiveName)
-    # }
     filename <- archive::archive_extract(archiveName)
-    # archive::archive_write_files(archiveName, files = relFns)
   } else {
-    filename <- unzip(filename, exdir = exdir)
+    filename <- unzip(archiveName, exdir = exdir)
   }
   filename
 }
