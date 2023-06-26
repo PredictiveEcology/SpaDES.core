@@ -136,6 +136,7 @@ test_that("testing .plotInitialTime & .plots", {
 
     # Makes plots
     expect_no_error(spades(mySim))
+    .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
     expect_true(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     # Makes no plots
     clearPlot()
