@@ -927,14 +927,13 @@ if (!exists("objSize")) {
 #' utils::object.size(a)
 objSize.simList <- function(x, quick = TRUE, ...) {
 
-  varName <- deparse(substitute(x))
+  total <- obj_size(x, quick = TRUE)
   aa <- objSize(x@.xData, quick = quick, ...)
 
   simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
   names(simSlots) <- simSlots
   otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-  total <- obj_size(x, quick = TRUE)
   if (!quick)
     attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
                                     other = attr(otherParts, "objSize"))
