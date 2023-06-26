@@ -30,6 +30,8 @@ defineModule(sim, list(
     defineParameter("N", "numeric", 100L, 10L, 1000L, "initial number of caribou"),
     defineParameter("torus", "logical", FALSE, FALSE, TRUE,
                     "should the map wrap around like a torus?"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".plotInitialTime", "numeric", start(sim), -Inf, Inf,
                     "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, -Inf, Inf,
@@ -90,8 +92,9 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
       # do stuff for this event
       ## TODO: restore plotting
       ##   Error: could not find function "$"
-      # Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-      #      new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
+      browser()
+      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
+           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
@@ -105,7 +108,8 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
 
       ## TODO: restore plotting
       ## Error: [subset] invalid name(s)
-      # Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
+      browser()
+      Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
