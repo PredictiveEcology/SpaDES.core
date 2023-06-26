@@ -196,31 +196,50 @@ test_that("Plots function 2", {
 
 test_that("Plots function 3 - use as Plot", {
   if (interactive()) {
-    testInit("raster", opts = list(spades.PlotsUsePlot = TRUE))
-    ras <- raster(extent(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
-    stk1 <- raster::stack(ras, ras)
-    stk2 <- raster::stack(ras, ras)
+    testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
+    packages <- c("raster", "terra")
+    functions <- cbind(c("raster", "extent", "stack", "nlayers"),
+                       c("rast", "ext", "rast", "nlyr"))
+    if (!requireNamespace("raster", quietly = TRUE)) {
+      functions <- functions[, 2,drop = FALSE]
+      packages <- packages[2]
+    }
+    for (i in seq(packages)) {
+      read <- getFromNamespace(functions[1, i], ns = packages[i])
+      ext <- getFromNamespace(functions[2, i], ns = packages[i])
+      if (packages[i] %in% "raster") {
+        stk <- getFromNamespace(functions[3, i], ns = packages[i])
+      } else {
+        stk <- c
+      }
+      nlyr <- getFromNamespace(functions[4, i], ns = packages[i])
 
-    clearPlot()
-    Plots(data = stk1, types = "screen")
-    stk1[1:10] <- 0.5
-    stk1 <- raster::stack(stk1)
-    Plots(data = stk1, types = "screen") # should show both plots with top row at 0.5
-    stk1[[1]][1:10] <- 0.25
-    stk1 <- raster::stack(stk1)
-    Plot(stk1) # should show first row on left plot only as lower -- 0.25
 
-    Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
-    stk2[[2]][1:10] <- 0.25
-    stk2 <- raster::stack(stk2)
-    Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
-    stk2[[2]][11:20] <- 0.6
-    stk2 <- raster::stack(stk2)
-    Plot(stk2) # should show first row on left plot only as lower -- 0.25
+      ras <- read(ext(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
+      stk1 <- stk(ras, ras)
+      stk2 <- stk(ras, ras)
 
-    clearPlot()
-    # should show plots as a using raster::plot
-    Plots(data = stk1, types = "screen", usePlot = FALSE, fn = raster::plot)
+      clearPlot()
+      Plots(data = stk1, types = "screen")
+      stk1[1:10] <- 0.5
+      stk1 <- stk(stk1)
+      Plots(data = stk1, types = "screen") # should show both plots with top row at 0.5
+      stk1[[1]][1:10] <- 0.25
+      stk1 <- stk(stk1)
+      Plot(stk1) # should show first row on left plot only as lower -- 0.25
+
+      Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
+      stk2[[2]][1:10] <- 0.25
+      stk2 <- stk(stk2)
+      Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
+      stk2[[2]][11:20] <- 0.6
+      stk2 <- stk(stk2)
+      Plot(stk2) # should show first row on left plot only as lower -- 0.25
+
+      clearPlot()
+      # should show plots as a using terra::plot
+      Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot)
+    }
   }
 })
 

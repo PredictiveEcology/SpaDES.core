@@ -231,10 +231,11 @@ Plots <- function(data, fn, filename,
     }
   }
 
+  browser()
   if (needScreen) {
     if (fnIsPlot) {
-      if (is.list(data) || !(is(data, "RasterStack") || is(data, "RasterBrick")) )# ||
-      #    is(data, "SpatRaster") || is(data, "SpatVector")))
+      if (is.list(data) || is(data, "RasterStack") || is(data, "RasterBrick") ||
+          (is(data, "SpatRaster") || is(data, "SpatVector")))
         {
         dataListToScreen <- data
       } else {
