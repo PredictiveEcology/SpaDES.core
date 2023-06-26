@@ -154,7 +154,6 @@ test_that("saving csv files does not work correctly", {
    expect_false(identical(df1, newObj))
 })
 
-
 test_that("saveSimList does not work correctly", {
 
   testInit(sampleModReqdPkgs,
@@ -258,7 +257,6 @@ test_that("saveSimList does not work correctly", {
   expect_error(mySim$landscape$DEM[])
 
 })
-
 
 test_that("saveSimList with file backed objs", {
   testInit(sampleModReqdPkgs,
@@ -444,4 +442,75 @@ test_that("registerOutputs", {
   sim <- registerOutputs(sim, filename = c(tf, tf2))
   odf <- outputs(sim)
   expect_true(all(odf$file %in% c(tf, tf2)))
+
+
+  newModule("test", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "test", "test.R"),'
+      defineModule(sim, list(
+      name = "test",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+      spatialExtent = terra::ext(rep(0, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "year",
+      citation = list("citation.bib"),
+      documentation = list("README.md", "test.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+        defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")
+      ),
+      inputObjects = bindrows(
+        expectsInput("age", "numeric", ""),
+        expectsInput("ageMap", "numeric", ""),
+        expectsInput("worked", "numeric", ""),
+        expectsInput("age2", "numeric", "") # need a dummy one that isn not supplied in simInit below
+      ),
+      outputObjects = bindrows(
+      )
+      ))
+
+      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+
+      tf <- tempfile2(.rndstr(), fileext = ".rds")
+      tf2 <- tempfile2(.rndstr(), fileext = ".rds")
+      tf3 <- tempfile2(.rndstr(), fileext = ".rds")
+
+      sim <- saveRDS(sim$age, file = tf) |> registerOutputs(filename = tf)
+      sim <- registerOutputs(filename = saveRDS(sim$age, file = tf2))
+      sim <- saveRDS(sim$age, file = tf3) |> registerOutputs()
+
+
+      #sim$dp <- dataPath(sim)
+      sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+      },
+      event1 = {
+      tf4 <- tempfile2(.rndstr(), fileext = ".qs")
+      sim <- qs::qsave(sim$age, file = tf4) |> registerOutputs()
+
+      sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+      })
+      return(invisible(sim))
+      }
+
+      .inputObjects <- function(sim) {
+        if (suppliedElsewhere("ageMap", sim)) {
+                sim$worked <- TRUE
+        }
+        sim
+      }
+      ', fill = TRUE)
+  modules <- "test"
+  sim <- simInit(times = list(start = 0, end = 1, timeunit = "year"),
+                 modules = modules,
+                 objects = list(age = 1, vegMap = 2, studyArea = 3),
+                 paths = list(modulePath = tmpdir))
+  sim <- spades(sim)
+  expect_equal(NROW(outputs(sim)$file), 4)
+  expect_true(all(file.exists(outputs(sim)$file)))
 })

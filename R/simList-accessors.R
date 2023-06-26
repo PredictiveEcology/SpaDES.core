@@ -1236,6 +1236,11 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @importFrom data.table := data.table
 #' @importFrom stats na.omit
+#' @seealso [registerOutputs()] which enables files that are saved to be added to
+#' the `simList` using the `outputs(sim)` mechanism, so the files that are saved
+#' during a module event can be tracked at the `simList` level. [saveSimList()]
+#' which will optionally add all the outputs that are tracked into an archive.
+#'
 #' @name outputs
 #' @rdname simList-accessors-outputs
 #'
@@ -1368,6 +1373,106 @@ setReplaceMethod(
 
     return(sim)
 })
+
+
+outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = NA,
+                          args = I(list(NA)), ...) {
+  if (!is(args, "list") && !is(args, "AsIs")) {
+    stop("args must a list (with same length as file) of lists (with named elements), ",
+         ", wrapped with I(  )")
+  }
+  if (length(args) < length(file))
+    args <- I(rep(args, length(file)))
+  df <- data.frame(file = file, saved = TRUE, objectName = objectName, fun = fun, args = args)
+
+
+  outs <- .fillOutputRows(df, endTime = saveTime)
+  if (!is(outputs[["arguments"]], "AsIs")) # needed for rbindlist
+    outputs[["arguments"]] <- I(outputs[["arguments"]])
+  rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
+}
+
+#' Add file name of a saved object to `outputs(sim)`
+#'
+#' If a module saves a file to disk during events, it can be useful to keep track
+#' of the files that are saved e.g., for [saveSimList()] so that all files can
+#' be added to the archive. In addition to setting `outputs` at the `simInit`
+#' stage, a module developer can also put this in a using any saving mechanism that
+#' is relevant (e.g., `qs::qsave`, `saveRDS` etc.). When a module event does this
+#' it can be useful to register that saved file. `registerOutputs` offers an additional
+#' mechanism to do this. See examples.
+#'
+#' @export
+#' @name registerOutputs
+#' @rdname simList-accessors-outputs
+#' @param sim A `simList`. If missing, then the function will search in the call
+#'    stack, so it will find it if it is in a `SpaDES` module.
+#' @param filename The filename to register in the outputs(sim) `data.frame`. If
+#'    missing, an attempt will be made to search for either a `file` or `filename`
+#'    argument in the call itself. This means that this function can be used with
+#'    the pipe, as long as the returned return from the upstream pipe function is
+#'    a filename or if it is `NULL` (e.g., `saveRDS`), then it will find the `file`
+#'    argument and use that.
+#'
+#' @details
+#' Note using `registerOutputs`: a user can pass any other
+#' arguments to `registerOutputs` that are in the
+#' `outputs(sim)` data.frame, such as `objectName`, `fun`, `package`, though these
+#' will not be used to save the files as this function is only about
+#' registering an output that has already been saved.
+#'
+#' @seealso [Plots()], [outputs()]
+#' @return A `simList` which will be the `sim` passed in with a new object registered
+#'   in the `outputs(sim)`
+#' @examples
+#' # For `registerOutputs`
+#' sim <- simInit()
+#' # This would normally be a save call, e.g., `writeRaster`
+#' tf <- reproducible::tempfile2(fileext = ".tif")
+#' sim <- registerOutputs(sim, filename = tf)
+#'
+#' # Using a pipe
+#' tf <- reproducible::tempfile2(fileext = ".rds")
+#' sim$a <- 1
+#' sim <- saveRDS(sim$a, tf) |> registerOutputs()
+#' # confirm:
+#' outputs(sim) # has object --> saved = TRUE
+#'
+registerOutputs <- function(filename, sim, ...) {
+  fn <- substitute(filename)
+
+  simIsIn <- NULL
+  simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
+
+  if (missing(sim)) sim <- NULL
+  if (is.null(sim)) {
+    if (!exists("sim", simIsIn, inherits = FALSE))
+      simIsIn <- try(whereInStack("sim"), silent = TRUE)
+  }
+  sim <- get0("sim", simIsIn, inherits = FALSE)
+
+
+  if (is.name(fn))
+    filename <- try(eval(fn, envir = simIsIn), silent = TRUE)
+
+  if (!is.character(filename)) {
+    fnNames <- names(fn)
+    if (is.null(fnNames)) {
+      fn <- match.call(eval(fn[[1]]), fn)
+      fnNames <- names(fn) # redo
+    }
+    theFileArg <- NULL
+    if (!is.null(fnNames))
+      theFileArg <- grep("^file$|^filename$", names(fn), value = TRUE)
+    if (!is.null(theFileArg))
+      filename <- try(eval(fn[[theFileArg]], envir = simIsIn), silent = TRUE)
+  }
+  if (is(filename, "try-error"))
+    stop("Couldn't guess filename; please pass it explicitly")
+
+  sim@outputs <- outputsAppend(sim@outputs, saveTime = time(sim), file = filename, ...)
+  sim
+}
 
 ################################################################################
 #' `inputArgs` and `outputArgs` are ways to specify any arguments that are needed for

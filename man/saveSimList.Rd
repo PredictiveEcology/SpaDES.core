@@ -49,8 +49,8 @@ arguments in that function.}
 \item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
 }
 \value{
-For \code{\link[=saveSimList]{saveSimList()}}, a saved \code{.qs} file in \code{filename} location.
-For \code{\link[=zipSimList]{zipSimList()}}, a saved \code{.zip} file in \code{zipfile} location.
+For \code{\link[=saveSimList]{saveSimList()}}, a saved \code{.qs} file in \code{filename} location or
+a \code{.tar.gz} (non-Windows) or \code{.zip} (Windows).
 
 invoked for side effect of zip archive creation
 }
@@ -58,13 +58,14 @@ invoked for side effect of zip archive creation
 Saving a \code{simList} may not work using the standard approaches (e.g.,
 \code{save}, \code{saveRDS}, and \code{qs::qsave}). There are 2 primary reasons why this doesn't
 work as expected: the \code{activeBindings} that are in place within modules (these
-allow the \code{mod} and \code{Par} to exist), and file-backed rasters. Because of these,
-a user should use \code{saveSimList} and \code{loadSimList} (and the \code{zipSimList}/\code{unzipSimList}
-alternatives).
-The most robust way if there are file-backed Raster* objects seems to be to
-set \code{fileBackend = 2}, though this may not be desirable if there are many
-large \verb{Raster*} objects. When using \code{fileBackend = 0} or \code{fileBackend = 1}, and
-when errors are noticed, please file a bug report on GitHub.
+allow the \code{mod} and \code{Par} to exist), and file-backed objects, such as \code{SpatRaster}
+and \verb{Raster*}. Because of these, a user should use \code{saveSimList} and \code{loadSimList}.
+These will save the object and recover the object using the \code{filename} supplied,
+if there are no file-backed objects. If there are file-backed objects, then it
+will save an archive (default is \code{.tar.gz} using the \code{archive} package for non-Windows
+and \code{\link[=zip]{zip()}} if using Windows, as there is currently an unidentified bug in \verb{archive*}
+on Windows). The user does not need to specify the filename any differently,
+as the code will search based on the filename without the file extension.
 
 \code{zipSimList} will save the \code{simList} and file-backed \verb{Raster*} objects, plus,
 optionally, files identified in \code{outputs(sim)} and \code{inputs(sim)}.
@@ -73,10 +74,9 @@ This uses \code{Copy} under the hood, to not affect the original
 \strong{VERY experimental}.
 }
 \details{
-There is a family of 4 functions that are mutually useful for saving and
+There is a family of 2 functions that are mutually useful for saving and
 loading \code{simList} objects and their associated files (e.g., file-backed
-\verb{Raster*}, \code{inputs}, \code{outputs}, \code{cache}) \code{\link[=saveSimList]{saveSimList()}}, \code{\link[=loadSimList]{loadSimList()}},
-\code{\link[=zipSimList]{zipSimList()}}, \code{\link[=unzipSimList]{unzipSimList()}}
+\verb{Raster*}, \code{inputs}, \code{outputs}, \code{cache}) \code{\link[=saveSimList]{saveSimList()}}, \code{\link[=loadSimList]{loadSimList()}}.
 
 \subsection{Save - Move - Load}{
 

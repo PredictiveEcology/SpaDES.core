@@ -81,12 +81,14 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
-    'Plots.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'environment.R'
     'helpers.R'
     'simList-class.R'
+    'times.R'
+    'simList-accessors.R'
+    'Plots.R'
     'cache.R'
     'check.R'
     'priority.R'
@@ -110,8 +112,6 @@ Collate:
     'moduleMetadata.R'
     'objectSynonyms.R'
     'options.R'
-    'times.R'
-    'simList-accessors.R'
     'plotting-diagrams.R'
     'plotting.R'
     'progress.R'

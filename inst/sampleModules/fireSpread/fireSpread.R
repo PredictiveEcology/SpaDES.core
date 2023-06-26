@@ -115,7 +115,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       # clearPlot()
       Plots(sim[[Par$stackName]],
            legendRange = list(0:maxFn(sim[[Par$stackName]]$DEM), 0:100,
-                              c(0, 1), 0:100, 0:10), new = TRUE)
+                              c(0, 1), 0:100, 0:10), new = TRUE, usePlot = TRUE)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval,
@@ -123,7 +123,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot = {
       # do stuff for this event
-      Plots(sim[[Par$stackName]]$Fires, new = FALSE)
+      Plots(sim[[Par$stackName]]$Fires, new = FALSE, usePlot = TRUE)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval,

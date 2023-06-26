@@ -414,7 +414,6 @@ loadSimList <- function(filename, projectPath = getwd(),
 unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   .Deprecated("loadSimList")
   sim <- loadSimList(zipfile, ...)
-
   return(sim)
 
 }
