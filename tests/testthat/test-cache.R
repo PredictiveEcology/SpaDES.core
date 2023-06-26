@@ -156,8 +156,7 @@ test_that("test event-level cache & memory leaks", {
 })
 
 test_that("test module-level cache", {
-  testInit(sampleModReqdPkgs,
-                          opts = list("reproducible.useMemoise" = FALSE))
+  testInit(sampleModReqdPkgs, opts = list("reproducible.useMemoise" = FALSE))
 
   opts <- options("reproducible.cachePath" = tmpdir)
   tmpfile <- tempfile(fileext = ".pdf")

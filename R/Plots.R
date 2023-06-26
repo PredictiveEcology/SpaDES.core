@@ -201,8 +201,11 @@ Plots <- function(data, fn, filename,
   if (fnIsPlot) {
     # make dummies
     gg <- 1
-    objNamePassedToData <- deparse1(substitute(data))
+    objNamePassedToData1 <- substitute(data)
     origEnv <- parent.frame()
+    objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
+    if (!is.character(objNamePassedToData))
+      objNamePassedToData <- deparse1(objNamePassedToData)
 
     # Try to see if the object is in the parent.frame(). If it isn't, default back to here.
     if (!objNamePassedToData %in% ls(origEnv))
@@ -231,12 +234,12 @@ Plots <- function(data, fn, filename,
     }
   }
 
-  browser()
   if (needScreen) {
+
     if (fnIsPlot) {
-      if (is.list(data) || is(data, "RasterStack") || is(data, "RasterBrick") ||
-          (is(data, "SpatRaster") || is(data, "SpatVector")))
-        {
+      if (is.list(data)){# || is(data, "RasterStack") || is(data, "RasterBrick") ||
+      #    (is(data, "SpatRaster") || is(data, "SpatVector")) && nlayers2(data) > 1)
+      #  {
         dataListToScreen <- data
       } else {
         dataListToScreen <- list(data)
@@ -248,29 +251,36 @@ Plots <- function(data, fn, filename,
           dataListToScreen[[1]]$labels$title <- NULL
         }
       } else {
-        if (!is.null(names(data))) {
-          dataListToScreen <- setNames(dataListToScreen, names(data))
+        if (!is.null(objNamePassedToData)) {
+          dataListToScreen <- setNames(dataListToScreen, objNamePassedToData)
         } else {
-          dataListToScreen <- setNames(dataListToScreen, "data")
+          if (!is.null(names(data))) {
+            dataListToScreen <- setNames(dataListToScreen, names(data))
+          } else {
+            dataListToScreen <- setNames(dataListToScreen, "data")
+          }
         }
       }
 
-      # cludge to make title of plots have data$ not dataListToScreen$
-      dataOrig <- data
-      data <- dataListToScreen
+      # Necessary for inheritance -- pass the environment with correct inheritance
+      if (!is.null(simIsIn)) {
+        newEnv <- new.env(parent = simIsIn)
+      } else {
+        newEnv <- environment()
+      }
+      newEnv$dataListToScreen <- dataListToScreen
+      gg <- fn(dataListToScreen, ..., env = newEnv)
 
-      gg <- fn(data, ...)
-
-      data <- dataOrig
-
-      .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-      qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
-      objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
-      objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
-      curPlotDev <- paste0("quickPlot", dev.cur())
-      ignore <- lapply(objNamesInQuickPlotObj, function(x) {
-        slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
-      })
+      if (FALSE) {
+        .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+        qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
+        objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
+        objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
+        curPlotDev <- paste0("quickPlot", dev.cur())
+        ignore <- lapply(objNamesInQuickPlotObj, function(x) {
+          slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
+        })
+      }
     } else {
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
@@ -463,4 +473,25 @@ filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
 .guessPkgFun <- function(bsf) {
   pkgName <- eval(parse(text = paste0("environmentName(environment(", bsf, "))")))
   return(paste0(pkgName, "::", bsf))
+}
+
+evalAttempt <- function(subs, envir) {
+  if (length(subs) > 2) {
+    subsOrig <- subs
+    out <- try(eval(subs[[3]], envir = envir), silent = TRUE)
+    if (is(out, "try-error"))
+      subs <- subsOrig
+    else
+      subs[[3]] <- out
+
+    if (is.call(subs[[2]])) {
+      out <- try(evalAttempt(subs[[2]], envir = envir), silent = TRUE)
+      if (!is(out, "try-error"))
+        subs[[2]] <- out
+
+    }
+    if (is(out, "try-error"))
+      subs <- subsOrig
+  }
+  subs
 }

@@ -133,13 +133,16 @@ test_that("testing .plotInitialTime & .plots", {
 
     mySim@params$randomLandscapes$.plotInitialTime <- 0
     mySim@params$fireSpread$.plotInitialTime <- 0
-    # mySim@params$caribouMovement$.plotInitialTime <- 0
 
     # Makes plots
-    spades(mySim)
+    expect_no_error(spades(mySim))
+    expect_true(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     # Makes no plots
+    clearPlot()
     spades(mySim, .plots = NA)
+    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     spades(mySim, .plotInitialTime = NA)
+    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
   }
 })
 
@@ -216,29 +219,29 @@ test_that("Plots function 3 - use as Plot", {
 
 
       ras <- read(ext(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
-      stk1 <- stk(ras, ras)
-      stk2 <- stk(ras, ras)
+      stk1 <- stk(ras, lyr2 = ras)
+      stk2 <- stk(ras, lyr2 = ras)
 
       clearPlot()
-      Plots(data = stk1, types = "screen")
+      expect_no_error(Plots(data = stk1, types = "screen"))
       stk1[1:10] <- 0.5
       stk1 <- stk(stk1)
-      Plots(data = stk1, types = "screen") # should show both plots with top row at 0.5
+      expect_no_error(Plots(data = stk1, types = "screen")) # should show both plots with top row at 0.5
       stk1[[1]][1:10] <- 0.25
       stk1 <- stk(stk1)
-      Plot(stk1) # should show first row on left plot only as lower -- 0.25
+      expect_no_error(Plot(stk1)) # should show first row on left plot only as lower -- 0.25
 
-      Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
+      expect_no_error(Plots(data = stk2, types = "screen")) # should add 2 plots, with original data, not updated
       stk2[[2]][1:10] <- 0.25
       stk2 <- stk(stk2)
-      Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
+      expect_no_error(Plots(data = stk2, types = "screen")) # should add 2 plots, with original data, not updated
       stk2[[2]][11:20] <- 0.6
       stk2 <- stk(stk2)
-      Plot(stk2) # should show first row on left plot only as lower -- 0.25
+      expect_no_error(Plot(stk2)) # should show first row on left plot only as lower -- 0.25
 
       clearPlot()
       # should show plots as a using terra::plot
-      Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot)
+      expect_no_error(Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot))
     }
   }
 })
