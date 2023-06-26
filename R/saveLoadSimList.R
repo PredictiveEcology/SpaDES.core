@@ -362,7 +362,7 @@ loadSimList <- function(filename, projectPath = getwd(),
   }
   paths <- modifyList2(paths, list(projectPath = projectPath,
                                    packagePath = .libPaths()[1]))
-  paths <- SpaDES.project::setupPaths( paths = paths, standAlone = FALSE)
+  paths <- setupPaths( paths = paths, standAlone = FALSE)
 
   prevPaths <- paths(sim)
   prevPathsTop <- basename(unlist(prevPaths))
