@@ -45,6 +45,7 @@ Imports:
     utils,
     whisker
 Suggests:
+    archive,
     CircStats,
     codetools,
     covr,
@@ -112,6 +113,7 @@ Collate:
     'moduleMetadata.R'
     'objectSynonyms.R'
     'options.R'
+    'paths.R'
     'plotting-diagrams.R'
     'plotting.R'
     'progress.R'

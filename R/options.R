@@ -177,6 +177,7 @@ spadesOptions <- function() {
   list( # nolint
     spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
+    spades.compressionLevel = 1L,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
     spades.dotInputObjects = TRUE,

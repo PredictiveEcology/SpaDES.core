@@ -959,7 +959,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", RSQLite::SQLite()),
+.dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", NULL),
                                        conn = getOption("reproducible.conn", NULL),
                                        verbose = getOption("reproducible.verbose")) {
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
@@ -981,7 +981,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @importFrom reproducible .dealWithClassOnRecovery
 #' @rdname dealWithClass
 .dealWithClassOnRecovery.simList <- function(obj, cachePath, cacheId,
-                                                 drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                                                 drv = getOption("reproducible.drv", NULL),
                                                  conn = getOption("reproducible.conn", NULL)) {
 
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
@@ -1079,7 +1079,7 @@ setMethod(
   signature = "simList",
   definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
                         cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
-                        drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                        drv = getOption("reproducible.drv", NULL),
                         conn = getOption("reproducible.conn", NULL), ...) {
     x <- x@paths$cachePath
     clearCache(x = x, userTags = userTags, after = after, before = before,
