@@ -519,6 +519,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     scratchPath = scratchPath,
     terraPath = terraPath
   ), checkPath, create = TRUE)
+  newPaths <- as.list(normPath(newPaths))
 
   ## set the new paths via options
   options(

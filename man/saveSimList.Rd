@@ -29,6 +29,10 @@ name.}
 \item{filename}{Character string with the path for saving \code{simList} to or
 reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs} file types are supported.}
 
+\item{projectPath}{Should be the "top level" or project path for the \code{simList}.
+Defaults to \code{getwd()}. All other paths will be relativized with respect to
+this if nested within this.}
+
 \item{outputs}{Logical. If \code{TRUE}, all files identified in
 \code{outputs(sim)} will be included in the zip.}
 

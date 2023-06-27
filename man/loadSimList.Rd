@@ -8,6 +8,7 @@
 loadSimList(
   filename,
   projectPath = getwd(),
+  tempPath = tempdir(),
   paths = NULL,
   otherFiles = "",
   verbose = getOption("reproducible.verbose")
@@ -19,6 +20,9 @@ unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 \item{filename}{Character giving the name of a saved simulation file.
 Currently, only file types \code{.qs} or \code{.rds} are supported.}
 
+\item{projectPath}{An optional path for the project within which the \code{simList}
+exists. This is used to identify relative paths for saving and loading the \code{simList}.}
+
 \item{paths}{A list of character vectors for all the \code{simList} paths. When
 loading a \code{simList}, this will replace the paths of everything to
 these new paths. Experimental still.}
@@ -28,6 +32,12 @@ existing file-backed \verb{Raster*} files that are the real paths for the possib
 incorrect paths in \code{Filenames(sim)} if the the \code{file} being read in is from
 a different computer, path, or drive. This could be the output from \code{unzipSimList}
 (which is calls \code{loadSimList} internally, passing the unzipped filenames)}
+
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 
 \item{zipfile}{Filename of a zipped simList}
 

@@ -162,6 +162,15 @@ test_that("saveSimList does not work correctly", {
   unlink(tmpfile[5])
   unlink(tmpfile[6])
   mapPath <- system.file("maps", package = "quickPlot")
+  modules <- system.file("sampleModules", package = "SpaDES.core")
+
+
+  modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
+  inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
+
+  linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
+  linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
+             file.path(modulePath, dir(modules, recursive = TRUE)))
 
   times <- list(start = 0, end = 1)
   parameters <- list(
@@ -169,10 +178,11 @@ test_that("saveSimList does not work correctly", {
     caribouMovement = list(.plotInitialTime = NA_integer_),
     randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
   )
+
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
-    inputPath = mapPath,
+    modulePath = modulePath,
+    inputPath = inputPath,
     outputPath = tmpdir
   )
 
@@ -187,8 +197,8 @@ test_that("saveSimList does not work correctly", {
   # keeps file-backings
   saveSimList(mySim, filename = tmpfile[2])
 
-  sim <- loadSimList(file = tmpfile[2], paths = paths(mySim))
-  expect_true(all(Filenames(sim) %in% Filenames(mySim)))
+  sim <- loadSimList(file = tmpfile[2], projectPath = tmpCache)
+  expect_true(all(basename(Filenames(sim)) %in% basename(Filenames(mySim))))
 
   # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
