@@ -272,6 +272,15 @@ test_that("saveSimList with file backed objs", {
   testInit(sampleModReqdPkgs,
            tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
   mapPath <- system.file("maps", package = "quickPlot")
+  modules <- system.file("sampleModules", package = "SpaDES.core")
+
+
+  modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
+  inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
+
+  linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
+  linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
+             file.path(modulePath, dir(modules, recursive = TRUE)))
 
   times <- list(start = 0, end = 1)
   parameters <- list(
@@ -279,12 +288,27 @@ test_that("saveSimList with file backed objs", {
     caribouMovement = list(.plotInitialTime = NA_integer_),
     randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
   )
+
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
-    inputPath = mapPath,
+    modulePath = modulePath,
+    inputPath = inputPath,
     outputPath = tmpdir
   )
+  # mapPath <- system.file("maps", package = "quickPlot")
+  #
+  # times <- list(start = 0, end = 1)
+  # parameters <- list(
+  #   .globals = list(stackName = "landscape"),
+  #   caribouMovement = list(.plotInitialTime = NA_integer_),
+  #   randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
+  # )
+  # modules <- list("randomLandscapes", "caribouMovement")
+  # paths <- list(
+  #   modulePath = system.file("sampleModules", package = "SpaDES.core"),
+  #   inputPath = mapPath,
+  #   outputPath = tmpdir
+  # )
 
   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                    outputs = data.frame(objectName = "landscape", saveTime = times$end))

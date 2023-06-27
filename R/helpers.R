@@ -322,11 +322,5 @@ needInstall <- function(
   }
 }
 
-isWindows <-  getFromNamespace("isWindows", "reproducible")
-makeRelative <- getFromNamespace("makeRelative", "reproducible")
-isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
-isRaster <- getFromNamespace("isRaster", "reproducible")
-isSpat <- getFromNamespace("isSpat", "reproducible")
-layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))
