@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 4.1),
     quickPlot (>= 1.0.1),
-    reproducible (>= 2.0.2.9002)
+    reproducible (>= 2.0.4.9004)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -71,7 +71,8 @@ Suggests:
     sp,
     SpaDES.tools (>= 1.0.1),
     tcltk,
-    testthat (>= 1.0.2)
+    testthat (>= 1.0.2),
+    withr
 Remotes:
     PredictiveEcology/reproducible@terra-migration
 Additional_repositories: https://predictiveecology.r-universe.dev/

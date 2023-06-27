@@ -77,7 +77,7 @@ setMethod("._outputObjectsDF",
 #'                      Semantic versioning is assumed <https://semver.org/>.
 #'
 #' @slot spatialExtent  Specifies the module's spatial extent as an
-#'                      [Extent()] object. Default is `NA`.
+#'                      `Raster::Extent` or `terra::SpatExtent` object. Default is `NA`.
 #'
 #' @slot timeframe      Specifies the valid timeframe for which the module was
 #'                      designed to simulate. Must be a [POSIXt()]

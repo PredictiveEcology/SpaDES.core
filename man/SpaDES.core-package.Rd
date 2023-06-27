@@ -328,7 +328,7 @@ the suggested `SpaDES.tools` package, and are summarized below.*
 
   \tabular{ll}{
     [checkObject()] \tab Check for a existence of an object within a `simList` \cr
-    [Require::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
+    [reproducible::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
   }
 }
 

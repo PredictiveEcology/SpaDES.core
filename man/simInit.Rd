@@ -138,6 +138,9 @@ then the \code{.inputObjects} will be cached.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
+
+\item{...}{An alternative way to pass \code{objects}, i.e., they can just be named
+arguments rather than in a \code{objects = list(...)}}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
@@ -311,7 +314,7 @@ mySim <- simInit(
   outputs = data.frame(
     expand.grid(objectName = c("caribou","landscape"),
     saveTime = 1:2,
-    stringsAsFactors = FALSE))
+    stringsAsFactors = FALSE)))
 
  # Use accessors for inputs, outputs
  mySim2 <- simInit(

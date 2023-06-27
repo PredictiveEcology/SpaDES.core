@@ -26,7 +26,7 @@ Modules listed here will be loaded with this module.}
 Semantic versioning is assumed \url{https://semver.org/}.}
 
 \item{\code{spatialExtent}}{Specifies the module's spatial extent as an
-\code{\link[=Extent]{Extent()}} object. Default is \code{NA}.}
+\code{Raster::Extent} or \code{terra::SpatExtent} object. Default is \code{NA}.}
 
 \item{\code{timeframe}}{Specifies the valid timeframe for which the module was
 designed to simulate. Must be a \code{\link[=POSIXt]{POSIXt()}}

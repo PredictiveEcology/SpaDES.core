@@ -279,7 +279,7 @@ test_that("test .prepareOutput", {
 test_that("test .robustDigest for simLists", {
   testInit(c("terra", "ggplot2"), smcc = TRUE,
                           opts = list(spades.recoveryMode = FALSE,
-                                      reproducible.verbose = 0,
+                                      reproducible.verbose = 1,
                                       "reproducible.useMemoise" = FALSE,
                                       reproducible.showSimilar = TRUE))
   # opts <- options("reproducible.cachePath" = tmpdir)
@@ -295,10 +295,10 @@ test_that("test .robustDigest for simLists", {
 
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mess1 <- capture_messages(do.call(simInit, args))
-  msgGrep <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
+  msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                    "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                   "There is no similar item in the cachePath", sep = "|")
-  expect_true(all(grepl(msgGrep, mess1)))
+                   "There is no similar item in the cachePath", "Saving", "Done", sep = "|")
+  expect_true(all(grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
   #a <- capture.output(
@@ -313,11 +313,8 @@ test_that("test .robustDigest for simLists", {
   xxx[editBelowLine + 1] <- newCode
   cat(xxx, file = fileName, sep = "\n")
 
-  msgGrep <- paste("Running .input", "module code", "so not checking minimum package",
-                   "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                   "There is no similar item in the cachePath", sep = "|")
   mess1 <- capture_messages(do.call(simInit, args))
-  expect_true(all(grepl(msgGrep, mess1)))
+  expect_true(all(grepl(msgGrep11, mess1)))
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
   xxx <- readLines(fileName)
