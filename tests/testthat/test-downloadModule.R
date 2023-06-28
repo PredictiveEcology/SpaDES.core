@@ -31,15 +31,13 @@ test_that("downloadModule downloads and unzips a single module", {
 
 test_that("downloadModule downloads and unzips a parent module", {
   skip_on_cran()
-  skip_if_not_installed("httr")
-  skip_if_not_installed("dplyr") # needed for bind_rows in these old modules
 
-  testInit(c("terra", "dplyr"), smcc = FALSE)
+  testInit(c("terra", "httr"), smcc = FALSE)
   m <- "LCC2005"
 
   ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
-  dirTD <- dir(tmpdir)
+  dirTD <- dir(tmpdir, recursive = TRUE)
   gotAllMods <- all(unlist(Map(yy = c("caribouMovementLcc", "cropReprojectLccAge", "fireSpreadLcc",
            "forestAge", "forestSuccessionBeacons", "LCC2005", "LccToBeaconsReclassify"),
          function(yy) any(grepl(yy, x = dirTD)))))
