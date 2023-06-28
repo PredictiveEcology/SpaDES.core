@@ -41,6 +41,7 @@ Imports:
     qs (>= 0.21.1),
     Require (>= 0.2.6),
     stats,
+    terra,
     utils,
     whisker
 Suggests:
@@ -70,7 +71,6 @@ Suggests:
     sp,
     SpaDES.tools (>= 1.0.1),
     tcltk,
-    terra,
     testthat (>= 1.0.2),
     withr
 Remotes:
