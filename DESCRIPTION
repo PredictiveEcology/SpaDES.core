@@ -41,7 +41,6 @@ Imports:
     qs (>= 0.21.1),
     Require (>= 0.2.6),
     stats,
-    terra,
     utils,
     whisker
 Suggests:
@@ -72,7 +71,8 @@ Suggests:
     SpaDES.tools (>= 1.0.1),
     tcltk,
     terra,
-    testthat (>= 1.0.2)
+    testthat (>= 1.0.2),
+    withr
 Remotes:
     ropensci/NLMR
 Additional_repositories: https://predictiveecology.r-universe.dev/
