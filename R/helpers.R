@@ -299,8 +299,8 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  target1 <- .dealWithClass(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
-  current1 <- .dealWithClass(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
   all.equal.default(target1, current1, check.environment = FALSE)
 }
 

@@ -943,7 +943,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 
 
 
-#' Methods for .dealWithClass and .dealWithClassOnRecovery
+#' Methods for .wrap and .unwrap
 #'
 #'
 #' @return The same obj as passed into the function, but dealt with so that it can be
@@ -953,12 +953,12 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @param drv an object that inherits from `DBIDriver`, or an existing
 #'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
-#' @inheritParams reproducible::.dealWithClass
-#' @importFrom reproducible .dealWithClass
+#' @inheritParams reproducible::.wrap
+#' @importFrom reproducible .wrap
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.dealWithClass.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", NULL),
+.wrap.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", NULL),
                                        conn = getOption("reproducible.conn", NULL),
                                        verbose = getOption("reproducible.verbose")) {
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
@@ -966,7 +966,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .dealWithClass(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
@@ -976,17 +976,17 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 
 
 #' @export
-#' @inheritParams reproducible::.dealWithClassOnRecovery
-#' @importFrom reproducible .dealWithClassOnRecovery
+#' @inheritParams reproducible::.unwrap
+#' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
-.dealWithClassOnRecovery.simList <- function(obj, cachePath, cacheId,
+.unwrap.simList <- function(obj, cachePath, cacheId,
                                                  drv = getOption("reproducible.drv", NULL),
                                                  conn = getOption("reproducible.conn", NULL)) {
 
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
-  outList <- .dealWithClassOnRecovery(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
+  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
   list2env(outList, envir = envir(obj))
   obj
 
@@ -1061,7 +1061,7 @@ if (!isGeneric("clearCache")) {
 #'
 #' This will take the `cachePath(object)` and pass
 #'
-#' @inheritParams .dealWithClass.simList
+#' @inheritParams .wrap.simList
 #' @inheritParams reproducible::clearCache
 #'
 #' @return A `data.table` object showing the subset of items in the cache, located at `cachePath`

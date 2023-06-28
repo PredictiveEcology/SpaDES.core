@@ -126,7 +126,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   # }
   # } else {
   fns <- Filenames(sim)
-  sim <- .dealWithClass(sim, cachePath = projectPath) # makes a copy of filebacked object files
+  sim <- .wrap(sim, cachePath = projectPath) # makes a copy of filebacked object files
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
   empties <- nchar(fns) == 0
   if (any(empties)) {
@@ -373,7 +373,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
   paths(sim) <- modifyList2(paths(sim), paths)
 
-  sim <- .dealWithClassOnRecovery(sim, cachePath = projectPath) # convert e.g., PackedSpatRaster
+  sim <- .unwrap(sim, cachePath = projectPath) # convert e.g., PackedSpatRaster
 
   # Work around for bug in qs that recovers data.tables as lists
   sim <- recoverDataTableFromQs(sim)

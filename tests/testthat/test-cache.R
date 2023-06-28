@@ -268,7 +268,7 @@ test_that("test .prepareOutput", {
     cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
   }
 
-  # The Filebacking changed during `.dealWithClass`
+  # The Filebacking changed during `.wrap`
   simCached1$landscape[] <- simCached1$landscape[]
   simCached2$landscape[] <- simCached2$landscape[]
   simCached1$habitatQuality[] <- simCached1$habitatQuality[]
