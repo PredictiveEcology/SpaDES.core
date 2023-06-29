@@ -1413,6 +1413,7 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
 #'    the pipe, as long as the returned return from the upstream pipe function is
 #'    a filename or if it is `NULL` (e.g., `saveRDS`), then it will find the `file`
 #'    argument and use that.
+#' @param ... Not used.
 #'
 #' @details
 #' Note using `registerOutputs`: a user can pass any other
@@ -3165,6 +3166,11 @@ setMethod("documentation",
             return(out)
 })
 
+if (!isGeneric("citation"))
+  setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
+    standardGeneric("citation")
+  })
+
 ################################################################################
 #' @param package For compatibility with [utils::citation()]. This can be
 #'                a `simList` or a character string for a package name.
@@ -3174,13 +3180,6 @@ setMethod("documentation",
 #' @export
 #' @rdname simList-accessors-metadata
 #'
-#' @aliases simList-accessors-metadata
-setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
-  standardGeneric("citation")
-})
-
-#' @export
-#' @rdname simList-accessors-metadata
 #' @aliases simList-accessors-metadata
 setMethod("citation",
           signature = "simList",

@@ -23,6 +23,9 @@ Currently, only file types \code{.qs} or \code{.rds} are supported.}
 \item{projectPath}{An optional path for the project within which the \code{simList}
 exists. This is used to identify relative paths for saving and loading the \code{simList}.}
 
+\item{tempPath}{A character string specifying the new base directory for the
+temporary paths maintained in a \code{simList}.}
+
 \item{paths}{A list of character vectors for all the \code{simList} paths. When
 loading a \code{simList}, this will replace the paths of everything to
 these new paths. Experimental still.}

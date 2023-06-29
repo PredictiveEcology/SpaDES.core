@@ -15,7 +15,6 @@
 \alias{reqdPkgs,missing-method}
 \alias{documentation}
 \alias{documentation,simList-method}
-\alias{citation}
 \alias{citation,simList-method}
 \alias{citation,character-method}
 \alias{sessInfo}
@@ -47,8 +46,6 @@ reqdPkgs(sim, module, modulePath)
 documentation(sim, module)
 
 \S4method{documentation}{simList}(sim, module)
-
-citation(package, lib.loc = NULL, auto = NULL, module = character())
 
 \S4method{citation}{simList}(package, lib.loc = NULL, auto = NULL, module = character())
 

@@ -42,6 +42,8 @@ argument in the call itself. This means that this function can be used with
 the pipe, as long as the returned return from the upstream pipe function is
 a filename or if it is \code{NULL} (e.g., \code{saveRDS}), then it will find the \code{file}
 argument and use that.}
+
+\item{...}{Not used.}
 }
 \value{
 A \code{simList} which will be the \code{sim} passed in with a new object registered

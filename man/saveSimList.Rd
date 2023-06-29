@@ -94,19 +94,14 @@ present and in the exact same paths.
 This approach is attempting to emulate a "relative filenames" approach,
 i.e., attempt to treat the file-backed raster file names as if they were
 relative (which they are not -- raster package forces absolute file
-paths). To do this, all the renaming occurs within \code{loadSimList} or
-\code{unzipSimList}. These function will use the \code{paths} argument to rewrite
+paths). To do this, all the renaming occurs within \code{loadSimList}.
+These function will use the \code{paths} argument to rewrite
 the paths of the files that are identified with \code{Filenames(sim)} so that
 they are in the equivalent (relative) position as they were. This will
 only work if all files were in one of the \code{paths} of the original
 \code{simList}, so that they can be matched up with the new \code{paths} passed in
 \code{loadSimList}. This is not guaranteed to work correctly, though it works
 in a wide array of testing.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{zipSimList(sim, zipfile = tmpZip, filename = "sim.qs")
-pths <- getPaths(mySim)
-out <- unzipSimList(tmpZip, paths = pths)
-}\if{html}{\out{</div>}}
 \item \code{fileBackend = 1}: On-the-fly renaming of file-backed rasters;
 \enumerate{
 \item Save the sim object with a filename, e.g.,  \code{file},
@@ -131,5 +126,5 @@ zipping, to include only cache elements that are relevant.
 }
 }
 \seealso{
-\code{\link[=loadSimList]{loadSimList()}}, \code{\link[=unzipSimList]{unzipSimList()}}
+\code{\link[=loadSimList]{loadSimList()}}
 }

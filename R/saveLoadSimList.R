@@ -214,7 +214,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #' @export
 #' @md
 #' @rdname saveSimList
-#' @seealso [loadSimList()], [unzipSimList()]
+#' @seealso [loadSimList()]
 #' @details
 #' ## Save - Move - Load
 #'
@@ -228,20 +228,14 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #'     This approach is attempting to emulate a "relative filenames" approach,
 #'     i.e., attempt to treat the file-backed raster file names as if they were
 #'     relative (which they are not -- raster package forces absolute file
-#'     paths). To do this, all the renaming occurs within `loadSimList` or
-#'     `unzipSimList`. These function will use the `paths` argument to rewrite
+#'     paths). To do this, all the renaming occurs within `loadSimList`.
+#'     These function will use the `paths` argument to rewrite
 #'     the paths of the files that are identified with `Filenames(sim)` so that
 #'     they are in the equivalent (relative) position as they were. This will
 #'     only work if all files were in one of the `paths` of the original
 #'     `simList`, so that they can be matched up with the new `paths` passed in
 #'     `loadSimList`. This is not guaranteed to work correctly, though it works
 #'     in a wide array of testing.
-#'
-#'     ```
-#'     zipSimList(sim, zipfile = tmpZip, filename = "sim.qs")
-#'     pths <- getPaths(mySim)
-#'     out <- unzipSimList(tmpZip, paths = pths)
-#'     ```
 #'
 #' 1. `fileBackend = 1`: On-the-fly renaming of file-backed rasters;
 #'
@@ -329,6 +323,8 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'   incorrect paths in `Filenames(sim)` if the the `file` being read in is from
 #'   a different computer, path, or drive. This could be the output from `unzipSimList`
 #'   (which is calls `loadSimList` internally, passing the unzipped filenames)
+#' @param tempPath A character string specifying the new base directory for the
+#'   temporary paths maintained in a `simList`.
 #' @inheritParams reproducible::Cache
 #'
 #' @return For [loadSimList()], a `simList` object.
