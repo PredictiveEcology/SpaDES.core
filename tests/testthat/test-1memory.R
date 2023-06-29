@@ -17,7 +17,7 @@ test_that("testing memoryUse", {
 
   #set.seed(42)
 
-  for (i in 1:10) gc()
+  # for (i in 1:10) gc()
   times <- list(start = 0.0, end = if (isWindows()) 60 else 30, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
