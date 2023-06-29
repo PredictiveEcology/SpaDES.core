@@ -3166,10 +3166,9 @@ setMethod("documentation",
             return(out)
 })
 
-if (!isGeneric("citation"))
-  setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
-    standardGeneric("citation")
-  })
+setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
+  standardGeneric("citation")
+})
 
 ################################################################################
 #' @param package For compatibility with [utils::citation()]. This can be
