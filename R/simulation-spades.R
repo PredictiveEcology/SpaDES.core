@@ -55,8 +55,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           # with the assumption that the "unresolved" future could schedule itself,
           # must block any module who's outputs are needed by the same module as the
           # unresolved future module
-          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture$moduleName) #&&
-            #modInFuture != curForFuture[["moduleName"]]
+          immediateDownstream <- names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]
+          if (length(immediateDownstream))
+            immediateDownstream <- !any(immediateDownstream %in% curForFuture$moduleName) #&&
+          length(immediateDownstream) == 0
+          #modInFuture != curForFuture[["moduleName"]]
         } else {
           TRUE
         }
@@ -214,7 +217,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
                                         curModName = cur[["moduleName"]])
 
-          if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
+          # In general... allow a spawning, unless it is literally next event
+          #   This is just a heuristic because other events could be inserted before
+          #    the next event ... but this is a decent guess
+          if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs[[sim@events[[1]]$moduleName]])) {
             sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                    showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                    futureNeeds = futureNeeds)
@@ -1399,7 +1405,7 @@ setMethod(
                                             knownObjects = sim@.xData$._knownObjects)
   }
 
-  return(sim)
+  return(sim) # TEMPORARY THIS IS FOR TESTING DEBUGGING IN FUTURE
 }
 
 #' @keywords internal
@@ -1657,7 +1663,7 @@ resolveFutureNow <- function(sim, cause = "") {
 
   futureRunning <- sim@events[[1]]
   futureRunning[1:4] <- as.list(strsplit(names(sim$simFuture)[1], split = "_")[[1]])
-  futureRunning[["eventTime"]] <- as.numeric(futureRunning[[1]])
+  futureRunning[["eventTime"]] <- as.numeric(futureRunning[["eventTime"]])
   futureRunning[["eventPriority"]] <- as.numeric(futureRunning[["eventPriority"]])
   futureRunningSimTU <- futureRunning
   futureRunningSimTU[["eventTime"]] <- convertTimeunit(as.numeric(futureRunningSimTU[[1]]), unit = timeunit(sim))
@@ -1667,6 +1673,7 @@ resolveFutureNow <- function(sim, cause = "") {
   message(crayon::magenta("           ", cause))
 
   tmpSim <- future::value(sim$simFuture[[1]][[1]])
+  tmpSim <- .unwrap(tmpSim)
   simMetadata <- sim$simFuture[[1]][[2]]
 
   # objects
@@ -1720,7 +1727,12 @@ getFutureNeeds <- function(deps, curModName) {
       function(modu)
         modu@outputObjects$objectName
     )
-    out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
+    out$anyModInputs <- lapply(
+      deps,
+      function(modu)
+        modu@inputObjects$objectName
+    )
+    out$dontAllowModules <- unlist(lapply(out$anyModInputs, function(x) any(x %in% out$thisModOutputs)))
   }
   out
 }
@@ -1733,13 +1745,19 @@ getFutureNeeds <- function(deps, curModName) {
   modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
-  globs <- list(sim = Copy(sim), cacheIt, debug, moduleCall, fnEnv, cur,
+  globs <- list(sim = .wrap(sim), cacheIt, debug, moduleCall, fnEnv, cur,
                 notOlderThan, showSimilar, .pkgEnv)# names(modObjs))
   names(globs) <- c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
                     "showSimilar", ".pkgEnv") #names(modObjs))
-  sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
-    list(sim = future::future(getFromNamespace(".runEvent", "SpaDES.core")(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                                                      showSimilar = showSimilar, .pkgEnv),
+
+  # When a name begins with a number, touchy to access it. Here reverse 1st 2 so character is first
+  futureListLabel <- paste(unlist(cur), collapse = "_")
+  sim$simFuture[[futureListLabel]] <-
+    list(sim = future::future(
+      getFromNamespace(".runForFutureWrapper", "SpaDES.core")(sim, cacheIt = cacheIt,
+                                                              debug = debug, moduleCall = moduleCall,
+                                                              fnEnv = fnEnv, cur = cur, notOlderThan = notOlderThan,
+                                                              showSimilar = showSimilar, .pkgEnv = .pkgEnv),
                               globals = globs,
                               packages = c("SpaDES.core", pkgs),
                               envir = envir, seed = TRUE),
@@ -1748,6 +1766,13 @@ getFutureNeeds <- function(deps, curModName) {
                                dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
   sim
 }
+
+.runForFutureWrapper <- function(sim, ...) {
+  sim <- .unwrap(sim)
+  sim <- .runEvent(sim, ...)
+  .wrap(sim)
+}
+
 
 modNameInFuture <- function(simFuture) {
   gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))

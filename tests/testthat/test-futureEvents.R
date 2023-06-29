@@ -1,15 +1,15 @@
 test_that("test spades.futureEvents", {
   skip_on_cran() ## these are longer tests (~2m)
-  skip_on_os("windows")
+  # skip_on_os("windows")
   testInit(c(sampleModReqdPkgs, "future", "ggplot2"),
            opts = list("reproducible.useMemoise" = FALSE,
                        "spades.futureEvents" = TRUE))
-  tmpdir <- tempdir2(.rndstr())
+  # tmpdir <- tempdir2(.rndstr())
   modPath <- system.file("sampleModules", package = "SpaDES.core")
   origFiles <- dir(modPath, full.names = TRUE, recursive = TRUE)
   tmpFiles <- file.path(tmpdir, dir(modPath, recursive = TRUE))
   checkPath(unique(dirname(tmpFiles)), create = TRUE)
-  linkOrCopy(origFiles, tmpFiles)
+  file.copy(origFiles, tmpFiles)
   modPath <- tmpdir
 
 
@@ -33,7 +33,9 @@ test_that("test spades.futureEvents", {
     writeLines(newModCode, con = f1)
   }
 
-  future::plan(future::multisession, workers = 3)
+  #future::plan(future::multisession, workers = 3)
+  #future::plan(future.callr::callr, workers = 3)
+  future::plan("sequential", workers = 3)
 
   mods <- c("caribouMovement", "randomLandscapes", "fireSpread", "test")
   # Example of changing parameter values
