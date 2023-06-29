@@ -74,7 +74,8 @@ Suggests:
     testthat (>= 1.0.2),
     withr
 Remotes:
-    ropensci/NLMR
+    ropensci/NLMR,
+    predictiveecology/reproducible@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
