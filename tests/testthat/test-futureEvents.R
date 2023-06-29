@@ -1,18 +1,22 @@
 test_that("test spades.futureEvents", {
   skip_on_cran() ## these are longer tests (~2m)
   skip_on_os("windows")
-  testInit(c(sampleModReqdPkgs, "future"),
+  testInit(c(sampleModReqdPkgs, "future", "ggplot2"),
            opts = list("reproducible.useMemoise" = FALSE,
                        "spades.futureEvents" = TRUE))
-  tmpdir <- tempdir()
+  tmpdir <- tempdir2(.rndstr())
   modPath <- system.file("sampleModules", package = "SpaDES.core")
-  newModule("test", path = modPath)
-  on.exit(unlink(file.path(modPath, "test"), recursive = TRUE), add = TRUE)
+  origFiles <- dir(modPath, full.names = TRUE, recursive = TRUE)
+  tmpFiles <- file.path(tmpdir, dir(modPath, recursive = TRUE))
+  checkPath(unique(dirname(tmpFiles)), create = TRUE)
+  linkOrCopy(origFiles, tmpFiles)
+  modPath <- tmpdir
+
+
+  newModule("test", path = modPath, open = FALSE)
   mods1 <- c("caribouMovement", "fireSpread", "test")
   for (mod in mods1) {
     f1 <- file.path(modPath, mod, paste0(mod, ".R"))
-    f2 <- file.path(modPath, mod, paste0(mod, "Orig.R"))
-    file.copy(f1, f2)
     ll <- readLines(f1)
     lin <- grep("Burn\\(sim\\)|Move\\(sim\\)|plotFun\\(sim\\)", ll)
     newModCode <- c(
@@ -28,15 +32,6 @@ test_that("test spades.futureEvents", {
     )
     writeLines(newModCode, con = f1)
   }
-  on.exit({
-    for (mod in mods1) {
-      f1 <- file.path(modPath, mod, paste0(mod, ".R"))
-      f2 <- file.path(modPath, mod, paste0(mod, "Orig.R"))
-      file.copy(f2, f1, overwrite = TRUE)
-      unlink(f2)
-    }
-  },
-  add = TRUE)
 
   future::plan(future::multisession, workers = 3)
 
