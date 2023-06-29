@@ -1733,12 +1733,14 @@ getFutureNeeds <- function(deps, curModName) {
   modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
+  globs <- list(sim = Copy(sim), cacheIt, debug, moduleCall, fnEnv, cur,
+                notOlderThan, showSimilar, .pkgEnv)# names(modObjs))
+  names(globs) <- c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
+                    "showSimilar", ".pkgEnv") #names(modObjs))
   sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
     list(sim = future::future(getFromNamespace(".runEvent", "SpaDES.core")(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                                                       showSimilar = showSimilar, .pkgEnv),
-
-                              globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
-                                          "showSimilar", ".pkgEnv", names(modObjs)),
+                              globals = globs,
                               packages = c("SpaDES.core", pkgs),
                               envir = envir, seed = TRUE),
          thisModOutputs = list(moduleName = cur[["moduleName"]],
