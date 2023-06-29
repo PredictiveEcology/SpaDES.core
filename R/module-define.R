@@ -27,7 +27,7 @@ moduleDefaults <- list(
   citation = list("citation.bib"),
   documentation = list(),
   loadOrder = list(after = NULL, before = NULL),
-  reqdPkgs = list()
+  reqdPkgs = list("ggplot2") # used in newModule template ggplotFn
 )
 
 ################################################################################

@@ -102,7 +102,7 @@ plotFun <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # do stuff for this event
   sampleData <- data.frame("TheSample" = sample(1:10, replace = TRUE))
-  Plots(sampleData, fn = ggplotFn)
+  Plots(sampleData, fn = ggplotFn) # needs ggplot2
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
