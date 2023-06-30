@@ -4,6 +4,9 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
 ## Enhancements
 * `options(spades.futureEvents = TRUE)` has been reworked and now works under a wider array of conditions. 
+* `Copy`, `.wrap`, `wrap` and `unwrap` all have fairly robust methods for `simList` class. The generics are in `reproducible` or `terra`
+* updated `sampleModules` to use `Plots` and `.plot` parameter.
+* new function: `registerOutputs` can be used by a developer to add saved files to the `outputs(sim)` data.frame.
 * messaging during nested `simInit` or `spades` calls will now not duplicate time prefix
 * `params` and `.globals` were previously not expected to change during `Cache`d events. Thus returned cached values were always the same as input as `params` and `.globals`. They are now assessed and returned as part of the `Cache`, as expected.
 * updates to handle upstream changes in `Require` and `reproducible`, including renaming `cacheRepo` to `cachePath` in some inherited functions.
@@ -18,6 +21,8 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * two new options -- `spades.loadReqdPkgs`, so a user can turn off loading of packages, and `spades.dotInputObjects`, so a user can omit running of the `.inputObjects` function in modules during `simInit`. These are updated in `spadesOptions`.
 * some tests and examples have been shortened, to fit within the CRAN guidelines
 * improved documentation
+* new hidden function `runScheduleEventsOnly` will extract only the `scheduleEvents` call; needed for `options(spades.futureEvents = TRUE)`
+* new option: `spades.saveFileExtensions` which allows users to use the `outputs(sim)` mechanism for saving, for file extensions that are not already supported by `.saveFileExtensions()`
 
 ## Dependency Changes
 * drop support for R 4.0 as dependency packages no longer support it
