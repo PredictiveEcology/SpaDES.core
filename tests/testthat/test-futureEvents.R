@@ -27,9 +27,11 @@ test_that("test spades.futureEvents", {
     lin <- grep("expectsInput", newModCode)[1]
     newModCode <- c(
       newModCode[seq(lin - 1)],
-      if (mod == "test") "    expectsInput(objectName = 'caribou', objectClass = 'raster', desc = NA, sourceURL = NA),",
+      if (mod == "test") "    expectsInput(objectName = 'caribou', objectClass = 'SpatRaster', desc = NA, sourceURL = NA),",
+      if (mod == "test") "    expectsInput(objectName = 'landscape', objectClass = 'SpatRaster', desc = NA, sourceURL = NA),",
       newModCode[(lin):length(newModCode)]
     )
+
     writeLines(newModCode, con = f1)
   }
 
@@ -42,6 +44,7 @@ test_that("test spades.futureEvents", {
 
   mods <- c("caribouMovement", "randomLandscapes", "fireSpread", "test")
   # Example of changing parameter values
+  options(spades.saveFileExtensions = data.frame(exts = ".grd", fun = "writeRaster", package = "terra"))
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
@@ -56,7 +59,10 @@ test_that("test spades.futureEvents", {
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou
-    outputs = data.frame(objectName = c("landscape", "caribou"),
+    outputs = data.frame(objectName = rep(c("landscape", "caribou"), 2),
+                         saveTime = rep(c(1, 2), each = 2),
+                         fun = rep(c("writeRaster", "writeVector"), 2),
+                         package = "terra",
                          stringsAsFactors = FALSE)
   )
 
@@ -65,23 +71,37 @@ test_that("test spades.futureEvents", {
 
   options("spades.futureEvents" = TRUE)
   set.seed(1)
-  simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
+  simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE) |>
+    suppressWarnings()
+
   options("spades.futureEvents" = FALSE)
+  fls <- outputs(simsTRUE)$file
+  expect_true(all(file.exists(fls)))
+  unlink(fls)
   set.seed(1)
-  simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
+  simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE) |>
+    suppressWarnings()
   expect_true(isTRUE(all.equal(completed(simsFALSE)[, 1:4], completed(simsTRUE)[, 1:4])))
-  # s2 <- completed(simsFALSE)[, 1:3]
-  # data.table::setorderv(s2, c("eventTime", "moduleName", "eventType"))
-  # s1 <- completed(simsTRUE)[, 1:3]
-  # data.table::setorderv(s1, c("eventTime", "moduleName", "eventType"))
+  fls <- outputs(simsFALSE)$file
+  expect_true(all(file.exists(fls)))
+  unlink(fls)
 
   mySim@depends@dependencies$caribouMovement@timeunit <- "year"
   options("spades.futureEvents" = TRUE)
   set.seed(1)
-  simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
+  simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE) |>
+    suppressWarnings()
+  fls <- outputs(simsTRUE)$file
+  expect_true(all(file.exists(fls)))
+  unlink(fls)
   options("spades.futureEvents" = FALSE)
   set.seed(1)
-  simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
+  simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE) |>
+    suppressWarnings()
+  fls <- outputs(simsFALSE)$file
+  expect_true(all(file.exists(fls)))
+  unlink(fls)
   expect_true(isTRUE(all.equal(completed(simsFALSE)[, 1:4], completed(simsTRUE)[, 1:4])))
+
 
 })
