@@ -57,7 +57,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           # unresolved future module
           immediateDownstream <- names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]
           if (length(immediateDownstream))
-            immediateDownstream <- !any(immediateDownstream %in% curForFuture$moduleName) #&&
+            immediateDownstream <- immediateDownstream[immediateDownstream %in% curForFuture$moduleName]#&&
           length(immediateDownstream) == 0
           #modInFuture != curForFuture[["moduleName"]]
         } else {
@@ -67,7 +67,14 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           cause <- if (!canProceed) paste0(curForFuture$moduleName, " requires outputs from ", modInFuture)
           else if (curForFuture$moduleName == "save") paste0("Current event is 'save'; so resolving all")
           else paste0(modInFuture, " finished running")
-          sim <- resolveFutureNow(sim, cause = cause)
+
+          # if (curForFuture$moduleName == "save")
+          #   browser()
+          resolveN <- if (curForFuture$moduleName == "save") length(sim$simFuture) else 1L
+          for (iii in seq(resolveN))
+            sim <- resolveFutureNow(sim, cause = cause)
+          if (curForFuture$moduleName == "save")
+            return(invisible(sim))
         }
 
       }
@@ -221,9 +228,19 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           #   This is just a heuristic because other events could be inserted before
           #    the next event ... but this is a decent guess
           if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs[[sim@events[[1]]$moduleName]])) {
-            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+            messageVerbose(
+              crayon::magenta(paste0(cur[["moduleName"]], " does not output anything that is ",
+                            "needed by the currently scheduled next module (", sim@events[[1]]$moduleName, ")")),
+              verbose = 1 - (debug %in% FALSE))
+            # don't use cur from above because it is "seconds" which mess with future
+            cur2 <- unlist(current(sim))
+            cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
+            simFuture <- sim$simFuture
+            sim$simFuture <- list()
+            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
                                    showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                    futureNeeds = futureNeeds)
+            sim$simFuture <- append(simFuture, sim$simFuture)
             skipEvent <- TRUE
           }
         }
@@ -1666,7 +1683,7 @@ resolveFutureNow <- function(sim, cause = "") {
   futureRunning[["eventTime"]] <- as.numeric(futureRunning[["eventTime"]])
   futureRunning[["eventPriority"]] <- as.numeric(futureRunning[["eventPriority"]])
   futureRunningSimTU <- futureRunning
-  futureRunningSimTU[["eventTime"]] <- convertTimeunit(as.numeric(futureRunningSimTU[[1]]), unit = timeunit(sim))
+  # futureRunningSimTU[["eventTime"]] <- convertTimeunit(as.numeric(futureRunningSimTU[[1]]), unit = timeunit(sim))
   setDT(futureRunningSimTU)
   setDT(futureRunning)
   message(crayon::magenta("        -- Resolving", capture.output(print(futureRunningSimTU, row.names = FALSE, col.names = "none"))))
