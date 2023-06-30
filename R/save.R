@@ -243,10 +243,24 @@ saveFiles <- function(sim) {
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
     "grd", "writeRaster", "raster",
+    "shp", "writeVector", "terra",
     "tif", "writeRaster", "terra"
   )), stringsAsFactors = FALSE)
   setnames(.sFE, new = c("exts", "fun", "package"), old = paste0("X", 1:3))
   .sFE <- .sFE[order(.sFE$package, .sFE$fun), ]
+  if (NROW(getOption("spades.saveFileExtensions")) > 0) {
+    if (!identical(colnames(.sFE), colnames(getOption("spades.saveFileExtensions")))) {
+      stop("The column names of `getOption('spades.saveFileExtensions') must be: ",
+           paste(colnames(.sFE), collapse = ", "), "; they are currently ",
+           paste(collapse = ", ", colnames(getOption("spades.saveFileExtensions"))))
+    }
+    # remove initial dot
+    .sFE <- rbind(getOption("spades.saveFileExtensions"), .sFE)
+    .sFE[["exts"]] <- gsub("^\\.", "", .sFE[["exts"]])
+    # remove if there are 2 extensions for same fun and package
+    dups <- duplicated(.sFE[, c("fun", "package")])
+    .sFE <- .sFE[!dups, ]
+  }
   return(.sFE)
 }
 

@@ -133,6 +133,15 @@
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
 #'   There is a message which describes how to find that. \cr
 #'
+#'   `spades.saveFileExtensions` \tab `NULL` \tab
+#'   a `data.frame` with 3 columns, "exts", "fun", and "package" indicating which
+#'   file extension, and which function from which package will be used when
+#'   using the `outputs` mechanism for saving files during a `spades` call. e.g.,
+#'   `options(spades.saveFileExtensions = data.frame(exts = "shp", fun = "st_write",
+#'   package = "sf")`.
+#'   Then specify e.g.,
+#'   `simInit(outputs = data.frame(objectName = "caribou", fun = "st_write", package = "sf"))`
+#'
 #'   `spades.scratchPath` \tab `file.path(tempdir(), "SpaDES", "scratch")`)
 #'     \tab The default local directory where transient files from modules and data will written.
 #'     This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
@@ -208,6 +217,8 @@ spadesOptions <- function() {
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
     spades.restartR.restartDir = file.path(.spadesTempDir(), "outputs"),
+    spades.saveFileExtensions = data.frame(exts = character(), fun = character(),
+                                           package = character()),
     spades.saveSimOnExit = TRUE,
     spades.scratchPath = file.path(.spadesTempDir(), "scratch"),
     spades.sessionInfo = TRUE,
