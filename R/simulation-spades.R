@@ -2176,7 +2176,7 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
     env2 <- new.env(parent = env)
     env2$sim <- sim
     for (i in num) {
-      sim <- eval(fn[[i]], env = env2)
+      sim <- eval(fn[[i]], envir = env2)
     }
   }
   sim
