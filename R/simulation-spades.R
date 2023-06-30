@@ -1838,10 +1838,11 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
         }
 
         evnts1 <- data.frame(current(sim))
-        evnts1new <- data.frame(current(sim))
+        # evnts1new <- data.frame(current(sim))
         widths <- unname(unlist(lapply(format(evnts1), nchar)))
         .pkgEnv[[".spadesDebugWidth"]] <- pmax(widths, .pkgEnv[[".spadesDebugWidth"]])
-        evnts1[1L, ] <- sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), evnts1)
+        evnts1[1L, ] <- sprintf(paste0("%-", .pkgEnv[[".spadesDebugWidth"]],"s"), evnts1)
+        evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
         if (.pkgEnv[[".spadesDebugFirst"]]) {
           evnts2 <- evnts1
           evnts2 <- evnts1
