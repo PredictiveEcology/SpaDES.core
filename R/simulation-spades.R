@@ -215,7 +215,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           set.seed(eventSeed) # will create .Random.seed
         }
 
+        browser()
+        # TODO -- use sim <- searchScheduleEvent(sim)
         .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+        if (cur$moduleName %in% "save") browser()
         if (useFuture) {
           # stop("using future for spades events is not yet fully implemented")
           futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
@@ -233,7 +236,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
           selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
           objsNeeded <- unique(c(objsNeeded, objsNeededForNextMod, selfObjects))
-          # if (nextScheduledEvent %in% "save") browser()
           if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
             spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
             messageVerbose(
@@ -2136,4 +2138,31 @@ debugMessTRUE <- function(sim, events) {
     outMess <- paste(unname(evnts1), collapse = ' ')
   }
   outMess
+}
+
+
+searchScheduleEvent <- function(sim, fn, env, wh = c("switch", "scheduleEvent")) {
+  if (missing(fn)) {
+    cur <- current(sim)
+    fn <- parse(text = deparse(sim$.mods[[cur$moduleName]][[paste0("doEvent.", cur$moduleName)]]))[[1]]
+    env <- environment(sim$.mods[[cur$moduleName]][[paste0("doEvent.", cur$moduleName)]])
+  }
+  num <- grep(wh[1], fn)
+  if (wh[1] != "scheduleEvent") {
+    if (num == 1) {
+      num <- which(names(fn) %in% cur$eventType)
+      sim <- searchScheduleEvent(sim = sim, fn = fn[[num]], env = env, wh = wh[-1])
+    } else {
+      sim <- searchScheduleEvent(sim = sim, fn = fn[[num]], env = env, wh = wh)
+    }
+  } else {
+    env2 <- new.env(parent = env)
+    env2$sim <- sim
+    for (i in num)
+      sim <- eval(fn[[i]], env = env2)
+  }
+  sim
+
+
+
 }
