@@ -1784,7 +1784,8 @@ getFutureNeeds <- function(deps, curModName) {
   modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
-  globs <- list(sim = .wrap(sim), cacheIt, debug, moduleCall, fnEnv, cur,
+  objsKepts <- na.omit(inputObjects(sim, module = currentModule(sim))[["objectName"]])
+  globs <- list(sim = .wrap(sim[objsKepts]), cacheIt, debug, moduleCall, fnEnv, cur,
                 notOlderThan, showSimilar, .pkgEnv)# names(modObjs))
   names(globs) <- c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
                     "showSimilar", ".pkgEnv") #names(modObjs))

@@ -3367,3 +3367,35 @@ findObjects <- function(objects, sim, module, path) {
   mo <- moduleObjects(sim, module, path)
   mo[grep(paste(objects, collapse = "|"), objectName), ]
 }
+
+
+#' Extract an intact `simList` but with subset of objects
+#'
+#' This is copies the non-object components of a `simList` (e.g., events, etc.)
+#' then selects only the objects listed in `i` using `Copy(mget(i, envir(sim)))`
+#' and adds them to the returned `simList`.
+#'
+#' @author Eliot McIntire
+#' @param i A character vector of objects to select.
+#' @param x A `simList`
+#'
+#' @return The `[` method returns a complete `simList` class with all the slots
+#'   copied from the original, but only the named objects in `i` are returned.
+#' @examples
+#' s <- simInit()
+#' s$a <- 1
+#' s$b <- 2
+#' s$d <- 3
+#' s[c("a", "d")] # a simList with only 2 objects
+#'
+#'
+#' @export
+setMethod(
+  "[",
+  signature = list(x = "simList", i = "character"),
+  function (x, i, ...) {
+    x2 <- Copy(x, objects = 2)
+    list2env(Copy(mget(i, envir = envir(x))), envir = envir(x2))
+    x2
+  }
+)
