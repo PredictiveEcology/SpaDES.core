@@ -231,7 +231,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         }
 
         .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
-        if (cur$moduleName %in% "save") browser()
         if (useFuture) {
           # stop("using future for spades events is not yet fully implemented")
           futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
@@ -252,8 +251,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
             spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
             messageVerbose(
-              crayon::magenta(paste0(spacing, cur[["moduleName"]], " does not output anything that is ",
-                            "needed by the currently scheduled next module (", nextScheduledEvent, ")")),
+              crayon::magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
+                            "next module (", nextScheduledEvent, ")")),
               verbose = 1 - (debug %in% FALSE))
             # don't use cur from above because it is "seconds" which mess with future
             cur2 <- unlist(current(sim))
@@ -264,7 +263,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                                    showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                    futureNeeds = futureNeeds)
             sim$.simFuture <- append(simFuture, sim$.simFuture)
-            sim <- searchScheduleEvent(sim) # TODO
+            sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
             skipEvent <- TRUE
           }
         }
@@ -1715,7 +1714,7 @@ resolveFutureNow <- function(sim, cause = "") {
   outMess <- debugMessTRUE(sim, events = futureRunningSimTU)
 
   # # If it had no outputs, then skip -- wait -- comment out for now ... the "events" stuff; but that may be unnecessary
-  #   because of the searchScheduleEvent, which "should" have found all the events.
+  #   because of the runScheduleEventsOnly, which "should" have found all the events.
   # if (length(sim$.simFuture[[1]]$thisModOutputs$objects)) {
   tmpSim <- future::value(sim$.simFuture[[1]][[1]])
   tmpSim <- .unwrap(tmpSim)
@@ -1734,7 +1733,7 @@ resolveFutureNow <- function(sim, cause = "") {
   newEvents <- evntsFut[!evntsNormal, on = allCols]
 
   if (NROW(newEvents)) {
-    warning("Seeing this message means that the searchScheduleEvent did not find all events; ",
+    warning("Seeing this message means that the runScheduleEventsOnly did not find all events; ",
             "please use `switch` and `scheduleEvent` inside the doEvent.", currentModule(tmpSim),
             " function")
     newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
@@ -2155,25 +2154,30 @@ debugMessTRUE <- function(sim, events) {
 }
 
 
-searchScheduleEvent <- function(sim, fn, env, wh = c("switch", "scheduleEvent")) {
+runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"), currnt) {
+
+  if (missing(currnt)) {
+    currnt <- unlist(current(sim))
+    currnt[["eventTime"]] <- as.numeric(currnt[["eventTime"]])
+  }
+
   if (missing(fn)) {
-    cur <- current(sim)
-    fn <- parse(text = deparse(sim$.mods[[cur$moduleName]][[paste0("doEvent.", cur$moduleName)]]))[[1]]
-    env <- environment(sim$.mods[[cur$moduleName]][[paste0("doEvent.", cur$moduleName)]])
+    fn <- parse(text = deparse(sim$.mods[[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]]))[[1]]
+    env <- environment(sim$.mods[[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]])
   }
   num <- grep(wh[1], fn)
   if (wh[1] != "scheduleEvent") {
     if (num == 1) {
-      num <- which(names(fn) %in% cur$eventType)
-      sim <- searchScheduleEvent(sim = sim, fn = fn[[num]], env = env, wh = wh[-1])
-    } else {
-      sim <- searchScheduleEvent(sim = sim, fn = fn[[num]], env = env, wh = wh)
+      num <- which(names(fn) %in% currnt[["eventType"]])
+      wh <- wh[-1]
     }
+    sim <- runScheduleEventsOnly(sim = sim, fn = fn[[num]], env = env, wh = wh, currnt = currnt)
   } else {
     env2 <- new.env(parent = env)
     env2$sim <- sim
-    for (i in num)
+    for (i in num) {
       sim <- eval(fn[[i]], env = env2)
+    }
   }
   sim
 

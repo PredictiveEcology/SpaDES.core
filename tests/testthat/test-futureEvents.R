@@ -20,7 +20,7 @@ test_that("test spades.futureEvents", {
     ll <- readLines(f1)
     lin <- grep("Burn\\(sim\\)|Move\\(sim\\)|plotFun\\(sim\\)", ll)
     newModCode <- c(
-      ll[seq(lin - 1)], "    system.time(for (i in 1:1e6) rnorm(10))",
+      ll[seq(lin - 1)], "    # Sys.sleep(0.2)", # comment out because not needed any more
       if (mod == "test") "sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, 'test', 'plot')",
       ll[lin:length(ll)]
     )
