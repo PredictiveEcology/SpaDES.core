@@ -33,8 +33,11 @@ test_that("test spades.futureEvents", {
     writeLines(newModCode, con = f1)
   }
 
-  future::plan(future::multisession, workers = 3)
-  #future::plan(future.callr::callr, workers = 3)
+  if (isWindows()) {
+    future::plan(future.callr::callr, workers = 3)
+  } else {
+    future::plan(future::multisession, workers = 3)
+  }
   #future::plan("sequential", workers = 3)
 
   mods <- c("caribouMovement", "randomLandscapes", "fireSpread", "test")
