@@ -442,8 +442,12 @@ setMethod(
       }
 
       # remove all functions from the module environment; they aren't allowed to be redefined within a function
-      out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
-                                   preDigest[[whSimList]]$.list[[whSimList2]])
+      if (length(preDigest[[whSimList]]$.list)) {
+        out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
+                                     preDigest[[whSimList]]$.list[[whSimList2]])
+      } else {
+        out <- postDigest$.list[[whSimList2]]
+      }
       for (modNam in modules(object)) {
         isModElement <- names(out) == modNam
         if (any(isModElement)) {

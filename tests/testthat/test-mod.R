@@ -1,6 +1,8 @@
 test_that("local mod object", {
   testInit(smcc = FALSE, debug = FALSE, verbose = TRUE,
                           opts = list("reproducible.useMemoise" = FALSE))
+  opts <- options(reproducible.cachePath = tmpCache)
+  on.exit(options(opts), add = TRUE)
 
   newModule("test", tmpdir, open = FALSE)
   newModule("test2", tmpdir, open = FALSE)
@@ -120,7 +122,7 @@ test_that("local mod object", {
   # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
   if (interactive()) {
     opt <- options("spades.recoveryMode" = TRUE)
-    on.exit(opt, add = TRUE)
+    on.exit(options(opt), add = TRUE)
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
@@ -140,7 +142,6 @@ test_that("local mod object", {
     sim@params$test2$testRestartSpades <- NULL
     sim3 <- restartSpades(sim, debug = FALSE)
     expect_true(NROW(completed(sim3)) == 7)
-    options("spades.recoveryMode" = FALSE)
   }
 })
 
