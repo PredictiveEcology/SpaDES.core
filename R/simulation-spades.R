@@ -215,8 +215,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           set.seed(eventSeed) # will create .Random.seed
         }
 
-        browser()
-        # TODO -- use sim <- searchScheduleEvent(sim)
         .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
         if (cur$moduleName %in% "save") browser()
         if (useFuture) {
@@ -251,6 +249,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                                    showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                    futureNeeds = futureNeeds)
             sim$simFuture <- append(simFuture, sim$simFuture)
+            sim <- searchScheduleEvent(sim) # TODO
             skipEvent <- TRUE
           }
         }
@@ -1189,9 +1188,10 @@ setMethod(
         if (!requireNamespace("future", quietly = TRUE))
           stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
 
-        message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
-                "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
-                "User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))")
+        message(crayon::magenta("useFuture is set to TRUE; this will attempt to spawn events"))
+        message(crayon::magenta("  in a separate process, if their outputs are not needed immediately"))
+        message(crayon::magenta("  STILL EXPERIMENTAL. Use cautiously."))
+        message(crayon::magenta("  User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))"))
         sim$.futureEventsSkipped <- 0
         sim$simFuture <- list()
       }
@@ -1797,12 +1797,13 @@ getFutureNeeds <- function(deps, curModName) {
                                                               debug = debug, moduleCall = moduleCall,
                                                               fnEnv = fnEnv, cur = cur, notOlderThan = notOlderThan,
                                                               showSimilar = showSimilar, .pkgEnv = .pkgEnv),
-                              globals = globs,
-                              packages = c("SpaDES.core", pkgs),
-                              envir = envir, seed = TRUE),
-         thisModOutputs = list(moduleName = cur[["moduleName"]],
-                               objects = futureNeeds$thisModOutputs,
-                               dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
+      globals = globs,
+      packages = c("SpaDES.core", pkgs),
+      # envir = envir,
+      seed = TRUE),
+      thisModOutputs = list(moduleName = cur[["moduleName"]],
+                            objects = futureNeeds$thisModOutputs,
+                            dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
   sim
 }
 

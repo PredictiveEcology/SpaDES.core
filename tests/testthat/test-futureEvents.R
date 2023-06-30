@@ -69,11 +69,11 @@ test_that("test spades.futureEvents", {
   options("spades.futureEvents" = FALSE)
   set.seed(1)
   simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
-  # expect_true(isTRUE(all.equal(completed(simsFALSE), completed(simsTRUE))))
-  s2 <- completed(simsFALSE)[, 1:3]
-  data.table::setorderv(s2, c("eventTime", "moduleName", "eventType"))
-  s1 <- completed(simsTRUE)[, 1:3]
-  data.table::setorderv(s1, c("eventTime", "moduleName", "eventType"))
+  expect_true(isTRUE(all.equal(completed(simsFALSE)[, 1:4], completed(simsTRUE)[, 1:4])))
+  # s2 <- completed(simsFALSE)[, 1:3]
+  # data.table::setorderv(s2, c("eventTime", "moduleName", "eventType"))
+  # s1 <- completed(simsTRUE)[, 1:3]
+  # data.table::setorderv(s1, c("eventTime", "moduleName", "eventType"))
 
   mySim@depends@dependencies$caribouMovement@timeunit <- "year"
   options("spades.futureEvents" = TRUE)
@@ -82,11 +82,6 @@ test_that("test spades.futureEvents", {
   options("spades.futureEvents" = FALSE)
   set.seed(1)
   simsFALSE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
-
-  s2 <- completed(simsFALSE)[, 1:3]
-  data.table::setorderv(s2, c("eventTime", "moduleName", "eventType"))
-  s1 <- completed(simsTRUE)[, 1:3]
-  data.table::setorderv(s1, c("eventTime", "moduleName", "eventType"))
-  expect_true(isTRUE(all.equal(s2, s1)))
+  expect_true(isTRUE(all.equal(completed(simsFALSE)[, 1:4], completed(simsTRUE)[, 1:4])))
 
 })
