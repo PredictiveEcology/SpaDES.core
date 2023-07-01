@@ -245,7 +245,6 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 
   # Different debug options (overrides the package option 'spades.debug')
   spades(mySim, debug = TRUE) # Fastest
-  spades(mySim, debug = "simList")
   spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
   # To get a combination -- use list(debug = list(..., ...))
   spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))

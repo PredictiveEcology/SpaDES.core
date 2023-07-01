@@ -146,6 +146,7 @@ The following options are likely of interest to most users
   package = "sf")`.
   Then specify e.g.,
   `simInit(outputs = data.frame(objectName = "caribou", fun = "st_write", package = "sf"))`
+  \cr
 
   `spades.scratchPath` \tab `file.path(tempdir(), "SpaDES", "scratch")`)
     \tab The default local directory where transient files from modules and data will written.

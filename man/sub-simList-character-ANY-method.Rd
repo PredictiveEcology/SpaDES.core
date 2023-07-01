@@ -10,6 +10,12 @@
 \item{x}{A \code{simList}}
 
 \item{i}{A character vector of objects to select.}
+
+\item{j}{Not used.}
+
+\item{...}{Not used.}
+
+\item{drop}{Not used.}
 }
 \value{
 The \code{[} method returns a complete \code{simList} class with all the slots

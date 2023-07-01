@@ -880,7 +880,6 @@ scheduleConditionalEvent <- function(sim,
 #'
 #'   # Different debug options (overrides the package option 'spades.debug')
 #'   spades(mySim, debug = TRUE) # Fastest
-#'   spades(mySim, debug = "simList")
 #'   spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
 #'   # To get a combination -- use list(debug = list(..., ...))
 #'   spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
@@ -1862,7 +1861,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 #' @importFrom crayon green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
-  if (!any(vapply(debug, function(x) x %in% 1:2, FUN.VALUE = logical(1))))
+  if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else FALSE, FUN.VALUE = logical(1))))
     debug <- append(list(1L), debug)
   for (i in seq_along(debug)) {
     if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
@@ -1873,10 +1872,10 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
         }
         outMess <- debugMessTRUE(sim)
       }
-    } else if (isTRUE(debug[[i]] %in% 1)) {
+    } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 1 else FALSE)) {
       outMess <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
-    } else if (isTRUE(debug[[i]] %in% 2)) {
+    } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 2 else FALSE)) {
       compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                          attr(sim, "completedCounter") == 1) {
         sim@.xData$._startClockTime

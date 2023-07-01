@@ -3174,20 +3174,30 @@ setMethod("documentation",
             return(out)
 })
 
+
+#' @name citation
+#' @rdname citation
 setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = character()) {
   standardGeneric("citation")
 })
 
-################################################################################
+
+#' A citation method for `SpaDES` modules
+#'
+#' This is a wrapper around [utils::citation()] for cases with `package` is a
+#' `character` string. Otherwise, it takes a `simList`.
+#'
 #' @param package For compatibility with [utils::citation()]. This can be
 #'                a `simList` or a character string for a package name.
 #' @inheritParams P
 #' @inheritParams utils::citation
 #' @include simList-class.R
 #' @export
-#' @rdname simList-accessors-metadata
+#' @name citation
+#' @rdname citation
+#' @return The citation information for a SpaDES module.
 #'
-#' @aliases simList-accessors-metadata
+#' @aliases citation,simList-method
 setMethod("citation",
           signature = "simList",
           definition = function(package, lib.loc, auto, module) {
@@ -3205,9 +3215,11 @@ setMethod("citation",
             return(out)
 })
 
+
 #' @export
-#' @rdname simList-accessors-metadata
-#' @aliases simList-accessors-metadata
+#' @rdname citation
+#' @name citation
+#' @aliases citation,character-method
 setMethod("citation",
           signature = "character",
           definition = function(package, lib.loc, auto, module) {
@@ -3215,8 +3227,6 @@ setMethod("citation",
 })
 
 ################################################################################
-#' @param package For compatibility with [utils::citation()]. This can be
-#'                a `simList` or a character string for a package name.
 #' @inheritParams P
 #' @inheritParams utils::citation
 #' @include simList-class.R
@@ -3377,9 +3387,13 @@ findObjects <- function(objects, sim, module, path) {
 #'
 #' @author Eliot McIntire
 #' @param i A character vector of objects to select.
+#' @param j Not used.
+#' @param ... Not used.
+#' @param drop Not used.
 #' @param x A `simList`
 #'
-#' @return The `[` method returns a complete `simList` class with all the slots
+#' @return
+#' The `[` method returns a complete `simList` class with all the slots
 #'   copied from the original, but only the named objects in `i` are returned.
 #' @examples
 #' s <- simInit()
