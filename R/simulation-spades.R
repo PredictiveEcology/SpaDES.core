@@ -66,7 +66,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
           immediateDownstream <- names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]
 
-          if (length(immediateDownstream))
+          if (length(immediateDownstream) && !nextScheduledEvent %in% "save")
             immediateDownstream <- immediateDownstream[immediateDownstream %in% curForFuture$moduleName]#&&
           length(immediateDownstream) == 0
         } else {
@@ -233,31 +233,37 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           # In general... allow a spawning, unless it is literally next event
           #   This is just a heuristic because other events could be inserted before
           #    the next event ... but this is a decent guess
-          nextScheduledEvent <- sim@events[[1]]$moduleName
+          # don't use cur from above because it is "seconds" which mess with future
+
+          # by running scheduleEvents first, we can see what the "next" event will actually
+          #   be so we can determine what inputs will be needed.
+          simNext <- runScheduleEventsOnly(sim, currnt = cur) # run the scheduleEvents only
+          nextScheduledEvent <- simNext@events[[1]]$moduleName
+
           objsNeeded <- NULL
           if (nextScheduledEvent %in% "save") {
             outs <- outputs(sim)
             objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
           }
           objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
-          selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
-          objsNeeded <- unique(c(objsNeeded, objsNeededForNextMod, selfObjects))
+          # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
+          objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
           if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
             spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
             messageVerbose(
               crayon::magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
                             "next module (", nextScheduledEvent, ")")),
               verbose = 1 - (debug %in% FALSE))
-            # don't use cur from above because it is "seconds" which mess with future
-            cur2 <- unlist(current(sim))
-            cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
             simFuture <- sim$.simFuture
             sim$.simFuture <- list()
+            cur2 <- unlist(current(sim))
+            cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
             sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
                                    showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                    futureNeeds = futureNeeds)
             sim$.simFuture <- append(simFuture, sim$.simFuture)
-            sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
+            # sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
+            sim@events <- simNext@events
             skipEvent <- TRUE
           }
         }
@@ -1815,7 +1821,7 @@ getFutureNeeds <- function(deps, curModName) {
 
 
 modNameInFuture <- function(simFuture) {
-  gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
+  gsub("^.+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
 }
 
 isListedEvent <- function(eventQueue, eventsToDo) {
