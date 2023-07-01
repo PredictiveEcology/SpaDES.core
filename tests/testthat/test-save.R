@@ -238,9 +238,9 @@ test_that("saveSimList does not work correctly", {
   # loses the raster landscape
   saveSimList(sim, filename = tmpfile[3])
   sim <- loadSimList(file = tmpfile[3])
-  expect_true(identical(gsub("\\_.", "",
-                             checkPath(Filenames(sim$landscape, allowMultiple = FALSE))),
-                        tmpfile[1]))
+  expect_equivalent(
+    gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(sim$landscape, allowMultiple = FALSE))),
+    tmpfile[1])
   expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
 
   mySim <- sim
