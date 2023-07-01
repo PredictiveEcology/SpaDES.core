@@ -144,15 +144,9 @@ setMethod(
       }
     }
 
-    if (!is.null(classOptions$.globals)) {# if (length(classOptions$.globals)) {
+    if (!is.null(classOptions$.globals)) {
       newGlobals <- object@params$.globals
     }
-
-    # Sort the params and .list with dots first, to allow Linux and Windows to be compatible
-    # if (!is.null(classOptions$params)) {#if (length(classOptions$params)) {
-    #   object@params <- list(classOptions$params)
-    #   names(object@params) <- classOptions$modules
-    # }
 
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
@@ -169,7 +163,7 @@ setMethod(
     object@params <- .sortDotsUnderscoreFirst(object@params)
 
     # Deal with globals
-    if (!is.null(classOptions$.globals)) {# if (length(classOptions$.globals)) {
+    if (!is.null(classOptions$.globals)) {
       object@params <- append(list(.globals = newGlobals), object@params)
     }
 
@@ -415,11 +409,9 @@ setMethod(
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
 
-    # browser(expr = exists("._addChangedAttr_5"))
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
       object <- .setSubAttrInList(object, ".Cache", "newCache", NULL)
-      #attr(object, ".Cache")$newCache <- NULL
 
       if (!identical(attr(object, ".Cache")$newCache, NULL))
         stop("attributes on the cache object are not correct - 4")
@@ -459,19 +451,7 @@ setMethod(
 
       changedObjs <- out[lengths(out) > 0] # remove empty elements
 
-      # isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
-      #   names(preDigest[[whSimList]]$.list[[whSimList2]])
-      # # if (sum(isNewObj)) {
-      # newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
-      # newObjs <- newObjs[!startsWith(newObjs, "._")]
-      # existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-      # post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
-      # pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
-      # changedObjs <- setdiffNamedRecursive(post, pre)
-      changed <- changedObjs #append(list(changedObjs = newObjs), changedObjs)
-      # } else {
-      #   changed <- character()
-      # }
+      changed <- changedObjs
       changed
     } else {
       character()

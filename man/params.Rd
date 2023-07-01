@@ -98,6 +98,8 @@ if (requireNamespace("NLMR", quietly = TRUE) &&
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation parameters.
 
+\link{Par}
+
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},

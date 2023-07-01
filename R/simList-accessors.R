@@ -465,9 +465,11 @@ setReplaceMethod("params",
 #' `P` is a concise way to access parameters within a module. It works more like
 #' a namespaced function in the sense that the module from which it is called is the
 #' default place it will look for the parameter. To access a parameter from within
-#' a module, you can use `P(sim)$paramName` instead of #' `params(sim)$moduleName$paramName`
+#' a module, you can use `P(sim)$paramName` instead of `params(sim)$moduleName$paramName`.
+#' You can also use `Par`, which is an Active Binding to P(sim)
 #'
 #' @aliases simList-accessors-params
+#' @seealso [Par]
 #' @export
 #' @importFrom reproducible .grepSysCalls
 #' @importFrom utils getSrcFilename
@@ -1645,16 +1647,6 @@ setReplaceMethod(
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
 
-    # keep named elements, use unnamed in remaining order:
-    #  cache, input, module, output
-    # if (length(na.omit(wh)) < length(value)) {
-    #   wh1 <- !(wh[1:length(value)] %in% (1:N)[1:length(value)])
-    #   wh2 <- !((1:N)[1:length(value)] %in% wh[1:length(value)])
-    #   if (length(wh1) < N) wh1 <- c(wh1, rep(FALSE, N - length(wh1)))
-    #   if (length(wh2) < N) wh2 <- c(wh2, rep(FALSE, N - length(wh2)))
-    #   wh[wh1] <- (1:N)[wh2]
-    # }
-
     # start with .paths()
     emptyOnes <- unlist(lapply(sim@paths, is.null))
     if (sum(emptyOnes) > 0) sim@paths[emptyOnes] <- .paths()[emptyOnes]
@@ -1662,7 +1654,6 @@ setReplaceMethod(
     # override with named ones
     sim@paths[!is.na(wh)] <- value[na.omit(wh)]
 
-    #sim@paths[is.na(wh)] <- .paths()[is.na(wh)]
     # keep named elements, use unnamed in remaining order:
     #  cache, input, module, output
     if (length(na.omit(wh)) < length(value)) {
