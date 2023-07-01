@@ -33,10 +33,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                     useFuture = getOption("spades.futureEvents", FALSE),
                     events = NULL,
                     ...) {
-  #if (missing(debug)) debug <- FALSE
-  #if (!inherits(sim, "simList")) stop("sim must be a simList")
-  #if (!is(sim, "simList")) stop("sim must be a simList")
-  if (!inherits(sim, "simList")) {  ## July 2022: R 4.2 flags against using class()
+  if (!inherits(sim, "simList")) {
     stop("doEvent can only accept a simList object")
   }
 
@@ -72,7 +69,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (length(immediateDownstream))
             immediateDownstream <- immediateDownstream[immediateDownstream %in% curForFuture$moduleName]#&&
           length(immediateDownstream) == 0
-          #modInFuture != curForFuture[["moduleName"]]
         } else {
           TRUE
         }
@@ -83,8 +79,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           else if (curForFuture$moduleName == "save") paste0("Current event is 'save'; so resolving all")
           else paste0(modInFuture[1], " finished running")
 
-          # resolveN <- if (curForFuture$moduleName == "save") length(sim$.simFuture) else 1L
-          # for (iii in seq(resolveN))
           sim <- resolveFutureNow(sim, cause = cause)
           return(invisible(sim))
         }
@@ -303,7 +297,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
         }
       }
-        # }
 
         # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
@@ -432,8 +425,6 @@ scheduleEvent <- function(sim,
                           eventType,
                           eventPriority = .pkgEnv$.normalVal,
                           .skipChecks = FALSE) {
-  #if (!inherits(sim, "simList")) stop("sim must be a simList")
-  #if (!is(sim, "simList")) stop("sim must be a simList")
 
   if (missing(moduleName)) moduleName <- currentModule(sim)
 
@@ -455,7 +446,6 @@ scheduleEvent <- function(sim,
     }
     if (!is.character(eventType)) stop("eventType must be a character")
     if (!is.character(moduleName)) stop("moduleName must be a character")
-    #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
     if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
   }
@@ -962,7 +952,6 @@ setMethod(
       tf <- tempfile();
       on.exit(unlink(tf))
       cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-      # unlockBinding(modNam, sim$.mods)
       sim$.mods[[modNam]]$sim <- sim
       opts <- options("spades.covr2" = FALSE) # turn off this chunk 2nd time through
       on.exit(options(opts), add = TRUE)
