@@ -89,23 +89,17 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- scheduleEvent(sim, time(sim) + Par$moveInterval, "caribouMovement", "move")
     },
     plot.init = {
-      # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", Par$stackName, "habitatQuality", sep = "$"),
-           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
+      # If this is scheduled because .plotInitialTime is not NA, it may not do anything
+      #   if Par$.plot is not "screen", "png" or another type.
+      Plots(sim$caribou, addTo = paste("sim", Par$stackName, "habitatQuality", sep = "$"),
+           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6), usePlot = TRUE)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval, "caribouMovement", "plot", .last())
     },
     plot = {
-      # do stuff for this event
-      ## TODO: restore plotting
-      ##   Error: could not find function "$"
-      # Plot(sim$caribou, addTo = paste("sim", Par$stackName, "habitatQuality", sep = "$"),
-      #      new = FALSE, pch = 19, size = 0.2, gp = gpar(cex = 0.6))
-
-      ## TODO: restore plotting
-      ## Error: [subset] invalid name(s)
-      Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
+      Plots(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6),
+            usePlot = TRUE)
 
       # schedule the next event
       sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval, "caribouMovement", "plot", .last())
