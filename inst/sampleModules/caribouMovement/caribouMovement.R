@@ -90,7 +90,7 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot.init = {
       # If this is scheduled because .plotInitialTime is not NA, it may not do anything
-      #   if Par$.plot is not "screen", "png" or another type.
+      #   if Par$.plots is not "screen", "png" or another type.
       Plots(sim$caribou, addTo = paste("sim", Par$stackName, "habitatQuality", sep = "$"),
            new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6), usePlot = TRUE)
 

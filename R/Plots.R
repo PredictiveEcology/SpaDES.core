@@ -398,7 +398,7 @@ Plots <- function(data, fn, filename,
 }
 
 
-#' Test whether there should be any plotting from `.plot` parameter
+#' Test whether there should be any plotting from `.plots` module parameter
 #'
 #' This will do all the various tests needed to determine whether
 #' plotting of one sort or another will occur.

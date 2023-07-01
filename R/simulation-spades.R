@@ -862,12 +862,14 @@ scheduleConditionalEvent <- function(sim,
 #' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
-#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+#'   # some options are not necessary for example
+#'   opts <- options("spades.moduleCodeChecks" = FALSE, spades.useRequire = FALSE)
 #'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
 #'   mySim <- simInit(
 #'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
 #'    params = list(
-#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned",
+#'                      .plots = NA) # plotting off --> not relevant for example
 #'    ),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -880,8 +882,8 @@ scheduleConditionalEvent <- function(sim,
 #'   # To get a combination -- use list(debug = list(..., ...))
 #'   spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
 #'
-#'   # Can turn off plotting, and inspect the output simList instead
-#'   out <- spades(mySim, .plots = NA) # much faster
+#'   # Can turn off plotting at spades call, and inspect the output simList instead
+#'   out <- spades(mySim, .plots = NA)
 #'   completed(out) # shows completed events
 #'
 #'   # use cache -- simInit should generally be rerun each time a spades call is made
@@ -896,14 +898,14 @@ scheduleConditionalEvent <- function(sim,
 #'      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'    )
-#'    print(system.time(out <- spades(mySim, cache = TRUE)))
+#'    print(system.time(out <- spades(mySim, cache = TRUE, .plots = NA)))
 #'   }
 #'
 #'   # E.g., with only the init events
 #'   outInitsOnly <- spades(mySim, events = "init")
 #'
 #'   # or more fine grained control
-#'   outSomeEvents <- spades(mySim,
+#'   outSomeEvents <- spades(mySim, .plots = NA,
 #'           events = list(randomLandscapes = c("init"),
 #'                         fireSpread = c("init", "burn")))
 #'
@@ -918,7 +920,7 @@ scheduleConditionalEvent <- function(sim,
 #'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'   )
 #'   # This will print a message saying that caribouMovement will run its events
-#'   outSomeEvents <- spades(mySim,
+#'   outSomeEvents <- spades(mySim, .plots = NA,
 #'           events = list(randomLandscapes = c("init"),
 #'                         fireSpread = c("init", "burn"),
 #'                         save = "init"))
@@ -1033,9 +1035,9 @@ setMethod(
         if (!useChkpnt)
           unspecifiedEvents <- setdiff(unspecifiedEvents, "checkpoint")
         if (length(unspecifiedEvents)) {
-          message("NOTE: ", paste(unspecifiedEvents, collapse = ", "), " not specified in events argument. ",
-                  "This means all events the module(s) will run. You may have intended to add e.g., list(",
-                  unspecifiedEvents[1], "= 'init')")
+          message("NOTE: ", paste(unspecifiedEvents, collapse = ", "), " not specified in events argument. ")
+          message("This means all events in the module(s) will run. You may have intended to add e.g.,")
+          message(" list(", unspecifiedEvents[1], "= 'init')")
         }
       }
 
@@ -1121,9 +1123,9 @@ setMethod(
             needClass = "integer")
         if (!is.null(.plotInitialTime) && !is.na(.plotInitialTime)) {
           message("Both .plots and .plotInitialTime are supplied; using .plots")
+          if (!is.numeric(.plotInitialTime) && is.na(.plotInitialTime))
+            .plotInitialTime <- start(sim)
         }
-        if (!is.numeric(.plotInitialTime) && is.na(.plotInitialTime))
-          .plotInitialTime <- start(sim)
       }
 
       if (!is.null(.plotInitialTime)) {
