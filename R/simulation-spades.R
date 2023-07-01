@@ -1119,16 +1119,17 @@ setMethod(
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_integer_, ".plotInitialTime",
             needClass = "integer")
-        if (!is.null(.plotInitialTime)) {
+        if (!is.null(.plotInitialTime) && !is.na(.plotInitialTime)) {
           message("Both .plots and .plotInitialTime are supplied; using .plots")
         }
-        .plotInitialTime <- .plots ## TODO: .plotInitialTime is numeric, not character! fails check below
+        if (!is.numeric(.plotInitialTime) && is.na(.plotInitialTime))
+          .plotInitialTime <- start(sim)
       }
 
       if (!is.null(.plotInitialTime)) {
         sim@params <- updateParamSlotInAllModules(
           sim@params, .plotInitialTime, ".plotInitialTime",
-          needClass = "numeric") ## TODO: fails if .plotInitialTime takes .plots value above
+          needClass = "numeric")
         if (is.na(.plotInitialTime))
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_character_, ".plots",
