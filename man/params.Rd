@@ -47,7 +47,8 @@ with the same structure as \code{params}.}
 Returns or sets the value of the slot from the \code{simList} object.
 }
 \description{
-\code{params} and \code{P} access the parameter slot in the \code{simList}.
+\code{params}, \code{P} and \code{Par} (an active binding, like "mod") access the parameter
+slot in the \code{simList}.
 \code{params} has a replace method, so can be used to update a parameter value.
 }
 \details{
@@ -64,6 +65,14 @@ part for speed (e.g., 2-4x faster) is specifying the moduleName.
 Specifying the parameter name is <5\% faster.
 }
 \examples{
+s <- simInit()
+# add a parameter to tmp module
+params(s)$tmp <- list(a = 1)
+
+# Only work inside a module, inside a function with `sim` is an argument
+# P(s, "a") # get "a" parameter inside the current module
+# Par$a     # same. Get "a" parameter inside the current module
+
 if (requireNamespace("NLMR", quietly = TRUE) &&
     requireNamespace("SpaDES.tools", quietly = TRUE)) {
   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
@@ -97,8 +106,6 @@ if (requireNamespace("NLMR", quietly = TRUE) &&
 }
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation parameters.
-
-\link{Par}
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},

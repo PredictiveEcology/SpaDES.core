@@ -402,7 +402,8 @@ setMethod(
 ################################################################################
 #' Get and set simulation parameters
 #'
-#' `params` and `P` access the parameter slot in the `simList`.
+#' `params`, `P` and `Par` (an active binding, like "mod") access the parameter
+#'  slot in the `simList`.
 #' `params` has a replace method, so can be used to update a parameter value.
 #'
 #' @inheritParams objs
@@ -469,12 +470,20 @@ setReplaceMethod("params",
 #' You can also use `Par`, which is an Active Binding to P(sim)
 #'
 #' @aliases simList-accessors-params
-#' @seealso [Par]
 #' @export
 #' @importFrom reproducible .grepSysCalls
 #' @importFrom utils getSrcFilename
 #' @include simList-class.R
 #' @rdname params
+#' @examples
+#' s <- simInit()
+#' # add a parameter to tmp module
+#' params(s)$tmp <- list(a = 1)
+#'
+#' # Only work inside a module, inside a function with `sim` is an argument
+#' # P(s, "a") # get "a" parameter inside the current module
+#' # Par$a     # same. Get "a" parameter inside the current module
+#'
 P <- function(sim, param, module) UseMethod("P")
 
 #' @export
