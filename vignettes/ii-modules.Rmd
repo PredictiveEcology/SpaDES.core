@@ -172,7 +172,7 @@ A module's metadata defines default values for module-specific parameters, and t
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
 ```{r passing-params, echo=TRUE}
-library(SpaDES.core)
+  library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -274,8 +274,10 @@ parameters <- list(
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
+
+# run just 1 year for vignette
 mySim <- simInitAndSpades(
-  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  times = list(start = 0.0, end = 1.0, timeunit = "year"),
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),

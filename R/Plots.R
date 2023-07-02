@@ -103,8 +103,8 @@
 #' #  module script. Otherwise, it will cause a memory leak.
 #' if (requireNamespace("ggplot2")) {
 #' fn <- function(d)
-#'   ggplot(d, aes(a)) +
-#'   geom_histogram()
+#'   ggplot2::ggplot(d, ggplot2::aes(a)) +
+#'   ggplot2::geom_histogram()
 #' sim <- simInit()
 #' sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 #'

@@ -61,9 +61,9 @@ test_that("Plots function 1", {
     return(invisible(sim))
     }
     fn1 <- function(d1, bins, ...) {
-        ggplot(d1, aes(a)) +
-        geom_histogram(bins = bins, ...) +
-        labs(title = "hello")
+        ggplot2::ggplot(d1, ggplot2::aes(a)) +
+        ggplot2::geom_histogram(bins = bins, ...) +
+        ggplot2::labs(title = "hello")
       }
 
 
@@ -97,9 +97,9 @@ test_that("Plots function 1", {
   if (interactive()) {
     something <- data.frame(a = sample(1:10, replace = TRUE))
     fn1 <- function(d1, bins, title = "hello", ...) {
-      ggplot(d1, aes(a)) +
-        geom_histogram(bins = bins, ...) +
-        labs(title = title)
+      ggplot2::ggplot(d1, ggplot2::aes(a)) +
+        ggplot2::geom_histogram(bins = bins, ...) +
+        ggplot2::labs(title = title)
     }
     # Should add next 2 plots to same windows
     Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run1")
@@ -187,8 +187,8 @@ test_that("Plots function 2", {
     return(invisible(sim))
     }
     fn1 <- function(d, bins, ...) {
-        ggplot(d, aes(a)) +
-        geom_histogram(bins = bins, ...)
+        ggplot2::ggplot(d, ggplot2::aes(a)) +
+        ggplot2::geom_histogram(bins = bins, ...)
       }
 ', fill = TRUE)
   expect_error({
