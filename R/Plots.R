@@ -101,7 +101,7 @@
 #' # Note: if this is used inside a SpaDES module, do not define this
 #' #  function inside another function. Put it outside in a normal
 #' #  module script. Otherwise, it will cause a memory leak.
-#' if (!require("ggplot2")) stop("please install ggplot2")
+#' if (requireNamespace("ggplot2")) {
 #' fn <- function(d)
 #'   ggplot(d, aes(a)) +
 #'   geom_histogram()
@@ -127,6 +127,7 @@
 #' r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
 #' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 #'
+#' }
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
