@@ -67,6 +67,7 @@ Suggests:
     rgdal,
     rmarkdown,
     roxygen2,
+    RSQLite,
     rstudioapi,
     sp,
     SpaDES.tools (>= 1.0.1),
