@@ -97,11 +97,12 @@ The following options are likely of interest to most users
   during `simInit`. These are passed to codetools::checkUsage.
   Default is given by the function, plus these: \cr
 
-  `moduleDocument` \tab  `NULL`
+  `spades.moduleDocument` \tab  `TRUE`
     \tab  When a module is an R package e.g., via `convertToPackage`,
-    it will not, by default, rebuild documentation during `simInit`.
-    If the user would like this to happen on every call to `simInit`,
-    set this option to `TRUE` \cr
+    it will, by default, rebuild documentation and reparse during `simInit`.
+    Since rebuilding documentation (from the roxygen2 tags) can be time consuming,
+    a user may wish to prevent this from happening each `simInit` call. If so,
+    set this option to `FALSE` \cr
 
   `spades.modulePath` \tab `file.path(tempdir(), "SpaDES", "modules")`)
     \tab The default local directory where modules and data will be downloaded and stored.
