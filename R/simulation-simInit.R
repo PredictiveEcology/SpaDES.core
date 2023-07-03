@@ -313,9 +313,9 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'  events(mySim) # load event is at time 1 year
 #'  events(mySim2) # load event is at time 1 month, reported in years because of
 #'                 #   update to times above
-#' }
 #' options(opts)
 #'
+#' }
 #' }
 #'
 setGeneric(

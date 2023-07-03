@@ -673,8 +673,7 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
-  testInit(smcc = TRUE)
-
+  testInit("ggplot2", smcc = TRUE)
   m <- "test"
   newModule(m, tmpdir, open = FALSE)
   fileName <- file.path(m, paste0(m, ".R"))#child4/child4.R"
@@ -695,7 +694,7 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
 })
 
 test_that("messaging with multiple modules", {
-  testInit(smcc = TRUE)
+  testInit("ggplot2", smcc = TRUE)
 
   m1 <- "test"
   m2 <- "test2"
@@ -842,7 +841,7 @@ test_that("messaging with multiple modules", {
 })
 
 test_that("Module code checking -- pipe with matrix product with backtick & data.table", {
-  testInit(smcc = TRUE)
+  testInit("ggplot2", smcc = TRUE)
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)

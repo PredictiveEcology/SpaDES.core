@@ -1,5 +1,5 @@
 test_that("test userSuppliedObj", {
-  testInit("terra", smcc = TRUE)
+  testInit(c("terra", "ggplot2"), smcc = TRUE)
 
   m <- "test"
   newModule(m, tmpdir, open = FALSE)

@@ -18,7 +18,7 @@ cat(c(
   ), sep = "\n")
 
 ## ----passing-params, echo=TRUE------------------------------------------------
-library(SpaDES.core)
+  library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -89,8 +89,10 @@ parameters <- list(
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
+
+# run just 1 year for vignette
 mySim <- simInitAndSpades(
-  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  times = list(start = 0.0, end = 1.0, timeunit = "year"),
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
@@ -253,50 +255,4 @@ unlink(normalizePath(ftmp))
 
 ## ----caribouMovement, echo=TRUE, eval=FALSE-----------------------------------
 #  openModules(system.file("sampleModules", package = "SpaDES.core"), "moduleName")
-
-## ----download-module, echo=TRUE, eval=FALSE-----------------------------------
-#  downloadModule("moduleName")
-
-## ----create-new-module, eval=FALSE, echo=TRUE, message=FALSE------------------
-#  # create a new module called "randomLandscape" in the "custom-modules" subdirectory
-#  # and open the resulting file immediately for editing.
-#  newModule(name = "randomLandscapes", path = "custom-modules", open = TRUE)
-
-## ----module-group-init, eval=FALSE--------------------------------------------
-#  library(DiagrammeR)
-#  library(SpaDES.core)
-#  
-#  outputDir <- file.path(tempdir(), "simOutputs")
-#  times <- list(start = 0.0, end = 20.0)
-#  parameters <- list(
-#    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-#    .progress = list(NA),
-#    randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
-#    fireSpread = list(
-#      nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
-#      returnInterval = 10, startTime = 0,
-#      .plotInitialTime = 0, .plotInterval = 10
-#    ),
-#    caribouMovement = list(
-#      N = 100L, moveInterval = 1, torus = TRUE,
-#      .plotInitialTime = 1, .plotInterval = 1
-#    )
-#  )
-#  modules <- list("SpaDES_sampleModules")
-#  objects <- list()
-#  paths <- list(
-#    modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#    outputPath = outputDir
-#  )
-#  
-#  mySim <- simInit(times = times, params = parameters, modules = modules,
-#                   objects = objects, paths = paths)
-#  
-#  modules(mySim) # note the child modules are initialized
-
-## ----module-group-dl, eval=FALSE----------------------------------------------
-#  downloadModule("SpaDES_sampleModules")
-
-## ----cleanup, echo=FALSE------------------------------------------------------
-unlink(outputDir, recursive = TRUE)
 

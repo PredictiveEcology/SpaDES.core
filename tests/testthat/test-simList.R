@@ -196,7 +196,7 @@ test_that("simList object initializes correctly (1)", {
 
 test_that("simList object initializes correctly (2)", {
 
-  testInit(c("terra"), smcc = FALSE)
+  testInit(c("terra", "ggplot2"), smcc = FALSE)
   ## test with outputs
   abundRasters <- list(terra::rast(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
 
@@ -211,7 +211,7 @@ test_that("simList object initializes correctly (2)", {
                      modules = list("test"), paths = paths,
                      objects = obj)
     }))
-  expect_length(grep("was built under R version", aa, invert = TRUE), 0)
+  expect_equivalent(grep("was built under R version", aa, invert = TRUE, value = TRUE), character())
 })
 
 test_that("simList test all signatures", {
@@ -324,7 +324,7 @@ test_that("simList test all signatures", {
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   skip_on_cran()
   ## Test resulting from bug found by Greg Paradis April 7, 2019
-  testInit("terra", smcc = FALSE)
+  testInit(c("terra", "ggplot2"), smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   newModule(childModName, tmpdir, type = "child", open = FALSE)
