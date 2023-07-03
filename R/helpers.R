@@ -313,8 +313,9 @@ needInstall <- function(
   if (!requireNamespace(pkg, quietly = TRUE)) {
     need <- TRUE
   } else {
-    if (isTRUE(packageVersion(pkg) < minVersion))
-      need <- TRUE
+    if (!is.null(minVersion))
+      if (isTRUE(packageVersion(pkg) < minVersion))
+        need <- TRUE
   }
   if (need) {
     stop(messageStart,
