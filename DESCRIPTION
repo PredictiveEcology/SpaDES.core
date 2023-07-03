@@ -64,7 +64,6 @@ Suggests:
     png,
     RColorBrewer (>= 1.1-2),
     raster (>= 2.5-8),
-    rgdal,
     rmarkdown,
     roxygen2,
     RSQLite,

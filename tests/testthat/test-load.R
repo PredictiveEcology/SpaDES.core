@@ -346,8 +346,8 @@ test_that("more tests", {
   expect_identical(bb$test, test)
 
   # Test for incremental loading via intervals
-  if (require(rgdal, quietly = TRUE)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
+  #if (require(rgdal, quietly = TRUE)) {
+  #  on.exit(detach("package:rgdal"), add = TRUE)
 
     files <- dir(system.file("maps", package = "quickPlot"),
                 full.names = TRUE, pattern = "tif")
@@ -373,7 +373,7 @@ test_that("more tests", {
     expect_message({
       sim3 <- spades(sim2)
     }, "time 20")
-  }
+  # }
 })
 
 test_that("interval loading of objects from .GlobalEnv", {
