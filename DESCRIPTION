@@ -69,7 +69,7 @@ Suggests:
     RSQLite,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 1.0.1),
+    SpaDES.tools (>= 2.0.0),
     tcltk,
     testthat (>= 1.0.2),
     withr
