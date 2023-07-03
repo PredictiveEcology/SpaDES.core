@@ -329,7 +329,7 @@ test_that("passing nearly empty file to simInit does not work correctly", {
 test_that("more tests", {
   skip_on_cran()
 
-  testInit()
+  testInit("raster")
 
   sim <- simInit()
   test <- 1:10
