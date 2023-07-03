@@ -149,32 +149,49 @@ test_that("convertToPackage testing", {
   skip_if_not_installed('pkgload')
   skip_on_cran()
 
-  try(pkgload::unload("test"), silent = TRUE)
-  try(pkgload::unload("test2"), silent = TRUE)
-
   testInit(smcc = FALSE, debug = FALSE,
-                          opts = list("reproducible.useMemoise" = FALSE))
+                          opts = list("reproducible.useMemoise" = FALSE,
+                                      "spades.moduleDocument" = TRUE))
+
+  testName1 <- paste0("test.", .rndstr(len = 2))
+  testName2 <- paste0("test2.", .rndstr(len = 1))
+  mainModFile1 <- paste0(testName1, ".R")
+  mainModFile2 <- paste0(testName2, ".R")
+  try(pkgload::unload(testName1), silent = TRUE)
+  try(pkgload::unload(testName2), silent = TRUE)
+
   on.exit({
-    try(pkgload::unload("test"), silent = TRUE)
-    try(pkgload::unload("test2"), silent = TRUE)
+    try(pkgload::unload(testName1), silent = TRUE)
+    try(pkgload::unload(testName2), silent = TRUE)
   }, add = TRUE)
 
-  newModule("test", tmpdir, open = FALSE)
-  newModule("test2", tmpdir, open = FALSE)
-  testFilePath <- file.path(tmpdir, "test", "test.R")
-  test2FilePath <- file.path(tmpdir, "test2", "test2.R")
+  newModule(testName1, tmpdir, open = FALSE)
+  newModule(testName2, tmpdir, open = FALSE)
+  testFilePath <- file.path(tmpdir, testName1, mainModFile1)
+  test2FilePath <- file.path(tmpdir, testName2, mainModFile2)
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  cat(file = testFilePath, testCode, fill = TRUE)
 
-  cat(file = test2FilePath, test2Code, fill = TRUE)
+  testCodeMod <- gsub("test", testName1, testCode)
+  test2CodeMod <- gsub("test2", testName2, test2Code)
+
+  cat(file = testFilePath, testCodeMod, fill = TRUE)
+
+  cat(file = test2FilePath, test2CodeMod, fill = TRUE)
   # Test converting these to packages
   cat(file = testFilePath,'
+      #\' @title Init
+      #\' @rdname Init
+      #\' @name Init
+      #\' @param sim A simList
       Init <- function(sim) {
         sim$aaaa <- Run(1)
         return(sim)
       }
 
+      #\' @title Run
+      #\' @name Run
+      #\' @param a An object
       Run <- function(a) {
         return(a + 1)
       }
@@ -182,6 +199,7 @@ test_that("convertToPackage testing", {
 
   cat(file = test2FilePath,'
       Init <- function(sim) {
+        # Need to keep comments
         sim$cccc <- try(Run(1), silent = TRUE)
         return(sim)
       }
@@ -191,43 +209,42 @@ test_that("convertToPackage testing", {
       }
       ', fill = TRUE, append = TRUE)
 
-  # aaaaa <<- 1
-
-  for (tt in c("test", "test2")) {
-    expect_true(!file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+  for (tt in c(testName1, testName2)) {
+    expect_false(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+    expect_false(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
   }
-  convertToPackage(module = "test", path = tmpdir, buildDocuments = FALSE)
-  convertToPackage(module = "test2", path = tmpdir, buildDocuments = FALSE)
-  for (tt in c("test", "test2")) {
+  convertToPackage(module = testName1, path = tmpdir, buildDocuments = FALSE)
+  convertToPackage(module = testName2, path = tmpdir, buildDocuments = FALSE)
+  for (tt in c(testName1, testName2)) {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
     expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
   }
-  expect_true(file.exists(file.path(tmpdir, "test", "R", "Init.R")))
-  expect_true(file.exists(file.path(tmpdir, "test2", "R", "Init.R")))
-  expect_true(file.exists(file.path(tmpdir, "test", "R", "Run.R")))
-  expect_true(file.exists(file.path(tmpdir, "test2", "R", "Run2.R")))
 
-  mySim9 <- simInit(times = list(start = 0, end = 0),
-                    paths = list(modulePath = tmpdir), modules = c("test", "test2"))
+  expect_true(file.exists(file.path(tmpdir, testName1, "R", "Init.R")))
+  expect_true(file.exists(file.path(tmpdir, testName2, "R", "Init.R")))
+  expect_true(file.exists(file.path(tmpdir, testName1, "R", "Run.R")))
+  expect_true(file.exists(file.path(tmpdir, testName2, "R", "Run2.R")))
 
-  # doesn't document
-  for (tt in c("test", "test2")) {
+  mySim9 <- simInit(times = list(start = 0, end = 1),
+                    paths = list(modulePath = tmpdir), modules = c(testName1, testName2))
+
+  # doesn't document, unless it is first time
+  for (tt in c(testName1, testName2)) {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
   }
   working <- spades(mySim9, debug = FALSE)
 
-  if (requireNamespace("roxygen2")) {
+  # if (requireNamespace("roxygen2")) {
     # document -- this exports all functions!! Danger for testing later
-    out <- lapply(c("test", "test2"), function(tt) {
-      roxygen2::roxygenise(file.path(tmpdir, tt))
-    })
+    # out <- lapply(c(testName1, testName2), function(tt) {
+    #   roxygen2::roxygenise(file.path(tmpdir, tt))
+    # })
 
     # Will run document() so will have the NAMESPACE and
-    for (tt in c("test", "test2")) {
+    for (tt in c(testName1, testName2)) {
       expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
       expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
       expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
@@ -237,9 +254,11 @@ test_that("convertToPackage testing", {
     expect_true(is(working, "simList"))
     expect_true(working$aaaa == 2)
     expect_true(is(working$cccc, "try-error"))
-    bbb <- test2:::Run2(2)
+    bbb <- get("Run2", asNamespace(testName2))(2)
+    fnTxt <- readLines(file.path(dirname(test2FilePath), "R", "Init.R"))
+    expect_true(sum(grepl("Need to keep comments", fnTxt)) == 1)
     expect_true(bbb == 4)
-    pkgload::unload("test")
-    pkgload::unload("test2")
-  }
+    pkgload::unload(testName1)
+    pkgload::unload(testName2)
+  #}
 })
