@@ -116,10 +116,12 @@ simply use the \code{devtools::install(pathToModuleRoot)}. Even if it is install
 }
 
 \examples{
-tmpdir <- tempdir2()
-newModule("test", tmpdir, open = FALSE)
-convertToPackage("test", path = tmpdir)
-pkgload::load_all(file.path(tmpdir, "test"))
-pkgload::unload("test")
+if (requireNamespace("ggplot2") && requireNamespace("pkgload") ) {
+  tmpdir <- tempdir2()
+  newModule("test", tmpdir, open = FALSE)
+  convertToPackage("test", path = tmpdir)
+  pkgload::load_all(file.path(tmpdir, "test"))
+  pkgload::unload("test")
+}
 
 }

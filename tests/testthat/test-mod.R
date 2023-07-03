@@ -149,7 +149,7 @@ test_that("convertToPackage testing", {
   skip_if_not_installed('pkgload')
   skip_on_cran()
 
-  testInit(smcc = FALSE, debug = FALSE,
+  testInit(c("roxygen2", "ggplot2"), smcc = FALSE, debug = FALSE,
                           opts = list("reproducible.useMemoise" = FALSE,
                                       "spades.moduleDocument" = TRUE))
 

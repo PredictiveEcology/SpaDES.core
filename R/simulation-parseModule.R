@@ -246,6 +246,7 @@ setMethod(
 
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
+          if (!requireNamespace("roxygen2")) stop("Please install.packages(c('roxygen2'))")
           namespaceFile <- dir(m, pattern = "NAMESPACE")
           if (isTRUE(getOption("spades.moduleDocument", NULL)) || length(namespaceFile) == 0) {
             message(crayon::blue("    To skip rebuilding documentation, set options('spades.moduleDocument' = FALSE)"))
