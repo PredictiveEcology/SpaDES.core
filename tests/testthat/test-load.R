@@ -69,8 +69,6 @@ test_that("loading inputs does not work correctly", {
   }
 
   # use loadFiles directly
-  # if (require(rgdal, quietly = TRUE)) {
-  #   on.exit(detach("package:rgdal"), add = TRUE)
     sim1 <- loadFiles(
       filelist = filelist,
       paths = list(
@@ -152,8 +150,6 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
 
     times <- list(start = 0, end = 1, timeunit = "seconds")
 
-    # if (require(rgdal, quietly = TRUE)) {
-    #  on.exit(detach("package:rgdal"), add = TRUE)
     sim2 <- simInit(times = times, params = parameters, modules = modules,
                     paths = paths, inputs = inputs)
     expect_true(c("DEM") %in% ls(sim2))
@@ -211,8 +207,6 @@ test_that("passing objects to simInit does not work correctly", {
   mapPath <- mapPath <- system.file("maps", package = "quickPlot")
 
   # test object passing directly
-  # if (require(rgdal, quietly = TRUE)) {
-#    on.exit(detach("package:rgdal"), add = TRUE)
   functions <- c("raster", "rast")
   packages <- c("raster", "terra")
   if (!requireNamespace("raster", quietly = TRUE)) {
@@ -291,8 +285,6 @@ test_that("passing nearly empty file to simInit does not work correctly", {
   mapPath <- mapPath <- system.file("maps", package = "quickPlot")
 
   # test object passing directly
-  # if (require(rgdal, quietly = TRUE)) {
-  #    on.exit(detach("package:rgdal"), add = TRUE)
   functions <- c("raster", "rast")
   packages <- c("raster", "terra")
   if (!requireNamespace("raster", quietly = TRUE)) {
@@ -305,8 +297,6 @@ test_that("passing nearly empty file to simInit does not work correctly", {
     mapPath <- system.file("maps", package = "quickPlot")
 
     # test object passing directly
-    #if (require(rgdal, quietly = TRUE)) {
-    #  on.exit(detach("package:rgdal"), add = TRUE)
     filelist <- data.frame(
       files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
       functions = functions[i],
@@ -346,8 +336,6 @@ test_that("more tests", {
   expect_identical(bb$test, test)
 
   # Test for incremental loading via intervals
-  #if (require(rgdal, quietly = TRUE)) {
-  #  on.exit(detach("package:rgdal"), add = TRUE)
 
     files <- dir(system.file("maps", package = "quickPlot"),
                 full.names = TRUE, pattern = "tif")

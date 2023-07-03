@@ -258,8 +258,6 @@ test_that("simList test all signatures", {
     stringsAsFactors = FALSE
   )
 
-  # if (require(rgdal)) {
-  #   on.exit(detach("package:rgdal"), add = TRUE)
 
   # objects
   layers <- lapply(filelist$files, rasterToMemory)
