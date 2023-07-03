@@ -329,7 +329,7 @@ test_that("passing nearly empty file to simInit does not work correctly", {
 test_that("more tests", {
   skip_on_cran()
 
-  testInit()
+  testInit("raster")
 
   sim <- simInit()
   test <- 1:10
@@ -346,8 +346,8 @@ test_that("more tests", {
   expect_identical(bb$test, test)
 
   # Test for incremental loading via intervals
-  if (require(rgdal, quietly = TRUE)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
+  #if (require(rgdal, quietly = TRUE)) {
+  #  on.exit(detach("package:rgdal"), add = TRUE)
 
     files <- dir(system.file("maps", package = "quickPlot"),
                 full.names = TRUE, pattern = "tif")
@@ -373,7 +373,7 @@ test_that("more tests", {
     expect_message({
       sim3 <- spades(sim2)
     }, "time 20")
-  }
+  # }
 })
 
 test_that("interval loading of objects from .GlobalEnv", {
