@@ -18,10 +18,10 @@
 #' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()].
 #'
 #' @param sim Either a `simList` or a character string of the name
-#'        of a `simList` that can be found in `envir`. Using
-#'        a character string will assign that object name to the saved
-#'        `simList`, so when it is recovered it will be given that
-#'        name.
+#'        of a `simList` that can be found in `envir`.
+#'        Using a character string will assign that object name to the saved
+#'        `simList`, so when it is recovered it will be given that name.
+#'
 #' @param envir If `sim` is a character string, then this must be provided.
 #'        It is the environment where the object named `sim` can be found.
 #'
@@ -30,16 +30,20 @@
 #'
 #' @param outputs Logical. If `TRUE`, all files identified in
 #'    `outputs(sim)` will be included in the zip.
+#'
 #' @param inputs Logical. If `TRUE`, all files identified in
 #'    `inputs(sim)` will be included in the zip.
+#'
 #' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
 #'    zip archive. Defaults to `FALSE` as this could be large, and may include many
 #'    out of date elements. See Details.
+#'
 #' @param projectPath Should be the "top level" or project path for the `simList`.
-#'    Defaults to `getwd()`. All other paths will be relativized with respect to
+#'    Defaults to `getwd()`. All other paths will be made relative with respect to
 #'    this if nested within this.
+#'
 #' @param ... Not used. If a user passes previous arguments that are now deprecated,
-#'   they will be passed into this ...
+#'   they will be passed into this `...`.
 #'
 #' @return
 #' For [saveSimList()], a saved `.qs` file in `filename` location or
@@ -200,13 +204,12 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #'
 #' `zipSimList` will save the `simList` and file-backed `Raster*` objects, plus,
 #' optionally, files identified in `outputs(sim)` and `inputs(sim)`.
-#' This uses `Copy` under the hood, to not affect the original
-#' `simList`.
+#' This uses `Copy` under the hood, to not affect the original `simList`.
 #' **VERY experimental**.
 #'
-#' @param ... passed to [saveSimList()], including non-optional ones
-#'    such as `filename`. Also see `fileBackend` and `filebackedDir`
-#'    arguments in that function.
+#' @param ... passed to [saveSimList()], including non-optional ones such as `filename`.
+#'            Also see `fileBackend` and `filebackedDir` arguments in that function.
+#'
 #' @param zipfile A character string indicating the filename for the zip file. Passed to `zip`.
 #'
 #' @return invoked for side effect of zip archive creation
@@ -222,7 +225,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #'
 #' 3. `fileBackend = 0`: No renaming of file-backed rasters. This is unlikely to
 #'     work for most use-cases as the original file paths are left intact. Recovery
-#'     of this saved simList will only work if the file-backed objects' files are
+#'     of this saved `simList` will only work if the file-backed objects' files are
 #'     present and in the exact same paths.
 #'
 #'     This approach is attempting to emulate a "relative filenames" approach,
@@ -239,7 +242,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #'
 #' 1. `fileBackend = 1`: On-the-fly renaming of file-backed rasters;
 #'
-#'     1. Save the sim object with a filename, e.g.,  `file`,
+#'     1. Save the `sim` object with a filename, e.g.,  `file`,
 #'     2. make a copy of all file-backed rasters to `fileBackedDir`,
 #'     3. update all the pointers to those files so that they are correct in the raster metadata
 #'
@@ -395,8 +398,8 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 #' If `cache` is used, it is likely that it should be trimmed before
 #' zipping, to include only cache elements that are relevant.
 #'
-#' @param zipfile Filename of a zipped simList
-#' @param load Logical. If `TRUE`, the default, then the simList will
+#' @param zipfile Filename of a zipped `simList`
+#' @param load Logical. If `TRUE`, the default, then the `simList` will
 #'   also be loaded into R.
 #' @param ... passed to `unzip`
 #'

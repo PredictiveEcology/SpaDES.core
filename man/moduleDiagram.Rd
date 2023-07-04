@@ -17,11 +17,11 @@ moduleDiagram(sim, type, showParents = TRUE, ...)
 completed simulation).}
 
 \item{type}{Character string, either \code{"rgl"} for \code{igraph::rglplot}
-or \code{"tk"} for \code{igraph::tkplot}, \code{"Plot"} to use quickPlot::Plot
-or \code{"plot"} to use base::plot, the default.}
+or \code{"tk"} for \code{igraph::tkplot}, \code{"Plot"} to use \code{quickPlot::Plot()}
+or \code{"plot"} to use \code{base::plot()}, the default.}
 
 \item{showParents}{Logical. If TRUE, then any children that are grouped into parent
-modules will be grouped together by colored blobs. Internally,
+modules will be grouped together by coloured blobs. Internally,
 this is calling \code{\link[=moduleGraph]{moduleGraph()}}. Default \code{FALSE}.}
 
 \item{...}{Additional arguments passed to plotting function specified by \code{type}.}

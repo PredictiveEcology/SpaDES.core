@@ -46,7 +46,7 @@ checkpointLoad(file)
 \item{eventType}{A character string specifying the type of event: one of
 either \code{"init"}, \code{"load"}, or \code{"save"}.}
 
-\item{debug}{Optional logical flag determines whether sim debug info
+\item{debug}{Optional logical flag determines whether \code{sim} debug info
 will be printed (default \code{debug = FALSE}).}
 
 \item{file}{The checkpoint file.}
@@ -67,7 +67,7 @@ and \url{https://stackoverflow.com/q/13997444/1380598}
 \seealso{
 \code{\link[=.Random.seed]{.Random.seed()}}.
 
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{envir}()},
 \code{\link{events}()},
@@ -84,4 +84,4 @@ Other functions to access elements of a 'simList' object:
 \author{
 Alex Chubaty
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

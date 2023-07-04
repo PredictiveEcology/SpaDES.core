@@ -35,7 +35,7 @@ ongoingMemoryThisPid <- function(seconds = 1000,
 #' The purpose of this function is to allow continuous monitoring, external to the R session.
 #' Normally, this is run in a different session.
 #'
-#' @param thisPid Numeric or integer, the PID of the process.
+#' @param thisPid Numeric or integer, the `PID` of the process.
 #'                If omitted, it will be found with `Sys.getpid()`.
 #'
 #' @return estimated memory use in MiB

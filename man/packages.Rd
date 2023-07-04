@@ -13,13 +13,11 @@ packages(sim, modules, paths, filenames, envir, clean = FALSE, ...)
 \arguments{
 \item{sim}{A \code{simList} object.}
 
-\item{modules}{Character vector, specifying the name or
-vector of names of module(s)}
+\item{modules}{Character vector, specifying the name or vector of names of module(s)}
 
-\item{paths}{Character vector, specifying the name or
-vector of names of paths(s) for those modules. If path not specified,
-it will be taken from getOption("spades.modulePath"), which is set
-with \code{setPaths})}
+\item{paths}{Character vector, specifying the name or vector of names of paths(s) for
+those modules. If path not specified, it will be taken from
+\code{getOption("spades.modulePath")}, which is set with \code{setPaths()})}
 
 \item{filenames}{Character vector specifying filenames of modules (i.e.
 combined path & module. If this is specified, then \code{modules} and
@@ -27,13 +25,12 @@ combined path & module. If this is specified, then \code{modules} and
 
 \item{envir}{Optional environment in which to store parsed code. This may be
 useful if the same file is being parsed multiple times. This
-function will check in that envir for the parsed file before
-parsing again. If the \code{envir} is transient, then this will
-have no effect.}
+function will check in that environment for the parsed file before
+parsing again. If the \code{envir} is transient, then this will have no effect.}
 
 \item{clean}{Optional logical. If \code{TRUE}, it will scrub any references to
-github repositories, e.g., "PredictiveEcology/reproducible" will be
-returned as "reproducible"}
+GitHub repositories, e.g., "PredictiveEcology/reproducible" will be
+returned as "reproducible".}
 
 \item{...}{All \code{simInit} parameters.}
 }
@@ -44,7 +41,7 @@ A sorted character vector of package names.
 Get module or simulation package dependencies
 }
 \seealso{
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -61,4 +58,4 @@ Other functions to access elements of a 'simList' object:
 \author{
 Alex Chubaty & Eliot McIntire
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

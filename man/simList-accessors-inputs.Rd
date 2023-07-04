@@ -29,8 +29,7 @@ inputArgs(sim) <- value
 \S4method{inputArgs}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The object to be stored at the slot. See Details.}
 }
@@ -112,10 +111,10 @@ This is useful if there is something required before simulation to produce the m
 object dependencies, including such things as downloading default datasets, e.g.,
 \code{downloadData('LCC2005', modulePath(sim))}.
 Nothing should be created here that does not create an named object in \code{inputObjects}.
-Any other initiation procedures should be put in the "init" eventType of the doEvent function.
-Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
-selectively skip unnecessary steps because the user has provided those inputObjects in the
-simInit call. e.g., the following code would look to see if the user had passed \code{defaultColor}
+Any other initiation procedures should be put in the "init" \code{eventType} of the \code{doEvent} function.
+Note: the module developer can use \code{sim$.userSuppliedObjNames} inside the function to
+selectively skip unnecessary steps because the user has provided those \code{inputObjects} in the
+\code{simInit} call. e.g., the following code would look to see if the user had passed \code{defaultColor}
 into during \code{simInit}. If the user had done this, then this function would not override
 that value with 'red'. If the user has not passed in a value for \code{defaultColor}, then
 the module will get it here:
@@ -204,7 +203,7 @@ unlink(tmpdir, recursive = TRUE)
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.2 on loading and saving.
 
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -218,4 +217,4 @@ Other functions to access elements of a 'simList' object:
 \code{\link{progressInterval}()},
 \code{\link{times}()}
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

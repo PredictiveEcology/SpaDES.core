@@ -19,8 +19,7 @@ currentModule(sim)
 .callingFrameTimeunit(x)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{x}{A \code{simList}}
 }

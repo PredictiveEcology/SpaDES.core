@@ -13,7 +13,7 @@ convertToPackage(
 \arguments{
 \item{module}{Character string of module name, without path}
 
-\item{path}{Character string of modulePath. Defaults to  \code{getOption("spades.modulePath")}.}
+\item{path}{Character string of \code{modulePath}. Defaults to  \code{getOption("spades.modulePath")}.}
 
 \item{buildDocuments}{A logical. If \code{TRUE}, the default, then the documentation
 will be built, if any exists, using \code{roxygen2::roxygenise}.}

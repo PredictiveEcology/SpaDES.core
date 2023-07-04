@@ -50,8 +50,7 @@ sessInfo(sim)
 \S4method{sessInfo}{simList}(sim)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{module}{Character vector of module name(s)}
 

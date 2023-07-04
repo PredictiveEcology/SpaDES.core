@@ -69,7 +69,7 @@ moduleDefaults <- list(
 #'                              `terra::ext`. This is currently unimplemented.
 #'                              Once implemented, this should define what spatial region this
 #'                              module is scientifically reasonable to be used in.\cr
-#'    `timeframe` \tab Vector (length 2) of POSIXt dates specifying the temporal extent
+#'    `timeframe` \tab Vector (length 2) of `POSIXt` dates specifying the temporal extent
 #'                          of the module. Currently unimplemented.
 #'                          Once implemented, this should define what time frame this
 #'                          module is scientifically reasonable to be used for.\cr
@@ -122,7 +122,7 @@ moduleDefaults <- list(
 #'                             `sourceURL` (class `character`), and `other`
 #'                              (currently spades does nothing with this column).
 #'                             This data.frame identifies the objects that are expected,
-#'                             but does not do any loading of that object into the simList.
+#'                             but does not do any loading of that object into the `simList`.
 #'                             The `sourceURL` gives the developer the opportunity
 #'                             to identify the source of a data file that can be used
 #'                             with the model. This URL will be
@@ -157,7 +157,7 @@ moduleDefaults <- list(
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
-#' @seealso moduleDefaults [defineEvent()]
+#' @seealso [moduleDefaults()], [defineEvent()]
 #'
 #' @examples
 #' \donttest{
@@ -630,10 +630,10 @@ setMethod(
     return(returnDataframe)
 })
 
-#' An internal function for coercing a data.frame to inputs()
+#' An internal function for coercing a data.frame to `inputs()`
 #'
-#' @param inputDF A data.frame with partial columns to pass to inputs<-
-#' @param startTime Numeric time. The start(sim).
+#' @param inputDF A data.frame with partial columns to pass to `inputs<-`
+#' @param startTime Numeric time. The `start(sim)`.
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
@@ -693,10 +693,10 @@ setMethod(
   return(inputDF)
 }
 
-#' An internal function for coercing a data.frame to outputs()
+#' An internal function for coercing a data.frame to `outputs()`
 #'
-#' @param outputDF A data.frame with partial columns to pass to outputs<-
-#' @param endTime Numeric time. The end(sim).
+#' @param outputDF A data.frame with partial columns to pass to `outputs<-`
+#' @param endTime Numeric time. The `end(sim)`.
 #'
 #' @keywords internal
 #' @importFrom data.table setnames

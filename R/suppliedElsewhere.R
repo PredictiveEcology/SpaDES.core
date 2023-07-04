@@ -26,14 +26,13 @@ utils::globalVariables(c("objName", "V1"))
 #' `createsOutputs` in that module's metadata). There is a caveat to this test,
 #' however; if that other event also has the object as an `expectsInput`, then
 #' it would fail this test, as it *also* needs it as an input.
-#' This final one (`"initEvent"`)
-#' does not explicitly test that the object will be created in the "init" event, only that
-#' it is in the outputs of that module, and that it is a module that is loaded prior to
-#' this one.
+#' This final one (`"initEvent"`) does not explicitly test that the object will be created
+#' in the "init" event, only that it is in the outputs of that module, and that it is a module
+#' that is loaded prior to this one.
 #'
 #' @param object Character vector
 #' @param sim A `simList` in which to evaluated whether the object is supplied elsewhere
-#' @param where Character vector with one to three of "sim", "user", or "initEvent".
+#' @param where Character vector with one to three of `"sim"`, `"user"`, or `"initEvent"`.
 #'        Default is all three. Partial matching is used. See details.
 #' @param returnWhere Logical, default `FALSE`, whether the vector of length
 #'   3 logical should be returned, or a logical of length one

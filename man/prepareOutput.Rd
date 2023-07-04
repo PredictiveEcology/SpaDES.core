@@ -18,7 +18,7 @@ This is optional if \code{Cache} is used inside a SpaDES module.}
 the modified \code{object}
 }
 \description{
-See \link[reproducible:exportedMethods]{reproducible::.prepareOutput}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.prepareOutput()}}.
 }
 \seealso{
 \link[reproducible:exportedMethods]{reproducible::.prepareOutput}

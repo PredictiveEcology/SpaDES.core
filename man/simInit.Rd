@@ -147,10 +147,10 @@ A \code{simList} simulation object, pre-initialized from values
 specified in the arguments supplied.
 }
 \description{
-Create a new simulation object, the "sim" object. This object is implemented
-using an \code{environment} where all objects and functions are placed.
+Create a new simulation object, the \code{sim} object (a \code{simList}).
+This object is implemented using an \code{environment} where all objects and functions are placed.
 Since environments in \code{R} are pass by reference, "putting" objects in
-the sim object does no actual copy.
+the \code{sim} object does no actual copy.
 The \code{simList} also stores all parameters, and other important simulation
 information, such as times, paths, modules, and module load order.
 See more details below.

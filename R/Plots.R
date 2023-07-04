@@ -445,8 +445,7 @@ filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
 #'
 #' @param bsf character. A function name
 #'
-#' @return character. The package and function name as "pkg::bsf"
-
+#' @return character. The package and function name as `"pkg::bsf"`
 .guessPkgFun <- function(bsf) {
   pkgName <- eval(parse(text = paste0("environmentName(environment(", bsf, "))")))
   return(paste0(pkgName, "::", bsf))

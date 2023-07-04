@@ -2,74 +2,70 @@
 % Please edit documentation in R/save.R
 \name{saveFiles}
 \alias{saveFiles}
-\title{Save objects using `.saveObjects` in `params` slot of `simInit`}
+\title{Save objects using \code{.saveObjects} in \code{params} slot of \code{simInit}}
 \usage{
 saveFiles(sim)
 }
 \arguments{
-\item{sim}{A `simList` simulation object.}
+\item{sim}{A \code{simList} simulation object.}
 }
 \value{
-(invisibly) the modified `sim` object.
-        invoked for side effect of saving the simulation to file.
+(invisibly) the modified \code{sim} object.
+invoked for side effect of saving the simulation to file.
 }
 \description{
-In the [simInit()] call, a parameter called `.saveObjects` can be provided in
+In the \code{\link[=simInit]{simInit()}} call, a parameter called \code{.saveObjects} can be provided in
 each module.
 This must be a character string vector of all object names to save. These objects will
-then be saved whenever a call to `saveFiles` is made.
+then be saved whenever a call to \code{saveFiles} is made.
 }
 \details{
-The file names will be equal to the object name plus `time(sim)` is
+The file names will be equal to the object name plus \code{time(sim)} is
 appended at the end.
-The files are saved as `.rds` files, meaning, only one object gets
+The files are saved as \code{.rds} files, meaning, only one object gets
 saved per file.
 
-
 For objects saved using this function, the module developer must create save
-events that schedule a call to `saveFiles`.
+events that schedule a call to \code{saveFiles}.
 
 If this function is used outside of a module, it will save all files in the
-outputs(sim) that are scheduled to be saved at the current time in the simList.
+\code{outputs(sim)} that are scheduled to be saved at the current time in the \code{simList.}
 
-There are 3 ways to save objects using `SpaDES`.
+There are several ways to save objects using \code{SpaDES}.
 }
 \note{
 It is not possible to schedule separate saving events for each object
-that is listed in the `.saveObjects`.
+that is listed in the \code{.saveObjects}.
 }
-\section{1. Model-level saving}{
+\section{Model-level saving}{
 
 
-Using the `outputs` slot in the [simInit()] call.
-See example in [simInit()].
+Using the \code{outputs} slot in the \code{\link[=simInit]{simInit()}} call.
+See example in \code{\link[=simInit]{simInit()}}.
 This can be convenient because it gives overall control of many modules at a
-time, and it gets automatically scheduled during the
-[simInit()] call.
+time, and it gets automatically scheduled during the \code{\link[=simInit]{simInit()}} call.
 }
 
-\section{2. Module-level saving}{
+\section{Module-level saving}{
 
 
-Using the `saveFiles` function inside a module.
-This must be accompanied by a `.saveObjects` vector or list element in the
-`params` slot in the [simList()].
-Usually a module developer will create this method for future users of
-their module.
+Using the \code{saveFiles} function inside a module.
+This must be accompanied by a \code{.saveObjects} vector or list element in the
+\code{params} slot in the \code{\link[=simList]{simList()}}.
+Usually a module developer will create this method for future users of their module.
 }
 
-\section{3. Custom saving}{
+\section{Custom saving}{
 
 
 A module developer can save any object at any time inside their module, using
-standard R functions for saving R objects (e.g., `save` or `saveRDS`).
+standard R functions for saving R objects (e.g., \code{save} or \code{saveRDS}).
 This is the least modular approach, as it will happen whether a module user
 wants it or not.
 }
 
 \examples{
 \donttest{
-
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 requireNamespace("NLMR", quietly = TRUE)) {
 # # This will save the "caribou" object at the save interval of 1 unit of time

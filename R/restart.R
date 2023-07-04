@@ -31,7 +31,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' Restart an interrupted simulation
 #'
 #' This is very experimental and has not been thoroughly tested. Use with caution.
-#' This function will reparse a single module (currently) into the `simList`
+#' This function will re-parse a single module (currently) into the `simList`
 #' where its source code should reside, and then optionally restart a simulation
 #' that stopped on an error, presumably after the developer has modified the
 #' source code of the module that caused the break.
@@ -51,11 +51,11 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' *if the `simList` was not modified yet during the event which caused the error*.
 #' The `simList` will be in the state it was at the time of the error.
 #'
-#' @param sim A simList. If not supplied (the default), this will take the sim from
+#' @param sim A `simList.` If not supplied (the default), this will take the `sim` from
 #'    `SpaDES.core:::.pkgEnv$.sim`, i.e., the one that was interrupted
 #'
 #' @param module A character string length one naming the module that caused the error and
-#'   whose source code was fixed. This module will be reparsed and placed into the simList
+#'   whose source code was fixed. This module will be re-parsed and placed into the `simList`
 #'
 #' @param restart Logical. If `TRUE`, then the call to `spades` will be made, i.e.,
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
@@ -64,7 +64,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
 #'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then
 #'   there will be a list in the `simList` called `.recoverableObjs`. These will be
-#'   replayed backwards in time to reproduce the initial state of the simList before
+#'   replayed backwards in time to reproduce the initial state of the `simList` before
 #'   the event that is `numEvents` back from the first event in `events(sim)`.
 #'
 #' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`

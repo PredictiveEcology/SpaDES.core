@@ -19,7 +19,7 @@
 recovery from memoised copy}
 }
 \description{
-See \link[reproducible:exportedMethods]{reproducible::.cacheMessage}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.cacheMessage()}}.
 }
 \seealso{
 \link[reproducible:exportedMethods]{reproducible::.cacheMessage}

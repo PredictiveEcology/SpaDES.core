@@ -29,8 +29,7 @@ parameters(sim, asDF = FALSE)
 \S4method{parameters}{simList}(sim, asDF = FALSE)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 
@@ -56,12 +55,12 @@ slot in the \code{simList}.
 NOT the current values that may be overwritten by a user. See examples.
 }
 \note{
-The differences between P, params and being explicit with passing arguments
+The differences between \code{P()}, \code{params()} and being explicit with passing arguments
 are mostly a question of speed and code compactness.
-The computationally fastest way to get a parameter is to specify moduleName and parameter name, as in:
-\code{P(sim, "paramName", "moduleName")} (replacing moduleName and paramName with your
-specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
-part for speed (e.g., 2-4x faster) is specifying the moduleName.
+The computationally fastest way to get a parameter is to specify \code{moduleName} and parameter name,
+as in: \code{P(sim, "paramName", "moduleName")} (replacing \code{moduleName} and \code{paramName} with your
+specific module and parameter names), but it is more verbose than \code{P(sim)$paramName}.
+Note: the important part for speed (e.g., 2-4x faster) is specifying the \code{moduleName}.
 Specifying the parameter name is <5\% faster.
 }
 \examples{
@@ -107,7 +106,7 @@ if (requireNamespace("NLMR", quietly = TRUE) &&
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation parameters.
 
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -121,4 +120,4 @@ Other functions to access elements of a 'simList' object:
 \code{\link{progressInterval}()},
 \code{\link{times}()}
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

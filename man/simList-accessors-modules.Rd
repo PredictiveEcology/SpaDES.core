@@ -29,8 +29,7 @@ depends(sim) <- value
 \S4method{depends}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{hidden}{Logical. If TRUE, show the default core modules.}
 
@@ -40,8 +39,7 @@ in which to replace element(s).}
 Returns or sets the value of the slot from the \code{simList} object.
 }
 \description{
-Accessor functions for the \code{depends} and \code{modules} slots in a
-\code{simList} object.
+Accessor functions for the \code{depends} and \code{modules} slots in a \code{simList} object.
 These are included for advanced users.
 \tabular{ll}{
 \code{\link[=depends]{depends()}} \tab List of simulation module dependencies. (advanced) \cr
@@ -55,7 +53,7 @@ Currently, only get and set methods are defined. Subset methods are not.
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.7 on Modules and dependencies.
 
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -72,4 +70,4 @@ Other functions to access elements of a 'simList' object:
 \author{
 Alex Chubaty
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

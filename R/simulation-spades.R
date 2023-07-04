@@ -739,7 +739,7 @@ scheduleConditionalEvent <- function(sim,
 #' `.plotInitialTime` and with `.plotInitialTime`. The primary use of
 #' these arguments is to temporarily turn off plotting and saving. "Temporary"
 #' means that the `simList` is not changed, so it can be used again with
-#' the simList values reinstated. To turn off plotting and saving, use
+#' the `simList` values reinstated. To turn off plotting and saving, use
 #' `.plotInitialTime = NA` or `.saveInitialTime = NA`. NOTE: if a
 #' module did not use `.plotInitialTime` or `.saveInitialTime`, then
 #' these arguments will not do anything.
@@ -756,7 +756,7 @@ scheduleConditionalEvent <- function(sim,
 #' the first argument of Cache. For events or modules, set the module `parameters`,
 #' `.useCache`, e.g.,
 #' `simInit(..., parameters = list(myModule = list(.useCache = "init")))`.
-#' This can be set to an event name, which will cache that event, or a logical (e.g., \code{}),
+#' This can be set to an event name, which will cache that event, or a logical,
 #' which will cache *every* event in that module. Event and module caching
 #' makes most sense when the event or module only runs once, such as an initialization
 #' or data preparation event/module. Caching an entire simulation is actually just
@@ -768,11 +768,11 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' If `cache` is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
-#' Instead, upon a call to `spades` in which the simList is identical,
+#' Instead, upon a call to `spades` in which the `simList` is identical,
 #' the function will simply return the result that would have come if it had
 #' been rerun. Use this with caution, as it will return exactly the result from
 #' a previous run, even if there is stochasticity internally.
-#' Caching is only based on the input simList.
+#' Caching is only based on the input `simList.`
 #' See also the vignette on caching for examples.
 #'
 #' @section `debug`:
@@ -816,16 +816,16 @@ scheduleConditionalEvent <- function(sim,
 #'   `TRUE` \tab `current(sim)` will be printed at the start of each event as
 #'                     it runs\cr
 #'   a function name (as character string) \tab If a function, then it will be run on the
-#'                                            simList, e.g., "time" will run
+#'                                            `simList`, e.g., "time" will run
 #'                                            `time(sim)` at each event.\cr
-#'   moduleName (as character string) \tab All calls to that module will be entered
+#'   `moduleName` (as character string) \tab All calls to that module will be entered
 #'                                         interactively\cr
-#'   eventName (as character string) \tab All calls that have that event name (in any module)
+#'   `eventName` (as character string) \tab All calls that have that event name (in any module)
 #'                                        will be entered interactively\cr
 #'   `c(<moduleName>, <eventName>)`  \tab Only the event in that specified module
 #'                                             will be entered into. \cr
 #'   Any other R expression expressed as a character string or quoted call \tab
-#'                                 Will be evaluated with access to the simList as 'sim'.
+#'                                 Will be evaluated with access to the `simList` as `sim`.
 #'                                If this is more than one character string, then all will
 #'                                be printed to the screen in their sequence. \cr
 #'   A numeric scalar, currently 1 or 2 (maybe others) \tab This will print out alternative forms of event
@@ -863,7 +863,7 @@ scheduleConditionalEvent <- function(sim,
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
 #'   # some options are not necessary for example
-#'   opts <- options("spades.moduleCodeChecks" = FALSE, spades.useRequire = FALSE)
+#'   opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
 #'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
 #'   mySim <- simInit(
 #'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
@@ -1308,7 +1308,7 @@ setMethod(
     }
     )
     return(invisible(sim))
-  })
+})
 
 #' @rdname spades
 #' @importFrom reproducible Cache
@@ -1996,22 +1996,21 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #' Alternative way to define events in SpaDES.core
 #'
 #' There are two ways to define what occurs during an event: defining a function
-#' called doEvent.*moduleName*, where *moduleName* is the actual module name. This
-#' approach is the original approach used in SpaDES.core, and it must have an
-#' explicit `switch` statement branching on `eventType`. The newer approach
-#' (still experimental) uses `defineEvent`. Instead of creating the
-#' function called, `doEvent.XXXX`, where XXXX is the module name, it creates one function
-#' for each event, each with the name `doEvent.XXXX.YYYY`, where `YYYY` is the event
-#' name. This may be a little bit cleaner, but both with still work.
+#' called `doEvent.moduleName`, where `moduleName` is the actual module name.
+#' This approach is the original approach used in SpaDES.core, and it must have an
+#' explicit `switch` statement branching on `eventType`.
+#' The newer approach (still experimental) uses `defineEvent()`.
+#' Instead of creating, `doEvent.moduleName()`, it creates one function
+#' for each event, each with the name `doEvent.moduleName.eventName`.
+#' This may be a little bit cleaner, but both with still work.
 #'
-#' @param sim A simList
+#' @param sim A `simList`
 #' @param eventName Character string of the desired event name to define. Default is "init"
 #' @param moduleName Character string of the name of the module. If this function is
 #'    used within a module, then it will try to find the module name.
 #' @param code An expression that defines the code to execute during the event. This will
-#'    be captured, and pasted into a new function (`doEvent.XXXX.YYYY`), where `XXXX` is the
-#'    `moduleName` and `YYYY` is the `eventName`, remaining unevaluated until
-#'    that new function is called.
+#'    be captured, and pasted into a new function (`doEvent.moduleName.eventName`),
+#'    remaining unevaluated until that new function is called.
 #' @param envir An optional environment to specify where to put the resulting function.
 #'     The default will place a function called `doEvent.moduleName.eventName` in the
 #'     module function location, i.e., `sim$.mods[[moduleName]]`. However, if this

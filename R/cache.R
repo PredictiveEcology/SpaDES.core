@@ -225,7 +225,7 @@ if (!isGeneric(".tagsByClass")) {
 
 #' `.tagsByClass` for `simList` objects
 #'
-#' See [reproducible::.tagsByClass]. Adds current `moduleName`,
+#' See [reproducible::.tagsByClass()]. Adds current `moduleName`,
 #' `eventType`, `eventTime`, and `function:spades` as `userTags`.
 #'
 #' @inheritParams reproducible::.tagsByClass
@@ -276,7 +276,7 @@ if (!isGeneric(".cacheMessage")) {
 
 #' `.cacheMessage` for `simList` objects
 #'
-#' See [reproducible::.cacheMessage].
+#' See [reproducible::.cacheMessage()].
 #'
 #' @exportMethod .cacheMessage
 #' @importFrom crayon blue
@@ -340,7 +340,7 @@ if (!isGeneric(".checkCacheRepo")) {
 
 #' `.checkCacheRepo` for `simList` objects
 #'
-#' See [reproducible::.checkCacheRepo].
+#' See [reproducible::.checkCacheRepo()].
 #'
 #' @inheritParams reproducible::.checkCacheRepo
 #'
@@ -502,7 +502,7 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
 
 #' `.prepareOutput` for `simList` objects
 #'
-#' See [reproducible::.prepareOutput].
+#' See [reproducible::.prepareOutput()].
 #'
 #' @inheritParams reproducible::.prepareOutput
 #'
@@ -766,7 +766,7 @@ setMethod(
 #'
 #' Takes a snapshot of `simList` objects.
 #'
-#' See [reproducible::.preDigestByClass].
+#' See [reproducible::.preDigestByClass()].
 #'
 #' @inheritParams reproducible::.preDigestByClass
 #'
@@ -796,7 +796,7 @@ if (!isGeneric(".addTagsToOutput")) {
 
 #' `.addTagsToOutput` for `simList` objects
 #'
-#' See [reproducible::.addTagsToOutput].
+#' See [reproducible::.addTagsToOutput()].
 #'
 #' @inheritParams reproducible::.addTagsToOutput
 #'
@@ -810,7 +810,6 @@ if (!isGeneric(".addTagsToOutput")) {
 #' @importMethodsFrom reproducible .addTagsToOutput
 #' @include simList-class.R
 #' @rdname addTagsToOutput
-#' @seealso [reproducible::.addTagsToOutput]
 setMethod(
   ".addTagsToOutput",
   signature = "simList",
@@ -894,7 +893,7 @@ if (!exists("objSize")) {
 #' so it estimates the correct size of functions stored there (e.g., with their enclosing
 #' environments) plus, it adds all other "normal" elements of the `simList`, e.g.,
 #' `objSize(completed(sim))`.
-#' The output is structured into 2 elements: the sim environment and all its objects,
+#' The output is structured into 2 elements: the `sim` environment and all its objects,
 #' and the other slots in the `simList` (e.g., events, completed, modules, etc.).
 #' The returned object also has an attribute, "total", which shows the total size.
 #'
@@ -927,10 +926,10 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 
 
 
-#' Methods for .wrap and .unwrap
+#' Methods for `.wrap` and `.unwrap`
 #'
 #'
-#' @return The same obj as passed into the function, but dealt with so that it can be
+#' @return The same object as passed into the function, but dealt with so that it can be
 #' saved to disk.
 #'
 #' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
@@ -964,8 +963,8 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
 .unwrap.simList <- function(obj, cachePath, cacheId,
-                                                 drv = getOption("reproducible.drv", NULL),
-                                                 conn = getOption("reproducible.conn", NULL)) {
+                            drv = getOption("reproducible.drv", NULL),
+                            conn = getOption("reproducible.conn", NULL)) {
 
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
@@ -1046,6 +1045,7 @@ if (!isGeneric("clearCache")) {
 #' This will take the `cachePath(object)` and pass
 #'
 #' @inheritParams .wrap.simList
+#'
 #' @inheritParams reproducible::clearCache
 #'
 #' @return A `data.table` object showing the subset of items in the cache, located at `cachePath`

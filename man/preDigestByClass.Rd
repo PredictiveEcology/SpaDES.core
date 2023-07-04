@@ -16,7 +16,7 @@ character vector corresponding to the names of objects stored in the \code{.xDat
 Takes a snapshot of \code{simList} objects.
 }
 \details{
-See \link[reproducible:exportedMethods]{reproducible::.preDigestByClass}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.preDigestByClass()}}.
 }
 \seealso{
 \link[reproducible:exportedMethods]{reproducible::.preDigestByClass}

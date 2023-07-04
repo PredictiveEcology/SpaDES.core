@@ -42,9 +42,9 @@ Default is 1. Above 3 will output much more information about the internals of
 Caching, which may help diagnose Caching challenges. Can set globally with an
 option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 
-\item{zipfile}{Filename of a zipped simList}
+\item{zipfile}{Filename of a zipped \code{simList}}
 
-\item{load}{Logical. If \code{TRUE}, the default, then the simList will
+\item{load}{Logical. If \code{TRUE}, the default, then the \code{simList} will
 also be loaded into R.}
 
 \item{...}{passed to \code{unzip}}

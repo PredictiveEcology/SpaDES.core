@@ -3,11 +3,11 @@
 #'
 #' This will create active bindings amongst the synonyms. To minimize copying,
 #' the first one that exists in the character vector will become the "canonical"
-#' object. All others named in the character vector will be activeBindings to
+#' object. All others named in the character vector will be `activeBindings` to
 #' that canonical one.  This synonym list will be assigned to the `envir`,
 #' as an object named `objectSynonyms`. That object will have an attribute
 #' called, `bindings` indicating which one is the canonical one and which
-#' is/are the activeBindings. EXPERIMENTAL: If the objects are removed during a
+#' is/are the `activeBindings.` EXPERIMENTAL: If the objects are removed during a
 #' `spades` call by, say, a module, then at the end of the event, the
 #' `spades` call will replace the bindings. In other words, if a module
 #' deletes the object, it will "come back". This may not always be desired.
@@ -25,8 +25,8 @@
 #'
 #' This function will append any new `objectSynonym` to any pre-existing
 #' `objectSynonym` in the `envir`. Similarly, this function assumes
-#' transitivity, i.e., if age and ageMap are synonyms, and ageMap and timeSinceFire
-#' are synonyms, then age and timeSinceFire must be synonyms.
+#' transitivity, i.e., if `age` and `ageMap` are synonyms, and `ageMap` and `timeSinceFire`
+#' are synonyms, then `age` and `timeSinceFire` must be synonyms.
 #'
 #' @return Active bindings in the `envir` so that all synonyms point to the same
 #' canonical object, e.g., they would be at `envir[[synonym[[1]][1]]]` and

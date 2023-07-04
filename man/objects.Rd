@@ -23,8 +23,7 @@ moduleObjects(sim, module, path)
 findObjects(objects, sim, module, path)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{...}{passed to \code{ls}}
 
@@ -37,8 +36,8 @@ Only relevant if \code{sim} not supplied.}
 
 \item{objects}{A character vector of length >= 1 with name(s) of objects to look
 for in the metadata. This is used in a \code{grep}, meaning it will do partial
-matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
-use \code{regexp}.}
+matching (e.g., \code{"studyArea"} will find \code{"studyArea"} and \code{"studyAreaLarge"}).
+User can use regular expressions.}
 }
 \value{
 Returns or sets a list of objects in the \code{simList} environment.
@@ -70,7 +69,7 @@ findObjects(path = path, module = dir(path), objects = "caribou")
 \seealso{
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation Parameters.
 
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -84,4 +83,4 @@ Other functions to access elements of a 'simList' object:
 \code{\link{progressInterval}()},
 \code{\link{times}()}
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

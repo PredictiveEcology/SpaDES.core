@@ -503,7 +503,7 @@ Modules are not required to have the following parameters set, but when using `n
 &nbsp;                  | Used to schedule save events.
 **`.saveObjects`**      | Character vector naming the objects to be saved.
 
-### `inputs` argument to simInit
+### `inputs` argument to `simInit`
 Alternatively, objects can be read in during the `simInit` function call by passing a data.frame to the `input` argument. 
 For `inputs()`, the `data.frame` must consist of, minimally, a column named `file` listing the absolute or relative filepaths of the files to be loaded.
 Additional columns can also be provided:
@@ -525,7 +525,7 @@ Additional columns can also be provided:
 &nbsp;          | If there is only one list, then it is assumed to apply to all load attempts and will be
 &nbsp;          | repeated for each load function.
 
-### `outputs` argument to simInit
+### `outputs` argument to `simInit`
 
 Objects to be saved can be specified using the `output` argument, by passing a data.frame analogous to the `.load` module. 
 This `data.frame` is passed via the `outputs` argument in the `simInit` call or via a `outputs(mySim) <- data.frame()`.

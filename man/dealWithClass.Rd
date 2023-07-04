@@ -3,7 +3,7 @@
 \name{.wrap.simList}
 \alias{.wrap.simList}
 \alias{.unwrap.simList}
-\title{Methods for .wrap and .unwrap}
+\title{Methods for \code{.wrap} and \code{.unwrap}}
 \usage{
 \method{.wrap}{simList}(
   obj,
@@ -41,9 +41,9 @@ option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 \item{cacheId}{Used strictly for messaging. This should be the cacheId of the object being recovered.}
 }
 \value{
-The same obj as passed into the function, but dealt with so that it can be
+The same object as passed into the function, but dealt with so that it can be
 saved to disk.
 }
 \description{
-Methods for .wrap and .unwrap
+Methods for \code{.wrap} and \code{.unwrap}
 }

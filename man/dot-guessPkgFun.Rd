@@ -10,7 +10,7 @@
 \item{bsf}{character. A function name}
 }
 \value{
-character. The package and function name as "pkg::bsf"
+character. The package and function name as \code{"pkg::bsf"}
 }
 \description{
 Guess package of a function

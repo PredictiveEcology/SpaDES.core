@@ -140,13 +140,13 @@ setMethod(
 
 #' Find objects if passed as character strings
 #'
-#' Objects are passed into simList via `simInit` call or `objects(simList)`
+#' Objects are passed into `simList` via `simInit` call or `objects(simList)`
 #' assignment. This function is an internal helper to find those objects from their
 #' environments by searching the call stack.
 #'
 #' @param objects A character vector of object names
 #' @param functionCall A character string identifying the function name to be
-#' searched in the call stack. Default is "simInit"
+#' searched in the call stack. Default is `"simInit"`.
 #'
 #' @author Eliot McIntire
 #' @importFrom reproducible .grepSysCalls

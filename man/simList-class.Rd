@@ -101,9 +101,8 @@ categorized into separate help pages:
 \section{Event Lists}{
 
 
-The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
-The completed event list is an ordered list in the exact order that the events
-were executed.
+The main event list is a sorted \code{data.table} (keyed) on \code{eventTime}, and \code{eventPriority.}
+The completed event list is an ordered list in the exact order that the events were executed.
 Each event is represented by a \code{\link[=data.table]{data.table()}} row consisting of:
 \tabular{ll}{
 \code{eventTime} \tab The time the event is to occur.\cr

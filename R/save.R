@@ -41,33 +41,29 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' The files are saved as `.rds` files, meaning, only one object gets
 #' saved per file.
 #'
-#'
 #' For objects saved using this function, the module developer must create save
 #' events that schedule a call to `saveFiles`.
 #'
 #' If this function is used outside of a module, it will save all files in the
-#' outputs(sim) that are scheduled to be saved at the current time in the simList.
+#' `outputs(sim)` that are scheduled to be saved at the current time in the `simList.`
 #'
-#' There are 3 ways to save objects using `SpaDES`.
+#' There are several ways to save objects using `SpaDES`.
 #'
-#' @noMd
-#' @section 1. Model-level saving:
+#' @section Model-level saving:
 #'
 #' Using the `outputs` slot in the [simInit()] call.
 #' See example in [simInit()].
 #' This can be convenient because it gives overall control of many modules at a
-#' time, and it gets automatically scheduled during the
-#' [simInit()] call.
+#' time, and it gets automatically scheduled during the [simInit()] call.
 #'
-#' @section 2. Module-level saving:
+#' @section Module-level saving:
 #'
 #' Using the `saveFiles` function inside a module.
 #' This must be accompanied by a `.saveObjects` vector or list element in the
 #' `params` slot in the [simList()].
-#' Usually a module developer will create this method for future users of
-#' their module.
+#' Usually a module developer will create this method for future users of their module.
 #'
-#' @section 3. Custom saving:
+#' @section Custom saving:
 #'
 #' A module developer can save any object at any time inside their module, using
 #' standard R functions for saving R objects (e.g., `save` or `saveRDS`).
@@ -89,7 +85,6 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' @examples
 #' \donttest{
-#'
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
 #' # # This will save the "caribou" object at the save interval of 1 unit of time

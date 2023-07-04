@@ -53,7 +53,7 @@ that may contribute to excessive disk usage.
 \item{scratchPath}{The default local directory in which to save transient files.
 If not specified, defaults to \code{getOption("spades.scratchPath")}.}
 
-\item{terraPath}{The default local directory in which to save transient terra files.
+\item{terraPath}{The default local directory in which to save transient \code{terra} files.
 If not specified, defaults to
 \code{file.path(getOption("spades.scratchPath"), "terra")}.
 \emph{Important note:} this location may not be cleaned up automatically,

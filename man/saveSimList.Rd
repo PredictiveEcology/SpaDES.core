@@ -21,16 +21,15 @@ zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
 }
 \arguments{
 \item{sim}{Either a \code{simList} or a character string of the name
-of a \code{simList} that can be found in \code{envir}. Using
-a character string will assign that object name to the saved
-\code{simList}, so when it is recovered it will be given that
-name.}
+of a \code{simList} that can be found in \code{envir}.
+Using a character string will assign that object name to the saved
+\code{simList}, so when it is recovered it will be given that name.}
 
 \item{filename}{Character string with the path for saving \code{simList} to or
 reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs} file types are supported.}
 
 \item{projectPath}{Should be the "top level" or project path for the \code{simList}.
-Defaults to \code{getwd()}. All other paths will be relativized with respect to
+Defaults to \code{getwd()}. All other paths will be made relative with respect to
 this if nested within this.}
 
 \item{outputs}{Logical. If \code{TRUE}, all files identified in
@@ -46,9 +45,8 @@ out of date elements. See Details.}
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can be found.}
 
-\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones
-such as \code{filename}. Also see \code{fileBackend} and \code{filebackedDir}
-arguments in that function.}
+\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones such as \code{filename}.
+Also see \code{fileBackend} and \code{filebackedDir} arguments in that function.}
 
 \item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
 }
@@ -73,8 +71,7 @@ as the code will search based on the filename without the file extension.
 
 \code{zipSimList} will save the \code{simList} and file-backed \verb{Raster*} objects, plus,
 optionally, files identified in \code{outputs(sim)} and \code{inputs(sim)}.
-This uses \code{Copy} under the hood, to not affect the original
-\code{simList}.
+This uses \code{Copy} under the hood, to not affect the original \code{simList}.
 \strong{VERY experimental}.
 }
 \details{
@@ -88,7 +85,7 @@ There are 3 different workflows for "save - move files - load" that work in our 
 \enumerate{
 \item \code{fileBackend = 0}: No renaming of file-backed rasters. This is unlikely to
 work for most use-cases as the original file paths are left intact. Recovery
-of this saved simList will only work if the file-backed objects' files are
+of this saved \code{simList} will only work if the file-backed objects' files are
 present and in the exact same paths.
 
 This approach is attempting to emulate a "relative filenames" approach,
@@ -104,7 +101,7 @@ only work if all files were in one of the \code{paths} of the original
 in a wide array of testing.
 \item \code{fileBackend = 1}: On-the-fly renaming of file-backed rasters;
 \enumerate{
-\item Save the sim object with a filename, e.g.,  \code{file},
+\item Save the \code{sim} object with a filename, e.g.,  \code{file},
 \item make a copy of all file-backed rasters to \code{fileBackedDir},
 \item update all the pointers to those files so that they are correct in the raster metadata
 }

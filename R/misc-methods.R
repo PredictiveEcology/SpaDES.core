@@ -1,8 +1,8 @@
 utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 
-#' A slightly modified version of getOption
+#' A slightly modified version of `getOption()`
 #'
-#' This can take x as a character string or as a function that returns a character string.
+#' This can take `x` as a character string or as a function that returns a character string.
 #'
 #' @inheritParams base::getOption
 #' @rdname getOption
@@ -308,14 +308,14 @@ setMethod(
 })
 
 ################################################################################
-#' Create empty fileTable for inputs and outputs
+#' Create empty `fileTable` for inputs and outputs
 #'
 #' Internal functions.
-#' Returns an empty fileTable to be used with inputs and outputs.
+#' Returns an empty `fileTable` to be used with inputs and outputs.
 #'
 #' @param x  Not used (should be missing)
 #'
-#' @return An empty data.frame with structure needed for input/output fileTable.
+#' @return An empty data.frame with structure needed for input/output `fileTable.`
 #'
 #' @keywords internal
 #' @rdname fileTable
@@ -398,7 +398,7 @@ setMethod(
 #' @param scratchPath The default local directory in which to save transient files.
 #'                    If not specified, defaults to `getOption("spades.scratchPath")`.
 #'
-#' @param terraPath  The default local directory in which to save transient terra files.
+#' @param terraPath  The default local directory in which to save transient `terra` files.
 #'                   If not specified, defaults to
 #'                   `file.path(getOption("spades.scratchPath"), "terra")`.
 #'                   *Important note:* this location may not be cleaned up automatically,
@@ -621,22 +621,24 @@ moduleCodeFiles <- function(paths, modules) {
 #' to be part of a `params = list(.globals = list(someParam = "test"))` passed to `simInit`.
 #'
 #' It is considered a "fail" under several conditions:
-#' \enumerate{
-#'   \item current module has a value that is not `NULL` or `"default"` and another module
-#'     has a different value;
-#'   \item there is more than one value for the `paramToCheck` in the other modules,
-#'     so it is ambiguous which one to return.
-#' }
+#' 1. current module has a value that is not `NULL` or `"default"` and another module
+#'    has a different value;
+#' 2. there is more than one value for the `paramToCheck` in the other modules,
+#'    so it is ambiguous which one to return.
 #'
 #' Either the current module is different than other modules, unless it is "default" or NULL.
 #'
-#' @param sim A simList
+#' @param sim A `simList` object
+#'
 #' @param paramToCheck A character string, length one, of a parameter name to
 #'   check and compare between the current module and one or more or all others
+#'
 #' @param moduleToUse A character vector of module names to check against. This can be
 #'   `"all"` which will compare against all other modules.
+#'
 #' @param ifSetButDifferent A character string indicating whether to `"error"` the default,
 #'   or send a `"warning"`, `message` or just silently continue (any other value).
+#'
 #' @param verbose Logical or Numeric, follows `reproducible.verbose` value by default.
 #'
 #' @return If the value of the `paramToCheck` in the current module is either `NULL` or

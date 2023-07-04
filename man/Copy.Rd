@@ -9,12 +9,11 @@
 \arguments{
 \item{object}{An R object (likely containing environments) or an environment.}
 
-\item{objects}{Whether the objects contained within the simList environment
+\item{objects}{Whether the objects contained within the \code{simList} environment
 should be copied. Default \code{TRUE}, which may be slow.}
 
-\item{queues}{Logical. Should the events queues (\code{events},
-\code{current}, \code{completed}) be deep copied via
-\code{data.table::copy}}
+\item{queues}{Logical. Should the events queues (\code{events}, \code{current}, \code{completed})
+be deep copied via \code{data.table::copy()}}
 
 \item{...}{Only used for custom Methods}
 }

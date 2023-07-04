@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc-methods.R
 \name{.getOption}
 \alias{.getOption}
-\title{A slightly modified version of getOption}
+\title{A slightly modified version of \code{getOption()}}
 \usage{
 .getOption(x, default = NULL)
 }
@@ -14,6 +14,6 @@
     checking whether it is set and setting it separately if not.}
 }
 \description{
-This can take x as a character string or as a function that returns a character string.
+This can take \code{x} as a character string or as a function that returns a character string.
 }
 \keyword{internal}

@@ -78,7 +78,7 @@ setMethod(
 #' To update your \file{CHECKSUMS.txt} files using the new algorithm:
 #' \enumerate{
 #'   \item specify your module (`moduleName <- "my_module"`);
-#'   \item use a temp dir to ensure all modules get fresh copies of the data
+#'   \item use a temporary location to ensure all modules get fresh copies of the data
 #'         (`tmpdir <- file.path(tempdir(), "SpaDES_modules")`);
 #'   \item download your module's data to the temp dir (`downloadData(moduleName, tmpdir)`);
 #'   \item initialize a dummy simulation to ensure any 'data prep' steps in the

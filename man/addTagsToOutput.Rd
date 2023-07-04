@@ -20,10 +20,7 @@ return. This is only relevant for list, environment (or similar) objects}
 modified \code{object}, with attributes added
 }
 \description{
-See \link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}.
-}
-\seealso{
-\link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}
+See \code{\link[reproducible:exportedMethods]{reproducible::.addTagsToOutput()}}.
 }
 \author{
 Eliot McIntire

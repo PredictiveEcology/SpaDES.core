@@ -36,7 +36,7 @@ stack, so it will find it if it is in a \code{SpaDES} module.}
 
 \item{value}{The object to be stored at the slot. See Details.}
 
-\item{filename}{The filename to register in the outputs(sim) \code{data.frame}. If
+\item{filename}{The filename to register in the \code{outputs(sim)} data.frame. If
 missing, an attempt will be made to search for either a \code{file} or \code{filename}
 argument in the call itself. This means that this function can be used with
 the pipe, as long as the returned return from the upstream pipe function is

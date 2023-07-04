@@ -10,8 +10,7 @@ defineModule(sim, x)
 \S4method{defineModule}{simList,list}(sim, x)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{x}{A list with a number of named elements, referred to as the metadata. See details.}
 }
@@ -56,7 +55,7 @@ for a widely accepted standard for version numbering.\cr
 \code{terra::ext}. This is currently unimplemented.
 Once implemented, this should define what spatial region this
 module is scientifically reasonable to be used in.\cr
-\code{timeframe} \tab Vector (length 2) of POSIXt dates specifying the temporal extent
+\code{timeframe} \tab Vector (length 2) of \code{POSIXt} dates specifying the temporal extent
 of the module. Currently unimplemented.
 Once implemented, this should define what time frame this
 module is scientifically reasonable to be used for.\cr
@@ -109,7 +108,7 @@ with columns \code{objectName} (class \code{character}),
 \code{sourceURL} (class \code{character}), and \code{other}
 (currently spades does nothing with this column).
 This data.frame identifies the objects that are expected,
-but does not do any loading of that object into the simList.
+but does not do any loading of that object into the \code{simList}.
 The \code{sourceURL} gives the developer the opportunity
 to identify the source of a data file that can be used
 with the model. This URL will be
@@ -144,7 +143,7 @@ that will cause these objects to be put into the
 
 }
 \seealso{
-moduleDefaults \code{\link[=defineEvent]{defineEvent()}}
+\code{\link[=moduleDefaults]{moduleDefaults()}}, \code{\link[=defineEvent]{defineEvent()}}
 }
 \author{
 Alex Chubaty

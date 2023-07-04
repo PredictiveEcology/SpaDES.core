@@ -13,7 +13,7 @@ paramCheckOtherMods(
 )
 }
 \arguments{
-\item{sim}{A simList}
+\item{sim}{A \code{simList} object}
 
 \item{paramToCheck}{A character string, length one, of a parameter name to
 check and compare between the current module and one or more or all others}

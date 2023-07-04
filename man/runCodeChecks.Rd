@@ -2,12 +2,12 @@
 % Please edit documentation in R/code-checking.R
 \name{.runCodeChecks}
 \alias{.runCodeChecks}
-\title{Runs a series of code checks during simInit}
+\title{Runs a series of code checks during \code{simInit()}}
 \usage{
 .runCodeChecks(sim, m, k, hadPrevMessage = FALSE)
 }
 \arguments{
-\item{sim}{simList}
+\item{sim}{a \code{simList} object}
 
 \item{m}{module name}
 
@@ -20,9 +20,8 @@ NULL (invisibly); invoked for side effect of generating message with that starts
 \code{paste0(m, ":", message)}.
 }
 \description{
-This uses custom tools and some optional tools in \code{codetools}
-package to check for function collisions with known,
-common function collisions (raster::stack, raster::scale).
+This uses custom tools and some optional tools in the \code{codetools} package to check for function
+collisions with known, common function collisions (\code{raster::stack}, \code{raster::scale}).
 All outputs will be sent as messages.
 }
 \keyword{internal}

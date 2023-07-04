@@ -2,18 +2,18 @@
 % Please edit documentation in R/simulation-simInit.R
 \name{.identifyChildModules}
 \alias{.identifyChildModules}
-\title{Identify Child Modules from a recursive list}
+\title{Identify child modules from a recursive list}
 \usage{
 .identifyChildModules(sim, modules)
 }
 \arguments{
-\item{sim}{simList}
+\item{sim}{a \code{simList} object}
 
 \item{modules}{List of module names}
 }
 \value{
 list of \code{modules} will flat named list of all module names (children, parents etc.) and
-\code{childModules} a non flat named list of only the childModule names.
+\code{childModules} a non-flat named list of only the \code{childModule} names.
 }
 \description{
 There can be parents, grandparents, etc

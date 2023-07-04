@@ -88,7 +88,7 @@
 #'
 #' @param module Character string of module name, without path
 #'
-#' @param path Character string of modulePath. Defaults to  `getOption("spades.modulePath")`.
+#' @param path Character string of `modulePath`. Defaults to  `getOption("spades.modulePath")`.
 #'
 #' @param buildDocuments A logical. If `TRUE`, the default, then the documentation
 #'   will be built, if any exists, using `roxygen2::roxygenise`.

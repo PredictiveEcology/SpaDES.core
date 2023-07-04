@@ -5,7 +5,6 @@
 #' See Details below.
 #'
 #' @export
-#' @noMd
 #' @return named list of the *default* package options.
 #'
 #' @details
@@ -20,8 +19,7 @@
 #'   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
 #'   `spades.allowInitDuringSimInit` \tab `FALSE`
 #'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; If set to `TRUE`,
-#'      `simInit` will
-#'      evaluate the dependencies in the metadata objects and determine whether
+#'      `simInit` will evaluate the dependencies in the metadata objects and determine whether
 #'      there are modules whose `init` events can be run safely prior to
 #'      the `.inputObjects` of other modules, i.e., if a module's `expectsInput`
 #'      is not being supplied by any other module's `createsOutput`. \cr
@@ -56,8 +54,8 @@
 #'
 #'   `spades.futureEvents` \tab `FALSE`
 #'     \tab  If set to `TRUE`, the event simulator will attempt to spawn events
-#'     whose outputs are not needed (by other events in the sim) into a future. In some
-#'     cases, this will speed up simulations, by running some events in parallel.
+#'     whose outputs are not needed (by other events in the `simList`) into a future.
+#'     In some cases, this will speed up simulations, by running some events in parallel.
 #'     Still VERY experimental. Use cautiously. \cr
 #'
 #'   `spades.inputPath`
@@ -89,13 +87,13 @@
 #'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
 #'   skipWith = TRUE)`
 #'     \tab Should the various code checks be run
-#'   during `simInit`. These are passed to codetools::checkUsage.
+#'   during `simInit`. These are passed to `codetools::checkUsage()`.
 #'   Default is given by the function, plus these: \cr
 #'
 #'   `spades.moduleDocument` \tab  `TRUE`
 #'     \tab  When a module is an R package e.g., via `convertToPackage`,
 #'     it will, by default, rebuild documentation and reparse during `simInit`.
-#'     Since rebuilding documentation (from the roxygen2 tags) can be time consuming,
+#'     Since rebuilding documentation (from the `roxygen2` tags) can be time consuming,
 #'     a user may wish to prevent this from happening each `simInit` call. If so,
 #'     set this option to `FALSE` \cr
 #'
@@ -121,21 +119,21 @@
 #'     \tab The default is NULL, meaning accept the module-level parameter\cr
 #'
 #'   `spades.recoveryMode` \tab `1L` \tab
-#'   If this a numeric > 0 or TRUE, then the
+#'   If this is a numeric greater than 0 or TRUE, then the
 #'   discrete event simulator will take a snapshot of the objects in the `simList`
 #'   that might change (based on metadata `outputObjects` for that module), prior to
 #'   initiating every event. This will allow the
 #'   user to be able to recover in case of an error or manual interruption (e.g., `Esc`).
 #'   If this is numeric, a copy of that number of "most
 #'   recent events" will be maintained so that the user can recover and restart
-#'   > 1 event in the past, i.e., redo some of the "completed" events. Default is
-#'   `TRUE`, i.e., it will keep the state of the `simList`
+#'   more than one event in the past, i.e., redo some of the "completed" events.
+#'   Default is `TRUE`, i.e., it will keep the state of the `simList`
 #'   at the start of the current event. This can be recovered with `restartSpades`
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
 #'   There is a message which describes how to find that. \cr
 #'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
-#'   a `data.frame` with 3 columns, "exts", "fun", and "package" indicating which
+#'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which
 #'   file extension, and which function from which package will be used when
 #'   using the `outputs` mechanism for saving files during a `spades` call. e.g.,
 #'   `options(spades.saveFileExtensions = data.frame(exts = "shp", fun = "st_write",
@@ -152,7 +150,7 @@
 #'   `spades.sessionInfo` \tab `TRUE`)
 #'     \tab Assigns the [utils::sessionInfo()] to the `simList` during `simInit` with
 #'     the name `sim$._sessionInfo`. This takes about 75 milliseconds, which may be
-#'     undesireable for some situations where speed is critical. If `FALSE`, then
+#'     undesirable for some situations where speed is critical. If `FALSE`, then
 #'     this is not assigned to the `simList`.\cr
 #'
 #'   `spades.switchPkgNamespaces` \tab `FALSE` to keep computational

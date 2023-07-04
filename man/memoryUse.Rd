@@ -10,7 +10,7 @@ memoryUseThisSession(thisPid)
 memoryUse(sim, max = TRUE)
 }
 \arguments{
-\item{thisPid}{Numeric or integer, the PID of the process.
+\item{thisPid}{Numeric or integer, the \code{PID} of the process.
 If omitted, it will be found with \code{Sys.getpid()}.}
 
 \item{sim}{A completed \code{simList}}

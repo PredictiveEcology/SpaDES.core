@@ -14,7 +14,7 @@
 #' for the module.
 #' The `functionCoverage` object contains percentage values for unit test
 #' coverage for each function defined in the module.
-#' Please use report() from covr package to view the coverage information.
+#' Please use `covr::report()` to view the coverage information.
 #' Two data.tables give the information of all the tested and untested functions
 #' in the module.
 #'

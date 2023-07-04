@@ -58,7 +58,7 @@ if (!isGeneric(".parseElems")) {
 
 #' `.parseElems` for `simList` class objects
 #'
-#' See [quickPlot::.parseElems].
+#' See [quickPlot::.parseElems()].
 #'
 #' @inheritParams quickPlot::.parseElems
 #'

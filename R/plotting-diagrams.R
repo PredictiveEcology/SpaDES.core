@@ -1,13 +1,11 @@
 utils::globalVariables(c(".", "moduleName"))
 
 ################################################################################
-#' ganttStatus
+#' `ganttStatus`
 #'
-#' Internal function assign the "status" of each event to be passed to
-#' `DiagrammeR::mermaid` to make a Gantt chart representing the
-#' events in a completed simulation.
-#' 'init' events are set as "done"; 'plot' events as "critical"; and all others
-#' as "active".
+#' Internal function assign the "status" of each event to be passed to `DiagrammeR::mermaid()`
+#' to make a Gantt chart representing the events in a completed simulation.
+#' `init` events are set as "done"; `plot` events as "critical"; and all others as "active".
 #'
 #' @param eventType Character vector of events.
 #'
@@ -107,14 +105,14 @@ setMethod(
 #' This event diagram is constructed using the completed event list
 #' To change the number of events shown, provide an `n` argument.
 #'
-#' Simulation time is presented on the x-axis, starting at date 'startDate'.
-#' Each module appears in a color-coded row, within which each event for that
+#' Simulation time is presented on the x-axis, starting at date `startDate`.
+#' Each module appears in a colour-coded row, within which each event for that
 #' module is displayed corresponding to the sequence of events for that module.
 #' Note that only the start time of the event is meaningful is these figures:
 #' the width of the bar associated with a particular module's event DOES NOT
 #' correspond to an event's "duration".
 #'
-#' Based on this StackOverflow answer: <https://stackoverflow.com/a/29999300/1380598>.
+#' Based on this Stack Overflow answer: <https://stackoverflow.com/a/29999300/1380598>.
 #'
 #' @note
 #' A red vertical line corresponding to the current date may appear on the figure.
@@ -277,11 +275,11 @@ setMethod(
 #'             completed simulation).
 #'
 #' @param type  Character string, either `"rgl"` for `igraph::rglplot`
-#' or `"tk"` for `igraph::tkplot`, `"Plot"` to use quickPlot::Plot
-#' or `"plot"` to use base::plot, the default.
+#' or `"tk"` for `igraph::tkplot`, `"Plot"` to use `quickPlot::Plot()`
+#' or `"plot"` to use `base::plot()`, the default.
 #'
 #' @param showParents Logical. If TRUE, then any children that are grouped into parent
-#'                    modules will be grouped together by colored blobs. Internally,
+#'                    modules will be grouped together by coloured blobs. Internally,
 #'                    this is calling [moduleGraph()]. Default `FALSE`.
 #'
 #'
@@ -483,8 +481,8 @@ setMethod(
 #' Build a module dependency graph
 #'
 #' This is still experimental, but this will show the hierarchical structure of
-#' parent and children modules and return a list with an igraph object
-#' and an igraph communities object, showing the groups.
+#' parent and children modules and return a list with an `igraph` object
+#' and an `igraph` communities object, showing the groups.
 #' Currently only tested with relatively simple structures.
 #'
 #' @inheritParams depsEdgeList
@@ -498,7 +496,7 @@ setMethod(
 #' @importFrom data.table rbindlist
 #' @include simList-class.R
 #' @rdname moduleGraph
-#' @seealso moduleDiagram
+#' @seealso [moduleDiagram()]
 #'
 # `igraph` is being imported in spades-package.R
 setGeneric("moduleGraph", function(sim, plot, ...) {

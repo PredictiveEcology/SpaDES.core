@@ -23,7 +23,7 @@ openModules(name, path)
 }
 \arguments{
 \item{name}{Character vector with names of modules to open. If missing, then
-all modules will be opened within the basedir.}
+all modules will be opened within the base directory.}
 
 \item{path}{Character string of length 1. The base directory within which
 there are only module subdirectories.}

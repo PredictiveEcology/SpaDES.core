@@ -164,7 +164,7 @@ elapsedTime(s2, units = "mins")
 \code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.5 on Simulation times;
 \code{\link[=elapsedTime]{elapsedTime()}},
 
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -181,4 +181,4 @@ Other functions to access elements of a 'simList' object:
 \author{
 Alex Chubaty and Eliot McIntire
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

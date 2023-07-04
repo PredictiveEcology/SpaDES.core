@@ -115,12 +115,12 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.8 on simList environment.
+#' @seealso [SpaDES.core-package()], specifically the section 1.2.8 on `simList` environment.
 #'
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
 #' @export
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @include simList-class.R
 #' @rdname simList-accessors-envir
 #'
@@ -166,14 +166,13 @@ setReplaceMethod("envir",
 #' `objs<-` requires takes a named list of values to be assigned in
 #' the simulation environment.
 #'
-#' @param sim      A `simList` object from which to extract element(s) or
-#'                 in which to replace element(s).
+#' @param sim A `simList` object from which to extract element(s) or in which to replace element(s).
 #' @param value objects to assign to the `simList`
 #' @param ... passed to `ls`
 #'
 #' @return Returns or sets a list of objects in the `simList` environment.
 #'
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
@@ -234,8 +233,7 @@ setReplaceMethod(
 ################################################################################
 #' Simulation modules and dependencies
 #'
-#' Accessor functions for the `depends` and `modules` slots in a
-#' `simList` object.
+#' Accessor functions for the `depends` and `modules` slots in a `simList` object.
 #' These are included for advanced users.
 #' \tabular{ll}{
 #'    [depends()] \tab List of simulation module dependencies. (advanced) \cr
@@ -253,7 +251,7 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @seealso [SpaDES.core-package()], specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @aliases simList-accessors-modules
@@ -416,15 +414,15 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @note The differences between P, params and being explicit with passing arguments
+#' @note The differences between `P()`, `params()` and being explicit with passing arguments
 #' are mostly a question of speed and code compactness.
-#' The computationally fastest way to get a parameter is to specify moduleName and parameter name, as in:
-#' `P(sim, "paramName", "moduleName")` (replacing moduleName and paramName with your
-#' specific module and parameter names), but it is more verbose than P(sim)$paramName. Note: the important
-#' part for speed (e.g., 2-4x faster) is specifying the moduleName.
+#' The computationally fastest way to get a parameter is to specify `moduleName` and parameter name,
+#' as in: `P(sim, "paramName", "moduleName")` (replacing `moduleName` and `paramName` with your
+#' specific module and parameter names), but it is more verbose than `P(sim)$paramName`.
+#' Note: the important part for speed (e.g., 2-4x faster) is specifying the `moduleName`.
 #' Specifying the parameter name is <5% faster.
 #'
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @aliases parameters
@@ -467,7 +465,7 @@ setReplaceMethod("params",
 #' a namespaced function in the sense that the module from which it is called is the
 #' default place it will look for the parameter. To access a parameter from within
 #' a module, you can use `P(sim)$paramName` instead of `params(sim)$moduleName$paramName`.
-#' You can also use `Par`, which is an Active Binding to P(sim)
+#' You can also use `Par`, which is an Active Binding to `P(sim)`.
 #'
 #' @aliases simList-accessors-params
 #' @export
@@ -626,7 +624,7 @@ P.simList <- function(sim, param, module) {
 #'
 #' @inheritParams params
 #'
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
@@ -775,7 +773,7 @@ setMethod("parameters",
 #' @export
 #' @include simList-class.R
 #' @rdname checkpoint
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #'
 setGeneric("checkpointFile", function(sim) {
   standardGeneric("checkpointFile")
@@ -865,7 +863,7 @@ setReplaceMethod("checkpointInterval",
 #'         for `progressInterval<-`, an updated `simList` object.
 #'
 #' @export
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @include simList-class.R
 #' @rdname progress
 #'
@@ -1038,10 +1036,10 @@ setReplaceMethod("progressType",
 #' object dependencies, including such things as downloading default datasets, e.g.,
 #' `downloadData('LCC2005', modulePath(sim))`.
 #' Nothing should be created here that does not create an named object in `inputObjects`.
-#' Any other initiation procedures should be put in the "init" eventType of the doEvent function.
-#' Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
-#' selectively skip unnecessary steps because the user has provided those inputObjects in the
-#' simInit call. e.g., the following code would look to see if the user had passed `defaultColor`
+#' Any other initiation procedures should be put in the "init" `eventType` of the `doEvent` function.
+#' Note: the module developer can use `sim$.userSuppliedObjNames` inside the function to
+#' selectively skip unnecessary steps because the user has provided those `inputObjects` in the
+#' `simInit` call. e.g., the following code would look to see if the user had passed `defaultColor`
 #' into during `simInit`. If the user had done this, then this function would not override
 #' that value with 'red'. If the user has not passed in a value for `defaultColor`, then
 #' the module will get it here:
@@ -1057,7 +1055,7 @@ setReplaceMethod("progressType",
 #' @return Returns or sets the value(s) of the `input` or `output` slots
 #' in the `simList` object.
 #'
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @seealso [SpaDES.core-package()], specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
@@ -1426,7 +1424,7 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
 #' @rdname simList-accessors-outputs
 #' @param sim A `simList`. If missing, then the function will search in the call
 #'    stack, so it will find it if it is in a `SpaDES` module.
-#' @param filename The filename to register in the outputs(sim) `data.frame`. If
+#' @param filename The filename to register in the `outputs(sim)` data.frame. If
 #'    missing, an attempt will be made to search for either a `file` or `filename`
 #'    argument in the call itself. This means that this function can be used with
 #'    the pipe, as long as the returned return from the upstream pipe function is
@@ -1610,7 +1608,7 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @seealso [SpaDES.core-package()], specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
@@ -1844,7 +1842,7 @@ setMethod("logPath",
 
 #' @inheritParams paths
 #' @param module The optional character string of the module(s) whose
-#'               paths are desired. If omitted, will return all modulePaths,
+#'               paths are desired. If omitted, will return all module paths,
 #'               if more than one exist.
 #' @include simList-class.R
 #' @export
@@ -2090,7 +2088,7 @@ setMethod("dataPath",
 #' @aliases simList-accessors-times
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @include simList-class.R
 #' @include times.R
 #' @rdname simList-accessors-times
@@ -2488,7 +2486,7 @@ setMethod(
 #'
 #' @aliases simList-accessors-events
 #' @export
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @importFrom data.table := copy data.table
 #' @importFrom stats setNames
 #' @include simList-class.R
@@ -2692,7 +2690,7 @@ setReplaceMethod("current",
 
 ################################################################################
 #' @inheritParams events
-#' @param times Logical. Should this function report the clockTime
+#' @param times Logical. Should this function report the `clockTime`.
 #'
 #' @aliases simList-accessors-events
 #' @export
@@ -2796,7 +2794,7 @@ setReplaceMethod(
 #' @return A `simList` object.
 #'
 #' @include simList-class.R
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @keywords internal
 #' @rdname addDepends
 #'
@@ -2840,18 +2838,16 @@ setMethod(
 #'
 #' @param sim  A `simList` object.
 #'
-#' @param modules Character vector, specifying the name or
-#'             vector of names of module(s)
-#' @param paths Character vector, specifying the name or
-#'             vector of names of paths(s) for those modules. If path not specified,
-#'             it will be taken from getOption("spades.modulePath"), which is set
-#'             with `setPaths`)
+#' @param modules Character vector, specifying the name or vector of names of module(s)
+#' @param paths Character vector, specifying the name or vector of names of paths(s) for
+#'              those modules. If path not specified, it will be taken from
+#'              `getOption("spades.modulePath")`, which is set with `setPaths()`)
 #' @param filenames Character vector specifying filenames of modules (i.e.
 #'                 combined path & module. If this is specified, then `modules` and
 #'                 `path` are ignored.
 #' @param clean Optional logical. If `TRUE`, it will scrub any references to
-#'              github repositories, e.g., "PredictiveEcology/reproducible" will be
-#'              returned as "reproducible"
+#'              GitHub repositories, e.g., "PredictiveEcology/reproducible" will be
+#'              returned as "reproducible".
 #'
 #' @inheritParams .parseModulePartial
 #'
@@ -2861,7 +2857,7 @@ setMethod(
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @include simList-class.R
-#' @family functions to access elements of a 'simList' object
+#' @family functions to access elements of a `simList` object
 #' @rdname packages
 #'
 # igraph exports %>% from magrittr
@@ -3364,8 +3360,8 @@ moduleObjects <- function(sim, module, path) {
 #' @rdname objects
 #' @param objects A character vector of length >= 1 with name(s) of objects to look
 #'   for in the metadata. This is used in a `grep`, meaning it will do partial
-#'   matching (e.g., "studyArea" will find "studyArea" and "studyAreaLarge"). User can
-#'   use `regexp`.
+#'   matching (e.g., `"studyArea"` will find `"studyArea"` and `"studyAreaLarge"`).
+#'   User can use regular expressions.
 #' @return
 #' `findObjects` returns a data.table similar to `moduleObjects`, but with only the
 #' objects provided by `objects`.

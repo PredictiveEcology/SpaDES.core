@@ -2,10 +2,10 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 
 #' Initialize a new simulation
 #'
-#' Create a new simulation object, the "sim" object. This object is implemented
-#' using an `environment` where all objects and functions are placed.
+#' Create a new simulation object, the `sim` object (a `simList`).
+#' This object is implemented using an `environment` where all objects and functions are placed.
 #' Since environments in `R` are pass by reference, "putting" objects in
-#' the sim object does no actual copy.
+#' the `sim` object does no actual copy.
 #' The `simList` also stores all parameters, and other important simulation
 #' information, such as times, paths, modules, and module load order.
 #' See more details below.
@@ -999,12 +999,10 @@ setMethod(
 
 #' Call `simInit` and `spades` together
 #'
-#' These functions are convenience wrappers that may allow for
-#' more efficient Caching.
-#' Passes all arguments to `simInit`, then passes the created `simList`
-#' to `spades`.
+#' These functions are convenience wrappers that may allow for more efficient caching.
+#' Passes all arguments to `simInit()`, then passes the created `simList` to `spades()`.
 #'
-#' @param ... Arguments passed to simInit and spades
+#' @param ... Arguments passed to `simInit()` and `spades()`
 #'
 #' @return Same as [spades()] (a `simList`) or
 #'
@@ -1015,8 +1013,7 @@ setMethod(
 #' @inheritParams simInit
 #' @inheritParams spades
 #'
-#' @aliases simInitAndSpades
-#' @rdname simInitAnd
+#' @rdname simInitAndSpades
 simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
                              notOlderThan, debug, progress, cache, .plots,
                              .plotInitialTime, .saveInitialTime, events, ...) {
@@ -1044,17 +1041,20 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   sim <- do.call(spades, objsSpades)
 }
 
-#' Identify Child Modules from a recursive list
+#' Identify child modules from a recursive list
 #'
 #' There can be parents, grandparents, etc
 #'
-#' @rdname identifyChildModules
-#' @param sim simList
+#' @param sim a `simList` object
+#'
 #' @param modules List of module names
+#'
+#' @return list of `modules` will flat named list of all module names (children, parents etc.) and
+#'         `childModules` a non-flat named list of only the `childModule` names.
+#'
 #' @importFrom reproducible basename2
 #' @keywords internal
-#' @return list of `modules` will flat named list of all module names (children, parents etc.) and
-#'         `childModules` a non flat named list of only the childModule names.
+#' @rdname identifyChildModules
 .identifyChildModules <- function(sim, modules) {
   modulesToSearch <- modules
   if (any(duplicated(modules))) {
@@ -1062,9 +1062,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   }
   if (length(modules) > 0) {
     modulesToSearch3 <- lapply(.parseModulePartial(sim, modulesToSearch,
-                                                  defineModuleElement = "childModules",
-                                                  envir = sim@.xData[[".parsedFiles"]]),
-                              as.list)
+                                                   defineModuleElement = "childModules",
+                                                   envir = sim@.xData[[".parsedFiles"]]),
+                               as.list)
     if (length(modulesToSearch3) > 0) {
       isParent <- unlist(lapply(modulesToSearch3, function(x) length(x) > 0))
 

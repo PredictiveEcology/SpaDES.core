@@ -19,11 +19,10 @@ if (!isGeneric("Copy")) {
 #'
 #' @inheritParams reproducible::Copy
 #'
-#' @param objects  Whether the objects contained within the simList environment
+#' @param objects  Whether the objects contained within the `simList` environment
 #'                 should be copied. Default `TRUE`, which may be slow.
-#' @param queues Logical. Should the events queues (`events`,
-#'               `current`, `completed`) be deep copied via
-#'               `data.table::copy`
+#' @param queues Logical. Should the events queues (`events`, `current`, `completed`)
+#'               be deep copied via `data.table::copy()`
 #'
 #' @return a copy of `object`
 #'

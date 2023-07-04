@@ -40,13 +40,12 @@
 \item{filename}{The filename of the module to be parsed.}
 
 \item{defineModuleElement}{Character string indicating which of the list
-elements in defineModule should be extracted}
+elements in \code{defineModule} should be extracted}
 
 \item{envir}{Optional environment in which to store parsed code. This may be
 useful if the same file is being parsed multiple times. This
-function will check in that envir for the parsed file before
-parsing again. If the \code{envir} is transient, then this will
-have no effect.}
+function will check in that environment for the parsed file before
+parsing again. If the \code{envir} is transient, then this will have no effect.}
 
 \item{userSuppliedObjNames}{Character string (or \code{NULL}, the default)
 indicating the names of objects that user has passed
@@ -54,7 +53,7 @@ into \code{simInit} via objects or inputs.
 If all module \code{inputObject} dependencies are provided by user,
 then the \code{.inputObjects} code will be skipped.}
 
-\item{notOlderThan}{Passed to \code{Cache} that may be used for .inputObjects function call.}
+\item{notOlderThan}{Passed to \code{Cache} that may be used for \code{.inputObjects} function call.}
 
 \item{...}{All \code{simInit} parameters.}
 }

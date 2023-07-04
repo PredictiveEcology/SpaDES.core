@@ -16,7 +16,7 @@
 #' @param eventType      A character string specifying the type of event: one of
 #'                       either `"init"`, `"load"`, or `"save"`.
 #'
-#' @param debug         Optional logical flag determines whether sim debug info
+#' @param debug         Optional logical flag determines whether `sim` debug info
 #'                      will be printed (default `debug = FALSE`).
 #'
 #' @return Returns the modified `simList` object.

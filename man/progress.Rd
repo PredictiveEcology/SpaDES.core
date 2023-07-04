@@ -28,8 +28,7 @@ progressType(sim) <- value
 \S4method{progressType}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
@@ -81,7 +80,7 @@ options(opts) # reset
 }}
 }
 \seealso{
-Other functions to access elements of a 'simList' object: 
+Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -95,4 +94,4 @@ Other functions to access elements of a 'simList' object:
 \code{\link{paths}()},
 \code{\link{times}()}
 }
-\concept{functions to access elements of a 'simList' object}
+\concept{functions to access elements of a \code{simList} object}

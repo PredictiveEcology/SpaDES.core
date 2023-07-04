@@ -72,7 +72,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * Fixed caching of `.inputObjects` to correctly capture objects that were assigned to `mod$xxx`.
 * Fixed caching of `simList` objects where changes to functions appeared to be undetected, and so a Cache call would return a stale module with function code from the Cached `simList`, which was incorrect.
 * fix recovery mode bug: use scratch directory specified by the user via `options(spades.scratchPath)` (see above).
-* `objSize` could have infinite recursion problem if there are simLists inside simLists. Fixed with new `reproducible::objSize`, which uses `lobstr::obj_size`.
+* `objSize` could have infinite recursion problem if there are `simList` objects inside `simList` objects. Fixed with new `reproducible::objSize`, which uses `lobstr::obj_size`.
 * several minor fixes, including in `Plots`
 * fixes to `saveFiles` related to `data.table` assignment and use in `outputs(sim)`
 * fix to `paramCheckOtherMods` to deal with `call` parameters
@@ -85,7 +85,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
   The simplest way to convert a module to a package is using the new function `convertToPackage`.
   Benefits of doing this are so that a SpaDES module can benefit from the infrastructure of an R package (e.g., `devtools::document`, `devtools::check`, setting up Continuous Integration systems etc.).
   Any documentation written using `#'` i.e., `roxygen2` will be copied immediately above the function where it was sitting. 
-* `newModule` now correctly places the `SpaDES.core` package dependency in the `reqdPkgs` element of the metadata, instead of `# SpaDES.core`. It will put the full Github reference if SpaDES.core was installed directly from GitHub.
+* `newModule` now correctly places the `SpaDES.core` package dependency in the `reqdPkgs` element of the metadata, instead of `# SpaDES.core`. It will put the full GitHub reference if SpaDES.core was installed directly from GitHub.
 * There is a bug in `qs` package: either `qsave` or `qread` converts `data.table` objects to `list` objects. `loadSimList` has a work around internally to convert these objects back to `data.table`, if the metadata indicate that the objects should be `data.table` objects.
 * new function: `paramCheckOtherMods`.
   Can be used within a module to assert that a parameter has the same value as the same parameter in other modules.
@@ -308,7 +308,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * new function and capacity: `restartR`.
   Restarts R mid-stream to deal with apparent memory leaks in R.
   In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <https://github.com/r-lib/fastmap>).
-  This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation.
+  This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the `simList`, restarting R, resets the memory consumption back to levels near the start of a simulation.
   The new functionality allows a user who is hitting this memory leak issue to restart R as a work around.
   See `?restartR` for instructions.
 * new function `newProject` to initialize a SpaDES project with subdirectories `cache/`, `inputs/`, `modules/`, and `outputs/`, and `setPaths()` accordingly.
@@ -367,7 +367,9 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 ## package dependencies
 
 * `archivist` and `devtools` added to Suggests because they are used in vignettes
-* minimium `reproducible` # SpaDES.core 0.2.6
+* minimum `reproducible`
+
+# SpaDES.core 0.2.6
 
 ## Enhancements
 
@@ -377,7 +379,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
     - functions placed in the `envir(sim)` (unusual, but may occur) won't find objects in the `.GlobalEnv`;
     - lighter memory footprint, as functions take RAM due to the objects in the `parent.env` in which they are defined (little know fact identified here: http://adv-r.had.co.nz/memory.html#gc identified as a possible source of memory leaks).
 
-* module's function environment in the simList now has its parent `asNamespace("SpaDES.core")` instead of the `envir(sim)` (as mentioned above), i.e,. `parent.env(sim[[currentModule(sim)]])` is `asNamespace("SpaDES.core")`. The main user-noticeable changes of this are that module functions will not accidentally find objects in the `simList` unless they are actually passed in explicitly as arguments.
+* module's function environment in the `simList` now has its parent `asNamespace("SpaDES.core")` instead of the `envir(sim)` (as mentioned above), i.e,. `parent.env(sim[[currentModule(sim)]])` is `asNamespace("SpaDES.core")`. The main user-noticeable changes of this are that module functions will not accidentally find objects in the `simList` unless they are actually passed in explicitly as arguments.
 * New active binding, `mod` that works as a module-specific variable, similar to a private object, *i.e.*, `mod$a` is a local object inside the module that persists across events. It is a pointer to `sim[[currentModule(sim)]]$a`
 * New function `scheduleConditionalEvent`, which allows an event to be scheduled based on a condition. Still experimental.
 * An experimental new function and feature, `objectSynonyms`, which will create active bindings of two names to a single object
@@ -387,7 +389,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * under-the-hood speed improvements for the DES (about 20% faster) -- 38 microseconds per event under ideal conditions
 * improved default path settings in `.inputObjects` (#83)
 * following `reproducible` package updates, now uses `data.table::setattr` internally to avoid copying of
-objects (this may have very little/no effect on simList objects)
+objects (this may have very little/no effect on `simList` objects)
 * `suppliedElsewhere` has a new argument, `returnWhere`, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.
 
 ## Bug Fixes
@@ -407,7 +409,7 @@ objects (this may have very little/no effect on simList objects)
 * `simList` internals changed. It now inherits from `environment`. Amongst other things, this means that tab autocomplete in RStudio now works for objects in the `simList`. Also, we removed several associated methods, `$`, `[[`, `ls`, `ls.str`, `objects`, as the defaults for environments work correctly with the `simList` now
 * `debug` arg in `spades` call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event
 * new function `elapsedTime` which gives a summary of the clock time used by each module or event
-* most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.
+* most metadata entries now have accessor of same name, e.g., `inputObjects(sim)` returns the `inputObjects` data.frame.
 * new function `citation` replaces `utils::citation` with an S4 generic. If `package` arg is a `character`, it dispatches `utils::citation`; if a `simList`, it gives the citation for the module(s)
 * improved messaging when GLPK not installed (*e.g.*, on macOS)
 * `downloadModule()` now prints the module # SpaDES.core downloaded (#77)
@@ -417,7 +419,7 @@ objects (this may have very little/no effect on simList objects)
 
 * resolved `.inputObjects()` name conflict (internal `.inputObjects` renamed to `._inputObjectsDF`; `.outputObjects` renamed to `._outputObjectsDF`)
 * module `.inputObjects` evaluated based on module load order (#72)
-* `.robustDigest` fix for simLists -- needed to omit `._startClockTime` and `.timestamp`
+* `.robustDigest` fix for `simList` objects -- needed to omit `._startClockTime` and `.timestamp`
 
 # SpaDES.core 0.2.2
 
@@ -474,7 +476,7 @@ objects (this may have very little/no effect on simList objects)
 * option `spades.debug` set to `TRUE` by default, instead of `FALSE`. This is better for new users.
 * `moduleMetadata` argument order changed, so `sim` is first, more consistent with all other `simList` accessors.
 * `downloadData` has changed dramatically, now it is a wrapper around `reproducible::prepInputs` which does more checking.
-* `extractURL` will extract the sourceURL from metadata, given an object name.
+* `extractURL` will extract the `sourceURL` from metadata, given an object name.
 * `makeMemoiseable` and `unmakeMemoisable`, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of `simList`.
 * new option, `spades.keepCompleted`, `TRUE` by default, which can be useful for dramatically speeding up the DES when there are many (>10,000) events.
 
@@ -511,7 +513,7 @@ objects (this may have very little/no effect on simList objects)
 
 * speed improvements:
 
-    - the core DES is now built around lists, rather than `data.table` objects. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
+    - the core DES is now built around lists, rather than `data.table` objects. For small objects (e.g., the event queue) that have fewer than 200 objects, lists are faster. Accessors (e.g., `events(sim)`, `completed(sim)`) of the event queues still show `data.table` objects, but these are made on the fly.
     - `.parseModule` and `.parseModuePartial` now put their parsed content into a temporary environment (`sim@.envir$.parsedFiles$<Full Filename>)` during the `simInit`, which gets re-used. Previously, files were parsed multiple times in a given `simInit` call. Several functions now have `envir` argument to pass this through (including `module# SpaDES.core`, `packages`, `checkParams`)
 
 * parsing of modules is now more intelligent, allowing for modules to contain functions (the current norm) and but they can also create objects at the module level. These can use the `sim` object in their definition. These objects can, for example, be used to help define parameters, for example, e.g., `startSimPlus1 <- start(sim) + 1` can be defined in the module and used in `defineModule`
@@ -525,9 +527,9 @@ objects (this may have very little/no effect on simList objects)
 * bug fixes:
 
     - in `zipModule` that omitted the checksum file from being included when `data = FALSE` (#3)
-    - caching of `.inputObjects` functions was evaluating outputObjects instead of inputObjects. Now corrected.
+    - caching of `.inputObjects` functions was evaluating `outputObjects` instead of `inputObjects`. Now corrected.
 
-* If `.inputObjects` contains arguments other than just sim, these will be evaluated as function inputs by the Cache mechanism (via .useCache), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in `asPath`, then any change to the underlying file will cause a re-cache.  e.g., `.inputObjects <- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }`
+* If `.inputObjects` contains arguments other than just `sim`, these will be evaluated as function inputs by the Cache mechanism (via `.useCache`), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in `asPath`, then any change to the underlying file will cause a re-cache.  e.g., `.inputObjects <- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }`
 * default `debug` option in `spades()` now uses the package option `spades.debug` and default is set to `FALSE` (#5)
 * various other speed improvements and bug fixes
 * convert `P` to a function, rather than S4 generic and method, for speed.
@@ -535,7 +537,7 @@ objects (this may have very little/no effect on simList objects)
 * new function `remoteFileSize` to check the size of remote files
 * new namespaced function `dataPath` will return `file.path(modulePath(sim), currentModule(sim), "data")`, which will return a different path, depending on which module it is placed inside.
 * add crayon to imports -- now messages are more colour coded
-* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object
+* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same `simList` object
 
 
 # SpaDES.core 0.1.0
