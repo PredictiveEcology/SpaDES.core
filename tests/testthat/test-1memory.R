@@ -26,7 +26,7 @@ test_that("testing memoryUse", {
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
   #set.seed(1234)
   mySim2 <- simInit(times = times, params = params,
                     modules = modules, objects = list(), paths = paths)
@@ -43,8 +43,6 @@ test_that("testing memoryUse", {
     suppressWarnings({
       memUse <- memoryUse(mySim3, max = FALSE)
     })
-    if (length(unique(memUse$maxMemory)) == 1)
-      browser()
     expect_true(length(unique(memUse$maxMemory)) > 1) # i.e., the join had to result in multiple values
   }
 })

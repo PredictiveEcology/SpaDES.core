@@ -6,7 +6,7 @@ test_that("paths file does not work correctly", {
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
 
   # test for mixture of named and unnamed
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"), tmpdir)
+  paths <- list(modulePath = getSampleModules(tmpdir), tmpdir)
   mySim <- simInit(times, params, modules, objects = list(), paths)
   expect_equal(lapply(paths(mySim), normPath),
                lapply(list(
@@ -21,7 +21,7 @@ test_that("paths file does not work correctly", {
               )
 
   # test for non consecutive order, but named
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+  paths <- list(modulePath = getSampleModules(tmpdir),
                 outputPath = tmpdir)
   mySim <- simInit(times, params, modules, objects = list(), paths)
   expect_equal(lapply(paths(mySim), normPath),
@@ -37,7 +37,7 @@ test_that("paths file does not work correctly", {
   # test for all unnamed
   paths <- list(tmpdir,
                 tmpdir,
-                system.file("sampleModules", package = "SpaDES.core"),
+                getSampleModules(tmpdir),
                 tmpdir,
                 tmpdir,
                 tmpdir,
@@ -56,7 +56,7 @@ test_that("paths file does not work correctly", {
   # test for all named, non consecutive, using accessors
   paths <- list(
     cachePath = tmpdir,
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modulePath = getSampleModules(tmpdir),
     outputPath = tmpdir,
     inputPath = tmpdir,
     rasterPath = file.path(tmpdir, "raster"), ## subdir of scratchPath

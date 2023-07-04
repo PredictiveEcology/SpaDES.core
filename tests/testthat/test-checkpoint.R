@@ -15,7 +15,7 @@ test_that("test checkpointing", {
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modulePath = getSampleModules(tmpdir),
     outputPath = tmpdir
   )
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
@@ -61,7 +61,7 @@ test_that("test checkpointing with disk-backed raster", {
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modulePath = getSampleModules(tmpdir),
     outputPath = tmpdir
   )
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)

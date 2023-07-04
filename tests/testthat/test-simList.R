@@ -7,7 +7,7 @@ test_that("simList object initializes correctly (1)", {
     .globals = list(burnStats = "npixelsburned", stackName = "landscape")
   )
   modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
 
@@ -172,7 +172,7 @@ test_that("simList object initializes correctly (1)", {
   expect_equal(sort(packages(mySim, clean = TRUE)), sort(pkgs))
 
   reqdPkgs <- lapply(modules, function(m) {
-    mfile <- file.path(system.file("sampleModules", package = "SpaDES.core"), m, paste0(m, ".R"))
+    mfile <- file.path(getSampleModules(tmpdir), m, paste0(m, ".R"))
     packages(filename = mfile)
   }) %>%
     unlist() %>%
@@ -182,7 +182,7 @@ test_that("simList object initializes correctly (1)", {
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
   mdir <- getOption("spades.modulePath")
-  options(spades.modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  options(spades.modulePath = getSampleModules(tmpdir))
   on.exit(options(spades.modulePath = mdir), add = TRUE)
   reqdPkgs <- lapply(modules, function(m) packages(module = m)) %>%
     unlist() %>%
@@ -230,10 +230,10 @@ test_that("simList test all signatures", {
   # modules
   modules <- list("randomLandscapes")#, "caribouMovement", "fireSpread")
   curPathIsPkgPath <- (identical(
-    normPath(system.file("sampleModules", package = "SpaDES.core")),
+    normPath(getSampleModules(tmpdir)),
     normPath(getwd())))
   if (!curPathIsPkgPath) { # on a R CMD check, these paths are same, so don't copy
-    modPaths <- dir(system.file("sampleModules", package = "SpaDES.core"),
+    modPaths <- dir(getSampleModules(tmpdir),
                     recursive = TRUE, full.names = TRUE)
     modPaths <- grep(paste(modules, collapse = "|"), modPaths, value = TRUE)
     file.copy(dirname(modPaths), recursive = TRUE, to = ".")
@@ -242,9 +242,9 @@ test_that("simList test all signatures", {
   }
 
   # paths
-  mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- getMapPath(tmpdir)
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modulePath = getSampleModules(tmpdir),
     inputPath = mapPath,
     outputPath = tempdir()
   )
@@ -386,7 +386,7 @@ test_that("inputObjects on module arg not sim", {
     .globals = list(burnStats = "npixelsburned", stackName = "landscape")
   )
   modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
   io <- inputObjects(module = modules, path = paths$modulePath)
   oo <- outputObjects(module = modules, path = paths$modulePath)
   sim1 <- simInit(modules = modules, paths = paths)

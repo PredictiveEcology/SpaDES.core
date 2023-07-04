@@ -13,7 +13,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   )
   modules <- list("randomLandscapes", #"caribouMovement",
                   "fireSpread")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
 
   set.seed(123)
   mySim <- simInit(times, params, modules, objects = list(), paths) %>%
@@ -189,7 +189,7 @@ test_that("spades calls - diff't signatures", {
     randomLandscapes = list(nx = 20, ny = 20)
   )
   modules <- list("randomLandscapes", "fireSpread")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
 
   for (i in 1:2) {
     a <- simInit(times, params, modules, paths = paths)
@@ -239,7 +239,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE)
   )
   modules <- list("randomLandscapes", "randomLandscapes", "caribouMovement")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
 
   expect_true(any(grepl(capture_messages({
     mySim <- simInit(times, params, modules, objects = list(), paths)
@@ -638,7 +638,7 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
   # Test moduleMetadata without `sim` and where there is a `sim` in the module metadata,
   #   so needs to load it. A non-error is good enough for now.
   md1 <- moduleMetadata(module = m, path = tmpdir) # no sim in metadata
-  md2 <- moduleMetadata(path = system.file("sampleModules", package = "SpaDES.core"),
+  md2 <- moduleMetadata(path = getSampleModules(tmpdir),
                         module = "randomLandscapes")
 
 
@@ -930,7 +930,7 @@ test_that("simInitAndSpades", {
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
   set.seed(123)
   mySim <- simInitAndSpades(times = times, params = params,
                             modules = modules, objects = list(), paths = paths, debug = FALSE)
@@ -971,7 +971,7 @@ test_that("debug using logging", {
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
   )
   modules <- list("randomLandscapes")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
 
   set.seed(123)
   mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
