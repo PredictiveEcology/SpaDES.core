@@ -59,7 +59,7 @@ a2 <- 2
 args <- lapply(1:2, function(x) {
                list(x = paste0("a", x),
                     envir = environment()) # may be necessary to specify in which envir a1, a2
-                                           # are located, if not in an interactive sessino
+                                           # are located, if not in an interactive session
                })
 inputs <- data.frame(objectName = "a", loadTime = 1:2, fun = "base::get", arguments = I(args))
 a <- simInit(inputs = inputs, times = list(start = 0, end = 1))
